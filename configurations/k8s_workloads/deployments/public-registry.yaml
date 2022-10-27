@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: public-registry
+  labels:
+    app: public-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: public-registry
+  template:
+    metadata:
+      labels:
+        app: public-registry
+    spec:
+      containers:
+        - image: quay.io/armosec/image-registry-test:kinglior
+          name: public-registry
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+

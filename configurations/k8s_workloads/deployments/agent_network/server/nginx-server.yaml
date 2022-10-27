@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-server
+spec:
+  selector:
+    matchLabels:
+      app: nginx-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-server
+    spec:
+      initContainers:
+      - name: init-files
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: [" wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1b.txt -P /www/data; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1kb.txt -P /www/data; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1mb.txt -P /www/data; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-10mb.txt -P /www/data; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-100mb.txt -P /www/data "]
+        volumeMounts:
+        - mountPath: /www/data
+          name: files-volume
+      containers:
+      - name: nginx-server
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /etc/nginx # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: nginx-server-conf
+        - mountPath: /www/data
+          name: files-volume
+      volumes:
+      - name: nginx-server-conf
+        configMap:
+          name: nginx-server-conf # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: files-volume # place file for download on /www/data
+        emptyDir: {}

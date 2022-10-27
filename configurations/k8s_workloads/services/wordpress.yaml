@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: worspress
+spec:
+  selector:
+    app: worspress
+  ports:
+    - protocol: TCP
+      targetPort: 80
+      port: 80

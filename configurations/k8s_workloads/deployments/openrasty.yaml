@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openrasty
+  labels:
+    app: openrasty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openrasty
+  template:
+    metadata:
+      labels:
+        app: openrasty
+    spec:
+      containers:
+        - name: openrasty
+          image: dreg.armo.cloud:443/systemtest/openrasty:v2
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: caregcred

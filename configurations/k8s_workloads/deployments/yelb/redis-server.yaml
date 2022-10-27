@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  name: redis-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-server
+  template:
+    metadata:
+      labels:
+        app: redis-server
+        tier: cacheacme
+    spec:
+      containers:
+      - image: redis:4.0.2
+        imagePullPolicy: Always
+        name: redis-server
+        ports:
+        - containerPort: 6379
+          protocol: TCP

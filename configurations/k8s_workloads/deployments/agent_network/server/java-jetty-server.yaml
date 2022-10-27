@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-jetty-server
+  labels:
+    app: java-jetty-server
+    tier: frontend
+spec:
+  selector: 
+    matchLabels:
+      app: java-jetty-server
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-jetty-server
+        tier: frontend
+    spec:
+      initContainers:
+      - name: init-files
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: [" wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1b.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1kb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1mb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-10mb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-100mb.txt -P /tmp/random_files "]
+        volumeMounts:
+        - mountPath: /tmp/random_files
+          name: files-volume
+      containers:
+        - name: java-jetty-server
+          image: dreg.armo.cloud:443/java-jetty-server
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: FILE_DIR
+              value: /tmp/random_files
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+          - mountPath: /tmp/random_files
+            name: files-volume
+      volumes:    
+      - name: files-volume # place file for download
+        emptyDir: {}     
+      imagePullSecrets:
+        - name: caregcred

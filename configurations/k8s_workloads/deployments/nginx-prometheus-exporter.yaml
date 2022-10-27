@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-prometheus-exporter
+  namespace: nginx-ingress
+spec:
+  ports:
+  - port: 9113
+    targetPort: 9113
+    protocol: TCP
+    name: stub-status
+  selector:
+    app: nginx-prometheus-exporter
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-prometheus-exporter
+  namespace: nginx-ingress
+  labels:
+    app: nginx-prometheus-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-prometheus-exporter
+  template:
+    metadata:
+      labels:
+        app: nginx-prometheus-exporter
+    spec:
+      containers:
+      - name: nginx-prometheus-exporter
+        image: nginx/nginx-prometheus-exporter:0.3.0
+        ports:
+        - containerPort: 9113
+          name: stub-status
+        args:
+        - -nginx.scrape-uri=http://nginx-ingress:8080/stub_status

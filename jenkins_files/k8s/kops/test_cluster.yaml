@@ -1,0 +1,141 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+spec:
+  api:
+    dns: {}
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://ca-test-k8s-cluster/systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  dnsZone: eudev1.cyberarmorsoft.com
+  etcdClusters:
+  - cpuRequest: 200m
+    etcdMembers:
+    - instanceGroup: master-eu-central-1a
+      name: a
+    memoryRequest: 100Mi
+    name: main
+  - cpuRequest: 100m
+    etcdMembers:
+    - instanceGroup: master-eu-central-1a
+      name: a
+    memoryRequest: 100Mi
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.17.6
+  masterPublicName: api.systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  networkCIDR: 172.20.0.0/16
+  networking:
+    kubenet: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - cidr: 172.20.32.0/19
+    name: eu-central-1a
+    type: Public
+    zone: eu-central-1a
+  topology:
+    dns:
+      type: Public
+    masters: public
+    nodes: public
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  name: master-eu-central-1a
+spec:
+  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  machineType: m5.large
+  maxPrice: "0.04"
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-eu-central-1a
+  role: Master
+  subnets:
+  - eu-central-1a
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  name: nodes-spot-ig1
+spec:
+  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  machineType: m5.large
+  maxPrice: "0.04"
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes-spot-ig1
+    on-demand: "false"
+    kubernetes.io/subgroup: "tester"
+  role: Node
+  subnets:
+  - eu-central-1a
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  name: nodes-spot-ig2
+spec:
+  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  machineType: m5.large
+  maxPrice: "0.04"
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes-spot-ig2
+    on-demand: "false"
+    kubernetes.io/subgroup: "proxy"
+  role: Node
+  subnets:
+  - eu-central-1a
+  
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: systests-kubernetes-cluster.eudev1.cyberarmorsoft.com
+  name: nodes-spot-ig3
+spec:
+  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  machineType: m5.large
+  maxPrice: "0.04"
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes-spot-ig3
+    on-demand: "false"
+    kubernetes.io/subgroup: "server"
+  role: Node
+  subnets:
+  - eu-central-1a

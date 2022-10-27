@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-conf
+data:
+  traefik.yml: |
+    http:
+      services:
+        server-uut:
+          loadBalancer:
+            servers:
+            - url: http://server-uut:8080/
+            passHostHeader: true
+      routers:
+        my-router:
+          entryPoints:
+          - web
+          rule: "PathPrefix(`/`)"
+          service: server-uut
+    ## Static configuration
+    providers:      
+      file:
+        filename: /etc/traefik/traefik.yml
+    entryPoints:
+      web:
+        address: ":8081"

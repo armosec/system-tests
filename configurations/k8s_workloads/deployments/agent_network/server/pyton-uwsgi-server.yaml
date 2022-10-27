@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-server
+spec:
+  selector:
+    matchLabels:
+      app: python-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: python-server
+    spec:
+      initContainers:
+      - name: init-files
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: [" wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1b.txt -P /app/files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1kb.txt -P /app/files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1mb.txt -P /app/files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-10mb.txt -P /app/files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-100mb.txt -P /app/files "]
+        volumeMounts:
+        - mountPath: /app/files
+          name: files-volume
+      containers:
+      - name: python-server
+        image: dreg.armo.cloud:443/python-uwsgi-server
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /app/files
+          name: files-volume
+      volumes:
+      - name: files-volume # place file for download on /app/files
+        emptyDir: {}
+      imagePullSecrets:
+        - name: caregcred

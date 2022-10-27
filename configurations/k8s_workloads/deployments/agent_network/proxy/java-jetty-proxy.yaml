@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-jetty-proxy
+  labels:
+    app: java-jetty-proxy
+    tier: frontend
+spec:
+  selector: 
+    matchLabels:
+      app: java-jetty-proxy
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-jetty-proxy
+        tier: frontend
+    spec:
+      containers:
+        - name: java-jetty-proxy
+          image: dreg.armo.cloud:443/java-jetty-proxy
+          imagePullPolicy: IfNotPresent
+          env: 
+            - name: SERVER_URI
+              value: "http://server-uut:8080"
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: caregcred

@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-proxy
+spec:
+  selector:
+    matchLabels:
+      app: apache-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache-proxy
+    spec:
+      containers:
+      - name: apache-proxy
+        image: httpd:2.4
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - mountPath: /usr/local/apache2/conf # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: apache-proxy-conf
+      volumes:
+      - name: apache-proxy-conf
+        configMap:
+          name: apache-proxy-conf # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: httpd.conf
+              path: httpd.conf

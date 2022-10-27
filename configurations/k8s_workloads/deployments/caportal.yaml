@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-portalbe-test-mode
+spec:
+  selector:
+    matchLabels:
+      app: ca-portalbe-test-mode
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ca-portalbe-test-mode
+    spec:
+      containers:
+      - name: ca-portalbe-test-mode
+        image: dreg.armo.cloud:443/portal-backend:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8081
+        env:
+        - name: TESTS_MODE
+          value: "true"
+      imagePullSecrets:
+        - name: caregcred

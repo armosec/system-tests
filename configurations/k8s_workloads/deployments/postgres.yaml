@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  labels:
+    app: postgress
+spec:
+  selector:
+    matchLabels:
+      app: postgress
+  template:
+    metadata:
+      labels:
+        app: postgress
+        tier: postgreSQL
+    spec:
+      containers:
+        - image: postgres:12.0
+          name: postgresql
+          env:
+            - name: POSTGRES_USER
+              value: "postgress"
+            - name: POSTGRES_DB
+              value: "postgresshq_production"
+            - name: POSTGRES_PASSWORD
+              value: "postgress"
+          ports:
+            - containerPort: 5432
+              name: postgresql

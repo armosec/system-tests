@@ -1,0 +1,24 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ca-jmeter-slave
+  labels:
+    app: jmeter-slave
+    chart: jmeter-0.1.0
+    release: ca-jmeter
+    heritage: Helm
+spec:
+  selector:
+    app: jmeter-slave
+    release: ca-jmeter
+  clusterIP: None
+  ports:
+  - name: server-port
+    protocol: TCP
+    port: 1099
+    targetPort: 1099
+  - name: rmi-local-port
+    protocol: TCP
+    port: 60001
+    targetPort: 60001

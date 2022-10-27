@@ -1,0 +1,25 @@
+{
+    "name": "systest-fw-",
+    "guid": "",
+    "description": "framework for system test for cluster ",
+    "controls": [
+        {
+            "controlID": "C-0016"
+        },
+        {
+            "controlID": "C-0013"
+        },
+        {
+            "controlID": "C-0053"
+        },
+        {
+            "controlID": "C-0049"
+        },
+        {
+            "controlID": "C-0057"
+        },
+        {
+            "controlID": "C-0005"
+        }
+    ]
+}

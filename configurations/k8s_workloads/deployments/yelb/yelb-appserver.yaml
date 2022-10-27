@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yelb-appserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yelb-appserver
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: yelb-appserver
+        tier: middletier
+    spec:
+      containers:
+      - image: mreferre/yelb-appserver:0.5
+        imagePullPolicy: IfNotPresent
+        name: yelb-appserver
+        ports:
+        - containerPort: 4567
+          protocol: TCP

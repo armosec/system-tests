@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-proxy
+spec:
+  selector:
+    matchLabels:
+      app: python-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: python-proxy
+    spec:
+      containers:
+      - name: python-proxy
+        image: dreg.armo.cloud:443/python-uwsgi-proxy
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+        - name: caregcred

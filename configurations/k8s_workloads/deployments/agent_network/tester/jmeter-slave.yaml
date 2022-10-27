@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-jmeter-slave
+  labels:
+    app: jmeter-slave
+    chart: jmeter-0.1.0
+    release: ca-jmeter
+    heritage: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmeter-slave
+      release: ca-jmeter
+  template:
+    metadata:
+      labels:
+        app: jmeter-slave
+        release: ca-jmeter
+    spec:
+      containers:
+      - name: jmeter-slave
+        image: "kaarol/jmeter-slave:latest"
+        imagePullPolicy: Always
+        env:
+        - name: SSL_DISABLED
+          value: "true"
+        livenessProbe:
+          tcpSocket:
+            port: 1099
+          initialDelaySeconds: 60
+          periodSeconds: 5
+        ports:
+        - containerPort: 1099
+          name: server-port
+          protocol: TCP
+        - containerPort: 60001
+          name: rmi-local-port
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 1099
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      restartPolicy: Always

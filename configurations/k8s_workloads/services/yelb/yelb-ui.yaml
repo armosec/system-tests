@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: yelb-ui
+    tier: frontend
+  name: yelb-ui
+spec:
+#  externalTrafficPolicy: Cluster
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: yelb-ui
+    tier: frontend
+  type: ClusterIP #NodePort

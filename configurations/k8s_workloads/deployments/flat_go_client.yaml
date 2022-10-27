@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goclient
+  labels:
+    app: goclientserver
+    tier: frontend
+spec:
+  selector: 
+    matchLabels:
+      app: goclientserver
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: goclientserver
+        tier: frontend
+    spec:
+      containers:
+        - name: goclient
+          image: dreg.armo.cloud:443/goscratchclient:v2
+          imagePullPolicy: Always
+          env: 
+            - name: CONNECTIONSTRING
+              value: "goserver:8081"
+            - name: TIMEOUT
+              value: "1"
+            - name: ECHO
+              value: "longmsg"
+            - name: RESTART
+              value: "10"
+      imagePullSecrets:
+        - name: caregcred
+        
+                
+  

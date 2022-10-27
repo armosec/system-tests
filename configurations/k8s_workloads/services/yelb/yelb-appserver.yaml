@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: yelb-appserver
+    tier: middletier
+  name: yelb-appserver
+spec:
+  ports:
+    - port: 4567
+      protocol: TCP
+      targetPort: 4567
+  selector:
+    app: yelb-appserver
+    tier: middletier
+  type: ClusterIP

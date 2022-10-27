@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demoservice-client1
+  labels:
+    app: demoservice-client1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demoservice-client1
+  template:
+    metadata:
+      labels:
+        app: demoservice-client1
+    spec:
+      containers:
+        - name: demoservice
+          image: quay.io/armosec/demoservice:v1-debian
+          ports:
+            - containerPort: 8090
+          env:
+            - name: SLEEP_DURATION
+              value: "0.03"
+            - name: DEMO_FOLDERS
+              value: "/app"
+            - name: NUMBER_OF_WORDS
+              value: "1000"
+            - name: DEMO_TARGETS
+              value: "http://demoservice-server1:8090"
+            - name: SERVER_PORT
+              value: "8090"

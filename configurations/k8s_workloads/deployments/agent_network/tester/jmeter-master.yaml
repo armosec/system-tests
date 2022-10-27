@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-jmeter-master
+  labels:
+    app: jmeter-master
+    chart: jmeter-0.1.0
+    release: ca-jmeter
+    heritage: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmeter-master
+      release: ca-jmeter
+  template:
+    metadata:
+      labels:
+        app: jmeter-master
+        release: ca-jmeter
+    spec:
+      containers:
+      - name: jmeter-master
+        image: "kaarol/jmeter-master:latest"
+        imagePullPolicy: Always
+        env:
+        - name: SSL_DISABLED
+          value: "true"
+        - name: ONE_SHOT
+          value: "false"
+        - name: SLAVE_SVC_NAME
+          value: "ca-jmeter-slave"
+        ports:
+        - containerPort: 60000
+          name: rmi-local-port
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /test # mount jmeter test volumn to /test
+          readOnly: true
+          name: jmeter-test-conf
+        - mountPath: /tmp 
+          name: logs
+      volumes:
+      - name: jmeter-test-conf
+        configMap:
+          name: jmeter-test-conf # place ConfigMap `jmeter-test-conf` on /test
+          items:
+            - key: J4K8sAgentNetTest.jmx
+              path: J4K8sAgentNetTest.jmx
+      - name: logs
+        hostPath:
+          path: /tmp/jmetertestlogs
+          type: DirectoryOrCreate
+      restartPolicy: Always

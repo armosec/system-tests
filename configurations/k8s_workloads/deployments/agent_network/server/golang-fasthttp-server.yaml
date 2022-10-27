@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-fasthttp-server
+spec:
+  selector:
+    matchLabels:
+      app: golang-fasthttp-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: golang-fasthttp-server
+    spec:
+      initContainers:
+      - name: init-files
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: [" wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1b.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1kb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1mb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-10mb.txt -P /tmp/random_files; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-100mb.txt -P /tmp/random_files "]
+        volumeMounts:
+        - mountPath: /tmp/random_files
+          name: files-volume
+      containers:
+      - name: golang-fasthttp-server
+        image: dreg.armo.cloud:443/simple-golang-server:latest
+        command: ["/simple_server"]
+        args: ["-d=/tmp/random_files", "-use-standard=false"]
+        ports:
+        - containerPort: 8081
+        volumeMounts:      
+        - mountPath: /tmp/random_files
+          name: files-volume
+      volumes:    
+      - name: files-volume # place file for download
+        emptyDir: {}     
+      imagePullSecrets:
+        - name: caregcred

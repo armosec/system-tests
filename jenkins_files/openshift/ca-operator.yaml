@@ -1,0 +1,18 @@
+apiVersion: apm.cyberarmor.com/v1alpha1
+kind: Cyberarmor
+metadata:
+  name: cyberarmor-operator
+  namespace: default
+spec:
+  caClusterGuid: 3eea2bc3-b387-499f-8f5b-5c61fc59e631
+  caCustomerGuid: 5d817063-096f-4d91-b39b-8665240080af
+  caClusterName: 0eu3
+  caPortalBackend: https://caportalbe.eudev3.cyberarmorsoft.com
+  caK8sReportUrl: wss://report.eudev3.cyberarmorsoft.com
+  caMasterNotificationServerHost: wss://mns.eudev3.cyberarmorsoft.com/v1/waitfornotification
+  caloginInfo:
+    customer: CyberArmorTests
+    password: 6hdGjPeHqgmzpjRmqXIA
+    username: system_tests@cyberarmor.io
+  caPostman: postman.eudev3.cyberarmorsoft.com
+  caDashboardBackend: https://dashbe.eudev3.cyberarmorsoft.com

@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+    stages {
+        stage('Creating Workload Templates - using signing profiles from dev') {
+            parallel {
+                stage('Creating nginx proxy template in CyberArmor backend') {
+                    steps {
+                        sh 'cacli wt create -i prod-nginx-proxy-wt.json'
+                    }
+                }
+                stage('Creating WikiJS template in CyberArmor backend') {
+                    steps {
+                        sh 'cacli wt create -i prod-wikijs-wt.json'
+                    }
+                }
+                stage('Creating MariaDB template in CyberArmor backend') {
+                    steps {
+                        sh 'cacli wt create -i prod-maria-db-wt.json'
+                    }
+                }
+            }
+        }
+
+        stage('Signing Workloads - using signing profiles from dev') {
+            parallel {
+                stage('Signing nginx proxy') {
+                    steps {
+                        sh 'cacli wt create -i prod-nginx-proxy-wt.json'
+                    }
+                }
+                stage('Signing WikiJS') {
+                    steps {
+                        sh 'cacli wt create -i prod-wikijs-wt.json'
+                    }
+                }
+                stage('Signing MariaDB') {
+                    steps {
+                        sh 'cacli wt create -i prod-maria-db-wt.json'
+                    }
+                }
+            }
+        }
+
+        stage('Apply workloads in Production namesapce in K8S cluster') {
+            parallel {
+                stage('Appling nginx deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling WikiJS deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling MariaDB deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+            }
+        }
+
+        stage('Testing solution E2E') {
+            steps {
+                echo '========executing C========'
+            }
+        }
+        stage('Applying basic network policy') {
+            steps {
+                echo '========executing E========'
+            }
+        }
+        stage('Testing solution liveness') {
+            steps {
+                echo '========executing H========'
+            }
+        }
+    }
+}

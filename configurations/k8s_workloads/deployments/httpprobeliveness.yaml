@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livenessdeployment
+  labels:
+    app: livenessdeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: livenessdeployment
+  template:
+    metadata:
+      labels:
+        app: livenessdeployment
+    spec:
+        containers: 
+        - name: liveness 
+          image: nginx 
+          ports: 
+           - containerPort: 80 
+          env:
+           - name: CAA_LIVENESS_AND_READINESS_PROBE_NETWORK
+             value: "1"
+           - name: CAA_NETWORK_HIGH_LEVEL_DEBUG
+             value: "1"
+          livenessProbe: 
+             httpGet: 
+               path: / 
+               port: 80 
+             initialDelaySeconds: 0 #Default 0 
+             periodSeconds: 10 #Default 10 
+             timeoutSeconds: 1 #Default 1 
+             successThreshold: 1 #Default 1 
+             failureThreshold: 3 #Default 3 

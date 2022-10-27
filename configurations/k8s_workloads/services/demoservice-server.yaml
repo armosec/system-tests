@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoservice-server
+spec:
+  selector:
+    app: demoservice-server
+  ports:
+    - protocol: TCP
+      targetPort: 8089
+      port: 8089

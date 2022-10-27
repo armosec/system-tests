@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yelb-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yelb-db
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: yelb-db
+        tier: backenddb
+    spec:
+      containers:
+      - image: mreferre/yelb-db:0.5
+        imagePullPolicy: IfNotPresent
+        name: yelb-db
+        ports:
+        - containerPort: 5432
+          protocol: TCP

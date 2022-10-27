@@ -1,0 +1,23 @@
+[
+    {
+        "name": "ignore-kube-namespaces",
+        "policyType": "postureExceptionPolicy",
+        "actions": [
+            "alertOnly"
+        ],
+        "resources": [
+            {
+                "designatorType": "Attributes",
+                "attributes": {
+                    "clusterName": "minikube",
+                    "namespace": "kube-system"
+                }
+            }
+        ],
+        "posturePolicies": [
+            {
+                "frameworkName": "NSA"
+            }
+        ]
+    }
+]

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: workload-pod
+  labels:
+    app: workload-pod
+spec:
+  containers:
+    - name: demoservice
+      image: quay.io/armosec/demoservice:v25
+      ports:
+        - containerPort: 8089
+      env:
+        - name: SERVER_PORT
+          value: "8089"
+        - name: SLEEP_DURATION
+          value: "1"
+        - name: DEMO_FOLDERS
+          value: "/app"

@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-tomcat-proxy
+  labels:
+    app: java-tomcat-proxy
+    tier: frontend
+spec:
+  selector: 
+    matchLabels:
+      app: java-tomcat-proxy
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-tomcat-proxy
+        tier: frontend
+    spec:
+      containers:
+        - name: java-tomcat-proxy
+          image: dreg.armo.cloud:443/java-tomcat-proxy
+          imagePullPolicy: IfNotPresent
+          env: 
+            - name: SERVER_URI
+              value: "http://server-uut:8080"
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: caregcred

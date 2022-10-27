@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-external
+  labels:
+    app: nginx-external
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-external
+  template:
+    metadata:
+      labels:
+        app: nginx-external
+    spec:
+      containers:
+      - name: nginx-external
+        image: nginx
+        ports:
+        - containerPort: 80

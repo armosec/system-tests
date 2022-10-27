@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+    stages {
+        stage('Apply K8S services in dev namesapce in K8S cluster') {
+            parallel {
+                stage('Appling nginx service in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling WikiJS service in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling MariaDB service in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+            }
+        }
+        stage('Apply workloads in dev namesapce in K8S cluster') {
+            parallel {
+                stage('Appling nginx deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling WikiJS deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+                stage('Appling MariaDB deployment in K8S cluster') {
+                    steps {
+                        echo '========executing B========'
+                    }
+                }
+            }
+        }
+        stage('Attaching CyberArmor in exploration mode to dev namespace') {
+            steps {
+                sh 'cacli attach --wlid '
+                sh 'cacli attach --wlid '
+                sh 'cacli attach --wlid '
+            }
+        }
+
+        stage('Testing solution E2E') {
+            steps {
+                echo '========executing C========'
+            }
+        }
+        stage('Generation signing profiles') {
+            steps {
+                echo '========executing D========'
+            }
+        }
+        stage('Signing workloads') {
+            parallel {
+                stage('Signing nginx proxy') {
+                    steps {
+                        echo '========executing D========'
+                    }
+                }
+                stage('Signing WikiJS') {
+                    steps {
+                        echo '========executing D========'
+                    }
+                }
+                stage('Signing MariaDB') {
+                    steps {
+                        echo '========executing D========'
+                    }
+                }
+            }
+        }
+    }
+}

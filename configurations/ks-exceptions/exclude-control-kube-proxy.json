@@ -1,0 +1,24 @@
+{
+    "policyType": "postureExceptionPolicy",
+    "name": "exclude-control-kube-proxy",
+    "actions": [
+      "alertOnly"
+    ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "cluster": "minikube1",
+                "namespace": "kube-system",
+                "kind": "DaemonSet",
+                "name": "kube-proxy"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "controlName": "Allow privilege escalation",
+            "frameworkName": "NSA"
+        }
+    ]
+}

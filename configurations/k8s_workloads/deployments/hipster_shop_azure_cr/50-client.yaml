@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  labels:
+    app: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: dreg.armo.cloud:443/demoservice:v26
+          env:
+            - name: SLEEP_DURATION
+              value: "0.03"
+            - name: DEMO_TARGETS
+              value: "http://frontend:80"
+      imagePullSecrets:
+        - name: caregcred

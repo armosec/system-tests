@@ -1,0 +1,8 @@
+apiVersion: apm.cyberarmor.com/v1alpha1
+kind: Cyberarmornamespace
+metadata:
+  name: cyberarmor-namespace
+  namespace: default
+spec:
+  cyberArmorNameSpace: cyberarmor-system
+

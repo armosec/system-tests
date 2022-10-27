@@ -1,0 +1,120 @@
+{
+  "status": "failed",
+  "controls": {
+    "C-0002": {
+      "controlID": "C-0002",
+      "name": "Exec into container",
+      "status": "failed",
+      "ResourceCounters": {
+        "passedResources": 51,
+        "failedResources": 2,
+        "excludedResources": 0
+      }
+    },
+    "C-0012": {
+      "controlID": "C-0012",
+      "name": "Applications credentials in configuration files",
+      "status": "passed",
+      "ResourceCounters": {
+        "passedResources": 1,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0017": {
+      "controlID": "C-0017",
+      "name": "Immutable container filesystem",
+      "status": "failed",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 1,
+        "excludedResources": 0
+      }
+    },
+    "C-0030": {
+      "controlID": "C-0030",
+      "name": "Ingress and Egress blocked",
+      "status": "failed",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 1,
+        "excludedResources": 0
+      }
+    },
+    "C-0035": {
+      "controlID": "C-0035",
+      "name": "Cluster-admin binding",
+      "status": "failed",
+      "ResourceCounters": {
+        "passedResources": 51,
+        "failedResources": 2,
+        "excludedResources": 0
+      }
+    },
+    "C-0041": {
+      "controlID": "C-0041",
+      "name": "HostNetwork access",
+      "status": "passed",
+      "ResourceCounters": {
+        "passedResources": 1,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0047": {
+      "controlID": "C-0047",
+      "name": "Exposed dashboard",
+      "status": "irrelevant",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0058": {
+      "controlID": "C-0058",
+      "name": "CVE-2021-25741 - Using symlink for arbitrary host file system access.",
+      "status": "irrelevant",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0066": {
+      "controlID": "C-0066",
+      "name": "Secret/ETCD encryption enabled",
+      "status": "irrelevant",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0067": {
+      "controlID": "C-0067",
+      "name": "Audit logs enabled",
+      "status": "irrelevant",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    },
+    "C-0068": {
+      "controlID": "C-0068",
+      "name": "PSP enabled",
+      "status": "irrelevant",
+      "ResourceCounters": {
+        "passedResources": 0,
+        "failedResources": 0,
+        "excludedResources": 0
+      }
+    }
+  },
+  "ResourceCounters": {
+    "passedResources": 51,
+    "failedResources": 3,
+    "excludedResources": 0
+  }
+}

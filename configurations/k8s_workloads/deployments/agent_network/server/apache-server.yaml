@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-server
+spec:
+  selector:
+    matchLabels:
+      app: apache-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache-server
+    spec:
+      initContainers:
+      - name: init-files
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: [" wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1b.txt -P /usr/local/apache2/htdocs; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1kb.txt -P /usr/local/apache2/htdocs; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-1mb.txt -P /usr/local/apache2/htdocs; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-10mb.txt -P /usr/local/apache2/htdocs; wget https://cyberarmor-network-tests-files.s3.eu-central-1.amazonaws.com/random-100mb.txt -P /usr/local/apache2/htdocs "]
+        volumeMounts:
+        - mountPath: /usr/local/apache2/htdocs
+          name: files-volume
+      containers:
+      - name: apache-server
+        image: httpd:2.4
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/local/apache2/conf # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: apache-server-conf
+        - mountPath: /usr/local/apache2/htdocs
+          name: files-volume
+      volumes:
+      - name: apache-server-conf
+        configMap:
+          name: apache-server-conf # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: httpd.conf
+              path: httpd.conf
+      - name: files-volume # place file for download on /www/data
+        emptyDir: {}

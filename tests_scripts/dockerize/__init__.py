@@ -1,0 +1,1 @@
+from tests_scripts.dockerize.base_dockerize_test import BaseDockerizeTest

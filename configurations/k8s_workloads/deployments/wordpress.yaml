@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - image: wordpress:5.4.1-apache
+          name: wordpress
+          env:
+          - name: WORDPRESS_DB_HOST
+            value: "mysql"
+          - name: WORDPRESS_DB_PASSWORD
+            value: "123456"
+          - name: WORDPRESS_CONFIG_EXTRA
+            value: "define('USE_PCONNECT', true);
+            define('WP_CACHE', false);"
+          ports:
+          - containerPort: 80
+            name: wordpress

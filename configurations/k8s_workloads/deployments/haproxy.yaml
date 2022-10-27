@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy-ingress
+  labels:
+    app: haproxy-ingress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: haproxy-ingress
+  template:
+    metadata:
+      labels:
+        app: haproxy-ingress
+        cyberarmor.removeSecurityHeaders: "true"
+    spec:
+      containers:
+        - name: haproxy-ingress
+          imagePullPolicy: Always
+          image: dreg.armo.cloud:443/systemtest/haproxy:v1
+          ports:
+            - containerPort: 514
+              name: http
+      imagePullSecrets:
+        - name: caregcred

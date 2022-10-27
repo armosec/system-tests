@@ -1,0 +1,24 @@
+{
+    "policyType": "postureExceptionPolicy",
+    "name": "exclude-control-apache",
+    "actions": [
+      "alertOnly"
+    ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "cluster": "minikube1",
+                "namespace": "system-test",
+                "kind": "Deployment",
+                "name": "apache"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "controlName": "Allow privilege escalation",
+            "frameworkName": "NSA"
+        }
+    ]
+}

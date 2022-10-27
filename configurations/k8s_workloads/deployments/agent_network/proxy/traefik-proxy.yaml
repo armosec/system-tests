@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik-proxy
+spec:
+  selector:
+    matchLabels:
+      app: traefik-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: traefik-proxy
+    spec:
+      containers:
+      - name: traefik-proxy
+        image: traefik:v2.2.1
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - mountPath: /etc/traefik/traefik.yml # mount traefik-conf volumn to /etc/traefik/traefik.yml
+          readOnly: true
+          name: traefik-conf
+          subPath: traefik.yml
+      volumes:
+      - name: traefik-conf
+        configMap:
+          name: traefik-conf # place ConfigMap `traefik-conf` on /etc/traefik
+          items:
+            - key: traefik.yml
+              path: traefik.yml

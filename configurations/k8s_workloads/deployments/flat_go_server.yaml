@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goserver
+  labels:
+    app: goclientserver
+    tier: server
+spec:
+  selector: 
+    matchLabels:
+      app: goclientserver
+      tier: server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: goclientserver
+        tier: server
+    spec:
+      containers:
+        - name: goserver
+          image: dreg.armo.cloud:443/goscratchserver:v1
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8081
+      imagePullSecrets:
+        - name: caregcred
