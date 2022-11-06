@@ -16,7 +16,6 @@ tests = [
     "scan_local_repository_and_submit_to_backend",
     "scan_repository_from_url_and_submit_to_backend",
     "scan_with_exception_to_backend",
-    "new_customer",
     "scan_with_custom_framework",
     "scan_with_kubescape_helm_chart",
     "scan_image_controls"

@@ -259,44 +259,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
         return super().cleanup()
 
 
-class NewCustomer(BaseKubescape):
-    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(NewCustomer, self).__init__(test_obj=test_obj, backend=backend,
-                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
-
-    def start(self):
-        self.cleanup_cache()
-
-        Logger.logger.info("Installing kubescape")
-        # Logger.logger.info(self.install())
-        self.install()
-
-        Logger.logger.info("Scanning kubescape")
-        scan_report = self.scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
-                                submit=self.test_obj.get_arg("submit"), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-
-        Logger.logger.info("Get config-map")
-        config_map = self.kubernetes_obj.get_config_map(namespace='default', name='kubescape')
-
-        Logger.logger.info("Test result vs config-map")
-        self.test_new_customer(config_map=config_map, stdout=scan_report.stderr.decode('utf-8'))
-
-        return self.cleanup()
-
-    def cleanup_cache(self):
-        home_dir = os.path.expanduser("~/")
-        if os.path.exists(home_dir + ".kubescape/config.json"):
-            Logger.logger.info("Delete config.json")
-            os.remove(home_dir + ".kubescape/config.json")
-
-        Logger.logger.info("Delete config-map")
-        self.delete_kubescape_config_map()
-
-    def cleanup(self):
-        self.cleanup_cache()
-        return super().cleanup()
-
-
 class ScanWithCustomFramework(BaseKubescape):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanWithCustomFramework, self).__init__(test_obj=test_obj, backend=backend,

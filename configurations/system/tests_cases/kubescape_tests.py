@@ -167,18 +167,6 @@ class KubescapeTests(object):
         )
 
     @staticmethod
-    def new_customer():
-        from tests_scripts.kubescape.scan import NewCustomer
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=NewCustomer,
-            policy_scope='framework',
-            policy_name='nsa',
-            submit=True,
-            account=False
-        )
-
-    @staticmethod
     def scan_with_custom_framework():
         from tests_scripts.kubescape.scan import ScanWithCustomFramework
         return KubescapeConfiguration(

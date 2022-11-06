@@ -141,8 +141,10 @@ class BaseKubescape(BaseK8S):
         if "submit" in kwargs:
             command.append("--submit")
             self.remove_cluster_from_backend = True
-        if "account" in kwargs:
+            account_id = kwargs["account"] if "account" in kwargs else self.backend.get_customer_guid()
+            assert account_id, "missing account ID, the report will not be submitted"
             command.extend(["--account", self.backend.get_customer_guid()])
+
         if self.environment == "staging" or self.environment == "stage":
             command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armo.cloud,"
                                      "armoui.eustage2.cyberarmorsoft.com,eggauth.eustage2.cyberarmorsoft.com"])
@@ -752,19 +754,7 @@ class BaseKubescape(BaseK8S):
         if isinstance(ks_custom_fw, list):
             return [self.delete_custom_framework(ks_custom_fw=i) for i in ks_custom_fw]
         self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=ks_custom_fw['name'])
-
-    @staticmethod
-    def test_new_customer(config_map, stdout: str):
-        assert type(config_map) == kubernetes.client.models.v1_config_map.V1ConfigMap, \
-            "Expect from k8s-config-map obj to be V1ConfigMap type, and received: {type}".format(type=type(config_map))
-        config_map_data = config_map.to_dict()['data']
-        customer_guid = config_map_data['accountID'] if 'accountID' in config_map_data else config_map_data[
-            'customerGUID']
-        assert customer_guid in stdout, \
-            'In a new customer, customerGUID is expected to be within stdout'
-        assert config_map_data['invitationParam'] in stdout, \
-            'In a new customer, invitationParam is expected to be within stdout'
-
+ 
     def delete_kubescape_config_map(self, namespace: str = 'default', name: str = 'kubescape'):
         try:
             self.kubernetes_obj.delete_config_map(namespace=namespace, name=name)
