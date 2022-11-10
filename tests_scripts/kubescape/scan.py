@@ -613,7 +613,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             [r["statusText"] for r in resources if r["statusText"] == "failed"]
         )
         expected_excluded = ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0)
-        actual_be_excluded = len([r["statusText"] for r in resources if r["statusText"] == "excluded"])
+        actual_be_excluded = len([r["statusText"] for r in resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")])
         assert expected_excluded ==  actual_be_excluded, f"expecting {expected_excluded} from CLI, but got only {actual_be_excluded}, data from BE: {resources}"
 
         Logger.logger.info("Testing repository registration in portal")
