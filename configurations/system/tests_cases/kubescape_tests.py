@@ -62,7 +62,8 @@ class KubescapeTests(object):
             git_repository=GitRepository(name='kubescape', owner="armosec", branch="master",
                                          url="https://github.com/armosec/kubescape"),
             expected_helm_files=[
-                "examples/helm_chart/templates/serviceaccount.yaml"
+                "examples/helm_chart/templates/serviceaccount.yaml",
+                "examples/helm_chart/templates/cronjob.yaml"
             ],
             clone_before=False
         )

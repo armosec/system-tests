@@ -465,7 +465,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         should_clone_before = self.test_obj.get_arg("clone_before")
         git_repository = self.test_obj.get_arg("git_repository")
         if not isinstance(git_repository, GitRepository):
-            raise Exception("test expected git_repositry arg to be a GitRepository instance")
+            raise Exception("test expected git_repository arg to be a GitRepository instance")
 
         # Check for existing previous report
         old_report_guid, old_report_ts = self.get_report_guid_and_timestamp_for_git_repository(git_repository,
@@ -587,10 +587,11 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
         if expected_helm_files and len(expected_helm_files) > 0:
             Logger.logger.info("Testing helm chart scanning")
+            be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
             assert len(expected_helm_files) == len(
-                be_helm_files), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary"
-            assert sorted(expected_helm_files) == sorted(
-                [f["designators"]["attributes"]["filePath"] for f in be_helm_files])
+                be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
+                                f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
+            assert sorted(expected_helm_files) == sorted(be_helm_file_paths)
             assert "0" not in [str(f["childCount"]) for f in
                                be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
         else:
@@ -612,9 +613,9 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == len(
             [r["statusText"] for r in resources if r["statusText"] == "failed"]
         )
-        expected_excluded = ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0)
-        actual_be_excluded = len([r["statusText"] for r in resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")])
-        assert expected_excluded ==  actual_be_excluded, f"expecting {expected_excluded} from CLI, but got only {actual_be_excluded}, data from BE: {resources}"
+        assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
+            [r["statusText"] for r in resources if r["statusText"] == "warning"]
+        )
 
         Logger.logger.info("Testing repository registration in portal")
         repoHash = designators_attributes['repoHash']
