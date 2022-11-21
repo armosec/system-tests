@@ -614,7 +614,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             [r["statusText"] for r in resources if r["statusText"] == "failed"]
         )
         assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if r["statusText"] == "warning"]
+            [r["statusText"] for r in resources if(r["statusText"] == "excluded" or  r["statusText"] == "warning")]
         )
 
         Logger.logger.info("Testing repository registration in portal")
