@@ -38,7 +38,7 @@
 * download/clone repository
 * create a python environment 
     ```
-    ./create_env
+    ./create_env.sh
     ```
 
 ### Run:
@@ -48,7 +48,7 @@ Add to environment the following values to connect to the backend:
 | Argument name       | Description                         | Required for                                                       |
 |:--------------------|-------------------------------------|--------------------------------------------------------------------|
 | `CUSTOMER`          | customer name for login to keycloak | for all tests                                                      |
-| `NAME`              | username for login to keycloak      | for all tests                                                      |
+| `USERNAME`              | username for login to keycloak      | for all tests                                                      |
 | `PASSWORD`          | password for login to keycloak      | for all tests                                                      |
 | `CLIENT_ID`         | part of api-token                   | for scan_image_controls test                                       |
 | `SECRET_KEY`        | part of api-token                   | for scan_image_controls test                                       |
