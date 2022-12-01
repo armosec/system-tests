@@ -21,9 +21,20 @@ DEFAULT_BRANCH = "release"
 DEFAULT_RELEASE = "latest"
 DEFAULT_RESULTS = "results.json"
 
-_CLI_STATUS_FILED = 'status'
+_CLI_STATUS_FIELD = 'status'
 _CLI_STATUS_FAILED = 'failed'
+_CLI_STATUS_EXCLUDED = 'excluded'
 _CLI_SUMMARY_DETAILS_FIELD = 'summaryDetails'
+
+_CLI_SCORE_FIELD = "score"
+
+_CLI_CONTROLS_SEVERITY_COUNTERS_FIELD = "controlsSeverityCounters"
+_CLI_RESOURCES_SEVERITY_COUNTERS_FIELD = "resourcesSeverityCounters"
+_CLI_CRITICAL_SEVERITY_FIELD = "criticalSeverity"
+_CLI_HIGH_SEVERITY_FIELD = "highSeverity"
+_CLI_MEDIUM_SEVERITY_FIELD = "mediumSeverity"
+_CLI_LOW_SEVERITY_FIELD = "lowSeverity"
+
 _CLI_RESOURCE_COUNTERS_FIELD = 'ResourceCounters'
 _CLI_EXCLUDED_RESOURCES_FIELD = 'excludedResources'
 _CLI_PASSED_RESOURCES_FIELD = 'passedResources'
@@ -183,6 +194,11 @@ class BaseKubescape(BaseK8S):
     def get_posture_frameworks(self, report_guid, framework_name: str = ""):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_frameworks,
                                                framework_name=framework_name, report_guid=report_guid)
+        return c_panel_info
+
+    def get_posture_clusters(self, report_guid):
+        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_clusters,
+                                               report_guid=report_guid)
         return c_panel_info
 
     def get_framework(self, framework_name: str = ''):
@@ -606,7 +622,7 @@ class BaseKubescape(BaseK8S):
         for control in resource_result[_CONTROLS_FIELD]:
             if control[_CLI_CONTROL_ID_FIELD] == c_id:
                 for rule in control[_CLI_RULES_ID_FIELD]:
-                    if rule[_CLI_STATUS_FILED] == _CLI_STATUS_FAILED:
+                    if rule[_CLI_STATUS_FIELD] == _CLI_STATUS_FAILED:
                         return True
                 break
         return False
@@ -688,8 +704,7 @@ class BaseKubescape(BaseK8S):
         # self.compare_framework_data(cli_result, framework_name, report_guid)
         self.compare_controls_data(cli_result, framework_name, report_guid)
         self.compare_resources_data(cli_result, framework_name, report_guid)
-        
-
+        self.compare_cluster_summary_data(cli_result, report_guid)
 
     def get_posture_control_by_id(self, framework_name: str, report_guid: str, control_id: str):
         be_controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
@@ -747,6 +762,68 @@ class BaseKubescape(BaseK8S):
         be_controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
         cli_controls = cli_result[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD]
         self.test_controls_from_backend(be_controls=be_controls, be_frameworks=be_frameworks, cli_controls=cli_controls)
+
+    def compare_cluster_summary_data(self, cli_result, report_guid):
+        be_cluster_summaries = self.get_posture_clusters(report_guid=report_guid)
+        assert len(be_cluster_summaries) == 1, f"Expected to get only one cluster summary from backend but got {len(be_cluster_summaries)}"
+        
+        be_cluster_summary = be_cluster_summaries[0]
+        cli_summary_details = cli_result[_CLI_SUMMARY_DETAILS_FIELD]
+
+        # Resource severity counters
+        cli_resource_severity_counters = cli_summary_details[_CLI_RESOURCES_SEVERITY_COUNTERS_FIELD]
+        assert cli_resource_severity_counters[_CLI_CRITICAL_SEVERITY_FIELD] == be_cluster_summary['criticalSeverityResources'], \
+            f"Expected to get {cli_resource_severity_counters[_CLI_CRITICAL_SEVERITY_FIELD]} critical severity resources from backend but got {be_cluster_summary['criticalSeverityResources']}"
+        assert cli_resource_severity_counters[_CLI_HIGH_SEVERITY_FIELD] == be_cluster_summary['highSeverityResources'], \
+            f"Expected to get {cli_resource_severity_counters[_CLI_HIGH_SEVERITY_FIELD]} high severity resources from backend but got {be_cluster_summary['highSeverityResources']}"
+        assert cli_resource_severity_counters[_CLI_MEDIUM_SEVERITY_FIELD] == be_cluster_summary['mediumSeverityResources'], \
+            f"Expected to get {cli_resource_severity_counters[_CLI_MEDIUM_SEVERITY_FIELD]} medium severity resources from backend but got {be_cluster_summary['mediumSeverityResources']}"
+        assert cli_resource_severity_counters[_CLI_LOW_SEVERITY_FIELD] == be_cluster_summary['lowSeverityResources'], \
+            f"Expected to get {cli_resource_severity_counters[_CLI_LOW_SEVERITY_FIELD]} low severity resources from backend but got {be_cluster_summary['lowSeverityResources']}"
+
+        # Controls severity counters
+        cli_controls_severity_counters = cli_summary_details[_CLI_CONTROLS_SEVERITY_COUNTERS_FIELD]
+        assert cli_controls_severity_counters[_CLI_CRITICAL_SEVERITY_FIELD] == be_cluster_summary['criticalSeverityControls'], \
+            f"Expected to get {cli_controls_severity_counters[_CLI_CRITICAL_SEVERITY_FIELD]} critical severity controls from backend but got {be_cluster_summary['criticalSeverityControls']}"
+        assert cli_controls_severity_counters[_CLI_HIGH_SEVERITY_FIELD] == be_cluster_summary['highSeverityControls'], \
+            f"Expected to get {cli_controls_severity_counters[_CLI_HIGH_SEVERITY_FIELD]} high severity controls but got {be_cluster_summary['highSeverityControls']}"
+        assert cli_controls_severity_counters[_CLI_MEDIUM_SEVERITY_FIELD] == be_cluster_summary['mediumSeverityControls'], \
+            f"Expected to get {cli_controls_severity_counters[_CLI_MEDIUM_SEVERITY_FIELD]} medium severity controls but got {be_cluster_summary['mediumSeverityControls']}"
+        assert cli_controls_severity_counters[_CLI_LOW_SEVERITY_FIELD] == be_cluster_summary['lowSeverityControls'], \
+            f"Expected to get {cli_controls_severity_counters[_CLI_LOW_SEVERITY_FIELD]} low severity controls from backend but got {be_cluster_summary['lowSeverityControls']}"
+
+        # Scanned frameworks
+        cli_framework_names = [framework[_CLI_NAME_FIELD] for framework in cli_summary_details[_CLI_FRAMEWORKS_FIELD]]
+        assert sorted(cli_framework_names) == sorted(be_cluster_summary['frameworks']), \
+            f"Expected to get the same frameworks from backend and CLI but got {be_cluster_summary['frameworks']} and {cli_framework_names}"
+
+        # Risk score
+        assert cli_summary_details[_CLI_SCORE_FIELD] == be_cluster_summary['score'], \
+            f"Expected to get risk score {cli_summary_details[_CLI_SCORE_FIELD]} but got {be_cluster_summary['score']}"
+
+        # Resource counters
+        assert cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_PASSED_RESOURCES_FIELD] == be_cluster_summary['passedResources'], \
+            f"Expected to get {cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_PASSED_RESOURCES_FIELD]} passed resources but got {be_cluster_summary['passedResources']}"
+        assert cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_FAILED_RESOURCES_FIELD] == be_cluster_summary['failedResources'], \
+            f"Expected to get {cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_FAILED_RESOURCES_FIELD]} failed resources but got {be_cluster_summary['failedResources']}"
+        assert cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD] == be_cluster_summary['excludedResources'], \
+            f"Expected to get {cli_summary_details[_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD]} excluded resources but got {be_cluster_summary['excludedResources']}"
+
+        # Control Counters
+        cli_failed_controls = 0
+        cli_excluded_controls = 0
+        for control in cli_summary_details[_CONTROLS_FIELD].values():
+            if control[_CLI_STATUS_FIELD] == _CLI_STATUS_FAILED:
+                cli_failed_controls += 1
+            elif control[_CLI_STATUS_FIELD] == _CLI_STATUS_EXCLUDED:
+                cli_excluded_controls += 1
+
+        assert len(cli_summary_details[_CONTROLS_FIELD]) == be_cluster_summary['totalControls'], \
+            f"Expected to get {len(cli_summary_details[_CONTROLS_FIELD])} total controls but got {be_cluster_summary['totalControls']}"
+        assert cli_failed_controls == be_cluster_summary['failedControls'], \
+            f"Expected to get {cli_failed_controls} failed controls but got {be_cluster_summary['failedControls']}"
+        assert cli_excluded_controls == be_cluster_summary['warningControls'], \
+            f"Expected to get {cli_excluded_controls} excluded controls but got {be_cluster_summary['warningControls']}"
 
     def compare_resources_data(self, cli_result, framework_name, report_guid):
         be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
@@ -842,10 +919,10 @@ class BaseKubescape(BaseK8S):
         assert c_id in cli_result[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD].keys(), \
             'Not found control {c_id} in cli_results->summaryDetails'.format(c_id=c_id)
         assert cli_result[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][
-                   _CLI_STATUS_FILED] == expected_result, \
+                   _CLI_STATUS_FIELD] == expected_result, \
             'Received from cli_results for control {c_id} status {x}, but expected to be {y}'. \
                 format(c_id=c_id,
-                       x=cli_result[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_FILED],
+                       x=cli_result[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_FIELD],
                        y=expected_result)
 
     def test_control_input_in_kubescape(self, input_kind: str, input_name: str, included: bool):
@@ -1010,6 +1087,6 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def test_host_scanner_results(cli_results: dict):
         for control_id, control_value in cli_results[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD].items():
-            assert control_value[_CLI_STATUS_FILED] != 'skipped', \
+            assert control_value[_CLI_STATUS_FIELD] != 'skipped', \
                 f'Expected not to get skipped status as a result of the controls, ' \
                 f'when the flag enable-host-scan is added, the status of control {control_id} is skipped'
