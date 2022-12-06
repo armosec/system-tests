@@ -611,7 +611,7 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
-    def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str):
+    def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
         for be_ctrl in be_results:
             for id, control in cli_result["summaryDetails"]["controls"].items():
@@ -619,9 +619,10 @@ class BaseKubescape(BaseK8S):
                 if  be_ctrl['clusters'][0]['resourcesCount'] <  control['ResourceCounters']["failedResources"] and id not in be_ctrl_ids:
                     assert False, "Control {ctrl} should be in top 5 controls".format(ctrl=id)
 
-                # check control data and failed resources number
+                # check control data and failed resources
                 if be_ctrl["id"] == id:
                     assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(guid=report_guid)
+                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, "framework name should be {name}".format(name=framework_name)
                     assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
                         "Control {ctrl} should have {count} failed resources".format(ctrl=id, count=control['ResourceCounters']["failedResources"])
                     assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id, name=control['name'])
@@ -683,7 +684,7 @@ class BaseKubescape(BaseK8S):
 
         self.test_api_version_info()
 
-        self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid)
+        self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid, framework_name=framework_name)
         # self.compare_framework_data(cli_result, framework_name, report_guid)
         self.compare_controls_data(cli_result, framework_name, report_guid)
         self.compare_resources_data(cli_result, framework_name, report_guid)
@@ -751,9 +752,9 @@ class BaseKubescape(BaseK8S):
         be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
         self.test_resources_from_backend(be_resources=be_resources, cli_result=cli_result)
 
-    def compare_top_controls_data(self, cli_result, cluster_name, report_guid):
+    def compare_top_controls_data(self, cli_result, cluster_name, report_guid, framework_name):
         be_results = self.get_top_controls_results(cluster_name)
-        self.test_top_controls_from_backend(cli_result=cli_result, be_results=be_results, report_guid=report_guid)
+        self.test_top_controls_from_backend(cli_result=cli_result, be_results=be_results, report_guid=report_guid, framework_name=framework_name)
 
     def post_posture_exception(self, exceptions_file, cluster_name: str):
         ks_exceptions = self.create_ks_exceptions(cluster_name=cluster_name, exceptions_file=exceptions_file)
