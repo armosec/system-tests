@@ -611,6 +611,20 @@ class ControlPanelAPI(object):
             raise Exception('Error accessing dashboard. Request: results of posture controls is empty')
         return r.json()['response']
 
+    def get_top_controls_results(self, cluster_name):
+        # TODO: change to "topControls" when it will be deprecated 
+        r = self.post("/api/v1/posture/topFailedControls", params={"customerGUID": self.customer_guid, "cluster": cluster_name},
+                      json={"pageNum": 1, "pageSize": 5, "innerFilters": [{
+                          }]})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: results of posture top failed controls "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        j = r.json()
+        if 'response' not in j or len(j['response']) == 0:
+            raise Exception('Error accessing dashboard. Request: results of posture top failed controls is empty')
+        return r.json()['response']
+
     def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = ""):
         r = self.post("/api/v1/posture/resources", params={"customerGUID": self.customer_guid},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
