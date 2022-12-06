@@ -207,6 +207,10 @@ class BaseKubescape(BaseK8S):
                                                framework_name=framework_name, report_guid=report_guid)
         return c_panel_info
 
+    def get_top_controls_results(self, cluster_name):
+        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_top_controls_results, cluster_name=cluster_name)
+        return c_panel_info
+
     def get_posture_resources_CSV(self, framework_name: str, report_guid):
         ws = self.backend.ws_export_open("/ws/v1/posture/resources")
         message = {"innerFilters": [{"frameworkName": framework_name, "reportGUID": report_guid}]}
@@ -607,6 +611,25 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
+    def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str):
+        be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
+        for be_ctrl in be_results:
+            for id, control in cli_result["summaryDetails"]["controls"].items():
+                # check that there is no control with higher failed resources that is not in top 5 controls response
+                if  be_ctrl['clusters'][0]['resourcesCount'] <  control['ResourceCounters']["failedResources"] and id not in be_ctrl_ids:
+                    assert False, "Control {ctrl} should be in top 5 controls".format(ctrl=id)
+
+                # check control data and failed resources number
+                if be_ctrl["id"] == id:
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(guid=report_guid)
+                    assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
+                        "Control {ctrl} should have {count} failed resources".format(ctrl=id, count=control['ResourceCounters']["failedResources"])
+                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id, name=control['name'])
+                    assert be_ctrl['baseScore'] == control['scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id, scored=control['scored'])
+
+
+        
+
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         # self.test_filed_controls_in_resource(cli_result=cli_result, be_resources=be_resources, kind='Pod',
         #                                      cluster=self.kubernetes_obj.get_cluster_name(),
@@ -660,9 +683,12 @@ class BaseKubescape(BaseK8S):
 
         self.test_api_version_info()
 
+        self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid)
         # self.compare_framework_data(cli_result, framework_name, report_guid)
         self.compare_controls_data(cli_result, framework_name, report_guid)
         self.compare_resources_data(cli_result, framework_name, report_guid)
+        
+
 
     def get_posture_control_by_id(self, framework_name: str, report_guid: str, control_id: str):
         be_controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
@@ -724,6 +750,10 @@ class BaseKubescape(BaseK8S):
     def compare_resources_data(self, cli_result, framework_name, report_guid):
         be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
         self.test_resources_from_backend(be_resources=be_resources, cli_result=cli_result)
+
+    def compare_top_controls_data(self, cli_result, cluster_name, report_guid):
+        be_results = self.get_top_controls_results(cluster_name)
+        self.test_top_controls_from_backend(cli_result=cli_result, be_results=be_results, report_guid=report_guid)
 
     def post_posture_exception(self, exceptions_file, cluster_name: str):
         ks_exceptions = self.create_ks_exceptions(cluster_name=cluster_name, exceptions_file=exceptions_file)
