@@ -193,7 +193,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
 
             Logger.logger.info("check if kubescape cronjob created in backend")
-            assert self.backend.is_ks_cronjob_created_in_backend(
+            assert self.backend.is_ks_cronjob_created_in_backend(cluster_name,
                 framework_list[0]), "kubescape cronjob failed to create in backend"
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")

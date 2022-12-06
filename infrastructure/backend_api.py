@@ -1235,7 +1235,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
-    def is_ks_cronjob_created_in_backend(self, framework_name):
+    def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name:str):
         url = "/api/v1/posture/scan"
         params = {"customerGUID": self.customer_guid}
         r = self.get(url, params=params)
@@ -1245,7 +1245,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjobs = r.json()
         for cj in cronjobs:
-            if "ks-scheduled-scan-{}".format(framework_name.lower()) in cj["name"]:
+            if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name and "ks-scheduled-scan-{}".format(framework_name.lower()) in cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED]:
                 return True
         return False
     
@@ -1259,7 +1259,8 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjobs = r.json()
         for cj in cronjobs:
-            assert cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("ks-scheduled-scan-") or cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-scheduler"), f"ks-scheduled-scan- or kubescape-scheduler not in name: {cronjobs}"
+            if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name:
+                assert cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("ks-scheduled-scan-") or cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-scheduler"), f"ks-scheduled-scan- or kubescape-scheduler not in name: {cronjobs}"
 
 
 
