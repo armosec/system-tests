@@ -1259,7 +1259,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjobs = r.json()
         for cj in cronjobs:
-            assert cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("ks-scheduled-scan-") or cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-scheduler"), "ks-scheduled-scan- or kubescape-scheduler not in name"
+            assert cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("ks-scheduled-scan-") or cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-scheduler"), f"ks-scheduled-scan- or kubescape-scheduler not in name: {cronjobs}"
 
 
 
