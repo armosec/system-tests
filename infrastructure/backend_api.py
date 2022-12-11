@@ -573,6 +573,17 @@ class ControlPanelAPI(object):
             raise Exception('Error accessing dashboard. Request: results of posture frameworks is empty')
         return r.json()['response']
 
+    def get_posture_clusters(self, report_guid: str):
+        params = {"pageNum": 1, "pageSize": 2, "orderBy": "timestamp:desc", "innerFilters": [{"reportGUID": report_guid}]}
+        r = self.post("/api/v1/posture/clusters", params={"customerGUID": self.customer_guid}, json=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: results of posture clusters "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        if len(r.json()['response']) == 0:
+            raise Exception('Error accessing dashboard. Request: results of posture clusters is empty')
+        return r.json()['response']
+
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
