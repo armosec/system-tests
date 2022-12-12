@@ -923,11 +923,14 @@ class BaseKubescape(BaseK8S):
                     break
         return failed_backend_frameworks, failed_ks_frameworks
 
-    def results_ready(self, cluster_name, port):
+    def results_ready(self, cluster_name, port, report_guid=''):
         url = f"http://0.0.0.0:{port}/v1/status"
+        if report_guid and len(report_guid) > 0:
+            url = f"{url}?id={report_guid}"
 
         for i in range(1, 15):
             try:
+                Logger.logger.debug(f"results_ready - url: {url}")
                 res = requests.get(url=url)
                 if res.status_code >= 200 and res.status_code < 300:
                     res = res.json()
@@ -941,10 +944,13 @@ class BaseKubescape(BaseK8S):
             time.sleep(20)
         raise Exception('the last scan results are not ready in {} seconds'.format(10 * 20))
 
-    def get_kubescape_as_server_last_result(self, cluster_name, port):
-        if self.results_ready(cluster_name, port=port):
+    def get_kubescape_as_server_last_result(self, cluster_name, port, report_guid=''):
+        if self.results_ready(cluster_name, port=port, report_guid=report_guid):
             url = f"http://0.0.0.0:{port}/v1/results?keep=true"
+            if report_guid and len(report_guid) > 0:
+                url += f"&id={report_guid}"
 
+            Logger.logger.debug(f"get_kubescape_as_server_last_result - url: {url}")
             res = requests.get(url=url)
             if res.status_code >= 200 and res.status_code < 300:
                 return res.json()["response"]
