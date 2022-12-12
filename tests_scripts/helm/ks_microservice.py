@@ -115,7 +115,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                            old_report_guid=old_report_guid)
 
         Logger.logger.info('get result from kubescape in cluster')
-        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port)
+        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port, report_guid=report_guid)
 
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
@@ -145,13 +145,13 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             Logger.logger.info('check hostsensor trigger')
             assert self.is_hostsensor_triggered(), "host sensor has not triggered"
 
-        Logger.logger.info('get result from kubescape in cluster')
-        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port)
-
         Logger.logger.info("Get report-guid")
         report_guid = self.get_report_guid(cluster_name=cluster_name,
                                            old_report_guid=old_report_guid,
                                            framework_name=framework_list[0])
+
+        Logger.logger.info('get result from kubescape in cluster')
+        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port, report_guid)
 
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
