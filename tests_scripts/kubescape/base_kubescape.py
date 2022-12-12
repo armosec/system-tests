@@ -934,6 +934,7 @@ class BaseKubescape(BaseK8S):
                     if "type" not in res:
                         Logger.logger.warning("response from kubescape is missing 'type'")
                     elif res["type"] == "notBusy":
+                        Logger.logger.info(f"kubescape results ready. res: {res}")
                         return True
             except:
                 pass
