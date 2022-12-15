@@ -1247,7 +1247,12 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: delete registry scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        return r.json()
+        try:
+            return r.json()
+        except Exception as ex:
+            Logger.logger.debug("delete_registry_scan_cronjob failed to parse response: {0};{1};{2}".format(cj, ex, r.status_code))
+            return {}
+
 
     def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name:str):
         url = "/api/v1/posture/scan"
