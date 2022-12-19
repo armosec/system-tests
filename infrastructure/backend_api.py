@@ -767,7 +767,7 @@ class ControlPanelAPI(object):
                         params={"customerGUID": self.customer_guid, "frameworkName": framework_name})
         if not 200 <= r.status_code < 300:  # or not r.json() or not r.json()[0] != 'deleted':
             raise Exception(
-                'Error accessing dashboard. Request: delete posture exception "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: delete custom framework "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
 
     def get_scan_results_sum_summary(self, since_time: str, expected_results: int, namespace: str = None,
