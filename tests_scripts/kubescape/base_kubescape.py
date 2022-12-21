@@ -613,6 +613,7 @@ class BaseKubescape(BaseK8S):
 
     def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
+        assert len(be_ctrl_ids) == 5
         for be_ctrl in be_results:
             for id, control in cli_result["summaryDetails"]["controls"].items():
                 # check that there is no control with higher failed resources that is not in top 5 controls response
