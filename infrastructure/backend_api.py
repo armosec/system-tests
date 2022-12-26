@@ -1389,6 +1389,68 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
+    def get_job_report_request(self,  job_id):
+        url = "/api/v1/registry/jobReportsStatus"
+        params = {"customerGUID": self.customer_guid, "jobID": job_id}
+
+        for i in range(5):
+                r = self.get(url, params=params)
+                if 200 <= r.status_code < 300:
+                    return r.json()
+                time.sleep(5)
+                
+        raise Exception(
+            'Error accessing dashboard. Request: get job report status "%s" (code: %d, message: %s, jobID: "%s")' % (
+                            self.customer, r.status_code, r.text, job_id))
+    
+    def get_repositories_list(self,  job_id):
+        url = "/api/v1/registry/repositoriesList"
+        params = {"customerGUID": self.customer_guid, "jobID": job_id}
+
+        r = self.get(url, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get repositories list "%s" (code: %d, message: %s, jobID: %s)' % (
+                    self.customer, r.status_code, r.text, job_id))
+
+        return r.json()
+
+
+    def test_registry_connectivity_request(self, cluster_name, registry_name, auth_method, excluded_repositories):
+        url = "/api/v1/registry/scan"
+        params = {"customerGUID": self.customer_guid}
+        provider = registry_name.split(":")[0]
+        provider = provider.split("/")[0]
+        body = json.dumps([
+            {
+            "registryProvider": provider,
+            "action": "testRegistryConnectivity",
+            "clusterName": cluster_name, 
+            "registryName": registry_name, 
+            "cronTabSchedule": "",
+            "registryType": "public",
+            "depth": 3, 
+            "include":[],
+            "exclude": excluded_repositories,
+            "kind":"",
+            "isHTTPs": False,
+            "skipTLS": True,
+            "authMethod": {
+                "type": auth_method["auth_type"],
+                "username":auth_method["username"],
+                "password": auth_method["password"]
+            }
+            }
+        ])
+
+        r = self.post(url, params=params, data=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: test registry connectivity "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()[0]
+
+
 
     def delete_registry_scan(self, containers_scan_id):
         params = {"customerGUID": self.customer_guid}
