@@ -1407,13 +1407,16 @@ class ControlPanelAPI(object):
         url = "/api/v1/registry/repositoriesList"
         params = {"customerGUID": self.customer_guid, "jobID": job_id}
 
-        r = self.get(url, params=params)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
+        for i in range(5):
+            r = self.get(url, params=params)
+            if 200 <= r.status_code < 300:
+                    return r.json()
+            time.sleep(5)
+
+        raise Exception(
                 'Error accessing dashboard. Request: get repositories list "%s" (code: %d, message: %s, jobID: %s)' % (
                     self.customer, r.status_code, r.text, job_id))
 
-        return r.json()
 
 
     def test_registry_connectivity_request(self, cluster_name, registry_name, auth_method, excluded_repositories):
