@@ -1175,7 +1175,7 @@ class ControlPanelAPI(object):
         cronjob_list = r.json()
 
         for cj in cronjob_list:
-            if cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED] == cj_name:
+            if statics.CA_VULN_SCAN_CRONJOB_NAME_FILED in cj and cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED] == cj_name:
                 return cj
         if not expect_to_results:
             return {}
