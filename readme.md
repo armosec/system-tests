@@ -78,17 +78,17 @@ Add to environment the following values to connect to the backend:
 
 #### kwargs options
 
-| Command                  | Description                                        |
-|:-------------------------|----------------------------------------------------|
-| `ks_branch=value`        | install kubescape from branch value                |
-| `helm_branch=value`      | install helm-chart from branch value               |
-| `local_helm_chart=value` | local repo to install the helm-chart               |
-| `kubescape=value`        | use local kubescape in located in path: value      |
-| `kubescape-tag=value`    | install helm-chart with kubescape from tag: value  |
-| `kubevuln-tag=value`     | install helm-chart with kubevuln from tag: value   |
-| `kontroller-tag=value`   | install helm-chart with kontroller from tag: value |
-| `kollector-tag=value`    | install helm-chart with kollector from tag: value  |
-| `gateway-tag=value`      | install helm-chart with gateway from tag: value    |
+| Command                  | Description                                       |
+|:-------------------------|---------------------------------------------------|
+| `ks_branch=value`        | install kubescape from branch value               |
+| `helm_branch=value`      | install helm-chart from branch value              |
+| `local_helm_chart=value` | local repo to install the helm-chart              |
+| `kubescape=value`        | use local kubescape in located in path: value     |
+| `kubescape-tag=value`    | install helm-chart with kubescape from tag: value |
+| `kubevuln-tag=value`     | install helm-chart with kubevuln from tag: value  |
+| `operator-tag=value`     | install helm-chart with operator from tag: value  |
+| `kollector-tag=value`    | install helm-chart with kollector from tag: value |
+| `gateway-tag=value`      | install helm-chart with gateway from tag: value   |
 
 
 #### Run command:
