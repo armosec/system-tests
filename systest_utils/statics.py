@@ -135,7 +135,7 @@ KOLLECTOR_COMPONENT_NAME = 'kollector'
 GATEWAY_COMPONENT_NAME = 'gateway'
 
 KUBESCAPE_COMPONENT_TAG = 'kubescape-tag'
-KONTROLLER_COMPONENT_TAG = 'kontroller-tag'
+OPERATOR_COMPONENT_TAG = 'operator-tag'
 KUBEVULN_COMPONENT_TAG = 'kubevuln-tag'
 KOLLECTOR_COMPONENT_TAG = 'kollector-tag'
 GATEWAY_COMPONENT_TAG = 'gateway-tag'

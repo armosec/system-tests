@@ -101,7 +101,7 @@ class BaseHelm(BaseK8S):
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.KUBEVULN_COMPONENT_NAME,
                                                           component_tag=statics.KUBEVULN_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.OPERATOR_COMPONENT_NAME,
-                                                          component_tag=statics.KONTROLLER_COMPONENT_TAG))
+                                                          component_tag=statics.OPERATOR_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.KOLLECTOR_COMPONENT_NAME,
                                                           component_tag=statics.KOLLECTOR_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.GATEWAY_COMPONENT_NAME,
