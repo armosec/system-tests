@@ -1109,7 +1109,7 @@ class ControlPanelAPI(object):
         return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,registry_name= registry_name, excluded_repositories= excluded_repositories, registry_type=registry_type, auth_method=auth_method, schedule_string=schedule_string, kind=kind)
 
 
-    def send_registry_command(self, command, cluster_name, registry_name: str,   excluded_repositories: str, registry_type: str, auth_method: dict, schedule_string: str , kind :str, depth: int = 1):
+    def send_registry_command(self, command, cluster_name, registry_name: str,    registry_type: str, auth_method: dict, schedule_string: str , kind :str, depth: int = 1, excluded_repositories: list = []):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
         provider = registry_name.split(":")[0]
@@ -1138,8 +1138,8 @@ class ControlPanelAPI(object):
         r = self.post(url, params=params, data=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: test registry connectivity "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                   command, self.customer, r.status_code, r.text))
         return r
 
             
@@ -1282,8 +1282,8 @@ class ControlPanelAPI(object):
         r = self.post(url, params=params, data=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: test registry connectivity "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                    statics.UPDATE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
         return r
 
         
@@ -1327,8 +1327,8 @@ class ControlPanelAPI(object):
         r = self.delete(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: delete registry scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request:  %s "%s" (code: %d, message: %s)' % (
+                  statics.DELETE_REGISTRY_CJ_COMMAND,  self.customer, r.status_code, r.text))
         try:
             return r.json()
         except Exception as ex:
@@ -1342,8 +1342,8 @@ class ControlPanelAPI(object):
         r = self.delete(url, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: delete registry scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                statics.DELETE_REGISTRY_CJ_COMMAND,    self.customer, r.status_code, r.text))
         try:
             return r.json()
         except Exception as ex:
