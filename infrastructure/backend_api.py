@@ -1104,12 +1104,12 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def create_registry_scan_job_request(self, cluster_name, registry_name: str,    auth_method: dict, schedule_string: str, registry_type: str, kind: str,
+    def create_registry_scan_job_request(self, cluster_name, registry_name: str,    auth_method: dict, schedule_string: str, registry_type: str, 
     excluded_repositories: list = []):
-        return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,registry_name= registry_name, excluded_repositories= excluded_repositories, registry_type=registry_type, auth_method=auth_method, schedule_string=schedule_string, kind=kind)
+        return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,registry_name= registry_name, excluded_repositories= excluded_repositories, registry_type=registry_type, auth_method=auth_method, schedule_string=schedule_string)
 
 
-    def send_registry_command(self, command, cluster_name, registry_name: str,    registry_type: str, auth_method: dict, schedule_string: str , kind :str, depth: int = 1, excluded_repositories: list = []):
+    def send_registry_command(self, command, cluster_name, registry_name: str,    registry_type: str, auth_method: dict, schedule_string: str ,  depth: int = 1, excluded_repositories: list = []):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
         provider = registry_name.split(":")[0]
@@ -1125,7 +1125,6 @@ class ControlPanelAPI(object):
             "depth": depth,
             "include": [],
             "exclude": excluded_repositories,
-            "kind": kind,
             "isHTTPs": False,
             "skipTLS": True,
             "authMethod": {
@@ -1135,7 +1134,7 @@ class ControlPanelAPI(object):
             }
             }
         ])
-        r = self.post(url, params=params, data=body)
+        r = self.post(url, params=params, data=body, timeout=15)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
@@ -1176,7 +1175,7 @@ class ControlPanelAPI(object):
     def get_registry_scan_cronjob_list(self, cluster_name: str, expected_cjs):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
-        r = self.get(url, params=params)
+        r = self.get(url, params=params, timeout=15)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get registry scan cronjob list "%s" (code: %d, message: %s)' % (
@@ -1260,26 +1259,27 @@ class ControlPanelAPI(object):
     def update_vuln_scan_cronjob(self, cj):
         self.send_registry_command(command=statics.UPDATE_REGISTRY_CJ_COMMAND)
 
-    def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type, cron_tab_schedule, depth ):
+    def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type, cron_tab_schedule, depth,  auth_method=None ):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
         provider = registry_name.split(":")[0]
         provider = provider.split("/")[0]
-        body = json.dumps([
-    {
+        body = {
         "name":cj_name,
        "id": cj_id,
         "clusterName": cluster_name,
         "registryProvider":provider,
         "registryName": registry_name,
         "registryType": registry_type,
-        "cronTabSchedule": cron_tab_schedule,
+    "cronTabSchedule": cron_tab_schedule,
         "depth": depth,
         "repositories": [],
         "action": statics.UPDATE_REGISTRY_CJ_COMMAND
     }
-])
-        r = self.post(url, params=params, data=body)
+        if auth_method != None:
+            body['authMethod'] = auth_method
+
+        r = self.post(url, params=params, data=json.dumps([body]), timeout=20)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
