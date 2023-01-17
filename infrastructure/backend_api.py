@@ -1088,8 +1088,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-
-    def create_registry_scan_job_request(self, cluster_name, registry_name: str, schedule_string: str = ''):
+    def create_registry_scan_job_request_deprecated(self, cluster_name, registry_name: str, schedule_string: str = ''):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
         body = []
@@ -1104,6 +1103,46 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: create registry scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def create_registry_scan_job_request(self, cluster_name, registry_name: str,    auth_method: dict, schedule_string: str, registry_type: str, 
+    excluded_repositories: list = []):
+        return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,registry_name= registry_name, excluded_repositories= excluded_repositories, registry_type=registry_type, auth_method=auth_method, schedule_string=schedule_string)
+
+
+    def send_registry_command(self, command, cluster_name, registry_name: str,    registry_type: str, auth_method: dict, schedule_string: str ,  depth: int = 1, excluded_repositories: list = []):
+        url = "/api/v1/registry/scan"
+        params = {"customerGUID": self.customer_guid}
+        provider = registry_name.split(":")[0]
+        provider = provider.split("/")[0]
+        body = json.dumps([
+            {
+            "registryProvider": provider,
+            "action": command,
+            "clusterName": cluster_name,
+            "registryName": registry_name,
+            "cronTabSchedule": schedule_string,
+            "registryType": registry_type,
+            "depth": depth,
+            "include": [],
+            "exclude": excluded_repositories,
+            "isHTTPs": False,
+            "skipTLS": True,
+            "authMethod": {
+                "type": auth_method["type"],
+                "username":auth_method["username"],
+                "password": auth_method["password"]
+            }
+            }
+        ])
+        r = self.post(url, params=params, data=body, timeout=15)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                   command, self.customer, r.status_code, r.text))
+        return r
+
+            
+
 
     def get_vuln_scan_cronjob_list(self, cluster_name: str, expected_cjs):
         url = "/api/v1/vulnerability/scan/v2/"
@@ -1133,8 +1172,21 @@ class ControlPanelAPI(object):
                     assert actual[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubevuln"), f'cronjob name is not as expected'
 
 
-
     def get_registry_scan_cronjob_list(self, cluster_name: str, expected_cjs):
+        url = "/api/v1/registry/scan"
+        params = {"customerGUID": self.customer_guid}
+        r = self.get(url, params=params, timeout=15)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get registry scan cronjob list "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        cronjob_list = r.json()
+        registry_scan_cronjob_list = [cj for cj in cronjob_list if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
+        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs, cluster_name=cluster_name)    
+        return registry_scan_cronjob_list
+
+
+    def get_registry_scan_cronjob_list_deprecated(self, cluster_name: str, expected_cjs):
         url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
         r = self.get(url, params=params)
@@ -1205,18 +1257,38 @@ class ControlPanelAPI(object):
             f'cronjob-list: {cronjob_list}')
 
     def update_vuln_scan_cronjob(self, cj):
-        cj = [cj] if isinstance(cj, dict) else cj
-        url = "/api/v1/vulnerability/scan/v2/"
+        self.send_registry_command(command=statics.UPDATE_REGISTRY_CJ_COMMAND)
+
+    def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type, cron_tab_schedule, depth,  auth_method=None ):
+        url = "/api/v1/registry/scan"
         params = {"customerGUID": self.customer_guid}
-        r = self.put(url, params=params, json=cj)
+        provider = registry_name.split(":")[0]
+        provider = provider.split("/")[0]
+        body = {
+        "name":cj_name,
+       "id": cj_id,
+        "clusterName": cluster_name,
+        "registryProvider":provider,
+        "registryName": registry_name,
+        "registryType": registry_type,
+    "cronTabSchedule": cron_tab_schedule,
+        "depth": depth,
+        "repositories": [],
+        "action": statics.UPDATE_REGISTRY_CJ_COMMAND
+    }
+        if auth_method != None:
+            body['authMethod'] = auth_method
+
+        r = self.post(url, params=params, data=json.dumps([body]), timeout=20)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: update vuln scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                    statics.UPDATE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
         return r
 
+        
 
-    def update_registry_scan_cronjob(self, cj):
+    def update_registry_scan_cronjob_deprecated(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
         url = "/api/v1/registry/scan/"
         params = {"customerGUID": self.customer_guid}
@@ -1237,16 +1309,41 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete vuln scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-
+    
     def delete_registry_scan_cronjob(self, cj):
+        url = "/api/v1/registry/scan/"
+        params = {"customerGUID": self.customer_guid}
+        body = [
+            {
+                "name": cj["name"],
+                "id": cj["id"],
+                "clusterName": cj["clusterName"],
+                "registryProvider": cj["registryProvider"],
+                "registryName": cj["registryName"],
+                "action": statics.DELETE_REGISTRY_CJ_COMMAND
+            }
+            ]
+
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request:  %s "%s" (code: %d, message: %s)' % (
+                  statics.DELETE_REGISTRY_CJ_COMMAND,  self.customer, r.status_code, r.text))
+        try:
+            return r.json()
+        except Exception as ex:
+            Logger.logger.debug("delete_registry_scan_cronjob failed to parse response: {0};{1};{2}".format(cj, ex, r.status_code))
+            return {}
+
+    def delete_registry_scan_cronjob_deprecated(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
         url = "/api/v1/registry/scan/"
         params = {"customerGUID": self.customer_guid}
         r = self.delete(url, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: delete registry scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
+                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
+                statics.DELETE_REGISTRY_CJ_COMMAND,    self.customer, r.status_code, r.text))
         try:
             return r.json()
         except Exception as ex:
@@ -1439,7 +1536,7 @@ class ControlPanelAPI(object):
             "isHTTPs": False,
             "skipTLS": True,
             "authMethod": {
-                "type": auth_method["auth_type"],
+                "type": auth_method["type"],
                 "username":auth_method["username"],
                 "password": auth_method["password"]
             }
