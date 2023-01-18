@@ -1257,7 +1257,15 @@ class ControlPanelAPI(object):
             f'cronjob-list: {cronjob_list}')
 
     def update_vuln_scan_cronjob(self, cj):
-        self.send_registry_command(command=statics.UPDATE_REGISTRY_CJ_COMMAND)
+        cj = [cj] if isinstance(cj, dict) else cj
+        url = "/api/v1/vulnerability/scan/v2/"
+        params = {"customerGUID": self.customer_guid}
+        r = self.put(url, params=params, json=cj)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update vuln scan cronjob "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
 
     def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type, cron_tab_schedule, depth,  auth_method=None ):
         url = "/api/v1/registry/scan"
