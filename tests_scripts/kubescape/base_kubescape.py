@@ -22,6 +22,8 @@ DEFAULT_RELEASE = "latest"
 DEFAULT_RESULTS = "results.json"
 
 _CLI_STATUS_FILED = 'status'
+_CLI_SUB_STATUS_FIELD = 'subStatus'
+_CLI_SUB_STATUS_EXCEPTIONS = 'w/exceptions'
 _CLI_STATUS_FAILED = 'failed'
 _CLI_SUMMARY_DETAILS_FIELD = 'summaryDetails'
 _CLI_RESOURCE_COUNTERS_FIELD = 'ResourceCounters'
@@ -372,41 +374,41 @@ class BaseKubescape(BaseK8S):
                                                                         counter=_CLI_PASSED_RESOURCES_FIELD)
         assert result[_CLI_FAILED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
                                                                         counter=_CLI_FAILED_RESOURCES_FIELD)
-        assert result[_CLI_EXCLUDED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
-                                                                          counter=_CLI_EXCLUDED_RESOURCES_FIELD)
-        # assert result[_CLI_SKIPPED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
-        #                                                                  counter=_CLI_SKIPPED_RESOURCES_FIELD)
+        # assert result[_CLI_EXCLUDED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
+        #                                                                   counter=_CLI_EXCLUDED_RESOURCES_FIELD)
+        assert result[_CLI_SKIPPED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
+                                                                         counter=_CLI_SKIPPED_RESOURCES_FIELD)
 
     @staticmethod
-    def is_failed_passed_and_excluded_less_than_all(total_resources: int, resource_counters: dict, name: str):
-        message = "in {name}, {all} < {passed}+{failed}+{excluded} (all<passed+failed+excluded)"
+    def is_failed_passed_and_skipped_less_than_all(total_resources: int, resource_counters: dict, name: str):
+        message = "in {name}, {all} < {passed}+{failed}+{skipped} (all<passed+failed+skipped)"
         failed = resource_counters[_CLI_FAILED_RESOURCES_FIELD]
         passed = resource_counters[_CLI_PASSED_RESOURCES_FIELD]
-        excluded = resource_counters[_CLI_EXCLUDED_RESOURCES_FIELD]
+        skipped = resource_counters[_CLI_SKIPPED_RESOURCES_FIELD]
         # skipped = resource_counters[_CLI_SKIPPED_RESOURCES_FIELD]
-        assert total_resources >= passed + failed + excluded, message.format(
-            name=name, all=total_resources, failed=failed, passed=passed, excluded=excluded)
+        assert total_resources >= passed + failed + skipped, message.format(
+            name=name, all=total_resources, failed=failed, passed=passed, skipped=skipped)
 
     @staticmethod
     def test_resources_number_counter_in_result(framework_report: dict):
         """
-        Check if the number in "all resources" >= "passed" + "failed" + "excluded"
+        Check if the number in "all resources" >= "passed" + "failed" + "skipped"
         """
         all_resources = len(framework_report[_CLI_RESULTS_FIELD])
-        BaseKubescape.is_failed_passed_and_excluded_less_than_all(
+        BaseKubescape.is_failed_passed_and_skipped_less_than_all(
             total_resources=all_resources,
             resource_counters=framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD], name='global')
         for c_id, control in framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD].items():
-            BaseKubescape.is_failed_passed_and_excluded_less_than_all(
+            BaseKubescape.is_failed_passed_and_skipped_less_than_all(
                 total_resources=all_resources, resource_counters=control[_CLI_RESOURCE_COUNTERS_FIELD], name=c_id)
 
     @staticmethod
-    def test_exception_result(framework_report: dict):
-        message = "expected to receive non zero in warning resources filed, receive {x}". \
-            format(
-            x=framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD])
-        assert framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD][
-                   _CLI_EXCLUDED_RESOURCES_FIELD] > 0, message
+    def test_exception_result(framework_report: dict, controls_with_exception: list):
+        for c_id in controls_with_exception:
+            sub_status = framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_SUB_STATUS_FIELD]
+            assert sub_status == _CLI_SUB_STATUS_EXCEPTIONS, \
+                "control {x} supposed to be {w}, but it is {y}".format(x=c_id, y=sub_status, w=_CLI_SUB_STATUS_EXCEPTIONS)
+
 
     # @staticmethod
     # def test_results(framework_report: dict):

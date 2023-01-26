@@ -75,9 +75,9 @@ class ScanWithExceptions(BaseKubescape):
                                                     [self.test_obj.get_arg("exceptions")])
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    exceptions=''.join(exception_file))
-
+        control_test = self.test_obj.get_arg("controls_tested")
         Logger.logger.info("Testing results")
-        self.test_exception_result(framework_report=result)
+        self.test_exception_result(framework_report=result, controls_with_exception=control_test)
 
         return self.cleanup()
 

@@ -9,16 +9,13 @@
             {
                 "designatorType": "Attributes",
                 "attributes": {
-                    "namespace": "kube-.*"
+                    "kind": ".*"
                 }
             }
         ],
         "posturePolicies": [
             {
-                "frameworkName": "NSA"
-            },
-            {
-                "frameworkName": "MITRE"
+                "controlID": "C-0002" 
             }
         ]
     }
