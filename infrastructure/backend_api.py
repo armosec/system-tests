@@ -625,8 +625,8 @@ class ControlPanelAPI(object):
             raise Exception('Error accessing dashboard. Request: results of posture top failed controls is empty')
         return r.json()['response']
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = ""):
-        r = self.post("/api/v1/posture/resources", params={"customerGUID": self.customer_guid},
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false"):
+        r = self.post("/api/v1/posture/resources", params={"customerGUID": self.customer_guid, "relatedExceptions": related_exceptions},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
                           "designators.attributes.name": resource_name}]})

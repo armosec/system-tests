@@ -7,6 +7,7 @@ import time
 from configurations.system.git_repository import GitRepository
 from systest_utils import Logger, TestUtil, statics
 from .base_kubescape import (
+    _CLI_SKIPPED_RESOURCES_FIELD,
     BaseKubescape,
     _CLI_RESULTS_FIELD,
     _CLI_PASSED_RESOURCES_FIELD,
@@ -547,7 +548,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         assert repo_summary["statusText"] == kubescape_report[_CLI_SUMMARY_DETAILS_FIELD][
             "status"], "Repository summary status is different between BE and KS"
 
-        kubescape_status_to_control_id = dict(passed=[], failed=[], irrelevant=[])
+        kubescape_status_to_control_id = dict(passed=[], failed=[], skipped=[])
         for c_id, control in kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(statics.CONTROLS_FIELD,
                                                                                       {}).items():
             kubescape_status_to_control_id[control["status"]].append(c_id)
@@ -555,12 +556,18 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         # Check controlsStats counters in Repo Summary
         assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"])
         assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"])
+        assert repo_summary["controlsStats"]["skipped"] == len(kubescape_status_to_control_id["skipped"])
 
         # Check controlsInfo in Repo Summary
         assert sorted([c["id"] for c in repo_summary["controlsInfo"]["failed"]]) == sorted(
             kubescape_status_to_control_id["failed"])
         assert sorted([c["id"] for c in repo_summary["controlsInfo"]["passed"]]) == sorted(
             kubescape_status_to_control_id["passed"])
+        if "skipped" in repo_summary["controlsInfo"].keys():
+            assert sorted([c["id"] for c in repo_summary["controlsInfo"]["skipped"]]) == sorted(
+                kubescape_status_to_control_id["skipped"])
+        else:
+            assert len(kubescape_status_to_control_id["skipped"]) == 0
 
         Logger.logger.info("Testing file summary")
         file_summary = self.backend.get_repository_posture_files(new_report_guid)
@@ -615,6 +622,9 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         )
         assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
             [r["statusText"] for r in resources if(r["statusText"] == "excluded" or  r["statusText"] == "warning")]
+        )
+        assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == len(
+            [r["statusText"] for r in resources if(r["statusText"] == "skipped")]
         )
 
         Logger.logger.info("Testing repository registration in portal")
