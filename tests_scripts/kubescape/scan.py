@@ -591,7 +591,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             assert len(expected_helm_files) <= len(
                 be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
                                 f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
-            assert sorted(expected_helm_files) <= sorted(be_helm_file_paths)
+            for helm_chart in expected_helm_files:
+                assert helm_chart in be_helm_file_paths, f"Expected to find {helm_chart} in file summary, but it wasn't found"
             assert "0" not in [str(f["childCount"]) for f in
                                be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
         else:
