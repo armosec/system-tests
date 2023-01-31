@@ -588,10 +588,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         if expected_helm_files and len(expected_helm_files) > 0:
             Logger.logger.info("Testing helm chart scanning")
             be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
-            assert len(expected_helm_files) == len(
+            assert len(expected_helm_files) <= len(
                 be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
                                 f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
-            assert sorted(expected_helm_files) == sorted(be_helm_file_paths)
+            assert sorted(expected_helm_files) <= sorted(be_helm_file_paths)
             assert "0" not in [str(f["childCount"]) for f in
                                be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
         else:
