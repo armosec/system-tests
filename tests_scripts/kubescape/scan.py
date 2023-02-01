@@ -601,6 +601,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         Logger.logger.info("Testing resources summary")
         resources = self.backend.get_repository_posture_resources(new_report_guid)
 
+        for resource in resources:
+            assert resource in kubescape_report[_CLI_RESOURCES_FIELD], f"Resource {resource} was not found in the CLI report"
         # Check Total # of Resources
         assert len(resources) == len(kubescape_report[
                                          _CLI_RESULTS_FIELD]), f"Number of failed resources reported to BE: {len(resources)}, Number of failed resources counted by the CLI: {len(kubescape_report[_CLI_RESULTS_FIELD])}"
