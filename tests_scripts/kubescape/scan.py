@@ -590,7 +590,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
             assert len(expected_helm_files) <= len(
                 be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
-                                f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
+                                     f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
             for helm_chart in expected_helm_files:
                 assert helm_chart in be_helm_file_paths, f"Expected to find {helm_chart} in file summary, but it wasn't found"
             assert "0" not in [str(f["childCount"]) for f in
@@ -602,7 +602,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         resources = self.backend.get_repository_posture_resources(new_report_guid)
 
         # Check Total # of Resources
-        assert len(resources) == len(kubescape_report[_CLI_RESULTS_FIELD])
+        assert len(resources) == len(kubescape_report[
+                                         _CLI_RESULTS_FIELD]), f"Number of failed resources reported to BE: {len(resources)}, Number of failed resources counted by the CLI: {len(kubescape_report[_CLI_RESULTS_FIELD])}"
 
         # Check amount of resources per status
         ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
@@ -615,7 +616,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             [r["statusText"] for r in resources if r["statusText"] == "failed"]
         )
         assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if(r["statusText"] == "excluded" or  r["statusText"] == "warning")]
+            [r["statusText"] for r in resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")]
         )
 
         Logger.logger.info("Testing repository registration in portal")
