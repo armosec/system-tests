@@ -606,7 +606,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         if len(be_resources) != len(cli_resources):
             l = [i["resourceID"] for i in be_resources if not i in cli_resources]
             l.extend([i["resourceID"] for i in cli_resources if not i in be_resources])
-            raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}. Diff: {l[0]}")
+            raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}. Diff: {l}")
 
         # Check amount of resources per status
         ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
