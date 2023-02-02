@@ -599,26 +599,27 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             assert len(be_helm_files) == 0
 
         Logger.logger.info("Testing resources summary")
-        resources = self.backend.get_repository_posture_resources(new_report_guid)
+        be_resources = self.backend.get_repository_posture_resources(new_report_guid)
 
-        for resource in resources:
-            assert resource in kubescape_report[_CLI_RESOURCES_FIELD], f"Resource {resource} was not found in the CLI report"
+        cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
         # Check Total # of Resources
-        assert len(resources) == len(kubescape_report[
-                                         _CLI_RESULTS_FIELD]), f"Number of failed resources reported to BE: {len(resources)}, Number of failed resources counted by the CLI: {len(kubescape_report[_CLI_RESULTS_FIELD])}"
+        if len(be_resources) != len(cli_resources):
+            l = [i["resourceID"] for i in be_resources if not i in cli_resources]
+            l.extend([i["resourceID"] for i in cli_resources if not i in be_resources])
+            raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}. Diff: {l}")
 
         # Check amount of resources per status
         ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
             _CLI_RESOURCE_COUNTERS_FIELD, {}
         )
         assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if r["statusText"] == "passed"]
+            [r["statusText"] for r in be_resources if r["statusText"] == "passed"]
         )
         assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if r["statusText"] == "failed"]
+            [r["statusText"] for r in be_resources if r["statusText"] == "failed"]
         )
         assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")]
+            [r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")]
         )
 
         Logger.logger.info("Testing repository registration in portal")
