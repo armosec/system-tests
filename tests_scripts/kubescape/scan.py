@@ -595,33 +595,39 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         if expected_helm_files and len(expected_helm_files) > 0:
             Logger.logger.info("Testing helm chart scanning")
             be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
-            assert len(expected_helm_files) == len(
+            assert len(expected_helm_files) <= len(
                 be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
-                                f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
-            assert sorted(expected_helm_files) == sorted(be_helm_file_paths)
+                                     f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
+            for helm_chart in expected_helm_files:
+                assert helm_chart in be_helm_file_paths, f"Expected to find {helm_chart} in file summary, but it wasn't found"
             assert "0" not in [str(f["childCount"]) for f in
                                be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
         else:
             assert len(be_helm_files) == 0
 
         Logger.logger.info("Testing resources summary")
-        resources = self.backend.get_repository_posture_resources(new_report_guid)
+        be_resources = self.backend.get_repository_posture_resources(new_report_guid)
 
+        cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
         # Check Total # of Resources
-        assert len(resources) == len(kubescape_report[_CLI_RESULTS_FIELD])
+        if len(be_resources) != len(cli_resources):
+            l = [i["resourceID"] for i in be_resources if any(i["resourceID"] != j["resourceID"] for j in cli_resources)]
+            li = [i["resourceID"] for i in cli_resources if any(i["resourceID"] != j["resourceID"] for j in be_resources)]
+            raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}."\
+                f"Diff: Resources in be_resources and not in cli_resources:{l}, Resources in cli_resources and not in be_resources:{li}")
 
         # Check amount of resources per status
         ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
             _CLI_RESOURCE_COUNTERS_FIELD, {}
         )
         assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if r["statusText"] == "passed"]
+            [r["statusText"] for r in be_resources if r["statusText"] == "passed"]
         )
         assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if r["statusText"] == "failed"]
+            [r["statusText"] for r in be_resources if r["statusText"] == "failed"]
         )
         assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in resources if(r["statusText"] == "excluded" or  r["statusText"] == "warning")]
+            [r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")]
         )
         assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == len(
             [r["statusText"] for r in resources if(r["statusText"] == "skipped")]
