@@ -22,6 +22,7 @@ DEFAULT_RELEASE = "latest"
 DEFAULT_RESULTS = "results.json"
 
 _CLI_STATUS_FILED = 'status'
+_CLI_STATUS_INFO_FIELD = 'statusInfo'
 _CLI_SUB_STATUS_FIELD = 'subStatus'
 _CLI_SUB_STATUS_EXCEPTIONS = 'w/exceptions'
 _CLI_STATUS_FAILED = 'failed'
@@ -413,7 +414,7 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def test_exception_result(framework_report: dict, controls_with_exception: list):
         for c_id in controls_with_exception:
-            sub_status = framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_SUB_STATUS_FIELD]
+            sub_status = framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_INFO_FIELD][_CLI_SUB_STATUS_FIELD]
             assert sub_status == _CLI_SUB_STATUS_EXCEPTIONS, \
                 "control {x} supposed to be {w}, but it is {y}".format(x=c_id, y=sub_status, w=_CLI_SUB_STATUS_EXCEPTIONS)
 
