@@ -278,12 +278,8 @@ class BaseKubescape(BaseK8S):
         else:
             os_name = "ubuntu"
 
-        # download_url = f"https://github.com/{org}/kubescape/releases/{release}/download/kubescape-{os_name}-latest"
-
-        download_url = 'https://api.github.com/repos/kubescape/kubescape/releases/latest'
-        res = requests.get(download_url).json()
-        version = res['tag_name']
-        download_url = f"https://github.com/kubescape/kubescape/releases/{release}/download/kubescape-{os_name}-latest-{version}"
+        org = "dwertent"
+        download_url = f"https://github.com/{org}/kubescape/releases/{release}/download/kubescape-{os_name}-latest"
 
         kubescape_exec = os.path.join(self.test_driver.temp_dir, "kubescape")
         res = requests.get(download_url)
