@@ -550,6 +550,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         kubescape_status_to_control_id = dict(passed=[], failed=[], irrelevant=[])
         for c_id, control in kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(statics.CONTROLS_FIELD,
                                                                                       {}).items():
+            if control["status"] not in kubescape_status_to_control_id:
+                kubescape_status_to_control_id[control["status"]] = []
             kubescape_status_to_control_id[control["status"]].append(c_id)
 
         # Check controlsStats counters in Repo Summary
