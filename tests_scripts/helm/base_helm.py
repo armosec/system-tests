@@ -83,7 +83,7 @@ class BaseHelm(BaseK8S):
     def install_armo_helm_chart(self, helm_kwargs: dict = {}):
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
-        self.helm_branch = "statuses"
+
         if self.helm_branch != DEFAULT_BRANCH:
             self.download_armo_helm_chart_from_branch(branch=self.helm_branch)
 
