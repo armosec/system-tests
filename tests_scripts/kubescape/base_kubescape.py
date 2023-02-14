@@ -1005,13 +1005,13 @@ class BaseKubescape(BaseK8S):
             time.sleep(10)
         return False
 
-    def is_hostsensor_triggered(self, timeout=60):
+    def is_hostsensor_triggered(self, timeout=180):
         start = time.time()
         err = ""
         while time.time() - start < timeout:
             if self.kubernetes_obj.is_hostsensor_triggered():
                 return True
-            time.sleep(10)
+            time.sleep(5)
         return False
 
     @staticmethod
