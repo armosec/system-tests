@@ -7,8 +7,7 @@
       "status": "failed",
       "ResourceCounters": {
         "passedResources": 51,
-        "failedResources": 2,
-        "excludedResources": 0
+        "failedResources": 2
       }
     },
     "C-0012": {
@@ -17,8 +16,7 @@
       "status": "passed",
       "ResourceCounters": {
         "passedResources": 1,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0017": {
@@ -27,8 +25,7 @@
       "status": "failed",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 1,
-        "excludedResources": 0
+        "failedResources": 1
       }
     },
     "C-0030": {
@@ -37,8 +34,7 @@
       "status": "failed",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 1,
-        "excludedResources": 0
+        "failedResources": 1
       }
     },
     "C-0035": {
@@ -47,8 +43,7 @@
       "status": "failed",
       "ResourceCounters": {
         "passedResources": 51,
-        "failedResources": 2,
-        "excludedResources": 0
+        "failedResources": 2
       }
     },
     "C-0041": {
@@ -57,8 +52,7 @@
       "status": "passed",
       "ResourceCounters": {
         "passedResources": 1,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0047": {
@@ -67,8 +61,7 @@
       "status": "irrelevant",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0058": {
@@ -77,8 +70,7 @@
       "status": "irrelevant",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0066": {
@@ -87,8 +79,7 @@
       "status": "irrelevant",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0067": {
@@ -97,8 +88,7 @@
       "status": "irrelevant",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     },
     "C-0068": {
@@ -107,14 +97,12 @@
       "status": "irrelevant",
       "ResourceCounters": {
         "passedResources": 0,
-        "failedResources": 0,
-        "excludedResources": 0
+        "failedResources": 0
       }
     }
   },
   "ResourceCounters": {
     "passedResources": 51,
-    "failedResources": 3,
-    "excludedResources": 0
+    "failedResources": 3
   }
 }

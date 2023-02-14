@@ -117,6 +117,7 @@ RULE_RESPONSE_FIELD = "ruleResponse"
 
 BE_FAILED_RESOURCES_COUNT_FIELD = "failedResourcesCount"
 BE_WARNING_RESOURCES_COUNT_FIELD = "warningResourcesCount"
+BE_SKIPPED_RESOURCES_COUNT_FIELD = "skippedResourcesCount"
 BE_CORDS_FIELD = "cords"
 BE_REPORT_GUID_FIELD = "reportGUID"
 BE_REPORT_TIMESTAMP_FIELD = "timestamp"

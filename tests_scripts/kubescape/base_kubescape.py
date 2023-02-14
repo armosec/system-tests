@@ -22,6 +22,9 @@ DEFAULT_RELEASE = "latest"
 DEFAULT_RESULTS = "results.json"
 
 _CLI_STATUS_FILED = 'status'
+_CLI_STATUS_INFO_FIELD = 'statusInfo'
+_CLI_SUB_STATUS_FIELD = 'subStatus'
+_CLI_SUB_STATUS_EXCEPTIONS = 'w/exceptions'
 _CLI_STATUS_FAILED = 'failed'
 _CLI_SUMMARY_DETAILS_FIELD = 'summaryDetails'
 _CLI_RESOURCE_COUNTERS_FIELD = 'ResourceCounters'
@@ -202,9 +205,10 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false"):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
-                                               framework_name=framework_name, report_guid=report_guid)
+                                               framework_name=framework_name, report_guid=report_guid,
+                                               resource_name=resource_name, related_exceptions=related_exceptions)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -372,41 +376,42 @@ class BaseKubescape(BaseK8S):
                                                                         counter=_CLI_PASSED_RESOURCES_FIELD)
         assert result[_CLI_FAILED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
                                                                         counter=_CLI_FAILED_RESOURCES_FIELD)
-        assert result[_CLI_EXCLUDED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
-                                                                          counter=_CLI_EXCLUDED_RESOURCES_FIELD)
-        # assert result[_CLI_SKIPPED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
-        #                                                                  counter=_CLI_SKIPPED_RESOURCES_FIELD)
+        # assert result[_CLI_EXCLUDED_RESOURCES_FIELD] >= 0, message.format(resource_name=name,
+        #                                                                   counter=_CLI_EXCLUDED_RESOURCES_FIELD)
+
+        assert result.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) >= 0, message.format(resource_name=name,
+                                                                            counter=_CLI_SKIPPED_RESOURCES_FIELD)
 
     @staticmethod
-    def is_failed_passed_and_excluded_less_than_all(total_resources: int, resource_counters: dict, name: str):
-        message = "in {name}, {all} < {passed}+{failed}+{excluded} (all<passed+failed+excluded)"
+    def is_failed_passed_and_skipped_less_than_all(total_resources: int, resource_counters: dict, name: str):
+        message = "in {name}, {all} < {passed}+{failed}+{skipped} (all<passed+failed+skipped)"
         failed = resource_counters[_CLI_FAILED_RESOURCES_FIELD]
         passed = resource_counters[_CLI_PASSED_RESOURCES_FIELD]
-        excluded = resource_counters[_CLI_EXCLUDED_RESOURCES_FIELD]
+        skipped = resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0)
         # skipped = resource_counters[_CLI_SKIPPED_RESOURCES_FIELD]
-        assert total_resources >= passed + failed + excluded, message.format(
-            name=name, all=total_resources, failed=failed, passed=passed, excluded=excluded)
+        assert total_resources >= passed + failed + skipped, message.format(
+            name=name, all=total_resources, failed=failed, passed=passed, skipped=skipped)
 
     @staticmethod
     def test_resources_number_counter_in_result(framework_report: dict):
         """
-        Check if the number in "all resources" >= "passed" + "failed" + "excluded"
+        Check if the number in "all resources" >= "passed" + "failed" + "skipped"
         """
         all_resources = len(framework_report[_CLI_RESULTS_FIELD])
-        BaseKubescape.is_failed_passed_and_excluded_less_than_all(
+        BaseKubescape.is_failed_passed_and_skipped_less_than_all(
             total_resources=all_resources,
             resource_counters=framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD], name='global')
         for c_id, control in framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD].items():
-            BaseKubescape.is_failed_passed_and_excluded_less_than_all(
+            BaseKubescape.is_failed_passed_and_skipped_less_than_all(
                 total_resources=all_resources, resource_counters=control[_CLI_RESOURCE_COUNTERS_FIELD], name=c_id)
 
     @staticmethod
-    def test_exception_result(framework_report: dict):
-        message = "expected to receive non zero in warning resources filed, receive {x}". \
-            format(
-            x=framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD])
-        assert framework_report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_RESOURCE_COUNTERS_FIELD][
-                   _CLI_EXCLUDED_RESOURCES_FIELD] > 0, message
+    def test_exception_result(framework_report: dict, controls_with_exception: list):
+        for c_id in controls_with_exception:
+            sub_status = framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_INFO_FIELD][_CLI_SUB_STATUS_FIELD]
+            assert sub_status == _CLI_SUB_STATUS_EXCEPTIONS, \
+                "control {x} supposed to be {w}, but it is {y}".format(x=c_id, y=sub_status, w=_CLI_SUB_STATUS_EXCEPTIONS)
+
 
     # @staticmethod
     # def test_results(framework_report: dict):
@@ -429,22 +434,19 @@ class BaseKubescape(BaseK8S):
             message.format(x=len(cli_controls), y=len(be_controls))
 
     @staticmethod
-    def test_status_text(result_count: dict, warning_count: int, failed_count: int, status_txt: str, control_name: str):
+    def test_status_text(result_count: dict, skipped_controls: int, failed_count: int, status_txt: str, control_name: str):
         if failed_count > 0:
             result_count['failed_controls'] += 1
             assert status_txt == "failed", \
                 "control {x} supposed to be failed, but it is {y}".format(x=control_name, y=status_txt)
-        elif warning_count > 0:
-            result_count['warning_controls'] += 1
-            assert status_txt == "warning", \
-                "control {x} supposed to be warning, but it is {y}".format(x=control_name, y=status_txt)
-        elif warning_count > 0:
-            result_count['warning_controls'] += 1
-            assert status_txt == "warning", \
+        elif skipped_controls > 0:
+            result_count['skipped_controls'] += 1
+            assert status_txt == "skipped", \
                 "control {x} supposed to be warning, but it is {y}".format(x=control_name, y=status_txt)
         else:
-            # TODO: handle skipped
-            assert status_txt == "passed" or status_txt == "skipped" or status_txt == "irrelevant", \
+            # TODO: kept for backward compatibility the line below should be changed to "assert status_txt == "passed", \" 
+            # after the statuses merged to kubescape"
+            assert status_txt == "passed" or status_txt == "skipped" or status_txt == "warning" or status_txt == "irrelevant", \
                 "control {x} supposed to be passed or skipped, but it is {y}".format(x=control_name, y=status_txt)
         result_count['total_controls'] += 1
         return result_count
@@ -465,7 +467,7 @@ class BaseKubescape(BaseK8S):
     def test_controls_from_backend(cli_controls: dict, be_frameworks: dict, be_controls: list):
         BaseKubescape.test_number_of_controls_in_be(cli_controls=cli_controls, be_controls=be_controls)
 
-        result_count = {'total_controls': 0, 'failed_controls': 0, 'warning_controls': 0}
+        result_count = {'total_controls': 0, 'failed_controls': 0, 'skipped_controls': 0}
         for be_control in be_controls:
             c_id = be_control['id']
             assert c_id in cli_controls.keys(), "control {x} found in be_results, but not in cli_results".format(x=c_id)
@@ -475,17 +477,16 @@ class BaseKubescape(BaseK8S):
                     format(x=c_id, w=be_control[statics.BE_NAME_FILED],
                            y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_FAILED_RESOURCES_FIELD],
                            z=be_control[statics.BE_FAILED_RESOURCES_COUNT_FIELD])
-
-            assert be_control[statics.BE_WARNING_RESOURCES_COUNT_FIELD] == \
-                   cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD], \
-                "control {x} - {w}: the cli result is {y} warning, backend result is {z} warning". \
+            
+            assert be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD ,0) == cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD].get(_CLI_SKIPPED_RESOURCES_FIELD, 0), \
+                "control {x} - {w}: the cli result is {y} skipped, backend result is {z} skipped". \
                     format(x=c_id, w=be_control[statics.BE_NAME_FILED],
-                           y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_EXCLUDED_RESOURCES_FIELD],
-                           z=be_control[statics.BE_WARNING_RESOURCES_COUNT_FIELD])
+                        y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_SKIPPED_RESOURCES_FIELD],
+                        z=be_control[statics.BE_SKIPPED_RESOURCES_COUNT_FIELD])
 
             result_count = BaseKubescape.test_status_text(
                 result_count=result_count,
-                warning_count=be_control[statics.BE_WARNING_RESOURCES_COUNT_FIELD],
+                skipped_controls=be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD ,0),
                 failed_count=be_control[statics.BE_FAILED_RESOURCES_COUNT_FIELD],
                 status_txt=be_control[statics.BE_STATUS_TEXT_FILED],
                 control_name=be_control[statics.BE_NAME_FILED])
@@ -668,9 +669,11 @@ class BaseKubescape(BaseK8S):
 
     def test_related_applied_in_be(self, control_name: str, control_id: str, report_guid: str, framework_name: str,
                                    resource_name: str, has_related: bool, has_applied: bool):
-        be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
-                                                             control_id=control_id, report_guid=report_guid,
-                                                             framework_name=framework_name)
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid, 
+                                                  resource_name=resource_name,related_exceptions="true")
+        # be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
+        #                                                      control_id=control_id, report_guid=report_guid,
+        #                                                      framework_name=framework_name)
         resource = BaseKubescape.get_resource_from_be_resources(be_resources=be_resources, resource_name=resource_name)
         assert has_applied and len(resource["exceptionApplied"]) > 0 or not has_applied and \
                len(resource["exceptionApplied"]) == 0, "Applied-exception was received, " \
@@ -706,11 +709,6 @@ class BaseKubescape(BaseK8S):
                   " and failedResourcesCount = {x2}"
         assert control['previousFailedResourcesCount'] - control['failedResourcesCount'] > 0, message.format(
             x1=control['previousFailedResourcesCount'], x2=control['failedResourcesCount']
-        )
-        message = "Expect to increase the warning-controls. receive from backend: previousWarningResourcesCount = {x1}" \
-                  " and warningResourcesCount = {x2}"
-        assert control['previousWarningResourcesCount'] - control['warningResourcesCount'] < 0, message.format(
-            x1=control['previousWarningResourcesCount'], x2=control['warningResourcesCount']
         )
 
     def get_report_guid_and_timestamp_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",

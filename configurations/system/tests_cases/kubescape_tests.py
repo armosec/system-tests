@@ -35,7 +35,8 @@ class KubescapeTests(object):
             test_obj=ScanWithExceptions,
             policy_scope='framework',
             policy_name='mitre',
-            exceptions='kube-ns.json'
+            exceptions='kube-ns.json',
+            controls_tested=["C-0002"]
         )
 
     @staticmethod
