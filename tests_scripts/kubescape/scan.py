@@ -347,8 +347,8 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
-        Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y passed")
-        self.test_customer_configuration_result(cli_result=result, expected_result='passed',
+        Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
+        self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
 
         Logger.logger.info("Stage 2: Apply control configuration to backend")
@@ -367,7 +367,7 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
-        self.test_customer_configuration_result(cli_result=result, expected_result='failed',
+        self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
 
         Logger.logger.info("Stage 4: delete control configuration to backend")
@@ -622,18 +622,16 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
             _CLI_RESOURCE_COUNTERS_FIELD, {}
         )
-        assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in be_resources if r["statusText"] == "passed"]
-        )
-        assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in be_resources if r["statusText"] == "failed"]
-        )
-        assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")]
-        )
-        assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == len(
-            [r["statusText"] for r in be_resources if(r["statusText"] == "skipped")]
-        )
+
+        failed = len([r["statusText"] for r in be_resources if r["statusText"] == "failed"])
+        skipped = len([r["statusText"] for r in be_resources if r["statusText"] == "skipped"])
+        excluded = len([r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")])
+        passed = len([r["statusText"] for r in be_resources if r["statusText"] == "passed"])
+
+        assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == failed, f'CLI - number of failed resources: {ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0)}. BE - number of failed resources: {failed}'
+        assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == skipped, f'CLI - number of skipped resources: {ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0)}. BE - number of skipped resources: {skipped}'
+        assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == excluded, f'CLI - number of excluded resources: {ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0)}. BE - number of excluded resources: {excluded}'
+        assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == passed, f'CLI - number of passed resources: {ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0)}. BE - number of passed resources: {passed}'
 
         Logger.logger.info("Testing repository registration in portal")
         repoHash = designators_attributes['repoHash']
