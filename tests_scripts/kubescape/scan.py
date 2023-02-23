@@ -367,7 +367,7 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
-        self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
+        self.test_customer_configuration_result(cli_result=result, expected_result='failed',
                                                 c_id=self.test_obj.policy_name)
 
         Logger.logger.info("Stage 4: delete control configuration to backend")
