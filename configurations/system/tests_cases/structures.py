@@ -244,3 +244,35 @@ class KubescapeConfiguration(object):
         """
         return self.kwargs[item[0]] if item[0] in self.kwargs else item[1] if len(item) == 2 else self.kwargs[item]
 
+
+class PaymentConfiguration(object):
+
+    def __init__(self, name: str,
+                test_obj,
+                **kwargs):
+        # basic
+        self.name: str = name
+        self.test_obj = test_obj
+        self.kwargs: dict = kwargs
+
+    def get_arg(self, arg, default=None):
+        return self.kwargs[arg] if arg in self.kwargs else default
+
+    def get_name(self):
+        return self.name
+
+    def get_test_obj(self):
+        return self.test_obj
+
+    def __getitem__(self, item):
+        """
+        usage:
+        A(kwargs={"a": 0})
+        A["a"] -> 0
+        A[("a", 1)] -> 0
+        A["b"] -> raise exception
+        A[("b", 1)] -> 1
+        :param item: single item or tuple (item, default)
+        :return:
+        """
+        return self.kwargs[item[0]] if item[0] in self.kwargs else item[1] if len(item) == 2 else self.kwargs[item]

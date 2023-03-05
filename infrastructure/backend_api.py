@@ -26,26 +26,82 @@ INTEGRITY_STATUS_CLEAR = 0
 INTEGRITY_STATUS_PROTECTED = 2
 INTEGRITY_STATUS_BLOCKED = -1
 
+API_STRIPE_BILLING_PORTAL = "/api/v1/tenants/stripe/portal"
+API_STRIPE_CHECKOUT = "/api/v1/tenants/stripe/checkout"
+API_STRIPE_PLANS = "/api/v1/tenants/stripe/plans"
+API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
+API_TENANT_SUBSCRIPTION_CREATE = "/api/v1/tenants/stripe/subscription/create"
+API_TENANT_SUBSCRIPTION_CANCEL = "/api/v1/tenants/stripe/subscription/cancel"
+API_TENANT_SUBSCRIPTION_RENEW = "/api/v1/tenants/stripe/subscription/renew"
+
+STRIPE_COLLECTION_METHOD_CHARGE_AUTOMATICALLY = "charge_automatically"
+STRIPE_COLLECTION_METHOD_SEND_INVOICE = "send_invoice"
+
+
 
 class ControlPanelAPI(object):
     """docstring for DashBoardAPI"""
     verify = True
 
-    def __init__(self, user_name, password, customer, client_id, secret_key, url):
+    def __init__(self, user_name, password, customer, client_id, secret_key, url, skip_login=False, customer_guid=None):
         self.server = url
         self.name = user_name
         self.password = password
         self.customer = customer
         self.login_cookie = None
-        self.customer_guid = None
+        self.customer_guid = customer_guid
         self.auth = None
 
         self.verify = True
 
-        self.login_authorization_server()
+        if not skip_login:
+            self.login_authorization_server()
         self.client_id = client_id if client_id else None
         self.secret_key = secret_key if secret_key else None
 
+
+    def get_tenant_details(self) -> requests.Response:
+        res = self.get(API_TENANT_DETAILS, params={"customerGUID": self.customer_guid})
+        return res
+    
+    ## ************** Stripe Backend APIs ************** ##
+
+    def stripe_billing_portal(self) -> requests.Response:
+        res = self.get(API_STRIPE_BILLING_PORTAL, params={"customerGUID": self.customer_guid})
+        return res
+
+    def stripe_checkout(self,priceId: str) -> requests.Response:
+        res = self.post(API_STRIPE_CHECKOUT, 
+                        params={"customerGUID": self.customer_guid},
+                        data={
+                            "priceId": priceId
+                        },)
+        return res
+    
+    def get_stripe_plans(self) -> requests.Response:
+        res = self.get(API_STRIPE_PLANS, params={"customerGUID": self.customer_guid})
+        return res
+
+    
+    def create_subscription(self, priceId: str)-> requests.Response:
+
+        res = self.post(
+            API_TENANT_SUBSCRIPTION_CREATE,
+            params={"customerGUID": self.customer_guid},
+            data={
+                "priceId": priceId
+            },
+        )
+        return res
+    
+    def cancel_subscription(self)-> dict:
+        res = self.get(API_TENANT_SUBSCRIPTION_CANCEL, params={"customerGUID": self.customer_guid})
+        return res
+    
+    def renew_subscription(self)-> dict:
+        res = self.get(API_TENANT_SUBSCRIPTION_RENEW, params={"customerGUID": self.customer_guid})
+        return res
+    
     def get_customer_guid(self):
         return self.customer_guid
 
