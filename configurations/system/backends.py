@@ -1,9 +1,11 @@
 class Backend(object):
 
-    def __init__(self, name: str, dashboard: str, tls_verify: bool = True):
+    def __init__(self, name: str, dashboard: str, tls_verify: bool = True, skip_login: bool = False, customer_guid: str = None):
         self.name = name
         self.dashboard = dashboard
         self.tls_verify = tls_verify
+        self.skip_login = skip_login
+        self.customer_guid = customer_guid
 
     def get_dashboard_url(self):
         return self.dashboard
@@ -13,6 +15,12 @@ class Backend(object):
 
     def use_tls(self):
         return self.tls_verify
+    
+    def do_skip_login(self):
+        return self.skip_login
+
+    def get_customer_guid(self):
+        return self.customer_guid
 
 
 def set_backends():
@@ -41,6 +49,13 @@ def set_backends():
     backends.append(Backend(name='dev2',
                             dashboard='https://dashbe.eudev2.cyberarmorsoft.com',
                             tls_verify=False))
+    
+    # local
+    backends.append(Backend(name='local',
+                            dashboard='http://localhost:7666',
+                            tls_verify=False,
+                            skip_login=True,
+                            customer_guid="1e3a88bf-92ce-44f8-914e-cbe71830d566"))
 
     return {backend.get_name(): backend for backend in backends}
 
