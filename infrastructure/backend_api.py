@@ -70,11 +70,11 @@ class ControlPanelAPI(object):
         res = self.get(API_STRIPE_BILLING_PORTAL, params={"customerGUID": self.customer_guid})
         return res
 
-    def stripe_checkout(self,priceId: str) -> requests.Response:
+    def stripe_checkout(self,priceID: str) -> requests.Response:
         res = self.post(API_STRIPE_CHECKOUT, 
                         params={"customerGUID": self.customer_guid},
-                        data={
-                            "priceId": priceId
+                        json={
+                            "priceID": priceID
                         },)
         return res
     
@@ -83,13 +83,13 @@ class ControlPanelAPI(object):
         return res
 
     
-    def create_subscription(self, priceId: str)-> requests.Response:
+    def create_subscription(self, priceID: str)-> requests.Response:
 
         res = self.post(
             API_TENANT_SUBSCRIPTION_CREATE,
             params={"customerGUID": self.customer_guid},
-            data={
-                "priceId": priceId
+            json={
+                "priceID": priceID
             },
         )
         return res

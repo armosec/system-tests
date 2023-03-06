@@ -42,8 +42,8 @@ class BaseStripe(BasePayment):
         try:
             response = self.backend.create_subscription(priceID)
         except Exception as e:
-            assert False, f"create subscription failed with priceId: {priceID} and error: {e}"
-        assert response.status_code == client.OK, f"stripe checkout failed with priceId: {priceID}"
+            assert False, f"create subscription failed with priceID: {priceID} and error: {e}"
+        assert response.status_code == client.OK, f"stripe checkout failed with priceID: {priceID}"
         return response
     
         
@@ -60,7 +60,7 @@ class BaseStripe(BasePayment):
 
     def stripe_checkout(self, priceID) -> requests.Response:
         response = self.backend.stripe_checkout(priceID)
-        assert response.status_code == client.OK, f"stripe checkout failed with priceId: {priceID}"
+        assert response.status_code == client.CREATED, f"stripe checkout failed with priceID: {priceID}"
         return response
 
     def stripe_billing_portal(self) -> requests.Response:
