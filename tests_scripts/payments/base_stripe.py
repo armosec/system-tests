@@ -65,7 +65,7 @@ class BaseStripe(BasePayment):
 
     def stripe_billing_portal(self) -> requests.Response:
         response = self.backend.stripe_billing_portal()
-        assert response.status_code == client.OK, f"stripe billing portal failed. Make check sure 'PortalReturnPath' is well defined in the backend config"
+        assert response.status_code == client.CREATED, f"stripe billing portal failed. Make check sure 'PortalReturnPath' is well defined in the backend config"
         return response
 
     
