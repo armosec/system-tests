@@ -15,8 +15,9 @@ class Checkout(BaseStripe):
         super(Checkout, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
-        Logger.logger.info("Create new tenant")
-        self.create_new_tenant()
+        # TODO: Implement on backend creating new tenant
+        # Logger.logger.info("Create new tenant")
+        # self.create_new_tenant()
 
         Logger.logger.info("Stage 1: Go to stripe checkout page for each price")
 
@@ -34,8 +35,9 @@ class Create(BaseStripe):
         super(Create, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
-        Logger.logger.info("Create new tenant")
-        self.create_new_tenant()
+        # TODO: Implement on backend creating new tenant
+        # Logger.logger.info("Create new tenant")
+        # self.create_new_tenant()
 
         Logger.logger.info("Get Tenants details")
         response = self.get_tenant_details()
@@ -67,8 +69,9 @@ class Cancel(BaseStripe):
         super(Cancel, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
-        Logger.logger.info("Create new tenant")
-        self.create_new_tenant()
+        # TODO: Implement on backend creating new tenant
+        # Logger.logger.info("Create new tenant")
+        # self.create_new_tenant()
 
         Logger.logger.info("Get Tenants details")
         response = self.get_tenant_details()
@@ -100,8 +103,9 @@ class Renew(BaseStripe):
         super(Renew, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
-        Logger.logger.info("Create new tenant")
-        self.create_new_tenant()
+        # TODO: Implement on backend creating new tenant
+        # Logger.logger.info("Create new tenant")
+        # self.create_new_tenant()
 
         Logger.logger.info("Stage 1: create a subscription")
         response = self.create_subscription(self.expected_prices[0]["name"])
