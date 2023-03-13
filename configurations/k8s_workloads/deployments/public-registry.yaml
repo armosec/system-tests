@@ -15,7 +15,7 @@ spec:
         app: public-registry
     spec:
       containers:
-        - image: quay.io/armosec/image-registry-test:kinglior
+        - image: quay.io/armosec/image-registry-test:v4
           name: public-registry
           ports:
             - containerPort: 5000
