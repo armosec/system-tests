@@ -626,7 +626,7 @@ class ControlPanelAPI(object):
         return r.json()['response']
 
     def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false"):
-        r = self.post("/api/v1/posture/resources", params={"customerGUID": self.customer_guid, "relatedExceptions": related_exceptions},
+        r = self.post("/api/v1/posture/resources", params={"customerGUID": self.customer_guid, "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
                           "designators.attributes.name": resource_name}]})
@@ -643,7 +643,7 @@ class ControlPanelAPI(object):
                                          control_name: str, related_exceptions: str = "false"):
         r = self.post("/api/v1/posture/resources",
                       params={"customerGUID": self.customer_guid, "controlName": control_name,
-                              "relatedExceptions": related_exceptions},
+                              "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "designators.attributes.namespace:asc",
                             "innerFilters": [{
                                 "frameworkName": framework_name, "reportGUID": report_guid,
@@ -1484,7 +1484,7 @@ class ControlPanelAPI(object):
 
     def create_scan_registry_request(self, cluster_name, registry_name):
         url = "/api/v1/registry/scan"
-        params = {"customerGUID": self.customer_guid, "relatedExceptions": True}
+        params = {"customerGUID": self.customer_guid, "relatedExceptions": True, "ignoreRulesSummary": True}
         body = [{"clusterName": cluster_name, "registryName": registry_name, "cronTabSchedule": ""}]
 
         r = self.post(url, params=params, json=body)
