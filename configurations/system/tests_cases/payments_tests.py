@@ -6,14 +6,17 @@ from .structures import PaymentConfiguration
 # the name is an internal identifier which is assigned to a stripe priceId object. 
 # The price is the price in cents as defined in Stripe price object.
 EXPECTED_PRICES = [{"name":"MonthlyPriceID","price":2900},{"name":"YearlyPriceID","price":27600}]
+TEST_STRIPE_CUSTOMER_ID = "cus_NT8XoDsp5Alqwc"
+
 
 
 class PaymentTests(object):
     '''
     NOTE: 
-    1. In order to implement further tests, it is required to implement the ability to create a new tenant on the backend (frontEgg).
-    2. Tests depends on launching the stripe new backend APIs.
-    3. User tested must have a valid stripe customer with a valid test CC. The stripeCustomerID need to be defined in activeSubscripiton.StripeCustomerID. Example fo such a stripe test customer id is "cus_NT8XoDsp5Alqwc"
+    1. Tests depends on launching the stripe new backend APIs.
+    2. User tested must have a valid stripe customer with a valid test CC. The stripeCustomerID need to be defined in activeSubscripiton.StripeCustomerID. Example fo such a stripe test customer id is "cus_NT8XoDsp5Alqwc"
+    3. Tests rely on Admin permissions - this can be achieved by properly configuring the AllowAnyCustomer in the backend environment.
+    4. Tests must run on frontEgg supported environments.
     '''
     
     @staticmethod
@@ -22,7 +25,8 @@ class PaymentTests(object):
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Create,
-            expected_prices = EXPECTED_PRICES
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
         )      
 
     @staticmethod
@@ -31,7 +35,9 @@ class PaymentTests(object):
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Cancel,
-            expected_prices = EXPECTED_PRICES
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+
         )    
 
     @staticmethod
@@ -40,7 +46,9 @@ class PaymentTests(object):
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Renew,
-            expected_prices = EXPECTED_PRICES
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+
 
         )    
 
@@ -50,8 +58,8 @@ class PaymentTests(object):
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Checkout,
-            expected_prices = EXPECTED_PRICES
-
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
         )   
 
     @staticmethod

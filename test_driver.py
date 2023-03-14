@@ -43,7 +43,7 @@ class TestDriver(object):
                                   client_id=self.credentials_obj.get_client_id(),
                                   secret_key=self.credentials_obj.get_secret_key(),
                                   url=self.backend_obj.get_dashboard_url(),
-                                  skip_login=self.backend_obj.do_skip_login(),
+                                  login_method=self.backend_obj.get_login_method(),
                                   customer_guid=self.backend_obj.get_customer_guid())
 
         status = statics.FAILURE

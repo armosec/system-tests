@@ -1,10 +1,14 @@
+
+from infrastructure.backend_api import *
+
+
 class Backend(object):
 
-    def __init__(self, name: str, dashboard: str, tls_verify: bool = True, skip_login: bool = False, customer_guid: str = None):
+    def __init__(self, name: str, dashboard: str, tls_verify: bool = True, login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
         self.name = name
         self.dashboard = dashboard
         self.tls_verify = tls_verify
-        self.skip_login = skip_login
+        self.login_method = login_method
         self.customer_guid = customer_guid
 
     def get_dashboard_url(self):
@@ -16,8 +20,9 @@ class Backend(object):
     def use_tls(self):
         return self.tls_verify
     
-    def do_skip_login(self):
-        return self.skip_login
+    def get_login_method(self):
+        return self.login_method
+ 
 
     def get_customer_guid(self):
         return self.customer_guid
@@ -30,10 +35,24 @@ def set_backends():
     backends.append(Backend(name='development',
                             dashboard='https://dashbe.eudev3.cyberarmorsoft.com',
                             tls_verify=False))
+    
+    # development frontEgg
+    backends.append(Backend(name='development-egg',
+                            dashboard='http://eggdashbe-dev.armosec.io',
+                            customer_guid="f5f360bb-c233-4c33-a9af-5692e7795d61",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG))
 
     # staging
     backends.append(Backend(name='staging',
                             dashboard='https://dashbe.eustage2.cyberarmorsoft.com'))
+    
+    # staging frontEgg
+    backends.append(Backend(name='staging-egg',
+                            dashboard='http://eggdashbe-stg.armosec.io',
+                            customer_guid="f5f360bb-c233-4c33-a9af-5692e7795d61",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG))
 
     # production
     backends.append(Backend(name='production',
@@ -54,7 +73,7 @@ def set_backends():
     backends.append(Backend(name='local',
                             dashboard='http://localhost:7666',
                             tls_verify=False,
-                            skip_login=True,
+                            login_method=LOGIN_METHOD_FRONTEGG,
                             customer_guid="1e3a88bf-92ce-44f8-914e-cbe71830d566"))
 
     return {backend.get_name(): backend for backend in backends}
