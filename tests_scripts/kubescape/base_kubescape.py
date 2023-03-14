@@ -682,7 +682,7 @@ class BaseKubescape(BaseK8S):
                len(resource["relatedExceptions"]) == 0, "relatedExceptions was received, " \
                                                         "even though it was not supposed to be received"
         assert has_related and len(resource["ignoreRulesSummary"]) > 0 or not has_related and \
-               len(resource["ignoreRulesSummary"]) == 0, "ignoreRulesSummary was received, " \
+               resource["ignoreRulesSummary"] == None, "ignoreRulesSummary was received, " \
                                                         "even though it was not supposed to be received"
 
     def test_data_in_be(self, cli_result, cluster_name: str, framework_name: str, old_report_guid: str):
