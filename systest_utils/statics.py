@@ -80,6 +80,7 @@ KS_PORT_FORWARD = 33334
 HELM_REPO = "kubescape/kubescape-cloud-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
+CA_HELM_NAME = "kubescape"
 CA_CONFIG = "ks-cloud-config"
 CA_OPERATOR_CONTAINER_FROM_HELM_NAME = "operator"
 CA_OPERATOR_DEPLOYMENT_FROM_HELM_NAME = "operator"
