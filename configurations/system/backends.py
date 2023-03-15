@@ -49,7 +49,7 @@ def set_backends():
     
     # staging frontEgg
     backends.append(Backend(name='staging-egg',
-                            dashboard='http://eggdashbe-stg.armosec.io',
+                            dashboard='http://eggdashbe-stage.armosec.io',
                             customer_guid="f5f360bb-c233-4c33-a9af-5692e7795d61",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG))
