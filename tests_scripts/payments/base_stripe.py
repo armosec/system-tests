@@ -4,10 +4,12 @@ from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics
 import requests
 from  http import client
+import time
+from time import sleep
 
-from tests_scripts.payments.base_payment import BasePayment
 
-WEBHOOK_SLEEP = 1
+from tests_scripts.payments.base_payment import *
+
 
 class BaseStripe(BasePayment):
         
@@ -23,17 +25,28 @@ class BaseStripe(BasePayment):
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
     
+    def is_subscription_canceled(self, activeSubscription: str) -> bool:
+        return activeSubscription["cancelAtPeriodEnd"] == True
 
-    def tenants_subscription_active(self, activeSubscription: str):
-        super().tenants_subscription_active(activeSubscription)
-        assert activeSubscription["cancelAtPeriodEnd"] == False, "cancelAtPeriodEnd is True"
-        assert activeSubscription["stripeSubscriptionID"] != "", "stripeSubscriptionID is empty"
-        assert activeSubscription["stripeCustomerID"] != "", "stripeCustomerID is empty"
+    def is_subscription_active(self, activeSubscription: str) -> bool:
+        return activeSubscription["cancelAtPeriodEnd"] == False and activeSubscription["subscriptionStatus"] in SUBSCRIPTION_PAYING_STATUS
 
 
-    def tenants_subscription_canceled(self, activeSubscription: str):
-        super().tenants_subscription_canceled(activeSubscription)
-        assert activeSubscription["cancelAtPeriodEnd"] == True, "cancelAtPeriodEnd is False"
+    def wait_for_paying(self, tenant_id, timeout=0.5, sleep_interval=0.1) -> bool:
+
+        timeout_start = time.time()
+        updated = False
+
+        while time.time() < timeout_start + timeout and not updated:
+            response = self.get_tenant_details(tenant_id)
+
+            customerAccessStatus = response.json().get("customerAccessStatus", {})
+            if customerAccessStatus == payingCustomer:
+                updated = True
+            else:
+                sleep(sleep_interval)
+        
+        return updated
 
     def get_tenant_details(self, tenantID: str) -> requests.Response:
         response = self.backend.get_tenant_details(tenantID)

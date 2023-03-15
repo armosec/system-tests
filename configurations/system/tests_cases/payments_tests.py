@@ -51,6 +51,18 @@ class PaymentTests(object):
 
 
         )    
+    
+    @staticmethod
+    def stripe_webhook():
+        from tests_scripts.payments.webhook import StripeWebhook
+        return PaymentConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=StripeWebhook,
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+
+
+        )    
 
     @staticmethod
     def stripe_checkout():
