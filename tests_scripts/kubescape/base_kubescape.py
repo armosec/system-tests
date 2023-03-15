@@ -977,7 +977,7 @@ class BaseKubescape(BaseK8S):
     def get_report_guid(self, cluster_name: str, framework_name: str = "", old_report_guid: str = "",
                         wait_to_result: bool = False):
         found = False
-        for i in range(10):
+        for i in range(25):
             be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
                                                                      framework_name=framework_name)
             if wait_to_result and len(be_cluster_overtime) == 0:
