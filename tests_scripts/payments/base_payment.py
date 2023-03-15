@@ -10,6 +10,8 @@ trialCustomer   = "trial"
 blockedCustomer = "blocked"
 
 
+SUBSCRIPTION_PAYING_STATUS = ["active", "trialing", "incomplete"]
+
 class BasePayment(base_test.BaseTest):
         
 
@@ -22,19 +24,6 @@ class BasePayment(base_test.BaseTest):
     def http_status_ok(http_status: int):
         assert http_status == client.OK
 
-
-    def tenants_subscription_active(self, activeSubscription: str):
-        assert activeSubscription["licenseType"] == "Team", f"expected license type 'Team', found '{activeSubscription['licenseType']}'"
-        assert activeSubscription["subscriptionStatus"] == "active", f"expected subscription status 'active', found '{activeSubscription['subscriptionStatus']}'"
-
-    def tenants_subscription_canceled(self, activeSubscription: str):
-        assert activeSubscription["cancelAtPeriodEnd"] == True, f"expected cancelAtPeriodEnd to be True, found '{activeSubscription['CancelAtPeriodEnd']}'"
-
-    def tenants_access_state_paying(self, accessState: str):
-        assert accessState == payingCustomer, f"expected access state '{payingCustomer}', found '{accessState}'"
-
-    def tenants_access_state_free(self, accessState: str):
-        assert accessState == freeCustomer, f"expected access state '{freeCustomer}', found '{accessState}'"
 
     def create_new_tenant(self) -> requests.Response:
         return self.backend.create_tenant()
