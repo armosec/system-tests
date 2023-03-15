@@ -38,7 +38,7 @@
 | `stripe_checkout`              | payment |                                                                        | stripe, backend             |
 | `stripe_billing_portal`              | payment |                                                                        | stripe, backend             |
 | `stripe_plans`              | payment |                                                                        | stripe, backend             |
-
+| `stripe_webhook`              | payment |                                                                        | stripe, backend             |
 
 ### Install:
 * download/clone repository
