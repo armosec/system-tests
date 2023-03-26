@@ -176,7 +176,7 @@ class BaseKubescape(BaseK8S):
         if "host_scan_yaml" in kwargs and kwargs['host_scan_yaml'] != "":
             command.append(f"--host-scan-yaml={kwargs['host_scan_yaml']}")
         elif self.host_scan_yaml:
-            command.extend(['--host-scan-yaml', self.host_scan_yaml])
+            command.append(f"--host-scan-yaml={self.host_scan_yaml}")
 
         # command.append("--use-default")
 
