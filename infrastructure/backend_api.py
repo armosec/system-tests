@@ -27,25 +27,132 @@ INTEGRITY_STATUS_PROTECTED = 2
 INTEGRITY_STATUS_BLOCKED = -1
 
 
+LOGIN_METHOD_KEYCLOAK = "keycloak"
+LOGIN_METHOD_FRONTEGG = "frontegg"
+
+
+API_STRIPE_BILLING_PORTAL = "/api/v1/tenants/stripe/portal"
+API_STRIPE_CHECKOUT = "/api/v1/tenants/stripe/checkout"
+API_STRIPE_PLANS = "/api/v1/tenants/stripe/plans"
+API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
+API_TENANT_CREATE= "/api/v1/tenants/createTenant"
+API_TENANT_DELETE= "/api/v1/tenants/deleteTenant"
+API_TENANT_SUBSCRIPTION_CREATE = "/api/v1/tenants/stripe/subscription/create"
+API_TENANT_SUBSCRIPTION_CANCEL = "/api/v1/tenants/stripe/subscription/cancel"
+API_TENANT_SUBSCRIPTION_RENEW = "/api/v1/tenants/stripe/subscription/renew"
+
+API_ADMIN_TENANTS = "/api/v1/admin/tenants"
+API_ADMIN_TENANT_DETAILS = "/api/v1/admin/tenantDetails"
+API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
+API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
+API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
+
+
+STRIPE_COLLECTION_METHOD_CHARGE_AUTOMATICALLY = "charge_automatically"
+STRIPE_COLLECTION_METHOD_SEND_INVOICE = "send_invoice"
+
+
+
 class ControlPanelAPI(object):
     """docstring for DashBoardAPI"""
     verify = True
 
-    def __init__(self, user_name, password, customer, client_id, secret_key, url):
+    def __init__(self, user_name, password, customer, client_id, secret_key, url, login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None):
         self.server = url
         self.name = user_name
         self.password = password
         self.customer = customer
         self.login_cookie = None
-        self.customer_guid = None
+        self.customer_guid = customer_guid
         self.auth = None
 
         self.verify = True
 
-        self.login_authorization_server()
+        if login_method == LOGIN_METHOD_KEYCLOAK:
+            self.login_authorization_server()
+        elif login_method == LOGIN_METHOD_FRONTEGG:
+            self.login_frontegg()
+        else:
+            raise Exception(f"Login method '{login_method}' not supported")
+ 
         self.client_id = client_id if client_id else None
         self.secret_key = secret_key if secret_key else None
 
+    # logging to a frontegg environmet.
+    # doesn't login in practice to frontEgg but relies on "AllowAnyCustomer" configurations in the backend
+    def login_frontegg(self) -> requests.Response:
+
+        payload = {"email": self.name, "customer": self.customer, "password": self.password, "customerGUID": self.customer_guid}
+        res = self.post("/login", json=payload)
+        self.auth = {"Cookie" : "auth=" + res.cookies.get("auth")}
+        self.login_cookie = res.cookies
+
+        return res
+
+    def get_tenant_details(self, tenantID: str) -> requests.Response:
+        res = self.post(API_ADMIN_TENANT_DETAILS, cookies=self.login_cookie, json={"tenantID": tenantID})
+        return res
+    
+    def create_tenant(self) -> requests.Response:
+        res = self.get_no_cookie(API_TENANT_CREATE)
+        return res
+    
+    def delete_tenant(self, tenant_id) -> requests.Response:
+        res = self.delete(API_ADMIN_TENANTS, cookies=self.login_cookie, json={"tenantsIds": [tenant_id]})
+        return res
+    
+    ## ************** Stripe Backend APIs ************** ##
+
+    def stripe_billing_portal(self) -> requests.Response:
+        res = self.get(API_STRIPE_BILLING_PORTAL, params={"customerGUID": self.customer_guid})
+        return res
+
+    def stripe_checkout(self,priceID: str) -> requests.Response:
+        res = self.post(API_STRIPE_CHECKOUT, 
+                        params={"customerGUID": self.customer_guid},
+                        json={
+                            "priceID": priceID
+                        },)
+        return res
+    
+    def get_stripe_plans(self) -> requests.Response:
+        res = self.get(API_STRIPE_PLANS, params={"customerGUID": self.customer_guid})
+        return res
+
+    
+    def create_subscription(self, priceID: str, stripeCustomerID: str, tenantID: str)-> requests.Response:
+
+        res = self.post(
+            API_ADMIN_CREATE_SUBSCRIPTION,
+            cookies=self.login_cookie,
+            json={
+                "priceID": priceID,
+                "stripeCustomerID": stripeCustomerID,
+                "tenantID": tenantID
+            },
+        )
+        return res
+    
+    def cancel_subscription(self, tenantID: str)-> dict:
+        res = self.post(
+            API_ADMIN_CANCEL_SUBSCRIPTION,
+            cookies=self.login_cookie,
+            json={
+                "tenantID": tenantID
+            },
+        )
+        return res
+    
+    def renew_subscription(self, tenantID: str)-> dict:
+        res = self.post(
+            API_ADMIN_RENEW_SUBSCRIPTION,
+            cookies=self.login_cookie,
+            json={
+                "tenantID": tenantID
+            },
+        )        
+        return res
+    
     def get_customer_guid(self):
         return self.customer_guid
 
@@ -1427,10 +1534,16 @@ class ControlPanelAPI(object):
     def get_component(self, component):
         return Component(self, component.guid, component.solution_guid)
 
+    def post_no_cookie(self, url, **args):
+        return requests.post(self.server + url, **args)
+    
     def post(self, url, **args):
         args = self.add_login_cookie_to_args(args)
         return requests.post(self.server + url, **args)
 
+    def get_no_cookie(self, url, **args):
+        return requests.get(self.server + url, **args)
+    
     def get(self, url, **args):
         args = self.add_login_cookie_to_args(args)
         return requests.get(self.server + url, **args)

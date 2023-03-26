@@ -35,8 +35,8 @@ class HelmWrapper(object):
 
     @staticmethod
     def uninstall_armo_helm_chart():
-        TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", "armo"])
+        TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
 
     @staticmethod
     def remove_armo_from_repo():
-        TestUtil.run_command(command_args=["helm", "repo", "remove", "armo"])
+        TestUtil.run_command(command_args=["helm", "repo", "remove", "kubescape"])
