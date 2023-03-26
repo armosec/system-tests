@@ -164,7 +164,7 @@ class KubescapeTests(object):
             policy_name='nsa',
             submit=True,
             account=True,
-            exceptions="exclude-control-apache.json",
+            exceptions="exclude-control-apache.json,exclude-control-sa-resourceID-apache.json",
             yaml="apache.yaml"
         )
 
