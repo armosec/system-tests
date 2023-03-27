@@ -62,18 +62,21 @@ _SETTINGS_FILED = 'settings'
 
 _VULN_SCAN_RESOURCE_API_VERSION = 'result.vulnscan.com/v1'
 
+
 class BaseKubescape(BaseK8S):
     """
     Attach deployment by adding the inject annotation
     """
 
-    def __init__(self, test_obj=None, backend=None, test_driver=None,  kubernetes_obj=None):
+    def __init__(self, test_obj=None, backend=None, test_driver=None, kubernetes_obj=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                          kubernetes_obj=kubernetes_obj)
 
         self.ks_branch = self.test_driver.kwargs.get("ks_branch", DEFAULT_BRANCH)
+        self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
         self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
+        self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
 
     def default_scan(self, **kwargs):
         res_file = self.get_default_results_file()
@@ -151,10 +154,16 @@ class BaseKubescape(BaseK8S):
         if self.environment == "staging" or self.environment == "stage":
             command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armo.cloud,"
                                      "armoui.eustage2.cyberarmorsoft.com,eggauth.eustage2.cyberarmorsoft.com"])
+
         if self.environment == "dev" or self.environment == "development":
             command.extend(["--env", "dev"])
-        if "use_artifacts" in kwargs:
+
+        # first check if artifacts are passed to function
+        if "use_artifacts" in kwargs and kwargs['use_artifacts'] != "":
             command.extend(['--use-artifacts-from', kwargs['use_artifacts']])
+        elif self.artifacts:  # otherwise, load default artifacts (if passed by the command line)
+            command.extend(['--use-artifacts-from', self.artifacts])
+
         if "include_namespaces" in kwargs:
             command.extend(["--include-namespaces", kwargs['include_namespaces']])
         if "enable_host_scan" in kwargs:
@@ -164,7 +173,10 @@ class BaseKubescape(BaseK8S):
         if "secret_key" in kwargs:
             command.append(f"--secret-key={self.backend.get_secret_key()}")
 
-        # command.append(f'--enable-host-scan={TestUtil.get_arg_from_dict(kwargs, "enable_host_scan", "false")}')
+        if "host_scan_yaml" in kwargs and kwargs['host_scan_yaml'] != "":
+            command.append(f"--host-scan-yaml={kwargs['host_scan_yaml']}")
+        elif self.host_scan_yaml:
+            command.append(f"--host-scan-yaml={self.host_scan_yaml}")
 
         # command.append("--use-default")
 
@@ -212,7 +224,8 @@ class BaseKubescape(BaseK8S):
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
-        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_top_controls_results, cluster_name=cluster_name)
+        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_top_controls_results,
+                                               cluster_name=cluster_name)
         return c_panel_info
 
     def get_posture_resources_CSV(self, framework_name: str, report_guid):
@@ -380,7 +393,7 @@ class BaseKubescape(BaseK8S):
         #                                                                   counter=_CLI_EXCLUDED_RESOURCES_FIELD)
 
         assert result.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) >= 0, message.format(resource_name=name,
-                                                                            counter=_CLI_SKIPPED_RESOURCES_FIELD)
+                                                                                counter=_CLI_SKIPPED_RESOURCES_FIELD)
 
     @staticmethod
     def is_failed_passed_and_skipped_less_than_all(total_resources: int, resource_counters: dict, name: str):
@@ -408,10 +421,12 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def test_exception_result(framework_report: dict, controls_with_exception: list):
         for c_id in controls_with_exception:
-            sub_status = framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_INFO_FIELD][_CLI_SUB_STATUS_FIELD]
+            sub_status = \
+                framework_report[_CLI_SUMMARY_DETAILS_FIELD][statics.CONTROLS_FIELD][c_id][_CLI_STATUS_INFO_FIELD][
+                    _CLI_SUB_STATUS_FIELD]
             assert sub_status == _CLI_SUB_STATUS_EXCEPTIONS, \
-                "control {x} supposed to be {w}, but it is {y}".format(x=c_id, y=sub_status, w=_CLI_SUB_STATUS_EXCEPTIONS)
-
+                "control {x} supposed to be {w}, but it is {y}".format(x=c_id, y=sub_status,
+                                                                       w=_CLI_SUB_STATUS_EXCEPTIONS)
 
     # @staticmethod
     # def test_results(framework_report: dict):
@@ -434,7 +449,8 @@ class BaseKubescape(BaseK8S):
             message.format(x=len(cli_controls), y=len(be_controls))
 
     @staticmethod
-    def test_status_text(result_count: dict, skipped_controls: int, failed_count: int, status_txt: str, control_name: str):
+    def test_status_text(result_count: dict, skipped_controls: int, failed_count: int, status_txt: str,
+                         control_name: str):
         if failed_count > 0:
             result_count['failed_controls'] += 1
             assert status_txt == "failed", \
@@ -477,16 +493,17 @@ class BaseKubescape(BaseK8S):
                     format(x=c_id, w=be_control[statics.BE_NAME_FILED],
                            y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_FAILED_RESOURCES_FIELD],
                            z=be_control[statics.BE_FAILED_RESOURCES_COUNT_FIELD])
-            
-            assert be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD ,0) == cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD].get(_CLI_SKIPPED_RESOURCES_FIELD, 0), \
+
+            assert be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD, 0) == cli_controls[c_id][
+                _CLI_RESOURCE_COUNTERS_FIELD].get(_CLI_SKIPPED_RESOURCES_FIELD, 0), \
                 "control {x} - {w}: the cli result is {y} skipped, backend result is {z} skipped". \
                     format(x=c_id, w=be_control[statics.BE_NAME_FILED],
-                        y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_SKIPPED_RESOURCES_FIELD],
-                        z=be_control[statics.BE_SKIPPED_RESOURCES_COUNT_FIELD])
+                           y=cli_controls[c_id][_CLI_RESOURCE_COUNTERS_FIELD][_CLI_SKIPPED_RESOURCES_FIELD],
+                           z=be_control[statics.BE_SKIPPED_RESOURCES_COUNT_FIELD])
 
             result_count = BaseKubescape.test_status_text(
                 result_count=result_count,
-                skipped_controls=be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD ,0),
+                skipped_controls=be_control.get(statics.BE_SKIPPED_RESOURCES_COUNT_FIELD, 0),
                 failed_count=be_control[statics.BE_FAILED_RESOURCES_COUNT_FIELD],
                 status_txt=be_control[statics.BE_STATUS_TEXT_FILED],
                 control_name=be_control[statics.BE_NAME_FILED])
@@ -535,9 +552,9 @@ class BaseKubescape(BaseK8S):
                     format(cluster=cluster, kind=kind, name=name, namespace=namespace))
 
         resource_id, cli_affected_controls = self.get_affected_controls_from_cli_result(cli_result=cli_result,
-                                                                                                 kind=kind, name=name,
-                                                                                                 namespace=namespace,
-                                                                                                 api_version=api_version)
+                                                                                        kind=kind, name=name,
+                                                                                        namespace=namespace,
+                                                                                        api_version=api_version)
 
         assert sorted(be_affected_controls) == sorted(cli_affected_controls), \
             "For resource: {resource_id}, the affected controls from cli is {x}, the affected controls from be is {y}" \
@@ -566,7 +583,8 @@ class BaseKubescape(BaseK8S):
         return resource_result
 
     # @staticmethod
-    def get_failed_controls_from_cli_result(self, cli_result: dict, kind: str, name: str, namespace: str, api_version: str):
+    def get_failed_controls_from_cli_result(self, cli_result: dict, kind: str, name: str, namespace: str,
+                                            api_version: str):
         # not support rbac
         if kind == 'Pod':
             name = self.kubernetes_obj.get_pod_full_name(namespace=namespace, partial_name=name)
@@ -577,14 +595,17 @@ class BaseKubescape(BaseK8S):
             "No resource was found whose kind={kind}, name={name}, namespace={namespace} in in cli_result->resources". \
                 format(kind=kind, name=name, namespace=namespace)
 
-        resource_result = BaseKubescape.get_resource_result_from_cli_result(cli_result=cli_result, resource_id=resource_id)
+        resource_result = BaseKubescape.get_resource_result_from_cli_result(cli_result=cli_result,
+                                                                            resource_id=resource_id)
         assert resource_result, "No result found whose resourceID={resource_id} in cli_result->results". \
             format(resource_id=resource_id)
 
         return resource_id, [control['controlID'] for control in resource_result[_CONTROLS_FIELD]
-                             if BaseKubescape.cli_resource_failed_in_control(resource_result=resource_result, c_id=control['controlID'])]
+                             if BaseKubescape.cli_resource_failed_in_control(resource_result=resource_result,
+                                                                             c_id=control['controlID'])]
 
-    def get_affected_controls_from_cli_result(self, cli_result: dict, kind: str, name: str, namespace: str, api_version: str):
+    def get_affected_controls_from_cli_result(self, cli_result: dict, kind: str, name: str, namespace: str,
+                                              api_version: str):
         # not support rbac
         if kind == 'Pod':
             name = self.kubernetes_obj.get_pod_full_name(namespace=namespace, partial_name=name)
@@ -614,24 +635,34 @@ class BaseKubescape(BaseK8S):
 
     def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
-        assert len(be_ctrl_ids) > 0 and len(be_ctrl_ids) <= 5, "Top controls count should be between 1 to 5 but was {count}".format(count=len(be_ctrl_ids))
+        assert len(be_ctrl_ids) > 0 and len(
+            be_ctrl_ids) <= 5, "Top controls count should be between 1 to 5 but was {count}".format(
+            count=len(be_ctrl_ids))
         for be_ctrl in be_results:
             for id, control in cli_result["summaryDetails"]["controls"].items():
                 # check that there is no control with higher failed resources that is not in top 5 controls response
-                if  be_ctrl['clusters'][0]['resourcesCount'] <  control['ResourceCounters']["failedResources"] and id not in be_ctrl_ids:
+                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters'][
+                    "failedResources"] and id not in be_ctrl_ids:
                     assert False, "Control {ctrl} should be in top controls".format(ctrl=id)
 
                 # check control data and failed resources
                 if be_ctrl["id"] == id:
-                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(guid=report_guid)
-                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, "framework name should be {name}".format(name=framework_name)
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(
+                        guid=report_guid)
+                    assert be_ctrl['clusters'][0][
+                               'topFailedFramework'] == framework_name, "framework name should be {name}".format(
+                        name=framework_name)
                     assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
-                        "Control {ctrl} should have {count} failed resources".format(ctrl=id, count=control['ResourceCounters']["failedResources"])
-                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id, name=control['name'])
-                    assert be_ctrl['baseScore'] == control['scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id, scored=control['scored'])
-
-
-        
+                        "Control {ctrl} should have {count} failed resources".format(ctrl=id,
+                                                                                     count=control['ResourceCounters'][
+                                                                                         "failedResources"])
+                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id,
+                                                                                                               name=
+                                                                                                               control[
+                                                                                                                   'name'])
+                    assert be_ctrl['baseScore'] == control[
+                        'scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id,
+                                                                                            scored=control['scored'])
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         # self.test_filed_controls_in_resource(cli_result=cli_result, be_resources=be_resources, kind='Pod',
@@ -683,7 +714,7 @@ class BaseKubescape(BaseK8S):
                                                         "even though it was not supposed to be received"
         assert has_related and len(resource["ignoreRulesSummary"]) > 0 or not has_related and \
                resource["ignoreRulesSummary"] == None, "ignoreRulesSummary was received, " \
-                                                        "even though it was not supposed to be received"
+                                                       "even though it was not supposed to be received"
 
     def test_data_in_be(self, cli_result, cluster_name: str, framework_name: str, old_report_guid: str):
         report_guid = self.get_report_guid(cluster_name=cluster_name, framework_name=framework_name,
@@ -691,12 +722,11 @@ class BaseKubescape(BaseK8S):
 
         self.test_api_version_info()
 
-        self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid, framework_name=framework_name)
+        self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid,
+                                       framework_name=framework_name)
         # self.compare_framework_data(cli_result, framework_name, report_guid)
         self.compare_controls_data(cli_result, framework_name, report_guid)
         self.compare_resources_data(cli_result, framework_name, report_guid)
-        
-
 
     def get_posture_control_by_id(self, framework_name: str, report_guid: str, control_id: str):
         be_controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
@@ -756,7 +786,8 @@ class BaseKubescape(BaseK8S):
 
     def compare_top_controls_data(self, cli_result, cluster_name, report_guid, framework_name):
         be_results = self.get_top_controls_results(cluster_name)
-        self.test_top_controls_from_backend(cli_result=cli_result, be_results=be_results, report_guid=report_guid, framework_name=framework_name)
+        self.test_top_controls_from_backend(cli_result=cli_result, be_results=be_results, report_guid=report_guid,
+                                            framework_name=framework_name)
 
     def post_posture_exception(self, exceptions_file, cluster_name: str):
         ks_exceptions = self.create_ks_exceptions(cluster_name=cluster_name, exceptions_file=exceptions_file)
@@ -787,7 +818,7 @@ class BaseKubescape(BaseK8S):
         if isinstance(ks_custom_fw, list):
             return [self.delete_custom_framework(ks_custom_fw=i) for i in ks_custom_fw]
         self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=ks_custom_fw['name'])
- 
+
     def delete_kubescape_config_map(self, namespace: str = 'default', name: str = 'kubescape'):
         try:
             self.kubernetes_obj.delete_config_map(namespace=namespace, name=name)
