@@ -205,7 +205,7 @@ class BaseRelevantCves(BaseHelm):
         Logger.logger.info('Test backend results_details against results_sum_summary')
         self.test_results_details_against_results_sum_summary(containers_cve=containers_cve, be_summary=be_summary)
 
-    def expose_websocket(self, cluster):
+    def expose_operator(self, cluster):
         running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                              name=statics.CA_OPERATOR_DEPLOYMENT_FROM_HELM_NAME)
         try:
