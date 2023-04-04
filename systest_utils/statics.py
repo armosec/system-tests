@@ -55,6 +55,10 @@ SCAN_RESULT_ERRORS_FIELD = "errors"
 SCAN_RESULT_STATUS_FIELD = "status"
 SCAN_RESULT_TOTAL_FIELD = 'total'
 SCAN_RESULT_RCETOTAL_FIELD = 'rceTotal'
+SCAN_RESULT_IS_RELEVANT_FIELD = "relevantLabel"
+SCAN_RESULT_IS_RELEVANT_FIELD_TRUE = "yes"
+SCAN_RESULT_IS_RELEVANT_FIELD_FALSE = "no"
+SCAN_RESULT_IS_RELEVANT_FIELD_UNKNOWN = ""
 
 BASIC_NAMESPACE_YAML = "basic_ns.yaml"
 
@@ -151,6 +155,19 @@ TEST_REGISTRY_CONNECTIVITY_INFORMATION_STATUS = "registryInformation"
 TEST_REGISTRY_CONNECTIVITY_AUTHENTICATION_STATUS = "registryAuthentication"
 TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
 
+#storage aggregated API
+HELM_STORAGE_FEATURE="enableStorage"
+STORAGE_SBOM_PLURAL = "sbomspdxv2p3s"
+STORAGE_FILTERED_SBOM_PLURAL = "sbomspdxv2p3filtereds"
+STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
+STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
+STORAGE_AGGREGATED_API_VERSION = "v1beta1"
+STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
+
+#relevancy feature
+HELM_RELEVANCY_FEATURE="enableRelevancy"
+FILTERED_CVES_KEY="withRelevancy"
+ALL_CVES_KEY="AllCVEs"
 
 class Statistics(object):
     clear_state = "clear"

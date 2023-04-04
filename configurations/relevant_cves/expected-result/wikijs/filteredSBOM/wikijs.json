@@ -1,0 +1,1409 @@
+{
+    "SPDXID": "SPDXRef-DOCUMENT",
+    "comment": "",
+    "creationInfo": {
+        "comment": "",
+        "created": "2023-03-14T12:58:51Z",
+        "creators": [
+            "Organization: Anchore, Inc",
+            "Tool: syft-0.70.0",
+            "Organization: Kubescape",
+            "Tool: KubescapeNodeAgent"
+        ],
+        "licenseListVersion": "3.19"
+    },
+    "dataLicense": "CC0-1.0",
+    "documentDescribes": null,
+    "documentNamespace": "https://anchore.com/syft/image/requarks/wiki@sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-f5a7dc77-985f-4d72-85c7-9b90ef35a992",
+    "name": "wikijs",
+    "externalDocumentRefs": null,
+    "files": [
+        {
+            "SPDXID": "SPDXRef-31a349b3be1d23af",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/group",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-a3323e15446e44c4",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:1a058d5342cc722ad5439cacae4b2b4eedde51d8fe8800fcf28444302355c16d",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/hosts",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-1592a8d534782f2",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/passwd",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-5b6f33049ad1a5a1",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:1a058d5342cc722ad5439cacae4b2b4eedde51d8fe8800fcf28444302355c16d",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/ssl/openssl.cnf",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-23af1aaed0d20305",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/usr/lib/libgcc_s.so.1",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        }
+    ],
+    "hasExtractedLicensingInfos": null,
+    "packages": [
+        {
+            "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "Alpine base dir structure and init scripts",
+            "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "GPL-2.0-only",
+            "licenseDeclared": "GPL-2.0-only",
+            "licenseInfoFromFiles": null,
+            "name": "alpine-baselayout",
+            "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "3.2.0-r16"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "Alpine base dir structure and init scripts",
+            "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "GPL-2.0-only",
+            "licenseDeclared": "GPL-2.0-only",
+            "licenseInfoFromFiles": null,
+            "name": "alpine-baselayout",
+            "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "3.2.0-r16"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "Alpine base dir structure and init scripts",
+            "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout:3.2.0-r16:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "GPL-2.0-only",
+            "licenseDeclared": "GPL-2.0-only",
+            "licenseInfoFromFiles": null,
+            "name": "alpine-baselayout",
+            "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "3.2.0-r16"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "Crypto library from openssl",
+            "downloadLocation": "https://www.openssl.org/",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libcrypto1.1:libcrypto1.1:1.1.1l-r0:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:apk/alpine/libcrypto1.1@1.1.1l-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.14.3",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "OpenSSL",
+            "licenseDeclared": "OpenSSL",
+            "licenseInfoFromFiles": null,
+            "name": "libcrypto1.1",
+            "originator": "Person: Timo Teras \u003ctimo.teras@iki.fi\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "1.1.1l-r0"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-apk-libgcc-1e486e9cc6003b1a",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "GNU C compiler runtime libraries",
+            "downloadLocation": "https://gcc.gnu.org",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libgcc:libgcc:10.3.1_git20210424-r2:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:apk/alpine/libgcc@10.3.1_git20210424-r2?arch=x86_64\u0026upstream=gcc\u0026distro=alpine-3.14.3",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "GPL-2.0-or-later AND LGPL-2.1-or-later",
+            "licenseDeclared": "GPL-2.0-or-later AND LGPL-2.1-or-later",
+            "licenseInfoFromFiles": null,
+            "name": "libgcc",
+            "originator": "Person: Ariadne Conill \u003cariadne@dereferenced.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "10.3.1_git20210424-r2"
+        }
+    ],
+    "relationships": [
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libmount-1dfdcb9ef4a5b782"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-23af1aaed0d20305",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-apk-libgcc-1e486e9cc6003b1a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---b02f7c78af6ca960",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgcc-1e486e9cc6003b1a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-3d3f539520a09439",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libretls-55d8270082497bde",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-client-common-35b2398f6bf42e49"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-common-35b2398f6bf42e49",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-3d3f539520a09439",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-git-93728d922833cdd9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-curl-e0de2671b069f97f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-brotli-libs-3d6621a592ed8f0d"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libksba-3deac3532c7ac567"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-nettle-4414a0283cfaace3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-nettle-4414a0283cfaace3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libretls-55d8270082497bde",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ca-certificates-bundle-49b1d2868a3a2549"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libintl-4d44a989e7c2d99b"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ncurses-libs-55593090ef48f52a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-readline-737de1fb7a1e32ab",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ncurses-libs-55593090ef48f52a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libedit-f67db8dc99b5c2ae",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ncurses-libs-55593090ef48f52a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-339d26857179acac",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libretls-55d8270082497bde"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ca-certificates-59f0dfc47bad0b78"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-curl-e0de2671b069f97f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ca-certificates-59f0dfc47bad0b78"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-gmp-6340e62fb133f686"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-nettle-4414a0283cfaace3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-gmp-6340e62fb133f686"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgcrypt-65cabed244d299d5"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgcrypt-65cabed244d299d5"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-keygen-676a6d2acdbc2b0f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-keygen-676a6d2acdbc2b0f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libksba-3deac3532c7ac567",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libgcrypt-65cabed244d299d5",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libassuan-8d930eb549ddbac7",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libc-utils-76cb141a67eed50e",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-utils-6a9ab08217e03637"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-bc1da6b60498fea3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libunistring-6b355ad9cf81dcd3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-bash-33b8d63bcc23e3f7",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-59f0dfc47bad0b78",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+            "relatedSpdxElement": "SPDXRef-Package-binary-busybox-cabcb6c87dbbde99",
+            "relationshipType": "OTHER",
+            "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libmount-1dfdcb9ef4a5b782",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libgcc-1e486e9cc6003b1a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-339d26857179acac",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-bash-33b8d63bcc23e3f7",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-common-35b2398f6bf42e49",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-zlib-3b72ad1745a99acd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-3d3f539520a09439",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-3d3f539520a09439",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-brotli-libs-3d6621a592ed8f0d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libksba-3deac3532c7ac567",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-nettle-4414a0283cfaace3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libintl-4d44a989e7c2d99b",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ncurses-libs-55593090ef48f52a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libretls-55d8270082497bde",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-59f0dfc47bad0b78",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gmp-6340e62fb133f686",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libgcrypt-65cabed244d299d5",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-keygen-676a6d2acdbc2b0f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libgpg-error-67d7c44a1ceca15f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-6a9ab08217e03637",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libunistring-6b355ad9cf81dcd3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-busybox-6bf700b30f964336",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-sqlite-libs-71953325d9f1cd90",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-readline-737de1fb7a1e32ab",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pcre2-787d02d59193ff0a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libtasn1-7ab7881e9d89ecad",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libassuan-8d930eb549ddbac7",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-git-93728d922833cdd9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-sftp-server-9571945e172499e9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsasl-988ac090dcc913c1",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libffi-9e89f2d619383fa",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-nghttp2-libs-a796339c8220e593",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcap-a8f3af76fe35b957",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libbz2-aed522737461beed",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---b02f7c78af6ca960",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pcre-b20e4f4cfe28ff6a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-bc1da6b60498fea3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-expat-bf76456b3e5dd2af",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-sqlite-d07d669feb18fafa",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-npth-d9817c3d55042ea0",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-curl-e0de2671b069f97f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gdbm-eae205564d0724a4",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-p11-kit-f294a166107fe6e2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libedit-f67db8dc99b5c2ae",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-scanelf-f9f3f41ca590dd0a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libblkid-fde532ace0c1f07f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-musl-7122523f0dac0754"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-sqlite-libs-71953325d9f1cd90"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-bash-33b8d63bcc23e3f7",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-readline-737de1fb7a1e32ab"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-sqlite-d07d669feb18fafa",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-readline-737de1fb7a1e32ab"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-git-93728d922833cdd9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-pcre2-787d02d59193ff0a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libtasn1-7ab7881e9d89ecad"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libassuan-8d930eb549ddbac7"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libassuan-8d930eb549ddbac7"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-bc1da6b60498fea3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-sftp-server-9571945e172499e9"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libsasl-988ac090dcc913c1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-1592a8d534782f2",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-31a349b3be1d23af",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-a3323e15446e44c4",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-git-93728d922833cdd9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-curl-e0de2671b069f97f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libffi-9e89f2d619383fa"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-p11-kit-f294a166107fe6e2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libffi-9e89f2d619383fa"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsecret-76f4f3e9ea1222fd",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-nghttp2-libs-a796339c8220e593"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-pinentry-6f0a35f42dc0ff9d",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcap-a8f3af76fe35b957"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-bc1da6b60498fea3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libbz2-aed522737461beed"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-glib-a2ac3919ee7b5acf",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-pcre-b20e4f4cfe28ff6a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libssl1.1-34dee8f9a2a24020",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-common-35b2398f6bf42e49",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-3d3f539520a09439",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libretls-55d8270082497bde",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-59f0dfc47bad0b78",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-5b6f33049ad1a5a1",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-keygen-676a6d2acdbc2b0f",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-default-6ab33502116f2143",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-sftp-server-9571945e172499e9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libcurl-9a1b7b68adf3d9c2",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libldap-bb2d201ee42bec02",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-bc1da6b60498fea3",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libcrypto1.1-bc2137687b6feae1"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-git-93728d922833cdd9",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-expat-bf76456b3e5dd2af"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnupg-6f6a5771e12198ea",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-npth-d9817c3d55042ea0"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libsasl-988ac090dcc913c1",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-gdbm-eae205564d0724a4"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-server-ae68c0f166a0ecc6",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-openssh-server-common-ef023df807e0484b"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-gnutls-3e3feb9f9fdc34d8",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-p11-kit-f294a166107fe6e2"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-openssh-client-common-35b2398f6bf42e49",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libedit-f67db8dc99b5c2ae"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-6a9ab08217e03637",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-scanelf-f9f3f41ca590dd0a"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-ncurses-libs-55593090ef48f52a",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-ncurses-terminfo-base-fb155a9cb7e8d1a3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-Package-apk-libmount-1dfdcb9ef4a5b782",
+            "relationshipType": "DEPENDENCY_OF",
+            "spdxElementId": "SPDXRef-Package-apk-libblkid-fde532ace0c1f07f"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-DOCUMENT",
+            "relationshipType": "DESCRIBES",
+            "spdxElementId": "SPDXRef-DOCUMENT"
+        }
+    ],
+    "snippets": null,
+    "spdxVersion": "SPDX-2.3"
+}

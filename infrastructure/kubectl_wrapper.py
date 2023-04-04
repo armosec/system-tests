@@ -4,7 +4,8 @@ from http.client import FOUND
 import time
 from crypt import methods
 
-from kubernetes import client, config
+from kubernetes.client import api_client
+from kubernetes import client, config, dynamic
 from kubernetes.client.exceptions import ApiException
 import requests
 from systest_utils import Logger, TestUtil, statics
@@ -94,6 +95,11 @@ class KubectlWrapper(object):
                 context=active_context['name']))
             self.client_BatchV1beta1Api = client.BatchV1beta1Api(api_client=config.new_client_from_config(
                 context=active_context['name']))
+            self.client_CustomObjectsApi = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
+
+            self.client_dynamic = dynamic.DynamicClient(api_client.ApiClient(configuration=config.load_kube_config())
+    )    
+            # self.client_ = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
             
 
         else:
@@ -514,6 +520,8 @@ class KubectlWrapper(object):
             return wl['apiVersion']
         return ''
 
+    def get_dynamic_client(self, api_version, kind):
+        return self.client_dynamic.resources.get(api_version=api_version, kind=kind)
 
 def get_name(obj: dict):
     return obj["metadata"]["name"]

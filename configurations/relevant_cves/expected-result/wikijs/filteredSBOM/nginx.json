@@ -1,0 +1,431 @@
+{
+    "SPDXID": "SPDXRef-DOCUMENT",
+    "comment": "",
+    "creationInfo": {
+        "comment": "",
+        "created": "2023-03-14T12:35:44Z",
+        "creators": [
+            "Organization: Anchore, Inc",
+            "Tool: syft-0.70.0",
+            "Organization: Kubescape",
+            "Tool: KubescapeNodeAgent"
+        ],
+        "licenseListVersion": "3.19"
+    },
+    "dataLicense": "CC0-1.0",
+    "documentDescribes": null,
+    "documentNamespace": "https://anchore.com/syft/image/nginx@sha256-f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d-1c1ac522-f26a-403d-b4a0-f7967fcdaf91",
+    "externalDocumentRefs": null,
+    "files": [
+        {
+            "SPDXID": "SPDXRef-6981531aac982c6a",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:5dacd731af1b0386ead06c8b1feff9f65d9e0bdfec032d2cd0bc03690698feda",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/host.conf",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-363fa459d0e68d23",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:b8f18c3b860b067be09836beadd676a0aa1e784ec28cf730986859b4146c344a",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/etc/nginx/nginx.conf",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-eba769f43fcfae03",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:b8f18c3b860b067be09836beadd676a0aa1e784ec28cf730986859b4146c344a",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/usr/lib/x86_64-linux-gnu/libcrypto.so.1.1",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-577b441ffbcfbea7",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:b8f18c3b860b067be09836beadd676a0aa1e784ec28cf730986859b4146c344a",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/usr/lib/x86_64-linux-gnu/libssl.so.1.1",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        },
+        {
+            "SPDXID": "SPDXRef-4b9dfe077e8059a4",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:b8f18c3b860b067be09836beadd676a0aa1e784ec28cf730986859b4146c344a",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/usr/sbin/nginx",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        }
+    ],
+    "hasExtractedLicensingInfos": null,
+    "name": "nginx",
+    "packages": [
+        {
+            "SPDXID": "SPDXRef-Package-deb-base-files-9b227faede5750",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base-files:base-files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base-files:base_files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base_files:base-files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base_files:base_files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base:base-files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:base:base_files:9.9\\+deb9u8:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/base-files@9.9+deb9u8?arch=amd64\u0026distro=debian-9",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseDeclared": "NOASSERTION",
+            "licenseInfoFromFiles": null,
+            "name": "base-files",
+            "originator": "Person: Santiago Vila \u003csanvila@debian.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/base-files/copyright, /var/lib/dpkg/info/base-files.conffiles, /var/lib/dpkg/info/base-files.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "9.9+deb9u8"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-deb-libssl1.1-3bdf96623a5e5d8",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libssl1.1:libssl1.1:1.1.0j-1\\~deb9u1:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/libssl1.1@1.1.0j-1~deb9u1?arch=amd64\u0026upstream=openssl\u0026distro=debian-9",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "NONE",
+            "licenseDeclared": "NONE",
+            "licenseInfoFromFiles": null,
+            "name": "libssl1.1",
+            "originator": "Person: Debian OpenSSL Team \u003cpkg-openssl-devel@lists.alioth.debian.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libssl1.1/copyright, /var/lib/dpkg/info/libssl1.1:amd64.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "1.1.0j-1~deb9u1"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-deb-libssl1.1-3bdf96623a5e5d8",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libssl1.1:libssl1.1:1.1.0j-1\\~deb9u1:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/libssl1.1@1.1.0j-1~deb9u1?arch=amd64\u0026upstream=openssl\u0026distro=debian-9",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "NONE",
+            "licenseDeclared": "NONE",
+            "licenseInfoFromFiles": null,
+            "name": "libssl1.1",
+            "originator": "Person: Debian OpenSSL Team \u003cpkg-openssl-devel@lists.alioth.debian.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libssl1.1/copyright, /var/lib/dpkg/info/libssl1.1:amd64.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "1.1.0j-1~deb9u1"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-deb-nginx-16a6e6f21cd3fcb3",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:nginx:nginx:1.14.2-1\\~stretch:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/nginx@1.14.2-1~stretch?arch=amd64\u0026distro=debian-9",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "NONE",
+            "licenseDeclared": "NONE",
+            "licenseInfoFromFiles": null,
+            "name": "nginx",
+            "originator": "Person: Sergey Budnevitch \u003csb@nginx.com\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/nginx/copyright, /var/lib/dpkg/info/nginx.conffiles, /var/lib/dpkg/info/nginx.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "1.14.2-1~stretch"
+        },
+        {
+            "SPDXID": "SPDXRef-Package-deb-nginx-16a6e6f21cd3fcb3",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:nginx:nginx:1.14.2-1\\~stretch:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/nginx@1.14.2-1~stretch?arch=amd64\u0026distro=debian-9",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "NONE",
+            "licenseDeclared": "NONE",
+            "licenseInfoFromFiles": null,
+            "name": "nginx",
+            "originator": "Person: Sergey Budnevitch \u003csb@nginx.com\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/nginx/copyright, /var/lib/dpkg/info/nginx.conffiles, /var/lib/dpkg/info/nginx.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "1.14.2-1~stretch"
+        }
+    ],
+    "relationships": [
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-363fa459d0e68d23",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-nginx-16a6e6f21cd3fcb3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-4b9dfe077e8059a4",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-nginx-16a6e6f21cd3fcb3"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-577b441ffbcfbea7",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-libssl1.1-3bdf96623a5e5d8"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-eba769f43fcfae03",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-libssl1.1-3bdf96623a5e5d8"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-6981531aac982c6a",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-base-files-9b227faede5750"
+        },
+        {
+            "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+            "relatedSpdxElement": "SPDXRef-Package-java-archive-libintl-581120d5415820e3",
+            "relationshipType": "OTHER",
+            "spdxElementId": "SPDXRef-Package-deb-gettext-base-ee4ddc3a2c201c7e"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-DOCUMENT",
+            "relationshipType": "DESCRIBES",
+            "spdxElementId": "SPDXRef-DOCUMENT"
+        }
+    ],
+    "snippets": null,
+    "spdxVersion": "SPDX-2.3"
+}
