@@ -21,7 +21,7 @@ class HelmWrapper(object):
                                 repo: str=statics.HELM_REPO, helm_kwargs:dict={}):
         command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", statics.CA_NAMESPACE_FROM_HELM_NAME,
                         "--create-namespace", "--set", "account={x}".format(x=customer),
-                        "--set", "clusterName={}".format(cluster_name)]
+                        "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
 
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
@@ -35,8 +35,8 @@ class HelmWrapper(object):
 
     @staticmethod
     def uninstall_armo_helm_chart():
-        TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", "armo"])
+        TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
 
     @staticmethod
     def remove_armo_from_repo():
-        TestUtil.run_command(command_args=["helm", "repo", "remove", "armo"])
+        TestUtil.run_command(command_args=["helm", "repo", "remove", "kubescape"])
