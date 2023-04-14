@@ -687,12 +687,11 @@ class BaseK8S(BaseDockerizeTest):
         return wlid
 
     def get_instance_IDs(self, pods, namespace, **kwargs):
-        if isinstance(pods, list):
-            instanceIDs: list = [self.get_instance_IDs(pods=i, namespace=namespace, **kwargs) for i in pods]
-            return instanceIDs[0] if len(instanceIDs) == 1 else instanceIDs
-        instanceID = self.calculate_instance_ID(pod=pods, namespace=namespace, **kwargs)
-        self.instanceIDs.append(instanceID)
-        return instanceID
+        instanceIDs = []
+        for pod in pods:
+            instanceIDs_for_pod = self.calculate_instance_ID(pod=pod, namespace=namespace, **kwargs)
+            instanceIDs.append(instanceIDs_for_pod)
+        return instanceIDs
 
     def create_namespace(self, yaml_file=statics.BASIC_NAMESPACE_YAML, path=statics.DEFAULT_NAMESPACE_PATH,
                          unique_name=True, **kwargs):

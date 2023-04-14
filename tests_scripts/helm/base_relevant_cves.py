@@ -53,7 +53,10 @@ class BaseRelevantCves(BaseHelm):
 
     def get_CVEs_from_CVE_manifest(self, CVEManifest):
         cves = []
-        for vuln in CVEManifest['payload']['matches']['vulnerability']:
+        if 'spec' in CVEManifest:
+            CVEManifest = CVEManifest['spec']
+        for match in CVEManifest['payload']['matches']:
+            vuln = match['vulnerability']
             cves.append(vuln['id'])
         return cves
 
@@ -63,7 +66,7 @@ class BaseRelevantCves(BaseHelm):
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
-                if CVE[0] in expected_CVE_data[0]:
+                if CVE[0] in expected_CVE_data['metadata']['name']:
                     expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
                     SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
                     if expected_SBOM_file_list != SBOM_file_list:
@@ -176,7 +179,6 @@ class BaseRelevantCves(BaseHelm):
         f'in the following entries is happened:\n{failed_all_CVEs_paths}'
         assert not failed_filtered_CVEs_paths, f'the following relevant CVEs data is not found as expected\n{failed_filtered_CVEs_paths}'
 
-    @staticmethod
     def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
 
         start = time.time()
