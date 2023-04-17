@@ -946,14 +946,14 @@ class BaseK8S(BaseDockerizeTest):
             CVEs.append((CVEsKeys, CVE_data))
         elif isinstance(CVEsKeys, list):
             for key in CVEsKeys:
-              CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                 group=statics.STORAGE_AGGREGATED_API_GROUP,
                 version=statics.STORAGE_AGGREGATED_API_VERSION,
                 name=key,
                 namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                 plural=statics.STORAGE_CVES_PLURAL,
             )
-            CVEs.append((key, CVE_data))
+                CVEs.append((key, CVE_data))
         return CVEs
 
     def get_filtered_SBOM_from_storage(self, filteredSBOMKeys):

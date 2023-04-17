@@ -73,8 +73,6 @@ class RelevantCVEs(BaseRelevantCves):
         
         self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
         
-
-
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredSBOMKEys=self.get_workloads_images_hash(workload_objs))
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_CVEs(filteredSBOM, self.test_obj["expected_filtered_CVEs"])
@@ -105,7 +103,7 @@ class RelevantCVEs(BaseRelevantCves):
 
         return self.cleanup()
     
-
+# Tests that sniffer stop sniffing after X time
 class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
@@ -138,10 +136,6 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
-
         Logger.logger.info('Validate SBOMp was created with expected data')
         filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage, filteredSBOMKeys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
 
@@ -157,6 +151,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
         return self.cleanup()
 
+# Tests that BE has CVE data when relevancy is disabled
 class RelevancyDisabled(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
@@ -220,6 +215,82 @@ class RelevancyDisabled(BaseRelevantCves):
         # # 4.3 get CVEs for containers
         Logger.logger.info('Test BE CVEs against storage CVEs')
         self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id, be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs, statics.FILTERED_CVES_KEY: CVEs})
+
+        Logger.logger.info('delete armo namespace')
+        self.uninstall_armo_helm_chart()
+        TestUtil.sleep(150, "Waiting for aggregation to end")
+
+        Logger.logger.info("Deleting cluster from backend")
+        self.delete_cluster_from_backend_and_tested()
+        self.test_cluster_deleted(since_time=since_time)
+
+        return self.cleanup()
+    
+
+# Test that when deleting a workload, the relevant resources are deleted from storage
+class RelevancyEnabledDeletedImage(BaseRelevantCves):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(RelevancyEnabledDeletedImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                    kubernetes_obj=kubernetes_obj)
+        
+
+    def start(self):
+        cluster, namespace = self.setup(apply_services=False)
+
+        # P1 install helm-chart (armo)
+        # 1.1 add and update armo in repo
+        Logger.logger.info('install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
+
+        # 1.2 install armo helm-chart
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
+        #P2 apply workloads
+        Logger.logger.info('apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
+
+        #P3 verify results in storage
+        # 3 test SBOM created as expected in the storage
+        Logger.logger.info('Test SBOM was created in storage')
+        # 3.1 test SBOM created in the storage
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage, SBOMKeys=self.get_workloads_images_hash(workload_objs))
+
+        # 3.2 test CVEs created in the storage
+        Logger.logger.info('Test CVEs were created in storage')
+        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage, CVEsKeys=self.get_workloads_images_hash(workload_objs))
+
+        Logger.logger.info('exposing operator (port-fwd)')
+        self.expose_operator(cluster)
+        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
+
+        Logger.logger.info('Validate SBOMp was created')
+        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage, filteredSBOMKeys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
+
+        self.kubernetes_obj.delete_workloads(workload_objs=workload_objs, namespace=namespace)
+
+        Logger.logger.info('Test SBOM was deleted in storage')
+        self.test_SBOM_deleted(SBOMs, self.get_workloads_images_hash(workload_objs))
+
+        SBOM_keys = self.get_workloads_images_hash(workload_objs)
+        SBOMS = self.get_SBOM_from_storage(SBOM_keys)
+        assert SBOMS == {}, "SBOMs were not deleted"
+
+
+        Logger.logger.info('Test CVEs were deleted in storage')
+        CVE_keys = self.get_workloads_images_hash(workload_objs)
+        CVEs = self.get_CVEs_from_storage(CVE_keys)
+        assert CVEs == {}, "CVEs were not deleted"
+
+        Logger.logger.info('Test filtered SBOM was deleted in storage')
+        filteredSBOM_keys = self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace)
+        filteredSBOMs = self.get_filtered_SBOM_from_storage(filteredSBOM_keys)
+        assert filteredSBOMs == {}, "filtered SBOMs were not deleted"
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()

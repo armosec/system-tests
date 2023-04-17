@@ -1,21 +1,21 @@
 {
     "SPDXID": "SPDXRef-DOCUMENT",
+    "annotations": null,
     "comment": "",
     "creationInfo": {
         "comment": "",
-        "created": "2023-03-14T12:58:51Z",
+        "created": "2023-04-17T09:06:43Z",
         "creators": [
             "Organization: Anchore, Inc",
-            "Tool: syft-0.70.0",
+            "Tool: syft-v0.76.0",
             "Organization: Kubescape",
             "Tool: KubescapeNodeAgent"
         ],
-        "licenseListVersion": "3.19"
+        "licenseListVersion": "3.20"
     },
     "dataLicense": "CC0-1.0",
     "documentDescribes": null,
-    "documentNamespace": "https://anchore.com/syft/image/requarks/wiki@sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-f5a7dc77-985f-4d72-85c7-9b90ef35a992",
-    "name": "wikijs",
+    "documentNamespace": "https://anchore.com/syft/image/docker.io/requarks/wiki@sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-1d4a0af3-b2b4-430f-bb10-6f5beaf1ebea",
     "externalDocumentRefs": null,
     "files": [
         {
@@ -129,7 +129,177 @@
             "noticeText": ""
         }
     ],
-    "hasExtractedLicensingInfos": null,
+    "hasExtractedLicensingInfos": [
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--AFL-2.1-OR-BSD-3-Clause-",
+            "name": "(AFL-2.1 OR BSD-3-Clause)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--BSD-2-Clause-OR-MIT-OR-Apache-2.0-",
+            "name": "(BSD-2-Clause OR MIT OR Apache-2.0)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--BSD-3-Clause",
+            "name": "(BSD-3-Clause",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--BSD-3-Clause-OR-GPL-2.0-",
+            "name": "(BSD-3-Clause OR GPL-2.0)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--LGPL-2.0-or-MIT-",
+            "name": "(LGPL-2.0 or MIT)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--LGPL-3.0-or-later",
+            "name": "(LGPL-3.0-or-later",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--MIT-AND-BSD-3-Clause-",
+            "name": "(MIT AND BSD-3-Clause)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--MIT-AND-Zlib-",
+            "name": "(MIT AND Zlib)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--MIT-OR-Apache-2.0-",
+            "name": "(MIT OR Apache-2.0)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--MPL-2.0-OR-Apache-2.0-",
+            "name": "(MPL-2.0 OR Apache-2.0)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef--WTFPL-OR-MIT-",
+            "name": "(WTFPL OR MIT)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-AND",
+            "name": "AND",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Apache-2.0",
+            "name": "Apache 2.0",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD",
+            "name": "BSD",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL-2.0-or-later-",
+            "name": "GPL-2.0-or-later)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-MIT-or-GPL-2.0",
+            "name": "MIT or GPL-2.0",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-MIT-",
+            "name": "MIT)",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-MIT-X11",
+            "name": "MIT/X11",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-OR",
+            "name": "OR",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Public-Domain",
+            "name": "Public-Domain",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-WTFPL-OR-ISC",
+            "name": "WTFPL OR ISC",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-and",
+            "name": "and",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-custom",
+            "name": "custom",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-or",
+            "name": "or",
+            "seeAlsos": null
+        }
+    ],
+    "name": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
     "packages": [
         {
             "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-99cf2e0f247af59f",
@@ -181,7 +351,7 @@
                 {
                     "comment": "",
                     "referenceCategory": "PACKAGE-MANAGER",
-                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026distro=alpine-3.14.3",
                     "referenceType": "purl"
                 }
             ],
@@ -255,7 +425,7 @@
                 {
                     "comment": "",
                     "referenceCategory": "PACKAGE-MANAGER",
-                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026distro=alpine-3.14.3",
                     "referenceType": "purl"
                 }
             ],
@@ -329,7 +499,7 @@
                 {
                     "comment": "",
                     "referenceCategory": "PACKAGE-MANAGER",
-                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.14.3",
+                    "referenceLocator": "pkg:apk/alpine/alpine-baselayout@3.2.0-r16?arch=x86_64\u0026distro=alpine-3.14.3",
                     "referenceType": "purl"
                 }
             ],
@@ -368,6 +538,24 @@
                     "comment": "",
                     "referenceCategory": "SECURITY",
                     "referenceLocator": "cpe:2.3:a:libcrypto1.1:libcrypto1.1:1.1.1l-r0:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libcrypto1.1:libcrypto:1.1.1l-r0:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto1.1:1.1.1l-r0:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto:1.1.1l-r0:*:*:*:*:*:*:*",
                     "referenceType": "cpe23Type"
                 },
                 {
@@ -739,7 +927,7 @@
         },
         {
             "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-            "relatedSpdxElement": "SPDXRef-Package-binary-busybox-cabcb6c87dbbde99",
+            "relatedSpdxElement": "SPDXRef-Package-binary-busybox-a414f0f9bb6b84ca",
             "relationshipType": "OTHER",
             "spdxElementId": "SPDXRef-Package-apk-busybox-6bf700b30f964336"
         },
