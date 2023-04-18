@@ -74,6 +74,7 @@ class BaseKubescape(BaseK8S):
 
         self.ks_branch = self.test_driver.kwargs.get("ks_branch", DEFAULT_BRANCH)
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
+        self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
         self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
@@ -163,6 +164,12 @@ class BaseKubescape(BaseK8S):
             command.extend(['--use-artifacts-from', kwargs['use_artifacts']])
         elif self.artifacts:  # otherwise, load default artifacts (if passed by the command line)
             command.extend(['--use-artifacts-from', self.artifacts])
+
+        # used to include rego rules not yet merged in master branch.
+        if "use_from" in kwargs and kwargs['use_from'] != "":
+            command.extend(['--use-from', kwargs['use_from']])
+        elif self.policies:  # otherwise, load default policies (if passed by the command line)
+            command.extend(['--use-from', self.policies])
 
         if "include_namespaces" in kwargs:
             command.extend(["--include-namespaces", kwargs['include_namespaces']])
