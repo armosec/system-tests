@@ -115,7 +115,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanLocalFile,
             policy_scope='framework',
-            policy_name='all',
+            policy_name='allControls',
             yamls=['nginx.yaml'],
             resources=1
         )
