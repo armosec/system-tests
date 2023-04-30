@@ -1014,8 +1014,9 @@ class BaseKubescape(BaseK8S):
                                                                      framework_name=framework_name)
             if wait_to_result and len(be_cluster_overtime) == 0:
                 return ""
-            if len(be_cluster_overtime) > 0 and \
-                    be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD] != old_report_guid:
+            if len(be_cluster_overtime) > 0 and (old_report_guid == "" or
+                                                 be_cluster_overtime[statics.BE_CORDS_FIELD][
+                                                     statics.BE_REPORT_GUID_FIELD] != old_report_guid):
                 if found:
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
                 found = True
