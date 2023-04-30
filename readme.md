@@ -31,10 +31,7 @@
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |
-| `create_subscription`              | payment |                                                                        | stripe, backend             |
-| `cancel_subscription`              | payment |                                                                        | stripe, backend             |
-| `renew_subscription`              | payment |                                                                        | stripe, backend             |
+| `vulnerability_scanning_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`              | payment |                                                                        | stripe, backend             |
 | `stripe_billing_portal`              | payment |                                                                        | stripe, backend             |
 | `stripe_plans`              | payment |                                                                        | stripe, backend             |
