@@ -83,17 +83,17 @@ class StripeWebhook(BaseStripe):
         updated = self.wait_for_webhook_create_subscription(test_tenant_id, stripeSubscriptionID, timeout=WEBHOOK_TIMEOUT, sleep_interval=WEBHOOK_SLEEP_INTERVAL)
         assert updated == True, "create subscription - stripeSubscriptionID is not updated"
 
-        Logger.logger.info("Stage 4: cancel a subscription")
+        Logger.logger.info("Stage 3: cancel a subscription")
         response = self.cancel_subscription(test_tenant_id)
 
-        Logger.logger.info("Stage 5: Validate tenants details after subscription canceled")
+        Logger.logger.info("Stage 4: Validate tenants details after subscription canceled")
         updated = self.wait_for_webhook_cancel_subscription(test_tenant_id, timeout=WEBHOOK_TIMEOUT, sleep_interval=WEBHOOK_SLEEP_INTERVAL)
         assert updated == True, "cancel subscription - cancelAtPeriodEnd is not True"
 
-        Logger.logger.info("Stage 6: renew a subscription")
+        Logger.logger.info("Stage 5: renew a subscription")
         response = self.renew_subscription(test_tenant_id)
         
-        Logger.logger.info("Stage 7: Validate tenants details after subscription renewed")
+        Logger.logger.info("Stage 6: Validate tenants details after subscription renewed")
         updated = self.wait_for_webhook_renew_subscription(test_tenant_id, timeout=WEBHOOK_TIMEOUT, sleep_interval=WEBHOOK_SLEEP_INTERVAL)
         assert updated == True, "renew subscription - cancelAtPeriodEnd is not False"
 
