@@ -26,9 +26,9 @@ class HelmWrapper(object):
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
-        if environment == "development" or environment == "dev":
+        if environment in ["development", "dev", "development-egg"]:
             command_args.extend(["--set", "environment=dev"])
-        elif environment == "staging" or environment == "stage":
+        elif environment in ["staging", "stage", "staging-egg"]:
             command_args.extend(["--set", "environment=staging"])
         return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code, return_obj.stdout, return_obj.stderr)
