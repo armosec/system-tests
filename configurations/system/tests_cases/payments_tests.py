@@ -20,39 +20,6 @@ class PaymentTests(object):
     '''
     
     @staticmethod
-    def create_subscription():
-        from tests_scripts.payments.subscription import Create
-        return PaymentConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=Create,
-            expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
-        )      
-
-    @staticmethod
-    def cancel_subscription():
-        from tests_scripts.payments.subscription import Cancel
-        return PaymentConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=Cancel,
-            expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
-
-        )    
-
-    @staticmethod
-    def renew_subscription():
-        from tests_scripts.payments.subscription import Renew
-        return PaymentConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=Renew,
-            expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
-
-
-        )    
-    
-    @staticmethod
     def stripe_webhook():
         from tests_scripts.payments.webhook import StripeWebhook
         return PaymentConfiguration(
@@ -66,7 +33,7 @@ class PaymentTests(object):
 
     @staticmethod
     def stripe_checkout():
-        from tests_scripts.payments.subscription import Checkout
+        from tests_scripts.payments.checkout import Checkout
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Checkout,
@@ -79,8 +46,9 @@ class PaymentTests(object):
         from tests_scripts.payments.portal import Portal
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=Portal
-
+            test_obj=Portal,
+            expected_prices = EXPECTED_PRICES,
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
         )          
 
     @staticmethod

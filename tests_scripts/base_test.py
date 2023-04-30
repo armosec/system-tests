@@ -12,6 +12,8 @@ from infrastructure import backend_api
 from systest_utils import TestUtil, Logger, statics
 from systest_utils.wlid import Wlid
 
+from http import client
+
 AGENT_REPORT_RETIES: int = 10
 AGENT_REPORT_RETIES_WAIT: int = 20
 
@@ -40,9 +42,38 @@ class BaseTest(object):
         self.leave_redis_data: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "leave_redis_data", False)
         self.test_summery_data = {}
 
+        self.test_tenants_ids = []
+
+
     def __del__(self):
         Logger.logger.info(f"test summarize: {json.dumps(self.test_summery_data, indent=4)}")
 
+
+    def create_customer_name(self, prefix: str) -> str:
+        epoch = time.time()
+        prefix = "t_" + prefix
+        name = "%s_%d" % (prefix, epoch)
+        return name
+
+    def create_new_tenant(self, prefix=None) -> int:
+        prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
+        tenantName = self.create_customer_name(prefix)
+        res, test_tenant_id = self.backend.create_tenant(tenantName)
+        Logger.logger.info(f"create tenant name '{tenantName}' with tenant id {test_tenant_id}")
+        self.backend.select_customer(test_tenant_id)
+        self.test_tenants_ids.append(test_tenant_id)
+        return test_tenant_id
+
+    def delete_tenants(self):
+        for tenant_id in self.test_tenants_ids:
+            response = self.backend.delete_tenant(tenant_id)
+            if response.status_code != client.OK:
+                Logger.logger.error(f"delete tenant {tenant_id} failed")
+            else:
+                Logger.logger.info(f"deleted tenant {tenant_id}")
+
+
+    
     def create_ks_exceptions(self, cluster_name: str, exceptions_file):
         if not exceptions_file:
             return {}
