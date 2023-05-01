@@ -244,8 +244,6 @@ class ControlPanelAPI(object):
         customers = {received_customers[i + 1]: received_customers[i + 3]
                      for i in range(0, len(received_customers), 4)}
 
-        Logger.logger.debug('Available customers: %s' % str(customers))
-
         if not self.customer:
             self.customer = list(customers)[0]
         else:
