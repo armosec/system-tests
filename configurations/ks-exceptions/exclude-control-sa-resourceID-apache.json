@@ -1,0 +1,22 @@
+{
+    "policyType": "postureExceptionPolicy",
+    "name": "exclude-control-sa-resourceID-apache",
+    "actions": [
+      "alertOnly"
+    ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "cluster": "minikube1",
+                "resourceID": "/v1/system-test/ServiceAccount/default"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "controlName": "Automatic mapping of service account",
+            "frameworkName": "NSA"
+        }
+    ]
+}
