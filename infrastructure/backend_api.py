@@ -32,6 +32,8 @@ LOGIN_METHOD_KEYCLOAK = "keycloak"
 LOGIN_METHOD_FRONTEGG_SECRET = "frontegg_secret"
 LOGIN_METHOD_FRONTEGG_USERNAME = "frontegg_username"
 
+API_FRONTEGG_IDENTITY_RESOURCES_USERS_V2_USERS_V2_ME_TENANTS = "/frontegg/identity/resources/users/v2/me/tenants"
+
 
 API_STRIPE_BILLING_PORTAL = "/api/v1/tenants/stripe/portal"
 API_STRIPE_CHECKOUT = "/api/v1/tenants/stripe/checkout"
@@ -267,7 +269,7 @@ class ControlPanelAPI(object):
         auth = self.auth["Authorization"].split(" ")[1]
         authCreatedByUserId = self.api_login.decode_jwt(auth)["createdByUserId"]
         headers={"Authorization": f"Bearer {auth}", "frontegg-user-id": authCreatedByUserId}
-        res = self.get(self.auth_url + "/frontegg/identity/resources/users/v2/me/tenants", headers=headers)
+        res = self.get(self.auth_url + API_FRONTEGG_IDENTITY_RESOURCES_USERS_V2_USERS_V2_ME_TENANTS, headers=headers)
         assert res.status_code == client.OK, f"get tenant details failed"
         return res
 
