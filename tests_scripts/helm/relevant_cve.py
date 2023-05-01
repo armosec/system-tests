@@ -24,7 +24,7 @@ DEFAULT_BRANCH = "release"
 class RelevantCVEs(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevantCVEs, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
-                                                    kubernetes_obj=kubernetes_obj)
+                                           kubernetes_obj=kubernetes_obj)
 
     def start(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -42,7 +42,7 @@ class RelevantCVEs(BaseRelevantCves):
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
-        #P2 apply workload
+        # P2 apply workload
         Logger.logger.info('apply services')
         self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
         Logger.logger.info('apply config-maps')
@@ -51,29 +51,36 @@ class RelevantCVEs(BaseRelevantCves):
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
-        #P3 verify results in storage
+        # P3 verify results in storage
         # 3 test SBOM and CVEs created as expected in the storage
         Logger.logger.info('Get the scan result from local Storage')
         # 3.1 test SBOM created in the storage
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage, SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+                                        SBOMKeys=self.get_workloads_images_hash(workload_objs))
         # 3.2 test SBOM created as expected result in the storage
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
         # 3.3 test CVEs created in the storage
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage, CVEsKeys=self.get_workloads_images_hash(workload_objs))
+        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+                                       CVEsKeys=self.get_workloads_images_hash(workload_objs))
         # 3.4 test CVES created as expected result in the storage
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
         # 3.5 test filtered SBOM created in the storage
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage, filteredSBOMKeys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
+        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+                                               filteredSBOMKeys=self.get_instance_IDs(
+                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
+                                                                                                     namespace=namespace),
+                                                   namespace=namespace))
         # 3.6 test filtered CVEs created as expected result in the storage
         self.validate_expected_SBOM(filteredSBOM, self.test_obj["expected_filtered_SBOMs"])
         # 3.7 test filtered SBOM created in the storage
         Logger.logger.info('exposing operator (port-fwd)')
         self.expose_operator(cluster)
-        
+
         self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
-        
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredSBOMKEys=self.get_workloads_images_hash(workload_objs))
+
+        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
+                                               filteredSBOMKEys=self.get_workloads_images_hash(workload_objs))
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_CVEs(filteredSBOM, self.test_obj["expected_filtered_CVEs"])
 
@@ -91,7 +98,9 @@ class RelevantCVEs(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         # # 4.3 get CVEs for containers
 
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id, be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs, statics.FILTERED_CVES_KEY: filteredCVEs})
+        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -102,13 +111,14 @@ class RelevantCVEs(BaseRelevantCves):
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
-    
+
+
 # Tests that sniffer stop sniffing after X time
 class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
-                                                    kubernetes_obj=kubernetes_obj)
-        
+        super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj,
+                                                                    backend=backend,
+                                                                    kubernetes_obj=kubernetes_obj)
 
     def start(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -126,18 +136,23 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
-        #P2 create wl
+        # P2 create wl
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
         # P3 CHECK sbom and sbom'
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage, SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+                                        SBOMKeys=self.get_workloads_images_hash(workload_objs))
 
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
         Logger.logger.info('Validate SBOMp was created with expected data')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage, filteredSBOMKeys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
+        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+                                               filteredSBOMKeys=self.get_instance_IDs(
+                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
+                                                                                                     namespace=namespace),
+                                                   namespace=namespace))
 
         self.validate_expected_SBOM(filteredSBOM, self.test_obj["expected_filtered_SBOMs"])
 
@@ -151,11 +166,12 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
         return self.cleanup()
 
+
 # Tests that BE has CVE data when relevancy is disabled
 class RelevancyDisabled(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
-                                                    kubernetes_obj=kubernetes_obj)
+                                                kubernetes_obj=kubernetes_obj)
 
     def start(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -173,7 +189,7 @@ class RelevancyDisabled(BaseRelevantCves):
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
-        #P2 apply workloads
+        # P2 apply workloads
         Logger.logger.info('apply services')
         self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
         Logger.logger.info('apply config-maps')
@@ -182,18 +198,20 @@ class RelevancyDisabled(BaseRelevantCves):
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
-        #P3 verify results in storage
+        # P3 verify results in storage
         # 3 test SBOM created as expected in the storage
         Logger.logger.info('Test SBOM was created in storage')
         # 3.1 test SBOM created in the storage
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage, SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+                                        SBOMKeys=self.get_workloads_images_hash(workload_objs))
         # 3.2 test SBOM created as expected result in the storage
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
         # 3.3 test CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage, CVEsKeys=self.get_workloads_images_hash(workload_objs))
+        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+                                       CVEsKeys=self.get_workloads_images_hash(workload_objs))
         # 3.4 test CVES created as expected result in the storage
         Logger.logger.info('Validate CVEs were created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
@@ -214,7 +232,9 @@ class RelevancyDisabled(BaseRelevantCves):
 
         # # 4.3 get CVEs for containers
         Logger.logger.info('Test BE CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id, be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs, statics.FILTERED_CVES_KEY: CVEs})
+        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                          statics.FILTERED_CVES_KEY: CVEs})
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -225,14 +245,13 @@ class RelevancyDisabled(BaseRelevantCves):
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
-    
+
 
 # Test that when deleting a workload, the relevant resources are deleted from storage
 class RelevancyEnabledDeletedImage(BaseRelevantCves):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledDeletedImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
-                                                    kubernetes_obj=kubernetes_obj)
-        
+                                                           kubernetes_obj=kubernetes_obj)
 
     def start(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -250,27 +269,33 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
-        #P2 apply workloads
+        # P2 apply workloads
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
-        #P3 verify results in storage
+        # P3 verify results in storage
         # 3 test SBOM created as expected in the storage
         Logger.logger.info('Test SBOM was created in storage')
         # 3.1 test SBOM created in the storage
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage, SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+                                        SBOMKeys=self.get_workloads_images_hash(workload_objs))
 
         # 3.2 test CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage, CVEsKeys=self.get_workloads_images_hash(workload_objs))
+        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+                                       CVEsKeys=self.get_workloads_images_hash(workload_objs))
 
         Logger.logger.info('exposing operator (port-fwd)')
         self.expose_operator(cluster)
         self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
 
         Logger.logger.info('Validate SBOMp was created')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage, filteredSBOMKeys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
+        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+                                               filteredSBOMKeys=self.get_instance_IDs(
+                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
+                                                                                                     namespace=namespace),
+                                                   namespace=namespace))
 
         self.kubernetes_obj.delete_workloads(workload_objs=workload_objs, namespace=namespace)
 
@@ -281,14 +306,14 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
         SBOMS = self.get_SBOM_from_storage(SBOM_keys)
         assert SBOMS == {}, "SBOMs were not deleted"
 
-
         Logger.logger.info('Test CVEs were deleted in storage')
         CVE_keys = self.get_workloads_images_hash(workload_objs)
         CVEs = self.get_CVEs_from_storage(CVE_keys)
         assert CVEs == {}, "CVEs were not deleted"
 
         Logger.logger.info('Test filtered SBOM was deleted in storage')
-        filteredSBOM_keys = self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace)
+        filteredSBOM_keys = self.get_instance_IDs(
+            pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace)
         filteredSBOMs = self.get_filtered_SBOM_from_storage(filteredSBOM_keys)
         assert filteredSBOMs == {}, "filtered SBOMs were not deleted"
 
