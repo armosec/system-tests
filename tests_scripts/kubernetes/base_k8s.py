@@ -687,12 +687,11 @@ class BaseK8S(BaseDockerizeTest):
         return wlid
 
     def get_instance_IDs(self, pods, namespace, **kwargs):
-        if isinstance(pods, list):
-            instanceIDs: list = [self.get_instance_IDs(pods=i, namespace=namespace, **kwargs) for i in pods]
-            return instanceIDs[0] if len(instanceIDs) == 1 else instanceIDs
-        instanceID = self.calculate_instance_ID(pod=pods, namespace=namespace, **kwargs)
-        self.instanceIDs.append(instanceID)
-        return instanceID
+        instanceIDs = []
+        for pod in pods:
+            instanceIDs_for_pod = self.calculate_instance_ID(pod=pod, namespace=namespace, **kwargs)
+            instanceIDs.append(instanceIDs_for_pod)
+        return instanceIDs
 
     def create_namespace(self, yaml_file=statics.BASIC_NAMESPACE_YAML, path=statics.DEFAULT_NAMESPACE_PATH,
                          unique_name=True, **kwargs):
@@ -947,14 +946,14 @@ class BaseK8S(BaseDockerizeTest):
             CVEs.append((CVEsKeys, CVE_data))
         elif isinstance(CVEsKeys, list):
             for key in CVEsKeys:
-              CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                 group=statics.STORAGE_AGGREGATED_API_GROUP,
                 version=statics.STORAGE_AGGREGATED_API_VERSION,
                 name=key,
                 namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                 plural=statics.STORAGE_CVES_PLURAL,
             )
-            CVEs.append((key, CVE_data))
+                CVEs.append((key, CVE_data))
         return CVEs
 
     def get_filtered_SBOM_from_storage(self, filteredSBOMKeys):

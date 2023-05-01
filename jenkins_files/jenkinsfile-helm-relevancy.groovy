@@ -4,7 +4,10 @@ def ks_branch = "${env.KS_BRANCH}"
 
 // Add kubescape-CLI and kubescape-HELM tests that use the BE API
 def tests = [
-            "relevantCVEs":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "relevantCVEs":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "relevancy_disabled_installation": ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "relevancy_enabled_stop_sniffing": ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "relevancy_enabled_deleted_image": ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
             ]
 
 def parallelStagesMap = tests.collectEntries {
