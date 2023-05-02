@@ -423,7 +423,6 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_CLUSTER}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
-
     def get_finished_jobs_of_wlid(self, wlid: str):
         # TODO: page on if need for
         post_body = {
@@ -876,11 +875,16 @@ class ControlPanelAPI(object):
             raise Exception('Error accessing dashboard. Request: results of posture top failed controls is empty')
         return r.json()['response']
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false"):
-        r = self.post(API_POSTURE_RESOURCES, params={"customerGUID": self.selected_customer_guid, "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
-                      json={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
+
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None):
+        body={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
-                          "designators.attributes.name": resource_name}]})
+                          "designators.attributes.name": resource_name}]}
+        if namespace is not None:
+            body["innerFilters"][0]["designators.attributes.namespace"] = namespace
+        r = self.post(API_POSTURE_RESOURCES, params={"customerGUID": self.customer_guid, "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
+                      json=body)
+        
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of posture resources "%s" (code: %d, message: %s)' % (

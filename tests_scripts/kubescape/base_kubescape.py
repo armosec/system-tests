@@ -220,11 +220,10 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "",
-                              related_exceptions="false"):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
                                                framework_name=framework_name, report_guid=report_guid,
-                                               resource_name=resource_name, related_exceptions=related_exceptions)
+                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -703,9 +702,9 @@ class BaseKubescape(BaseK8S):
             f'resource "{resource_name}" not found in backend, resources found: {[resource["name"] for resource in be_resources]}')
 
     def test_related_applied_in_be(self, control_name: str, control_id: str, report_guid: str, framework_name: str,
-                                   resource_name: str, has_related: bool, has_applied: bool):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
-                                                  resource_name=resource_name, related_exceptions="true")
+                                   resource_name: str, has_related: bool, has_applied: bool, namespace=None):
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid, 
+                                                  resource_name=resource_name,related_exceptions="true",namespace=namespace)
         # be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
         #                                                      control_id=control_id, report_guid=report_guid,
         #                                                      framework_name=framework_name)
@@ -1017,8 +1016,9 @@ class BaseKubescape(BaseK8S):
                                                                      framework_name=framework_name)
             if wait_to_result and len(be_cluster_overtime) == 0:
                 return ""
-            if len(be_cluster_overtime) > 0 and \
-                    be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD] != old_report_guid:
+            if len(be_cluster_overtime) > 0 and (old_report_guid == "" or
+                                                 be_cluster_overtime[statics.BE_CORDS_FIELD][
+                                                     statics.BE_REPORT_GUID_FIELD] != old_report_guid):
                 if found:
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
                 found = True
