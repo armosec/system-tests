@@ -255,10 +255,10 @@ class ControlPanelAPI(object):
         encode_auth = self.api_login.encode_jwt(decoded_auth)
 
         res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": authCreatedByUserId}, cookies=None, headers={"Authorization": f"Bearer {encode_auth}"})
-        assert res.status_code == client.CREATED, f"Failed to create tenant {tenantName}: {res.text}"
+        assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
+        assert res.json().get("tenantId", {}) != {}, f"TenantId is empty: {res.text}"
+        return res, res.json()["tenantId"]
 
-        new_tenant_id = self.get_tenant_customer_guid(tenantName)
-        return res, new_tenant_id
 
     def get_tenants(self) -> requests.Response:
         """
@@ -360,7 +360,7 @@ class ControlPanelAPI(object):
                 "tenantID": tenantID
             },
         )
-        assert res.status_code == client.OK, f"stripe checkout failed with priceID: {priceID}, response.text: {res.text}"
+        assert res.status_code == client.OK, f"stripe create subscription failed with priceID: {priceID}, response.text: {res.text}"
         return res
     
     def cancel_subscription(self, tenantID: str)-> dict:
