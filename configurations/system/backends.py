@@ -76,17 +76,6 @@ def set_backends():
                             login_method=LOGIN_METHOD_KEYCLOAK,
                             tls_verify=False))
 
-    # production2 us-east-1
-    backends.append(Backend(name='production-us',
-                            dashboard='https://dashbe.prod2.us.armo.cloud',
-                            login_method=LOGIN_METHOD_KEYCLOAK,
-                            tls_verify=False))
-
-    # dev2
-    backends.append(Backend(name='dev2',
-                            dashboard='https://dashbe.eudev2.cyberarmorsoft.com',
-                            login_method=LOGIN_METHOD_KEYCLOAK,
-                            tls_verify=False))
     
     # local
     backends.append(Backend(name='local',
