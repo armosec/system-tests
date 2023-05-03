@@ -77,7 +77,7 @@ In case test requires admin apis access, login_customer_guid must be configured 
 
 ```json
 "AllowedAnyCustomer": [ {
-        "customerGuid": "f5f360bb-c233-4c33-a9af-5692e7795d61",
+        "customerGuid": "CUSTOMER_GUID",
       }],
 ```
 
