@@ -183,7 +183,7 @@ class BaseTest(object):
         return self.backend.get_microservice_instances(wlid, instance_id)
 
     @staticmethod
-    def wait_for_report(report_type, timeout=120, ignore_agent: bool = False, **kwargs):
+    def wait_for_report(report_type, timeout=120, sleep_interval=30, ignore_agent: bool = False, **kwargs):
         start = time.time()
         err = ""
         while time.time() - start < timeout:
@@ -195,7 +195,7 @@ class BaseTest(object):
                     raise e
                 err = e
                 Logger.logger.warning(f"{report_type.__func__.__name__}, error: '{e}', kwargs: '{kwargs}'")
-            time.sleep(30)
+            time.sleep(sleep_interval)
         raise Exception(
             f"{report_type.__func__.__name__}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
 

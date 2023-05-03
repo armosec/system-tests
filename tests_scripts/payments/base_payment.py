@@ -25,7 +25,11 @@ class BasePayment(base_test.BaseTest):
     def http_status_ok(http_status: int):
         assert http_status == client.OK
             
-
+    def get_tenant_active_subscription(self, tenant_id) -> str:
+        response = self.backend.get_tenant_details(tenant_id)
+        active_subscription = response.json().get("activeSubscription", {})
+        assert active_subscription != {}, "activeSubscription is empty"
+        return active_subscription
 
     def cancel_test_subscriptions(self):
         for tenantID in self.test_tenants_ids:

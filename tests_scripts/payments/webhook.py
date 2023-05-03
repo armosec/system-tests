@@ -33,5 +33,4 @@ class StripeWebhook(BaseStripe):
         return self.cleanup()
     
     def cleanup(self, **kwargs):
-        self.cancel_test_subscriptions()
         return super().cleanup(**kwargs)
