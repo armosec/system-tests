@@ -49,7 +49,7 @@ class BaseTest(object):
         Logger.logger.info(f"test summarize: {json.dumps(self.test_summery_data, indent=4)}")
 
 
-    def create_customer_name(self, prefix: str) -> str:
+    def create_tenant_name(self, prefix: str) -> str:
         epoch = time.time()
         prefix = "t_" + prefix
         name = "%s_%d" % (prefix, epoch)
@@ -57,10 +57,10 @@ class BaseTest(object):
 
     def create_new_tenant(self, prefix=None) -> int:
         prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
-        tenantName = self.create_customer_name(prefix)
+        tenantName = self.create_tenant_name(prefix)
         res, test_tenant_id = self.backend.create_tenant(tenantName)
         Logger.logger.info(f"create tenant name '{tenantName}' with tenant id {test_tenant_id}")
-        self.backend.select_customer(test_tenant_id)
+        self.backend.select_tenant(test_tenant_id)
         self.test_tenants_ids.append(test_tenant_id)
         return test_tenant_id
 

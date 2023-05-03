@@ -58,13 +58,13 @@ Backend API Attributes associated with login customer:
 
 <u>login_customer_guid</u> - the login customer guid.
 
-### selected customer
+### selected tenant
 
-This is the selected customer on which all APIs are executed against by default (besides admin apis which are always perfomed using the login_customer). If not actively selected, default values equal to the login customer.
+This is the selected tenant on which all APIs are executed against by default (besides admin apis which are always perfomed using the login_customer). If not actively selected, default values equal to the login customer.
 
-<u>selected_customer_cookie</u> - the selected customer cookie (default: login_customer_cookie).
+<u>selected_tenant_cookie</u> - the selected tenant cookie (default: login_customer_cookie).
 
-<u>selected_customer_guid</u> - the selected customer guid (default: login_customer_guid)
+<u>selected_tenant_id</u> - the selected tenant id (default: login_customer_guid)
 
 
 ## Admin APIs
@@ -84,20 +84,20 @@ In case test requires admin apis access, login_customer_guid must be configured 
 
 ## TENANTS MANAGEMENT
 
-Backend api object supports the creation and running tests against a specific tenant (selected_customer) that is not the login_customer_guid. 
+Backend api object supports the creation and running tests against a specific tenant (selected tenant) that is not the login_customer_guid. 
 
 This allows test isolation for a specifc tenant which can be easily deleted once test is concluded.
 
-In order to populate the selected_customer, best practice will be to first create it and then "select" it:
+In order to populate the selected tenant, best practice will be to first create it and then "select" it:
 
 ```go
 res, test_tenant_id = self.backend.create_tenant(tenantName)
-self.backend.select_customer(test_tenant_id)
+self.backend.select_tenant(test_tenant_id)
 ```
 
-Once the customer is selected, all apis calls will use it's cookie (selected_customer_cookie), unless it is an admin api which uses the login_customer_cookie.
+Once the tenant is selected, all apis calls will use it's cookie (selected_tenant_cookie), unless it is an admin api which uses the login_customer_cookie.
 
-At the end of the test, need to delete the selected customer:
+At the end of the test, need to delete the selected tenant:
 
 ```go
 self.backend.delete_tenant(tenant_id)

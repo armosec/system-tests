@@ -94,7 +94,7 @@ def deco_cookie(func):
             if "/api/v1/admin/" in url:
                 kwargs["cookies"] = ControlPanelAPIObj.login_customer_cookie
             else:
-                kwargs["cookies"] = ControlPanelAPIObj.selected_customer_cookie
+                kwargs["cookies"] = ControlPanelAPIObj.selected_tenant_cookie
 
         kwargs['headers'] = kwargs.get("headers", ControlPanelAPIObj.auth)
         kwargs["timeout"] = kwargs.get("timeout", 21)
@@ -129,10 +129,10 @@ class ControlPanelAPI(object):
         the cookie used for login the API. 
     login_customer_guid : str
         the customer_guid used for login the API. In order to access the admin APIS, this customer must be configured in AllowedAnyCustomer.
-    selected_customer_cookie : str
-        the cookie to use for selected customer APIs actions. By default, the login_customer_cookie is used.
-    selected_customer_guid : str
-        the customer_guid to use for selected customer APIs actions. By default, the login_customer_guid is used.
+    selected_tenant_cookie : str
+        the cookie to use for selected tenant APIs actions. By default, the login_customer_cookie is used.
+    selected_tenant_ud : str
+        the tenant id to use for selected tenant APIs actions. By default, the login_customer_guid is used.
     auth : str
         the auth to use for admin APIs actions
     auth_url : str
@@ -164,9 +164,9 @@ class ControlPanelAPI(object):
         self.login_customer_cookie = None
         self.login_customer_guid = None
 
-        # the cookie of the selected customer - by default, admin login_cookie unless selected other tenant.
-        self.selected_customer_cookie = None
-        self.selected_customer_guid = None
+        # the cookie of the selected tenant - by default, admin login_cookie unless selected other tenant.
+        self.selected_tenant_cookie = None
+        self.selected_tenant_id = None
 
         # the auth retrieved for the admin tenant
         self.auth = None
@@ -191,50 +191,50 @@ class ControlPanelAPI(object):
         self.login_customer_guid, self.login_customer_cookie, self.auth = self.api_login.login()  
         Logger.logger.info(f"Customer  {self.login_customer_guid} authenticated successfully")       
         self.auth = {'Authorization': f'Bearer {self.auth}'}
-        self.selected_customer_cookie = self.login_customer_cookie
-        self.selected_customer_guid = self.login_customer_guid
+        self.selected_tenant_cookie = self.login_customer_cookie
+        self.selected_tenant_id = self.login_customer_guid
 
     ## ************** Tenants Backend APIs ************** ##
 
 
-    def get_selected_customer(self) -> str:
+    def get_selected_tenant(self) -> str:
         """
-        Returns the current selected customer guid
+        Returns the current selected tenant id
         """
-        return self.selected_customer_guid
+        return self.selected_tenant_id
 
     
     def get_tenant_cookie(self, tenant_id: str) -> requests.Response:
         """
         Get the cookie of the given tenant.
         """
-        if tenant_id == self.selected_customer_guid:
-            return self.selected_customer_cookie
+        if tenant_id == self.selected_tenant_id:
+            return self.selected_tenant_cookie
         
         return self.api_login.getCookie(self.server, self.auth["Authorization"].split(" ")[1], tenant_id)
 
-    def select_customer(self, tenant_id: str):
+    def select_tenant(self, tenant_id: str):
         """ 
-        Configure tenant_id as the current selected customer. 
+        Configure tenant_id as the current selected tenant. 
         Once selected, all APIs will be executed on this tenant except for the admin APIs.
         """
-        if self.get_selected_customer() != tenant_id:
-            self.selected_customer_cookie = self.get_tenant_cookie(tenant_id)
-            self.selected_customer_guid = tenant_id
-            Logger.logger.info(f"Selected customer: {tenant_id}")
+        if self.get_selected_tenant() != tenant_id:
+            self.selected_tenant_cookie = self.get_tenant_cookie(tenant_id)
+            self.selected_tenant_id = tenant_id
+            Logger.logger.info(f"Selected tenant: {tenant_id}")
     
     def get_tenant_details(self, tenant_id=None) -> requests.Response:
         """
-        Get tenant details for tenant_id. If None, get details of the selected customer.
+        Get tenant details for tenant_id. If None, get details of the selected tenant.
         """
-        if tenant_id == self.selected_customer_guid or tenant_id is None:
-            cookies = self.selected_customer_cookie
+        if tenant_id == self.selected_tenant_id or tenant_id is None:
+            cookies = self.selected_tenant_cookie
         else:
             cookies = self.get_tenant_cookie(tenant_id)
         res = self.get(API_TENANT_DETAILS, cookies=cookies, json={"tenantId": tenant_id})
         assert res.status_code == client.OK, f"Failed to get tenant {tenant_id} details. Response: {res.text}"
         if not res.json()["guid"] == tenant_id:
-            raise Exception(f"Requested {tenant_id} details, got {res.text['guid']}. Make sure to first select the customer using select_customer()")
+            raise Exception(f"Requested {tenant_id} details, got {res.text['guid']}. Make sure to first select the customer using select_tenant()")
 
         return res
     
@@ -318,18 +318,18 @@ class ControlPanelAPI(object):
 
     def stripe_billing_portal(self) -> requests.Response:
         """
-            Creates a stripe billing portal url for the selected customer.
+            Creates a stripe billing portal url for the selected tenant.
         """
         res = self.get(API_STRIPE_BILLING_PORTAL) 
-        assert res.status_code == client.CREATED, f"stripe billing portal failed to create url for tenant_id {self.selected_customer_guid}. Response: {res.text}"
+        assert res.status_code == client.CREATED, f"stripe billing portal failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
 
     def stripe_checkout(self, priceID: str) -> requests.Response:
         """
-            Creates a stripe checkout url for the selected customer.
+            Creates a stripe checkout url for the selected tenant.
         """
         res = self.post(API_STRIPE_CHECKOUT, json={"priceID": priceID},)
-        assert res.status_code == client.CREATED, f"stripe checkout failed to create url for tenant_id {self.selected_customer_guid}. Response: {res.text}"
+        assert res.status_code == client.CREATED, f"stripe checkout failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
     
     def get_stripe_plans(self) -> requests.Response:
@@ -396,7 +396,7 @@ class ControlPanelAPI(object):
         return res
     
     def get_customer_guid(self):
-        return self.selected_customer_guid
+        return self.selected_tenant_id
 
     def get_client_id(self):
         return self.client_id
@@ -408,7 +408,7 @@ class ControlPanelAPI(object):
         Logger.logger.info("ControlPanelAPI Clean Up")
 
     def delete_ca_cluster(self, ca_cluster='default'):
-        r = self.delete(API_CLUSTER, params={"customerGUID": self.selected_customer_guid,
+        r = self.delete(API_CLUSTER, params={"customerGUID": self.selected_tenant_id,
                                      "cluster": ca_cluster}
                         )
         if not 200 <= r.status_code < 300:
@@ -419,7 +419,7 @@ class ControlPanelAPI(object):
         return r.status_code
 
     def get_full_clusters_list(self):
-        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_customer_guid})
+        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_CLUSTER}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
@@ -436,7 +436,7 @@ class ControlPanelAPI(object):
             ]
         }
         r = self.post(
-            API_JOBREPORTS, params={"customerGUID": self.selected_customer_guid}, json=post_body)
+            API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json=post_body)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -444,7 +444,7 @@ class ControlPanelAPI(object):
         # TODO update to v2
         url = "/v1/microservicesOverview"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "wlid": wlid})
+            url, params={"customerGUID": self.selected_tenant_id, "wlid": wlid})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -452,14 +452,14 @@ class ControlPanelAPI(object):
         # TODO update to v2
         url = "/v1/microservicesOverview"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "active": ('true', 'false')})
+            url, params={"customerGUID": self.selected_tenant_id, "active": ('true', 'false')})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
     def get_secret(self, sid):
         url = "/k8srestapi/v1/secret"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "sid": sid})
+            url, params={"customerGUID": self.selected_tenant_id, "sid": sid})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -467,7 +467,7 @@ class ControlPanelAPI(object):
         # TODO update to v2
         url = "/v1/session"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "wlid": wlid})
+            url, params={"customerGUID": self.selected_tenant_id, "wlid": wlid})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -475,7 +475,7 @@ class ControlPanelAPI(object):
         # TODO update to v2
         url = "/v1/session"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "sessionID": session_id})
+            url, params={"customerGUID": self.selected_tenant_id, "sessionID": session_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -483,19 +483,19 @@ class ControlPanelAPI(object):
         # TODO update to v2
         url = "/v1/microservicesOverview"
         r = self.get(url, params={
-            "customerGUID": self.selected_customer_guid, "cluster": cluster, "namespace": namespace})
+            "customerGUID": self.selected_tenant_id, "cluster": cluster, "namespace": namespace})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
     def get_neighbours(self):
         # TODO update to v2
         url = "/v1/neighbours"
-        r = self.get(url, params={"customerGUID": self.selected_customer_guid})
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
     def get_job_events_for_job(self, job_id: str):
-        r = self.post(API_JOBREPORTS, params={"customerGUID": self.selected_customer_guid}, json={
+        r = self.post(API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json={
             "pageNum": 1, "pageSize": 100, "innerFilters": [{"jobID": job_id}]})
         Logger.logger.debug("return_job_status: {0}".format(r.status_code))
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
@@ -504,7 +504,7 @@ class ControlPanelAPI(object):
     def get_incidents(self, **kwargs):
         # TODO update to v2
         url = "/v1/incidents"
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
         r = self.get(url, params=params)
@@ -520,7 +520,7 @@ class ControlPanelAPI(object):
 
     def get_outbound_connections(self, server_wlid: str = None, client_wlid: str = None, protection_status: int = None):
         url = "/v2/outboundConnectionsOpenLog"
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         if client_wlid:
             params["wlid"] = client_wlid
         inner_filters = {}
@@ -538,7 +538,7 @@ class ControlPanelAPI(object):
     def get_inbound_connections(self, server_wlid: str = None, client_wlid: str = None,
                                 protection_status: int = None):
         url = "/v2/inboundConnectionsOpenLog"
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         if server_wlid:
             params["wlid"] = server_wlid
         inner_filters = {}
@@ -556,7 +556,7 @@ class ControlPanelAPI(object):
     def get_microservice_instances(self, wlid: str = None, instance_id: str = None):
         # TODO update to v2
         url = "/v1/microserviceInstance"
-        params_dict = {"customerGUID": self.selected_customer_guid,
+        params_dict = {"customerGUID": self.selected_tenant_id,
                        "active": ["false", "true"]}
         if wlid is not None:
             params_dict["wlid"] = wlid
@@ -619,7 +619,7 @@ class ControlPanelAPI(object):
     def get_execution_info_from_wlid(self, wlid: str):
         url = "/v1/microserviceCodeExecution"
         r = self.get(
-            url, params={"customerGUID": self.selected_customer_guid, "wlid": wlid})
+            url, params={"customerGUID": self.selected_tenant_id, "wlid": wlid})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: customer tree of customer "%s" (code: %d, message: %s)' % (
@@ -630,11 +630,11 @@ class ControlPanelAPI(object):
         Logger.logger.info("remove_microservice_data {}".format(wlid))
         url = "/v1/microservice"
         r = self.delete(
-            url, params={"customerGUID": self.selected_customer_guid, "wlid": wlid})
+            url, params={"customerGUID": self.selected_tenant_id, "wlid": wlid})
         return r.text
 
     def get_customer_tree(self):
-        r = self.get("/customertree", params={"custguid": self.selected_customer_guid})
+        r = self.get("/customertree", params={"custguid": self.selected_tenant_id})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: customer tree of customer "%s" (code: %d, message: %s)' % (
@@ -718,7 +718,7 @@ class ControlPanelAPI(object):
     def get_posture_clusters_overtime(self, cluster_name: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1, "orderBy": "timestamp:desc", "innerFilters": [{
             "clusterName": cluster_name, "frameworkName": framework_name}]}
-        r = self.post(API_POSTURE_CLUSTERSOVERTIME, params={"customerGUID": self.selected_customer_guid},
+        r = self.post(API_POSTURE_CLUSTERSOVERTIME, params={"customerGUID": self.selected_tenant_id},
                       json=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -740,7 +740,7 @@ class ControlPanelAPI(object):
 
         r = self.post(
             API_REPOSITORYPOSTURE_REPOSITORIES,
-            params={"customerGUID": self.selected_customer_guid, "onlyLastScans": True},
+            params={"customerGUID": self.selected_tenant_id, "onlyLastScans": True},
             json=params,
         )
         if not 200 <= r.status_code < 300:
@@ -776,7 +776,7 @@ class ControlPanelAPI(object):
 
         r = self.post(
             API_REPOSITORYPOSTURE_FILES,
-            params={"customerGUID": self.selected_customer_guid},
+            params={"customerGUID": self.selected_tenant_id},
             json=params,
         )
         if not 200 <= r.status_code < 300:
@@ -796,7 +796,7 @@ class ControlPanelAPI(object):
 
         r = self.post(
             API_REPOSITORYPOSTURE_RESOURCES,
-            params={"customerGUID": self.selected_customer_guid},
+            params={"customerGUID": self.selected_tenant_id},
             json=params,
         )
         if not 200 <= r.status_code < 300:
@@ -814,7 +814,7 @@ class ControlPanelAPI(object):
                     }
                 ]
                 }
-        r = self.post("/v2/jobReports", params={"customerGUID": self.selected_customer_guid}, json=json)
+        r = self.post("/v2/jobReports", params={"customerGUID": self.selected_tenant_id}, json=json)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of posture frameworks "%s" (code: %d, message: %s)' % (
@@ -826,7 +826,7 @@ class ControlPanelAPI(object):
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
-        r = self.post(API_POSTURE_FRAMEWORKS, params={"customerGUID": self.selected_customer_guid},
+        r = self.post(API_POSTURE_FRAMEWORKS, params={"customerGUID": self.selected_tenant_id},
                       json=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -838,8 +838,8 @@ class ControlPanelAPI(object):
 
     # Get framework by name
     def get_framework(self, framework_name: str):
-        params = {"customerGUID": self.selected_customer_guid, "frameworkName": framework_name} if framework_name else \
-            {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id, "frameworkName": framework_name} if framework_name else \
+            {"customerGUID": self.selected_tenant_id}
         r = self.get(API_FRAMEWORK, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -850,7 +850,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_posture_controls(self, framework_name: str, report_guid: str):
-        r = self.post(API_POSTURE_CONTROLS, params={"customerGUID": self.selected_customer_guid},
+        r = self.post(API_POSTURE_CONTROLS, params={"customerGUID": self.selected_tenant_id},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid}]})
         if not 200 <= r.status_code < 300:
@@ -863,7 +863,7 @@ class ControlPanelAPI(object):
 
     def get_top_controls_results(self, cluster_name):
         # TODO: change to "topControls" when it will be deprecated 
-        r = self.post(API_POSTURE_TOPFAILEDCONTROLS, params={"customerGUID": self.selected_customer_guid, "cluster": cluster_name},
+        r = self.post(API_POSTURE_TOPFAILEDCONTROLS, params={"customerGUID": self.selected_tenant_id, "cluster": cluster_name},
                       json={"pageNum": 1, "pageSize": 5, "innerFilters": [{
                           }]})
         if not 200 <= r.status_code < 300:
@@ -897,7 +897,7 @@ class ControlPanelAPI(object):
     def get_posture_resources_by_control(self, framework_name: str, report_guid: str, control_id: str,
                                          control_name: str, related_exceptions: str = "false"):
         r = self.post(API_POSTURE_RESOURCES,
-                      params={"customerGUID": self.selected_customer_guid, "controlName": control_name,
+                      params={"customerGUID": self.selected_tenant_id, "controlName": control_name,
                               "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
                       json={"pageNum": 1, "pageSize": 150, "orderBy": "designators.attributes.namespace:asc",
                             "innerFilters": [{
@@ -913,7 +913,7 @@ class ControlPanelAPI(object):
         return r.json()['response']
 
     def get_cluster(self, cluster_name: str, expected_status_code: int = None):
-        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_customer_guid, "name": cluster_name})
+        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_tenant_id, "name": cluster_name})
         if expected_status_code:
             if r.status_code == expected_status_code:
                 return True
@@ -932,7 +932,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_cluster_with_risk_status(self, cluster_name: str, expected_status_code: int = None):
-        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_customer_guid,
+        r = self.get(API_CLUSTER, params={"customerGUID": self.selected_tenant_id,
                                                 "name": cluster_name,
                                                 "riskStatus": "true",
                                                 "priorityOrder": "true"})
@@ -958,7 +958,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def delete_cluster(self, cluster_name: str):
-        r = self.delete(API_CLUSTER, params={"customerGUID": self.selected_customer_guid, "name": cluster_name})
+        r = self.delete(API_CLUSTER, params={"customerGUID": self.selected_tenant_id, "name": cluster_name})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of clusters "%s" (code: %d, message: %s)' % (
@@ -967,7 +967,7 @@ class ControlPanelAPI(object):
         return r.text
 
     def get_repositories(self):
-        r = self.get(API_REPOSITORYPOSTURE, params={"customerGUID": self.selected_customer_guid})
+        r = self.get(API_REPOSITORYPOSTURE, params={"customerGUID": self.selected_tenant_id})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get repositories "%s" (code: %d, message: %s)' % (
@@ -976,7 +976,7 @@ class ControlPanelAPI(object):
 
     def delete_repository(self, repository_hash: str):
         r = self.delete(API_REPOSITORYPOSTURE,
-                        params={"customerGUID": self.selected_customer_guid, "repoHash": repository_hash})
+                        params={"customerGUID": self.selected_tenant_id, "repoHash": repository_hash})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: delete repository "%s" (code: %d, message: %s)' % (
@@ -985,7 +985,7 @@ class ControlPanelAPI(object):
         return r.text
 
     def post_posture_exception(self, exception_object: json):
-        r = self.post(API_POSTUREEXCEPTIONPOLICY, params={"customerGUID": self.selected_customer_guid},
+        r = self.post(API_POSTUREEXCEPTIONPOLICY, params={"customerGUID": self.selected_tenant_id},
                       json=exception_object)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -994,7 +994,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_all_posture_exception_by_cluster(self, cluster_name: str):
-        r = self.get(API_POSTUREEXCEPTIONPOLICY, params={"customerGUID": self.selected_customer_guid,
+        r = self.get(API_POSTUREEXCEPTIONPOLICY, params={"customerGUID": self.selected_tenant_id,
                                                                "scope.cluster": cluster_name})
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1004,7 +1004,7 @@ class ControlPanelAPI(object):
 
     def delete_posture_exception(self, policy_guid: str):
         r = self.delete(API_POSTUREEXCEPTIONPOLICY,
-                        params={"customerGUID": self.selected_customer_guid, "policyGUID": policy_guid})
+                        params={"customerGUID": self.selected_tenant_id, "policyGUID": policy_guid})
         if not 200 <= r.status_code < 300:  # or not r.json() or not r.json()[0] != 'deleted':
             raise Exception(
                 'Error accessing dashboard. Request: delete posture exception "%s" (code: %d, message: %s)' % (
@@ -1017,14 +1017,14 @@ class ControlPanelAPI(object):
             for policy_guid in policy_guids:
                 guids.append(policy_guid['guid'])
             r = self.delete(API_POSTUREEXCEPTIONPOLICY,
-                            params={"customerGUID": self.selected_customer_guid, "policyGUID": guids})
+                            params={"customerGUID": self.selected_tenant_id, "policyGUID": guids})
             if not 200 <= r.status_code < 300:  # or not r.json() or not r.json()[0] != 'deleted':
                 raise Exception(
                     'Error accessing dashboard. Request: delete posture exception "%s" (code: %d, message: %s)' % (
                         self.customer, r.status_code, r.text))
 
     def post_custom_framework(self, fw_object: json):
-        r = self.post(API_FRAMEWORK, params={"customerGUID": self.selected_customer_guid}, json=fw_object)
+        r = self.post(API_FRAMEWORK, params={"customerGUID": self.selected_tenant_id}, json=fw_object)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'failed to post custom framework "%s" (code: %d, message: %s)' % (
@@ -1033,7 +1033,7 @@ class ControlPanelAPI(object):
 
     def delete_custom_framework(self, framework_name: str):
         r = self.delete(API_FRAMEWORK,
-                        params={"customerGUID": self.selected_customer_guid, "frameworkName": framework_name})
+                        params={"customerGUID": self.selected_tenant_id, "frameworkName": framework_name})
         if not 200 <= r.status_code < 300:  # or not r.json() or not r.json()[0] != 'deleted':
             raise Exception(
                 'Error accessing dashboard. Request: delete custom framework "%s" (code: %d, message: %s)' % (
@@ -1042,7 +1042,7 @@ class ControlPanelAPI(object):
     def get_scan_results_sum_summary(self, since_time: str, expected_results: int, namespace: str = None,
                                      cluster_name: str = None, expected_status_code: int = None,
                                      containers_scan_id=None):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         if cluster_name:
             params['cluster'] = cluster_name
         if namespace:
@@ -1088,7 +1088,7 @@ class ControlPanelAPI(object):
     def get_scan_registry_results_sum_summary(self, since_time: str, expected_results: int, namespace: str = None,
                                               cluster_name: str = None, expected_status_code: int = None,
                                               containers_scan_id=None):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         if cluster_name:
             params['cluster'] = cluster_name
         if namespace:
@@ -1132,7 +1132,7 @@ class ControlPanelAPI(object):
         return result
 
     def set_cves_exceptions(self, cves_list, cluster_name, namespace, conatiner_name):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         vulnerabilities = []
         vulnerabilities.extend({"name": cve_name} for cve_name in cves_list)
         body = {"policyType": "vulnerabilityExceptionPolicy", "name": "{}{}".format(time.time(), len(cves_list)),
@@ -1155,7 +1155,7 @@ class ControlPanelAPI(object):
     def get_registry_container_cve(self, since_time: str, containers_scan_id: str, total_cve):
         page_size = 100
 
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = {
             "pageNum": 1,
             "pageSize": page_size,
@@ -1183,7 +1183,7 @@ class ControlPanelAPI(object):
     def get_registry_container_layers(self, container_scan_id: str):
         page_size = 30
 
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = {
             "pageNum": 1,
             "pageSize": page_size,
@@ -1201,7 +1201,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         page_size = 100
         body = {"pageNum": 1, 
                 "orderBy": "timestamp:desc,name:desc",
@@ -1236,7 +1236,7 @@ class ControlPanelAPI(object):
         return result
 
     def get_customer_configuration(self, scope: str = 'customer'):
-        r = self.get(API_CUSTOMERCONFIGURATION, params={"customerGUID": self.selected_customer_guid, "scope": scope})
+        r = self.get(API_CUSTOMERCONFIGURATION, params={"customerGUID": self.selected_tenant_id, "scope": scope})
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get customer configuration "%s" (code: %d, message: %s)' % (
@@ -1245,7 +1245,7 @@ class ControlPanelAPI(object):
 
     def update_customer_configuration(self, customer_config: dict, scope: str = 'customer'):
         # Add or delete from / to customer configuration
-        r = self.put(API_CUSTOMERCONFIGURATION, params={"customerGUID": self.selected_customer_guid, "scope": scope},
+        r = self.put(API_CUSTOMERCONFIGURATION, params={"customerGUID": self.selected_tenant_id, "scope": scope},
                      json=customer_config)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1297,7 +1297,7 @@ class ControlPanelAPI(object):
 
     def create_kubescape_job_request(self, cluster_name, trigger_by="job", framework_list=[""],
                                      with_host_sensor="true"):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = []
         if trigger_by == "job":
             Logger.logger.info('create kubescape scan on demand')
@@ -1318,7 +1318,7 @@ class ControlPanelAPI(object):
         return r
 
     def create_vuln_scan_job_request(self, cluster_name, namespaces_list: list, schedule_string: str = ''):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = []
         if schedule_string:
             Logger.logger.info('create vuln scan cronjob')
@@ -1338,7 +1338,7 @@ class ControlPanelAPI(object):
         return r
 
     def create_registry_scan_job_request_deprecated(self, cluster_name, registry_name: str, schedule_string: str = ''):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = []
        
         body.append({"clusterName": cluster_name, "registryName": registry_name,
@@ -1358,7 +1358,7 @@ class ControlPanelAPI(object):
 
 
     def send_registry_command(self, command, cluster_name, registry_name: str,    registry_type: str, auth_method: dict, schedule_string: str ,  depth: int = 1, excluded_repositories: list = []):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         provider = registry_name.split(":")[0]
         provider = provider.split("/")[0]
         body = json.dumps([
@@ -1392,7 +1392,7 @@ class ControlPanelAPI(object):
 
 
     def get_vuln_scan_cronjob_list(self, cluster_name: str, expected_cjs):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_VULNERABILITY_SCAN_V2, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1419,7 +1419,7 @@ class ControlPanelAPI(object):
 
 
     def get_registry_scan_cronjob_list(self, cluster_name: str, expected_cjs):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_REGISTRY_SCAN, params=params, timeout=15)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1432,7 +1432,7 @@ class ControlPanelAPI(object):
 
 
     def get_registry_scan_cronjob_list_deprecated(self, cluster_name: str, expected_cjs):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_REGISTRY_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1461,7 +1461,7 @@ class ControlPanelAPI(object):
         
 
     def get_vuln_scan_cronjob(self, cj_name: str, expect_to_results: bool = True):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_VULNERABILITY_SCAN_V2, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1481,7 +1481,7 @@ class ControlPanelAPI(object):
 
 
     def get_registry_scan_cronjob(self, cj_name: str, expect_to_results: bool = True):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_REGISTRY_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1500,7 +1500,7 @@ class ControlPanelAPI(object):
 
     def update_vuln_scan_cronjob(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.put(API_VULNERABILITY_SCAN_V2, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1509,7 +1509,7 @@ class ControlPanelAPI(object):
         return r
 
     def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type, cron_tab_schedule, depth,  auth_method=None ):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         provider = registry_name.split(":")[0]
         provider = provider.split("/")[0]
         body = {
@@ -1538,7 +1538,7 @@ class ControlPanelAPI(object):
 
     def update_registry_scan_cronjob_deprecated(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.put(API_REGISTRY_SCAN, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1548,7 +1548,7 @@ class ControlPanelAPI(object):
 
     def delete_vuln_scan_cronjob(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.delete(API_VULNERABILITY_SCAN_V2, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1557,7 +1557,7 @@ class ControlPanelAPI(object):
         return r.json()
     
     def delete_registry_scan_cronjob(self, cj):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = [
             {
                 "name": cj["name"],
@@ -1582,7 +1582,7 @@ class ControlPanelAPI(object):
 
     def delete_registry_scan_cronjob_deprecated(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.delete(API_REGISTRY_SCAN, params=params, json=cj)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1596,7 +1596,7 @@ class ControlPanelAPI(object):
 
 
     def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name:str):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_POSTURE_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1609,7 +1609,7 @@ class ControlPanelAPI(object):
         return False
     
     def is__backend_returning_only_ks_cronjob(self, cluster_name: str):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_POSTURE_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1623,7 +1623,7 @@ class ControlPanelAPI(object):
 
 
     def update_kubescape_job_request(self, cluster_name, cronjobs_name):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = []
         for cj in cronjobs_name:
             id = "wlid://cluster-{}/namespace-{}/cronjob-{}".format(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
@@ -1638,7 +1638,7 @@ class ControlPanelAPI(object):
         return r
 
     def delete_kubescape_job_request(self, cluster_name, schedule, cronjobs_name):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         body = []
         for cj in cronjobs_name:
             id = "wlid://cluster-{}/namespace-{}/cronjob-{}".format(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
@@ -1691,7 +1691,7 @@ class ControlPanelAPI(object):
 
         server = self.server
         server = server.replace("https", "wss")
-        server = "{}?customerGUID={}".format(server + url, self.selected_customer_guid)
+        server = "{}?customerGUID={}".format(server + url, self.selected_tenant_id)
         Logger.logger.debug("WS connection url:{0}".format(server))
         for cookie in self.login_customer_cookie:
             cookie = "Cookie: {}={}".format(cookie.name, cookie.value)
@@ -1720,7 +1720,7 @@ class ControlPanelAPI(object):
         return result
 
     def create_scan_registry_request(self, cluster_name, registry_name):
-        params = {"customerGUID": self.selected_customer_guid, "relatedExceptions": True, "ignoreRulesSummary": True}
+        params = {"customerGUID": self.selected_tenant_id, "relatedExceptions": True, "ignoreRulesSummary": True}
         body = [{"clusterName": cluster_name, "registryName": registry_name, "cronTabSchedule": ""}]
 
         r = self.post(API_REGISTRY_SCAN, params=params, json=body)
@@ -1731,7 +1731,7 @@ class ControlPanelAPI(object):
         return r
 
     def get_job_report_request(self,  job_id):
-        params = {"customerGUID": self.selected_customer_guid, "jobID": job_id}
+        params = {"customerGUID": self.selected_tenant_id, "jobID": job_id}
 
         for i in range(5):
                 r = self.get(API_REGISTRY_JOBREPORTSSTATUS, params=params)
@@ -1744,7 +1744,7 @@ class ControlPanelAPI(object):
                             self.customer, r.status_code, r.text, job_id))
     
     def get_repositories_list(self,  job_id):
-        params = {"customerGUID": self.selected_customer_guid, "jobID": job_id}
+        params = {"customerGUID": self.selected_tenant_id, "jobID": job_id}
 
         for i in range(5):
             r = self.get(API_REGISTRY_RESPOSITORIESLIST, params=params)
@@ -1759,7 +1759,7 @@ class ControlPanelAPI(object):
 
 
     def test_registry_connectivity_request(self, cluster_name, registry_name, auth_method, excluded_repositories):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         provider = registry_name.split(":")[0]
         provider = provider.split("/")[0]
         body = json.dumps([
@@ -1794,7 +1794,7 @@ class ControlPanelAPI(object):
 
 
     def delete_registry_scan(self, containers_scan_id):
-        params = {"customerGUID": self.selected_customer_guid}
+        params = {"customerGUID": self.selected_tenant_id}
         payload = {
             "innerFilters": [{"containersScanID": containers_scan_id}],
         }
@@ -1845,7 +1845,7 @@ class Component(object):
     def __init__(self, dashboard_connection: ControlPanelAPI, guid, solution_guid, customer_guid=None):
         super(Component, self).__init__()
         self.dashboard_connection = dashboard_connection
-        self.selected_customer_guid = customer_guid if customer_guid is not None else dashboard_connection.customer_guid
+        self.selected_tenant_id = customer_guid if customer_guid is not None else dashboard_connection.customer_guid
         self.guid = guid
         self.solution_guid = solution_guid
 
