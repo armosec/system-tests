@@ -42,6 +42,7 @@ _CLI_RESULTS_FIELD = 'results'
 _CLI_FRAMEWORKS_FIELD = "frameworks"
 _CLI_SCORE_FIELD = "score"
 _COMPLIANCE_SCORE_FIELD = "complianceScore"
+_COMPLIANCE_SCORE_FIELDV1 = "complianceScorev1"
 
 _ALL_RESOURCES_COUNT_FIELD = "totalResources"
 _WARN_RESOURCES_COUNT_FIELD = "warningResources"
@@ -1040,19 +1041,19 @@ class BaseKubescape(BaseK8S):
                     passed_resources += amount
             if total_resources == 0:
                 if control[_CLI_STATUS_INFO_FIELD][_CLI_STATUS_FILED] == _CLI_STATUS_PASSED:
-                    assert control[_CLI_SCORE_FIELD] == 100, "expected passed control to have compliance score of 100, but it is {}".format(control[_CLI_SCORE_FIELD])
+                    assert control[_COMPLIANCE_SCORE_FIELD] == 100, "expected passed control to have compliance score of 100, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
                 else:
-                    assert control[_CLI_SCORE_FIELD] == 0, "expected compliance score to be 0, but it is {}".format(control[_CLI_SCORE_FIELD])
+                    assert control[_COMPLIANCE_SCORE_FIELD] == 0, "expected compliance score to be 0, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
             else:
-                assert round(control[_CLI_SCORE_FIELD], 2) == round((passed_resources / total_resources) * 100, 2), \
-                    "expected compliance score to be {}, but it is {}".format(round((passed_resources / total_resources) * 100, 2), round(control[_CLI_SCORE_FIELD]), 2)
+                assert round(control[_COMPLIANCE_SCORE_FIELD], 2) == round((passed_resources / total_resources) * 100, 2), \
+                    "expected compliance score to be {}, but it is {}".format(round((passed_resources / total_resources) * 100, 2), round(control[_COMPLIANCE_SCORE_FIELD]), 2)
     
     def test_frameworks_compliance_score(self, report: dict):
         #  for each framework check that compliance score is the average of controls scores
         for framework in report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_FRAMEWORKS_FIELD]:
             sum_scores = 0
             for c_id, control in framework[_CONTROLS_FIELD].items():
-                sum_scores += control[_CLI_SCORE_FIELD]
+                sum_scores += control[_COMPLIANCE_SCORE_FIELD]
             assert round(framework[_COMPLIANCE_SCORE_FIELD], 2) == round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), \
                 "expected compliance score to be {}, but it is {}".format(round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), round(framework[_COMPLIANCE_SCORE_FIELD]), 2)
 
@@ -1061,15 +1062,15 @@ class BaseKubescape(BaseK8S):
         controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
         for control in controls:
           c_id = control['id']
-          assert control[_CLI_SCORE_FIELD] == framework_report[_CONTROLS_FIELD][c_id][_CLI_SCORE_FIELD], \
+          assert control[_COMPLIANCE_SCORE_FIELD] == framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], \
             "in framework {}, expected compliance score in be of control: {} to be {}, but it is {}".format(
-              framework_name, c_id, framework_report[_CONTROLS_FIELD][c_id][_CLI_SCORE_FIELD], control[_CLI_SCORE_FIELD])
+              framework_name, c_id, framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], control[_COMPLIANCE_SCORE_FIELD])
 
     def test_frameworks_compliance_score_from_backend(self, framework_report, report_guid, framework_name: str = ""):
         be_frameworks = self.get_posture_frameworks(framework_name=framework_name, report_guid=report_guid)
-        assert framework_report[_COMPLIANCE_SCORE_FIELD] == be_frameworks[0][_COMPLIANCE_SCORE_FIELD], \
+        assert framework_report[_COMPLIANCE_SCORE_FIELD] == be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1], \
             "expected framework: {} compliance score in be to be {}, but it is".format(
-            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_frameworks[0][_COMPLIANCE_SCORE_FIELD])
+            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1])
 
 
     def test_compliance_score_in_clusters_overtime(self, cluster_name: str, framework_report: dict, framework_name: str = ""):
