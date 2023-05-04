@@ -248,6 +248,9 @@ class ControlPanelAPI(object):
         returns: The response of the request.
         """
 
+        if self.login_method != LOGIN_METHOD_FRONTEGG_SECRET:
+            raise Exception(f"create_tenant() is only supported for {LOGIN_METHOD_FRONTEGG_SECRET} login_method")
+        
         # API validates the "sub" equals to the user id. "sub" recieved in "auth" is not the user id therefore need to decode, change and encode it again.
         decoded_auth = self.api_login.decode_jwt(self.auth["Authorization"].split(" ")[1])
         authCreatedByUserId = decoded_auth["createdByUserId"]
