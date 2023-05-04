@@ -18,7 +18,8 @@ tests = [
     "scan_with_exception_to_backend",
     "scan_with_custom_framework",
     "scan_with_kubescape_helm_chart",
-    "scan_image_controls"
+    "scan_image_controls",
+    "scan_compliance_score"
 ]
 
 sep = "=" * 40
