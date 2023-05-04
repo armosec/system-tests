@@ -37,44 +37,48 @@ class Backend(object):
 def set_backends():
     backends = list()
 
-    # development
-    backends.append(Backend(name='development',
-                            dashboard='https://dashbe.eudev3.cyberarmorsoft.com',
-                            login_method=LOGIN_METHOD_KEYCLOAK,
-                            tls_verify=False))
     
     # development frontEgg
-    backends.append(Backend(name='development-egg',
+    backends.append(Backend(name='development',
                             dashboard='https://eggdashbe-dev.armosec.io',
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # staging
-    backends.append(Backend(name='staging',
-                            dashboard='https://dashbe.eustage2.cyberarmorsoft.com',
-                            login_method=LOGIN_METHOD_KEYCLOAK,
-))
     
     # staging frontEgg
-    backends.append(Backend(name='staging-egg',
+    backends.append(Backend(name='staging',
                             dashboard='http://eggdashbe-stage.armosec.io',
                             auth_url='https://eggauth-stage.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
     # staging frontEgg
-    backends.append(Backend(name='production-egg',
+    backends.append(Backend(name='production',
                             dashboard='https://api.armosec.io',
                             auth_url='https://auth.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # production
-    backends.append(Backend(name='production',
-                            dashboard='https://dashbe.euprod1.cyberarmorsoft.com',
-                            login_method=LOGIN_METHOD_KEYCLOAK,
-                            tls_verify=False))
+
+    # # development
+    # backends.append(Backend(name='development',
+    #                         dashboard='https://dashbe.eudev3.cyberarmorsoft.com',
+    #                         login_method=LOGIN_METHOD_KEYCLOAK,
+    #                         tls_verify=False))
+
+
+    #     # staging
+    # backends.append(Backend(name='staging',
+    #                             dashboard='https://dashbe.eustage2.cyberarmorsoft.com',
+    #                             login_method=LOGIN_METHOD_KEYCLOAK,
+    # ))
+
+    # # production
+    # backends.append(Backend(name='production',
+    #                         dashboard='https://dashbe.euprod1.cyberarmorsoft.com',
+    #                         login_method=LOGIN_METHOD_KEYCLOAK,
+    #                         tls_verify=False))
 
     
     # local
