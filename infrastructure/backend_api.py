@@ -145,7 +145,7 @@ class ControlPanelAPI(object):
     
     """
 
-    def __init__(self, user_name, password, customer, client_id, secret_key, url, auth_url, login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None):
+    def __init__(self, user_name, password, customer, client_id, secret_key, url, auth_url=None, login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None):
         self.server = url
         self.login_method = login_method
         self.customer_guid = customer_guid
