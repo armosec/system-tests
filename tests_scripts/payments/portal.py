@@ -1,25 +1,29 @@
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger
 from .base_stripe import BaseStripe
-from time import sleep
 
 
 class Portal(BaseStripe):
     '''
-        check stripe customer billing portal page - if returns 200 is means that the page is up and running
+        check stripe customer billing portal page
     '''
     def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
         super(Portal, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
         Logger.logger.info("Create new tenant")
-        self.create_new_tenant()
+        test_tenant_id = self.create_new_tenant()
 
-        Logger.logger.info("Get Tenants details")
-        response = self.get_tenant_details()
+        Logger.logger.info("Stage 1: create a subscription")
+        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, test_tenant_id)
 
-        Logger.logger.info("Stage 1: Go to stripe billing portal")
-
+        Logger.logger.info("Stage 2: Get billing portal URL")
         response = self.stripe_billing_portal()
 
+        Logger.logger.info("Stage 3: cancel a subscription")
+        response = self.cancel_subscription(test_tenant_id)
+
         return self.cleanup()
+    
+    def cleanup(self, **kwargs):
+        return super().cleanup(**kwargs)
