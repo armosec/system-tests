@@ -53,13 +53,15 @@ class RelevantVulnerabilityScanningTests(object):
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_modified_entrypoint"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             test_obj=RelevancyEnabledStopSniffingAfterTime,
-            expected_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
-            expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx_entrypoint.json")],
+            expected_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
+            expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
+            expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
+            expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False,
-                         "nodeAgent.config.updateDataPeriod": 60}
+                         "nodeAgent.config.updateDataPeriod": 120}
         )
     
 

@@ -165,6 +165,9 @@ STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"
 STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
 
+STORAGE_CVE_LABEL = "kubescape.io/context"
+STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
+
 #relevancy feature
 HELM_RELEVANCY_FEATURE="enableRelevancy"
 FILTERED_CVES_KEY="withRelevancy"
