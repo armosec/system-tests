@@ -137,7 +137,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                 with_host_sensor = "true"
 
         Logger.logger.info("create scan by backend trigger")
-        # TestUtil.sleep(50, "wait test")
+        TestUtil.sleep(50, "wait test")
         self.backend.create_kubescape_job_request(cluster_name=cluster_name, trigger_by=trigger_by,
                                                   framework_list=framework_list, with_host_sensor=with_host_sensor)
 
@@ -186,7 +186,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                 with_host_sensor = "true"
 
         if job["operation"] == "create":
-            # TestUtil.sleep(30, "wait test")
+            TestUtil.sleep(30, "wait test")
             self.backend.create_kubescape_job_request(cluster_name=cluster_name, trigger_by=trigger_by,
                                                       framework_list=framework_list, with_host_sensor=with_host_sensor)
 
@@ -194,12 +194,12 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
 
             Logger.logger.info("check if kubescape cronjob created in backend")
-            # TestUtil.sleep(50, "wait for kubescape cronjob to be created in backend")
+            TestUtil.sleep(50, "wait for kubescape cronjob to be created in backend")
             assert self.backend.is_ks_cronjob_created_in_backend(cluster_name,
                 framework_list[0]), "kubescape cronjob failed to create in backend"
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")
-            # TestUtil.sleep(50, "wait test")
+            TestUtil.sleep(50, "wait test")
             self.backend.is__backend_returning_only_ks_cronjob(cluster_name), "kubescape cronjob failed to create in backend"
 
 
