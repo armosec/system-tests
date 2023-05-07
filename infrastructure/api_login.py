@@ -65,7 +65,7 @@ class FrontEggSecretAPILogin(APILogin):
         json_res = response.json()
         customer_guid = json_res[0]["customerGUID"]
         cookie = super().getCookie(self.base_url, auth, customer_guid)
-        return customer_guid, cookie, auth
+        return customer_guid, cookie, cookie["auth"]
     
     
 

@@ -188,11 +188,12 @@ class ControlPanelAPI(object):
         else:
             raise Exception(f"Login method '{login_method}' not supported")
         
-        self.login_customer_guid, self.login_customer_cookie, self.auth = self.api_login.login()  
+        self.login_customer_guid, self.login_customer_cookie, auth = self.api_login.login()  
         Logger.logger.info(f"Customer  {self.login_customer_guid} authenticated successfully")       
-        self.auth = {'Authorization': f'Bearer {self.auth}'}
-        self.selected_tenant_cookie = self.login_customer_cookie
+        self.auth = {'Authorization': f'Bearer {auth}'}
+
         self.selected_tenant_id = self.login_customer_guid
+        self.selected_tenant_cookie = self.login_customer_cookie
 
     ## ************** Tenants Backend APIs ************** ##
 
@@ -261,36 +262,6 @@ class ControlPanelAPI(object):
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
         assert res.json().get("tenantId", {}) != {}, f"TenantId is empty: {res.text}"
         return res, res.json()["tenantId"]
-
-
-    def get_tenants(self) -> requests.Response:
-        """
-        Get all tenants of the current user id.
-
-        returns: The response of the request.
-        """
-        auth = self.auth["Authorization"].split(" ")[1]
-        authCreatedByUserId = self.api_login.decode_jwt(auth)["createdByUserId"]
-        headers={"Authorization": f"Bearer {auth}", "frontegg-user-id": authCreatedByUserId}
-        res = self.get(self.auth_url + API_FRONTEGG_IDENTITY_RESOURCES_USERS_V2_USERS_V2_ME_TENANTS, headers=headers)
-        assert res.status_code == client.OK, f"get tenant details failed"
-        return res
-
-    def get_tenant_customer_guid(self, tenantName: str) -> str:
-        """
-        Get the customer guid of the tenant with name tenantName.
-
-        params:
-            tenantName: The name of the tenant to get the customer guid of.
-        """
-        response = self.get_tenants()
-        response_json = response.json()
-
-        for tenant in response_json:
-            if tenant["name"] == tenantName:
-                return tenant["tenantId"]
-        
-        raise Exception(f"tenant {tenantName} not found")
     
     def delete_tenant(self, tenant_id) -> requests.Response:
         """
