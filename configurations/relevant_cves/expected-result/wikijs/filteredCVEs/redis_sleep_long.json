@@ -1,0 +1,71 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "creationTimestamp": "2023-04-18T23:17:45Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "redis",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "redis-sleep",
+            "kubescape.io/workload-namespace": "systest-ns-damt"
+        },
+        "name": "92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+        "namespace": "kubescape",
+        "resourceVersion": "396",
+        "uid": "a3f59e2c-95c0-4b9d-9f4e-4c409ede7a6f"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:a34fea872b4ed6c6f82c66f3f4a4bfc5b7947ed73847ea255f25f09339de2921",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": true
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-04-18T01:32:21Z",
+                    "checksum": "sha256:a34fea872b4ed6c6f82c66f3f4a4bfc5b7947ed73847ea255f25f09339de2921",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "alpine"
+                ],
+                "name": "alpine",
+                "version": "3.17.2"
+            },
+            "matches": null,
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}
