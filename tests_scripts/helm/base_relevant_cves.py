@@ -134,6 +134,55 @@ class BaseRelevantCves(BaseHelm):
                     error_lst=scan[statics.SCAN_RESULT_ERRORS_FIELD]
                 )
 
+    @staticmethod
+    def test_results_details_against_results_sum_summary(containers_cve: dict, be_summary: list):
+
+        containers_severity = {}
+        for name, cve_dict in containers_cve.items():
+            containers_severity[name] = {statics.SCAN_RESULT_RCETOTAL_FIELD: 0, statics.SCAN_RESULT_TOTAL_FIELD: 0}
+            for cve, details in cve_dict.items():
+                containers_severity[name][statics.SCAN_RESULT_RCETOTAL_FIELD] += details[statics.SCAN_RESULT_RCETOTAL_FIELD]
+                containers_severity[name][statics.SCAN_RESULT_TOTAL_FIELD] += details[statics.SCAN_RESULT_TOTAL_FIELD]
+                if details[statics.SCAN_RESULT_SEVERITY_FIELD] not in containers_severity[name]:
+                    containers_severity[name][details[statics.SCAN_RESULT_SEVERITY_FIELD]] = 0
+                containers_severity[name][details[statics.SCAN_RESULT_SEVERITY_FIELD]] += details[statics.SCAN_RESULT_TOTAL_FIELD]
+
+        for container in be_summary:
+            message = 'It is expected that the data from results_sum_summary and the data from results_details will ' \
+                      'be the same, in this case they are different. In container {x}, from results_sum_summary ' \
+                      '{x1} = {x2} and from results_details {x1} = {y2}'
+            container_severity_key = container[statics.SCAN_RESULT_CONTAINER_NAME_FIELD]
+            if container_severity_key == '':
+                container_severity_key = container['imageTag']
+
+            assert container[statics.SCAN_RESULT_TOTAL_FIELD] == \
+                   containers_severity[container_severity_key][statics.SCAN_RESULT_TOTAL_FIELD], \
+                message.format(x=container[statics.SCAN_RESULT_CONTAINER_NAME_FIELD],
+                               x1=statics.SCAN_RESULT_TOTAL_FIELD,
+                               x2=container[statics.SCAN_RESULT_TOTAL_FIELD],
+                               y2=containers_severity[container_severity_key][
+                                   statics.SCAN_RESULT_TOTAL_FIELD])
+            assert container[statics.SCAN_RESULT_RCETOTAL_FIELD] == \
+                   containers_severity[container_severity_key][
+                       statics.SCAN_RESULT_RCETOTAL_FIELD], \
+                message.format(x=container[statics.SCAN_RESULT_CONTAINER_NAME_FIELD],
+                               x1=statics.SCAN_RESULT_RCETOTAL_FIELD,
+                               x2=container[statics.SCAN_RESULT_RCETOTAL_FIELD],
+                               y2=containers_severity[container_severity_key][
+                                   statics.SCAN_RESULT_RCETOTAL_FIELD])
+
+            for severity in container[statics.SCAN_RESULT_SEVERITIES_STATS_FIELD]:
+                assert severity[statics.SCAN_RESULT_TOTAL_FIELD] == \
+                       containers_severity[container_severity_key][
+                           severity[statics.SCAN_RESULT_SEVERITY_FIELD]], \
+                    message.format(x=container[statics.SCAN_RESULT_CONTAINER_NAME_FIELD],
+                                   x1=statics.SCAN_RESULT_SEVERITIES_STATS_FIELD + '->' + severity[
+                                       statics.SCAN_RESULT_SEVERITY_FIELD] + '->' + statics.SCAN_RESULT_TOTAL_FIELD,
+                                   x2=severity[statics.SCAN_RESULT_TOTAL_FIELD],
+                                   y2=containers_severity[container_severity_key][
+                                       severity[statics.SCAN_RESULT_SEVERITY_FIELD]])
+
+
     def get_container_cve(self, since_time: str, container_scan_id):
         """
         params:
@@ -166,8 +215,20 @@ class BaseRelevantCves(BaseHelm):
             is_rce = statics.SCAN_RESULT_IS_RCE_FIELD
             categories = statics.SCAN_RESULT_CATEGORIES_FIELD
             is_relevant = statics.SCAN_RESULT_IS_RELEVANT_FIELD
-            container_cve_dict = {i[name]: {severity: i[severity], is_rce: i[categories][is_rce], is_relevant: i[is_relevant]} for i in
-                                  container_cve}
+            total_count = statics.SCAN_RESULT_TOTAL_FIELD
+            rce_count =  statics.SCAN_RESULT_RCETOTAL_FIELD
+            container_cve_dict = {}
+            for item in container_cve:
+                is_rce_cve = item[categories][is_rce]
+                if item[name] in container_cve_dict:
+                    container_cve_dict[item[name]][total_count] += 1
+                    container_cve_dict[item[name]][is_relevant] = item[is_relevant]
+                    if is_rce_cve:
+                        container_cve_dict[item[name]][rce_count] += 1
+                else:
+                    container_cve_dict[item[name]] = {severity: item[severity], is_rce: item[categories][is_rce],
+                total_count: 1, rce_count: 1 if is_rce_cve else 0, is_relevant: item[is_relevant]}
+            
             result[container[_CONTAINER_NAME]] = container_cve_dict
             Logger.logger.info(
                 "after processing: container {} has CVEs {}".format(container[_CONTAINER_NAME], container_cve_dict))
@@ -182,13 +243,22 @@ class BaseRelevantCves(BaseHelm):
         return cve_list
 
     def test_expected_scan_result(self, backend_CVEs, storage_CVEs):
+        # check that all backend CVEs are in storage
+        # check that filtered CVEs have relevantLabel set to 'yes'
+        # check that non-filtered CVEs have relevantLabel set to 'no'
+        # check that we have the same number of CVEs in storage and backend
         failed_CVEs_path = []
+        total_cves = 0
+
         for container_name, cve_list in backend_CVEs.items():
             assert container_name in backend_CVEs.keys(), \
                 f"Expect to receive {container_name} in results_details from backend"
+            
             storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], container_name)
             storage_all_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.ALL_CVES_KEY], container_name)
+
             for cve, cve_details in cve_list.items():
+                total_cves += cve_details[statics.SCAN_RESULT_TOTAL_FIELD]
                 if cve in storage_filtered_CVEs:
                     assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_TRUE, \
                         f"Expect to receive {cve} as relevant CVE"
@@ -197,11 +267,12 @@ class BaseRelevantCves(BaseHelm):
                         f"Expect to receive {cve} as not relevant CVE"
                 else:
                     failed_CVEs_path.append(f"{container_name} -> {cve}")
-            
-            # assert len(storage_CVEs[statics.FILTERED_CVES_KEY]) + len(storage_CVEs[statics.ALL_CVES_KEY]) == len(cve_list), \
-            #     f"Expect to receive {len(storage_CVEs[statics.FILTERED_CVES_KEY]) + len(storage_CVEs[statics.ALL_CVES_KEY])} CVEs in total from backend, but received {len(cve_list)} CVEs"
 
-        assert not failed_CVEs_path, 'Expect the data from backend would not fail less CVEs then the expected results.\n' \
+            assert total_cves == len(storage_filtered_CVEs) + len(storage_all_CVEs), \
+                f"Expect to receive {total_cves} CVEs in total from backend, but received {len(storage_filtered_CVEs) + len(storage_all_CVEs)} CVEs"
+
+
+        assert not failed_CVEs_path, 'Expect the data from backend would be the same as storage CVE results.\n' \
         f'in the following entries is happened:\n{failed_CVEs_path}'
 
     def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
@@ -230,7 +301,7 @@ class BaseRelevantCves(BaseHelm):
                 f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
 
         Logger.logger.info('Test backend results_details against results_sum_summary')
-        self.test_results_details_against_results_sum_summary(containers_cve=containers_cve, be_summary=be_summary)
+        self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
 
     def expose_operator(self, cluster):
         running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
