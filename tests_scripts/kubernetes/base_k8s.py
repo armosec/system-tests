@@ -479,6 +479,27 @@ class BaseK8S(BaseDockerizeTest):
             return self.get_workload(api_version=pod.api_version ,name=pod.metadata.name, kind=pod.kind, namespace=namespace)
         return self.get_workload(api_version=pod.metadata.owner_references[0].api_version ,name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind, namespace=namespace)
         
+    def get_api_version_from_instance_ID(self, instance_ID: str):
+        return instance_ID.split("/")[0].split("-")[1]
+    
+    def get_namespace_from_instance_ID(self, instance_ID: str):
+        namespace_list = instance_ID.split("/")[2].split("-")
+        return "-".join(namespace_list[1:])
+    
+    
+    def get_kind_from_instance_ID(self, instance_ID: str):
+        return instance_ID.split("/")[3].split("-")[1]
+
+    def get_workload_name_from_instance_ID(self, instance_ID: str):
+        name_list = instance_ID.split("/")[4].split("-")
+        name_list.pop(0)
+        name_list.pop()
+        return "-".join(name_list)
+
+    def get_container_name_from_instance_ID(self, instance_ID: str):
+        return instance_ID.split("/")[5].split("-")[1]
+
+    
     # apiVersion-<>/namespace-<>/kind-<>/name-<>/containerName-<>
     def calculate_instance_ID(self, pod, namespace):
         p_workload=self.get_owner_reference(pod, namespace)
@@ -487,6 +508,7 @@ class BaseK8S(BaseDockerizeTest):
         for container in p_workload['spec']['template']['spec']['containers']:
             instanceIDs.append("apiVersion-" + p_workload["apiVersion"] + "/namespace-" + namespace + "/kind-" + p_workload['kind'] + "/name-" + p_workload['metadata']['name'] + "/containerName-" + container["name"])
         return instanceIDs
+    
        
     @staticmethod
     def calculate_sid(secret, **kwargs):
@@ -685,6 +707,8 @@ class BaseK8S(BaseDockerizeTest):
         self.wlids.append(wlid)
         set(self.wlids)
         return wlid
+    
+    
 
     def get_instance_IDs(self, pods, namespace, **kwargs):
         instanceIDs = []
@@ -986,13 +1010,13 @@ class BaseK8S(BaseDockerizeTest):
         if isinstance(filteredCVEsKEys, list):
             for keys in filteredCVEsKEys:
                 for key in keys:
-                    CVEs = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                    cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                         group=statics.STORAGE_AGGREGATED_API_GROUP,
                         version=statics.STORAGE_AGGREGATED_API_VERSION,
                         namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                         plural=statics.STORAGE_CVES_PLURAL,
                         name=hashlib.sha256(str(key).encode()).hexdigest(),
                     )
-                    filteredCVEs.append((filteredCVEsKEys, CVEs))
+                    filteredCVEs.append((key, cve_data))
 
         return filteredCVEs

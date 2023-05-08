@@ -166,7 +166,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
-        self.validate_expected_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"])
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"],namespace=namespace)
 
 
         Logger.logger.info('Get the scan result from Backend')
@@ -181,7 +181,11 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
         self.test_no_errors_in_scan_result(be_summary)
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id, be_summary=be_summary)
+    
+
+        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
         
         
         Logger.logger.info('delete armo namespace')

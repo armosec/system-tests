@@ -57,10 +57,28 @@ class BaseRelevantCves(BaseHelm):
         cves = []
         if 'spec' in CVEManifest:
             CVEManifest = CVEManifest['spec']
-        for match in CVEManifest['payload']['matches']:
-            vuln = match['vulnerability']
-            cves.append(vuln['id'])
+        if CVEManifest['payload']['matches'] is not None:
+            for match in CVEManifest['payload']['matches']:
+                vuln = match['vulnerability']
+                cves.append(vuln['id'])
         return cves
+    
+    def validate_expected_filtered_CVEs(self, CVEs, expected_CVEs_path,namespace):
+        verified_CVEs = 0
+        for expected_CVE in expected_CVEs_path:
+            for CVE in CVEs:
+                with open(expected_CVE[1], 'r') as content_file:
+                    content = content_file.read()
+                expected_CVE_data = json.loads(content)
+                instanceID = CVE[0]
+                if self.get_container_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_CONTAINER_LABEL]\
+                            and self.get_workload_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                    expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
+                    SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
+                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the CVEs in the storage is not has expected"
+                    verified_CVEs += 1
+                    break
+        assert verified_CVEs == len(expected_CVEs_path), "not all CVEs were verified"
 
     def validate_expected_CVEs(self, CVEs, expected_CVEs_path):
         verified_CVEs = 0
@@ -158,30 +176,33 @@ class BaseRelevantCves(BaseHelm):
 
     def parse_filtered_CVEs_from_storage(self, storage_CVEs, container_name):
         cve_list = []
-        for cve in storage_CVEs[0][1]["spec"]["payload"]["matches"]:
-            cve_list.append(cve["vulnerability"]["id"])
+        if storage_CVEs[0][1]["spec"]["payload"]["matches"] is not None:
+            for cve in storage_CVEs[0][1]["spec"]["payload"]["matches"]:
+                cve_list.append(cve["vulnerability"]["id"])
         return cve_list
 
     def test_expected_scan_result(self, backend_CVEs, storage_CVEs):
-        failed_all_CVEs_paths = []
-        failed_filtered_CVEs_paths = []
+        failed_CVEs_path = []
         for container_name, cve_list in backend_CVEs.items():
             assert container_name in backend_CVEs.keys(), \
                 f"Expect to receive {container_name} in results_details from backend"
             storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], container_name)
             storage_all_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.ALL_CVES_KEY], container_name)
-            for cve in cve_list:
-                if cve not in storage_all_CVEs:
-                    failed_all_CVEs_paths.append(f"{container_name} -> {cve}")
-                if cve not in storage_filtered_CVEs:
-                    failed_filtered_CVEs_paths.append(f"{container_name} -> {cve}")
+            for cve, cve_details in cve_list.items():
+                if cve in storage_filtered_CVEs:
+                    assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_TRUE, \
+                        f"Expect to receive {cve} as relevant CVE"
+                elif cve in storage_all_CVEs:
+                    assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_FALSE, \
+                        f"Expect to receive {cve} as not relevant CVE"
                 else:
-                    if cve[statics.SCAN_RESULT_IS_RELEVANT_FIELD] is not statics.SCAN_RESULT_IS_RELEVANT_FIELD_TRUE:
-                        failed_filtered_CVEs_paths.append(f"{container_name} -> {cve}")
+                    failed_CVEs_path.append(f"{container_name} -> {cve}")
+            
+            # assert len(storage_CVEs[statics.FILTERED_CVES_KEY]) + len(storage_CVEs[statics.ALL_CVES_KEY]) == len(cve_list), \
+            #     f"Expect to receive {len(storage_CVEs[statics.FILTERED_CVES_KEY]) + len(storage_CVEs[statics.ALL_CVES_KEY])} CVEs in total from backend, but received {len(cve_list)} CVEs"
 
-        assert not failed_all_CVEs_paths, 'Expect the data from backend would not fail less CVEs then the expected results.\n' \
-        f'in the following entries is happened:\n{failed_all_CVEs_paths}'
-        assert not failed_filtered_CVEs_paths, f'the following relevant CVEs data is not found as expected\n{failed_filtered_CVEs_paths}'
+        assert not failed_CVEs_path, 'Expect the data from backend would not fail less CVEs then the expected results.\n' \
+        f'in the following entries is happened:\n{failed_CVEs_path}'
 
     def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
 
@@ -220,6 +241,7 @@ class BaseRelevantCves(BaseHelm):
                                                                      {"source": 4002, "exposed": 4002})
             if self.port_forward_proc is None or self.port_forward_proc.stderr is not None:
                 raise Exception('port forwarding to operator failed')
+            time.sleep(5)
             Logger.logger.info('expose_websocket done')
         except Exception as e:
             print(e)
@@ -229,7 +251,7 @@ class BaseRelevantCves(BaseHelm):
             "commands": [
                 {
                     "CommandName": "scan",    
-                    "wlid": "wlid://cluster-" + cluster + "/namespace-" + namespace
+                    "WildWlid": "wlid://cluster-" + cluster + "/namespace-" + namespace
                 }
             ]
         }
