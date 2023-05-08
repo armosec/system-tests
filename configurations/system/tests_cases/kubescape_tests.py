@@ -38,6 +38,18 @@ class KubescapeTests(object):
             exceptions='kube-ns.json',
             controls_tested=["C-0002"]
         )
+    
+    @staticmethod
+    def scan_compliance_score():
+        from tests_scripts.kubescape.scan import ScanComplianceScore
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanComplianceScore,
+            policy_scope='framework',
+            policy_name='nsa,mitre,cis-v1.23-t1.0.1',
+            submit=True,
+            account=True
+        )
 
     @staticmethod
     def scan_repository():
@@ -115,7 +127,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanLocalFile,
             policy_scope='framework',
-            policy_name='all',
+            policy_name='allControls',
             yamls=['nginx.yaml'],
             resources=1
         )
@@ -164,7 +176,7 @@ class KubescapeTests(object):
             policy_name='nsa',
             submit=True,
             account=True,
-            exceptions="exclude-control-apache.json",
+            exceptions="exclude-control-apache.json,exclude-control-sa-resourceID-apache.json",
             yaml="apache.yaml"
         )
 

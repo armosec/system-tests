@@ -4,15 +4,22 @@ from infrastructure.backend_api import *
 
 class Backend(object):
 
-    def __init__(self, name: str, dashboard: str, tls_verify: bool = True, login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
+    def __init__(self, name: str, dashboard: str, 
+                 auth_url: str = None, 
+                 tls_verify: bool = True, 
+                 login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
         self.name = name
         self.dashboard = dashboard
+        self.auth_url = auth_url
         self.tls_verify = tls_verify
         self.login_method = login_method
         self.customer_guid = customer_guid
 
     def get_dashboard_url(self):
         return self.dashboard
+
+    def get_auth_url(self):
+        return self.auth_url
 
     def get_name(self):
         return self.name
@@ -22,7 +29,6 @@ class Backend(object):
     
     def get_login_method(self):
         return self.login_method
- 
 
     def get_customer_guid(self):
         return self.customer_guid
@@ -34,46 +40,48 @@ def set_backends():
     # development
     backends.append(Backend(name='development',
                             dashboard='https://dashbe.eudev3.cyberarmorsoft.com',
+                            login_method=LOGIN_METHOD_KEYCLOAK,
                             tls_verify=False))
     
     # development frontEgg
     backends.append(Backend(name='development-egg',
-                            dashboard='http://eggdashbe-dev.armosec.io',
-                            customer_guid="f5f360bb-c233-4c33-a9af-5692e7795d61",
+                            dashboard='https://eggdashbe-dev.armosec.io',
+                            auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
     # staging
     backends.append(Backend(name='staging',
-                            dashboard='https://dashbe.eustage2.cyberarmorsoft.com'))
+                            dashboard='https://dashbe.eustage2.cyberarmorsoft.com',
+                            login_method=LOGIN_METHOD_KEYCLOAK,
+))
     
     # staging frontEgg
     backends.append(Backend(name='staging-egg',
                             dashboard='http://eggdashbe-stage.armosec.io',
-                            customer_guid="f5f360bb-c233-4c33-a9af-5692e7795d61",
+                            auth_url='https://eggauth-stage.armosec.io',
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
+    # staging frontEgg
+    backends.append(Backend(name='production-egg',
+                            dashboard='https://api.armosec.io',
+                            auth_url='https://auth.armosec.io',
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
     # production
     backends.append(Backend(name='production',
                             dashboard='https://dashbe.euprod1.cyberarmorsoft.com',
+                            login_method=LOGIN_METHOD_KEYCLOAK,
                             tls_verify=False))
 
-    # production2 us-east-1
-    backends.append(Backend(name='production-us',
-                            dashboard='https://dashbe.prod2.us.armo.cloud',
-                            tls_verify=False))
-
-    # dev2
-    backends.append(Backend(name='dev2',
-                            dashboard='https://dashbe.eudev2.cyberarmorsoft.com',
-                            tls_verify=False))
     
     # local
     backends.append(Backend(name='local',
                             dashboard='http://localhost:7666',
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG,
+                            login_method=LOGIN_METHOD_FRONTEGG_USERNAME,
                             customer_guid="1e3a88bf-92ce-44f8-914e-cbe71830d566"))
 
     return {backend.get_name(): backend for backend in backends}

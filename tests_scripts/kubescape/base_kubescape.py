@@ -26,6 +26,7 @@ _CLI_STATUS_INFO_FIELD = 'statusInfo'
 _CLI_SUB_STATUS_FIELD = 'subStatus'
 _CLI_SUB_STATUS_EXCEPTIONS = 'w/exceptions'
 _CLI_STATUS_FAILED = 'failed'
+_CLI_STATUS_PASSED = 'passed'
 _CLI_SUMMARY_DETAILS_FIELD = 'summaryDetails'
 _CLI_RESOURCE_COUNTERS_FIELD = 'ResourceCounters'
 _CLI_EXCLUDED_RESOURCES_FIELD = 'excludedResources'
@@ -39,6 +40,9 @@ _CLI_RULES_ID_FIELD = 'rules'
 _CLI_RESOURCES_FIELD = 'resources'
 _CLI_RESULTS_FIELD = 'results'
 _CLI_FRAMEWORKS_FIELD = "frameworks"
+_CLI_SCORE_FIELD = "score"
+_COMPLIANCE_SCORE_FIELD = "complianceScore"
+_COMPLIANCE_SCORE_FIELDV1 = "complianceScorev1"
 
 _ALL_RESOURCES_COUNT_FIELD = "totalResources"
 _WARN_RESOURCES_COUNT_FIELD = "warningResources"
@@ -217,11 +221,10 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "",
-                              related_exceptions="false"):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
                                                framework_name=framework_name, report_guid=report_guid,
-                                               resource_name=resource_name, related_exceptions=related_exceptions)
+                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -700,9 +703,9 @@ class BaseKubescape(BaseK8S):
             f'resource "{resource_name}" not found in backend, resources found: {[resource["name"] for resource in be_resources]}')
 
     def test_related_applied_in_be(self, control_name: str, control_id: str, report_guid: str, framework_name: str,
-                                   resource_name: str, has_related: bool, has_applied: bool):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
-                                                  resource_name=resource_name, related_exceptions="true")
+                                   resource_name: str, has_related: bool, has_applied: bool, namespace=None):
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid, 
+                                                  resource_name=resource_name,related_exceptions="true",namespace=namespace)
         # be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
         #                                                      control_id=control_id, report_guid=report_guid,
         #                                                      framework_name=framework_name)
@@ -1014,8 +1017,9 @@ class BaseKubescape(BaseK8S):
                                                                      framework_name=framework_name)
             if wait_to_result and len(be_cluster_overtime) == 0:
                 return ""
-            if len(be_cluster_overtime) > 0 and \
-                    be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD] != old_report_guid:
+            if len(be_cluster_overtime) > 0 and (old_report_guid == "" or
+                                                 be_cluster_overtime[statics.BE_CORDS_FIELD][
+                                                     statics.BE_REPORT_GUID_FIELD] != old_report_guid):
                 if found:
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
                 found = True
@@ -1024,6 +1028,60 @@ class BaseKubescape(BaseK8S):
 
             time.sleep(5)
         raise Exception('Failed to get the report-guid from the last scan.')
+    
+    def test_controls_compliance_score(self, report: dict):
+        # for each control check that compliance score is the percentage of passed resources/total resources
+        for _, control in report[_CLI_SUMMARY_DETAILS_FIELD][_CONTROLS_FIELD].items():
+            total_resources = 0
+            passed_resources = 0
+            for resource_group, amount in control[_CLI_RESOURCE_COUNTERS_FIELD].items():
+                total_resources += amount
+                # excluded resources are considered to have passed status
+                if resource_group == _CLI_PASSED_RESOURCES_FIELD or resource_group == _CLI_EXCLUDED_RESOURCES_FIELD:
+                    passed_resources += amount
+            if total_resources == 0:
+                if control[_CLI_STATUS_INFO_FIELD][_CLI_STATUS_FILED] == _CLI_STATUS_PASSED:
+                    assert control[_COMPLIANCE_SCORE_FIELD] == 100, "expected passed control to have compliance score of 100, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
+                else:
+                    assert control[_COMPLIANCE_SCORE_FIELD] == 0, "expected compliance score to be 0, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
+            else:
+                assert round(control[_COMPLIANCE_SCORE_FIELD], 2) == round((passed_resources / total_resources) * 100, 2), \
+                    "expected compliance score to be {}, but it is {}".format(round((passed_resources / total_resources) * 100, 2), round(control[_COMPLIANCE_SCORE_FIELD]), 2)
+    
+    def test_frameworks_compliance_score(self, report: dict):
+        #  for each framework check that compliance score is the average of controls scores
+        for framework in report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_FRAMEWORKS_FIELD]:
+            sum_scores = 0
+            for c_id, control in framework[_CONTROLS_FIELD].items():
+                sum_scores += control[_COMPLIANCE_SCORE_FIELD]
+            assert round(framework[_COMPLIANCE_SCORE_FIELD], 2) == round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), \
+                "expected compliance score to be {}, but it is {}".format(round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), round(framework[_COMPLIANCE_SCORE_FIELD]), 2)
+
+
+    def test_controls_compliance_score_from_backend(self, framework_report, report_guid, framework_name: str = ""):
+        controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
+        for control in controls:
+          c_id = control['id']
+          assert control[_COMPLIANCE_SCORE_FIELD] == framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], \
+            "in framework {}, expected compliance score in be of control: {} to be {}, but it is {}".format(
+              framework_name, c_id, framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], control[_COMPLIANCE_SCORE_FIELD])
+
+    def test_frameworks_compliance_score_from_backend(self, framework_report, report_guid, framework_name: str = ""):
+        be_frameworks = self.get_posture_frameworks(framework_name=framework_name, report_guid=report_guid)
+        assert framework_report[_COMPLIANCE_SCORE_FIELD] == be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1], \
+            "expected framework: {} compliance score in be to be {}, but it is".format(
+            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1])
+
+
+    def test_compliance_score_in_clusters_overtime(self, cluster_name: str, framework_report: dict, framework_name: str = ""):
+        be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name, framework_name=framework_name)
+        assert len(be_cluster_overtime) > 0 , "expected to get response from clustersOvertime for framework {} in cluster {}".format(framework_name, cluster_name)
+        # check that framework score from be_cluster_overtime matches the score from framework_report from kubescape
+        assert be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD] == framework_report[_COMPLIANCE_SCORE_FIELD], \
+            "expected framework: {} compliance score in be to be {}, but it is".format(  
+            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
+
+
 
     def get_job_report_info(self, report_guid, cluster_wlid: str = ""):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_job_report_info,

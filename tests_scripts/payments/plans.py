@@ -1,5 +1,6 @@
 from .base_stripe import BaseStripe
 from time import sleep
+from systest_utils import Logger
 
 
 class Plans(BaseStripe):
@@ -11,10 +12,13 @@ class Plans(BaseStripe):
         super(Plans, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
     
     def start(self):
+        Logger.logger.info("Create new tenant")
+        test_tenant_id = self.create_new_tenant()
+    
         response = self.backend.get_stripe_plans()
-        assert response.status_code == 200, f"expected status code 200, found {response.status_code}. Make sure you have a valid stripe secret key and priceIdsMap is well configured"
+        assert "plans" in response.json(), "'plans' not found in response"
 
-        for plan in response.json():
+        for plan in response.json()["plans"]:
             name = plan["name"]
             price = plan["price"]
             assert name in [price["name"] for price in self.expected_prices], f"price plan '{name}' not found in response"
