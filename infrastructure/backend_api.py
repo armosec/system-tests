@@ -189,9 +189,10 @@ class ControlPanelAPI(object):
             raise Exception(f"Login method '{login_method}' not supported")
         
         self.login_customer_guid, self.login_customer_cookie, auth = self.api_login.login()  
-        Logger.logger.info(f"Customer  {self.login_customer_guid} authenticated successfully")       
-        self.auth = {'Authorization': f'Bearer {auth}'}
+        Logger.logger.info(f"Customer guid  {self.login_customer_guid} authenticated successfully")
+        self.auth = {'Authorization': f'Bearer {auth}'} if 'bearer' not in auth.lower() else {'Authorization': f'{auth}'}
 
+        
         self.selected_tenant_id = self.login_customer_guid
         self.selected_tenant_cookie = self.login_customer_cookie
 
