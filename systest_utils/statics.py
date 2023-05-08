@@ -168,6 +168,12 @@ STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
 STORAGE_CVE_LABEL = "kubescape.io/context"
 STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
 
+RELEVANCY_KIND_LABEL = "kubescape.io/workload-kind"
+RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
+RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
+RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
+
+
 #relevancy feature
 HELM_RELEVANCY_FEATURE="enableRelevancy"
 FILTERED_CVES_KEY="withRelevancy"

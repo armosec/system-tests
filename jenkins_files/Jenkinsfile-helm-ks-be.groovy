@@ -21,6 +21,7 @@ def tests = ["vulnerability_scanning":                                          
              "scan_with_exception_to_backend":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_with_custom_framework":                                                ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_customer_configuration":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_compliance_score":                                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
 //             "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             // "vulnerability_scanning_trigger_scan_registry_by_backend":                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_test_public_registry_connectivity_by_backend" :                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],

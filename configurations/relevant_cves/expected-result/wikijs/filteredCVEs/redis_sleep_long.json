@@ -2,19 +2,20 @@
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
     "kind": "VulnerabilityManifest",
     "metadata": {
-        "creationTimestamp": "2023-04-18T23:17:45Z",
+        "creationTimestamp": "2023-05-07T13:33:16Z",
         "labels": {
+            "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "redis",
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "redis-sleep",
-            "kubescape.io/workload-namespace": "systest-ns-damt"
+            "kubescape.io/workload-namespace": "systest-ns-xslr"
         },
-        "name": "92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+        "name": "e832bd541bba86c0c083a274062d321a1b32d20fe23eb2fd4c05a79647e90cac",
         "namespace": "kubescape",
-        "resourceVersion": "396",
-        "uid": "a3f59e2c-95c0-4b9d-9f4e-4c409ede7a6f"
+        "resourceVersion": "183",
+        "uid": "ad8c7af3-295a-4300-a69f-54e6a22f9e19"
     },
     "spec": {
         "metadata": {
@@ -22,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:a34fea872b4ed6c6f82c66f3f4a4bfc5b7947ed73847ea255f25f09339de2921",
+                "databaseVersion": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -31,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-04-18T01:32:21Z",
-                    "checksum": "sha256:a34fea872b4ed6c6f82c66f3f4a4bfc5b7947ed73847ea255f25f09339de2921",
+                    "built": "2023-05-07T01:30:36Z",
+                    "checksum": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5

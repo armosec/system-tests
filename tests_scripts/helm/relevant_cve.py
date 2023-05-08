@@ -121,13 +121,16 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
     def start(self):
         cluster, namespace = self.setup(apply_services=False)
+        # agenda:
+        # 1. install helm-chart with relevancy enabled
+        # 2. create workload with an sleep as entrypoint
+        # 3. check that files opened after X time are no in SBOMp list and relevant CVEs, by comparing SBOM, SBOMp, CVEs and CVEsp
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
-        
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -140,34 +143,40 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
         # P3 CHECK sbom and sbom'
+        Logger.logger.info('Get SBOMs from storage')  
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_workloads_images_hash(workload_objs))
 
-        Logger.logger.info('Validate SBOM was created with expected data')                     
+        Logger.logger.info('Validate SBOMs was created with expected data')                     
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
-        Logger.logger.info('Validate SBOMp was created with expected data')
+        Logger.logger.info('Get SBOMsp from storage')  
         filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_instance_IDs(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
                                                    namespace=namespace))
 
+        Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_SBOM(filteredSBOM, self.test_obj["expected_filtered_SBOMs"])
 
+        Logger.logger.info('Get CVEs from storage')  
         CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage, CVEsKeys=self.get_workloads_images_hash(workload_objs))
-        # 3.4 test CVES created as expected result in the storage
+
+        Logger.logger.info('Validate CVEs was created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
         
         Logger.logger.info('exposing operator (port-fwd)')
         self.expose_operator(cluster)
         
+        Logger.logger.info('Sending vuln scan command')
         self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
         
+        Logger.logger.info('Get filtered CVEs from storage')
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
-        # 3.8 test filtered CVEs created as expected result in the storage
-        self.validate_expected_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"])
 
+        Logger.logger.info('Validate filtered CVEs was created with expected data')
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"],namespace=namespace)
 
         Logger.logger.info('Get the scan result from Backend')
         be_summary, _ = self.wait_for_report(timeout=560, report_type=self.backend.get_scan_results_sum_summary,
@@ -176,12 +185,16 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
                                                  namespace=namespace))
 
         # P4 check result
-        # 4.1 check results (> from expected result)
+        # 4.1 check results
         Logger.logger.info('Test no errors in results')
-
         self.test_no_errors_in_scan_result(be_summary)
+
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id, be_summary=be_summary)
+    
+        Logger.logger.info('Test backend CVEs against storage CVEs')
+        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
         
         
         Logger.logger.info('delete armo namespace')

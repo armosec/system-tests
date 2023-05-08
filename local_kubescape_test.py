@@ -18,7 +18,8 @@ tests = [
     "scan_with_exception_to_backend",
     "scan_with_custom_framework",
     "scan_with_kubescape_helm_chart",
-    "scan_image_controls"
+    "scan_image_controls",
+    "scan_compliance_score"
 ]
 
 sep = "=" * 40
@@ -70,6 +71,7 @@ def run_all_tests(kubescape_exec: str, environment: str):
             os.system(f"{kubescape_exec} config delete")
         except:
             pass
+
         try:
             cmd = f'python3 systest-cli.py -t {test_name} -b {environment} -c CyberArmorTests --kwargs kubescape={kubescape_exec}'
             result = subprocess.run(cmd.split(" "), timeout=1000)

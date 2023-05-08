@@ -57,7 +57,7 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyEnabledStopSniffingAfterTime,
             expected_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
             expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
-            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False,

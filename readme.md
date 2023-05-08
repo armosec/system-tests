@@ -16,6 +16,7 @@
 | `scan_repository_from_url_and_submit_to_backend`               | kubescape  | scan repository from URL and test results against the backend          | kubescape, backend            |
 | `scan_with_exception_to_backend`                               | kubescape  | scan framework NSA with exception and test results against the backend | kubescape, backend            | 
 | `scan_with_custom_framework`                                   | kubescape  | scan custom framework and test results against the backend             | kubescape, backend            |
+| `scan_compliance_score`                                   | kubescape  | scan and test compliance score from kubescape report and from backend             | kubescape, backend            |
 | `scan_customer_configuration`                                  | kubescape  | scan controls with customer configuration                              | kubescape, backend            |
 | `host_scanner`                                                 | kubescape  | scan with host scanner                                                 | kubescape                     |
 | `vulnerability_scanning`                                       | helm-chart |                                                                        | kubevuln, backend             |
@@ -31,10 +32,7 @@
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |
-| `create_subscription`              | payment |                                                                        | stripe, backend             |
-| `cancel_subscription`              | payment |                                                                        | stripe, backend             |
-| `renew_subscription`              | payment |                                                                        | stripe, backend             |
+| `vulnerability_scanning_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`              | payment |                                                                        | stripe, backend             |
 | `stripe_billing_portal`              | payment |                                                                        | stripe, backend             |
 | `stripe_plans`              | payment |                                                                        | stripe, backend             |

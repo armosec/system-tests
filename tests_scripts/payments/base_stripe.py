@@ -10,6 +10,9 @@ from time import sleep
 
 from tests_scripts.payments.base_payment import *
 
+WEBHOOK_TIMEOUT = 3
+WEBHOOK_SLEEP_INTERVAL = 1
+
 
 class BaseStripe(BasePayment):
         
@@ -25,62 +28,75 @@ class BaseStripe(BasePayment):
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
     
-    def is_subscription_canceled(self, activeSubscription: str) -> bool:
-        return activeSubscription["cancelAtPeriodEnd"] == True
+    def is_subscription_canceled(self, tenant_id: str) -> bool:
+        activeSubscription = self.get_tenant_active_subscription(tenant_id)
+        assert activeSubscription.get("cancelAtPeriodEnd", {}) == True, "cancelAtPeriodEnd is not True"
+        return True
 
-    def is_subscription_active(self, activeSubscription: str) -> bool:
-        return activeSubscription["cancelAtPeriodEnd"] == False and activeSubscription["subscriptionStatus"] in SUBSCRIPTION_PAYING_STATUS
+    def is_subscription_active(self, tenant_id: str) -> bool:
+        activeSubscription = self.get_tenant_active_subscription(tenant_id)
+        assert activeSubscription.get("cancelAtPeriodEnd", {}) == False and activeSubscription.get("subscriptionStatus", {}) in SUBSCRIPTION_PAYING_STATUS, "cancelAtPeriodEnd is not False or subscriptionStatus is not paying"
+        return True
 
+    def is_subscription_updated(self, tenant_id, stripeSubscriptionID: str) -> bool:
+        activeSubscription = self.get_tenant_active_subscription(tenant_id)
+        assert activeSubscription.get("stripeSubscriptionID", {}) == stripeSubscriptionID, "stripeSubscriptionID is not updated"
+        return True
 
-    def wait_for_paying(self, tenant_id, timeout=0.5, sleep_interval=0.1) -> bool:
-
-        timeout_start = time.time()
-        updated = False
-
-        while time.time() < timeout_start + timeout and not updated:
-            response = self.get_tenant_details(tenant_id)
-
-            customerAccessStatus = response.json().get("customerAccessStatus", {})
-            if customerAccessStatus == payingCustomer:
-                updated = True
-            else:
-                sleep(sleep_interval)
         
-        return updated
 
-    def get_tenant_details(self, tenantID: str) -> requests.Response:
-        response = self.backend.get_tenant_details(tenantID)
-        assert response.status_code == client.OK, f"get tenant details failed"
-        return response
+    def get_tenant_details(self, tenant_id) -> requests.Response:
+        return self.backend.get_tenant_details(tenant_id)
     
+
     def create_subscription(self, priceID: str, stripeCustomerID :str, tenantID: str) -> requests.Response:
-        try:
-            response = self.backend.create_subscription(priceID, stripeCustomerID, tenantID)
-        except Exception as e:
-            assert False, f"create subscription failed with priceID: {priceID} and error: {e}"
-        assert response.status_code == client.OK, f"stripe checkout failed with priceID: {priceID}"
+        response = self.backend.create_subscription(priceID, stripeCustomerID, tenantID)
+
+        Logger.logger.info(f"Subscription created successfully for tenantID: {tenantID} with priceID: {priceID}")
+
+        stripeSubscriptionID = response.json().get("id", {})
+
+        Logger.logger.info("Validate tenants details after subscription creation")
+        updated, t = self.wait_for_report(report_type=self.is_subscription_updated,
+                                               tenant_id=tenantID,
+                                               stripeSubscriptionID=stripeSubscriptionID,
+                                               timeout=WEBHOOK_TIMEOUT,
+                                               sleep_interval=WEBHOOK_SLEEP_INTERVAL)
+
+        # updated = self.wait_for_webhook_create_subscription(tenantID, stripeSubscriptionID, timeout=WEBHOOK_TIMEOUT, sleep_interval=WEBHOOK_SLEEP_INTERVAL)
+        assert updated == True, "validate create subscription failed - stripeSubscriptionID is not updated"
         return response
     
         
     def cancel_subscription(self, tenantID: str) -> requests.Response:
         response = self.backend.cancel_subscription(tenantID)
-        assert response.status_code == client.OK, f"cancel subscription failed"
+        Logger.logger.info(f"Subscription canceled successfully for tenantID: {tenantID}")
+
+        Logger.logger.info("Validate tenants details after subscription canceled")
+        update, t = self.wait_for_report(report_type=self.is_subscription_canceled,
+                                                  tenant_id=tenantID,
+                                                    timeout=WEBHOOK_TIMEOUT,
+                                                    sleep_interval=WEBHOOK_SLEEP_INTERVAL)
+        assert update == True, "validate cancel subscription failed - cancelAtPeriodEnd is not True"
         return response
     
     def renew_subscription(self, tenantID: str) -> requests.Response:
         response = self.backend.renew_subscription(tenantID)
-        assert response.status_code == client.OK, f"renew subscription failed"
+        Logger.logger.info(f"Subscription renewed successfully for tenantID: {tenantID}")
+
+        Logger.logger.info("Validate tenants details after subscription renewed")
+        updated, t = self.wait_for_report(report_type=self.is_subscription_active,
+                                                    tenant_id=tenantID,
+                                                    timeout=WEBHOOK_TIMEOUT,
+                                                    sleep_interval=WEBHOOK_SLEEP_INTERVAL)
+        assert updated == True, "validate renew subscription failed - cancelAtPeriodEnd is not False"
         return response
 
 
-    def stripe_checkout(self, priceID) -> requests.Response:
-        response = self.backend.stripe_checkout(priceID)
-        assert response.status_code == client.CREATED, f"stripe checkout failed with priceID: {priceID}"
-        return response
+    def stripe_checkout(self,priceID) -> requests.Response:
+        return self.backend.stripe_checkout(priceID)
 
     def stripe_billing_portal(self) -> requests.Response:
-        response = self.backend.stripe_billing_portal()
-        assert response.status_code == client.CREATED, f"stripe billing portal failed. Make sure that 'PortalReturnPath' is well defined in the backend config"
-        return response
+        return self.backend.stripe_billing_portal()
 
     

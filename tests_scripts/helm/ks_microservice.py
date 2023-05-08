@@ -103,7 +103,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         for job in self.test_obj["test_job"]:
             job_type = job["trigger_by"]
             if job_type == "scan_on_start":
-                self.check_result_in_namespace_creation(job, cluster_name, old_report_guid, port=port)
+                self.check_result_in_namespace_creation(job, cluster_name, "", port=port)
             elif job_type == "job":
                 self.check_result_with_backend_demand(job, cluster_name, old_report_guid, port=port)
             elif job_type == "cronjob":

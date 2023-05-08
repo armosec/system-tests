@@ -15,7 +15,9 @@ from .base_kubescape import (
     _CLI_EXCLUDED_RESOURCES_FIELD,
     _CLI_SUMMARY_DETAILS_FIELD,
     _CLI_RESOURCE_COUNTERS_FIELD,
-    _CLI_RESOURCES_FIELD
+    _CLI_RESOURCES_FIELD,
+    _CLI_FRAMEWORKS_FIELD,
+    _CLI_NAME_FIELD
 )
 
 
@@ -79,6 +81,63 @@ class ScanWithExceptions(BaseKubescape):
         control_test = self.test_obj.get_arg("controls_tested")
         Logger.logger.info("Testing results")
         self.test_exception_result(framework_report=result, controls_with_exception=control_test)
+
+        return self.cleanup()
+    
+class ScanComplianceScore(BaseKubescape):
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanComplianceScore, self).__init__(test_obj=test_obj, backend=backend,
+                                                 kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        # test Agenda:
+        # 1. run kubescape scan
+        # 2. check the compliance score per control matches the resource counters
+        # 3. check the framework compliance score is the average of its controls
+        # 4. check controls compliance score from backend api /api/v1/posture/controls
+        # 5. check the framework compliance score from backend api /api/v1/posture/frameworks
+        # 6. check the framework compliance score from backend api /api/v1/posture/clustersOvertime
+        
+        Logger.logger.info("Installing kubescape")
+        # Logger.logger.info(self.install())
+        self.install(branch=self.ks_branch)
+
+        Logger.logger.info("Scanning kubescape")
+        result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
+                                   submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
+
+        Logger.logger.info("Testing results")
+
+        Logger.logger.info("Testing results in controls")
+        self.test_controls_compliance_score(report=result)
+
+        Logger.logger.info("Testing results in frameworks")
+        self.test_frameworks_compliance_score(report=result)
+
+        TestUtil.sleep(10, "wait for kubescape scan to report", "info")
+
+        Logger.logger.info("Testing data in backend")
+        # get first framework name from policy_name, until first ','
+        framework_name = self.test_obj.get_arg("policy_name").split(',')[0].upper()
+        report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
+                                               framework_name=framework_name)
+        assert report_guid != "", "report guid is empty"
+
+        for framework_report in result[_CLI_SUMMARY_DETAILS_FIELD][_CLI_FRAMEWORKS_FIELD]:
+            Logger.logger.info("Testing results from backend in controls")
+            self.test_controls_compliance_score_from_backend(framework_name=framework_report[_CLI_NAME_FIELD], report_guid=report_guid,
+                                                             framework_report=framework_report)
+
+            Logger.logger.info("Testing results from backend in frameworks")
+            self.test_frameworks_compliance_score_from_backend(framework_report=framework_report, report_guid=report_guid, framework_name=framework_report[_CLI_NAME_FIELD])
+
+            Logger.logger.info("Testing results in clusters overtime")
+            self.test_compliance_score_in_clusters_overtime(cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                            framework_name=framework_report[_CLI_NAME_FIELD],framework_report=framework_report)
+        
+        Logger.logger.info("Deleting cluster from backend")
+        self.delete_cluster_from_backend_and_tested()
 
         return self.cleanup()
 
@@ -159,6 +218,12 @@ class ScanWithExceptionToBackend(BaseKubescape):
         resource = 'apache'
         control_id = "C-0016"
         control_name = "Allow privilege escalation"
+        #second resource exception (by resource ID)
+        resource_1 = 'default'
+        control_id_1 = "C-0034"
+        control_name_1 = "Allow privilege escalation"
+        
+        exceptionFiles = self.test_obj.get_arg("exceptions").split(',')
 
         Logger.logger.info("Installing kubescape")
         # Logger.logger.info(self.install())
@@ -189,6 +254,10 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
                                         report_guid=first_report_guid, has_related=False, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
+        Logger.logger.info("Stage 2.2.1: Check 2nd control if exception-applied empty and exception-related empty")
+        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                        report_guid=first_report_guid, has_related=False, has_applied=False,
+                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
         Logger.logger.info("Stage 2.3: Verify download of controls and resources")
         self.get_posture_controls_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -198,13 +267,20 @@ class ScanWithExceptionToBackend(BaseKubescape):
 
         Logger.logger.info("Stage 3: Add exception to backend and test with backend")
         Logger.logger.info("Stage 3.1: Add exception to backend")
-        policy_guid = self.post_posture_exception(exceptions_file=self.test_obj.get_arg("exceptions"),
+        policy_guid = self.post_posture_exception(exceptions_file=exceptionFiles[0],
+                                                  cluster_name=self.kubernetes_obj.get_cluster_name())
+        Logger.logger.info("Stage 3.1.1: Add 2nd exception to backend")
+        policy_guid_1 = self.post_posture_exception(exceptions_file=exceptionFiles[1],
                                                   cluster_name=self.kubernetes_obj.get_cluster_name())
 
         Logger.logger.info("Stage 3.2: Check if exception-applied empty and exception-deployed not empty")
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
                                         report_guid=first_report_guid, has_related=True, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
+        Logger.logger.info("Stage 3.2.1: Check 2nd control if exception-applied empty and exception-deployed not empty")
+        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                        report_guid=first_report_guid, has_related=True, has_applied=False,
+                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
         Logger.logger.info("Stage 4: Scanning kubescape with exception and test result with backend")
         Logger.logger.info("Stage 4.1: Scanning kubescape with exception")
@@ -219,21 +295,34 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
                                         report_guid=second_report_guid, has_related=True, has_applied=True,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
+        Logger.logger.info("Stage 4.2.1: Check for 2nd control if exception-applied not empty and exception-deployed not empty")
+        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                        report_guid=second_report_guid, has_related=True, has_applied=True,
+                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
         # Test for cli-result
         # TODO self.test_exception_result(framework_report=cli_result)
         # Test for backend-result
         Logger.logger.info("Stage 4.3: Test data from controls-api, from backend")
         self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
                                         report_guid=second_report_guid, control_id=control_id)
+        Logger.logger.info("Stage 4.3.1: Test data of 2nd from controls-api, from backend")
+        self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
+                                        report_guid=second_report_guid, control_id=control_id_1)
 
         Logger.logger.info("Stage 5: Delete exception object from backend and test with backend")
         Logger.logger.info("Stage 5.1: Delete exception object from backend")
         self.delete_posture_exception(policy_guid=policy_guid)
+        Logger.logger.info("Stage 5.1: Delete 2nd exception object from backend")
+        self.delete_posture_exception(policy_guid=policy_guid_1)
 
         Logger.logger.info("Stage 5.2: Check if exception-applied not empty and exception-deployed empty")
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
                                         report_guid=second_report_guid, has_related=False, has_applied=True,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
+        Logger.logger.info("Stage 5.2.1: Check if 2nd exception-applied not empty and exception-deployed empty")
+        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                        report_guid=second_report_guid, has_related=False, has_applied=True,
+                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
         Logger.logger.info("Stage 6: Scanning kubescape after deleting the exception and test result with backend")
         Logger.logger.info("Stage 6.1: Scanning kubescape after deleting the exception")
@@ -248,6 +337,11 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
                                         report_guid=third_report_guid, has_related=False, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
+        Logger.logger.info("Stage 6.2.1: Check if 2nd exception-applied empty and exception-deployed empty")
+        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                        report_guid=third_report_guid, has_related=False, has_applied=False,
+                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+
 
         Logger.logger.info("Deleting cluster from backend")
         self.delete_cluster_from_backend_and_tested()
