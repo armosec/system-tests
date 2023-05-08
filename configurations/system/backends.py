@@ -82,11 +82,25 @@ def set_backends():
 
     
     # local
+    # backends.append(Backend(name='local',
+    #                         dashboard='http://localhost:7666',
+    #                         auth_url='https://eggauth-dev.armosec.io',
+    #                         tls_verify=False,
+    #                         login_method=LOGIN_METHOD_FRONTEGG_USERNAME))
+
+    # backends.append(Backend(name='local',
+    #                         dashboard='http://localhost:7666',
+    #                         auth_url='https://eggauth-dev.armosec.io',
+    #                         tls_verify=False,
+    #                         login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
+
     backends.append(Backend(name='local',
                             dashboard='http://localhost:7666',
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_KEYCLOAK))
+                            login_method=LOGIN_METHOD_FRONTEGG_USERNAME,
+                            customer_guid='SOME_CUSTOMER_GUID'))
 
     return {backend.get_name(): backend for backend in backends}
 

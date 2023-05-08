@@ -184,15 +184,17 @@ class ControlPanelAPI(object):
         elif login_method == LOGIN_METHOD_FRONTEGG_SECRET:
             self.api_login = FrontEggSecretAPILogin(auth_url=self.auth_url, base_url=self.server, client_id=self.client_id, secret_key=self.secret_key)
         elif login_method == LOGIN_METHOD_FRONTEGG_USERNAME:
-            self.api_login = FrontEggUsernameAPILogin(auth_url=self.auth_url, base_url=self.server, username=self.username, password=self.password, customer=self.customer, customerGuid=self.customer_guid)
+            self.api_login = FrontEggUsernameAPILogin(server=self.server, username=self.username, password=self.password, customer=self.customer, customer_guid=self.customer_guid)
         else:
             raise Exception(f"Login method '{login_method}' not supported")
         
         self.login_customer_guid, self.login_customer_cookie, auth = self.api_login.login()  
         Logger.logger.info(f"Customer guid  {self.login_customer_guid} authenticated successfully")
-        self.auth = {'Authorization': f'Bearer {auth}'} if 'bearer' not in auth.lower() else {'Authorization': f'{auth}'}
+        if login_method == LOGIN_METHOD_FRONTEGG_USERNAME:
+            self.auth = {"Cookie" : "auth=" + auth}
+        else:
+            self.auth = {'Authorization': f'Bearer {auth}'} if 'bearer' not in auth.lower() else {'Authorization': f'{auth}'}
 
-        
         self.selected_tenant_id = self.login_customer_guid
         self.selected_tenant_cookie = self.login_customer_cookie
 
@@ -213,7 +215,7 @@ class ControlPanelAPI(object):
         if tenant_id == self.selected_tenant_id:
             return self.selected_tenant_cookie
         
-        return self.api_login.getCookie(self.server, self.auth["Authorization"].split(" ")[1], tenant_id)
+        return self.api_login.getCookie(self.server, self.api_login.frontEgg_auth, tenant_id)
 
     def select_tenant(self, tenant_id: str):
         """ 
@@ -252,14 +254,9 @@ class ControlPanelAPI(object):
 
         if self.login_method != LOGIN_METHOD_FRONTEGG_SECRET:
             raise Exception(f"create_tenant() is only supported for {LOGIN_METHOD_FRONTEGG_SECRET} login_method")
-        
-        # API validates the "sub" equals to the user id. "sub" recieved in "auth" is not the user id therefore need to decode, change and encode it again.
-        decoded_auth = self.api_login.decode_jwt(self.auth["Authorization"].split(" ")[1])
-        authCreatedByUserId = decoded_auth["createdByUserId"]
-        decoded_auth["sub"] = authCreatedByUserId
-        encode_auth = self.api_login.encode_jwt(decoded_auth)
+  
 
-        res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": authCreatedByUserId}, cookies=None, headers={"Authorization": f"Bearer {encode_auth}"})
+        res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": self.api_login.get_frontEgg_user_id()}, cookies=None, headers={"Authorization": f"Bearer {self.api_login.get_frontEgg_auth_user_id()}"})
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
         assert res.json().get("tenantId", {}) != {}, f"TenantId is empty: {res.text}"
         return res, res.json()["tenantId"]
