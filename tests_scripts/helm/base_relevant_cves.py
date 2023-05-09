@@ -265,11 +265,12 @@ class BaseRelevantCves(BaseHelm):
                 elif cve in storage_all_CVEs:
                     assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_FALSE, \
                         f"Expect to receive {cve} as not relevant CVE"
-                else:
+                if cve not in storage_filtered_CVEs and cve not in storage_all_CVEs:
                     failed_CVEs_path.append(f"{container_name} -> {cve}")
 
-            assert total_cves == len(storage_filtered_CVEs) + len(storage_all_CVEs), \
-                f"Expect to receive {total_cves} CVEs in total from backend, but received {len(storage_filtered_CVEs) + len(storage_all_CVEs)} CVEs"
+
+        assert total_cves == len(storage_all_CVEs), \
+            f"Expect to receive {len(storage_all_CVEs)} CVEs in total from backend, but received {total_cves} CVEs"
 
 
         assert not failed_CVEs_path, 'Expect the data from backend would be the same as storage CVE results.\n' \
