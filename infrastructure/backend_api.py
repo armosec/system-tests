@@ -89,12 +89,19 @@ def deco_cookie(func):
         if type(ControlPanelAPIObj) != ControlPanelAPI:
             raise Exception("In 'apply_cookie': First argument must be ControlPanelAPI object")
         
+        if "params" not in kwargs:
+            kwargs["params"] = {}
+
         url = args[1]
         if "cookies" not in kwargs:
             if "/api/v1/admin/" in url:
                 kwargs["cookies"] = ControlPanelAPIObj.login_customer_cookie
+                if "customerGuid" not in kwargs["params"]:
+                    kwargs["params"]["customerGuid"] = ControlPanelAPIObj.login_customer_guid
             else:
                 kwargs["cookies"] = ControlPanelAPIObj.selected_tenant_cookie
+                if "customerGuid" not in kwargs["params"]:
+                    kwargs["params"]["customerGuid"] = ControlPanelAPIObj.selected_tenant_id
 
         kwargs['headers'] = kwargs.get("headers", ControlPanelAPIObj.auth)
         kwargs["timeout"] = kwargs.get("timeout", 21)
