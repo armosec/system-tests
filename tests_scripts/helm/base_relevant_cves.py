@@ -245,6 +245,13 @@ class BaseRelevantCves(BaseHelm):
                     cve_list.append(cve["vulnerability"]["id"])
                 break
         return cve_list
+    
+    def is_relevancy_enabled(self):
+        if self.test_obj.get_arg('relevancy_enabled') is not None:
+            return self.test_obj.get_arg('relevancy_enabled')
+        else:
+            return True
+
 
     def test_expected_scan_result(self, backend_CVEs, storage_CVEs):
         # check that all backend CVEs are in storage
@@ -252,7 +259,7 @@ class BaseRelevantCves(BaseHelm):
         # check that non-filtered CVEs have relevantLabel set to 'no'
         # check that we have the same number of CVEs in storage and backend
         failed_CVEs_path = []
-        relevancy_enabled = self.test_obj.get_arg('relevancy_enabled')
+        relevancy_enabled = self.is_relevancy_enabled()
 
         for container_name, cve_list in backend_CVEs.items():
             assert container_name in backend_CVEs.keys(), \
