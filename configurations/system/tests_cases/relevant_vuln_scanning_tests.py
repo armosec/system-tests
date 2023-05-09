@@ -49,7 +49,7 @@ class RelevantVulnerabilityScanningTests(object):
     def relevancy_enabled_stop_sniffing():
         from tests_scripts.helm.relevant_cve import RelevancyEnabledStopSniffingAfterTime
         from systest_utils import statics
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -60,16 +60,33 @@ class RelevantVulnerabilityScanningTests(object):
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False,
-                         "nodeAgent.config.updateDataPeriod": 120}
+            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False}
         )
     
+    @staticmethod
+    def relevant_data_is_appended():
+        from tests_scripts.helm.relevant_cve import RelevantDataIsAppended
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis-sleep-5-min"),
+            test_obj=RelevantDataIsAppended,
+            expected_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
+            expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
+            expected_updated_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_5_min.json")],
+            expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_5_min.json")],
+            expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
+            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False,
+                         "nodeAgent.config.learningPeriod": 2}
+        )
 
     @staticmethod
     def relevancy_enabled_deleted_image():
         from tests_scripts.helm.relevant_cve import RelevancyEnabledDeletedImage
         from systest_utils import statics
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
