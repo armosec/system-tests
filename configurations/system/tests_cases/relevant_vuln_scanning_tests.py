@@ -42,7 +42,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/CVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/CVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/CVEs/wikijs.json")],
             expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
-            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False}
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: False},
+            relevancy_enabled=False
         )
     
     @staticmethod
@@ -78,8 +79,7 @@ class RelevantVulnerabilityScanningTests(object):
             expected_updated_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_5_min.json")],
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_5_min.json")],
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False,
-                         "nodeAgent.config.learningPeriod": 2}
+            helm_kwargs={"nodeAgent.config.learningPeriod": 2}
         )
 
     @staticmethod

@@ -325,16 +325,25 @@ class RelevancyDisabled(BaseRelevantCves):
                                                 kubernetes_obj=kubernetes_obj)
 
     def start(self):
+        # agenda:
+        # 1. instal helm
+        # 2. apply workloads
+        # 3. check sbom from storage
+        # 4. check CVEs from storage
+        # 5. check BE data
+
+
         cluster, namespace = self.setup(apply_services=False)
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
-        # # 1.2 install armo helm-chart
+        # 1.2 install armo helm-chart
+        Logger.logger.info('install armo helm-chart')
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # # 1.3 verify installation
@@ -355,6 +364,7 @@ class RelevancyDisabled(BaseRelevantCves):
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        
         # 3.2 test SBOM created as expected result in the storage
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
@@ -385,7 +395,7 @@ class RelevancyDisabled(BaseRelevantCves):
         Logger.logger.info('Test BE CVEs against storage CVEs')
         self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: CVEs})
+                                                                                          statics.FILTERED_CVES_KEY: []})
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
