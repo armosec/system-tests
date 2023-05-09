@@ -161,7 +161,6 @@ class RelevantDataIsAppended(BaseRelevantCves):
         Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_SBOM(filteredSBOM, self.test_obj["expected_filtered_SBOMs"])
 
-        Logger.logger.info('Wait for new filtered SBOMp to be created, sleeping for 6 minutes')
         TestUtil.sleep(360, "Waiting for new filtered SBOMp to be created")
 
         Logger.logger.info('Get updated SBOMsp from storage')  
@@ -186,7 +185,6 @@ class RelevantDataIsAppended(BaseRelevantCves):
         Logger.logger.info('Sending vuln scan command')
         self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
 
-        Logger.logger.info('Wait for new filtered CVEs to be created, sleeping for 5 minutes')
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
         
         Logger.logger.info('Get filtered CVEs from storage')
