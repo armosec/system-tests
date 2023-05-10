@@ -236,8 +236,17 @@ class BaseRelevantCves(BaseHelm):
                 "after processing: container {} has CVEs {}".format(container[_CONTAINER_NAME], container_cve_dict))
 
         return result
+    
+    def parse_filtered_CVEs_from_storage(self, storage_CVEs, container_name):
+        cve_list = []
+        for storage_cve in storage_CVEs:
+            if container_name in  storage_cve[0] and  storage_cve[1]["spec"]["payload"]["matches"] is not None:
+                for cve in storage_cve[1]["spec"]["payload"]["matches"]:
+                    cve_list.append(cve["vulnerability"]["id"])
+                break
+        return cve_list
 
-    def parse_filtered_CVEs_from_storage(self, storage_CVEs, image_hash):
+    def parse_CVEs_from_storage(self, storage_CVEs, image_hash):
         cve_list = []
         for storage_cve in storage_CVEs:
             if storage_cve[0] in image_hash and  storage_cve[1]["spec"]["payload"]["matches"] is not None:
@@ -265,10 +274,10 @@ class BaseRelevantCves(BaseHelm):
             assert container_name in backend_CVEs.keys(), \
                 f"Expect to receive {container_name} in results_details from backend"
 
-            image_hash = next(iter(cve_list.items()))[0]['imageHash']
+            image_hash = next(iter(cve_list.items()))[1]['imageHash']
             total_cves = 0
-            storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], image_hash)
-            storage_all_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.ALL_CVES_KEY], image_hash)
+            storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], container_name=container_name)
+            storage_all_CVEs = self.parse_CVEs_from_storage(storage_CVEs[statics.ALL_CVES_KEY], image_hash=image_hash)
 
             for cve, cve_details in cve_list.items():
                 total_cves += cve_details[statics.SCAN_RESULT_TOTAL_FIELD]
