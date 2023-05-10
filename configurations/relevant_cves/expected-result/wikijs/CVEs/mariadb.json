@@ -3,17 +3,19 @@
     "kind": "VulnerabilityManifest",
     "metadata": {
         "annotations": {
-            "kubescape.io/image-tag": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
+            "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2023-04-17T08:46:01Z",
+        "creationTimestamp": "2023-05-09T07:44:55Z",
         "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-library-mariadb-sha256-821d0411208eaa88f9e1f0daccd1d5",
             "kubescape.io/image-name": "docker-io-library-mariadb"
         },
         "name": "821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
         "namespace": "kubescape",
-        "resourceVersion": "3",
-        "uid": "9f14c8df-dd47-4c99-81ee-25cdc3cd5c76"
+        "resourceVersion": "109",
+        "uid": "8783b803-ccea-4eaf-8b6b-0d7da3873d0b"
     },
     "spec": {
         "metadata": {
@@ -21,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:0dd28a1229f1f4a14651c62a43091e21aadf80df9e40ea63cafbaf287ab1d8f7",
+                "databaseVersion": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -30,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-04-17T01:31:26Z",
-                    "checksum": "sha256:0dd28a1229f1f4a14651c62a43091e21aadf80df9e40ea63cafbaf287ab1d8f7",
+                    "built": "2023-05-09T01:29:44Z",
+                    "checksum": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5
@@ -4106,6 +4108,7 @@
                                 "http://seclists.org/fulldisclosure/2022/Oct/45",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html",
+                                "https://security.netapp.com/advisory/ntap-20230427-0012/",
                                 "https://support.apple.com/kb/HT213443",
                                 "https://support.apple.com/kb/HT213444",
                                 "https://support.apple.com/kb/HT213488"
@@ -4183,6 +4186,7 @@
                                 "http://seclists.org/fulldisclosure/2022/Oct/45",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html",
+                                "https://security.netapp.com/advisory/ntap-20230427-0012/",
                                 "https://support.apple.com/kb/HT213443",
                                 "https://support.apple.com/kb/HT213444",
                                 "https://support.apple.com/kb/HT213488"
@@ -4260,6 +4264,7 @@
                                 "http://seclists.org/fulldisclosure/2022/Oct/45",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html",
+                                "https://security.netapp.com/advisory/ntap-20230427-0012/",
                                 "https://support.apple.com/kb/HT213443",
                                 "https://support.apple.com/kb/HT213444",
                                 "https://support.apple.com/kb/HT213488"
@@ -4342,6 +4347,7 @@
                                 "http://seclists.org/fulldisclosure/2022/Oct/45",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html",
+                                "https://security.netapp.com/advisory/ntap-20230427-0012/",
                                 "https://support.apple.com/kb/HT213443",
                                 "https://support.apple.com/kb/HT213444",
                                 "https://support.apple.com/kb/HT213488"
@@ -4424,6 +4430,7 @@
                                 "http://seclists.org/fulldisclosure/2022/Oct/45",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2020-08/msg00006.html",
                                 "https://lists.gnu.org/archive/html/bug-ncurses/2021-10/msg00023.html",
+                                "https://security.netapp.com/advisory/ntap-20230427-0012/",
                                 "https://support.apple.com/kb/HT213443",
                                 "https://support.apple.com/kb/HT213444",
                                 "https://support.apple.com/kb/HT213488"
@@ -6210,6 +6217,7 @@
                                 "https://access.redhat.com/security/cve/CVE-2021-3997",
                                 "https://bugzilla.redhat.com/show_bug.cgi?id=2024639",
                                 "https://github.com/systemd/systemd/commit/5b1cf7a9be37e20133c0208005274ce4a5b5c6a1",
+                                "https://security.gentoo.org/glsa/202305-15",
                                 "https://www.openwall.com/lists/oss-security/2022/01/10/2"
                             ]
                         }
@@ -6291,6 +6299,7 @@
                                 "https://access.redhat.com/security/cve/CVE-2021-3997",
                                 "https://bugzilla.redhat.com/show_bug.cgi?id=2024639",
                                 "https://github.com/systemd/systemd/commit/5b1cf7a9be37e20133c0208005274ce4a5b5c6a1",
+                                "https://security.gentoo.org/glsa/202305-15",
                                 "https://www.openwall.com/lists/oss-security/2022/01/10/2"
                             ]
                         }
@@ -8822,6 +8831,7 @@
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VCMNWKERPBKOEBNL7CLTTX3ZZCZLH7XA/",
                                 "https://security.gentoo.org/glsa/202210-02",
                                 "https://security.netapp.com/advisory/ntap-20220715-0011/",
+                                "https://security.netapp.com/advisory/ntap-20230420-0008/",
                                 "https://www.debian.org/security/2023/dsa-5343",
                                 "https://www.openssl.org/news/secadv/20220705.txt"
                             ]
@@ -8898,6 +8908,7 @@
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VCMNWKERPBKOEBNL7CLTTX3ZZCZLH7XA/",
                                 "https://security.gentoo.org/glsa/202210-02",
                                 "https://security.netapp.com/advisory/ntap-20220715-0011/",
+                                "https://security.netapp.com/advisory/ntap-20230420-0008/",
                                 "https://www.debian.org/security/2023/dsa-5343",
                                 "https://www.openssl.org/news/secadv/20220705.txt"
                             ]
@@ -18103,6 +18114,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18183,6 +18195,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18263,6 +18276,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18343,6 +18357,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18423,6 +18438,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18507,6 +18523,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18591,6 +18608,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18671,6 +18689,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -18751,6 +18770,7 @@
                             "namespace": "nvd:cpe",
                             "severity": "High",
                             "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230505-0010/",
                                 "https://www.kb.cert.org/vuls/id/730793"
                             ]
                         }
@@ -21770,7 +21790,10 @@
                             "namespace": "nvd:cpe",
                             "severity": "Critical",
                             "urls": [
+                                "http://seclists.org/fulldisclosure/2022/Oct/37",
+                                "http://seclists.org/fulldisclosure/2022/Oct/38",
                                 "http://seclists.org/fulldisclosure/2022/Oct/41",
+                                "http://seclists.org/fulldisclosure/2022/Oct/42",
                                 "http://www.openwall.com/lists/oss-security/2022/08/05/2",
                                 "http://www.openwall.com/lists/oss-security/2022/08/09/1",
                                 "https://github.com/curl/curl/issues/9271",
@@ -21779,12 +21802,13 @@
                                 "https://github.com/madler/zlib/commit/eff308af425b67093bab25f80f1ae950166bece1",
                                 "https://github.com/nodejs/node/blob/75b68c6e4db515f76df73af476eccf382bbcb00a/deps/zlib/inflate.c#L762-L764",
                                 "https://lists.debian.org/debian-lts-announce/2022/09/msg00012.html",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/JWN4VE3JQR4O2SOUS5TXNLANRPMHWV4I/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PAVPQNCG3XRLCLNSQRM3KAN5ZFMVXVTY/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/X5U7OTKZSHY2I3ZFJSR2SHFHW72RKGDK/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/JWN4VE3JQR4O2SOUS5TXNLANRPMHWV4I/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PAVPQNCG3XRLCLNSQRM3KAN5ZFMVXVTY/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/X5U7OTKZSHY2I3ZFJSR2SHFHW72RKGDK/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/",
                                 "https://security.netapp.com/advisory/ntap-20220901-0005/",
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
                                 "https://support.apple.com/kb/HT213488",
                                 "https://support.apple.com/kb/HT213489",
                                 "https://support.apple.com/kb/HT213490",
@@ -21863,7 +21887,10 @@
                             "namespace": "nvd:cpe",
                             "severity": "Critical",
                             "urls": [
+                                "http://seclists.org/fulldisclosure/2022/Oct/37",
+                                "http://seclists.org/fulldisclosure/2022/Oct/38",
                                 "http://seclists.org/fulldisclosure/2022/Oct/41",
+                                "http://seclists.org/fulldisclosure/2022/Oct/42",
                                 "http://www.openwall.com/lists/oss-security/2022/08/05/2",
                                 "http://www.openwall.com/lists/oss-security/2022/08/09/1",
                                 "https://github.com/curl/curl/issues/9271",
@@ -21872,12 +21899,13 @@
                                 "https://github.com/madler/zlib/commit/eff308af425b67093bab25f80f1ae950166bece1",
                                 "https://github.com/nodejs/node/blob/75b68c6e4db515f76df73af476eccf382bbcb00a/deps/zlib/inflate.c#L762-L764",
                                 "https://lists.debian.org/debian-lts-announce/2022/09/msg00012.html",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/JWN4VE3JQR4O2SOUS5TXNLANRPMHWV4I/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PAVPQNCG3XRLCLNSQRM3KAN5ZFMVXVTY/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/X5U7OTKZSHY2I3ZFJSR2SHFHW72RKGDK/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/JWN4VE3JQR4O2SOUS5TXNLANRPMHWV4I/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PAVPQNCG3XRLCLNSQRM3KAN5ZFMVXVTY/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/X5U7OTKZSHY2I3ZFJSR2SHFHW72RKGDK/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/",
                                 "https://security.netapp.com/advisory/ntap-20220901-0005/",
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
                                 "https://support.apple.com/kb/HT213488",
                                 "https://support.apple.com/kb/HT213489",
                                 "https://support.apple.com/kb/HT213490",
@@ -21966,7 +21994,8 @@
                                 "https://github.com/systemd/systemd/commit/9102c625a673a3246d7e73d8737f3494446bad4e",
                                 "https://github.com/systemd/systemd/issues/23928",
                                 "https://github.com/systemd/systemd/pull/23933",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RVBQC2VLSDVQAPJTEMTREXDL4HYLXG2P/"
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RVBQC2VLSDVQAPJTEMTREXDL4HYLXG2P/",
+                                "https://security.gentoo.org/glsa/202305-15"
                             ]
                         }
                     ],
@@ -22048,7 +22077,8 @@
                                 "https://github.com/systemd/systemd/commit/9102c625a673a3246d7e73d8737f3494446bad4e",
                                 "https://github.com/systemd/systemd/issues/23928",
                                 "https://github.com/systemd/systemd/pull/23933",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RVBQC2VLSDVQAPJTEMTREXDL4HYLXG2P/"
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RVBQC2VLSDVQAPJTEMTREXDL4HYLXG2P/",
+                                "https://security.gentoo.org/glsa/202305-15"
                             ]
                         }
                     ],
@@ -25990,7 +26020,7 @@
                         {
                             "cvss": null,
                             "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0215",
-                            "description": "The public API function BIO_new_NDEF is a helper function used for streaming ASN.1 data via a BIO. It is primarily used internally to OpenSSL to support the SMIME, CMS and PKCS7 streaming capabilities, but may also be called directly by end user applications. The function receives a BIO from the caller, prepends a new BIO_f_asn1 filter BIO onto the front of it to form a BIO chain, and then returns the new head of the BIO chain to the caller. Under certain conditions, for example if a CMS recipient public key is invalid, the new filter BIO is freed and the function returns a NULL result indicating a failure. However, in this case, the BIO chain is not properly cleaned up and the BIO passed by the caller still retains internal pointers to the previously freed filter BIO. If the caller then goes on to call BIO_pop() on the BIO then a use-after-free will occur. This will most likely result in a crash. This scenario occurs directly in the internal function B64_write_ASN1() which may cause BIO_new_NDEF() to be called and will subsequently call BIO_pop() on the BIO. This internal function is in turn called by the public API functions PEM_write_bio_ASN1_stream, PEM_write_bio_CMS_stream, PEM_write_bio_PKCS7_stream, SMIME_write_ASN1, SMIME_write_CMS and SMIME_write_PKCS7. Other public API functions that may be impacted by this include i2d_ASN1_bio_stream, BIO_new_CMS, BIO_new_PKCS7, i2d_CMS_bio_stream and i2d_PKCS7_bio_stream. The OpenSSL cms and smime command line applications are similarly affected.",
+                            "description": "The public API function BIO_new_NDEF is a helper function used for streaming\nASN.1 data via a BIO. It is primarily used internally to OpenSSL to support the\nSMIME, CMS and PKCS7 streaming capabilities, but may also be called directly by\nend user applications.\n\nThe function receives a BIO from the caller, prepends a new BIO_f_asn1 filter\nBIO onto the front of it to form a BIO chain, and then returns the new head of\nthe BIO chain to the caller. Under certain conditions, for example if a CMS\nrecipient public key is invalid, the new filter BIO is freed and the function\nreturns a NULL result indicating a failure. However, in this case, the BIO chain\nis not properly cleaned up and the BIO passed by the caller still retains\ninternal pointers to the previously freed filter BIO. If the caller then goes on\nto call BIO_pop() on the BIO then a use-after-free will occur. This will most\nlikely result in a crash.\n\n\n\nThis scenario occurs directly in the internal function B64_write_ASN1() which\nmay cause BIO_new_NDEF() to be called and will subsequently call BIO_pop() on\nthe BIO. This internal function is in turn called by the public API functions\nPEM_write_bio_ASN1_stream, PEM_write_bio_CMS_stream, PEM_write_bio_PKCS7_stream,\nSMIME_write_ASN1, SMIME_write_CMS and SMIME_write_PKCS7.\n\nOther public API functions that may be impacted by this include\ni2d_ASN1_bio_stream, BIO_new_CMS, BIO_new_PKCS7, i2d_CMS_bio_stream and\ni2d_PKCS7_bio_stream.\n\nThe OpenSSL cms and smime command line applications are similarly affected.\n\n\n\n",
                             "id": "CVE-2023-0215",
                             "namespace": "nvd:cpe",
                             "severity": "High",
@@ -25998,6 +26028,8 @@
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=8818064ce3c3c0f1b740a5aaba2a987e75bfbafd",
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=9816136fe31d92ace4037d5da5257f763aeeb4eb",
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=c3829dd8825c654652201e16f8a0a0c46ee3f344",
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://security.netapp.com/advisory/ntap-20230427-0009/",
                                 "https://www.openssl.org/news/secadv/20230207.txt"
                             ]
                         }
@@ -26059,7 +26091,7 @@
                         {
                             "cvss": null,
                             "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0215",
-                            "description": "The public API function BIO_new_NDEF is a helper function used for streaming ASN.1 data via a BIO. It is primarily used internally to OpenSSL to support the SMIME, CMS and PKCS7 streaming capabilities, but may also be called directly by end user applications. The function receives a BIO from the caller, prepends a new BIO_f_asn1 filter BIO onto the front of it to form a BIO chain, and then returns the new head of the BIO chain to the caller. Under certain conditions, for example if a CMS recipient public key is invalid, the new filter BIO is freed and the function returns a NULL result indicating a failure. However, in this case, the BIO chain is not properly cleaned up and the BIO passed by the caller still retains internal pointers to the previously freed filter BIO. If the caller then goes on to call BIO_pop() on the BIO then a use-after-free will occur. This will most likely result in a crash. This scenario occurs directly in the internal function B64_write_ASN1() which may cause BIO_new_NDEF() to be called and will subsequently call BIO_pop() on the BIO. This internal function is in turn called by the public API functions PEM_write_bio_ASN1_stream, PEM_write_bio_CMS_stream, PEM_write_bio_PKCS7_stream, SMIME_write_ASN1, SMIME_write_CMS and SMIME_write_PKCS7. Other public API functions that may be impacted by this include i2d_ASN1_bio_stream, BIO_new_CMS, BIO_new_PKCS7, i2d_CMS_bio_stream and i2d_PKCS7_bio_stream. The OpenSSL cms and smime command line applications are similarly affected.",
+                            "description": "The public API function BIO_new_NDEF is a helper function used for streaming\nASN.1 data via a BIO. It is primarily used internally to OpenSSL to support the\nSMIME, CMS and PKCS7 streaming capabilities, but may also be called directly by\nend user applications.\n\nThe function receives a BIO from the caller, prepends a new BIO_f_asn1 filter\nBIO onto the front of it to form a BIO chain, and then returns the new head of\nthe BIO chain to the caller. Under certain conditions, for example if a CMS\nrecipient public key is invalid, the new filter BIO is freed and the function\nreturns a NULL result indicating a failure. However, in this case, the BIO chain\nis not properly cleaned up and the BIO passed by the caller still retains\ninternal pointers to the previously freed filter BIO. If the caller then goes on\nto call BIO_pop() on the BIO then a use-after-free will occur. This will most\nlikely result in a crash.\n\n\n\nThis scenario occurs directly in the internal function B64_write_ASN1() which\nmay cause BIO_new_NDEF() to be called and will subsequently call BIO_pop() on\nthe BIO. This internal function is in turn called by the public API functions\nPEM_write_bio_ASN1_stream, PEM_write_bio_CMS_stream, PEM_write_bio_PKCS7_stream,\nSMIME_write_ASN1, SMIME_write_CMS and SMIME_write_PKCS7.\n\nOther public API functions that may be impacted by this include\ni2d_ASN1_bio_stream, BIO_new_CMS, BIO_new_PKCS7, i2d_CMS_bio_stream and\ni2d_PKCS7_bio_stream.\n\nThe OpenSSL cms and smime command line applications are similarly affected.\n\n\n\n",
                             "id": "CVE-2023-0215",
                             "namespace": "nvd:cpe",
                             "severity": "High",
@@ -26067,6 +26099,8 @@
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=8818064ce3c3c0f1b740a5aaba2a987e75bfbafd",
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=9816136fe31d92ace4037d5da5257f763aeeb4eb",
                                 "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=c3829dd8825c654652201e16f8a0a0c46ee3f344",
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://security.netapp.com/advisory/ntap-20230427-0009/",
                                 "https://www.openssl.org/news/secadv/20230207.txt"
                             ]
                         }
@@ -26347,7 +26381,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0464"
                             },
                             "matcher": "dpkg-matcher",
@@ -26386,8 +26420,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0464",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0464",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -26414,7 +26450,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0464"
                             },
                             "matcher": "dpkg-matcher",
@@ -26453,8 +26489,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0464",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0464",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -26485,7 +26523,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0465"
                             },
                             "matcher": "dpkg-matcher",
@@ -26525,8 +26563,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0465",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0465",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -26553,7 +26593,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0465"
                             },
                             "matcher": "dpkg-matcher",
@@ -26593,8 +26633,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0465",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0465",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -26625,7 +26667,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0466"
                             },
                             "matcher": "dpkg-matcher",
@@ -26665,8 +26707,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0466",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0466",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -26693,7 +26737,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 1.1.1f-1ubuntu2.18 (deb)",
                                 "vulnerabilityID": "CVE-2023-0466"
                             },
                             "matcher": "dpkg-matcher",
@@ -26733,8 +26777,10 @@
                         "cvss": null,
                         "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0466",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.1f-1ubuntu2.18"
+                            ]
                         },
                         "id": "CVE-2023-0466",
                         "namespace": "ubuntu:distro:ubuntu:20.04",
@@ -28656,6 +28702,1938 @@
                 {
                     "artifact": {
                         "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21911"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21911",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: InnoDB).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21911",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21911",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21911",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21911"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.31-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21912"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21912",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Security: Privileges).  Supported versions that are affected are 5.7.41 and prior and  8.0.30 and prior. Easily exploitable vulnerability allows unauthenticated attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 7.5 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21912",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21912",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.31-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21912",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21912"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.32-0buntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21913"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21913",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.31 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21913",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21913",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.32-0buntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21913",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21913"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.31-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21917"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21917",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.30 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21917",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21917",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.31-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21917",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21917"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21919"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21919",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: DDL).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21919",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21919",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21919",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21919"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21920"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21920",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21920",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21920",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21920",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21920"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21929"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21929",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: DDL).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server as well as  unauthorized update, insert or delete access to some of MySQL Server accessible data. CVSS 3.1 Base Score 5.5 (Integrity and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:H).",
+                            "id": "CVE-2023-21929",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21929",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21929",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21929"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21933"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21933",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: DDL).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21933",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21933",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21933",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21933"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21935"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21935",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21935",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21935",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21935",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21935"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21940"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21940",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Components Services).  Supported versions that are affected are 8.0.32 and prior. Difficult to exploit vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.4 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21940",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21940",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21940",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21940"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21945"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21945",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21945",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21945",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21945",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21945"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21946"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21946",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows low privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 6.5 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21946",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21946",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21946",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21946"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21947"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21947",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Components Services).  Supported versions that are affected are 8.0.32 and prior. Difficult to exploit vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.4 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21947",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21947",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21947",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21947"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21953"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21953",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Partition).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21953",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21953",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21953",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21953"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21955"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21955",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Partition).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21955",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21955",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21955",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21955"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21962"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21962",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Components Services).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21962",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21962",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21962",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21962"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.32-0buntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21963"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21963",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Connection Handling).  Supported versions that are affected are 5.7.40 and prior and  8.0.31 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a partial denial of service (partial DOS) of MySQL Server. CVSS 3.1 Base Score 2.7 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:L).",
+                            "id": "CVE-2023-21963",
+                            "namespace": "nvd:cpe",
+                            "severity": "Low",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21963",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.32-0buntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21963",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21963"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21966"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21966",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: JSON).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21966",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21966",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21966",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21966"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21972"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21972",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: DML).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21972",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21972",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21972",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21972"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21976"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21976",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21976",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21976",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21976",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21976"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21977"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21977",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21977",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21977",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21977",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21977"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21980"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21980",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Client programs).  Supported versions that are affected are 5.7.41 and prior and  8.0.32 and prior. Difficult to exploit vulnerability allows low privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks require human interaction from a person other than the attacker. Successful attacks of this vulnerability can result in takeover of MySQL Server. CVSS 3.1 Base Score 7.1 (Confidentiality, Integrity and Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:H/I:H/A:H).",
+                            "id": "CVE-2023-21980",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21980",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21980",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21980"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libmysqlclient21:libmysqlclient21:8.0.27-0ubuntu0.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Artistic",
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "LicenseRef-BSD-like",
+                            "LicenseRef-Boost-1.0",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "ISC",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LicenseRef-public-domain",
+                            "LicenseRef-zlib-libpng"
+                        ],
+                        "locations": null,
+                        "name": "libmysqlclient21",
+                        "purl": "pkg:deb/ubuntu/libmysqlclient21@8.0.27-0ubuntu0.20.04.1?arch=amd64\u0026upstream=mysql-8.0\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "mysql-8.0"
+                            }
+                        ],
+                        "version": "8.0.27-0ubuntu0.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 8.0.33-0ubuntu0.20.04.1 (deb)",
+                                "vulnerabilityID": "CVE-2023-21982"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "mysql-8.0",
+                                    "version": "8.0.27-0ubuntu0.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-21982",
+                            "description": "Vulnerability in the MySQL Server product of Oracle MySQL (component: Server: Optimizer).  Supported versions that are affected are 8.0.32 and prior. Easily exploitable vulnerability allows high privileged attacker with network access via multiple protocols to compromise MySQL Server.  Successful attacks of this vulnerability can result in unauthorized ability to cause a hang or frequently repeatable crash (complete DOS) of MySQL Server. CVSS 3.1 Base Score 4.9 (Availability impacts).  CVSS Vector: (CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H).",
+                            "id": "CVE-2023-21982",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://www.oracle.com/security-alerts/cpuapr2023.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21982",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "8.0.33-0ubuntu0.20.04.1"
+                            ]
+                        },
+                        "id": "CVE-2023-21982",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-21982"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
                             "cpe:2.3:a:libsystemd0:libsystemd0:245.4-4ubuntu3.14:*:*:*:*:*:*:*"
                         ],
                         "language": "",
@@ -28712,7 +30690,8 @@
                                 "https://blog.compass-security.com/2012/10/dangerous-sudoers-entries-part-2-insecure-functionality/",
                                 "https://github.com/systemd/systemd/blob/main/NEWS#L4335-L4340",
                                 "https://lists.debian.org/debian-lts-announce/2023/03/msg00032.html",
-                                "https://medium.com/@zenmoviefornotification/saidov-maxim-cve-2023-26604-c1232a526ba7"
+                                "https://medium.com/@zenmoviefornotification/saidov-maxim-cve-2023-26604-c1232a526ba7",
+                                "https://security.netapp.com/advisory/ntap-20230505-0009/"
                             ]
                         }
                     ],
@@ -28791,7 +30770,8 @@
                                 "https://blog.compass-security.com/2012/10/dangerous-sudoers-entries-part-2-insecure-functionality/",
                                 "https://github.com/systemd/systemd/blob/main/NEWS#L4335-L4340",
                                 "https://lists.debian.org/debian-lts-announce/2023/03/msg00032.html",
-                                "https://medium.com/@zenmoviefornotification/saidov-maxim-cve-2023-26604-c1232a526ba7"
+                                "https://medium.com/@zenmoviefornotification/saidov-maxim-cve-2023-26604-c1232a526ba7",
+                                "https://security.netapp.com/advisory/ntap-20230505-0009/"
                             ]
                         }
                     ],
@@ -28808,6 +30788,152 @@
                         "severity": "Low",
                         "urls": [
                             "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-26604"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:login:login:1:4.8.1-1ubuntu5.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only"
+                        ],
+                        "locations": null,
+                        "name": "login",
+                        "purl": "pkg:deb/ubuntu/login@1:4.8.1-1ubuntu5.20.04.1?arch=amd64\u0026upstream=shadow\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "shadow"
+                            }
+                        ],
+                        "version": "1:4.8.1-1ubuntu5.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-29383"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "shadow",
+                                    "version": "1:4.8.1-1ubuntu5.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-29383",
+                            "description": "In Shadow 4.13, it is possible to inject control characters into fields provided to the SUID program chfn (change finger). Although it is not possible to exploit this directly (e.g., adding a new user fails because \\n is in the block list), it is possible to misrepresent the /etc/passwd file when viewed. Use of \\r manipulations and Unicode characters to work around blocking of the : character make it possible to give the impression that a new user has been added. In other words, an adversary may be able to convince a system administrator to take the system offline (an indirect, social-engineered denial of service) by demonstrating that \"cat /etc/passwd\" shows a rogue user account.",
+                            "id": "CVE-2023-29383",
+                            "namespace": "nvd:cpe",
+                            "severity": "Low",
+                            "urls": [
+                                "https://github.com/shadow-maint/shadow/commit/e5905c4b84d4fb90aefcd96ee618411ebfac663d",
+                                "https://github.com/shadow-maint/shadow/pull/687",
+                                "https://www.trustwave.com/en-us/resources/blogs/spiderlabs-blog/cve-2023-29383-abusing-linux-chfn-to-misrepresent-etc-passwd/",
+                                "https://www.trustwave.com/en-us/resources/security-resources/security-advisories/?fid=31797"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-29383",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-29383",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-29383"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:passwd:passwd:1:4.8.1-1ubuntu5.20.04.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only"
+                        ],
+                        "locations": null,
+                        "name": "passwd",
+                        "purl": "pkg:deb/ubuntu/passwd@1:4.8.1-1ubuntu5.20.04.1?arch=amd64\u0026upstream=shadow\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "shadow"
+                            }
+                        ],
+                        "version": "1:4.8.1-1ubuntu5.20.04.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-29383"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "shadow",
+                                    "version": "1:4.8.1-1ubuntu5.20.04.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-29383",
+                            "description": "In Shadow 4.13, it is possible to inject control characters into fields provided to the SUID program chfn (change finger). Although it is not possible to exploit this directly (e.g., adding a new user fails because \\n is in the block list), it is possible to misrepresent the /etc/passwd file when viewed. Use of \\r manipulations and Unicode characters to work around blocking of the : character make it possible to give the impression that a new user has been added. In other words, an adversary may be able to convince a system administrator to take the system offline (an indirect, social-engineered denial of service) by demonstrating that \"cat /etc/passwd\" shows a rogue user account.",
+                            "id": "CVE-2023-29383",
+                            "namespace": "nvd:cpe",
+                            "severity": "Low",
+                            "urls": [
+                                "https://github.com/shadow-maint/shadow/commit/e5905c4b84d4fb90aefcd96ee618411ebfac663d",
+                                "https://github.com/shadow-maint/shadow/pull/687",
+                                "https://www.trustwave.com/en-us/resources/blogs/spiderlabs-blog/cve-2023-29383-abusing-linux-chfn-to-misrepresent-etc-passwd/",
+                                "https://www.trustwave.com/en-us/resources/security-resources/security-advisories/?fid=31797"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-29383",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-29383",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-29383"
                         ]
                     }
                 },
@@ -29208,7 +31334,10 @@
                                 "https://gist.github.com/LiveOverflow/c937820b688922eb127fb760ce06dab9",
                                 "https://github.com/opencontainers/runc/issues/2197#issuecomment-1437617334",
                                 "https://github.com/opencontainers/runc/issues/3751",
-                                "https://lists.debian.org/debian-lts-announce/2023/03/msg00023.html"
+                                "https://lists.debian.org/debian-lts-announce/2023/03/msg00023.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/DHGVGGMKGZSJ7YO67TGGPFEHBYMS63VF/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/FYVE3GB4OG3BNT5DLQHYO4M5SXX33AQ5/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I6BF24VCZRFTYBTT3T7HDZUOTKOTNPLZ/"
                             ]
                         }
                     ],

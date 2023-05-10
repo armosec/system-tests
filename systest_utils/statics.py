@@ -51,6 +51,7 @@ SCAN_RESULT_IS_RCE_FIELD = "isRce"
 SCAN_RESULT_CONTAINER_SCAN_ID_FIELD = "containersScanID"
 SCAN_RESULT_SEVERITIES_STATS_FIELD = "severitiesStats"
 SCAN_RESULT_SEVERITY_FIELD = "severity"
+SCAN_RESULT_IMAGEHASH_FIELD = "imageHash"
 SCAN_RESULT_ERRORS_FIELD = "errors"
 SCAN_RESULT_STATUS_FIELD = "status"
 SCAN_RESULT_TOTAL_FIELD = 'total'
@@ -175,7 +176,7 @@ RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 
 
 #relevancy feature
-HELM_RELEVANCY_FEATURE="enableRelevancy"
+HELM_RELEVANCY_FEATURE="nodeAgent.enabled"
 FILTERED_CVES_KEY="withRelevancy"
 ALL_CVES_KEY="AllCVEs"
 
