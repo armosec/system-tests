@@ -110,6 +110,22 @@ class RelevantVulnerabilityScanningTests(object):
             name=inspect.currentframe().f_code.co_name,
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             test_obj=RelevancyEnabledLargeImage,
-            expected_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+            expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
             helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5}
+        )
+
+    @staticmethod
+    def relevancy_extra_large_image():
+        from tests_scripts.helm.relevant_cve import RelevancyEnabledExtraLargeImage
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            test_obj=RelevancyEnabledExtraLargeImage,
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+             expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
+            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms"}
         )
