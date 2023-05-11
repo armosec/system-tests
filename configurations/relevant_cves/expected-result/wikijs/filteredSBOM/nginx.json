@@ -1,10 +1,40 @@
 {
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3Filtered",
+    "metadata": {
+        "annotations": {
+        },
+        "creationTimestamp": "2023-05-10T16:56:55Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "nginx",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "nginx",
+            "kubescape.io/workload-namespace": "systest-ns-pfml"
+        },
+        "name": "314a64d46c380536261d4dcc71d75097f1a4584c7e81725050a3df3534d1078d",
+        "namespace": "kubescape",
+        "resourceVersion": "189",
+        "uid": "8e4b9a33-d7b5-4f72-825a-4c60ea8e95bd"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
             "SPDXID": "SPDXRef-DOCUMENT",
             "annotations": null,
             "comment": "",
             "creationInfo": {
                 "comment": "",
-                "created": "2023-04-17T09:05:15Z",
+                "created": "2023-05-10T13:41:18Z",
                 "creators": [
                     "Organization: Anchore, Inc",
                     "Tool: syft-v0.76.0",
@@ -15,7 +45,7 @@
             },
             "dataLicense": "CC0-1.0",
             "documentDescribes": null,
-            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/nginx@sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2-69f73d20-6336-4c9a-aeca-49e349880196",
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/nginx@sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2-3cea0564-c18c-44fb-bbad-869d40416e1a",
             "externalDocumentRefs": null,
             "files": [
                 {
@@ -1363,3 +1393,6 @@
             "snippets": null,
             "spdxVersion": "SPDX-2.3"
         }
+    },
+    "status": {}
+}

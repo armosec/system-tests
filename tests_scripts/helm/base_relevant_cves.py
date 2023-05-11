@@ -34,9 +34,16 @@ class BaseRelevantCves(BaseHelm):
     
     def get_files_from_SBOM(self, SBOM):
         files = []
-        for fileData in SBOM['files']:
-            files.append(fileData['fileName'])
+        if SBOM['spec']['spdx']['files'] is not None:
+            for fileData in SBOM['spec']['spdx']['files']:
+                files.append(fileData['fileName'])
         return files
+    
+    def get_annotations_from_SBOM(self, SBOM):
+        annotations = {}
+        for key, annotation in SBOM['metadata']['annotations'].items():
+            annotations[key] = annotation
+        return annotations
     
     def validate_expected_SBOM(self, SBOMs, expected_SBOM_paths):
         verified_SBOMs = 0
@@ -45,10 +52,16 @@ class BaseRelevantCves(BaseHelm):
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
-                if expected_SBOM_data['name'] in SBOM[1]['spec']['spdx']['name']:
+
+                if expected_SBOM_data['metadata']['name'] in SBOM[1]['metadata']['name']:
+                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
+                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                    for key, annotation in expected_SBOM_annotations.items():
+                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} in the SBOM in the storage is not as expected"
+                    
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
-                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1]['spec']['spdx'])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not has expected" 
+                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected" 
                     verified_SBOMs += 1
                     break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
@@ -62,6 +75,30 @@ class BaseRelevantCves(BaseHelm):
                 vuln = match['vulnerability']
                 cves.append(vuln['id'])
         return cves
+    
+    def validate_expected_filtered_SBOMs(self, SBOMs, expected_SBOM_paths,namespace):
+        verified_SBOMs = 0
+        for expected_SBOM in expected_SBOM_paths:
+            for SBOM in SBOMs:
+                with open(expected_SBOM[1], 'r') as content_file:
+                    content = content_file.read()
+                expected_SBOM_data = json.loads(content)
+                instanceID = SBOM[0]
+                if self.get_container_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_CONTAINER_LABEL]\
+                            and self.get_workload_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+
+                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
+                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                    for key, annotation in expected_SBOM_annotations.items():
+                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} in the SBOM in the storage is not as expected"
+                    
+                    expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
+                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected" 
+                    verified_SBOMs += 1
+                    break
+        assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
+
     
     def validate_expected_filtered_CVEs(self, CVEs, expected_CVEs_path,namespace):
         verified_CVEs = 0

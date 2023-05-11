@@ -1,0 +1,48 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+            "kubescape.io/status": "incomplete"
+        },
+        "creationTimestamp": "2023-05-10T10:30:56Z",
+        "labels": {
+            "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
+            "kubescape.io/image-name": "docker-io-library-redis"
+        },
+        "name": "92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+        "namespace": "kubescape",
+        "resourceVersion": "11",
+        "uid": "143ac773-c792-4e15-a198-868d57616a6b"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
+            "SPDXID": "SPDXRef-",
+            "annotations": null,
+            "comment": "",
+            "creationInfo": null,
+            "dataLicense": "",
+            "documentDescribes": null,
+            "documentNamespace": "",
+            "externalDocumentRefs": null,
+            "files": null,
+            "hasExtractedLicensingInfos": null,
+            "name": "",
+            "packages": null,
+            "relationships": null,
+            "snippets": null,
+            "spdxVersion": ""
+        }
+    },
+    "status": {}
+}

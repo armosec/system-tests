@@ -177,6 +177,7 @@ RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 
 #relevancy feature
 HELM_RELEVANCY_FEATURE="nodeAgent.enabled"
+HELM_MAX_IMAGE_SIZE = "kubevuln.config.maxImageSize" 
 FILTERED_CVES_KEY="withRelevancy"
 ALL_CVES_KEY="AllCVEs"
 
