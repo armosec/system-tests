@@ -1,0 +1,51 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3Filtered",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/status": "incomplete"
+        },
+        "creationTimestamp": "2023-05-11T13:21:26Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "redis",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "redis-sleep",
+            "kubescape.io/workload-namespace": "systest-ns-etip"
+        },
+        "name": "6e4088e1e32698027dedd240a585b90fe8119a6f21800c6c0cbce71b3429a018",
+        "namespace": "kubescape",
+        "resourceVersion": "33",
+        "uid": "3130143e-e0ac-4199-a06d-ceaaef6f207e"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
+            "SPDXID": "SPDXRef-",
+            "annotations": null,
+            "comment": "",
+            "creationInfo": null,
+            "dataLicense": "",
+            "documentDescribes": null,
+            "documentNamespace": "",
+            "externalDocumentRefs": null,
+            "files": [],
+            "hasExtractedLicensingInfos": null,
+            "name": "",
+            "packages": [],
+            "relationships": [],
+            "snippets": null,
+            "spdxVersion": ""
+        }
+    },
+    "status": {}
+}
