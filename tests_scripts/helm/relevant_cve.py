@@ -521,9 +521,7 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
         # P3 verify results in storage
-        # 3 test SBOM created as expected in the storage
         Logger.logger.info('Test SBOM was created in storage')
-        # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_workloads_images_hash(workload_objs))
         
@@ -587,9 +585,7 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
         # P3 verify results in storage
-        # 3 test SBOM created as expected in the storage
         Logger.logger.info('Test SBOM was created in storage')
-        # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_workloads_images_hash(workload_objs))
         
