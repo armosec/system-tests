@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: redis-fixed
+  name: redis-fixed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-fixed
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: redis-fixed
+    spec:
+      containers:
+      - image: rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96
+        imagePullPolicy: IfNotPresent
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: redis-data
