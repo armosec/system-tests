@@ -129,3 +129,19 @@ class RelevantVulnerabilityScanningTests(object):
              expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
             helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms"}
         )
+    
+    @staticmethod
+    def relevancy_storage_disabled():
+        from tests_scripts.helm.relevant_cve import RelevancyStorageDisabled
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
+            secret="wikijs.yaml",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
+            test_obj=RelevancyStorageDisabled,
+            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: False}
+        )
