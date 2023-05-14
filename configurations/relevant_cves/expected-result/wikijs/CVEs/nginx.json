@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2023-05-09T07:46:11Z",
+        "creationTimestamp": "2023-05-14T06:51:35Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-library-nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3f",
@@ -14,8 +14,8 @@
         },
         "name": "aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
         "namespace": "kubescape",
-        "resourceVersion": "113",
-        "uid": "492689ec-4e82-4d07-9456-8e0c31b36139"
+        "resourceVersion": "68",
+        "uid": "ea9bcbb3-ffb8-4618-bc78-219097874a72"
     },
     "spec": {
         "metadata": {
@@ -23,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                "databaseVersion": "sha256:55cc4c156ab24a5895c8791730147ad6afc0bb152c268de8f7d68e63d338c482",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -32,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-05-09T01:29:44Z",
-                    "checksum": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                    "built": "2023-05-14T01:32:43Z",
+                    "checksum": "sha256:55cc4c156ab24a5895c8791730147ad6afc0bb152c268de8f7d68e63d338c482",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5
@@ -11259,6 +11259,78 @@
                         "severity": "High",
                         "urls": [
                             "https://security-tracker.debian.org/tracker/CVE-2023-29491"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Hylafax"
+                        ],
+                        "locations": null,
+                        "name": "libtiff5",
+                        "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64\u0026upstream=tiff\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "tiff"
+                            }
+                        ],
+                        "version": "4.2.0-1+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-30086"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "tiff",
+                                    "version": "4.2.0-1+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-30086",
+                            "description": "Buffer Overflow vulnerability found in Libtiff V.4.0.7 allows a local attacker to cause a denial of service via the tiffcp function in tiffcp.c.",
+                            "id": "CVE-2023-30086",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "http://libtiff-release-v4-0-7.com",
+                                "http://tiffcp.com",
+                                "https://gitlab.com/libtiff/libtiff/-/issues/538"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-30086",
+                        "description": "Buffer Overflow vulnerability found in Libtiff V.4.0.7 allows a local attacker to cause a denial of service via the tiffcp function in tiffcp.c.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-30086",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-30086"
                         ]
                     }
                 },

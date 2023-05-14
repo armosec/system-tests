@@ -338,7 +338,6 @@ class RelevancyDisabled(BaseRelevantCves):
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
-        Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
 
@@ -385,6 +384,7 @@ class RelevancyDisabled(BaseRelevantCves):
         be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
                                              namespace=namespace, since_time=since_time,
                                              expected_results=expected_number_of_pods)
+        
         Logger.logger.info('Test no errors in scan result')
         self.test_no_errors_in_scan_result(be_summary)
 
