@@ -339,6 +339,41 @@ class BaseRelevantCves(BaseHelm):
         assert not failed_CVEs_path, 'Expect the data from backend would be the same as storage CVE results.\n' \
         f'in the following entries is happened:\n{failed_CVEs_path}'
 
+    def test_be_summary(self, be_summary):
+
+        workload_identifiers = []
+        customer_guid = be_summary[0]['designators']['attributes']['customerGUID']
+
+        # check that same workload doesn't appear more than once
+        for summary in be_summary:
+            workload_identifier = f"{summary['wlid']}/{summary['designators']['attributes']['containerName']}/{summary['registry']}/{summary['imageTag']}"
+          
+            assert workload_identifier not in workload_identifiers , f"Expect to receive unique workload identifier, but received {workload_identifier} twice"
+
+            workload_identifiers.append(workload_identifier)
+
+        # check filters with wlid,  namespace, container, registry, tag, relevantLabel
+        fields_to_check = [ 'namespace', 'wlid', 'containerName', 'registry', 'imageTag', 'relevantLabel']
+        for field in fields_to_check:
+            resp = self.backend.get_unique_values_for_field_scan_summary(field=field, customer_guid=customer_guid)
+            resp = resp.json()
+            resp_for_field = resp['fields'][field]
+            if len(resp_for_field) > 1:
+                # first value is always empty (for all values)
+                value = resp_for_field[1]
+                resps = self.backend.get_summary_with_inner_filters(filter={field:value}, customer_guid=customer_guid)
+                objs_with_filter_count = 0
+                for obj in resp['fieldsCount'][field]:
+                    if obj['key'] == value:
+                        objs_with_filter_count = obj['count']
+                        break
+                objs_with_filter = resps.json()['response']
+                assert len(objs_with_filter) == objs_with_filter_count, f"Expect to receive {objs_with_filter_count} objects for {field} filter, but received {len(objs_with_filter)}"
+                for obj in objs_with_filter:
+                    assert obj[field] == value, f"Expect to receive {value} for {field} filter, but received {obj[field]}"
+
+            
+
     def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
 
         start = time.time()
@@ -363,6 +398,9 @@ class BaseRelevantCves(BaseHelm):
         if not success:
             raise Exception(
                 f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
+
+        Logger.logger.info('Test backend summary')
+        self.test_be_summary(be_summary)
 
         Logger.logger.info('Test backend results_details against results_sum_summary')
         self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
