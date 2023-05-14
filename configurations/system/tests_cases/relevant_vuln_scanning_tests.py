@@ -145,3 +145,21 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyStorageDisabled,
             helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: False}
         )
+    
+    @staticmethod
+    def relevancy_fix_vuln():
+        from tests_scripts.helm.relevant_cve import RelevancyFixVuln
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis"),
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis-fixed.json")],
+            expected_CVEs=[("redis", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis-fixed.json")],
+            expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis-fixed.json")],
+            expected_filtered_CVEs = [("redis" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis-fixed.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-fixed.json",
+            test_obj=RelevancyFixVuln,
+            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms"}
+        )
