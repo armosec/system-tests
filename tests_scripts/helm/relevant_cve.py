@@ -548,6 +548,67 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
+
+class RelevancyEnabledLargeImage(BaseRelevantCves):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(RelevancyEnabledLargeImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                           kubernetes_obj=kubernetes_obj)
+        
+
+    def start(self):
+        # agenda:
+        # 1. install helm-chart with really small maxImageSize in kubevuln
+        # 2. apply workload
+        # 3. verify that an SBOM was created with an incomplete annotation
+        # 4. verify that SBOMp was created with an incomplete annotation
+        cluster, namespace = self.setup(apply_services=False)
+
+        # P1 install helm-chart (armo)
+        # 1.1 add and update armo in repo
+        Logger.logger.info('install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
+
+        # 1.2 install armo helm-chart
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
+        # P2 apply workloads
+        Logger.logger.info('apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
+
+        # P3 verify results in storage
+        Logger.logger.info('Test SBOM was created in storage')
+        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+                                        SBOMKeys=self.get_workloads_images_hash(workload_objs))
+        
+
+        Logger.logger.info('Validate SBOM was created with expected data')
+        self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
+
+        Logger.logger.info('Get SBOMsp from storage')  
+        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+                                               filteredSBOMKeys=self.get_instance_IDs(
+                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
+                                                                                                     namespace=namespace),
+                                                   namespace=namespace))
+
+        Logger.logger.info('Validate SBOMsp was created with expected data')
+        self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
+
+        Logger.logger.info('delete armo namespace')
+        self.uninstall_armo_helm_chart()
+        TestUtil.sleep(150, "Waiting for aggregation to end")
+
+        Logger.logger.info("Deleting cluster from backend")
+        self.delete_cluster_from_backend_and_tested()
+        self.test_cluster_deleted(since_time=since_time)
+
+        return self.cleanup()
     
 
 
@@ -606,6 +667,63 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
+        TestUtil.sleep(150, "Waiting for aggregation to end")
+
+        Logger.logger.info("Deleting cluster from backend")
+        self.delete_cluster_from_backend_and_tested()
+        self.test_cluster_deleted(since_time=since_time)
+
+        return self.cleanup()
+
+class RelevancyStorageDisabled(BaseRelevantCves):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(RelevancyStorageDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                           kubernetes_obj=kubernetes_obj)
+        
+
+    def start(self):
+        # agenda:
+        # 1. install helm-chart with really small timeout in kubevuln
+        # 2. apply workload
+        # 3. verify that an SBOM was created with an incomplete annotation
+        # 4. verify that SBOMp was created with an incomplete annotation
+        cluster, namespace = self.setup(apply_services=False)
+
+        # P1 install helm-chart (armo)
+        # 1.1 add and update armo in repo
+        # Logger.logger.info('install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
+
+        # 1.2 install armo helm-chart
+        # self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
+        # P2 apply workloads
+        Logger.logger.info('apply services')
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+        Logger.logger.info('apply config-maps')
+        self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+        Logger.logger.info('apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
+
+        Logger.logger.info('Get the scan result from Backend')
+        expected_number_of_pods = self.get_expected_number_of_pods(
+            namespace=namespace)
+        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+                                             namespace=namespace, since_time=since_time,
+                                             expected_results=expected_number_of_pods)
+        # P4 check result
+        # 4.1 check results (> from expected result)
+        Logger.logger.info('Test no errors in results')
+        self.test_no_errors_in_scan_result(be_summary)
+
+        Logger.logger.info('delete armo namespace')
+        # self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
