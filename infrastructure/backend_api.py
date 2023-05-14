@@ -303,11 +303,11 @@ class ControlPanelAPI(object):
         assert res.status_code == client.CREATED, f"stripe billing portal failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
 
-    def stripe_checkout(self, priceID: str) -> requests.Response:
+    def stripe_checkout(self, priceID: str, qauntity: int) -> requests.Response:
         """
             Creates a stripe checkout url for the selected tenant.
         """
-        res = self.post(API_STRIPE_CHECKOUT, json={"priceID": priceID},)
+        res = self.post(API_STRIPE_CHECKOUT, json={"priceID": priceID, "quantity": qauntity},)
         assert res.status_code == client.CREATED, f"stripe checkout failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
     
@@ -320,7 +320,7 @@ class ControlPanelAPI(object):
         return res
 
     
-    def create_subscription(self, priceID: str, stripeCustomerID: str, tenantID: str)-> requests.Response:
+    def create_subscription(self, priceID: str, stripeCustomerID: str, quantity: int, tenantID: str)-> requests.Response:
         """
             Creates a subscription for a tenant.
 
@@ -336,7 +336,8 @@ class ControlPanelAPI(object):
             json={
                 "priceID": priceID,
                 "stripeCustomerID": stripeCustomerID,
-                "tenantID": tenantID
+                "tenantID": tenantID,
+                "quantity": quantity,
             },
         )
         assert res.status_code == client.OK, f"stripe create subscription failed with priceID: {priceID}, response.text: {res.text}"
@@ -1120,7 +1121,7 @@ class ControlPanelAPI(object):
                                  "attributes": {"cluster": cluster_name, "containerName": conatiner_name,
                                                 "kind": "deployment", "name": "nginx", "namespace": namespace}}],
                 "vulnerabilities": vulnerabilities}
-        r = self.post(url=API_VULNERABILITYEXCEPTIONPOLICY, params=params, data=json.dumps(body))
+        r = self.post(API_VULNERABILITYEXCEPTIONPOLICY, params=params, data=json.dumps(body))
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: set cves exceptions "%s" (code: %d, message: %s)' % (
