@@ -115,7 +115,7 @@ class ScanComplianceScore(BaseKubescape):
         Logger.logger.info("Testing results in frameworks")
         self.test_frameworks_compliance_score(report=result)
 
-        TestUtil.sleep(10, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(30, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         # get first framework name from policy_name, until first ','
