@@ -61,7 +61,7 @@ def skip_test(backend, test) {
 
 
 def generate_stage(platform, test, run_node, backend){
-    if skip_test(backend, test) {
+    if (skip_test(backend, test)) {
         return "echo 'skipping test ${test}'"
     }
 
