@@ -9,12 +9,20 @@ def tests = ["stripe_plans":                                                    
              "stripe_billing_portal":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
-def skip_tests = ["production": 
-                                [
-                                "stripe_webhook", 
-                                "stripe_billing_portal"
-                                ]
-                ]
+
+skip_tests = ["production": 
+                            [
+                            "stripe_webhook", 
+                            "stripe_billing_portal"
+                            ]
+            ]
+
+def skip_test(backend, test) {
+    if (skip_tests == null || skip_tests.size() == 0 ||  !skip_tests.containsKey(backend)){
+        return false
+    }
+    return skip_tests[backend].contains(test)
+}    
 
 def parallelStagesMap = tests.collectEntries {
     ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}")]
@@ -51,13 +59,6 @@ pipeline {
     } //stages
 } //pipeline
 
-
-def skip_test(backend, test) {
-    if (!${skip_tests}.containsKey(backend)) {
-        return false
-    }
-    return ${skip_tests}[backend].contains(test)
-}    
 
 
 def generate_stage(platform, test, run_node, backend){
