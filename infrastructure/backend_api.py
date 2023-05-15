@@ -92,7 +92,11 @@ def deco_cookie(func):
         if "params" not in kwargs:
             kwargs["params"] = {}
 
-        url = args[1]
+        url = args[1] if len(args) > 1 else kwargs.get("url", "")
+
+        if url == "":
+            raise Exception("In 'apply_cookie': No url was given")
+
         if "cookies" not in kwargs:
             if "/api/v1/admin/" in url:
                 kwargs["cookies"] = ControlPanelAPIObj.login_customer_cookie
