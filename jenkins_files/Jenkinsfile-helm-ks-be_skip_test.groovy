@@ -53,14 +53,15 @@ pipeline {
 
 
 def skip_test(backend, test) {
-    if (!skip_tests.containsKey(backend)) {
+    if (!${skip_tests}.containsKey(backend)) {
         return false
     }
-    return skip_tests[backend].contains(test)
+    return ${skip_tests}[backend].contains(test)
 }    
 
 
 def generate_stage(platform, test, run_node, backend){
+    
     if (skip_test(backend, test)) {
         return "echo 'skipping test ${test}'"
     }
