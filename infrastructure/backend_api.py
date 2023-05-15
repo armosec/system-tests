@@ -1262,11 +1262,15 @@ class ControlPanelAPI(object):
         return r.json()['total']['value']
 
     def get_scan_results_sum_summary_CSV(self, namespace: str, expected_results: int,
-                                         cluster_name: str = None):
+                                         cluster_name: str = None, severity: str = None, fixable: bool = False):
         Logger.logger.debug("Load csv scan_results_sum_summary %s ", namespace)
         ws = self.ws_export_open("/ws/v1/vulnerability/scanResultsSumSummary")
 
         message = {"innerFilters": [{'cluster': cluster_name, 'namespace': namespace}]}
+        if severity is not None:
+            message['innerFilters'][0]['severitiesStats.severity'] = severity  
+        if fixable:
+            message['innerFilters'][0]['severitiesStats.fixedTotal'] = "1|greater"     
         self.ws_send(ws, json.dumps(message))
         result = self.ws_extract_receive(ws)
 
