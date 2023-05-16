@@ -18,7 +18,7 @@ def tests_to_skip = ["production":
             ]
 
 def parallelStagesMap = tests.collectEntries {
-    skip = (tests_to_skip.size() != 0 && tests_to_skip.containsKey(backend) && tests_to_skip[backend].contains(it.key))
+    skip = (tests_to_skip.containsKey(backend) && tests_to_skip[backend].contains(it.key))
     ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", skip)]
 }
 
@@ -57,7 +57,7 @@ pipeline {
 
 def generate_stage(platform, test, run_node, backend, skip=false){
     
-    if (skip == true) {
+    if ("${skip}" == true) {
         return "echo 'skipping test ${test}'"
     }
 
