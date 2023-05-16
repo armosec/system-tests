@@ -57,7 +57,7 @@ pipeline {
 
 def generate_stage(platform, test, run_node, backend, skip=false){
     
-    if (skip) {
+    if (skip == true) {
         return "echo 'skipping test ${test}'"
     }
 
