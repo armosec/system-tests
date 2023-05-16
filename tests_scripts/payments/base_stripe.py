@@ -10,7 +10,7 @@ from time import sleep
 
 from tests_scripts.payments.base_payment import *
 
-WEBHOOK_TIMEOUT = 5
+WEBHOOK_TIMEOUT = 3
 WEBHOOK_SLEEP_INTERVAL = 1
 
 
@@ -49,8 +49,8 @@ class BaseStripe(BasePayment):
         return self.backend.get_tenant_details(tenant_id)
     
 
-    def create_subscription(self, priceID: str, stripeCustomerID :str, quantity:int, tenantID: str) -> requests.Response:
-        response = self.backend.create_subscription(priceID, stripeCustomerID, quantity, tenantID)
+    def create_subscription(self, priceID: str, stripeCustomerID :str, tenantID: str) -> requests.Response:
+        response = self.backend.create_subscription(priceID, stripeCustomerID, tenantID)
 
         Logger.logger.info(f"Subscription created successfully for tenantID: {tenantID} with priceID: {priceID}")
 
@@ -94,8 +94,7 @@ class BaseStripe(BasePayment):
 
 
     def stripe_checkout(self,priceID) -> requests.Response:
-        quantity = 5
-        return self.backend.stripe_checkout(priceID, quantity)
+        return self.backend.stripe_checkout(priceID)
 
     def stripe_billing_portal(self) -> requests.Response:
         return self.backend.stripe_billing_portal()

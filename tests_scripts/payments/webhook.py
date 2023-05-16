@@ -20,10 +20,9 @@ class StripeWebhook(BaseStripe):
 
     def start(self):
         test_tenant_id = self.create_new_tenant()
-        quantity = 5
 
         Logger.logger.info("Stage 1: create a subscription")
-        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, test_tenant_id)
+        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, test_tenant_id)
 
         Logger.logger.info("Stage 2: cancel a subscription")
         response = self.cancel_subscription(test_tenant_id)
