@@ -11,12 +11,11 @@ class Portal(BaseStripe):
         super(Portal, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
-        quantity = 5
         Logger.logger.info("Create new tenant")
         test_tenant_id = self.create_new_tenant()
 
         Logger.logger.info("Stage 1: create a subscription")
-        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, test_tenant_id)
+        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, test_tenant_id)
 
         Logger.logger.info("Stage 2: Get billing portal URL")
         response = self.stripe_billing_portal()
