@@ -10,22 +10,23 @@ def tests = ["stripe_plans":                                                    
              ]
 
 
-skip_tests = ["production": 
+def tests_to_skip = ["production": 
                             [
                             "stripe_webhook", 
                             "stripe_billing_portal"
                             ]
             ]
 
-def skip_test(backend, test) {
-    if (skip_tests == null || skip_tests.size() == 0 ||  !skip_tests.containsKey(backend)){
-        return false
-    }
-    return skip_tests[backend].contains(test)
-}    
+// def skip_test(backend, test) {
+//     if (skip_tests == null || skip_tests.size() == 0 || !skip_tests.containsKey(backend)){
+//         return false
+//     }
+//     return skip_tests[backend].contains(test)
+// }    
 
 def parallelStagesMap = tests.collectEntries {
-    ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}")]
+    skip = (tests_to_skip.size() != 0 && tests_to_skip.containsKey("${backend}") && tests_to_skip["${backend}"].contains("${it.key}"))
+    ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}"), skip]
 }
 
 pipeline {
@@ -61,9 +62,9 @@ pipeline {
 
 
 
-def generate_stage(platform, test, run_node, backend){
+def generate_stage(platform, test, run_node, backend, skip=false){
     
-    if (skip_test(backend, test)) {
+    if (skip) {
         return "echo 'skipping test ${test}'"
     }
 
