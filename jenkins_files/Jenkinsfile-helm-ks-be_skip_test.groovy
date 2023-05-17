@@ -19,7 +19,7 @@ def tests_to_skip = ["production":
 
 def parallelStagesMap = tests.collectEntries {
     if (tests_to_skip.containsKey("${backend}".toString()) && tests_to_skip["${backend}".toString()].contains(it.key))
-        ["${it.key} (skiped)" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", true)]
+        ["${it.key} (skipped)" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", true)]
     else 
         ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", false)]
 }
