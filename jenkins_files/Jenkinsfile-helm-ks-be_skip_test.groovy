@@ -59,17 +59,20 @@ pipeline {
 
 def generate_stage(platform, test, run_node, backend, boolean skip){
     
-    if (skip == true) {
-        return {
-            stage("skipping test: ${test}") {
-                echo "skipping test ${test}"
-            } //stage
-        }
-    }
+    // if (skip == true) {
+    //     return {
+    //         stage("skipping test: ${test}") {
+    //             echo "skipping test ${test}"
+    //         } //stage
+    //     }
+    // }
 
     if ("${platform}" == 'k8s'){
         return {
             stage("${test}") {
+                when {
+                    expression { skip == false; }
+                }
                 node("${run_node}"){
                     env.CA_IGNORE_VERIFY_CACLI = "true"
                     unstash 'test-workspace'
