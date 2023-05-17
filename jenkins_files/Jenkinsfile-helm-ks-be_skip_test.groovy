@@ -19,9 +19,9 @@ def tests_to_skip = ["production":
 
 def parallelStagesMap = tests.collectEntries {
     if (tests_to_skip.containsKey("${backend}".toString()) && tests_to_skip["${backend}".toString()].contains(it.key))
-        ["${it.key} (skipped)" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", true)]
+        ["${it.key} (skipped)" : skip_stage(it.value[1], it.key, it.value[0], "${backend}")]
     else 
-        ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", false)]
+        ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}")]
 }
 
 pipeline {
@@ -56,8 +56,17 @@ pipeline {
 } //pipeline
 
 
+def skip_stage(platform, test, run_node, backend){
+        return {
+            stage("${test}") {
+                echo "skipping test ${test}"
+            } //stage
+        }
+    }
 
-def generate_stage(platform, test, run_node, backend, boolean skip){
+
+
+def generate_stage(platform, test, run_node, backend){
     
     if (skip == true) {
         return {
@@ -70,11 +79,6 @@ def generate_stage(platform, test, run_node, backend, boolean skip){
     if ("${platform}" == 'k8s'){
         return {
             stage("${test}") {
-                when {
-                    expression {
-                        skip == false;
-                    }
-                }
                 node("${run_node}"){
                     env.CA_IGNORE_VERIFY_CACLI = "true"
                     unstash 'test-workspace'
