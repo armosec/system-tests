@@ -71,7 +71,9 @@ def generate_stage(platform, test, run_node, backend, boolean skip){
         return {
             stage("${test}") {
                 when {
-                    expression { skip == false }
+                    expression {
+                        skip == false;
+                    }
                 }
                 node("${run_node}"){
                     env.CA_IGNORE_VERIFY_CACLI = "true"
