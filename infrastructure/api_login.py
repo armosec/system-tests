@@ -27,7 +27,7 @@ class APILogin(object):
             headers = {'Authorization': f'Bearer: {auth}' if 'bearer' not in auth.lower() else ' '.join(findall('[a-zA-Z0-9._\- ]+', auth))}
         else:   
             headers = {'Authorization': f'Bearer: {auth}'}
-
+            
         response =  self.session.post(f'{base_url}{API_OPENID_CUSTOMERS}',headers= headers, json=data)
         assert response.status_code == 200, f"getCookie failed for customer_guid {customer_guid}: {response.text}, status: {response.status_code}"
         return response.cookies
@@ -42,6 +42,15 @@ class FrontEggSecretAPILogin(APILogin):
                 "clientId": f"{client_id}",
                 "secret": f"{secret_key}"
         }
+
+        # frontEgg user id retrievd from auth
+        self.frontEgg_user_id = None
+
+        # frontEgg auth token retrieved from initial authenticaion
+        self.frontEgg_auth = None
+
+        # frontEgg auth token with fixed user_id in sub
+        self.frontEgg_auth_user_id = None
 
 
     def decode_jwt(self, token: str):
@@ -64,8 +73,23 @@ class FrontEggSecretAPILogin(APILogin):
         assert response.status_code == 200, f"got error: {response.text}, status: {response.status_code}"
         json_res = response.json()
         customer_guid = json_res[0]["customerGUID"]
+        self.set_FrontEgg_auth_user_id(auth)
+        
         cookie = super().getCookie(self.base_url, auth, customer_guid)
-        return customer_guid, cookie, auth
+        return customer_guid, cookie, cookie["auth"]
+    
+    def set_FrontEgg_auth_user_id(self, auth):
+        self.frontEgg_auth = auth
+        decoded_auth = self.decode_jwt(auth)
+        self.frontEgg_user_id = decoded_auth["createdByUserId"]
+        decoded_auth["sub"] = self.frontEgg_user_id
+        self.frontEgg_auth_user_id = self.encode_jwt(decoded_auth)
+
+    def get_frontEgg_auth_user_id(self):
+        return self.frontEgg_auth_user_id
+
+    def get_frontEgg_user_id(self):
+        return self.frontEgg_user_id
     
     
 
@@ -164,6 +188,7 @@ class FrontEggUsernameAPILogin(APILogin):
     ONLY TESTED FOR LOCAL ENVIRONMENT WITH CUSTOMER GUID DEFINED IN AllowedAnyCustomer.
     """
     def __init__(self, server, customer, username, password, customer_guid):
+        super().__init__()
         self.customer = customer
         self.server = server
         self.username = username
@@ -172,8 +197,6 @@ class FrontEggUsernameAPILogin(APILogin):
         self.auth = None
 
     def login(self):
-        payload = {"email": self.username, "customer": self.customer, "password": self.password, "customerGUID": self.customer_guid}
-        res = requests.post(self.server + "/login", data=payload)
-        auth = {"Cookie" : "auth=" + res.cookies.get("auth")}
-        login_customer_cookie = res.cookies
-        return self.customer_guid, login_customer_cookie, auth
+        payload = {"email": self.username, "customer": self.customer, "password": self.password,  "customerGUID": self.customer_guid}
+        res = requests.post(self.server + "/login", json=payload)        
+        return res.json()["customerGuid"], res.cookies, res.cookies.get("auth")
