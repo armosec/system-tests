@@ -67,14 +67,6 @@ def skip_stage(platform, test, run_node, backend){
 
 
 def generate_stage(platform, test, run_node, backend){
-    
-    if (skip == true) {
-        return {
-            stage("${test}") {
-                echo "skipping test ${test}"
-            } //stage
-        }
-    }
 
     if ("${platform}" == 'k8s'){
         return {
