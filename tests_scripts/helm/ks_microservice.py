@@ -96,7 +96,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         Logger.logger.info("Get old report-guid")
         old_report_guid = self.get_report_guid(cluster_name=cluster_name, wait_to_result=True)
         TestUtil.sleep(120, "wait for namespace creation to finished")
-        pod_name = self.kubernetes_obj.get_pod_full_name(statics.CA_NAMESPACE_FROM_HELM_NAME, "kubescape")
+        pod_name = self.kubernetes_obj.get_kubescape_pod(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         self.port_forward_proc = self.kubernetes_obj.portforward(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                                  pod_name, 8080)
 
