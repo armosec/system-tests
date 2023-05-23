@@ -131,6 +131,12 @@ class KubectlWrapper(object):
             if partial_name in pod.metadata.name:
                 return pod.metadata.name
 
+    def get_kubescape_pod(self, namespace):
+        pods = self.client_CoreV1Api.list_namespaced_pod(namespace=namespace)
+        for pod in pods.items:
+            if 'app' in pod.metadata.labels and pod.metadata.labels['app'] == 'kubescape':
+                return pod.metadata.name
+
     def delete_namespace(self, namespace=str()):
         try:
             return self.client_CoreV1Api.delete_namespace(name=namespace)
