@@ -18,7 +18,9 @@ def tests = ["vulnerability_scanning":                                          
 //             "vulnerability_scanning_trigger_scan_registry_by_backend":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
 //             "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_triggering_with_cron_job":                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+             "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning_test_public_registry_connectivity_by_backend" :                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 def parallelStagesMap = tests.collectEntries {
