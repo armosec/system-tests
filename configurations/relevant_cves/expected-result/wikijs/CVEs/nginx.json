@@ -3,19 +3,19 @@
     "kind": "VulnerabilityManifest",
     "metadata": {
         "annotations": {
-            "kubescape.io/image-id": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
+            "kubescape.io/image-id": "nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2023-05-14T06:51:35Z",
+        "creationTimestamp": "2023-05-28T07:30:54Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
-            "kubescape.io/image-id": "docker-io-library-nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3f",
-            "kubescape.io/image-name": "docker-io-library-nginx"
+            "kubescape.io/image-id": "nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1",
+            "kubescape.io/image-name": "nginx"
         },
         "name": "aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
         "namespace": "kubescape",
-        "resourceVersion": "68",
-        "uid": "ea9bcbb3-ffb8-4618-bc78-219097874a72"
+        "resourceVersion": "37",
+        "uid": "0f269760-f16c-4427-8665-d34df82f60e7"
     },
     "spec": {
         "metadata": {
@@ -23,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:55cc4c156ab24a5895c8791730147ad6afc0bb152c268de8f7d68e63d338c482",
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -32,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-05-14T01:32:43Z",
-                    "checksum": "sha256:55cc4c156ab24a5895c8791730147ad6afc0bb152c268de8f7d68e63d338c482",
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5
@@ -7889,7 +7889,7 @@
                             "description": "GnuPG can be made to spin on a relatively small input by (for example) crafting a public key with thousands of signatures attached, compressed down to just a few KB.",
                             "id": "CVE-2022-3219",
                             "namespace": "nvd:cpe",
-                            "severity": "Medium",
+                            "severity": "Low",
                             "urls": [
                                 "https://access.redhat.com/security/cve/CVE-2022-3219",
                                 "https://bugzilla.redhat.com/show_bug.cgi?id=2127010",
@@ -9519,7 +9519,7 @@
                     "matchDetails": [
                         {
                             "found": {
-                                "versionConstraint": "none (deb)",
+                                "versionConstraint": "\u003c 0.6.1-2.1+deb11u1 (deb)",
                                 "vulnerabilityID": "CVE-2023-1999"
                             },
                             "matcher": "dpkg-matcher",
@@ -9539,12 +9539,19 @@
                     ],
                     "relatedVulnerabilities": null,
                     "vulnerability": {
-                        "advisories": null,
+                        "advisories": [
+                            {
+                                "id": "DSA-5408-1",
+                                "link": "https://security-tracker.debian.org/tracker/DSA-5408-1"
+                            }
+                        ],
                         "cvss": null,
                         "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-1999",
                         "fix": {
-                            "state": "not-fixed",
-                            "versions": []
+                            "state": "fixed",
+                            "versions": [
+                                "0.6.1-2.1+deb11u1"
+                            ]
                         },
                         "id": "CVE-2023-1999",
                         "namespace": "debian:distro:debian:11",
@@ -9614,26 +9621,10 @@
                         {
                             "cvss": null,
                             "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-2004",
-                            "description": "An integer overflow vulnerability was discovered in Freetype in tt_hvadvance_adjust() function in src/truetype/ttgxvar.c.",
+                            "description": "** REJECT ** DO NOT USE THIS CANDIDATE NUMBER. ConsultIDs: none. Reason: This candidate was withdrawn by its CNA. Further investigation showed that it was not a security issue. Notes: none.",
                             "id": "CVE-2023-2004",
                             "namespace": "nvd:cpe",
-                            "severity": "High",
-                            "urls": [
-                                "https://access.redhat.com/security/cve/CVE-2023-2004",
-                                "https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=50462",
-                                "https://bugzilla.redhat.com/show_bug.cgi?id=2186428",
-                                "https://github.com/freetype/freetype/commit/e6fda039ad638866b7a6a5d046f03278ba1b7611",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/4AOSGAOPXLBK4A5ZRTVZ4M6QKVLSWMWG/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/ES2CDRHR2Y4WY6DNDIAPYZFXJU3ZBFAV/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/FEJZMAUB4XP44HSHEBDWEKFGA7DUHY42/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/IHHD6KNH4WLUE6JG6HRQZWNAJMHJ32X7/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/KDNGTGQAUZJ6YQDI2AVGYIFFPUMMZLKS/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NGWWGQULJ7QRNP4GY57HE7OO7VMRWMPN/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RJQI63HWZFL6M26Q6UOHKDY6LD2PFC5Z/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SFZWDF43D73C5KWFF26GIIVZJKEFPS3K/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SLO7BL2MHZYPY6O3OAEAQL3SKYMGGO6M/",
-                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VRSEIYMPWLVPGTC34N2Q3WAUHGGOWSWP/"
-                            ]
+                            "urls": []
                         }
                     ],
                     "vulnerability": {
@@ -9647,7 +9638,7 @@
                         },
                         "id": "CVE-2023-2004",
                         "namespace": "debian:distro:debian:11",
-                        "severity": "High",
+                        "severity": "Unknown",
                         "urls": [
                             "https://security-tracker.debian.org/tracker/CVE-2023-2004"
                         ]
@@ -9956,6 +9947,80 @@
                 {
                     "artifact": {
                         "cpes": [
+                            "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "LicenseRef-Hylafax"
+                        ],
+                        "locations": null,
+                        "name": "libtiff5",
+                        "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64\u0026upstream=tiff\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "tiff"
+                            }
+                        ],
+                        "version": "4.2.0-1+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-2731"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "tiff",
+                                    "version": "4.2.0-1+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-2731",
+                            "description": "A NULL pointer dereference flaw was found in Libtiff's LZWDecode() function in the libtiff/tif_lzw.c file. This flaw allows a local attacker to craft specific input data that can cause the program to dereference a NULL pointer when decompressing a TIFF format file, resulting in a program crash or denial of service.",
+                            "id": "CVE-2023-2731",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://access.redhat.com/security/cve/CVE-2023-2731",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2207635",
+                                "https://github.com/libsdl-org/libtiff/commit/9be22b639ea69e102d3847dca4c53ef025e9527b",
+                                "https://gitlab.com/libtiff/libtiff/-/issues/548"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-2731",
+                        "description": "A NULL pointer dereference flaw was found in Libtiff's LZWDecode() function in the libtiff/tif_lzw.c file. This flaw allows a local attacker to craft specific input data that can cause the program to dereference a NULL pointer when decompressing a TIFF format file, resulting in a program crash or denial of service.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-2731",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-2731"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
                             "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
                         ],
                         "language": "",
@@ -10716,6 +10781,438 @@
                         "severity": "Medium",
                         "urls": [
                             "https://security-tracker.debian.org/tracker/CVE-2023-27538"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "curl",
+                        "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28320"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28320",
+                            "description": "A denial of service vulnerability exists in curl \u003cv8.1.0 in the way libcurl provides several different backends for resolving host names, selected at build time. If it is built to use the synchronous resolver, it allows name resolves to time-out slow operations using `alarm()` and `siglongjmp()`. When doing this, libcurl used a global buffer that was not mutex protected and a multi-threaded application might therefore crash or otherwise misbehave.",
+                            "id": "CVE-2023-28320",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1929597"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28320",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28320",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28320"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "libcurl4",
+                        "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64\u0026upstream=curl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "curl"
+                            }
+                        ],
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28320"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28320",
+                            "description": "A denial of service vulnerability exists in curl \u003cv8.1.0 in the way libcurl provides several different backends for resolving host names, selected at build time. If it is built to use the synchronous resolver, it allows name resolves to time-out slow operations using `alarm()` and `siglongjmp()`. When doing this, libcurl used a global buffer that was not mutex protected and a multi-threaded application might therefore crash or otherwise misbehave.",
+                            "id": "CVE-2023-28320",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1929597"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28320",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28320",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28320"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "curl",
+                        "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28321"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28321",
+                            "description": "An improper certificate validation vulnerability exists in curl \u003cv8.1.0 in the way it supports matching of wildcard patterns when listed as \"Subject Alternative Name\" in TLS server certificates. curl can be built to use its own name matching function for TLS rather than one provided by a TLS library. This private wildcard matching function would match IDN (International Domain Name) hosts incorrectly and could as a result accept patterns that otherwise should mismatch. IDN hostnames are converted to puny code before used for certificate checks. Puny coded names always start with `xn--` and should not be allowed to pattern match, but the wildcard check in curl could still check for `x*`, which would match even though the IDN name most likely contained nothing even resembling an `x`.",
+                            "id": "CVE-2023-28321",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1950627"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28321",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28321",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28321"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "libcurl4",
+                        "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64\u0026upstream=curl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "curl"
+                            }
+                        ],
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28321"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28321",
+                            "description": "An improper certificate validation vulnerability exists in curl \u003cv8.1.0 in the way it supports matching of wildcard patterns when listed as \"Subject Alternative Name\" in TLS server certificates. curl can be built to use its own name matching function for TLS rather than one provided by a TLS library. This private wildcard matching function would match IDN (International Domain Name) hosts incorrectly and could as a result accept patterns that otherwise should mismatch. IDN hostnames are converted to puny code before used for certificate checks. Puny coded names always start with `xn--` and should not be allowed to pattern match, but the wildcard check in curl could still check for `x*`, which would match even though the IDN name most likely contained nothing even resembling an `x`.",
+                            "id": "CVE-2023-28321",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1950627"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28321",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28321",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28321"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "curl",
+                        "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28322"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28322",
+                            "description": "An information disclosure vulnerability exists in curl \u003cv8.1.0 when doing HTTP(S) transfers, libcurl might erroneously use the read callback (`CURLOPT_READFUNCTION`) to ask for data to send, even when the `CURLOPT_POSTFIELDS` option has been set, if the same handle previously wasused to issue a `PUT` request which used that callback. This flaw may surprise the application and cause it to misbehave and either send off the wrong data or use memory after free or similar in the second transfer. The problem exists in the logic for a reused handle when it is (expected to be) changed from a PUT to a POST.",
+                            "id": "CVE-2023-28322",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1954658"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28322",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28322",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28322"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "ISC",
+                            "curl",
+                            "LicenseRef-other",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "libcurl4",
+                        "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64\u0026upstream=curl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "curl"
+                            }
+                        ],
+                        "version": "7.74.0-1.3+deb11u7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-28322"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "curl",
+                                    "version": "7.74.0-1.3+deb11u7"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28322",
+                            "description": "An information disclosure vulnerability exists in curl \u003cv8.1.0 when doing HTTP(S) transfers, libcurl might erroneously use the read callback (`CURLOPT_READFUNCTION`) to ask for data to send, even when the `CURLOPT_POSTFIELDS` option has been set, if the same handle previously wasused to issue a `PUT` request which used that callback. This flaw may surprise the application and cause it to misbehave and either send off the wrong data or use memory after free or similar in the second transfer. The problem exists in the logic for a reused handle when it is (expected to be) changed from a PUT to a POST.",
+                            "id": "CVE-2023-28322",
+                            "namespace": "nvd:cpe",
+                            "urls": [
+                                "https://hackerone.com/reports/1954658"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-28322",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28322",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Unknown",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-28322"
                         ]
                     }
                 },
@@ -11076,6 +11573,7 @@
                                 "http://ncurses.scripts.mit.edu/?p=ncurses.git;a=commit;h=eb51b1ea1f75a0ec17c9c5937cb28df1e8eeec56",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/10",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/11",
+                                "https://security.netapp.com/advisory/ntap-20230517-0009/",
                                 "https://www.openwall.com/lists/oss-security/2023/04/12/5",
                                 "https://www.openwall.com/lists/oss-security/2023/04/13/4"
                             ]
@@ -11158,6 +11656,7 @@
                                 "http://ncurses.scripts.mit.edu/?p=ncurses.git;a=commit;h=eb51b1ea1f75a0ec17c9c5937cb28df1e8eeec56",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/10",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/11",
+                                "https://security.netapp.com/advisory/ntap-20230517-0009/",
                                 "https://www.openwall.com/lists/oss-security/2023/04/12/5",
                                 "https://www.openwall.com/lists/oss-security/2023/04/13/4"
                             ]
@@ -11240,6 +11739,7 @@
                                 "http://ncurses.scripts.mit.edu/?p=ncurses.git;a=commit;h=eb51b1ea1f75a0ec17c9c5937cb28df1e8eeec56",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/10",
                                 "http://www.openwall.com/lists/oss-security/2023/04/19/11",
+                                "https://security.netapp.com/advisory/ntap-20230517-0009/",
                                 "https://www.openwall.com/lists/oss-security/2023/04/12/5",
                                 "https://www.openwall.com/lists/oss-security/2023/04/13/4"
                             ]
@@ -11310,6 +11810,7 @@
                             "description": "Buffer Overflow vulnerability found in Libtiff V.4.0.7 allows a local attacker to cause a denial of service via the tiffcp function in tiffcp.c.",
                             "id": "CVE-2023-30086",
                             "namespace": "nvd:cpe",
+                            "severity": "Medium",
                             "urls": [
                                 "http://libtiff-release-v4-0-7.com",
                                 "http://tiffcp.com",
@@ -11328,7 +11829,7 @@
                         },
                         "id": "CVE-2023-30086",
                         "namespace": "debian:distro:debian:11",
-                        "severity": "Unknown",
+                        "severity": "Medium",
                         "urls": [
                             "https://security-tracker.debian.org/tracker/CVE-2023-30086"
                         ]
@@ -11375,18 +11876,33 @@
                             "type": "exact-indirect-match"
                         }
                     ],
-                    "relatedVulnerabilities": null,
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-30774",
+                            "description": "A vulnerability was found in the libtiff library. This flaw causes a heap buffer overflow issue via the TIFFTAG_INKNAMES and TIFFTAG_NUMBEROFINKS values.",
+                            "id": "CVE-2023-30774",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://access.redhat.com/security/cve/CVE-2023-30774",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2187139",
+                                "https://gitlab.com/libtiff/libtiff/-/issues/463"
+                            ]
+                        }
+                    ],
                     "vulnerability": {
                         "advisories": null,
                         "cvss": null,
                         "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-30774",
+                        "description": "A vulnerability was found in the libtiff library. This flaw causes a heap buffer overflow issue via the TIFFTAG_INKNAMES and TIFFTAG_NUMBEROFINKS values.",
                         "fix": {
                             "state": "wont-fix",
                             "versions": []
                         },
                         "id": "CVE-2023-30774",
                         "namespace": "debian:distro:debian:11",
-                        "severity": "Unknown",
+                        "severity": "Medium",
                         "urls": [
                             "https://security-tracker.debian.org/tracker/CVE-2023-30774"
                         ]
@@ -11433,11 +11949,26 @@
                             "type": "exact-indirect-match"
                         }
                     ],
-                    "relatedVulnerabilities": null,
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-30775",
+                            "description": "A vulnerability was found in the libtiff library. This security flaw causes a heap buffer overflow in extractContigSamples32bits, tiffcrop.c.",
+                            "id": "CVE-2023-30775",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://access.redhat.com/security/cve/CVE-2023-30775",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2187141",
+                                "https://gitlab.com/libtiff/libtiff/-/issues/464"
+                            ]
+                        }
+                    ],
                     "vulnerability": {
                         "advisories": null,
                         "cvss": null,
                         "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-30775",
+                        "description": "A vulnerability was found in the libtiff library. This security flaw causes a heap buffer overflow in extractContigSamples32bits, tiffcrop.c.",
                         "fix": {
                             "state": "not-fixed",
                             "versions": []
