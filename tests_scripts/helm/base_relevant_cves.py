@@ -57,7 +57,7 @@ class BaseRelevantCves(BaseHelm):
                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
                     for key, annotation in expected_SBOM_annotations.items():
-                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} in the SBOM in the storage is not as expected"
+                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
                     
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
                     SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
