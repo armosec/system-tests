@@ -81,7 +81,7 @@ class RelevantCVEs(BaseRelevantCves):
         
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
-        self.validate_expected_CVEs(filteredSBOM, self.test_obj["expected_filtered_CVEs"])
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
         # # P4 get CVEs results
         # # 4.1 get summary result

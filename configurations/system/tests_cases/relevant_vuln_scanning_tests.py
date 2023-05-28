@@ -21,7 +21,9 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevantCVEs,
             expected_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/SBOM/nginx_SBOM.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/SBOM/mariadb_SBOM.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/SBOM/wikijs_SBOM.json")],
             expected_CVEs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/CVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/CVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/CVEs/wikijs.json")],
-           expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
+            expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
+            expected_filtered_CVEs = [("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/wikijs.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
         
