@@ -636,7 +636,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
-        # self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
@@ -662,7 +662,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
         self.test_no_errors_in_scan_result(be_summary)
 
         Logger.logger.info('delete armo namespace')
-        # self.uninstall_armo_helm_chart()
+        self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
@@ -693,7 +693,7 @@ class RelevancyFixVuln(BaseRelevantCves):
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
-        # self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
@@ -755,7 +755,7 @@ class RelevancyFixVuln(BaseRelevantCves):
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
 
         Logger.logger.info('delete armo namespace')
-        # self.uninstall_armo_helm_chart()
+        self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
