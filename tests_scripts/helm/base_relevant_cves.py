@@ -94,7 +94,7 @@ class BaseRelevantCves(BaseHelm):
                     
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
                     SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}" 
+                    assert expected_SBOM_file_list == SBOM_file_list, f"the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}" 
                     verified_SBOMs += 1
                     break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
