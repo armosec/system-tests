@@ -3,20 +3,22 @@
     "kind": "SBOMSPDXv2p3Filtered",
     "metadata": {
         "annotations": {
+            "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+            "kubescape.io/status": "",
+            "kubescape.io/workload-container-name": "redis"
         },
-        "creationTimestamp": "2023-05-10T14:29:26Z",
+        "creationTimestamp": "2023-05-28T14:21:06Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "redis",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "redis-sleep",
-            "kubescape.io/workload-namespace": "systest-ns-hezd"
+            "kubescape.io/workload-name": "redis-sleep"
         },
-        "name": "8d9ce4f791d9666f1df15e49eec06f8f3325f91aea6849ab03d3deecccd4072d",
+        "name": "d3cc7fe0f6f9e76c3d3dcdbfd92db2ba4b095859e9a1ddab408dc40845f40620",
         "namespace": "kubescape",
-        "resourceVersion": "129",
-        "uid": "ccdcb83d-642d-4596-aab7-1d0f8b0b5b94"
+        "resourceVersion": "72",
+        "uid": "574d730e-ea29-4db0-8b04-b9b72cf56f24"
     },
     "spec": {
         "metadata": {
@@ -34,7 +36,7 @@
             "comment": "",
             "creationInfo": {
                 "comment": "",
-                "created": "2023-05-10T13:39:46Z",
+                "created": "2023-05-28T14:17:16Z",
                 "creators": [
                     "Organization: Anchore, Inc",
                     "Tool: syft-v0.76.0",
@@ -45,7 +47,7 @@
             },
             "dataLicense": "CC0-1.0",
             "documentDescribes": null,
-            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/redis@sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-f48cf288-153c-46bc-874b-ad442a6e33c6",
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/redis@sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-ead8fd6e-fb68-4e87-929f-044ffb4946f9",
             "externalDocumentRefs": null,
             "files": [
                 {
@@ -64,6 +66,28 @@
                     "fileContributors": null,
                     "fileDependencies": null,
                     "fileName": "/etc/group",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-4cf9c3537f896231",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:7cd52847ad775a5ddc4b58326cf884beee34544296402c6292ed76474c686d39",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/nsswitch.conf",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
@@ -313,6 +337,104 @@
                     "supplier": null,
                     "validUntilDate": "",
                     "versionInfo": "3.4.0-r0"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-291d1267b40d636f",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.0-r0?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.17.2",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "3.4.0-r0"
                 }
             ],
             "relationships": [
@@ -321,6 +443,12 @@
                     "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-92b19c7750fb559d",
                     "relationshipType": "DEPENDENCY_OF",
                     "spdxElementId": "SPDXRef-Package-apk-busybox-binsh-256fc96b4a8c4da8"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-4cf9c3537f896231",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-291d1267b40d636f"
                 },
                 {
                     "comment": "",

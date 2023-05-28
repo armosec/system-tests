@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2023-05-07T11:23:10Z",
+        "creationTimestamp": "2023-05-28T14:17:17Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
@@ -14,8 +14,8 @@
         },
         "name": "92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
         "namespace": "kubescape",
-        "resourceVersion": "85",
-        "uid": "bd8683c4-f7fa-45a4-b72b-714cd6286def"
+        "resourceVersion": "70",
+        "uid": "1ebc4c67-8e25-4146-9741-6435d5e74433"
     },
     "spec": {
         "metadata": {
@@ -23,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -32,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-05-07T01:30:36Z",
-                    "checksum": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5
@@ -1124,6 +1124,69 @@
                             "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/EQ4DJSO4DMR55AWK6OPVJH5UTEB35R2Z/",
                             "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/LPUTH7NBQTZDVJWFNUD24ZCS6NDUFYS6/",
                             "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/OQGKMKSQE67L32HE6W5EI2I2YKW5VWHI/"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "= 7.0.10 (unknown)",
+                                "vulnerabilityID": "CVE-2023-31655"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-31655",
+                        "description": "redis-7.0.10 was discovered to contain a segmentation violation.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-31655",
+                        "namespace": "nvd:cpe",
+                        "severity": "High",
+                        "urls": [
+                            "https://github.com/RedisLabs/redisraft/issues/608"
                         ]
                     }
                 }
