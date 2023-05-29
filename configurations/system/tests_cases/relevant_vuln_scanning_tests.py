@@ -162,6 +162,5 @@ class RelevantVulnerabilityScanningTests(object):
             expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis-fixed.json")],
             expected_filtered_CVEs = [("redis" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis-fixed.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-fixed.json",
-            test_obj=RelevancyFixVuln,
-            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms"}
+            test_obj=RelevancyFixVuln
         )
