@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-proxy
+  labels:
+    app: httpd-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd-proxy
+  template:
+    metadata:
+      labels:
+        app: httpd-proxy
+    spec:
+      securityContext:
+        fsGroup: 33
+
+      containers:
+      - name: apache-proxy
+        # command: ["/bin/sh", "-c", "while true; do echo hello; sleep 1000;done"]
+        image: httpd:latest
+        securityContext:
+            capabilities:
+              add: ["NET_BIND_SERVICE"]
+        ports:
+        - containerPort: 443        
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/local/apache2/conf
+        - name: certs-volume
+          mountPath: /usr/local/apache2/conf/certs
+      volumes:
+      - name: config-volume
+        configMap:
+          name: apache-config
+      - name: certs-volume
+        secret:
+          secretName: apache-certs
+          defaultMode: "0644"
