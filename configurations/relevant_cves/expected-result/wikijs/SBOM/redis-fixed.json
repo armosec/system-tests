@@ -3,7 +3,7 @@
     "kind": "SBOMSPDXv2p3",
     "metadata": {
         "annotations": {
-            "kubescape.io/image-id": "rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96",
+            "kubescape.io/image-id": "docker.io/rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96",
             "kubescape.io/status": ""
         },
         "creationTimestamp": "2023-05-14T12:13:31Z",
