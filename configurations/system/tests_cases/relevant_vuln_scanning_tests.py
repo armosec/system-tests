@@ -145,7 +145,7 @@ class RelevantVulnerabilityScanningTests(object):
             config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_obj=RelevancyStorageDisabled,
-            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: False}
+            helm_kwargs={statics.HELM_STORAGE_FEATURE: False}
         )
     
     @staticmethod
