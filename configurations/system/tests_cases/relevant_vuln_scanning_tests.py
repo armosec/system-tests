@@ -76,7 +76,7 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis-sleep-5-min"),
             test_obj=RelevantDataIsAppended,
             expected_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
-            expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
+            expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_5_min.json")],
             expected_updated_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_5_min.json")],
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_5_min.json")],
               expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
@@ -164,3 +164,5 @@ class RelevantVulnerabilityScanningTests(object):
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-fixed.json",
             test_obj=RelevancyFixVuln
         )
+    
+   
