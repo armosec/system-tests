@@ -157,7 +157,7 @@ class RelevantDataIsAppended(BaseRelevantCves):
         Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
 
-        TestUtil.sleep(360, "Waiting for new filtered SBOMp to be created")
+        TestUtil.sleep(660, "Waiting for new filtered SBOMp to be created")
 
         Logger.logger.info('Get updated SBOMsp from storage')  
         filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
