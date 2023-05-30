@@ -338,11 +338,11 @@ class KubectlWrapper(object):
         kind = application['kind'] if isinstance(application, dict) else application.kind
 
         if 'Deployment' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_deployment(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_deployment(namespace=namespace, name=get_name(application))
         elif 'ReplicaSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_replica_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_replica_set(namespace=namespace, name=get_name(application))
         elif 'StatefulSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_stateful_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_stateful_set(namespace=namespace, name=get_name(application))
         elif "ClusterRole" == kind:
             status = self.client_RbacAuthorizationV1Api.delete_cluster_role(name=get_name(application))
         elif "ClusterRoleBinding" == kind:
@@ -350,13 +350,13 @@ class KubectlWrapper(object):
         elif "CustomResourceDefinition" == kind:
             status = self.client_ApiextensionsV1Api.delete_custom_resource_definition(name=application["metadata"]["name"])
         elif 'DaemonSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_daemon_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_daemon_set(namespace=namespace, name=get_name(application))
         elif 'Pod' == kind:
-            status = self.client_CoreV1Api.delete_namespaced_pod(namespace=namespace, body=application)
+            status = self.client_CoreV1Api.delete_namespaced_pod(namespace=namespace, name=get_name(application))
         elif 'Namespace' == kind:
             status = self.client_CoreV1Api.delete_namespace(name=namespace)
         elif 'ConfigMap' == kind:
-            status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace, body=application,
+            status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace,
                                                                         _request_timeout=None)
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))

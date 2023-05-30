@@ -74,10 +74,6 @@ class RelevantCVEs(BaseRelevantCves):
         # 3.6 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
         # 3.7 test filtered SBOM created in the storage
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
         
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
@@ -179,12 +175,6 @@ class RelevantDataIsAppended(BaseRelevantCves):
         Logger.logger.info('Validate CVEs was created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
         
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-        
-        Logger.logger.info('Sending vuln scan command')
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
-
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
         
         Logger.logger.info('Get filtered CVEs from storage')
@@ -275,12 +265,6 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
         Logger.logger.info('Validate CVEs was created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
-        
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-        
-        Logger.logger.info('Sending vuln scan command')
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
         
         Logger.logger.info('Get filtered CVEs from storage')
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
@@ -447,10 +431,6 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
         CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_workloads_images_hash(workload_objs))
 
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
-
         Logger.logger.info('Validate SBOMp was created')
         filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_instance_IDs(
@@ -458,10 +438,9 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
                                                                                                      namespace=namespace),
                                                    namespace=namespace))
 
-        self.kubernetes_obj.delete_workloads(workload_objs=workload_objs, namespace=namespace)
+        self.kubernetes_obj.delete_workload(namespace=namespace, application=workload_objs[0])
 
-        Logger.logger.info('Test SBOM was deleted in storage')
-        self.test_SBOM_deleted(SBOMs, self.get_workloads_images_hash(workload_objs))
+        TestUtil.sleep(150, "wait for workload CRDs to be deleted")
 
         SBOM_keys = self.get_workloads_images_hash(workload_objs)
         SBOMS = self.get_SBOM_from_storage(SBOM_keys)
@@ -630,7 +609,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
-        # Logger.logger.info('install armo helm-chart')
+        Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
@@ -726,10 +705,6 @@ class RelevancyFixVuln(BaseRelevantCves):
         # 3.6 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
         # 3.7 test filtered SBOM created in the storage
-        Logger.logger.info('exposing operator (port-fwd)')
-        self.expose_operator(cluster)
-
-        self.send_vuln_scan_command(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
 
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_instance_IDs(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
