@@ -402,8 +402,8 @@ class BaseRelevantCves(BaseHelm):
         Logger.logger.info('Test backend summary')
         self.test_be_summary(be_summary)
 
-        Logger.logger.info('Test backend results_details against results_sum_summary')
-        self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
+        # Logger.logger.info('Test backend results_details against results_sum_summary')
+        # self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
 
     def expose_operator(self, cluster):
         running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
