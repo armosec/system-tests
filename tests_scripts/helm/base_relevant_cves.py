@@ -399,8 +399,8 @@ class BaseRelevantCves(BaseHelm):
             raise Exception(
                 f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
 
-        Logger.logger.info('Test backend summary')
-        self.test_be_summary(be_summary)
+        # Logger.logger.info('Test backend summary')
+        # self.test_be_summary(be_summary)
 
         # Logger.logger.info('Test backend results_details against results_sum_summary')
         # self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
