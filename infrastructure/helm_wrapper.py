@@ -24,7 +24,7 @@ class HelmWrapper(object):
                         "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
 
         # by default use offline vuln DB
-        command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=true"])
+        command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
         
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
