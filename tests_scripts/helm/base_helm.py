@@ -9,8 +9,13 @@ import psutil
 DEFAULT_BRANCH = "release"
 
 
+HTTPD_PROXY_CRT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.crt")
+HTTPD_PROXY_KEY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.key")
+
+HELM_PROXY_URL = "https://httpd-proxy.default"
+
 class BaseHelm(BaseK8S):
-    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None, with_proxy=False):
         super(BaseHelm, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                        kubernetes_obj=kubernetes_obj)
 
@@ -23,7 +28,9 @@ class BaseHelm(BaseK8S):
                                                                "ignore_armo_system_logs", False)
         self.remove_cluster_from_backend = False
         self.port_forward_proc = None
+        self.proxy_config = test_obj[("proxy_config", None)]
 
+    
     @staticmethod
     def kill_child_processes(parent_pid, sig=signal.SIGTERM):
         try:
@@ -60,7 +67,7 @@ class BaseHelm(BaseK8S):
                 self.backend.delete_cluster(cluster_name=cluster_name)
             except:
                 pass
-        return statics.SUCCESS, ""
+        return super().cleanup(**kwargs)
 
     def display_armo_system_logs(self, level=Logger.logger.debug):
         pods = self.get_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
@@ -88,12 +95,26 @@ class BaseHelm(BaseK8S):
             self.download_armo_helm_chart_from_branch(branch=self.helm_branch)
 
         helm_kwargs.update(self.get_in_cluster_tags())
+
+        # if there is proxy configuration, configure and get the proxy helm params
+        if self.proxy_config != None:
+            helm_proxy_url = self.proxy_config.get("helm_proxy_url", None)
+            if helm_proxy_url ==None:
+                Logger.logger.warning(f"helm_proxy_url is not defined in proxy_config, using default {statics.HELM_PROXY_URL}")
+            else:
+                Logger.logger.info(f"helm_proxy_url is defined in proxy_config, using {helm_proxy_url}")
+
+            helm_proxy_params = HelmWrapper.configure_helm_proxy(helm_proxy_url=helm_proxy_url)
+            
+            helm_kwargs.update(helm_proxy_params)
+
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid(),
                                             environment=self.test_driver.backend_obj.get_name(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True
         self.remove_cluster_from_backend = True
+
 
     def get_in_cluster_tags(self):
         component_tag = {}
@@ -153,3 +174,4 @@ class BaseHelm(BaseK8S):
     @staticmethod
     def remove_armo_from_repo():
         HelmWrapper.remove_armo_from_repo()
+

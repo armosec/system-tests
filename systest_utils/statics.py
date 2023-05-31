@@ -9,6 +9,13 @@ CLIENT = 3.1
 MASTER = 4.0
 SLAVE = 4.1
 
+# helm proxy constants
+DEFAULT_HELM_PROXY_PATH = os.path.abspath(os.path.join('configurations', 'helm-proxy'))
+HELM_PROXY_URL = "https://httpd-proxy.default"
+
+
+
+
 DEFAULT_WT_PATH = os.path.abspath(os.path.join('configurations', 'workload-templates'))
 DEFAULT_DOCKER_FILE_PATH = os.path.abspath(os.path.join('configurations', 'dockerfiles'))
 DEFAULT_SP_PATH = os.path.abspath(os.path.join('configurations', 'signing-profiles'))
