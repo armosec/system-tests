@@ -7,7 +7,7 @@ def tests = ["vulnerability_scanning":                                          
              "vulnerability_scanning_trigger_scan_public_registry_excluded":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_trigger_scan_private_quay_registry":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
 //             "vulnerability_scanning_trigger_scan_registry_by_backend":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-//             "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_triggering_with_cron_job":                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
