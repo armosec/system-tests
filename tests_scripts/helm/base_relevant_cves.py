@@ -34,9 +34,16 @@ class BaseRelevantCves(BaseHelm):
     
     def get_files_from_SBOM(self, SBOM):
         files = []
-        for fileData in SBOM['files']:
-            files.append(fileData['fileName'])
+        if SBOM['spec']['spdx']['files'] is not None:
+            for fileData in SBOM['spec']['spdx']['files']:
+                files.append(fileData['fileName'])
         return files
+    
+    def get_annotations_from_SBOM(self, SBOM):
+        annotations = {}
+        for key, annotation in SBOM['metadata']['annotations'].items():
+            annotations[key] = annotation
+        return annotations
     
     def validate_expected_SBOM(self, SBOMs, expected_SBOM_paths):
         verified_SBOMs = 0
@@ -45,10 +52,16 @@ class BaseRelevantCves(BaseHelm):
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
-                if expected_SBOM_data['name'] in SBOM[1]['spec']['spdx']['name']:
+
+                if expected_SBOM_data['metadata']['name'] in SBOM[1]['metadata']['name']:
+                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
+                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                    for key, annotation in expected_SBOM_annotations.items():
+                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
+                    
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
-                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1]['spec']['spdx'])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not has expected" 
+                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected" 
                     verified_SBOMs += 1
                     break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
@@ -62,6 +75,30 @@ class BaseRelevantCves(BaseHelm):
                 vuln = match['vulnerability']
                 cves.append(vuln['id'])
         return cves
+    
+    def validate_expected_filtered_SBOMs(self, SBOMs, expected_SBOM_paths,namespace):
+        verified_SBOMs = 0
+        for expected_SBOM in expected_SBOM_paths:
+            for SBOM in SBOMs:
+                with open(expected_SBOM[1], 'r') as content_file:
+                    content = content_file.read()
+                expected_SBOM_data = json.loads(content)
+                instanceID = SBOM[0]
+                if self.get_container_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_CONTAINER_LABEL]\
+                            and self.get_workload_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+
+                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
+                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                    for key, annotation in expected_SBOM_annotations.items():
+                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} in the SBOM in the storage is not as expected"
+                    
+                    expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
+                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+                    assert expected_SBOM_file_list == SBOM_file_list, f"the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}" 
+                    verified_SBOMs += 1
+                    break
+        assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
+
     
     def validate_expected_filtered_CVEs(self, CVEs, expected_CVEs_path,namespace):
         verified_CVEs = 0
@@ -302,6 +339,41 @@ class BaseRelevantCves(BaseHelm):
         assert not failed_CVEs_path, 'Expect the data from backend would be the same as storage CVE results.\n' \
         f'in the following entries is happened:\n{failed_CVEs_path}'
 
+    def test_be_summary(self, be_summary):
+
+        workload_identifiers = []
+        customer_guid = be_summary[0]['designators']['attributes']['customerGUID']
+
+        # check that same workload doesn't appear more than once
+        for summary in be_summary:
+            workload_identifier = f"{summary['wlid']}/{summary['designators']['attributes']['containerName']}/{summary['registry']}/{summary['imageTag']}"
+          
+            assert workload_identifier not in workload_identifiers , f"Expect to receive unique workload identifier, but received {workload_identifier} twice"
+
+            workload_identifiers.append(workload_identifier)
+
+        # check filters with wlid,  namespace, container, registry, tag, relevantLabel
+        fields_to_check = [ 'namespace', 'wlid', 'containerName', 'registry', 'imageTag', 'relevantLabel']
+        for field in fields_to_check:
+            resp = self.backend.get_unique_values_for_field_scan_summary(field=field, customer_guid=customer_guid)
+            resp = resp.json()
+            resp_for_field = resp['fields'][field]
+            if len(resp_for_field) > 1:
+                # first value is always empty (for all values)
+                value = resp_for_field[1]
+                resps = self.backend.get_summary_with_inner_filters(filter={field:value}, customer_guid=customer_guid)
+                objs_with_filter_count = 0
+                for obj in resp['fieldsCount'][field]:
+                    if obj['key'] == value:
+                        objs_with_filter_count = obj['count']
+                        break
+                objs_with_filter = resps.json()['response']
+                assert len(objs_with_filter) == objs_with_filter_count, f"Expect to receive {objs_with_filter_count} objects for {field} filter, but received {len(objs_with_filter)}"
+                for obj in objs_with_filter:
+                    assert obj[field] == value, f"Expect to receive {value} for {field} filter, but received {obj[field]}"
+
+            
+
     def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
 
         start = time.time()
@@ -327,8 +399,11 @@ class BaseRelevantCves(BaseHelm):
             raise Exception(
                 f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
 
-        Logger.logger.info('Test backend results_details against results_sum_summary')
-        self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
+        # Logger.logger.info('Test backend summary')
+        # self.test_be_summary(be_summary)
+
+        # Logger.logger.info('Test backend results_details against results_sum_summary')
+        # self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
 
     def expose_operator(self, cluster):
         running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,

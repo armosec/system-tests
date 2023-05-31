@@ -21,7 +21,9 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevantCVEs,
             expected_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/SBOM/nginx_SBOM.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/SBOM/mariadb_SBOM.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/SBOM/wikijs_SBOM.json")],
             expected_CVEs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/CVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/CVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/CVEs/wikijs.json")],
-           expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
+            expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
+            expected_filtered_CVEs = [("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/wikijs.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
         
@@ -60,8 +62,7 @@ class RelevantVulnerabilityScanningTests(object):
             expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
-            expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False}
+            expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")]
         )
     
     @staticmethod
@@ -72,13 +73,13 @@ class RelevantVulnerabilityScanningTests(object):
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis-sleep-5-min"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis-sleep"),
             test_obj=RelevantDataIsAppended,
             expected_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
             expected_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
-            expected_updated_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_5_min.json")],
-            expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_5_min.json")],
-              expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
+            expected_updated_filtered_SBOMs=[("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep.json")],
+            expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
             helm_kwargs={"nodeAgent.config.learningPeriod": 2}
         )
@@ -99,3 +100,69 @@ class RelevantVulnerabilityScanningTests(object):
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: False}
         )
+    
+
+    @staticmethod
+    def relevancy_large_image():
+        from tests_scripts.helm.relevant_cve import RelevancyEnabledLargeImage
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            test_obj=RelevancyEnabledLargeImage,
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+            expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
+            helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5}
+        )
+
+    @staticmethod
+    def relevancy_extra_large_image():
+        from tests_scripts.helm.relevant_cve import RelevancyEnabledExtraLargeImage
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            test_obj=RelevancyEnabledExtraLargeImage,
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+             expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
+            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms"}
+        )
+    
+    @staticmethod
+    def relevancy_storage_disabled():
+        from tests_scripts.helm.relevant_cve import RelevancyStorageDisabled
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
+            secret="wikijs.yaml",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
+            test_obj=RelevancyStorageDisabled,
+            helm_kwargs={statics.HELM_STORAGE_FEATURE: False}
+        )
+    
+    @staticmethod
+    def relevancy_fix_vuln():
+        from tests_scripts.helm.relevant_cve import RelevancyFixVuln
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis"),
+            expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis-fixed.json")],
+            expected_CVEs=[("redis", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis-fixed.json")],
+            expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis-fixed.json")],
+            expected_filtered_CVEs = [("redis" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis.json"), ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis-fixed.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-fixed.json",
+            test_obj=RelevancyFixVuln, 
+            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
+        )
+

@@ -53,6 +53,7 @@ API_VULNERABILITYEXCEPTIONPOLICY = "/api/v1/vulnerabilityExceptionPolicy"
 API_VULNERABILITY_SCANRESULTSSUMSUMMARY = "/api/v1/vulnerability/scanResultsSumSummary"
 API_VULNERABILITY_SCAN_V2 = "/api/v1/vulnerability/scan/v2/"
 API_VULNERABILITY_SCANRESULTSDETAILS = "/api/v1/vulnerability/scanResultsDetails"
+API_VULNERABILITY_UNIQUE_VALUES_SUMMARY =   "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
 
 
 API_REPOSITORYPOSTURE = "/api/v1/repositoryPosture"
@@ -1183,6 +1184,36 @@ class ControlPanelAPI(object):
         Logger.logger.info(
             'layers of container scan id : {} response {}'.format(container_scan_id, r.json()))
         return r.json()
+    
+    def get_unique_values_for_field_scan_summary(self, field, customer_guid):
+        params = {"customerGUID": customer_guid}
+        body = {
+            "fields": {
+                field: "",
+            }
+        }
+
+        r = self.post(API_VULNERABILITY_UNIQUE_VALUES_SUMMARY, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        return r
+        
+    def get_summary_with_inner_filters(self, filter, customer_guid):
+        params = {"customerGUID": customer_guid}
+        body = {
+            "innerFilters": [filter],
+        }
+
+        r = self.post(API_VULNERABILITY_SCANRESULTSSUMSUMMARY, params=params, json=body)
+        if not 200 <= r.status_code < 300 or len(r.json()['response']) == 0:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
 
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
         params = {"customerGUID": self.selected_tenant_id}

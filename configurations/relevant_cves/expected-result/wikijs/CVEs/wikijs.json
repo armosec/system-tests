@@ -3,19 +3,19 @@
     "kind": "VulnerabilityManifest",
     "metadata": {
         "annotations": {
-            "kubescape.io/image-id": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
+            "kubescape.io/image-id": "requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2023-05-09T07:45:56Z",
+        "creationTimestamp": "2023-05-28T07:33:12Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
-            "kubescape.io/image-id": "docker-io-requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac",
-            "kubescape.io/image-name": "docker-io-requarks-wiki"
+            "kubescape.io/image-id": "requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac000edf7653",
+            "kubescape.io/image-name": "requarks-wiki"
         },
         "name": "dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
         "namespace": "kubescape",
-        "resourceVersion": "111",
-        "uid": "a9447b11-4a46-4185-8b11-89cb2478c226"
+        "resourceVersion": "41",
+        "uid": "c2822a96-6ff6-49d6-b9f9-e3878620d2ad"
     },
     "spec": {
         "metadata": {
@@ -23,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -32,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-05-09T01:29:44Z",
-                    "checksum": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5
@@ -7724,11 +7724,11 @@
                         "cvss": [
                             {
                                 "metrics": {
-                                    "baseScore": 5.5,
+                                    "baseScore": 3.3,
                                     "exploitabilityScore": 1.8,
-                                    "impactScore": 3.6
+                                    "impactScore": 1.4
                                 },
-                                "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L",
                                 "vendorMetadata": {},
                                 "version": "3.1"
                             }
@@ -7741,7 +7741,7 @@
                         },
                         "id": "CVE-2022-3219",
                         "namespace": "nvd:cpe",
-                        "severity": "Medium",
+                        "severity": "Low",
                         "urls": [
                             "https://access.redhat.com/security/cve/CVE-2022-3219",
                             "https://bugzilla.redhat.com/show_bug.cgi?id=2127010",
@@ -8747,6 +8747,7 @@
                         "urls": [
                             "http://seclists.org/fulldisclosure/2023/Jan/19",
                             "http://seclists.org/fulldisclosure/2023/Jan/20",
+                            "http://www.openwall.com/lists/oss-security/2023/05/17/4",
                             "https://hackerone.com/reports/1704017",
                             "https://lists.debian.org/debian-lts-announce/2023/01/msg00028.html",
                             "https://security.gentoo.org/glsa/202212-01",
@@ -9310,7 +9311,7 @@
                                     "cpe:2.3:a:nodejs:node.js:*:*:*:*:-:*:*:*",
                                     "cpe:2.3:a:nodejs:node.js:*:*:*:*:lts:*:*:*"
                                 ],
-                                "versionConstraint": "\u003e= 14.0.0, \u003c= 14.14.0 || \u003e= 14.15.0, \u003c= 14.20.1 || \u003e= 16.0.0, \u003c= 16.12.0 || \u003e= 16.13.0, \u003c 16.17.1 || \u003e= 18.0.0, \u003c 18.9.1 (unknown)",
+                                "versionConstraint": "\u003e= 14.0.0, \u003c= 14.14.0 || \u003e= 14.15.0, \u003c 14.20.1 || \u003e= 16.0.0, \u003c= 16.12.0 || \u003e= 16.13.0, \u003c 16.17.1 || \u003e= 18.0.0, \u003c 18.9.1 (unknown)",
                                 "vulnerabilityID": "CVE-2022-35256"
                             },
                             "matcher": "stock-matcher",
@@ -12899,6 +12900,7 @@
                                 "https://github.com/git/git/commit/668f2d53613ac8fd373926ebe219f2c29112d93e",
                                 "https://github.com/git/git/security/advisories/GHSA-2hvf-7c8p-28fx",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PI7FZ4NNR5S5J5K6AMVQBH2JFP6NE4L7/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RKOXOAZ42HLXHXTW6JZI4L5DAIYDTYCU/",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YFZWGQKB6MM5MNF2DLFTD7KS2KWPICKL/"
                             ]
                         }
@@ -12975,6 +12977,7 @@
                                 "https://github.com/git-for-windows/git/security/advisories/GHSA-9w66-8mq8-5vm8",
                                 "https://github.com/msys2/MINGW-packages/pull/10461",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PI7FZ4NNR5S5J5K6AMVQBH2JFP6NE4L7/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RKOXOAZ42HLXHXTW6JZI4L5DAIYDTYCU/",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YFZWGQKB6MM5MNF2DLFTD7KS2KWPICKL/",
                                 "https://pubs.opengroup.org/onlinepubs/9699919799/functions/printf.html"
                             ]
@@ -13924,6 +13927,7 @@
                                 "https://github.com/git/git/commit/528290f8c61222433a8cf02fb7cfffa8438432b4",
                                 "https://github.com/git/git/security/advisories/GHSA-v48j-4xgg-4844",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/PI7FZ4NNR5S5J5K6AMVQBH2JFP6NE4L7/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RKOXOAZ42HLXHXTW6JZI4L5DAIYDTYCU/",
                                 "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YFZWGQKB6MM5MNF2DLFTD7KS2KWPICKL/"
                             ]
                         }
@@ -13999,7 +14003,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-265q-28rp-chq5",
                         "description": "Insecure Entropy Source - Math.random() in node-uuid",
                         "fix": {
@@ -14071,7 +14089,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.1,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-28xr-mwxg-3qc8",
                         "description": "Command injection in simple-git",
                         "fix": {
@@ -14085,6 +14117,63 @@
                         "severity": "High",
                         "urls": [
                             "https://github.com/advisories/GHSA-28xr-mwxg-3qc8"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:monorepo-symlink-test:monorepo-symlink-test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo-symlink-test:monorepo_symlink_test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo_symlink_test:monorepo-symlink-test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo_symlink_test:monorepo_symlink_test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo-symlink:monorepo-symlink-test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo-symlink:monorepo_symlink_test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo_symlink:monorepo-symlink-test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo_symlink:monorepo_symlink_test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo:monorepo-symlink-test:0.0.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:monorepo:monorepo_symlink_test:0.0.0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "javascript",
+                        "licenses": [
+                            "MIT"
+                        ],
+                        "locations": null,
+                        "name": "monorepo-symlink-test",
+                        "purl": "pkg:npm/monorepo-symlink-test@0.0.0",
+                        "type": "npm",
+                        "upstreams": null,
+                        "version": "0.0.0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003e=0 (unknown)",
+                                "vulnerabilityID": "GHSA-2jcg-qqmg-46q6"
+                            },
+                            "matcher": "javascript-matcher",
+                            "searchedBy": {
+                                "language": "javascript",
+                                "namespace": "github:language:javascript"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://github.com/advisories/GHSA-2jcg-qqmg-46q6",
+                        "description": "Malware in monorepo-symlink-test",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "GHSA-2jcg-qqmg-46q6",
+                        "namespace": "github:language:javascript",
+                        "severity": "Critical",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-2jcg-qqmg-46q6"
                         ]
                     }
                 },
@@ -14199,7 +14288,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-2r2c-g63r-vccr",
                         "description": "Improper Verification of Cryptographic Signature in `node-forge`",
                         "fix": {
@@ -14271,7 +14374,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.1,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-3f95-r44v-8mrg",
                         "description": "Command injection in simple-git",
                         "fix": {
@@ -14339,7 +14456,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.2,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.8
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-3jfq-g458-7qm9",
                         "description": "Arbitrary File Creation/Overwrite due to insufficient absolute path sanitization",
                         "fix": {
@@ -14405,7 +14536,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-3xq5-wjfh-ppjc",
                         "description": "Luxon Inefficient Regular Expression Complexity vulnerability",
                         "fix": {
@@ -14468,7 +14613,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-4jv9-3563-23j3",
                         "description": "Knex.js has a limited SQL injection vulnerability",
                         "fix": {
@@ -14531,7 +14690,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-4jv9-3563-23j3",
                         "description": "Knex.js has a limited SQL injection vulnerability",
                         "fix": {
@@ -14601,7 +14774,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-5379-r78w-42h2",
                         "description": "Unlimited transforms allowed for signed nodes",
                         "fix": {
@@ -14722,7 +14909,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.2,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.8
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-5955-9wpr-37jh",
                         "description": "Arbitrary File Creation/Overwrite on Windows via insufficient relative path sanitization",
                         "fix": {
@@ -14786,7 +14987,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 2.5
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-5fg8-2547-mr8q",
                         "description": "Misinterpretation of malicious XML input",
                         "fix": {
@@ -14856,7 +15071,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-5h4j-qrvg-9xhw",
                         "description": "Improper calculations in ECC implementation can trigger a Denial-of-Service (DoS)",
                         "fix": {
@@ -14979,7 +15208,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-6fc8-4gx4-v693",
                         "description": "ReDoS in Sec-Websocket-Protocol header",
                         "fix": {
@@ -15047,7 +15290,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-6vfc-qv3f-vr6c",
                         "description": "Uncontrolled Resource Consumption in markdown-it",
                         "fix": {
@@ -15116,7 +15373,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8,
+                                    "exploitabilityScore": 2.1,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.0"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-74fj-2j2h-c42q",
                         "description": "Exposure of sensitive information in follow-redirects",
                         "fix": {
@@ -15178,7 +15449,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-776f-qx25-q3cc",
                         "description": "xml2js is vulnerable to prototype pollution ",
                         "fix": {
@@ -15242,7 +15527,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-776f-qx25-q3cc",
                         "description": "xml2js is vulnerable to prototype pollution ",
                         "fix": {
@@ -15306,7 +15605,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-776f-qx25-q3cc",
                         "description": "xml2js is vulnerable to prototype pollution ",
                         "fix": {
@@ -15370,7 +15683,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-776f-qx25-q3cc",
                         "description": "xml2js is vulnerable to prototype pollution ",
                         "fix": {
@@ -15440,7 +15767,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.1,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 2.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-7gc6-qh9x-w6h8",
                         "description": "Incorrect Authorization in cross-fetch",
                         "fix": {
@@ -15510,7 +15851,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.1,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 2.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-7gc6-qh9x-w6h8",
                         "description": "Incorrect Authorization in cross-fetch",
                         "fix": {
@@ -15580,7 +15935,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.1,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 2.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-7gc6-qh9x-w6h8",
                         "description": "Incorrect Authorization in cross-fetch",
                         "fix": {
@@ -15884,7 +16253,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-8hfj-j24r-96c4",
                         "description": "Path Traversal: 'dir/../../filename' in moment.locale",
                         "fix": {
@@ -15954,7 +16337,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-93q8-gq69-wqmw",
                         "description": "Inefficient Regular Expression Complexity in chalk/ansi-regex",
                         "fix": {
@@ -16024,7 +16421,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-93q8-gq69-wqmw",
                         "description": "Inefficient Regular Expression Complexity in chalk/ansi-regex",
                         "fix": {
@@ -16079,7 +16490,21 @@
                     "relatedVulnerabilities": null,
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.6,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-984p-xq9m-4rjw",
                         "description": "Rate Limiting Bypass in express-brute",
                         "fix": {
@@ -16143,7 +16568,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.1,
+                                    "exploitabilityScore": 1.6,
+                                    "impactScore": 5.5
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:L/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9c47-m6qq-7p4h",
                         "description": "Prototype Pollution in JSON5 via Parse Method",
                         "fix": {
@@ -16209,7 +16648,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.1,
+                                    "exploitabilityScore": 1.6,
+                                    "impactScore": 5.5
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:L/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9c47-m6qq-7p4h",
                         "description": "Prototype Pollution in JSON5 via Parse Method",
                         "fix": {
@@ -16282,7 +16735,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.1,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9p95-fxvg-qgq2",
                         "description": "simple-git vulnerable to Remote Code Execution when enabling the ext transport protocol",
                         "fix": {
@@ -16347,7 +16814,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9qrh-qjmc-5w2p",
                         "description": "Denial-of-Service when binding invalid parameters in sqlite3",
                         "fix": {
@@ -16415,7 +16896,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.2,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.8
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9r2w-394v-53qc",
                         "description": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning using symbolic links",
                         "fix": {
@@ -16486,7 +16981,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-9w5j-4mwv-2wj8",
                         "description": "Remote code execution in simple-git",
                         "fix": {
@@ -16563,7 +17072,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-cf4h-3jhx-xvhq",
                         "description": "Arbitrary Code Execution in underscore",
                         "fix": {
@@ -16640,7 +17163,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-cf4h-3jhx-xvhq",
                         "description": "Arbitrary Code Execution in underscore",
                         "fix": {
@@ -16710,7 +17247,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-cfm4-qjh2-4765",
                         "description": "Improper Verification of Cryptographic Signature in node-forge",
                         "fix": {
@@ -16775,7 +17326,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-crh6-fp67-6883",
                         "description": "xmldom allows multiple root nodes in a DOM",
                         "fix": {
@@ -16839,7 +17404,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-crh6-fp67-6883",
                         "description": "xmldom allows multiple root nodes in a DOM",
                         "fix": {
@@ -16900,7 +17479,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.6,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-f4c9-cqv8-9v98",
                         "description": "Insufficient Granularity of Access Control in JSDom",
                         "fix": {
@@ -16971,7 +17564,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-f794-r6xc-hf3v",
                         "description": "Improper Access Control in passport-oauth2",
                         "fix": {
@@ -17038,7 +17645,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-f8q6-p94x-37v3",
                         "description": "minimatch ReDoS vulnerability",
                         "fix": {
@@ -17112,7 +17733,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-fhg7-m89q-25r3",
                         "description": "ReDoS Vulnerability in ua-parser-js version ",
                         "fix": {
@@ -17183,7 +17818,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.8,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-fwr7-v2mv-hh25",
                         "description": "Prototype Pollution in async",
                         "fix": {
@@ -17307,7 +17956,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-h452-7996-h45h",
                         "description": "cookiejar Regular Expression Denial of Service via Cookie.parse function",
                         "fix": {
@@ -17373,7 +18036,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 4.3,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-h6q6-9hqw-rwfv",
                         "description": "Misinterpretation of malicious XML input",
                         "fix": {
@@ -17444,7 +18121,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hj9c-8jmm-8c52",
                         "description": "Packing does not respect root-level ignore files in workspaces",
                         "fix": {
@@ -17509,7 +18200,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5,
+                                    "exploitabilityScore": 1.6,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hjrf-2m68-5959",
                         "description": "jsonwebtoken's insecure implementation of key retrieval function could lead to Forgeable Public/Private Tokens from RSA to HMAC",
                         "fix": {
@@ -17575,7 +18280,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hrpp-h998-j3pp",
                         "description": "qs vulnerable to Prototype Pollution",
                         "fix": {
@@ -17641,7 +18360,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hrpp-h998-j3pp",
                         "description": "qs vulnerable to Prototype Pollution",
                         "fix": {
@@ -17707,7 +18440,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hrpp-h998-j3pp",
                         "description": "qs vulnerable to Prototype Pollution",
                         "fix": {
@@ -17773,7 +18520,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-hrpp-h998-j3pp",
                         "description": "qs vulnerable to Prototype Pollution",
                         "fix": {
@@ -17837,7 +18598,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.1,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-jqv5-7xpx-qj74",
                         "description": "sqlite vulnerable to code execution due to Object coercion",
                         "fix": {
@@ -17908,7 +18683,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.1,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-m974-647v-whv7",
                         "description": "Signature bypass via multiple root elements",
                         "fix": {
@@ -17978,7 +18767,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-mhxj-85r3-2x55",
                         "description": "file-type vulnerable to Infinite Loop via malformed MKV file",
                         "fix": {
@@ -18043,7 +18846,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.1,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 2.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-p8p7-x288-28g6",
                         "description": "Server-Side Request Forgery in Request",
                         "fix": {
@@ -18109,7 +18926,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.9,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-pw2r-vq6v-hr8c",
                         "description": "Exposure of Sensitive Information to an Unauthorized Actor in follow-redirects",
                         "fix": {
@@ -18180,7 +19011,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-q8pj-2vqx-8ggc",
                         "description": "Denial of service in css-what",
                         "fix": {
@@ -18305,7 +19150,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.2,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.8
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-qq89-hq3f-393p",
                         "description": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning using symbolic links",
                         "fix": {
@@ -18371,7 +19230,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.5,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-qrpm-p2h7-hrv2",
                         "description": "Exposure of Sensitive Information to an Unauthorized Actor in nanoid",
                         "fix": {
@@ -18435,7 +19308,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.4,
+                                    "exploitabilityScore": 1.6,
+                                    "impactScore": 4.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:H/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-qwph-4952-7xr6",
                         "description": "jsonwebtoken vulnerable to signature validation bypass due to insecure default algorithm in jwt.verify()",
                         "fix": {
@@ -18503,7 +19390,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.2,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.8
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-r628-mhmh-qjhw",
                         "description": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning",
                         "fix": {
@@ -18575,7 +19476,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.8,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.0"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-r683-j2x4-v87g",
                         "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
                         "fix": {
@@ -18647,7 +19562,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.8,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.0"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-r683-j2x4-v87g",
                         "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
                         "fix": {
@@ -18719,7 +19648,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 8.8,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.0"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-r683-j2x4-v87g",
                         "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
                         "fix": {
@@ -18794,7 +19737,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-rc47-6667-2j5j",
                         "description": "http-cache-semantics vulnerable to Regular Expression Denial of Service",
                         "fix": {
@@ -18914,7 +19871,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 4.8,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 2.5
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-v923-w3x8-wh69",
                         "description": "Passport before 0.6.0 vulnerable to session regeneration when a users logs in or out",
                         "fix": {
@@ -18989,7 +19960,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-w573-4hg7-7wgq",
                         "description": "decode-uri-component vulnerable to Denial of Service (DoS)",
                         "fix": {
@@ -19059,7 +20044,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 2.6,
+                                    "exploitabilityScore": 1.2,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Low",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-w7rc-rwvf-8q5r",
                         "description": "The `size` option isn't honored after following a redirect in node-fetch",
                         "fix": {
@@ -19130,7 +20129,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-wc69-rhjr-hc9g",
                         "description": "Moment.js vulnerable to Inefficient Regular Expression Complexity",
                         "fix": {
@@ -19197,7 +20210,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-wm7h-9275-46v2",
                         "description": "Crash in HeaderParser in dicer",
                         "fix": {
@@ -19262,7 +20289,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-wm7h-9275-46v2",
                         "description": "Crash in HeaderParser in dicer",
                         "fix": {
@@ -19331,7 +20372,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-x4jg-mjrx-434g",
                         "description": "Improper Verification of Cryptographic Signature in node-forge",
                         "fix": {
@@ -19398,7 +20453,21 @@
                     ],
                     "vulnerability": {
                         "advisories": null,
-                        "cvss": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "Critical",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
                         "dataSource": "https://github.com/advisories/GHSA-xvch-5gv4-984h",
                         "description": "Prototype Pollution in minimist",
                         "fix": {

@@ -2,7 +2,7 @@
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
     "kind": "VulnerabilityManifest",
     "metadata": {
-        "creationTimestamp": "2023-05-07T13:33:16Z",
+        "creationTimestamp": "2023-05-28T14:26:03Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -10,12 +10,12 @@
             "kubescape.io/workload-container-name": "redis",
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "redis-sleep",
-            "kubescape.io/workload-namespace": "systest-ns-xslr"
+            "kubescape.io/workload-namespace": "systest-ns-qjvg"
         },
-        "name": "e832bd541bba86c0c083a274062d321a1b32d20fe23eb2fd4c05a79647e90cac",
+        "name": "480254f0cf10c522e358ee63cc16367a02d8d2722e8d2bd8f0a529ad609a18f6",
         "namespace": "kubescape",
-        "resourceVersion": "183",
-        "uid": "ad8c7af3-295a-4300-a69f-54e6a22f9e19"
+        "resourceVersion": "76",
+        "uid": "4c74a7dc-b81e-40bf-9992-8718115ee38c"
     },
     "spec": {
         "metadata": {
@@ -23,7 +23,7 @@
                 "createdAt": null
             },
             "tool": {
-                "databaseVersion": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                 "name": "",
                 "version": "v0.61.0"
             },
@@ -32,8 +32,8 @@
         "payload": {
             "descriptor": {
                 "db": {
-                    "built": "2023-05-07T01:30:36Z",
-                    "checksum": "sha256:15ea7bc21a47461c5d1d999b3e62849e661d7a262ac8b1ba2eb8218840e0ec79",
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
                     "error": null,
                     "location": "/home/ks/.cache/grype/db/5",
                     "schemaVersion": 5

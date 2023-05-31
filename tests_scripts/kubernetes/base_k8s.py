@@ -992,7 +992,7 @@ class BaseK8S(BaseDockerizeTest):
                         namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                         plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
                     )
-            filteredSBOMs.append((filteredSBOMKeys, filtered_SBOM_data))
+                    filteredSBOMs.append((key, filtered_SBOM_data))
         elif isinstance(filteredSBOMKeys, list):
             for key in filteredSBOMKeys:
               filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(

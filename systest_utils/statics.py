@@ -82,7 +82,7 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
-HELM_REPO = "kubescape/kubescape-cloud-operator"
+HELM_REPO = "charts/kubescape-cloud-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
 CA_HELM_NAME = "kubescape"
@@ -158,7 +158,7 @@ TEST_REGISTRY_CONNECTIVITY_AUTHENTICATION_STATUS = "registryAuthentication"
 TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
 
 #storage aggregated API
-HELM_STORAGE_FEATURE="enableStorage"
+HELM_STORAGE_FEATURE="kubescapeStorage.enabled"
 STORAGE_SBOM_PLURAL = "sbomspdxv2p3s"
 STORAGE_FILTERED_SBOM_PLURAL = "sbomspdxv2p3filtereds"
 STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
@@ -177,6 +177,8 @@ RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 
 #relevancy feature
 HELM_RELEVANCY_FEATURE="nodeAgent.enabled"
+HELM_MAX_IMAGE_SIZE = "kubevuln.config.maxImageSize" 
+HELM_SCAN_TIMEOUT = "kubevuln.config.scanTimeout"
 FILTERED_CVES_KEY="withRelevancy"
 ALL_CVES_KEY="AllCVEs"
 
