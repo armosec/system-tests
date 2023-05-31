@@ -115,7 +115,7 @@ class ScanComplianceScore(BaseKubescape):
         Logger.logger.info("Testing results in frameworks")
         self.test_frameworks_compliance_score(report=result)
 
-        TestUtil.sleep(10, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         # get first framework name from policy_name, until first ','
@@ -189,7 +189,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(10, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
@@ -246,6 +246,8 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+
         first_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
                                                  old_report_guid=old_report_guid)
@@ -286,7 +288,9 @@ class ScanWithExceptionToBackend(BaseKubescape):
         Logger.logger.info("Stage 4.1: Scanning kubescape with exception")
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-
+        
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        
         second_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                   framework_name=self.test_obj.get_arg("policy_name").upper(),
                                                   old_report_guid=first_report_guid)
@@ -329,6 +333,8 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        
         third_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
                                                  old_report_guid=second_report_guid)
@@ -461,6 +467,9 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
+        
+        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        
         self.test_customer_configuration_result(cli_result=result, expected_result='failed',
                                                 c_id=self.test_obj.policy_name)
 
