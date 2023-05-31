@@ -1,7 +1,9 @@
 // This file should be DEPRECATED!
 def backend = "${env.BACKEND}"
 
-def tests = ["vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+def tests = [
+            "vulnerability_scanning_proxy":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_trigger_scan_public_registry":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "ks_microservice_ns_creation":                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
