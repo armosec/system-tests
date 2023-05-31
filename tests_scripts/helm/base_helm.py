@@ -97,9 +97,10 @@ class BaseHelm(BaseK8S):
         helm_kwargs.update(self.get_in_cluster_tags())
 
         # if there is proxy configuration, configure and get the proxy helm params
-        if self.proxy_config != None:
+        if self.proxy_config is not None:
             helm_proxy_url = self.proxy_config.get("helm_proxy_url", None)
-            if helm_proxy_url ==None:
+            if helm_proxy_url is None:
+                helm_proxy_url = statics.HELM_PROXY_URL
                 Logger.logger.warning(f"helm_proxy_url is not defined in proxy_config, using default {statics.HELM_PROXY_URL}")
             else:
                 Logger.logger.info(f"helm_proxy_url is defined in proxy_config, using {helm_proxy_url}")

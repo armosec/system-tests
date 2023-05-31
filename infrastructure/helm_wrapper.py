@@ -83,6 +83,7 @@ class HelmWrapper(object):
 
     @staticmethod
     def configure_helm_proxy(helm_proxy_url):
+        Logger.logger.info(f"Start configuring helm proxy with url: '{helm_proxy_url}'")
         helm_proxy_domain = helm_proxy_url.split("//")[1]
         HelmWrapper.set_cnf_property(SAN_SCR_PATH, "CN =", helm_proxy_domain)
         HelmWrapper.set_cnf_property(SAN_SCR_PATH, "DNS.1 =", helm_proxy_domain)
@@ -93,6 +94,8 @@ class HelmWrapper(object):
         HelmWrapper.create_helm_proxy_configmaps()
         TestUtil.run_command(command_args=f"chmod u+x {BASE64_ENCODED_SECRET_SCRIPT_PATH}")
         status, return_obj =  TestUtil.run_command(command_args=[BASE64_ENCODED_SECRET_SCRIPT_PATH], display_stdout=False)
+
+        Logger.logger.info(f"Helm proxy with url: '{helm_proxy_url}' configured successfully.")
 
         return {"global.httpsProxy": helm_proxy_url, 
                 "global.proxySecretFile": return_obj.stdout.decode("utf-8")}
