@@ -40,5 +40,4 @@ class BasePayment(base_test.BaseTest):
                 Logger.logger.info(f"canceled subscription for tenant {tenantID}")
 
     def cleanup(self, **kwargs):
-        super().delete_tenants()
         return super().cleanup(**kwargs)
