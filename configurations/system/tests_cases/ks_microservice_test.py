@@ -1,7 +1,8 @@
 import inspect
 
-from infrastructure import supported_systemsAPI
-from .structures import TestConfiguration, K8SConnection
+from .structures import TestConfiguration
+from systest_utils import statics
+
 
 
 class KSMicroserviceTests(object):
@@ -140,4 +141,22 @@ class KSMicroserviceTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": ["MITRE"], "hostsensor": False},
                       {"trigger_by": "cronjob", "operation": "create", "framework": ["NSA"], "hostsensor": False}]
+        )
+
+
+    @staticmethod
+    def ks_microservice_create_2_cronjob_mitre_and_nsa_proxy():
+        from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanWithKubescapeAsServiceTest,
+            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
+            secret="wikijs.yaml",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
+            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": ["MITRE"], "hostsensor": False},
+                      {"trigger_by": "cronjob", "operation": "create", "framework": ["NSA"], "hostsensor": False}],
+            proxy_config={"helm_proxy_url":statics.HELM_PROXY_URL}
         )

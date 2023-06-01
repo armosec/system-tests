@@ -2,6 +2,7 @@
 def backend = "${env.BACKEND}"
 
 def tests = [
+             "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "vulnerability_scanning_proxy":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
