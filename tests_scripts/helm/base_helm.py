@@ -104,7 +104,7 @@ class BaseHelm(BaseK8S):
             else:
                 Logger.logger.info(f"helm_proxy_url is defined in proxy_config, using {helm_proxy_url}")
 
-            helm_proxy_params = HelmWrapper.configure_helm_proxy(helm_proxy_url=helm_proxy_url)
+            helm_proxy_params = HelmWrapper.configure_helm_proxy(helm_proxy_url=helm_proxy_url, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
             
             helm_kwargs.update(helm_proxy_params)
 
