@@ -12,7 +12,6 @@ DEFAULT_BRANCH = "release"
 HTTPD_PROXY_CRT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.crt")
 HTTPD_PROXY_KEY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.key")
 
-HELM_PROXY_URL = "https://httpd-proxy.default"
 
 class BaseHelm(BaseK8S):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None, with_proxy=False):
