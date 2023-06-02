@@ -76,6 +76,7 @@ class ScanWithExceptions(BaseKubescape):
         Logger.logger.info("Scanning kubescape")
         exception_file = BaseKubescape.get_abs_path(statics.DEFAULT_EXCEPTIONS_PATH,
                                                     [self.test_obj.get_arg("exceptions")])
+        self.override_exceptions_file(exception_file=exception_file)
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    exceptions=''.join(exception_file))
         control_test = self.test_obj.get_arg("controls_tested")
@@ -83,7 +84,16 @@ class ScanWithExceptions(BaseKubescape):
         self.test_exception_result(framework_report=result, controls_with_exception=control_test)
 
         return self.cleanup()
-    
+
+    def override_exceptions_file(self, exception_file):
+        # Kubescape supports input from a single source, so, when artifacts and exceptions are the input, we must override the exceptions file in theartifacts directory.
+        # This is a patch, the correct solution is to combine both file.
+        # The real solution is for Kubescape to support such cases
+        if self.artifacts:
+            import shutil
+            shutil.copy(exception_file[0], os.path.join(self.artifacts, "exceptions.json"))
+
+
 class ScanComplianceScore(BaseKubescape):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
