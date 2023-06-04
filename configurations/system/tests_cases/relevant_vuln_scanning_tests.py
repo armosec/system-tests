@@ -168,7 +168,7 @@ class RelevantVulnerabilityScanningTests(object):
 
 
     @staticmethod
-    def relevancy_golang():
+    def relevancy_python():
         from tests_scripts.helm.relevant_cve import RelevantCVEs
         from systest_utils import statics
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
