@@ -30,7 +30,7 @@ class RelevantCVEs(BaseRelevantCves):
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
-      #  1.1 add and update armo in repo
+        #  1.1 add and update armo in repo
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
@@ -47,6 +47,8 @@ class RelevantCVEs(BaseRelevantCves):
         self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
         Logger.logger.info('apply config-maps')
         self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+        Logger.logger.info('apply secrets')
+        self.apply_directory(path=self.test_obj[("secrets", None)], namespace=namespace)
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)

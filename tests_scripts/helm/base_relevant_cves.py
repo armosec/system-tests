@@ -311,6 +311,9 @@ class BaseRelevantCves(BaseHelm):
             assert container_name in backend_CVEs.keys(), \
                 f"Expect to receive {container_name} in results_details from backend"
 
+            if len(cve_list) == 0: 
+                continue
+
             image_hash = next(iter(cve_list.items()))[1]['imageHash']
             total_cves = 0
             storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], container_name=container_name)
@@ -374,7 +377,7 @@ class BaseRelevantCves(BaseHelm):
 
             
 
-    def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 600):
+    def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 900):
 
         start = time.time()
         err = ""

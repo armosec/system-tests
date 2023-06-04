@@ -1,0 +1,70 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/qorbani/golang-hello-world@sha256:a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
+            "kubescape.io/status": ""
+        },
+        "creationTimestamp": "2023-06-04T21:34:24Z",
+        "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-qorbani-golang-hello-world-sha256-a14f3fbf3d5d1c4a000",
+            "kubescape.io/image-name": "docker-io-qorbani-golang-hello-world"
+        },
+        "name": "a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
+        "namespace": "kubescape",
+        "resourceVersion": "30",
+        "uid": "dc167751-5c67-4193-9cda-9a91ed34ffdc"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": false
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": null,
+                "name": "",
+                "version": ""
+            },
+            "matches": null,
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}
