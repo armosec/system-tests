@@ -17,8 +17,8 @@ spec:
       containers:
       - name: python
         args:
-        - python /src/PythonHelloWorld.py; sleep 3600
+        - python3 -c 'print("hello world")'; sleep 3600
         command:
         - /bin/sh
         - -c
-        image: kaylaweb/python-hello-world@sha256:1e380e2669642a362c4e60f1859201b31c77ea6d67290f99062b4a4568802f3c
+        image: python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07

@@ -3,11 +3,11 @@
     "kind": "SBOMSPDXv2p3Filtered",
     "metadata": {
         "annotations": {
-            "kubescape.io/image-id": "docker.io/kaylaweb/python-hello-world@sha256:1e380e2669642a362c4e60f1859201b31c77ea6d67290f99062b4a4568802f3c",
+            "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
             "kubescape.io/status": "",
             "kubescape.io/workload-container-name": "python"
         },
-        "creationTimestamp": "2023-06-04T13:17:29Z",
+        "creationTimestamp": "2023-06-05T10:33:42Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -15,10 +15,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "python"
         },
-        "name": "19998fedd9709445e32326ca006539794e581e33f15eaac4a7dfcaa8a7533168",
+        "name": "620ff9ad030f4cff8e90fa0ca6c198d7d2890e29801eadb9da925fb5223718c9",
         "namespace": "kubescape",
-        "resourceVersion": "45",
-        "uid": "9370b1c3-e5c8-4742-b701-cc6c5c90a0bb"
+        "resourceVersion": "39",
+        "uid": "15e8bf73-a7aa-4205-90ef-c592c53df19d"
     },
     "spec": {
         "metadata": {
@@ -36,7 +36,7 @@
             "comment": "",
             "creationInfo": {
                 "comment": "",
-                "created": "2023-06-04T12:59:31Z",
+                "created": "2023-06-05T10:31:41Z",
                 "creators": [
                     "Organization: Anchore, Inc",
                     "Tool: syft-v0.76.0",
@@ -47,11 +47,11 @@
             },
             "dataLicense": "CC0-1.0",
             "documentDescribes": null,
-            "documentNamespace": "https://anchore.com/syft/image/docker.io/kaylaweb/python-hello-world@sha256-1e380e2669642a362c4e60f1859201b31c77ea6d67290f99062b4a4568802f3c-4650ad9f-45f1-412a-84f8-9fc5e8a1930b",
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/python@sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-e0c66c19-adf3-4687-b736-6c2828280294",
             "externalDocumentRefs": null,
             "files": [
                 {
-                    "SPDXID": "SPDXRef-359cde58f63926c",
+                    "SPDXID": "SPDXRef-15565c002b5faa0f",
                     "annotations": null,
                     "artifactOfs": null,
                     "attributionTexts": null,
@@ -61,11 +61,11 @@
                             "checksumValue": "0000000000000000000000000000000000000000"
                         }
                     ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
+                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                     "copyrightText": "",
                     "fileContributors": null,
                     "fileDependencies": null,
-                    "fileName": "/bin/sleep",
+                    "fileName": "/etc/group",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
@@ -73,7 +73,7 @@
                     "noticeText": ""
                 },
                 {
-                    "SPDXID": "SPDXRef-6e0f4210f80e6a94",
+                    "SPDXID": "SPDXRef-ff1c9d543f9bda84",
                     "annotations": null,
                     "artifactOfs": null,
                     "attributionTexts": null,
@@ -83,11 +83,11 @@
                             "checksumValue": "0000000000000000000000000000000000000000"
                         }
                     ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
+                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                     "copyrightText": "",
                     "fileContributors": null,
                     "fileDependencies": null,
-                    "fileName": "/lib/x86_64-linux-gnu/libselinux.so.1",
+                    "fileName": "/etc/nsswitch.conf",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
@@ -95,7 +95,7 @@
                     "noticeText": ""
                 },
                 {
-                    "SPDXID": "SPDXRef-5e0d6f7f888ac504",
+                    "SPDXID": "SPDXRef-7b8c84ee1caf54a2",
                     "annotations": null,
                     "artifactOfs": null,
                     "attributionTexts": null,
@@ -105,275 +105,11 @@
                             "checksumValue": "0000000000000000000000000000000000000000"
                         }
                     ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
+                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                     "copyrightText": "",
                     "fileContributors": null,
                     "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_ADDRESS",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-7b859d23a9c0dbf9",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_COLLATE",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-5be6d2b49421ffa3",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_CTYPE",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-ae5a13d6797aff8a",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_IDENTIFICATION",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-9eb61cb0eb463f77",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_MEASUREMENT",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-5fa1a5f0b44554a7",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_MESSAGES/SYS_LC_MESSAGES",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-2fb289e161d86481",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_MONETARY",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-5b631bdc28201d71",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_NAME",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-adfc2a887d65b9ae",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_NUMERIC",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-5d671005c073a2ce",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_PAPER",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-1587bd08cf2293d6",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_TELEPHONE",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-8511f5423d1a792",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/locale/C.UTF-8/LC_TIME",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-112b06bf0ba8bffd",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:007ab444b234be691d8dafd51839b7713324a261b16e2487bf4a3f989ded912d",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache",
+                    "fileName": "/etc/passwd",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
@@ -385,664 +121,102 @@
                 {
                     "comment": "",
                     "extractedText": "NONE",
-                    "licenseId": "LicenseRef--",
-                    "name": "#",
+                    "licenseId": "LicenseRef-",
+                    "name": "",
                     "seeAlsos": null
                 },
                 {
                     "comment": "",
                     "extractedText": "NONE",
-                    "licenseId": "LicenseRef-2-clause",
-                    "name": "2-clause",
+                    "licenseId": "LicenseRef-AND",
+                    "name": "AND",
                     "seeAlsos": null
                 },
                 {
                     "comment": "",
                     "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Artistic",
-                    "name": "Artistic",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Autoconf",
-                    "name": "Autoconf",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD",
-                    "name": "BSD",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-2-Clause-alike",
-                    "name": "BSD-2-Clause-alike",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-2-Clause-regents",
-                    "name": "BSD-2-Clause-regents",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-3",
-                    "name": "BSD-3",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-3-clause-GENERIC",
-                    "name": "BSD-3-clause-GENERIC",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-4-clause-POWERDOG",
-                    "name": "BSD-4-clause-POWERDOG",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-BY-LC-NE",
-                    "name": "BSD-BY-LC-NE",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BSD-like",
-                    "name": "BSD-like",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-BZIP",
-                    "name": "BZIP",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Bellcore",
-                    "name": "Bellcore",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Boost",
-                    "name": "Boost",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-CC0",
-                    "name": "CC0",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Catharon-OSL",
-                    "name": "Catharon-OSL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-DONT-CHANGE-THE-GPL",
-                    "name": "DONT-CHANGE-THE-GPL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-EDL-1.0",
-                    "name": "EDL-1.0",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Expat",
-                    "name": "Expat",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GAP",
-                    "name": "GAP",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GAP-Makefile.in",
-                    "name": "GAP~Makefile.in",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GAP-configure",
-                    "name": "GAP~configure",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GFDL",
-                    "name": "GFDL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GFDL-1.3-",
-                    "name": "GFDL-1.3+",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GFDL-NIV-1.3-",
-                    "name": "GFDL-NIV-1.3+",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GNU-GPL-v2",
-                    "name": "GNU GPL v2",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GNU-GPLv2-or-any-later-version",
-                    "name": "GNU GPLv2 or any later version",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPL",
-                    "name": "GPL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPL-2.1-",
-                    "name": "GPL-2.1+",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPL-3--WITH-BISON-EXCEPTION",
-                    "name": "GPL-3+-WITH-BISON-EXCEPTION",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPLv2-",
-                    "name": "GPLv2+",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPLv3",
-                    "name": "GPLv3",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GPLv3-",
-                    "name": "GPLv3+",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-GZip",
-                    "name": "GZip",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-HSIEH-BSD",
-                    "name": "HSIEH-BSD",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-HSIEH-DERIVATIVE",
-                    "name": "HSIEH-DERIVATIVE",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickLicensePartEZXML",
-                    "name": "ImageMagickLicensePartEZXML",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickLicensePartFIG",
-                    "name": "ImageMagickLicensePartFIG",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickLicensePartGsview",
-                    "name": "ImageMagickLicensePartGsview",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickLicensePartOpenSSH",
-                    "name": "ImageMagickLicensePartOpenSSH",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickPartGraphicsMagick",
-                    "name": "ImageMagickPartGraphicsMagick",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickPartlibjpeg",
-                    "name": "ImageMagickPartlibjpeg",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ImageMagickPartlibsquish",
-                    "name": "ImageMagickPartlibsquish",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-LGPL",
-                    "name": "LGPL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-MIT-Old-Style-with-legal-disclaimer-2",
-                    "name": "MIT-Old-Style-with-legal-disclaimer-2",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-MIT-X-Consortium",
-                    "name": "MIT-X-Consortium",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Magick--",
-                    "name": "Magick++",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-OpenGroup-BSD-like",
-                    "name": "OpenGroup-BSD-like",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-PD",
-                    "name": "PD",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-PD-debian",
-                    "name": "PD-debian",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-PSF-or-ZPL",
-                    "name": "PSF or ZPL",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Perllikelicence",
-                    "name": "Perllikelicence",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Permission",
-                    "name": "Permission",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Python-Software-Foundation-License",
-                    "name": "Python Software Foundation License",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-REGCOMP",
-                    "name": "REGCOMP",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-REGCOMP-",
-                    "name": "REGCOMP,",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-RFC-Reference",
-                    "name": "RFC-Reference",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-S2P",
-                    "name": "S2P",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-SDBM-PUBLIC-DOMAIN",
-                    "name": "SDBM-PUBLIC-DOMAIN",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-SWsoft",
-                    "name": "SWsoft",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-TEXT-TABS",
-                    "name": "TEXT-TABS",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-TatcherUlrichPublicDomain",
-                    "name": "TatcherUlrichPublicDomain",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-The",
-                    "name": "The",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-This",
-                    "name": "This",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-UNKNOWN",
-                    "name": "UNKNOWN",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Unicode",
-                    "name": "Unicode",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Unicode-data",
-                    "name": "Unicode-data",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-WEBP",
-                    "name": "WEBP",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Wietse",
-                    "name": "Wietse",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-XFIG",
-                    "name": "XFIG",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-Xen-interface",
-                    "name": "Xen-interface",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-ad-hoc",
-                    "name": "ad-hoc",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-almost",
-                    "name": "almost",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-config-h",
-                    "name": "config-h",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-dlmalloc",
-                    "name": "dlmalloc",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-mingw-runtime",
-                    "name": "mingw-runtime",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-no-modification",
-                    "name": "no-modification",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-noderivs",
-                    "name": "noderivs",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-nonstandard-",
-                    "name": "nonstandard,",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-other",
-                    "name": "other",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive",
-                    "name": "permissive",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-fsf",
-                    "name": "permissive-fsf",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-long-disclaimer",
-                    "name": "permissive-long-disclaimer",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-nowarranty",
-                    "name": "permissive-nowarranty",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-short-disclaimer",
-                    "name": "permissive-short-disclaimer",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-without-disclaimer",
-                    "name": "permissive-without-disclaimer",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-permissive-without-notices-or-disclaimer",
-                    "name": "permissive-without-notices-or-disclaimer",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-probably-PD",
-                    "name": "probably-PD",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-public-domain",
-                    "name": "public-domain",
-                    "seeAlsos": null
-                },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-zlib-libpng",
-                    "name": "zlib/libpng",
+                    "licenseId": "LicenseRef-Public-Domain",
+                    "name": "Public-Domain",
                     "seeAlsos": null
                 }
             ],
-            "name": "docker.io/kaylaweb/python-hello-world@sha256:1e380e2669642a362c4e60f1859201b31c77ea6d67290f99062b4a4568802f3c",
+            "name": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
             "packages": [
                 {
-                    "SPDXID": "SPDXRef-Package-deb-coreutils-8d3d72c1af50a311",
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942",
                     "annotations": null,
                     "attributionTexts": null,
                     "builtDate": "",
                     "checksums": null,
                     "comment": "",
                     "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
                     "externalRefs": [
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:coreutils:coreutils:8.23-4:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/coreutils@8.23-4?arch=amd64\u0026distro=debian-8",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18.0",
                             "referenceType": "purl"
                         }
                     ],
@@ -1051,72 +225,96 @@
                     "hasFiles": null,
                     "homepage": "",
                     "licenseComments": "",
-                    "licenseConcluded": "GPL-3.0-only",
-                    "licenseDeclared": "GPL-3.0-only",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
                     "licenseInfoFromFiles": null,
-                    "name": "coreutils",
-                    "originator": "Person: Michael Stone \u003cmstone@debian.org\u003e",
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
                     "packageFileName": "",
                     "packageVerificationCode": null,
                     "primaryPackagePurpose": "",
                     "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/coreutils/copyright, /var/lib/dpkg/info/coreutils.md5sums, /var/lib/dpkg/status",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
                     "summary": "",
                     "supplier": null,
                     "validUntilDate": "",
-                    "versionInfo": "8.23-4"
+                    "versionInfo": "3.4.3-r1"
                 },
                 {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942",
                     "annotations": null,
                     "attributionTexts": null,
                     "builtDate": "",
                     "checksums": null,
                     "comment": "",
                     "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
                     "externalRefs": [
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18.0",
                             "referenceType": "purl"
                         }
                     ],
@@ -1125,72 +323,96 @@
                     "hasFiles": null,
                     "homepage": "",
                     "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
                     "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
                     "packageFileName": "",
                     "packageVerificationCode": null,
                     "primaryPackagePurpose": "",
                     "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
                     "summary": "",
                     "supplier": null,
                     "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
+                    "versionInfo": "3.4.3-r1"
                 },
                 {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942",
                     "annotations": null,
                     "attributionTexts": null,
                     "builtDate": "",
                     "checksums": null,
                     "comment": "",
                     "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
                     "externalRefs": [
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
                             "referenceType": "cpe23Type"
                         },
                         {
                             "comment": "",
                             "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18.0",
                             "referenceType": "purl"
                         }
                     ],
@@ -1199,1038 +421,478 @@
                     "hasFiles": null,
                     "homepage": "",
                     "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
                     "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
                     "packageFileName": "",
                     "packageVerificationCode": null,
                     "primaryPackagePurpose": "",
                     "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
                     "summary": "",
                     "supplier": null,
                     "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc-bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc_bin:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc-bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc:libc_bin:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc-bin@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc-bin",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc-bin/copyright, /var/lib/dpkg/info/libc-bin.conffiles, /var/lib/dpkg/info/libc-bin.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libc6-58ce29a04bc3cff6",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libc6:libc6:2.19-18\\+deb8u9:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libc6@2.19-18+deb8u9?arch=amd64\u0026upstream=glibc\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libc6",
-                    "originator": "Person: GNU Libc Maintainers \u003cdebian-glibc@lists.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libc6/copyright, /var/lib/dpkg/info/libc6:amd64.conffiles, /var/lib/dpkg/info/libc6:amd64.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.19-18+deb8u9"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-libselinux1-c5ff2746e8d2666c",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:libselinux1:libselinux1:2.3-2:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/debian/libselinux1@2.3-2?arch=amd64\u0026upstream=libselinux\u0026distro=debian-8",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
-                    "licenseInfoFromFiles": null,
-                    "name": "libselinux1",
-                    "originator": "Person: Debian SELinux maintainers \u003cselinux-devel@lists.alioth.debian.org\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libselinux1/copyright, /var/lib/dpkg/info/libselinux1:amd64.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.3-2"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-binary-python-f11d0d852151e5c3",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:python_software_foundation:python:3.6.1:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:python:python:3.6.1:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:python:python:3.6.1:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:generic/python@3.6.1",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "NONE",
-                    "licenseDeclared": "NONE",
-                    "licenseInfoFromFiles": null,
-                    "name": "python",
-                    "originator": null,
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from the following paths: /usr/local/bin/python3.6, /usr/local/lib/libpython3.6m.so.1.0",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "3.6.1"
+                    "versionInfo": "3.4.3-r1"
                 }
             ],
             "relationships": [
                 {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-argparse-6b85f84e24c639d9",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-libpython2.7-stdlib-3678d6f6bf4eefcd"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-wsgiref-f76569cabcd31278",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-libpython2.7-stdlib-3678d6f6bf4eefcd"
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-112b06bf0ba8bffd",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc6-58ce29a04bc3cff6"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-binary-python-32b51157b12b9a5a",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-python2.7-minimal-82828d3d7f8d9b26"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-359cde58f63926c",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-coreutils-8d3d72c1af50a311"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libpanelw-32930215fba37e48"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-6e0f4210f80e6a94",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libselinux1-c5ff2746e8d2666c"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-1587bd08cf2293d6",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-2fb289e161d86481",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-5b631bdc28201d71",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-5be6d2b49421ffa3",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libintl-4683c5e9f4a38553"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-5d671005c073a2ce",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-ca-certificates-bundle-4e13527f0d53db92"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-5e0d6f7f888ac504",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-ncurses-terminfo-base-53f4f6c8df74a1ad"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-5fa1a5f0b44554a7",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-ncurses-terminfo-base-53f4f6c8df74a1ad"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-7b859d23a9c0dbf9",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-8511f5423d1a792",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-9eb61cb0eb463f77",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-adfc2a887d65b9ae",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168"
                 },
                 {
                     "comment": "",
-                    "relatedSpdxElement": "SPDXRef-ae5a13d6797aff8a",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-libc-bin-cc2f06f485adcb85"
+                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149"
                 },
                 {
                     "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-bzr-d84c807e3405bda1",
+                    "relatedSpdxElement": "SPDXRef-Package-binary-busybox-ab348b7311a7f008",
                     "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-python-bzrlib-cd10fc3ff4355444"
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149"
                 },
                 {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-mercurial-6aa361de15a9c358",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-mercurial-common-dfdf59375b6b5854"
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b"
                 },
                 {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-six-1bcfd52c076d128",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-python-six-e0eafbcdb93fdbb2"
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9"
                 },
                 {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-python-configobj-386eb39d2a9f5cad",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-deb-python-configobj-e736a08144a4ffec"
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-443847d53cea327d",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-scanelf-7eed4e4d0586ba77"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-keyutils-libs-88434b371539e615"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-443847d53cea327d",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libintl-4683c5e9f4a38553",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-scanelf-7eed4e4d0586ba77",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-keyutils-libs-88434b371539e615",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libverto-a153395c3cb48c77",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-sqlite-libs-ac3256975e225a0a",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libcom-err-bc4f7d820866d6d8",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libuuid-fa9aec2305890935",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libverto-a153395c3cb48c77"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-206b74577cfae6ce",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-sqlite-libs-ac3256975e225a0a"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-15565c002b5faa0f",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-206b74577cfae6ce",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-7b8c84ee1caf54a2",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-ff1c9d543f9bda84",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcom-err-bc4f7d820866d6d8"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-krb5-conf-cc48ed0a37d6d922"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libtirpc-conf-d6d5d2a0992c9c3e"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libuuid-fa9aec2305890935"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libc-utils-bc2b0db44f9f8773",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786"
                 },
                 {
                     "comment": "",
