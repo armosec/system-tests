@@ -202,3 +202,21 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
+    
+    @staticmethod
+    def relevancy_java():
+        from tests_scripts.helm.relevant_cve import RelevantCVEs
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "java-simple"),
+            expected_SBOMs=[("java", "configurations/relevant_cves/expected-result/wikijs/SBOM/java-simple.json")],
+            expected_CVEs=[("java", "configurations/relevant_cves/expected-result/wikijs/CVEs/java-simple.json")],
+            expected_filtered_SBOMs=[("java", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/java-simple.json")],
+            expected_filtered_CVEs = [("java", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/java-simple.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/java-simple.json",
+            test_obj=RelevantCVEs,
+            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
+        )
