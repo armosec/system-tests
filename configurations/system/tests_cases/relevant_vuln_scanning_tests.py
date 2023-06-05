@@ -239,3 +239,21 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
+    
+    @staticmethod
+    def relevancy_golang_dynamic():
+        from tests_scripts.helm.relevant_cve import RelevantCVEs
+        from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "golang-simple-dynamic"),
+            expected_SBOMs=[("golang", "configurations/relevant_cves/expected-result/wikijs/SBOM/golang-dynamic-simple.json")],
+            expected_CVEs= [("golang", "configurations/relevant_cves/expected-result/wikijs/CVEs/golang-dynamic-simple.json")],
+            expected_filtered_SBOMs=[("golang", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/golang-dynamic-simple.json")],
+            expected_filtered_CVEs =[("golang", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/golang-dynamic-simple.json")],
+            expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/golang-dynamic.json",
+            test_obj=RelevantCVEs,
+            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
+        )
