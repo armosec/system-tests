@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-simple-server
+spec:
+  selector:
+    app: java-simple-server
+  ports:
+    - protocol: TCP
+      targetPort: 8080
+      port: 8080

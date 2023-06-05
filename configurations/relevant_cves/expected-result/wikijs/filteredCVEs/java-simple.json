@@ -9,7 +9,7 @@
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "java",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "java"
+            "kubescape.io/workload-name": "java-simple-server"
         },
         "name": "2a1c38b9f2c4443e9e5a192d430ef58e3fde695b96a09247a4661b746139e905",
         "namespace": "kubescape",
