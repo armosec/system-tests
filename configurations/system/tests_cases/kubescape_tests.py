@@ -231,3 +231,15 @@ class KubescapeTests(object):
             submit=False,
             account=False,
         )
+
+    @staticmethod
+    def host_scanner_with_hostsensorrule():
+        from tests_scripts.kubescape.scan import HostScanner
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=HostScanner,
+            policy_scope='control',
+            policy_name='C-0052,C-0069,C-0070,C-0092,C-0093,C-0094,C-0095,C-0096,C-0097,C-0098,C-0099,C-0100',
+            submit=False,
+            account=False,
+        )
