@@ -16,9 +16,10 @@
 | `scan_repository_from_url_and_submit_to_backend`               | kubescape  | scan repository from URL and test results against the backend          | kubescape, backend            |
 | `scan_with_exception_to_backend`                               | kubescape  | scan framework NSA with exception and test results against the backend | kubescape, backend            | 
 | `scan_with_custom_framework`                                   | kubescape  | scan custom framework and test results against the backend             | kubescape, backend            |
-| `scan_compliance_score`                                   | kubescape  | scan and test compliance score from kubescape report and from backend             | kubescape, backend            |
+| `scan_compliance_score`                                        | kubescape  | scan and test compliance score from kubescape report and from backend  | kubescape, backend            |
 | `scan_customer_configuration`                                  | kubescape  | scan controls with customer configuration                              | kubescape, backend            |
 | `host_scanner`                                                 | kubescape  | scan with host scanner                                                 | kubescape                     |
+| `host_scanner_with_hostsensorrule`                             | kubescape  | scan with host scanner using rules with `hostSensorRule: true`         | kubescape                     |
 | `vulnerability_scanning`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_on_new_image`             | helm-chart |                                                                        | kubevuln, backend             |
 | `ks_microservice_ns_creation`                                  | helm-chart |                                                                        | in-cluster kubescape, backend |
