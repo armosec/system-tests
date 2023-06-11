@@ -86,7 +86,7 @@ class BaseRelevantCves(BaseHelm):
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
                 instanceID = SBOM[0]
-                if self.get_workload_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                if expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] in instanceID and self.get_namespace_from_instance_ID(instanceID) == namespace:
 
                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
@@ -109,7 +109,7 @@ class BaseRelevantCves(BaseHelm):
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
                 instanceID = CVE[0]
-                if self.get_workload_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                if expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] in instanceID and self.get_namespace_from_instance_ID(instanceID) == namespace:
                     expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
                     SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
                     assert expected_SBOM_file_list == SBOM_file_list, "the files in the CVEs in the storage is not has expected"
