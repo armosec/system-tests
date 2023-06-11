@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "mariadb-sha256-821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a",
             "kubescape.io/image-name": "mariadb"
         },
-        "name": "821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
+        "name": "mariadb-sha256-821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66-0b6c66",
         "namespace": "kubescape",
         "resourceVersion": "39",
         "uid": "dfed97ce-bbc9-4ed1-b7d6-0c5a3cf8f5bd"

@@ -447,6 +447,27 @@ class BaseK8S(BaseDockerizeTest):
             subname = Wlid.get_name(wlid=wlid)
         names = [pod.metadata.name for pod in self.get_running_pods(namespace=namespace, name=subname)]
         return names[0] if len(names) == 1 else names
+    
+    @staticmethod
+    def get_image_ids(pod):
+        return [(container_status.name, container_status.image_id)  for container_status in pod.status.container_statuses]
+    
+    @staticmethod
+    def get_image_tags(pod):
+        return [(container_spec.name, container_spec.image)  for container_spec in pod.spec.containers]
+
+    def get_pod_data(self, get_data_of_pod_call_back, namespace: str = "", subname: str = "", wlid: str = ""):
+        """
+        get pod/s name/s
+        :return:
+        """
+        if get_data_of_pod_call_back is None:
+            raise Exception('empty call back get pod data function')
+        if wlid:
+            namespace = Wlid.get_namespace(wlid=wlid)
+            subname = Wlid.get_name(wlid=wlid)
+        image_ids = [get_data_of_pod_call_back(pod) for pod in self.get_running_pods(namespace=namespace, name=subname)]
+        return image_ids[0] if len(image_ids) == 1 else image_ids
 
     @staticmethod
     def update_workload_metadata_by_wlid(workload: dict, wlid: str):
@@ -483,23 +504,17 @@ class BaseK8S(BaseDockerizeTest):
         return instance_ID.split("/")[0].split("-")[1]
     
     def get_namespace_from_instance_ID(self, instance_ID: str):
-        namespace_list = instance_ID.split("/")[2].split("-")
-        return "-".join(namespace_list[1:])
-    
+        namespace_list = instance_ID.split("-")
+        return "-".join(namespace_list[:3])
     
     def get_kind_from_instance_ID(self, instance_ID: str):
-        return instance_ID.split("/")[3].split("-")[1]
+        data = instance_ID.split("-")
+        return "-".join(data[3:4]) 
 
     def get_workload_name_from_instance_ID(self, instance_ID: str):
-        name_list = instance_ID.split("/")[4].split("-")
-        name_list.pop(0)
-        name_list.pop()
-        return "-".join(name_list)
+        data = instance_ID.split("-")
+        return "-".join(data[4:5])
 
-    def get_container_name_from_instance_ID(self, instance_ID: str):
-        return instance_ID.split("/")[5].split("-")[1]
-
-    
     # apiVersion-<>/namespace-<>/kind-<>/name-<>/containerName-<>
     def calculate_instance_ID(self, pod, namespace):
         p_workload=self.get_owner_reference(pod, namespace)
@@ -707,13 +722,11 @@ class BaseK8S(BaseDockerizeTest):
         self.wlids.append(wlid)
         set(self.wlids)
         return wlid
-    
-    
 
     def get_instance_IDs(self, pods, namespace, **kwargs):
         instanceIDs = []
         for pod in pods:
-            instanceIDs_for_pod = self.calculate_instance_ID(pod=pod, namespace=namespace, **kwargs)
+            instanceIDs_for_pod = self.calculate_instance_ID(pod=pod, namespace=namespace)
             instanceIDs.append(instanceIDs_for_pod)
         return instanceIDs
 
@@ -988,7 +1001,7 @@ class BaseK8S(BaseDockerizeTest):
                     filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                         group=statics.STORAGE_AGGREGATED_API_GROUP,
                         version=statics.STORAGE_AGGREGATED_API_VERSION,
-                        name=hashlib.sha256(str(key).encode()).hexdigest(),
+                        name=key,
                         namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                         plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
                     )
@@ -998,7 +1011,7 @@ class BaseK8S(BaseDockerizeTest):
               filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                 group=statics.STORAGE_AGGREGATED_API_GROUP,
                 version=statics.STORAGE_AGGREGATED_API_VERSION,
-                name=hashlib.sha256(str(key).encode()).hexdigest(),
+                name=key,
                 namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                 plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
             )
@@ -1015,7 +1028,7 @@ class BaseK8S(BaseDockerizeTest):
                         version=statics.STORAGE_AGGREGATED_API_VERSION,
                         namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                         plural=statics.STORAGE_CVES_PLURAL,
-                        name=hashlib.sha256(str(key).encode()).hexdigest(),
+                        name=key,
                     )
                     filteredCVEs.append((key, cve_data))
 

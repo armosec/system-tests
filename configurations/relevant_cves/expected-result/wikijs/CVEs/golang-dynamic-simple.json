@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "docker-io-rcohendockerhub-golang-hello-world-sha256-4cabc6988f0",
             "kubescape.io/image-name": "docker-io-rcohendockerhub-golang-hello-world"
         },
-        "name": "4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+        "name": "docker-io-rcohendockerhub-golang-hello-world-sha256-4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c-1acf3c",
         "namespace": "kubescape",
         "resourceVersion": "18",
         "uid": "87ca411c-9cb2-4738-9419-dc0a13700a15"

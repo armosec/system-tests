@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
             "kubescape.io/image-name": "docker-io-library-redis"
         },
-        "name": "92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+        "name": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-9722c2",
         "namespace": "kubescape",
         "resourceVersion": "70",
         "uid": "1ebc4c67-8e25-4146-9741-6435d5e74433"

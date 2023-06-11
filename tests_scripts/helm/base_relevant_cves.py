@@ -10,6 +10,8 @@ from pkg_resources import parse_version
 import json
 from deepdiff import DeepDiff
 import hashlib
+import re
+from tests_scripts.kubernetes.base_k8s import BaseK8S
 
 _UNSET_DATE = "0001-01-01T00:00:00Z"
 
@@ -84,8 +86,7 @@ class BaseRelevantCves(BaseHelm):
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
                 instanceID = SBOM[0]
-                if self.get_container_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_CONTAINER_LABEL]\
-                            and self.get_workload_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                if self.get_workload_name_from_instance_ID(instanceID) == expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
 
                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
@@ -108,8 +109,7 @@ class BaseRelevantCves(BaseHelm):
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
                 instanceID = CVE[0]
-                if self.get_container_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_CONTAINER_LABEL]\
-                            and self.get_workload_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                if self.get_workload_name_from_instance_ID(instanceID) == expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
                     expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
                     SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
                     assert expected_SBOM_file_list == SBOM_file_list, "the files in the CVEs in the storage is not has expected"
@@ -124,7 +124,7 @@ class BaseRelevantCves(BaseHelm):
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
-                if CVE[0] in expected_CVE_data['metadata']['name']:
+                if CVE[0] == expected_CVE_data['metadata']['name']:
                     expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
                     SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
                     assert expected_SBOM_file_list == SBOM_file_list, "the files in the CVEs in the storage is not has expected"
@@ -136,24 +136,86 @@ class BaseRelevantCves(BaseHelm):
         if isinstance(workload_objs, list):
             instance_IDS: list = [self.get_wlid(workload=i, **kwargs) for i in workload_objs]
             return instance_IDS[0] if len(instance_IDS) == 1 else instance_IDS
+
+    def get_workloads_images_ids(self, workload_objs, namespace):
+        images_container_ids: list = [self.get_pod_data(get_data_of_pod_call_back=BaseK8S.get_image_ids, namespace=namespace, subname=i["metadata"]["name"]) for i in workload_objs]
+        return images_container_ids
+
+    def get_workloads_images_tags(self, workload_objs, namespace):
+        images_container_tags: list = [self.get_pod_data(get_data_of_pod_call_back=BaseK8S.get_image_tags, namespace=namespace, subname=i["metadata"]["name"]) for i in workload_objs]
+        return images_container_tags
+
+    @staticmethod
+    def sanitize_image_tag(image_tag):
+        sanitized_image_tag = image_tag
+        replace_and_subs = [("://", "-"), (":", "-"), ("/", "-"), ("_", "-"), ("@", "-")]
+        for rep in replace_and_subs:
+            sanitized_image_tag = re.sub(rep[0], rep[1], sanitized_image_tag)
+        return sanitized_image_tag
+
+    @staticmethod
+    def parse_container_key(image_tag: str, image_id: str):
+        image_id_slug_hash_length = 6
+        image_id_stub = image_id[(len(image_id)-image_id_slug_hash_length):]
+        sanitized_image_tag = BaseRelevantCves.sanitize_image_tag(image_tag)
+        slug = "%s-%s" % (sanitized_image_tag, image_id_stub)
+        slug = slug.lower()
+        assert re.match("^[a-z0-9][a-z0-9.-]{0,251}[a-z0-9]$", slug), 'parse_container_key - not valid SBOM key/slug %s'.format(slug)
+        return slug
+
+    def get_imagesIDs_keys(self, workload_objs, namespace):
+        container_name_index = 0
+        container_image_tag_index = 1
+        container_image_id_index = 1
+        image_workload_tags = self.get_workloads_images_tags(workload_objs=workload_objs, namespace=namespace)
+        image_workload_ids = self.get_workloads_images_ids(workload_objs=workload_objs, namespace=namespace)
+        SBOM_keys = []
+        for image_tags in image_workload_tags:
+            found = False
+            for image_tag in image_tags:
+                found = False
+                for image_ids in image_workload_ids:
+                    for image_id in image_ids:
+                        if image_tag[container_name_index] == image_id[container_name_index]:
+                            SBOM_keys.append(BaseRelevantCves.parse_container_key(image_tag[container_image_tag_index], image_id[container_image_id_index])) 
+                            found = True
+                            break
+                    if found:
+                        break
+        return SBOM_keys
+
+    @staticmethod
+    def get_kind_from_instance_id(instance_id: str):
+        result = re.search('kind-(.*)/name', instance_id)
+        return result.group(1)
+
+    @staticmethod
+    def get_name_from_instance_id(instance_id: str):
+        result = re.search('name-(.*)/containerName', instance_id)
+        return result.group(1)
     
-    def get_workload_image_hash(self, container, **kwargs):
-        image_hash_parts=container['image'].split("@sha256:")
-        if len(image_hash_parts) != 2:
-            raise Exception("image in the workload must be supplied with hash")
-        return image_hash_parts[1]
+    @staticmethod
+    def sanitize_instance_id(instance_id):
+        if len(instance_id) > 243:
+            return instance_id[:243]
+        return instance_id
+        
+    def get_filtered_data_key(self, instance_id, namespace):
+        instance_id_slug_hash_length = 4
+        hashed_id = hashlib.sha256(str(instance_id).encode()).hexdigest()
+        leading_digest = hashed_id[:instance_id_slug_hash_length]
+        trailing_digest = hashed_id[len(hashed_id)-instance_id_slug_hash_length:]
+        hashless_instance_id_slug = "%s-%s-%s" % (namespace, BaseRelevantCves.get_kind_from_instance_id(instance_id), BaseRelevantCves.get_name_from_instance_id(instance_id))
+        hashless_instance_id_slug = self.sanitize_instance_id(hashless_instance_id_slug)
+        hashless_instance_id_slug = "%s-%s-%s" % (hashless_instance_id_slug, leading_digest, trailing_digest)
+        hashless_instance_id_slug = hashless_instance_id_slug.lower()
+        return hashless_instance_id_slug
 
-    def get_workload_images_hash(self, workload_obj, **kwargs):
-        containers = workload_obj['spec']['template']['spec']['containers']
-        images_container_hash: list = [self.get_workload_image_hash(container=i, **kwargs) for i in containers]
-        return images_container_hash
 
-    def get_workloads_images_hash(self, workload_objs, **kwargs):
-        if isinstance(workload_objs, list):
-            images_hash = []
-            for i in workload_objs:
-                images_hash.extend(self.get_workload_images_hash(workload_obj=i, **kwargs))
-            return images_hash[0] if len(images_hash) == 1 else images_hash
+    def get_filtered_data_keys(self, pods, namespace, **kwargs):
+        instance_ids = self.get_instance_IDs(pods=pods, namespace=namespace, kwargs=kwargs)
+        filtered_data_keys: list = [self.get_filtered_data_key(instance_id=j, namespace=namespace) for i in instance_ids for j in i]
+        return filtered_data_keys
 
     @staticmethod
     def get_container_scan_id(be_summary: dict):

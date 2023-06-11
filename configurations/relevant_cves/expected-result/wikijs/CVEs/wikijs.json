@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac000edf7653",
             "kubescape.io/image-name": "requarks-wiki"
         },
-        "name": "dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
+        "name": "requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-87439d",
         "namespace": "kubescape",
         "resourceVersion": "41",
         "uid": "c2822a96-6ff6-49d6-b9f9-e3878620d2ad"
