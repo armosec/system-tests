@@ -1185,7 +1185,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
-        params = {"customerGUID": self.selected_tenant_id}
+        params = {"customerGUID": self.selected_tenant_id, "ignoreRulesSummary": "true", "relatedExceptions": "true"}
         page_size = 100
         body = {"pageNum": 1, 
                 "orderBy": "timestamp:desc,name:desc",
