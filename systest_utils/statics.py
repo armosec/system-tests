@@ -11,9 +11,7 @@ SLAVE = 4.1
 
 # helm proxy constants
 DEFAULT_HELM_PROXY_PATH = os.path.abspath(os.path.join('configurations', 'helm-proxy'))
-HELM_PROXY_URL = "http://httpd-proxy.default"
-
-
+HELM_PROXY_URL = "http://httpd-proxy.default:80"
 
 
 DEFAULT_WT_PATH = os.path.abspath(os.path.join('configurations', 'workload-templates'))
