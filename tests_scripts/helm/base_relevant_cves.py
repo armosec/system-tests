@@ -124,6 +124,7 @@ class BaseRelevantCves(BaseHelm):
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
+                Logger.logger.info("CVE[0]: {} =?= expected_CVE_data['metadata']['name']: {}".format(CVE[0], expected_CVE_data['metadata']['name']))
                 if CVE[0] == expected_CVE_data['metadata']['name']:
                     expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
                     SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
