@@ -4,6 +4,7 @@ def branch = "${env.BRANCH}"
 // Add ONLY kubescape-HELM tests (do NOT add any CLI related tests)
 def tests = [
             "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "vulnerability_scanning_proxy":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "ks_microservice_ns_creation":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
