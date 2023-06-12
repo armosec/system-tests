@@ -200,6 +200,7 @@ class BaseTest(object):
             f"{report_type.__func__.__name__}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
 
     def cleanup(self, wlid: str = None, display_wt: bool = False):
+        self.delete_tenants()
         return "", ""
 
     def validate_microservice_is_inactive(self, wlid, tries_num=5):

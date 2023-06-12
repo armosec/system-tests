@@ -39,4 +39,4 @@ spec:
       - name: certs-volume
         secret:
           secretName: apache-certs
-          defaultMode: "0644"
+          defaultMode: 0644
