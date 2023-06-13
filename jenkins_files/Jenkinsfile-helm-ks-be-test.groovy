@@ -3,13 +3,13 @@ def helm_branch = "${env.HELM_BRANCH}"
 def ks_branch = "${env.KS_BRANCH}"
 
 
-def delete_test_tenant = "${env.DELETE_TEST_TENANT}" ?: "ALWAYS"
+def delete_test_tenant
 
-// if (env.DELETE_TEST_TENANT) {
-//     def delete_test_tenant = "${env.DELETE_TEST_TENANT}"
-// } else {
-//     def delete_test_tenant = "ALWAYS"
-// }
+if (env.DELETE_TEST_TENANT) {
+    def delete_test_tenant = "${env.DELETE_TEST_TENANT}"
+} else {
+    def delete_test_tenant = "ALWAYS"
+}
 
 
 
