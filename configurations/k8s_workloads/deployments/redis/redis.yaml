@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: redis
-  name: redis
+    app: redis-not-fixed
+  name: redis-not-fixed
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis
+      app: redis-not-fixed
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -17,12 +17,12 @@ spec:
   template:
     metadata:
       labels:
-        app: redis
+        app: redis-not-fixed
     spec:
       containers:
       - image: docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2
         imagePullPolicy: IfNotPresent
-        name: redis
+        name: redis-not-fixed
         ports:
         - containerPort: 6379
           name: redis

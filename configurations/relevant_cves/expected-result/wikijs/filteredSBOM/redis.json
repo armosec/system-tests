@@ -5,15 +5,15 @@
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
             "kubescape.io/status": "",
-            "kubescape.io/workload-container-name": "redis"
+            "kubescape.io/workload-container-name": "redis-not-fixed"
         },
         "creationTimestamp": "2023-05-29T19:52:21Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-container-name": "redis",
+            "kubescape.io/workload-container-name": "redis-not-fixed",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "redis"
+            "kubescape.io/workload-name": "redis-not-fixed"
         },
         "name": "89e51a6d80238bcaecaef07860c482fc092aaf551ca5127e03616a8babd52eed",
         "namespace": "kubescape",

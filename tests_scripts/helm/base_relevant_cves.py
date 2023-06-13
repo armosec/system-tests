@@ -86,7 +86,7 @@ class BaseRelevantCves(BaseHelm):
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
                 instanceID = SBOM[0]
-                if expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] in instanceID and self.get_namespace_from_instance_ID(instanceID) == namespace:
+                if expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] == SBOM[1]['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] and self.get_namespace_from_instance_ID(instanceID) == namespace:
 
                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
