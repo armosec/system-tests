@@ -4,12 +4,12 @@ def ks_branch = "${env.KS_BRANCH}"
 
 def delete_test_tenant
 
-try {
+if (env.DELETE_TEST_TENANT) {
     delete_test_tenant = "${env.DELETE_TEST_TENANT}"
-} catch (err) {
-    echo "${err}"
-    delete_test_tenant =  "ALWAYS"
+} else {
+    delete_test_tenant = "ALWAYS"
 }
+
 
 // def delete_test_tenant = "${env.DELETE_TEST_TENANT}" ?: "ALWAYS"
 
