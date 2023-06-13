@@ -1668,7 +1668,7 @@ class ControlPanelAPI(object):
         return requests.delete(self.server + url, **args)
 
     def get_cookie(self):
-        return self.login_customer_cookie
+        return self.selected_tenant_cookie
 
     def get_server(self):
         return self.server
@@ -1681,7 +1681,7 @@ class ControlPanelAPI(object):
         server = server.replace("https", "wss")
         server = "{}?customerGUID={}".format(server + url, self.selected_tenant_id)
         Logger.logger.debug("WS connection url:{0}".format(server))
-        for cookie in self.login_customer_cookie:
+        for cookie in self.selected_tenant_cookie:
             cookie = "Cookie: {}={}".format(cookie.name, cookie.value)
         ws.connect(server, header=[cookie])
         return ws
