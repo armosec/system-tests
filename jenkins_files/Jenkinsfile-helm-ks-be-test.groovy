@@ -2,12 +2,11 @@ def backend = "${env.BACKEND}"
 def helm_branch = "${env.HELM_BRANCH}"
 def ks_branch = "${env.KS_BRANCH}"
 
-def delete_test_tenant
 
 if (env.DELETE_TEST_TENANT) {
-    delete_test_tenant = "${env.DELETE_TEST_TENANT}"
+    def delete_test_tenant = "${env.DELETE_TEST_TENANT}"
 } else {
-    delete_test_tenant = "ALWAYS"
+    def delete_test_tenant = "ALWAYS"
 }
 
 
