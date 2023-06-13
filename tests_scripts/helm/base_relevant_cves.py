@@ -349,7 +349,8 @@ class BaseRelevantCves(BaseHelm):
     def parse_CVEs_from_storage(self, storage_CVEs, image_hash):
         cve_list = []
         for storage_cve in storage_CVEs:
-            if storage_cve[0] in image_hash and  storage_cve[1]["spec"]["payload"]["matches"] is not None:
+            key = storage_cve[0].split("-")[-2]
+            if key in image_hash and  storage_cve[1]["spec"]["payload"]["matches"] is not None:
                 for cve in storage_cve[1]["spec"]["payload"]["matches"]:
                     cve_list.append(cve["vulnerability"]["id"])
                 break
