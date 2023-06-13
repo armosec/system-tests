@@ -14,13 +14,13 @@ class Portal(BaseStripe):
         quantity = 5
 
         Logger.logger.info("Stage 1: create a subscription")
-        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, self.test_tenants_ids[0])
+        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, self.test_tenant_id)
 
         Logger.logger.info("Stage 2: Get billing portal URL")
         response = self.stripe_billing_portal()
 
         Logger.logger.info("Stage 3: cancel a subscription")
-        response = self.cancel_subscription(self.test_tenants_ids[0])
+        response = self.cancel_subscription(self.test_tenant_id)
 
         return self.cleanup()
     

@@ -51,8 +51,9 @@ class BaseTest(object):
 
         self.delete_test_tenant = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "delete_test_tenant", DELETE_TEST_TENANT_DEFAULT)
 
-        self.test_tenants_ids = []
-        test_tenant_id = self.create_new_tenant()
+        self.test_tenant_id = ""
+
+        self.test_tenant_id = self.create_new_tenant()
 
         self.test_failed = False
 
@@ -77,31 +78,34 @@ class BaseTest(object):
         res, test_tenant_id = self.backend.create_tenant(tenantName)
         Logger.logger.info(f"created tenant name '{tenantName}' with tenant id {test_tenant_id}")
         self.backend.select_tenant(test_tenant_id)
-        self.test_tenants_ids.append(test_tenant_id)
         return test_tenant_id
 
 
     def delete_tenants(self):
 
+        if self.test_tenant_id == "":
+            Logger.logger.info(f"test_tenant_id is empty or was deleted, not deleting")
+            return
+
         # skip delete if delete_test_tenant is NEVER
         if self.delete_test_tenant == DELETE_TEST_TENANT_NEVER:
             Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_NEVER}', not deleting")
-            Logger.logger.info(f"test_tenants_ids is '{self.test_tenants_ids}'")
+            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
             return 
     
         # skip delete if delete_test_tenant is TEST_PASSED and test failed
         if self.delete_test_tenant == DELETE_TEST_TENANT_TEST_PASSED and self.test_failed:
             Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_TEST_PASSED}' and test failed, not deleting")
-            Logger.logger.info(f"test_tenants_ids is '{self.test_tenants_ids}'")
+            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
             return
         
-        # delete all test tenants
-        for tenant_id in self.test_tenants_ids:
-            response = self.backend.delete_tenant(tenant_id)
-            if response.status_code != client.OK:
-                Logger.logger.error(f"delete tenant {tenant_id} failed")
-            else:
-                Logger.logger.info(f"deleted tenant {tenant_id}")
+   
+        response = self.backend.delete_tenant(self.test_tenant_id)
+        if response.status_code != client.OK:
+            Logger.logger.error(f"delete tenant failed {self.test_tenant_id}")
+        else:
+            Logger.logger.info(f"deleted tenant {self.test_tenant_id}")
+            self.test_tenant_id = ""
 
 
     

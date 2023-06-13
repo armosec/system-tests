@@ -22,13 +22,13 @@ class StripeWebhook(BaseStripe):
         quantity = 5
 
         Logger.logger.info("Stage 1: create a subscription")
-        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, self.test_tenants_ids[0])
+        response = self.create_subscription(self.expected_prices[0]["name"], self.test_stripe_customer_id, quantity, self.test_tenant_id)
 
         Logger.logger.info("Stage 2: cancel a subscription")
-        response = self.cancel_subscription(self.test_tenants_ids[0])
+        response = self.cancel_subscription(self.test_tenant_id)
 
         Logger.logger.info("Stage 3: renew a subscription")
-        response = self.renew_subscription(self.test_tenants_ids[0])
+        response = self.renew_subscription(self.test_tenant_id)
    
         return self.cleanup()
     
