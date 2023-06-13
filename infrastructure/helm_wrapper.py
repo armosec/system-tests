@@ -110,6 +110,7 @@ class HelmWrapper(object):
         HelmWrapper.create_helm_proxy_certificates()
         HelmWrapper.create_helm_proxy_configmaps()
 
+
         TestUtil.run_command(command_args=f"chmod u+x {BASE64_ENCODED_SECRET_SCRIPT_PATH}")
         status, return_obj =  TestUtil.run_command(command_args=[BASE64_ENCODED_SECRET_SCRIPT_PATH], display_stdout=False)
 
