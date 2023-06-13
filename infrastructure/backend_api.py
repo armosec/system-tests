@@ -41,6 +41,7 @@ API_STRIPE_PLANS = "/api/v1/tenants/stripe/plans"
 API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
 API_TENANT_CREATE= "/api/v1/tenants/createTenant"
 API_CLUSTER = "/api/v1/cluster"
+API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan" 
 API_JOBREPORTS = "/api/v1/jobReports"
 API_POSTURE_CLUSTERSOVERTIME = "/api/v1/posture/clustersOvertime"
 API_POSTURE_FRAMEWORKS =  "/api/v1/posture/frameworks"
@@ -896,6 +897,19 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: results of posture resources by control is empty')
         return r.json()['response']
+
+    
+    def get_image_scan_stats(self):
+        r = self.get(API_IMAGE_SCAN_STATS, params={"customerGUID": self.selected_tenant_id, "includeLastReport": False})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: results of imageScan "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        if len(r.json()) == 0:
+            raise Exception(
+                'Expected to receive real imageScan object in results of get imageScan "%s", and received "%s"'
+                % (self.selected_tenant_id, r.text))
+        return r.json()
 
     def get_cluster(self, cluster_name: str, expected_status_code: int = None):
         r = self.get(API_CLUSTER, params={"customerGUID": self.selected_tenant_id, "name": cluster_name})

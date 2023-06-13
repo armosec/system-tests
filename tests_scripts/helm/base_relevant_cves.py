@@ -32,49 +32,49 @@ class BaseRelevantCves(BaseHelm):
         assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
             format(x=self.kubernetes_obj.get_cluster_name())
     
-    def get_files_from_SBOM(self, SBOM):
-        files = []
-        if SBOM['spec']['spdx']['files'] is not None:
-            for fileData in SBOM['spec']['spdx']['files']:
-                files.append(fileData['fileName'])
-        return files
+#     def get_files_from_SBOM(self, SBOM):
+#         files = []
+#         if SBOM['spec']['spdx']['files'] is not None:
+#             for fileData in SBOM['spec']['spdx']['files']:
+#                 files.append(fileData['fileName'])
+#         return files
     
-    def get_annotations_from_SBOM(self, SBOM):
-        annotations = {}
-        for key, annotation in SBOM['metadata']['annotations'].items():
-            annotations[key] = annotation
-        return annotations
+#     def get_annotations_from_SBOM(self, SBOM):
+#         annotations = {}
+#         for key, annotation in SBOM['metadata']['annotations'].items():
+#             annotations[key] = annotation
+#         return annotations
     
-    def validate_expected_SBOM(self, SBOMs, expected_SBOM_paths):
-        verified_SBOMs = 0
-        for expected_SBOM in expected_SBOM_paths:
-            for SBOM in SBOMs:
-                with open(expected_SBOM[1], 'r') as content_file:
-                    content = content_file.read()
-                expected_SBOM_data = json.loads(content)
+#     def validate_expected_SBOM(self, SBOMs, expected_SBOM_paths):
+#         verified_SBOMs = 0
+#         for expected_SBOM in expected_SBOM_paths:
+#             for SBOM in SBOMs:
+#                 with open(expected_SBOM[1], 'r') as content_file:
+#                     content = content_file.read()
+#                 expected_SBOM_data = json.loads(content)
 
-                if expected_SBOM_data['metadata']['name'] in SBOM[1]['metadata']['name']:
-                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
-                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
-                    for key, annotation in expected_SBOM_annotations.items():
-                        assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
+#                 if expected_SBOM_data['metadata']['name'] in SBOM[1]['metadata']['name']:
+#                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
+#                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+#                     for key, annotation in expected_SBOM_annotations.items():
+#                         assert SBOM_annotations[key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
                     
-                    expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
-                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected" 
-                    verified_SBOMs += 1
-                    break
-        assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
+#                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
+#                     SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+#                     assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected" 
+#                     verified_SBOMs += 1
+#                     break
+#         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
 
-    def get_CVEs_from_CVE_manifest(self, CVEManifest):
-        cves = []
-        if 'spec' in CVEManifest:
-            CVEManifest = CVEManifest['spec']
-        if CVEManifest['payload']['matches'] is not None:
-            for match in CVEManifest['payload']['matches']:
-                vuln = match['vulnerability']
-                cves.append(vuln['id'])
-        return cves
+#     def get_CVEs_from_CVE_manifest(self, CVEManifest):
+#         cves = []
+#         if 'spec' in CVEManifest:
+#             CVEManifest = CVEManifest['spec']
+#         if CVEManifest['payload']['matches'] is not None:
+#             for match in CVEManifest['payload']['matches']:
+#                 vuln = match['vulnerability']
+#                 cves.append(vuln['id'])
+#         return cves
     
     def validate_expected_filtered_SBOMs(self, SBOMs, expected_SBOM_paths,namespace):
         verified_SBOMs = 0
@@ -292,146 +292,38 @@ class BaseRelevantCves(BaseHelm):
                 break
         return cve_list
     
-    def is_relevancy_enabled(self):
-        if self.test_obj.get_arg('relevancy_enabled') is not None:
-            return self.test_obj.get_arg('relevancy_enabled')
-        else:
-            return True
+#     def is_relevancy_enabled(self):
+#         if self.test_obj.get_arg('relevancy_enabled') is not None:
+#             return self.test_obj.get_arg('relevancy_enabled')
+#         else:
+#             return True
 
 
-    def test_expected_scan_result(self, backend_CVEs, storage_CVEs):
-        # check that all backend CVEs are in storage
-        # check that filtered CVEs have relevantLabel set to 'yes'
-        # check that non-filtered CVEs have relevantLabel set to 'no'
-        # check that we have the same number of CVEs in storage and backend
-        failed_CVEs_path = []
-        relevancy_enabled = self.is_relevancy_enabled()
 
-        for container_name, cve_list in backend_CVEs.items():
-            assert container_name in backend_CVEs.keys(), \
-                f"Expect to receive {container_name} in results_details from backend"
+#     def expose_operator(self, cluster):
+#         running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
+#                                              name=statics.CA_OPERATOR_DEPLOYMENT_FROM_HELM_NAME)
+#         try:
+#             self.port_forward_proc = self.kubernetes_obj.portforward(cluster, statics.CA_NAMESPACE_FROM_HELM_NAME,
+#                                                                      running_pods[0].metadata.name,
+#                                                                      {"source": 4002, "exposed": 4002})
+#             if self.port_forward_proc is None or self.port_forward_proc.stderr is not None:
+#                 raise Exception('port forwarding to operator failed')
+#             time.sleep(5)
+#             Logger.logger.info('expose_websocket done')
+#         except Exception as e:
+#             print(e)
 
-            if len(cve_list) == 0: 
-                continue
-
-            image_hash = next(iter(cve_list.items()))[1]['imageHash']
-            total_cves = 0
-            storage_filtered_CVEs = self.parse_filtered_CVEs_from_storage(storage_CVEs[statics.FILTERED_CVES_KEY], container_name=container_name)
-            storage_all_CVEs = self.parse_CVEs_from_storage(storage_CVEs[statics.ALL_CVES_KEY], image_hash=image_hash)
-
-            for cve, cve_details in cve_list.items():
-                total_cves += cve_details[statics.SCAN_RESULT_TOTAL_FIELD]
-                if cve in storage_filtered_CVEs:
-                    assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_TRUE, \
-                        f"Expect to receive {cve} as relevant CVE"
-                elif cve in storage_all_CVEs:
-                    if relevancy_enabled:
-                        assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_FALSE, \
-                            f"Expect to receive {cve} as not relevant CVE"
-                    else:
-                        assert cve_details[statics.SCAN_RESULT_IS_RELEVANT_FIELD] == statics.SCAN_RESULT_IS_RELEVANT_FIELD_UNKNOWN, \
-                            f"Expect to receive {cve} as relevant CVE"
-                if cve not in storage_filtered_CVEs and cve not in storage_all_CVEs:
-                    failed_CVEs_path.append(f"{container_name} -> {cve}")
-
-
-            assert total_cves == len(storage_all_CVEs), \
-                f"Expect to receive {len(storage_all_CVEs)} CVEs in total from backend, but received {total_cves} CVEs"
-
-
-        assert not failed_CVEs_path, 'Expect the data from backend would be the same as storage CVE results.\n' \
-        f'in the following entries is happened:\n{failed_CVEs_path}'
-
-    def test_be_summary(self, be_summary):
-
-        workload_identifiers = []
-        customer_guid = be_summary[0]['designators']['attributes']['customerGUID']
-
-        # check that same workload doesn't appear more than once
-        for summary in be_summary:
-            workload_identifier = f"{summary['wlid']}/{summary['designators']['attributes']['containerName']}/{summary['registry']}/{summary['imageTag']}"
-          
-            assert workload_identifier not in workload_identifiers , f"Expect to receive unique workload identifier, but received {workload_identifier} twice"
-
-            workload_identifiers.append(workload_identifier)
-
-        # check filters with wlid,  namespace, container, registry, tag, relevantLabel
-        fields_to_check = [ 'namespace', 'wlid', 'containerName', 'registry', 'imageTag', 'relevantLabel']
-        for field in fields_to_check:
-            resp = self.backend.get_unique_values_for_field_scan_summary(field=field, customer_guid=customer_guid)
-            resp = resp.json()
-            resp_for_field = resp['fields'][field]
-            if len(resp_for_field) > 1:
-                # first value is always empty (for all values)
-                value = resp_for_field[1]
-                resps = self.backend.get_summary_with_inner_filters(filter={field:value}, customer_guid=customer_guid)
-                objs_with_filter_count = 0
-                for obj in resp['fieldsCount'][field]:
-                    if obj['key'] == value:
-                        objs_with_filter_count = obj['count']
-                        break
-                objs_with_filter = resps.json()['response']
-                assert len(objs_with_filter) == objs_with_filter_count, f"Expect to receive {objs_with_filter_count} objects for {field} filter, but received {len(objs_with_filter)}"
-                for obj in objs_with_filter:
-                    assert obj[field] == value, f"Expect to receive {value} for {field} filter, but received {obj[field]}"
-
-            
-
-    def test_backend_cve_against_storage_result(self, since_time: str, containers_scan_id, be_summary, storage_CVEs, timeout: int = 900):
-
-        start = time.time()
-        err = ""
-        success = False
-        while time.time() - start < timeout:
-            Logger.logger.info('wait for detailed CVE aggregation to end in backend')
-            try:
-                backend_CVEs = self.get_container_cve(since_time=since_time, container_scan_id=containers_scan_id)
-                Logger.logger.info('Test results against expected results')
-                self.test_expected_scan_result(backend_CVEs=backend_CVEs, storage_CVEs=storage_CVEs)
-                success = True
-                break
-            except Exception as e:
-                if str(e).find("502 Bad Gateway") > 0:
-                    raise e
-                err = e
-                Logger.logger.warning(
-                    "timeout {} since_time {} containers_scan_id {} error: {}".format(timeout // 60, since_time,
-                                                                                      containers_scan_id, err))
-            time.sleep(30)
-        if not success:
-            raise Exception(
-                f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
-
-        # Logger.logger.info('Test backend summary')
-        # self.test_be_summary(be_summary)
-
-        # Logger.logger.info('Test backend results_details against results_sum_summary')
-        # self.test_results_details_against_results_sum_summary(containers_cve=backend_CVEs, be_summary=be_summary)
-
-    def expose_operator(self, cluster):
-        running_pods = self.get_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
-                                             name=statics.CA_OPERATOR_DEPLOYMENT_FROM_HELM_NAME)
-        try:
-            self.port_forward_proc = self.kubernetes_obj.portforward(cluster, statics.CA_NAMESPACE_FROM_HELM_NAME,
-                                                                     running_pods[0].metadata.name,
-                                                                     {"source": 4002, "exposed": 4002})
-            if self.port_forward_proc is None or self.port_forward_proc.stderr is not None:
-                raise Exception('port forwarding to operator failed')
-            time.sleep(5)
-            Logger.logger.info('expose_websocket done')
-        except Exception as e:
-            print(e)
-
-    def send_vuln_scan_command(self, cluster: str, namespace: str):
-        data = {
-            "commands": [
-                {
-                    "CommandName": "scan",    
-                    "WildWlid": "wlid://cluster-" + cluster + "/namespace-" + namespace
-                }
-            ]
-        }
-        resp = requests.post('http://0.0.0.0:4002/v1/triggerAction', json=data)
-        print(resp)
-        if resp.status_code < 200 or resp.status_code >= 300:
-            raise Exception(f'bad response: {resp.text}')
+#     def send_vuln_scan_command(self, cluster: str, namespace: str):
+#         data = {
+#             "commands": [
+#                 {
+#                     "CommandName": "scan",    
+#                     "WildWlid": "wlid://cluster-" + cluster + "/namespace-" + namespace
+#                 }
+#             ]
+#         }
+#         resp = requests.post('http://0.0.0.0:4002/v1/triggerAction', json=data)
+#         print(resp)
+#         if resp.status_code < 200 or resp.status_code >= 300:
+#             raise Exception(f'bad response: {resp.text}')

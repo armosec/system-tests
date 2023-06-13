@@ -19,6 +19,7 @@ class HelmWrapper(object):
     @staticmethod
     def install_armo_helm_chart(customer: str, environment: str, cluster_name: str,
                                 repo: str=statics.HELM_REPO, helm_kwargs:dict={}):
+        repo = "/home/daniel/armo/helm-charts/charts/kubescape-cloud-operator"
         command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", statics.CA_NAMESPACE_FROM_HELM_NAME,
                         "--create-namespace", "--set", "account={x}".format(x=customer),
                         "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]

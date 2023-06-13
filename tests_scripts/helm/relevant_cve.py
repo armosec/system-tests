@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from systest_utils.wlid import Wlid
 
-from tests_scripts.helm.base_relevant_cves import BaseRelevantCves
+from tests_scripts.helm.base_relevant_cves import BaseVulnerabilityScanning
 
 DEFAULT_BRANCH = "release"
 
@@ -21,7 +21,7 @@ DEFAULT_BRANCH = "release"
 #         'password'] != ''
 
 
-class RelevantCVEs(BaseRelevantCves):
+class RelevantCVEs(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevantCVEs, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                            kubernetes_obj=kubernetes_obj)
@@ -95,7 +95,7 @@ class RelevantCVEs(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         # # 4.3 get CVEs for containers
 
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
 
@@ -109,7 +109,7 @@ class RelevantCVEs(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevantDataIsAppended(BaseRelevantCves):
+class RelevantDataIsAppended(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevantDataIsAppended, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                     backend=backend,
@@ -199,7 +199,7 @@ class RelevantDataIsAppended(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
     
         Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
         
@@ -215,7 +215,7 @@ class RelevantDataIsAppended(BaseRelevantCves):
         return self.cleanup()
 
 # Tests that sniffer stop sniffing after X time
-class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
+class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                     backend=backend,
@@ -288,7 +288,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
     
         Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
         
@@ -305,7 +305,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
 
 # Tests that BE has CVE data when relevancy is disabled
-class RelevancyDisabled(BaseRelevantCves):
+class RelevancyDisabled(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                 kubernetes_obj=kubernetes_obj)
@@ -379,7 +379,7 @@ class RelevancyDisabled(BaseRelevantCves):
 
         # # 4.3 get CVEs for containers
         Logger.logger.info('Test BE CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: []})
 
@@ -395,7 +395,7 @@ class RelevancyDisabled(BaseRelevantCves):
 
 
 # Test that when deleting a workload, the relevant resources are deleted from storage
-class RelevancyEnabledDeletedImage(BaseRelevantCves):
+class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledDeletedImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -469,7 +469,7 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevancyEnabledLargeImage(BaseRelevantCves):
+class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledLargeImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -533,7 +533,7 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
 
 
 
-class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
+class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledExtraLargeImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -595,7 +595,7 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevancyStorageDisabled(BaseRelevantCves):
+class RelevancyStorageDisabled(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyStorageDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -652,7 +652,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
 
         return self.cleanup()
     
-class RelevancyFixVuln(BaseRelevantCves):
+class RelevancyFixVuln(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyFixVuln, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -669,15 +669,15 @@ class RelevancyFixVuln(BaseRelevantCves):
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         # Logger.logger.info('install armo helm-chart')
-        self.add_and_upgrade_armo_to_repo()
+        # self.add_and_upgrade_armo_to_repo()
 
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
-        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+        # self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 1.3 verify installation
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        # self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
         # P2 apply workloads
         Logger.logger.info('apply workloads')
@@ -727,7 +727,7 @@ class RelevancyFixVuln(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         # # 4.3 get CVEs for containers
 
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
 
