@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "docker-io-library-jetty-sha256-30fb2e30885acafd65073eed25c682d3",
             "kubescape.io/image-name": "docker-io-library-jetty"
         },
-        "name": "docker.io-library-jetty-sha256-30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660-1d6660",
+        "name": "jetty-sha256-30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660-1d6660",
         "namespace": "kubescape",
         "resourceVersion": "30",
         "uid": "f934d208-4f3d-4807-aba1-4798e6128d49"

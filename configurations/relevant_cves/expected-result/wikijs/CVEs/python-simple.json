@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "docker-io-library-python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f",
             "kubescape.io/image-name": "docker-io-library-python"
         },
-        "name": "docker.io-library-python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
+        "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
         "namespace": "kubescape",
         "resourceVersion": "27",
         "uid": "64fab614-9ad9-4709-ae72-1b4d0984884a"
