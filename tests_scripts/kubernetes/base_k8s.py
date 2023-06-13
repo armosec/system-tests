@@ -1020,16 +1020,25 @@ class BaseK8S(BaseDockerizeTest):
 
     def get_filtered_CVEs_from_storage(self, filteredCVEsKEys):
         filteredCVEs = []
-        if isinstance(filteredCVEsKEys, list):
+        if any(isinstance(i, list) for i in filteredCVEsKEys):
             for keys in filteredCVEsKEys:
                 for key in keys:
                     cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                         group=statics.STORAGE_AGGREGATED_API_GROUP,
                         version=statics.STORAGE_AGGREGATED_API_VERSION,
+                        name=key,
                         namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                         plural=statics.STORAGE_CVES_PLURAL,
-                        name=key,
                     )
                     filteredCVEs.append((key, cve_data))
-
+        elif isinstance(filteredCVEsKEys, list):
+            for key in filteredCVEsKEys:
+              cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=key,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_CVES_PLURAL,
+            )
+              filteredCVEs.append((key, cve_data))
         return filteredCVEs
