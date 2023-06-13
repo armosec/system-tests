@@ -9,7 +9,6 @@ CREATE_CONFIGMAPS_SCRIPT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "c
 BASE64_ENCODED_SECRET_SCRIPT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "base64_encoded_secret.sh")
 SAN_SCR_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "san_scr.cnf")
 HTTPD_CONF_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd.conf")
-HELM_PROXY_NETWORK_POLICY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "network_policy_block_all.yaml")
 
 
 
@@ -110,8 +109,6 @@ class HelmWrapper(object):
 
         HelmWrapper.create_helm_proxy_certificates()
         HelmWrapper.create_helm_proxy_configmaps()
-
-        HelmWrapper.update_helm_proxy_network_policy_namespace(HELM_PROXY_NETWORK_POLICY_PATH, namespace)
 
         TestUtil.run_command(command_args=f"chmod u+x {BASE64_ENCODED_SECRET_SCRIPT_PATH}")
         status, return_obj =  TestUtil.run_command(command_args=[BASE64_ENCODED_SECRET_SCRIPT_PATH], display_stdout=False)
