@@ -31,6 +31,9 @@ def input_parser():
     parser.add_argument("--logger", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="logger level", default="DEBUG",
                         dest="logger_level")
 
+    parser.add_argument("--delete_test_tenant", choices=["ALWAYS", "TEST_PASSED", "NEVER"], help="when to delete test tenant", default="ALWAYS",
+                        dest="delete_test_tenant")
+    
     parser.add_argument("-f", "--fresh", action="store_true", dest="fresh", default=False,
                         help="refresh local docker images, build new ones (and remove the old ones).")
 
