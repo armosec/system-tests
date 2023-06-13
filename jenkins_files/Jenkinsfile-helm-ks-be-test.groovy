@@ -6,7 +6,8 @@ def delete_test_tenant
 
 try {
     delete_test_tenant = "${env.DELETE_TEST_TENANT}"
-} catch (MissingPropertyException e) {
+} catch (err) {
+    echo "${err}"
     delete_test_tenant =  "ALWAYS"
 }
 
