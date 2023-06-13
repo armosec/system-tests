@@ -1,7 +1,8 @@
 def backend = "${env.BACKEND}"
 def helm_branch = "${env.HELM_BRANCH}"
 def ks_branch = "${env.KS_BRANCH}"
-def delete_test_tenant = "${env.DELETE_TEST_TENANT}" ?: "ALWAYS"
+def delete_test_tenant = env.hasProperty('DELETE_TEST_TENANT') ? "${env.DELETE_TEST_TENANT}" : "ALWAYS"
+
 
 
 //ks_microservice_create_2_cronjob_mitre_and_nsa
