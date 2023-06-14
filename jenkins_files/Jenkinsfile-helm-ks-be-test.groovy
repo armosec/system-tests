@@ -2,6 +2,7 @@ def backend = "${env.BACKEND}"
 def helm_branch = "${env.HELM_BRANCH}"
 def ks_branch = "${env.KS_BRANCH}"
 
+
 def delete_test_tenant
 
 if (env.DELETE_TEST_TENANT) {
@@ -9,6 +10,15 @@ if (env.DELETE_TEST_TENANT) {
 } else {
     delete_test_tenant = "ALWAYS"
 }
+
+
+
+// def delete_test_tenant = "${env.hasProperty('DELETE_TEST_TENANT')}" ? "${env.DELETE_TEST_TENANT}" : "ALWAYS"
+
+
+
+//ks_microservice_create_2_cronjob_mitre_and_nsa
+//vulnerability_scanning
 
 
 // Add kubescape-CLI and kubescape-HELM tests that use the BE API

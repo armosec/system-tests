@@ -44,7 +44,8 @@ class TestDriver(object):
                                   secret_key=self.credentials_obj.get_secret_key(),
                                   url=self.backend_obj.get_dashboard_url(),
                                   auth_url=self.backend_obj.get_auth_url(),
-                                  login_method=self.backend_obj.get_login_method())
+                                  login_method=self.backend_obj.get_login_method(),
+                                  customer_guid=self.backend_obj.get_customer_guid())
 
         status = statics.FAILURE
         summary = ""
@@ -73,7 +74,18 @@ class TestDriver(object):
             status, summary = test_class_obj.start()
         except Exception as ex:
             status = statics.FAILURE
-            _, _ = test_class_obj.cleanup()
+            test_class_obj.failed()
+            _, _, tb = sys.exc_info()
+            function_name = tb.tb_frame.f_code.co_name
+
+            if function_name != "cleanup":
+                try:
+                    _, _ = test_class_obj.cleanup()
+                except Exception as e:
+                    Logger.logger.info("Failed to cleanup test")
+                    Logger.logger.error("error: {}".format(traceback.print_exc()))
+            else:
+                Logger.logger.info("Failed to cleanup test")
             summary = ex
             Logger.logger.error("error: {}".format(traceback.print_exc()))
         finally:

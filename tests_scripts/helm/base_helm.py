@@ -58,14 +58,10 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-        if self.remove_cluster_from_backend:
+        if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
-            try:
-                cluster_name = self.kubernetes_obj.get_cluster_name()
-                Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
-                self.backend.delete_cluster(cluster_name=cluster_name)
-            except:
-                pass
+            self.cluster_deleted = self.delete_cluster_from_backend()
+
         return super().cleanup(**kwargs)
 
     def display_armo_system_logs(self, level=Logger.logger.debug):
