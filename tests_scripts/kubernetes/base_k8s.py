@@ -189,12 +189,16 @@ class BaseK8S(BaseDockerizeTest):
 
     def delete_cluster_from_backend_and_tested(self):
         try:
-            self.backend.delete_cluster(cluster_name=self.kubernetes_obj.get_cluster_name())
+            cluster_name = self.kubernetes_obj.get_cluster_name()
+            Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
+            self.backend.delete_cluster(cluster_name=cluster_name)
+            # self.backend.delete_cluster(cluster_name=self.kubernetes_obj.get_cluster_name())
         except requests.ReadTimeout as e:
             pass
         except Exception as e:
             raise e
 
+        # verify cluster was deleted from backend
         cluster_result, _ = self.wait_for_report(report_type=self.backend.get_cluster, timeout=300,
                                                  cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  expected_status_code=404)

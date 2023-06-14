@@ -11,6 +11,7 @@ from configurations.system.secret_policy import SecretPolicy
 from infrastructure import backend_api
 from systest_utils import TestUtil, Logger, statics
 from systest_utils.wlid import Wlid
+from datetime import datetime, timezone
 
 from http import client
 
@@ -32,6 +33,9 @@ DELETE_TEST_TENANT_DEFAULT = DELETE_TEST_TENANT_ALWAYS
 class BaseTest(object):
     def __init__(self, test_driver: driver.TestDriver, test_obj, backend: backend_api.ControlPanelAPI = None,
                  **kwargs):
+        
+        self.test_started_at = datetime.now(timezone.utc).astimezone().isoformat()
+
         # objects
         self.test_driver = test_driver
         self.test_obj = test_obj

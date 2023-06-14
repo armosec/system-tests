@@ -49,8 +49,8 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         self.test_helm_chart_tesults(report_guid=report_guid)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        # Logger.logger.info("Deleting cluster from backend")
+        # self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
 
@@ -86,8 +86,8 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
 
         self.test_scan_jobs(port=statics.KS_PORT_FORWARD)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        # Logger.logger.info("Deleting cluster from backend")
+        # self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
     def test_scan_jobs(self, port):
