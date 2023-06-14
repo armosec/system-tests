@@ -84,7 +84,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
 
         self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = expected_number_of_pods)
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -188,8 +188,7 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         Logger.logger.info('Test backend CVEs against storage CVEs')
         self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
-        
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -277,7 +276,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
         Logger.logger.info('Test backend CVEs against storage CVEs')
         self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         
         Logger.logger.info('delete armo namespace')
@@ -716,7 +715,7 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
 
         self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
 
         # Logger.logger.info('delete armo namespace')
         # self.uninstall_armo_helm_chart()
