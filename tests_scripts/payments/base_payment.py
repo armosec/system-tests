@@ -32,12 +32,11 @@ class BasePayment(base_test.BaseTest):
         return active_subscription
 
     def cancel_test_subscriptions(self):
-        for tenantID in self.test_tenants_ids:
-            response = self.backend.cancel_subscription(tenantID)
-            if response.status_code != client.OK:
-                Logger.logger.error(f"cancel subscription for tenant {tenantID} failed")
-            else:
-                Logger.logger.info(f"canceled subscription for tenant {tenantID}")
+        response = self.backend.cancel_subscription(self.test_tenant_id)
+        if response.status_code != client.OK:
+            Logger.logger.error(f"cancel subscription for tenant {self.test_tenant_id} failed")
+        else:
+            Logger.logger.info(f"canceled subscription for tenant {self.test_tenant_id}")
 
     def cleanup(self, **kwargs):
         return super().cleanup(**kwargs)

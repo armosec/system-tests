@@ -21,6 +21,7 @@
 | `host_scanner`                                                 | kubescape  | scan with host scanner                                                 | kubescape                     |
 | `host_scanner_with_hostsensorrule`                             | kubescape  | scan with host scanner using rules with `hostSensorRule: true`         | kubescape                     |
 | `vulnerability_scanning`                                       | helm-chart |                                                                        | kubevuln, backend             |
+| `vulnerability_scanning_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_on_new_image`             | helm-chart |                                                                        | kubevuln, backend             |
 | `ks_microservice_ns_creation`                                  | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
@@ -30,6 +31,7 @@
 | `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
+`ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
@@ -80,6 +82,10 @@ Add to environment the following values to connect to the backend:
 | `-temp`/ `--temp-dir`                  | temp dir location, make sure the test has r/w privileges                                                                               |                                        |      ./temp      |
 | `-lcn`/ `--leave-cyberarmor-namespace` | Leave CyberArmor namespace after test is done                                                                                          |                                        |      False       |
 | -h                                     | Help                                                                                                                                   | 
+| `--delete_test_tenant` | When to delete test tenant, if configured for test                                                                                          |  ALWAYS(default), TEST_PASSED, NEVER                                       |      False       |
+
+
+
 
 #### kwargs options
 

@@ -26,7 +26,8 @@ class PaymentTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=StripeWebhook,
             expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID,
+            create_test_tenant = True
 
 
         )    
@@ -38,7 +39,9 @@ class PaymentTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=Checkout,
             expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID,
+            create_test_tenant = True
+
         )   
 
     @staticmethod
@@ -48,7 +51,9 @@ class PaymentTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=Portal,
             expected_prices = EXPECTED_PRICES,
-            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID
+            test_stripe_customer_id = TEST_STRIPE_CUSTOMER_ID,
+            create_test_tenant = True
+
         )          
 
     @staticmethod
@@ -57,6 +62,8 @@ class PaymentTests(object):
         return PaymentConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Plans,
-            expected_prices = EXPECTED_PRICES
+            expected_prices = EXPECTED_PRICES,
+            create_test_tenant = True
+
         )    
 

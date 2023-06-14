@@ -187,19 +187,27 @@ class BaseK8S(BaseDockerizeTest):
         except Exception as e:
             Logger.logger.error(e)
 
-    def delete_cluster_from_backend_and_tested(self):
+    def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
         try:
-            self.backend.delete_cluster(cluster_name=self.kubernetes_obj.get_cluster_name())
+            cluster_name = self.kubernetes_obj.get_cluster_name()
+            Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
+            self.backend.delete_cluster(cluster_name=cluster_name)
         except requests.ReadTimeout as e:
-            pass
+            return False
         except Exception as e:
             raise e
 
-        cluster_result, _ = self.wait_for_report(report_type=self.backend.get_cluster, timeout=300,
-                                                 cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                 expected_status_code=404)
-        assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
-            format(x=self.kubernetes_obj.get_cluster_name())
+        if confirm_deletion:
+            # verify cluster was deleted from backend
+            cluster_result, _ = self.wait_for_report(report_type=self.backend.get_cluster, timeout=300,
+                                                    cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                    expected_status_code=404)
+            assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
+                format(x=self.kubernetes_obj.get_cluster_name())
+            
+            Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
+        
+        return True
 
     def apply_secret(self, **kwargs):
         return self.apply_yaml_file(path=statics.DEFAULT_SECRETE_PATH, **kwargs)

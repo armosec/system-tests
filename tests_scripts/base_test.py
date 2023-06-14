@@ -11,6 +11,7 @@ from configurations.system.secret_policy import SecretPolicy
 from infrastructure import backend_api
 from systest_utils import TestUtil, Logger, statics
 from systest_utils.wlid import Wlid
+from datetime import datetime, timezone
 
 from http import client
 
@@ -22,9 +23,20 @@ DEFAULT_TIMEOUT_IS_SIGNED = 60 * 10
 DEFAULT_TIMEOUT_IS_SECRET_PROTECTED = 60 * 10
 
 
+DELETE_TEST_TENANT_ALWAYS = "ALWAYS"
+DELETE_TEST_TENANT_TEST_PASSED = "TEST_PASSED"
+DELETE_TEST_TENANT_NEVER = "NEVER"
+
+DELETE_TEST_TENANT_DEFAULT = DELETE_TEST_TENANT_ALWAYS
+
+
 class BaseTest(object):
     def __init__(self, test_driver: driver.TestDriver, test_obj, backend: backend_api.ControlPanelAPI = None,
                  **kwargs):
+        
+        self.test_started_at = datetime.now(timezone.utc).astimezone().isoformat()
+        self.cluster_deleted = False
+
         # objects
         self.test_driver = test_driver
         self.test_obj = test_obj
@@ -42,35 +54,70 @@ class BaseTest(object):
         self.leave_redis_data: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "leave_redis_data", False)
         self.test_summery_data = {}
 
-        self.test_tenants_ids = []
+        self.test_tenant_id = ""
+
+        # defines when to delete tenant. Only applied if self.create_test_tenant is True
+        self.delete_test_tenant = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "delete_test_tenant", DELETE_TEST_TENANT_DEFAULT)
+
+        # defines if to create a new  test tenant for the test
+        self.create_test_tenant = test_obj[("create_test_tenant", False)]
+
+        if self.create_test_tenant:
+            Logger.logger.info(f"create_test_tenant is True")
+            self.test_tenant_id = self.create_new_tenant()
+
+        self.test_failed = False
+
 
 
     def __del__(self):
         Logger.logger.info(f"test summarize: {json.dumps(self.test_summery_data, indent=4)}")
 
+    def failed(self):
+        self.test_failed = True
 
     def create_tenant_name(self, prefix: str) -> str:
         epoch = time.time()
-        prefix = "t_" + prefix
+        prefix = "auto_systest_" + prefix
         name = "%s_%d" % (prefix, epoch)
         return name
 
     def create_new_tenant(self, prefix=None) -> int:
-        prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
+        Logger.logger.info(f"creating new test tenant")
+        # prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
+        prefix = prefix if prefix is not None else ""
         tenantName = self.create_tenant_name(prefix)
         res, test_tenant_id = self.backend.create_tenant(tenantName)
-        Logger.logger.info(f"create tenant name '{tenantName}' with tenant id {test_tenant_id}")
+        Logger.logger.info(f"created tenant name '{tenantName}' with tenant id {test_tenant_id}")
         self.backend.select_tenant(test_tenant_id)
-        self.test_tenants_ids.append(test_tenant_id)
         return test_tenant_id
 
+
     def delete_tenants(self):
-        for tenant_id in self.test_tenants_ids:
-            response = self.backend.delete_tenant(tenant_id)
-            if response.status_code != client.OK:
-                Logger.logger.error(f"delete tenant {tenant_id} failed")
-            else:
-                Logger.logger.info(f"deleted tenant {tenant_id}")
+
+        if self.test_tenant_id == "":
+            Logger.logger.info(f"test_tenant_id is empty or was deleted, not deleting")
+            return
+
+        # skip delete if delete_test_tenant is NEVER
+        if self.delete_test_tenant == DELETE_TEST_TENANT_NEVER:
+            Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_NEVER}', not deleting")
+            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
+            return 
+    
+        # skip delete if delete_test_tenant is TEST_PASSED and test failed
+        if self.delete_test_tenant == DELETE_TEST_TENANT_TEST_PASSED and self.test_failed:
+            Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_TEST_PASSED}' and test failed, not deleting")
+            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
+            return
+        
+   
+        response = self.backend.delete_tenant(self.test_tenant_id)
+        if response.status_code != client.OK:
+            Logger.logger.error(f"delete tenant failed {self.test_tenant_id}")
+        else:
+            Logger.logger.info(f"deleted tenant {self.test_tenant_id}")
+            self.test_tenant_id = ""
 
 
     

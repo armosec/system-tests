@@ -146,8 +146,6 @@ class ScanComplianceScore(BaseKubescape):
             self.test_compliance_score_in_clusters_overtime(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                             framework_name=framework_report[_CLI_NAME_FIELD],framework_report=framework_report)
         
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
 
         return self.cleanup()
 
@@ -206,8 +204,6 @@ class ScanAndSubmitToBackend(BaseKubescape):
                              framework_name=(self.test_obj.get_arg("policy_name")).upper(),
                              old_report_guid=old_report_guid)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
 
@@ -359,8 +355,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                         framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
     def cleanup(self):
@@ -417,8 +411,6 @@ class ScanWithCustomFramework(BaseKubescape):
         Logger.logger.info("Stage 3.2: Test custom framework deleted")
         self.test_scan_custom_fw_deleted(fw_name)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
     def cleanup(self):

@@ -12,8 +12,6 @@ class Plans(BaseStripe):
         super(Plans, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
     
     def start(self):
-        Logger.logger.info("Create new tenant")
-        test_tenant_id = self.create_new_tenant()
     
         response = self.backend.get_stripe_plans()
         assert "plans" in response.json(), "'plans' not found in response"
