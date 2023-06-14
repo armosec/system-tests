@@ -26,6 +26,19 @@ class HelmWrapper(object):
         # by default use offline vuln DB
         command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
         
+        #node agent resources
+        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_CPU}=1000m"])
+        command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_CPU}=1000m"])
+        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_MEMORY}=1000Mi"])
+        command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_MEMORY}=2000Mi"])
+
+        #storage resources
+        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_CPU}=1000m"])
+        command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_CPU}=1000m"])
+        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_MEMORY}=1000Mi"])
+        command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_MEMORY}=2000Mi"])
+
+        
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
