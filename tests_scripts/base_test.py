@@ -56,9 +56,13 @@ class BaseTest(object):
 
         self.delete_test_tenant = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "delete_test_tenant", DELETE_TEST_TENANT_DEFAULT)
 
+        self.create_test_tenant = test_obj[("create_test_tenant", False)]
+
         self.test_tenant_id = ""
 
-        self.test_tenant_id = self.create_new_tenant()
+        if self.create_test_tenant:
+            Logger.logger.info(f"create_test_tenant is True")
+            self.test_tenant_id = self.create_new_tenant()
 
         self.test_failed = False
 
