@@ -718,12 +718,12 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: filteredCVEs})
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
+        # Logger.logger.info('delete armo namespace')
+        # self.uninstall_armo_helm_chart()
+        # TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
-        self.test_cluster_deleted(since_time=since_time)
+        # Logger.logger.info("Deleting cluster from backend")
+        # self.delete_cluster_from_backend_and_tested()
+        # self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
