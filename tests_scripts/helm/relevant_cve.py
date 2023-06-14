@@ -66,8 +66,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_filtered_data_keys(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
-        # self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
-        # filteredCVEs = {}
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
         # # P4 get CVEs results
         # # 4.1 get summary result
@@ -693,12 +692,12 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
                                                                                                      namespace=namespace),
                                                    namespace=namespace))
         # 3.6 test filtered CVEs created as expected result in the storage
-        # self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
+        self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
         # 3.7 test filtered SBOM created in the storage
 
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_filtered_data_keys(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
-        # self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
         Logger.logger.info('Get the scan result from Backend')
         expected_number_of_pods = self.get_expected_number_of_pods(
