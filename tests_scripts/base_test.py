@@ -78,13 +78,14 @@ class BaseTest(object):
 
     def create_tenant_name(self, prefix: str) -> str:
         epoch = time.time()
-        prefix = "systest_" + prefix
+        prefix = "auto_systest_" + prefix
         name = "%s_%d" % (prefix, epoch)
         return name
 
     def create_new_tenant(self, prefix=None) -> int:
         Logger.logger.info(f"creating new test tenant")
-        prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
+        # prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
+        prefix = prefix if prefix is not None else ""
         tenantName = self.create_tenant_name(prefix)
         res, test_tenant_id = self.backend.create_tenant(tenantName)
         Logger.logger.info(f"created tenant name '{tenantName}' with tenant id {test_tenant_id}")

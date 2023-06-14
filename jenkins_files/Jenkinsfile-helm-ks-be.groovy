@@ -2,8 +2,13 @@ def backend = "${env.BACKEND}"
 def helm_branch = "${env.HELM_BRANCH}"
 def ks_branch = "${env.KS_BRANCH}"
 
-//ks_microservice_create_2_cronjob_mitre_and_nsa
-//vulnerability_scanning
+def delete_test_tenant
+
+if (env.DELETE_TEST_TENANT) {
+    delete_test_tenant = "${env.DELETE_TEST_TENANT}"
+} else {
+    delete_test_tenant = "ALWAYS"
+}
 
 
 // Add kubescape-CLI and kubescape-HELM tests that use the BE API
@@ -53,7 +58,7 @@ def parallelStagesMap = tests.collectEntries {
     if (tests_to_skip.containsKey("${backend}".toString()) && tests_to_skip["${backend}".toString()].contains(it.key))
         ["${it.key}" : skip_stage(it.value[1], it.key, it.value[0], "${backend}")]
     else 
-        ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}")]
+        ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${backend}", "${delete_test_tenant}")]
 }
 
 
@@ -98,7 +103,7 @@ def skip_stage(platform, test, run_node, backend){
     }
 
 
-def generate_stage(platform, test, run_node, backend){
+def generate_stage(platform, test, run_node, backend, delete_test_tenant){
     if ("${platform}" == 'k8s'){
         return {
             stage("${test}") {
@@ -110,7 +115,7 @@ def generate_stage(platform, test, run_node, backend){
                         clean_docker_history()
                         start_minikube()
                         prep_test()
-                        run_test("${test}", "${backend}", "${ks_branch}", "${helm_branch}")
+                        run_test("${test}", "${backend}", "${ks_branch}", "${helm_branch}", "${delete_test_tenant}")
                     } catch (err){
                         echo "${err}"
                         currentBuild.result = 'FAILURE'
@@ -178,7 +183,7 @@ def clean_docker_history(){
     } //script
 }
 
-def run_test(String test_name, String backend, String ks_branch, String helm_branch){
+def run_test(String test_name, String backend, String ks_branch, String helm_branch, String delete_test_tenant){
     try {
         withCredentials([string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD')]) {
             sh '''
@@ -187,7 +192,7 @@ def run_test(String test_name, String backend, String ks_branch, String helm_bra
             echo "''' + test_name + ''';;" >>/tmp/testhistory
             cat /tmp/testhistory
             source systests_python_env/bin/activate
-            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c CyberArmorTests --logger DEBUG --kwargs ks_branch=''' + ks_branch +''' helm_branch='''+helm_branch+'''
+            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c CyberArmorTests --logger DEBUG --delete_test_tenant '''+ delete_test_tenant +''' --kwargs ks_branch=''' + ks_branch +'''  helm_branch='''+helm_branch+'''
             deactivate
             '''
         }
