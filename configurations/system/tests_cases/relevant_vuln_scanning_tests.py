@@ -63,7 +63,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: True}
+            helm_kwargs={statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
+
         )
     
     @staticmethod
@@ -82,7 +83,7 @@ class RelevantVulnerabilityScanningTests(object):
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={"nodeAgent.config.learningPeriod": 2, statics.HELM_RELEVANCY_FEATURE: True}
+            helm_kwargs={"nodeAgent.config.learningPeriod": 2, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
 
     @staticmethod
@@ -115,7 +116,7 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyEnabledLargeImage,
             expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
             expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
-            helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5, statics.HELM_RELEVANCY_FEATURE: True}
+            helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
 
     @staticmethod
@@ -130,7 +131,7 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyEnabledExtraLargeImage,
             expected_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
              expected_filtered_SBOMs=[("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
-            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_RELEVANCY_FEATURE: True}
+            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: True}
         )
     
     @staticmethod
