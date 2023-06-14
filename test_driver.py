@@ -82,10 +82,10 @@ class TestDriver(object):
                 try:
                     _, _ = test_class_obj.cleanup()
                 except Exception as e:
-                    Logger.logger.Info("Failed to cleanup test")
+                    Logger.logger.info("Failed to cleanup test")
                     Logger.logger.error("error: {}".format(traceback.print_exc()))
             else:
-                Logger.logger.Info("Failed to cleanup test")
+                Logger.logger.info("Failed to cleanup test")
             summary = ex
             Logger.logger.error("error: {}".format(traceback.print_exc()))
         finally:

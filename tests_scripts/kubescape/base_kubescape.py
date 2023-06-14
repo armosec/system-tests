@@ -82,6 +82,7 @@ class BaseKubescape(BaseK8S):
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
         self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
+        self.remove_cluster_from_backend = False
 
     def default_scan(self, **kwargs):
         res_file = self.get_default_results_file()
