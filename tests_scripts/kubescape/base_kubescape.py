@@ -89,9 +89,10 @@ class BaseKubescape(BaseK8S):
         return self.load_results(results_file=res_file)
 
     def cleanup(self, **kwargs):
-        if self.remove_cluster_from_backend:
+        if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.delete_cluster_from_backend_and_tested()
+            self.cluster_deleted = True
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
 

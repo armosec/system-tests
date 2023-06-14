@@ -75,7 +75,17 @@ class TestDriver(object):
         except Exception as ex:
             status = statics.FAILURE
             test_class_obj.failed()
-            _, _ = test_class_obj.cleanup()
+            _, _, tb = sys.exc_info()
+            function_name = tb.tb_frame.f_code.co_name
+
+            if function_name != "cleanup":
+                try:
+                    _, _ = test_class_obj.cleanup()
+                except Exception as e:
+                    Logger.logger.Info("Failed to cleanup test")
+                    Logger.logger.error("error: {}".format(traceback.print_exc()))
+            else:
+                Logger.logger.Info("Failed to cleanup test")
             summary = ex
             Logger.logger.error("error: {}".format(traceback.print_exc()))
         finally:

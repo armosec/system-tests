@@ -35,6 +35,7 @@ class BaseTest(object):
                  **kwargs):
         
         self.test_started_at = datetime.now(timezone.utc).astimezone().isoformat()
+        self.cluster_deleted = False
 
         # objects
         self.test_driver = test_driver

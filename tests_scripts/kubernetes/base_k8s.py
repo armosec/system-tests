@@ -204,6 +204,8 @@ class BaseK8S(BaseDockerizeTest):
                                                  expected_status_code=404)
         assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
             format(x=self.kubernetes_obj.get_cluster_name())
+        
+        Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
 
     def apply_secret(self, **kwargs):
         return self.apply_yaml_file(path=statics.DEFAULT_SECRETE_PATH, **kwargs)

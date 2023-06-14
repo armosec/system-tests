@@ -58,9 +58,11 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-        if self.remove_cluster_from_backend:
+        if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.delete_cluster_from_backend_and_tested()
+            self.cluster_deleted = True
+
             # try:
             #     cluster_name = self.kubernetes_obj.get_cluster_name()
             #     Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
