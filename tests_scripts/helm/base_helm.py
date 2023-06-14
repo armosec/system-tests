@@ -60,8 +60,7 @@ class BaseHelm(BaseK8S):
 
         if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
-            self.delete_cluster_from_backend_and_tested()
-            self.cluster_deleted = True
+            self.cluster_deleted = self.delete_cluster_from_backend()
 
         return super().cleanup(**kwargs)
 

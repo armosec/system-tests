@@ -54,11 +54,13 @@ class BaseTest(object):
         self.leave_redis_data: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "leave_redis_data", False)
         self.test_summery_data = {}
 
+        self.test_tenant_id = ""
+
+        # defines when to delete tenant. Only applied if self.create_test_tenant is True
         self.delete_test_tenant = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "delete_test_tenant", DELETE_TEST_TENANT_DEFAULT)
 
+        # defines if to create a new  test tenant for the test
         self.create_test_tenant = test_obj[("create_test_tenant", False)]
-
-        self.test_tenant_id = ""
 
         if self.create_test_tenant:
             Logger.logger.info(f"create_test_tenant is True")
