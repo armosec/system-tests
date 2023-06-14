@@ -191,6 +191,16 @@ HELM_OFFLINE_VULN_DB="grypeOfflineDB.enabled"
 FILTERED_CVES_KEY="withRelevancy"
 ALL_CVES_KEY="AllCVEs"
 
+#in cluster limits
+HELM_NODE_AGENT_REQ_CPU="nodeAgent.resources.requests.cpu"
+HELM_NODE_AGENT_LIMITS_CPU="nodeAgent.resources.limits.cpu"
+HELM_NODE_AGENT_REQ_MEMORY="nodeAgent.resources.requests.memory"
+HELM_NODE_AGENT_LIMITS_MEMORY="nodeAgent.resources.limits.memory"
+HELM_STORAGE_REQ_CPU="storage.resources.requests.cpu"
+HELM_STORAGE_LIMITS_CPU="storage.resources.limits.cpu"
+HELM_STORAGE_REQ_MEMORY="storage.resources.requests.memory"
+HELM_STORAGE_LIMITS_MEMORY="storage.resources.limits.memory"
+
 class Statistics(object):
     clear_state = "clear"
     attached_state = "attached"

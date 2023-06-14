@@ -22,7 +22,7 @@ spec:
       containers:
       - image: rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96
         imagePullPolicy: IfNotPresent
-        name: redis
+        name: redis-fixed
         ports:
         - containerPort: 6379
           name: redis

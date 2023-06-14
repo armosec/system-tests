@@ -12,7 +12,7 @@
             "kubescape.io/image-id": "nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1",
             "kubescape.io/image-name": "nginx"
         },
-        "name": "aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
+        "name": "nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2-5c2ef2",
         "namespace": "kubescape",
         "resourceVersion": "37",
         "uid": "0f269760-f16c-4427-8665-d34df82f60e7"

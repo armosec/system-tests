@@ -18,9 +18,9 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         # P1 install helm-chart (armo)
         #  1.1 add and update armo in repo
         # Logger.logger.info('install armo helm-chart')
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -111,8 +111,8 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         # 4. wait for new file to be open, check that data was appended to SBOMp
         # 5. check backend data against cluster data
 
-        cluster, namespace = self.setup(apply_services=False)
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
+        cluster, namespace = self.setup(apply_services=False)
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -214,9 +214,9 @@ class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
         # 1. install helm-chart with relevancy enabled
         # 2. create workload with an sleep as entrypoint
         # 3. check that files opened after X time are no in SBOMp list and relevant CVEs, by comparing SBOM, SBOMp, CVEs and CVEsp
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -307,8 +307,8 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
         # 5. check BE data
 
 
-        cluster, namespace = self.setup(apply_services=False)
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
+        cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
@@ -389,6 +389,7 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
                                                            kubernetes_obj=kubernetes_obj)
 
     def start(self):
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -396,7 +397,6 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -469,6 +469,7 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -476,7 +477,6 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -533,6 +533,7 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -540,7 +541,6 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -595,6 +595,7 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -602,7 +603,6 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -652,20 +652,20 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
-        # Logger.logger.info('install armo helm-chart')
+        Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 1.3 verify installation
-        # self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
         # P2 apply workloads
         Logger.logger.info('apply workloads')

@@ -1,6 +1,6 @@
 {
-    "redis": [
-    ],
-    "redis-fixed": [
-    ]
-  } 
+  "redis-not-fixed": [
+  ],
+  "redis-fixed": [
+  ]
+}
