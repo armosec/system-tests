@@ -63,19 +63,6 @@ class BaseHelm(BaseK8S):
             self.delete_cluster_from_backend_and_tested()
             self.cluster_deleted = True
 
-            # try:
-            #     cluster_name = self.kubernetes_obj.get_cluster_name()
-            #     Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
-            #     self.backend.delete_cluster(cluster_name=cluster_name)
-
-            #     cluster_result, _ = self.wait_for_report(report_type=self.backend.get_scan_results_sum_summary, namespace='',
-            #                                      expected_results=0, since_time=self.test_started_at, expected_status_code=404,
-            #                                      cluster_name=self.kubernetes_obj.get_cluster_name(), timeout=600)
-            #     assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
-            #         format(x=self.kubernetes_obj.get_cluster_name())
-            # except:
-            #     pass
-
         return super().cleanup(**kwargs)
 
     def display_armo_system_logs(self, level=Logger.logger.debug):
