@@ -67,7 +67,6 @@ SCAN_RESULT_IS_RELEVANT_FIELD_TRUE = "yes"
 SCAN_RESULT_IS_RELEVANT_FIELD_FALSE = "no"
 SCAN_RESULT_IS_RELEVANT_FIELD_UNKNOWN = ""
 
-
 DESIGNATORS_FIELD = "designators"
 
 BASIC_NAMESPACE_YAML = "basic_ns.yaml"
@@ -117,7 +116,6 @@ CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_ANNOTATION_FIELD = "armo.cloud/registryna
 # armo-system secrets & configs
 CA_VULN_REGISTRY_SCAN_SECRET_HELM_NAME = 'kubescape-registry-scan'
 CA_VULN_REGISTRY_SCAN_CONFIGMAP_HELM_NAME = 'kubescape-registry-scan'
-
 
 CA_VULN_SCAN_RESOURCE_API_VERSION = 'result.vulnscan.com/v1'
 
@@ -169,9 +167,8 @@ TEST_REGISTRY_CONNECTIVITY_INFORMATION_STATUS = "registryInformation"
 TEST_REGISTRY_CONNECTIVITY_AUTHENTICATION_STATUS = "registryAuthentication"
 TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
 
-#storage aggregated API
-HELM_STORAGE_FEATURE="kubescapeStorage.enabled"
-HELM_RELEVANCY_FEATURE="nodeAgent.enabled"
+# storage aggregated API
+HELM_STORAGE_FEATURE = "kubescapeStorage.enabled"
 STORAGE_SBOM_PLURAL = "sbomspdxv2p3s"
 STORAGE_FILTERED_SBOM_PLURAL = "sbomspdxv2p3filtereds"
 STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
@@ -187,25 +184,25 @@ RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
 RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
 RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 
-
-#relevancy feature
-HELM_RELEVANCY_FEATURE="nodeAgent.enabled"
-HELM_MAX_IMAGE_SIZE = "kubevuln.config.maxImageSize" 
+# relevancy feature
+HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
+HELM_RELEVANCY_FEATURE_ENABLED = "enable"
+HELM_RELEVANCY_FEATURE_DISABLED = "disable"
+HELM_MAX_IMAGE_SIZE = "kubevuln.config.maxImageSize"
 HELM_SCAN_TIMEOUT = "kubevuln.config.scanTimeout"
-HELM_OFFLINE_VULN_DB="grypeOfflineDB.enabled"
-FILTERED_CVES_KEY="withRelevancy"
-ALL_CVES_KEY="AllCVEs"
+HELM_OFFLINE_VULN_DB = "grypeOfflineDB.enabled"
+FILTERED_CVES_KEY = "withRelevancy"
+ALL_CVES_KEY = "AllCVEs"
 
-#in cluster limits
-HELM_NODE_AGENT_REQ_CPU="nodeAgent.resources.requests.cpu"
-HELM_NODE_AGENT_LIMITS_CPU="nodeAgent.resources.limits.cpu"
-HELM_NODE_AGENT_REQ_MEMORY="nodeAgent.resources.requests.memory"
-HELM_NODE_AGENT_LIMITS_MEMORY="nodeAgent.resources.limits.memory"
-HELM_STORAGE_REQ_CPU="storage.resources.requests.cpu"
-HELM_STORAGE_LIMITS_CPU="storage.resources.limits.cpu"
-HELM_STORAGE_REQ_MEMORY="storage.resources.requests.memory"
-HELM_STORAGE_LIMITS_MEMORY="storage.resources.limits.memory"
-
+# in cluster limits
+HELM_NODE_AGENT_REQ_CPU = "nodeAgent.resources.requests.cpu"
+HELM_NODE_AGENT_LIMITS_CPU = "nodeAgent.resources.limits.cpu"
+HELM_NODE_AGENT_REQ_MEMORY = "nodeAgent.resources.requests.memory"
+HELM_NODE_AGENT_LIMITS_MEMORY = "nodeAgent.resources.limits.memory"
+HELM_STORAGE_REQ_CPU = "storage.resources.requests.cpu"
+HELM_STORAGE_LIMITS_CPU = "storage.resources.limits.cpu"
+HELM_STORAGE_REQ_MEMORY = "storage.resources.requests.memory"
+HELM_STORAGE_LIMITS_MEMORY = "storage.resources.limits.memory"
 
 
 class Statistics(object):
