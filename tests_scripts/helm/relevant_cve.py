@@ -1,27 +1,13 @@
-import json
-import os
-import re
-import time
-import base64
-import kubernetes.client
-import requests
-
 from systest_utils import statics, Logger, TestUtil
 from datetime import datetime, timezone
 
 from systest_utils.wlid import Wlid
 
-from tests_scripts.helm.base_relevant_cves import BaseRelevantCves
+from tests_scripts.helm.base_vulnerability_scanning import BaseVulnerabilityScanning
 
 DEFAULT_BRANCH = "release"
 
-
-# def is_accesstoken_credentials(credentials):
-#     return 'username' in credentials and 'password' in credentials and credentials['username'] != '' and credentials[
-#         'password'] != ''
-
-
-class RelevantCVEs(BaseRelevantCves):
+class RelevantCVEs(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevantCVEs, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                            kubernetes_obj=kubernetes_obj)
@@ -31,16 +17,17 @@ class RelevantCVEs(BaseRelevantCves):
 
         # P1 install helm-chart (armo)
         #  1.1 add and update armo in repo
-        Logger.logger.info('install armo helm-chart')
+        # Logger.logger.info('install armo helm-chart')
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
 
         # P2 apply workload
         Logger.logger.info('apply services')
@@ -58,7 +45,7 @@ class RelevantCVEs(BaseRelevantCves):
         Logger.logger.info('Get the scan result from local Storage')
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
-                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
+                                         SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.2 test SBOM created as expected result in the storage
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
         # 3.3 test CVEs created in the storage
@@ -95,13 +82,13 @@ class RelevantCVEs(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         # # 4.3 get CVEs for containers
 
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = expected_number_of_pods)
 
-        # Logger.logger.info('delete armo namespace')
-        # self.uninstall_armo_helm_chart()
-        # TestUtil.sleep(150, "Waiting for aggregation to end")
+        Logger.logger.info('delete armo namespace')
+        self.uninstall_armo_helm_chart()
+        TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
         self.delete_cluster_from_backend_and_tested()
@@ -109,7 +96,7 @@ class RelevantCVEs(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevantDataIsAppended(BaseRelevantCves):
+class RelevantDataIsAppended(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevantDataIsAppended, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                     backend=backend,
@@ -123,8 +110,8 @@ class RelevantDataIsAppended(BaseRelevantCves):
         # 4. wait for new file to be open, check that data was appended to SBOMp
         # 5. check backend data against cluster data
 
-        cluster, namespace = self.setup(apply_services=False)
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
+        cluster, namespace = self.setup(apply_services=False)
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -199,10 +186,9 @@ class RelevantDataIsAppended(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
     
         Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
-        
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -215,7 +201,7 @@ class RelevantDataIsAppended(BaseRelevantCves):
         return self.cleanup()
 
 # Tests that sniffer stop sniffing after X time
-class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
+class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                     backend=backend,
@@ -226,9 +212,9 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         # 1. install helm-chart with relevancy enabled
         # 2. create workload with an sleep as entrypoint
         # 3. check that files opened after X time are no in SBOMp list and relevant CVEs, by comparing SBOM, SBOMp, CVEs and CVEsp
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -288,9 +274,9 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
     
         Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         
         Logger.logger.info('delete armo namespace')
@@ -305,7 +291,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseRelevantCves):
 
 
 # Tests that BE has CVE data when relevancy is disabled
-class RelevancyDisabled(BaseRelevantCves):
+class RelevancyDisabled(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                 kubernetes_obj=kubernetes_obj)
@@ -319,8 +305,8 @@ class RelevancyDisabled(BaseRelevantCves):
         # 5. check BE data
 
 
-        cluster, namespace = self.setup(apply_services=False)
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
+        cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
@@ -379,7 +365,7 @@ class RelevancyDisabled(BaseRelevantCves):
 
         # # 4.3 get CVEs for containers
         Logger.logger.info('Test BE CVEs against storage CVEs')
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                                           statics.FILTERED_CVES_KEY: []})
 
@@ -395,12 +381,13 @@ class RelevancyDisabled(BaseRelevantCves):
 
 
 # Test that when deleting a workload, the relevant resources are deleted from storage
-class RelevancyEnabledDeletedImage(BaseRelevantCves):
+class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledDeletedImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
 
     def start(self):
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -408,7 +395,6 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -469,7 +455,7 @@ class RelevancyEnabledDeletedImage(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevancyEnabledLargeImage(BaseRelevantCves):
+class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledLargeImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -481,6 +467,7 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -488,7 +475,6 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -533,7 +519,7 @@ class RelevancyEnabledLargeImage(BaseRelevantCves):
 
 
 
-class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
+class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyEnabledExtraLargeImage, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -545,6 +531,7 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -552,7 +539,6 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
         # Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -595,7 +581,7 @@ class RelevancyEnabledExtraLargeImage(BaseRelevantCves):
 
         return self.cleanup()
 
-class RelevancyStorageDisabled(BaseRelevantCves):
+class RelevancyStorageDisabled(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyStorageDisabled, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -607,6 +593,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -614,7 +601,6 @@ class RelevancyStorageDisabled(BaseRelevantCves):
         Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -652,7 +638,7 @@ class RelevancyStorageDisabled(BaseRelevantCves):
 
         return self.cleanup()
     
-class RelevancyFixVuln(BaseRelevantCves):
+class RelevancyFixVuln(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RelevancyFixVuln, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                            kubernetes_obj=kubernetes_obj)
@@ -664,14 +650,14 @@ class RelevancyFixVuln(BaseRelevantCves):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
-        # Logger.logger.info('install armo helm-chart')
+        Logger.logger.info('install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
 
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
 
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -727,9 +713,9 @@ class RelevancyFixVuln(BaseRelevantCves):
         containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         # # 4.3 get CVEs for containers
 
-        self.test_backend_cve_against_storage_result(since_time=since_time, containers_scan_id=containers_scan_id,
+        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
                                                      be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs})
+                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()

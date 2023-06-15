@@ -135,7 +135,7 @@ class BaseK8S(BaseDockerizeTest):
         if apply_config_map:
             self.apply_config_map(namespace=namespace, yaml_file=self.test_obj.get_arg("config_map"))
 
-        return cluster, namespace
+        return self.get_cluster_name(), namespace
 
     def __del__(self):
 
@@ -158,6 +158,12 @@ class BaseK8S(BaseDockerizeTest):
             pass
 
         super(BaseK8S, self).__del__()
+
+    @staticmethod
+    def get_cluster_name():
+        clusters, active_cluster = config.list_kube_config_contexts()
+
+        return active_cluster['name']
 
     def remove_all_namespaces(self, remove_cyberarmor_namespace: bool = True):
         for ns in self.namespaces[:]:
