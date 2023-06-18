@@ -56,6 +56,8 @@ class ScanUrl(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    url=self.test_obj.get_arg("url"))
 
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        
         Logger.logger.info("Testing results")
         self.test_counters(framework_report=result)
 
@@ -76,6 +78,7 @@ class ScanWithExceptions(BaseKubescape):
         Logger.logger.info("Scanning kubescape")
         exception_file = BaseKubescape.get_abs_path(statics.DEFAULT_EXCEPTIONS_PATH,
                                                     [self.test_obj.get_arg("exceptions")])
+        self.override_exceptions_file(exception_file=exception_file)
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    exceptions=''.join(exception_file))
         control_test = self.test_obj.get_arg("controls_tested")
@@ -83,7 +86,16 @@ class ScanWithExceptions(BaseKubescape):
         self.test_exception_result(framework_report=result, controls_with_exception=control_test)
 
         return self.cleanup()
-    
+
+    def override_exceptions_file(self, exception_file):
+        # Kubescape supports input from a single source, so, when artifacts and exceptions are the input, we must override the exceptions file in theartifacts directory.
+        # This is a patch, the correct solution is to combine both file.
+        # The real solution is for Kubescape to support such cases
+        if self.artifacts:
+            import shutil
+            shutil.copy(exception_file[0], os.path.join(self.artifacts, "exceptions.json"))
+
+
 class ScanComplianceScore(BaseKubescape):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -115,7 +127,7 @@ class ScanComplianceScore(BaseKubescape):
         Logger.logger.info("Testing results in frameworks")
         self.test_frameworks_compliance_score(report=result)
 
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         # get first framework name from policy_name, until first ','
@@ -136,8 +148,6 @@ class ScanComplianceScore(BaseKubescape):
             self.test_compliance_score_in_clusters_overtime(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                             framework_name=framework_report[_CLI_NAME_FIELD],framework_report=framework_report)
         
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
 
         return self.cleanup()
 
@@ -189,15 +199,13 @@ class ScanAndSubmitToBackend(BaseKubescape):
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
                              framework_name=(self.test_obj.get_arg("policy_name")).upper(),
                              old_report_guid=old_report_guid)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
 
@@ -246,7 +254,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
         first_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -289,7 +297,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
         
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         
         second_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                   framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -333,7 +341,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         
         third_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -349,8 +357,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                         framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
     def cleanup(self):
@@ -407,8 +413,6 @@ class ScanWithCustomFramework(BaseKubescape):
         Logger.logger.info("Stage 3.2: Test custom framework deleted")
         self.test_scan_custom_fw_deleted(fw_name)
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
         return self.cleanup()
 
     def cleanup(self):
@@ -468,7 +472,7 @@ class CustomerConfiguration(BaseKubescape):
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
         
-        TestUtil.sleep(20, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         
         self.test_customer_configuration_result(cli_result=result, expected_result='failed',
                                                 c_id=self.test_obj.policy_name)

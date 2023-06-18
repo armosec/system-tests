@@ -1,12 +1,19 @@
 def customer = "${env.CUSTOMER}"
 def ks_branch = "${env.KS_BRANCH}"
 def helm_branch = "${env.HELM_BRANCH}"
+def delete_test_tenant
 
-def tests = ["${env.TEST}":   ["${env.FLEET}",  "${env.PLATFORM}"]]
+if (env.DELETE_TEST_TENANT) {
+    delete_test_tenant = "${env.DELETE_TEST_TENANT}"
+} else {
+    delete_test_tenant = "ALWAYS"
+}
+
+def tests = ["${env.TEST}":   ["${env.FLEET}",  "${env.PLATFORM}", "${delete_test_tenant}"]]
 
 
 def parallelStagesMap = tests.collectEntries {
-    ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${env.BACKEND}")]
+    ["${it.key}" : generate_stage(it.value[1], it.key, it.value[0], "${env.BACKEND}", it.value[2])]
 }
 
 pipeline {
@@ -43,7 +50,7 @@ pipeline {
 } //pipeline
 
 
-def generate_stage(platform, test, run_node, backend){
+def generate_stage(platform, test, run_node, backend, delete_test_tenant){
     if ("${platform}" == 'docker'){
         return {
             stage("${platform}_${test}") {
@@ -52,7 +59,7 @@ def generate_stage(platform, test, run_node, backend){
                     print_hostname()
                     try {
                         prep_test()
-                        run_test("${test}", "${backend}", "${customer}", "${ks_branch}", "${helm_branch}")
+                        run_test("${test}", "${backend}", "${customer}", "${ks_branch}", "${helm_branch}", "${delete_test_tenant}")
                     } catch (err){
                         echo "${err}"
                         currentStage.result = 'FAILURE'
@@ -75,7 +82,7 @@ def generate_stage(platform, test, run_node, backend){
                     try {
                         start_minikube()
                         prep_test()
-                        run_test("${test}", "${backend}", "${customer}", "${ks_branch}", "${helm_branch}")
+                        run_test("${test}", "${backend}", "${customer}", "${ks_branch}", "${helm_branch}", "${delete_test_tenant}")
                     } catch (err){
                         echo "${err}"
                         currentStage.result = 'FAILURE'
@@ -131,7 +138,7 @@ def prep_test(){
     } //script
 }
 
-def run_test(String test_name, String backend, String customer, String ks_b, String vuln_b){
+def run_test(String test_name, String backend, String customer, String ks_b, String vuln_b, String delete_test_tenant){
     try {
         withCredentials([string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD')]) {
             sh '''
@@ -140,7 +147,7 @@ def run_test(String test_name, String backend, String customer, String ks_b, Str
             echo "''' + test_name + ''';;" >/tmp/testhistory
             cat /tmp/testhistory
             source systests_python_env/bin/activate
-            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c ''' + customer + '''  --duration ''' + "${env.DURATION}" + ''' --logger DEBUG  --kwargs ks_branch=''' + ks_b +''' helm_branch='''+vuln_b+'''
+            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c ''' + customer + '''  --duration ''' + "${env.DURATION}" + ''' --logger DEBUG --delete_test_tenant '''+ delete_test_tenant +'''  --kwargs ks_branch=''' + ks_b +''' helm_branch='''+vuln_b+'''
             deactivate
             '''
         }

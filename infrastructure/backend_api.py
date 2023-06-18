@@ -293,7 +293,7 @@ class ControlPanelAPI(object):
 
 
         res = self.delete(API_ADMIN_TENANTS, json={"tenantsIds": [tenant_id]})
-        assert res.status_code == client.OK, f"delete tenant failed: {res.status_code} {res.text}"
+        assert res.status_code == client.OK, f"delete tenant failed {tenant_id}: {res.status_code} {res.text}"
         return res
 
     
@@ -1230,7 +1230,7 @@ class ControlPanelAPI(object):
         return r
 
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
-        params = {"customerGUID": self.selected_tenant_id}
+        params = {"customerGUID": self.selected_tenant_id, "ignoreRulesSummary": "true", "relatedExceptions": "true"}
         page_size = 100
         body = {"pageNum": 1, 
                 "orderBy": "timestamp:desc,name:desc",
@@ -1713,7 +1713,7 @@ class ControlPanelAPI(object):
         return requests.delete(self.server + url, **args)
 
     def get_cookie(self):
-        return self.login_customer_cookie
+        return self.selected_tenant_cookie
 
     def get_server(self):
         return self.server
@@ -1726,7 +1726,7 @@ class ControlPanelAPI(object):
         server = server.replace("https", "wss")
         server = "{}?customerGUID={}".format(server + url, self.selected_tenant_id)
         Logger.logger.debug("WS connection url:{0}".format(server))
-        for cookie in self.login_customer_cookie:
+        for cookie in self.selected_tenant_cookie:
             cookie = "Cookie: {}={}".format(cookie.name, cookie.value)
         ws.connect(server, header=[cookie])
         return ws

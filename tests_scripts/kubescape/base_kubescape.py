@@ -82,6 +82,7 @@ class BaseKubescape(BaseK8S):
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
         self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
+        self.remove_cluster_from_backend = False
 
     def default_scan(self, **kwargs):
         res_file = self.get_default_results_file()
@@ -89,7 +90,9 @@ class BaseKubescape(BaseK8S):
         return self.load_results(results_file=res_file)
 
     def cleanup(self, **kwargs):
-
+        if self.remove_cluster_from_backend and not self.cluster_deleted:
+            TestUtil.sleep(150, "Waiting for aggregation to end")
+            self.cluster_deleted = self.delete_cluster_from_backend()
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
 

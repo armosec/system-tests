@@ -3,6 +3,7 @@ def branch = "${env.BRANCH}"
 def helm_repo = "${env.HELM_REPO}"
 
 // Add ONLY kubescape-HELM tests (do NOT add any CLI related tests)
+
 def tests = ["vulnerability_scanning":                                                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
              "vulnerability_scanning_trigger_scan_on_new_image":                         ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
              "vulnerability_scanning_trigger_scan_public_registry":                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
@@ -18,7 +19,7 @@ def tests = ["vulnerability_scanning":                                          
             "relevant_data_is_appended":                                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "relevancy_extra_large_image":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "relevancy_large_image":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
-
+             
              ]
 
 def parallelStagesMap = tests.collectEntries {
