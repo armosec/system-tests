@@ -91,7 +91,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -195,7 +195,7 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -284,7 +284,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -374,7 +374,7 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -450,7 +450,7 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -511,7 +511,7 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -576,7 +576,7 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -633,7 +633,7 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
@@ -722,7 +722,7 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
         Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend_and_tested()
+        self.delete_cluster_from_backend()
         self.test_cluster_deleted(since_time=since_time)
 
         return self.cleanup()
