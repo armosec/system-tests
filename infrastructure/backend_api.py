@@ -80,7 +80,7 @@ API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
 API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
-
+API_NOTIFICATIONS_UNSUBSCRIBE =  "/api/v1/notifications/unsubscribe"
 
 def deco_cookie(func):
 
@@ -1793,6 +1793,42 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+    
+    def get_notifications_unsubscribed(self, tenant_id=None) -> requests.Response:       
+        if tenant_id == self.selected_tenant_id or tenant_id is None:
+            cookies = self.selected_tenant_cookie
+        else:
+            cookies = self.get_tenant_cookie(tenant_id)
+        res = self.get(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=cookies)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+   
+    def add_notifications_unsubscribed(self, notifications_identifiers , tenant_id=None) -> requests.Response:       
+        if tenant_id == self.selected_tenant_id or tenant_id is None:
+            cookies = self.selected_tenant_cookie
+        else:
+            cookies = self.get_tenant_cookie(tenant_id)
+        res = self.post(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=cookies, json=notifications_identifiers)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+    def remove_notifications_unsubscribed(self, notifications_identifiers , tenant_id=None) -> requests.Response:       
+        if tenant_id == self.selected_tenant_id or tenant_id is None:
+            cookies = self.selected_tenant_cookie
+        else:
+            cookies = self.get_tenant_cookie(tenant_id)
+        res = self.delete(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=cookies, json=notifications_identifiers)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
 
 
 class Solution(object):
