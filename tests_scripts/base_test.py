@@ -328,3 +328,12 @@ class BaseTest(object):
         return TestUtil.get_arg_from_dict(self.test_driver.kwargs, config,
                                           default=TestUtil.get_arg_from_dict(self.test_obj.kwargs, config,
                                                                              default=default))
+
+    @staticmethod
+    def assertEqual(firts, second, msg):
+        assert firts == second, msg
+        
+    @staticmethod
+    def assertIn(member, container, msg):
+        assert member in container, msg
+  

@@ -80,7 +80,7 @@ API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
 API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
-
+API_NOTIFICATIONS_UNSUBSCRIBE =  "/api/v1/notifications/unsubscribe"
 
 def deco_cookie(func):
 
@@ -1793,6 +1793,30 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+    
+    def get_notifications_unsubscribed(self) -> requests.Response:       
+        res = self.get(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+   
+    def add_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:       
+        res = self.post(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie, json=notifications_identifiers)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+    def remove_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:       
+        res = self.delete(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie, json=notifications_identifiers)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
 
 
 class Solution(object):
