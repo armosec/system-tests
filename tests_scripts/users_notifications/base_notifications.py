@@ -11,12 +11,4 @@ class BaseNotifications(base_test.BaseTest):
     def cleanup(self, **kwargs):
         super().cleanup(**kwargs)        
         return statics.SUCCESS, ""
-    
-    @staticmethod
-    def assertEqual(firts, second, msg):
-        assert firts == second, msg
-        
-    @staticmethod
-    def assertIn(member, container, msg):
-        assert member in container, msg
-  
+
