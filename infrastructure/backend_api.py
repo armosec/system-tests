@@ -41,6 +41,7 @@ API_STRIPE_PLANS = "/api/v1/tenants/stripe/plans"
 API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
 API_TENANT_CREATE= "/api/v1/tenants/createTenant"
 API_CLUSTER = "/api/v1/cluster"
+API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan" 
 API_JOBREPORTS = "/api/v1/jobReports"
 API_POSTURE_CLUSTERSOVERTIME = "/api/v1/posture/clustersOvertime"
 API_POSTURE_FRAMEWORKS =  "/api/v1/posture/frameworks"
@@ -53,6 +54,7 @@ API_VULNERABILITYEXCEPTIONPOLICY = "/api/v1/vulnerabilityExceptionPolicy"
 API_VULNERABILITY_SCANRESULTSSUMSUMMARY = "/api/v1/vulnerability/scanResultsSumSummary"
 API_VULNERABILITY_SCAN_V2 = "/api/v1/vulnerability/scan/v2/"
 API_VULNERABILITY_SCANRESULTSDETAILS = "/api/v1/vulnerability/scanResultsDetails"
+API_VULNERABILITY_UNIQUE_VALUES_SUMMARY =   "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
 
 
 API_REPOSITORYPOSTURE = "/api/v1/repositoryPosture"
@@ -896,6 +898,19 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: results of posture resources by control is empty')
         return r.json()['response']
 
+    
+    def get_image_scan_stats(self):
+        r = self.get(API_IMAGE_SCAN_STATS, params={"customerGUID": self.selected_tenant_id, "includeLastReport": False})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: results of imageScan "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        if len(r.json()) == 0:
+            raise Exception(
+                'Expected to receive real imageScan object in results of get imageScan "%s", and received "%s"'
+                % (self.selected_tenant_id, r.text))
+        return r.json()
+
     def get_cluster(self, cluster_name: str, expected_status_code: int = None):
         r = self.get(API_CLUSTER, params={"customerGUID": self.selected_tenant_id, "name": cluster_name})
         if expected_status_code:
@@ -1183,6 +1198,36 @@ class ControlPanelAPI(object):
         Logger.logger.info(
             'layers of container scan id : {} response {}'.format(container_scan_id, r.json()))
         return r.json()
+    
+    def get_unique_values_for_field_scan_summary(self, field, customer_guid):
+        params = {"customerGUID": customer_guid}
+        body = {
+            "fields": {
+                field: "",
+            }
+        }
+
+        r = self.post(API_VULNERABILITY_UNIQUE_VALUES_SUMMARY, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        return r
+        
+    def get_summary_with_inner_filters(self, filter, customer_guid):
+        params = {"customerGUID": customer_guid}
+        body = {
+            "innerFilters": [filter],
+        }
+
+        r = self.post(API_VULNERABILITY_SCANRESULTSSUMSUMMARY, params=params, json=body)
+        if not 200 <= r.status_code < 300 or len(r.json()['response']) == 0:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
 
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
         params = {"customerGUID": self.selected_tenant_id, "ignoreRulesSummary": "true", "relatedExceptions": "true"}

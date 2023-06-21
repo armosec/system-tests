@@ -1,16 +1,25 @@
 def backend = "${env.BACKEND}"
 def branch = "${env.BRANCH}"
+def helm_repo = "${env.HELM_REPO}"
 
 // Add ONLY kubescape-HELM tests (do NOT add any CLI related tests)
-def tests = ["vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_trigger_scan_public_registry":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_trigger_scan_public_registry_excluded":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_trigger_scan_private_quay_registry":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-//             "vulnerability_scanning_trigger_scan_registry_by_backend":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            // "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_triggering_with_cron_job":                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+
+def tests = ["vulnerability_scanning":                                                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "vulnerability_scanning_trigger_scan_on_new_image":                         ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "vulnerability_scanning_trigger_scan_public_registry":                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "vulnerability_scanning_trigger_scan_public_registry_excluded":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "vulnerability_scanning_trigger_scan_private_quay_registry":                ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "vulnerability_scanning_trigger_scan_registry_by_backend":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "vulnerability_scanning_triggering_with_cron_job":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+             "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevantCVEs":                                                              ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevancy_disabled_installation":                                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevancy_enabled_stop_sniffing":                                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevant_data_is_appended":                                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevancy_extra_large_image":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "relevancy_large_image":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
+             
              ]
 
 def parallelStagesMap = tests.collectEntries {
@@ -59,7 +68,7 @@ def generate_stage(platform, test, run_node, backend){
                     try {
                         clean_docker_history()
                         prep_test()
-                        run_test("${test}", "${backend}", "${branch}")
+                        run_test("${test}", "${backend}", "${branch}", "${helm_repo}")
                     } catch (err){
                         echo "${err}"
                         currentBuild.result = 'FAILURE'
@@ -83,7 +92,7 @@ def generate_stage(platform, test, run_node, backend){
                         clean_docker_history()
                         start_minikube()
                         prep_test()
-                        run_test("${test}", "${backend}", "${branch}")
+                        run_test("${test}", "${backend}", "${branch}", "${helm_repo}")
                     } catch (err){
                         echo "${err}"
                         currentBuild.result = 'FAILURE'
@@ -101,21 +110,21 @@ def generate_stage(platform, test, run_node, backend){
 
 
 def start_minikube(){
-	script{
-		sh '''
-	    #!/bin/bash
+    script{
+        sh '''
+        #!/bin/bash
         ./jenkins_files/k8s/start_profiled_minikube.sh
-	    '''
-	} //script
+        '''
+    } //script
 }
 
 def remove_minikube(){
-	script{
-		sh '''
-	    #!/bin/bash
+    script{
+        sh '''
+        #!/bin/bash
         ./jenkins_files/k8s/remove_minikube.sh
-	    '''
-	} //script
+        '''
+    } //script
 }
 
 
@@ -151,7 +160,7 @@ def clean_docker_history(){
     } //script
 }
 
-def run_test(String test_name, String backend, String branch){
+def run_test(String test_name, String backend, String branch, String helm_repo){
     try {
         withCredentials([string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD')]) {
             sh '''
@@ -160,7 +169,7 @@ def run_test(String test_name, String backend, String branch){
             echo "''' + test_name + ''';;" >>/tmp/testhistory
             cat /tmp/testhistory
             source systests_python_env/bin/activate
-            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c CyberArmorTests --logger DEBUG --kwargs helm_branch='''+branch+'''
+            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c CyberArmorTests --logger DEBUG --kwargs helm_branch='''+branch+''' helm_repo='''+helm_repo+'''
             deactivate
             '''
         }

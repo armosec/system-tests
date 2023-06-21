@@ -1,0 +1,1398 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3Filtered",
+    "metadata": {
+        "annotations": {
+        },
+        "creationTimestamp": "2023-05-10T16:56:55Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "nginx",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "nginx",
+            "kubescape.io/workload-namespace": "systest-ns-pfml"
+        },
+        "name": "314a64d46c380536261d4dcc71d75097f1a4584c7e81725050a3df3534d1078d",
+        "namespace": "kubescape",
+        "resourceVersion": "189",
+        "uid": "8e4b9a33-d7b5-4f72-825a-4c60ea8e95bd"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
+            "SPDXID": "SPDXRef-DOCUMENT",
+            "annotations": null,
+            "comment": "",
+            "creationInfo": {
+                "comment": "",
+                "created": "2023-05-10T13:41:18Z",
+                "creators": [
+                    "Organization: Anchore, Inc",
+                    "Tool: syft-v0.76.0",
+                    "Organization: Kubescape",
+                    "Tool: KubescapeNodeAgent"
+                ],
+                "licenseListVersion": "3.20"
+            },
+            "dataLicense": "CC0-1.0",
+            "documentDescribes": null,
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/library/nginx@sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2-3cea0564-c18c-44fb-bbad-869d40416e1a",
+            "externalDocumentRefs": null,
+            "files": [
+                {
+                    "SPDXID": "SPDXRef-94aa0e4fde207a42",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/host.conf",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-3673487794e8039c",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/nginx/nginx.conf",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-e4fa050c6956d054",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/lib/x86_64-linux-gnu/libselinux.so.1",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-238a15f818329179",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/bin/basename",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-4d4c8143d04b69b2",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/bin/find",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-9fc0d45313cce67b",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/bin/sort",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-b8d9ac64e8dd931b",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/lib/x86_64-linux-gnu/libcrypto.so.1.1",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-8c41eac206567e8f",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/lib/x86_64-linux-gnu/libssl.so.1.1",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-ee143082a06f987",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/usr/sbin/nginx",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                }
+            ],
+            "hasExtractedLicensingInfos": [
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-All-permissive",
+                    "name": "All-permissive",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Artistic",
+                    "name": "Artistic",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Artistic-dist",
+                    "name": "Artistic-dist",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Autoconf",
+                    "name": "Autoconf",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-2-clause-author",
+                    "name": "BSD-2-clause-author",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-2-clause-verbatim",
+                    "name": "BSD-2-clause-verbatim",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3",
+                    "name": "BSD-3",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-Aaron-D-Gifford",
+                    "name": "BSD-3-clause-Aaron-D-Gifford",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-GENERIC",
+                    "name": "BSD-3-clause-GENERIC",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-John-Birrell",
+                    "name": "BSD-3-clause-John-Birrell",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-Regents",
+                    "name": "BSD-3-clause-Regents",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-author",
+                    "name": "BSD-3-clause-author",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-3-clause-with-weird-numbering",
+                    "name": "BSD-3-clause-with-weird-numbering",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-4-clause-Christopher-G-Demetriou",
+                    "name": "BSD-4-clause-Christopher-G-Demetriou",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-4-clause-Niels-Provos",
+                    "name": "BSD-4-clause-Niels-Provos",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-4-clause-POWERDOG",
+                    "name": "BSD-4-clause-POWERDOG",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-5-clause-Peter-Wemm",
+                    "name": "BSD-5-clause-Peter-Wemm",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-BY-LC-NE",
+                    "name": "BSD-BY-LC-NE",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-like-with-advertising-clause",
+                    "name": "BSD-like-with-advertising-clause",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD-variant",
+                    "name": "BSD-variant",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BSD3",
+                    "name": "BSD3",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-BZIP",
+                    "name": "BZIP",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-CC0",
+                    "name": "CC0",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Chromium",
+                    "name": "Chromium",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-DONT-CHANGE-THE-GPL",
+                    "name": "DONT-CHANGE-THE-GPL",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Expat",
+                    "name": "Expat",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-FSF-manpages",
+                    "name": "FSF-manpages",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-FreeSoftware",
+                    "name": "FreeSoftware",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GAP",
+                    "name": "GAP",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GAP-Makefile.in",
+                    "name": "GAP~Makefile.in",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GAP-configure",
+                    "name": "GAP~configure",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GFDL",
+                    "name": "GFDL",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GFDL-1.2-",
+                    "name": "GFDL-1.2+",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GFDL-1.3--no-invariant",
+                    "name": "GFDL-1.3+-no-invariant",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GFDL-3",
+                    "name": "GFDL-3",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPL",
+                    "name": "GPL",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPL-2--autoconf-exception",
+                    "name": "GPL-2+-autoconf-exception",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPL-2--libtool-exception",
+                    "name": "GPL-2+-libtool-exception",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPL-3--WITH-BISON-EXCEPTION",
+                    "name": "GPL-3+-WITH-BISON-EXCEPTION",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPL-3--autoconf-exception",
+                    "name": "GPL-3+-autoconf-exception",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPLv2-",
+                    "name": "GPLv2+",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-GPLv3-",
+                    "name": "GPLv3+",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-HSIEH-BSD",
+                    "name": "HSIEH-BSD",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-HSIEH-DERIVATIVE",
+                    "name": "HSIEH-DERIVATIVE",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Hylafax",
+                    "name": "Hylafax",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-ISC-IBM",
+                    "name": "ISC+IBM",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-ISC-Original",
+                    "name": "ISC-Original",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-LGPL",
+                    "name": "LGPL",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-LGPLv2.1-",
+                    "name": "LGPLv2.1+",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-LGPLv3--or-GPLv2-",
+                    "name": "LGPLv3+_or_GPLv2+",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-MIT-1",
+                    "name": "MIT-1",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-MIT-X11",
+                    "name": "MIT/X11",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-OpenGroup-BSD-like",
+                    "name": "OpenGroup-BSD-like",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-PD",
+                    "name": "PD",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-PD-debian",
+                    "name": "PD-debian",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Permissive",
+                    "name": "Permissive",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Public-Domain",
+                    "name": "Public-Domain",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-REGCOMP",
+                    "name": "REGCOMP",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-REGCOMP-",
+                    "name": "REGCOMP,",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-RFC-Reference",
+                    "name": "RFC-Reference",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-RRA-KEEP-THIS-NOTICE",
+                    "name": "RRA-KEEP-THIS-NOTICE",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-SDBM-PUBLIC-DOMAIN",
+                    "name": "SDBM-PUBLIC-DOMAIN",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-SIL-OFL-1.1",
+                    "name": "SIL-OFL-1.1",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-TEXT-TABS",
+                    "name": "TEXT-TABS",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-The",
+                    "name": "The",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-TinySCHEME",
+                    "name": "TinySCHEME",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-Unicode",
+                    "name": "Unicode",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-WEBP",
+                    "name": "WEBP",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-XFIG",
+                    "name": "XFIG",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-all-permissive",
+                    "name": "all-permissive",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-config-h",
+                    "name": "config-h",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-configure",
+                    "name": "configure",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-expat",
+                    "name": "expat",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-g10-permissive",
+                    "name": "g10-permissive",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-installsh",
+                    "name": "installsh",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-noderivs",
+                    "name": "noderivs",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-other",
+                    "name": "other",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive",
+                    "name": "permissive",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-autoconf-m4",
+                    "name": "permissive-autoconf-m4",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-autoconf-m4-no-warranty",
+                    "name": "permissive-autoconf-m4-no-warranty",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-configure",
+                    "name": "permissive-configure",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-fsf",
+                    "name": "permissive-fsf",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-like-automake-output",
+                    "name": "permissive-like-automake-output",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-makefile-in",
+                    "name": "permissive-makefile-in",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-permissive-nowarranty",
+                    "name": "permissive-nowarranty",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-probably-PD",
+                    "name": "probably-PD",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-public-domain",
+                    "name": "public-domain",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-public-domain-md4",
+                    "name": "public-domain-md4",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-public-domain-md5",
+                    "name": "public-domain-md5",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-public-domain-s-s-d",
+                    "name": "public-domain-s-s-d",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-public-domain-sha1",
+                    "name": "public-domain-sha1",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-same-as-rest-of-p11kit",
+                    "name": "same-as-rest-of-p11kit",
+                    "seeAlsos": null
+                }
+            ],
+            "name": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
+            "packages": [
+                {
+                    "SPDXID": "SPDXRef-Package-deb-base-files-3c26dd637259b397",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base-files:base-files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base-files:base_files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base_files:base-files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base_files:base_files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base:base-files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:base:base_files:11.1\\+deb11u6:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/base-files@11.1+deb11u6?arch=amd64\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "LicenseRef-GPL",
+                    "licenseDeclared": "LicenseRef-GPL",
+                    "licenseInfoFromFiles": null,
+                    "name": "base-files",
+                    "originator": "Person: Santiago Vila \u003csanvila@debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/base-files/copyright, /var/lib/dpkg/info/base-files.conffiles, /var/lib/dpkg/info/base-files.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "11.1+deb11u6"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-coreutils-65bac153c492b66e",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:coreutils:coreutils:8.32-4\\+b1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64\u0026upstream=coreutils%408.32-4\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-3.0-only",
+                    "licenseDeclared": "GPL-3.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "coreutils",
+                    "originator": "Person: Michael Stone \u003cmstone@debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/coreutils/copyright, /var/lib/dpkg/info/coreutils.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "8.32-4+b1"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-coreutils-65bac153c492b66e",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:coreutils:coreutils:8.32-4\\+b1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64\u0026upstream=coreutils%408.32-4\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-3.0-only",
+                    "licenseDeclared": "GPL-3.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "coreutils",
+                    "originator": "Person: Michael Stone \u003cmstone@debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/coreutils/copyright, /var/lib/dpkg/info/coreutils.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "8.32-4+b1"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-findutils-b503e3d45616f33c",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:findutils:findutils:4.8.0-1:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/findutils@4.8.0-1?arch=amd64\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GFDL-1.3-only AND GPL-3.0-only",
+                    "licenseDeclared": "GFDL-1.3-only AND GPL-3.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "findutils",
+                    "originator": "Person: Andreas Metzler \u003cametzler@debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/findutils/copyright, /var/lib/dpkg/info/findutils.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "4.8.0-1"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-libselinux1-bb9d0a1adefb7931",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:libselinux1:libselinux1:3.1-3:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/libselinux1@3.1-3?arch=amd64\u0026upstream=libselinux\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-2.0-only AND LGPL-2.1-only",
+                    "licenseDeclared": "GPL-2.0-only AND LGPL-2.1-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "libselinux1",
+                    "originator": "Person: Debian SELinux maintainers \u003cselinux-devel@lists.alioth.debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libselinux1/copyright, /var/lib/dpkg/info/libselinux1:amd64.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "3.1-3"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-libssl1.1-63a11d0164944054",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0\\+deb11u4:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "NONE",
+                    "licenseDeclared": "NONE",
+                    "licenseInfoFromFiles": null,
+                    "name": "libssl1.1",
+                    "originator": "Person: Debian OpenSSL Team \u003cpkg-openssl-devel@lists.alioth.debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libssl1.1/copyright, /var/lib/dpkg/info/libssl1.1:amd64.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "1.1.1n-0+deb11u4"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-libssl1.1-63a11d0164944054",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0\\+deb11u4:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "NONE",
+                    "licenseDeclared": "NONE",
+                    "licenseInfoFromFiles": null,
+                    "name": "libssl1.1",
+                    "originator": "Person: Debian OpenSSL Team \u003cpkg-openssl-devel@lists.alioth.debian.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/libssl1.1/copyright, /var/lib/dpkg/info/libssl1.1:amd64.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "1.1.1n-0+deb11u4"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-nginx-d338dab56e8b4b8e",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:nginx:nginx:1.23.3-1\\~bullseye:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/nginx@1.23.3-1~bullseye?arch=amd64\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "NONE",
+                    "licenseDeclared": "NONE",
+                    "licenseInfoFromFiles": null,
+                    "name": "nginx",
+                    "originator": "Person: NGINX Packaging \u003cnginx-packaging@f5.com\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/nginx/copyright, /var/lib/dpkg/info/nginx.conffiles, /var/lib/dpkg/info/nginx.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "1.23.3-1~bullseye"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-deb-nginx-d338dab56e8b4b8e",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:nginx:nginx:1.23.3-1\\~bullseye:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:deb/debian/nginx@1.23.3-1~bullseye?arch=amd64\u0026distro=debian-11",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "NONE",
+                    "licenseDeclared": "NONE",
+                    "licenseInfoFromFiles": null,
+                    "name": "nginx",
+                    "originator": "Person: NGINX Packaging \u003cnginx-packaging@f5.com\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/nginx/copyright, /var/lib/dpkg/info/nginx.conffiles, /var/lib/dpkg/info/nginx.md5sums, /var/lib/dpkg/status",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "1.23.3-1~bullseye"
+                }
+            ],
+            "relationships": [
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-java-archive-libintl-a29ca26c5c907c8",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-deb-gettext-base-19929d95b155bf28"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-94aa0e4fde207a42",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-base-files-3c26dd637259b397"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-8c41eac206567e8f",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-libssl1.1-63a11d0164944054"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-b8d9ac64e8dd931b",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-libssl1.1-63a11d0164944054"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-238a15f818329179",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-coreutils-65bac153c492b66e"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-9fc0d45313cce67b",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-coreutils-65bac153c492b66e"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-4d4c8143d04b69b2",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-findutils-b503e3d45616f33c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-e4fa050c6956d054",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-libselinux1-bb9d0a1adefb7931"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-3673487794e8039c",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-nginx-d338dab56e8b4b8e"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-ee143082a06f987",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-deb-nginx-d338dab56e8b4b8e"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-DOCUMENT",
+                    "relationshipType": "DESCRIBES",
+                    "spdxElementId": "SPDXRef-DOCUMENT"
+                }
+            ],
+            "snippets": null,
+            "spdxVersion": "SPDX-2.3"
+        }
+    },
+    "status": {}
+}

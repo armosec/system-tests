@@ -1,0 +1,738 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+            "kubescape.io/status": ""
+        },
+        "creationTimestamp": "2023-06-05T22:18:20Z",
+        "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-rcohendockerhub-golang-hello-world-sha256-4cabc6988f0",
+            "kubescape.io/image-name": "docker-io-rcohendockerhub-golang-hello-world"
+        },
+        "name": "docker.io-rcohendockerhub-golang-hello-world-sha256-4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c-1acf3c",
+        "namespace": "kubescape",
+        "resourceVersion": "18",
+        "uid": "87ca411c-9cb2-4738-9419-dc0a13700a15"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": false
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "alpine"
+                ],
+                "name": "alpine",
+                "version": ""
+            },
+            "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:go:go:1.20.4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "go",
+                        "purl": "pkg:generic/go@1.20.4",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "1.20.4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:golang:go:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2020-29509"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 5.6,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-29509",
+                        "description": "The encoding/xml package in Go (all versions) does not correctly preserve the semantics of attribute namespace prefixes during tokenization round-trips, which allows an attacker to craft inputs that behave in conflicting ways during different stages of processing in affected downstream applications.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2020-29509",
+                        "namespace": "nvd:cpe",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/mattermost/xml-roundtrip-validator/blob/master/advisories/unstable-attributes.md",
+                            "https://security.netapp.com/advisory/ntap-20210129-0006/"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:go:go:1.20.4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "go",
+                        "purl": "pkg:generic/go@1.20.4",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "1.20.4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:golang:go:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2020-29511"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 5.6,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-29511",
+                        "description": "The encoding/xml package in Go (all versions) does not correctly preserve the semantics of element namespace prefixes during tokenization round-trips, which allows an attacker to craft inputs that behave in conflicting ways during different stages of processing in affected downstream applications.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2020-29511",
+                        "namespace": "nvd:cpe",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/mattermost/xml-roundtrip-validator/blob/master/advisories/unstable-elements.md",
+                            "https://security.netapp.com/advisory/ntap-20210129-0006/"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcrypto3:libcrypto3:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto3:libcrypto:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto3:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto:3.1.0-r2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libcrypto3",
+                        "purl": "pkg:apk/alpine/libcrypto3@3.1.0-r2?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18_alpha20230329",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.1.0-r2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.1.0-r4 (apk)",
+                                "vulnerabilityID": "CVE-2023-1255"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": ""
+                                },
+                                "namespace": "alpine:distro:alpine:edge",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.1.0-r2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-1255",
+                            "description": "Issue summary: The AES-XTS cipher decryption implementation for 64 bit ARM\nplatform contains a bug that could cause it to read past the input buffer,\nleading to a crash.\n\nImpact summary: Applications that use the AES-XTS algorithm on the 64 bit ARM\nplatform can crash in rare circumstances. The AES-XTS algorithm is usually\nused for disk encryption.\n\nThe AES-XTS cipher decryption implementation for 64 bit ARM platform will read\npast the end of the ciphertext buffer if the ciphertext size is 4 mod 5 in 16\nbyte blocks, e.g. 144 bytes or 1024 bytes. If the memory after the ciphertext\nbuffer is unmapped, this will trigger a crash which results in a denial of\nservice.\n\nIf an attacker can control the size and location of the ciphertext buffer\nbeing decrypted by an application using AES-XTS on 64 bit ARM, the\napplication is affected. This is fairly unlikely making this issue\na Low severity one.",
+                            "id": "CVE-2023-1255",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=02ac9c9420275868472f33b01def01218742b8bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=bc2f61ad70971869b242fc1cb445b98bad50074a"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.1.0-r4"
+                            ]
+                        },
+                        "id": "CVE-2023-1255",
+                        "namespace": "alpine:distro:alpine:edge",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl3:libssl3:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl3:libssl:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl3:3.1.0-r2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl:3.1.0-r2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libssl3",
+                        "purl": "pkg:apk/alpine/libssl3@3.1.0-r2?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18_alpha20230329",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.1.0-r2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.1.0-r4 (apk)",
+                                "vulnerabilityID": "CVE-2023-1255"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": ""
+                                },
+                                "namespace": "alpine:distro:alpine:edge",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.1.0-r2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-1255",
+                            "description": "Issue summary: The AES-XTS cipher decryption implementation for 64 bit ARM\nplatform contains a bug that could cause it to read past the input buffer,\nleading to a crash.\n\nImpact summary: Applications that use the AES-XTS algorithm on the 64 bit ARM\nplatform can crash in rare circumstances. The AES-XTS algorithm is usually\nused for disk encryption.\n\nThe AES-XTS cipher decryption implementation for 64 bit ARM platform will read\npast the end of the ciphertext buffer if the ciphertext size is 4 mod 5 in 16\nbyte blocks, e.g. 144 bytes or 1024 bytes. If the memory after the ciphertext\nbuffer is unmapped, this will trigger a crash which results in a denial of\nservice.\n\nIf an attacker can control the size and location of the ciphertext buffer\nbeing decrypted by an application using AES-XTS on 64 bit ARM, the\napplication is affected. This is fairly unlikely making this issue\na Low severity one.",
+                            "id": "CVE-2023-1255",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=02ac9c9420275868472f33b01def01218742b8bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=bc2f61ad70971869b242fc1cb445b98bad50074a"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.1.0-r4"
+                            ]
+                        },
+                        "id": "CVE-2023-1255",
+                        "namespace": "alpine:distro:alpine:edge",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:docker:docker:v20.10.17+incompatible:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:JYCuMrWaVNophQTOrMMoSwudOVEfcegoZZrleKc1xwE="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/docker/docker",
+                        "purl": "pkg:golang/github.com/docker/docker@v20.10.17+incompatible",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v20.10.17+incompatible"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003e=1.12.0,\u003c20.10.24 (unknown)",
+                                "vulnerabilityID": "GHSA-232p-vwff-86mp"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28840",
+                            "description": "Moby is an open source container framework developed by Docker Inc. that is distributed as Docker, Mirantis Container Runtime, and various other downstream projects/products. The Moby daemon component (`dockerd`), which is developed as moby/moby, is commonly referred to as *Docker*. Swarm Mode, which is compiled in and delivered by default in dockerd and is thus present in most major Moby downstreams, is a simple, built-in container orchestrator that is implemented through a combination of SwarmKit and supporting network code. The overlay network driver is a core feature of Swarm Mode, providing isolated virtual LANs that allow communication between containers and services across the cluster. This driver is an implementation/user of VXLAN, which encapsulates link-layer (Ethernet) frames in UDP datagrams that tag the frame with a VXLAN Network ID (VNI) that identifies the originating overlay network. In addition, the overlay network driver supports an optional, off-by-default encrypted mode, which is especially useful when VXLAN packets traverses an untrusted network between nodes. Encrypted overlay networks function by encapsulating the VXLAN datagrams through the use of the IPsec Encapsulating Security Payload protocol in Transport mode. By deploying IPSec encapsulation, encrypted overlay networks gain the additional properties of source authentication through cryptographic proof, data integrity through check-summing, and confidentiality through encryption. When setting an endpoint up on an encrypted overlay network, Moby installs three iptables (Linux kernel firewall) rules that enforce both incoming and outgoing IPSec. These rules rely on the u32 iptables extension provided by the xt_u32 kernel module to directly filter on a VXLAN packet's VNI field, so that IPSec guarantees can be enforced on encrypted overlay networks without interfering with other overlay networks or other users of VXLAN. Two iptables rules serve to filter incoming VXLAN datagrams with a VNI that corresponds to an encrypted network and discards unencrypted datagrams. The rules are appended to the end of the INPUT filter chain, following any rules that have been previously set by the system administrator. Administrator-set rules take precedence over the rules Moby sets to discard unencrypted VXLAN datagrams, which can potentially admit unencrypted datagrams that should have been discarded. The injection of arbitrary Ethernet frames can enable a Denial of Service attack. A sophisticated attacker may be able to establish a UDP or TCP connection by way of the container’s outbound gateway that would otherwise be blocked by a stateful firewall, or carry out other escalations beyond simple injection by smuggling packets into the overlay network. Patches are available in Moby releases 23.0.3 and 20.10.24. As Mirantis Container Runtime's 20.10 releases are numbered differently, users of that platform should update to 20.10.16. Some workarounds are available. Close the VXLAN port (by default, UDP port 4789) to incoming traffic at the Internet boundary to prevent all VXLAN packet injection, and/or ensure that the `xt_u32` kernel module is available on all nodes of the Swarm cluster.",
+                            "id": "CVE-2023-28840",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://github.com/moby/libnetwork/security/advisories/GHSA-gvm4-2qqg-m333",
+                                "https://github.com/moby/moby/issues/43382",
+                                "https://github.com/moby/moby/pull/45118",
+                                "https://github.com/moby/moby/security/advisories/GHSA-232p-vwff-86mp",
+                                "https://github.com/moby/moby/security/advisories/GHSA-33pg-m6jh-5237",
+                                "https://github.com/moby/moby/security/advisories/GHSA-6wrf-mxfj-pf5p",
+                                "https://github.com/moby/moby/security/advisories/GHSA-vwm3-crmr-xfxw"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 4.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-232p-vwff-86mp",
+                        "description": "Docker Swarm encrypted overlay network may be unauthenticated",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "20.10.24"
+                            ]
+                        },
+                        "id": "GHSA-232p-vwff-86mp",
+                        "namespace": "github:language:go",
+                        "severity": "High",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-232p-vwff-86mp"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:docker:docker:v20.10.17+incompatible:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:JYCuMrWaVNophQTOrMMoSwudOVEfcegoZZrleKc1xwE="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/docker/docker",
+                        "purl": "pkg:golang/github.com/docker/docker@v20.10.17+incompatible",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v20.10.17+incompatible"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003e=1.12.0,\u003c20.10.24 (unknown)",
+                                "vulnerabilityID": "GHSA-33pg-m6jh-5237"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28841",
+                            "description": "Moby is an open source container framework developed by Docker Inc. that is distributed as Docker, Mirantis Container Runtime, and various other downstream projects/products. The Moby daemon component (`dockerd`), which is developed as moby/moby is commonly referred to as *Docker*. Swarm Mode, which is compiled in and delivered by default in `dockerd` and is thus present in most major Moby downstreams, is a simple, built-in container orchestrator that is implemented through a combination of SwarmKit and supporting network code. The `overlay` network driver is a core feature of Swarm Mode, providing isolated virtual LANs that allow communication between containers and services across the cluster. This driver is an implementation/user of VXLAN, which encapsulates link-layer (Ethernet) frames in UDP datagrams that tag the frame with the VXLAN metadata, including a VXLAN Network ID (VNI) that identifies the originating overlay network. In addition, the overlay network driver supports an optional, off-by-default encrypted mode, which is especially useful when VXLAN packets traverses an untrusted network between nodes. Encrypted overlay networks function by encapsulating the VXLAN datagrams through the use of the IPsec Encapsulating Security Payload protocol in Transport mode. By deploying IPSec encapsulation, encrypted overlay networks gain the additional properties of source authentication through cryptographic proof, data integrity through check-summing, and confidentiality through encryption. When setting an endpoint up on an encrypted overlay network, Moby installs three iptables (Linux kernel firewall) rules that enforce both incoming and outgoing IPSec. These rules rely on the `u32` iptables extension provided by the `xt_u32` kernel module to directly filter on a VXLAN packet's VNI field, so that IPSec guarantees can be enforced on encrypted overlay networks without interfering with other overlay networks or other users of VXLAN. An iptables rule designates outgoing VXLAN datagrams with a VNI that corresponds to an encrypted overlay network for IPsec encapsulation. Encrypted overlay networks on affected platforms silently transmit unencrypted data. As a result, `overlay` networks may appear to be functional, passing traffic as expected, but without any of the expected confidentiality or data integrity guarantees. It is possible for an attacker sitting in a trusted position on the network to read all of the application traffic that is moving across the overlay network, resulting in unexpected secrets or user data disclosure. Thus, because many database protocols, internal APIs, etc. are not protected by a second layer of encryption, a user may use Swarm encrypted overlay networks to provide confidentiality, which due to this vulnerability this is no longer guaranteed. Patches are available in Moby releases 23.0.3, and 20.10.24. As Mirantis Container Runtime's 20.10 releases are numbered differently, users of that platform should update to 20.10.16. Some workarounds are available. Close the VXLAN port (by default, UDP port 4789) to outgoing traffic at the Internet boundary in order to prevent unintentionally leaking unencrypted traffic over the Internet, and/or ensure that the `xt_u32` kernel module is available on all nodes of the Swarm cluster.",
+                            "id": "CVE-2023-28841",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://github.com/moby/libnetwork/blob/d9fae4c73daf76c3b0f77e14b45b8bf612ba764d/drivers/overlay/encryption.go#L205-L207",
+                                "https://github.com/moby/libnetwork/security/advisories/GHSA-gvm4-2qqg-m333",
+                                "https://github.com/moby/moby/issues/43382",
+                                "https://github.com/moby/moby/pull/45118",
+                                "https://github.com/moby/moby/security/advisories/GHSA-232p-vwff-86mp",
+                                "https://github.com/moby/moby/security/advisories/GHSA-33pg-m6jh-5237",
+                                "https://github.com/moby/moby/security/advisories/GHSA-6wrf-mxfj-pf5p",
+                                "https://github.com/moby/moby/security/advisories/GHSA-vwm3-crmr-xfxw"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-33pg-m6jh-5237",
+                        "description": "Docker Swarm encrypted overlay network traffic may be unencrypted",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "20.10.24"
+                            ]
+                        },
+                        "id": "GHSA-33pg-m6jh-5237",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-33pg-m6jh-5237"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:docker:docker:v20.10.17+incompatible:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:JYCuMrWaVNophQTOrMMoSwudOVEfcegoZZrleKc1xwE="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/docker/docker",
+                        "purl": "pkg:golang/github.com/docker/docker@v20.10.17+incompatible",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v20.10.17+incompatible"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003e=1.12.0,\u003c20.10.24 (unknown)",
+                                "vulnerabilityID": "GHSA-6wrf-mxfj-pf5p"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28842",
+                            "description": "Moby) is an open source container framework developed by Docker Inc. that is distributed as Docker, Mirantis Container Runtime, and various other downstream projects/products. The Moby daemon component (`dockerd`), which is developed as moby/moby is commonly referred to as *Docker*. Swarm Mode, which is compiled in and delivered by default in `dockerd` and is thus present in most major Moby downstreams, is a simple, built-in container orchestrator that is implemented through a combination of SwarmKit and supporting network code. The `overlay` network driver is a core feature of Swarm Mode, providing isolated virtual LANs that allow communication between containers and services across the cluster. This driver is an implementation/user of VXLAN, which encapsulates link-layer (Ethernet) frames in UDP datagrams that tag the frame with the VXLAN metadata, including a VXLAN Network ID (VNI) that identifies the originating overlay network. In addition, the overlay network driver supports an optional, off-by-default encrypted mode, which is especially useful when VXLAN packets traverses an untrusted network between nodes. Encrypted overlay networks function by encapsulating the VXLAN datagrams through the use of the IPsec Encapsulating Security Payload protocol in Transport mode. By deploying IPSec encapsulation, encrypted overlay networks gain the additional properties of source authentication through cryptographic proof, data integrity through check-summing, and confidentiality through encryption. When setting an endpoint up on an encrypted overlay network, Moby installs three iptables (Linux kernel firewall) rules that enforce both incoming and outgoing IPSec. These rules rely on the `u32` iptables extension provided by the `xt_u32` kernel module to directly filter on a VXLAN packet's VNI field, so that IPSec guarantees can be enforced on encrypted overlay networks without interfering with other overlay networks or other users of VXLAN. The `overlay` driver dynamically and lazily defines the kernel configuration for the VXLAN network on each node as containers are attached and detached. Routes and encryption parameters are only defined for destination nodes that participate in the network. The iptables rules that prevent encrypted overlay networks from accepting unencrypted packets are not created until a peer is available with which to communicate. Encrypted overlay networks silently accept cleartext VXLAN datagrams that are tagged with the VNI of an encrypted overlay network. As a result, it is possible to inject arbitrary Ethernet frames into the encrypted overlay network by encapsulating them in VXLAN datagrams. The implications of this can be quite dire, and GHSA-vwm3-crmr-xfxw should be referenced for a deeper exploration. Patches are available in Moby releases 23.0.3, and 20.10.24. As Mirantis Container Runtime's 20.10 releases are numbered differently, users of that platform should update to 20.10.16. Some workarounds are available. In multi-node clusters, deploy a global ‘pause’ container for each encrypted overlay network, on every node. For a single-node cluster, do not use overlay networks of any sort. Bridge networks provide the same connectivity on a single node and have no multi-node features. The Swarm ingress feature is implemented using an overlay network, but can be disabled by publishing ports in `host` mode instead of `ingress` mode (allowing the use of an external load balancer), and removing the `ingress` network. If encrypted overlay networks are in exclusive use, block UDP port 4789 from traffic that has not been validated by IPSec.",
+                            "id": "CVE-2023-28842",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://github.com/moby/libnetwork/security/advisories/GHSA-gvm4-2qqg-m333",
+                                "https://github.com/moby/moby/security/advisories/GHSA-232p-vwff-86mp",
+                                "https://github.com/moby/moby/security/advisories/GHSA-33pg-m6jh-5237",
+                                "https://github.com/moby/moby/security/advisories/GHSA-6wrf-mxfj-pf5p",
+                                "https://github.com/moby/moby/security/advisories/GHSA-vwm3-crmr-xfxw"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 2.2,
+                                    "impactScore": 4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-6wrf-mxfj-pf5p",
+                        "description": "Docker Swarm encrypted overlay network with a single endpoint is unauthenticated",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "20.10.24"
+                            ]
+                        },
+                        "id": "GHSA-6wrf-mxfj-pf5p",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-6wrf-mxfj-pf5p"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:golang:x/net:v0.5.0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:GyT4nK/YDHSqa1c4753ouYCDajOYKTja9Xb/OHtgvSw="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "golang.org/x/net",
+                        "purl": "pkg:golang/golang.org/x/net@v0.5.0",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v0.5.0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c0.7.0 (unknown)",
+                                "vulnerabilityID": "GHSA-vvpx-j8f3-3w6h"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-41723",
+                            "description": "A maliciously crafted HTTP/2 stream could cause excessive CPU consumption in the HPACK decoder, sufficient to cause a denial of service from a small number of small requests.",
+                            "id": "CVE-2022-41723",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://go.dev/cl/468135",
+                                "https://go.dev/cl/468295",
+                                "https://go.dev/issue/57855",
+                                "https://groups.google.com/g/golang-announce/c/V0aBFqaFs_E",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/4MA5XS5DAOJ5PKKNG5TUXKPQOFHT5VBC/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RGW7GE2Z32ZT47UFAQFDRQE33B7Q7LMT/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RLBQ3A7ROLEQXQLXFDLNJ7MYPKG5GULE/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/XX3IMUTZKRQ73PBZM4E2JP4BKYH4C6XE/",
+                                "https://pkg.go.dev/vuln/GO-2023-1571"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-vvpx-j8f3-3w6h",
+                        "description": "Uncontrolled Resource Consumption",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "0.7.0"
+                            ]
+                        },
+                        "id": "GHSA-vvpx-j8f3-3w6h",
+                        "namespace": "github:language:go",
+                        "severity": "High",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-vvpx-j8f3-3w6h"
+                        ]
+                    }
+                }
+            ],
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

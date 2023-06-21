@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golangdynamic
+  labels:
+    app: golangdynamic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golangdynamic
+  template:
+    metadata:
+      labels:
+        app: golangdynamic
+    spec:
+      containers:
+      - name: golangdynamic
+        args:
+        - ./main; sleep 3600
+        command:
+        - /bin/sh
+        - -c
+        image: docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c

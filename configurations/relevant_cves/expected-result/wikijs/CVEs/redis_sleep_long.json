@@ -1,0 +1,1214 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+            "kubescape.io/status": ""
+        },
+        "creationTimestamp": "2023-05-28T14:17:17Z",
+        "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
+            "kubescape.io/image-name": "docker-io-library-redis"
+        },
+        "name": "docker.io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-9722c2",
+        "namespace": "kubescape",
+        "resourceVersion": "70",
+        "uid": "1ebc4c67-8e25-4146-9741-6435d5e74433"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": false
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "alpine"
+                ],
+                "name": "alpine",
+                "version": "3.17.2"
+            },
+            "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:-:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2022-0543"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 10,
+                                    "exploitabilityScore": 10,
+                                    "impactScore": 10
+                                },
+                                "vector": "AV:N/AC:L/Au:N/C:C/I:C/A:C",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 10,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-0543",
+                        "description": "It was discovered, that redis, a persistent key-value database, due to a packaging issue, is prone to a (Debian-specific) Lua sandbox escape, which could result in remote code execution.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2022-0543",
+                        "namespace": "nvd:cpe",
+                        "severity": "Critical",
+                        "urls": [
+                            "http://packetstormsecurity.com/files/166885/Redis-Lua-Sandbox-Escape.html",
+                            "https://bugs.debian.org/1005787",
+                            "https://lists.debian.org/debian-security-announce/2022/msg00048.html",
+                            "https://security.netapp.com/advisory/ntap-20220331-0004/",
+                            "https://www.debian.org/security/2022/dsa-5081",
+                            "https://www.ubercomp.com/posts/2022-01-20_redis_on_debian_rce"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "busybox",
+                        "purl": "pkg:/",
+                        "type": "",
+                        "upstreams": null,
+                        "version": "1.35.0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:busybox:busybox:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "\u003c= 1.35.0 (unknown)",
+                                "vulnerabilityID": "CVE-2022-28391"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 8.8,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-28391",
+                        "description": "BusyBox through 1.35.0 allows remote attackers to execute arbitrary code if netstat is used to print a DNS PTR record's value to a VT compatible terminal. Alternatively, the attacker could choose to change the terminal's colors.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2022-28391",
+                        "namespace": "nvd:cpe",
+                        "severity": "High",
+                        "urls": [
+                            "https://git.alpinelinux.org/aports/plain/main/busybox/0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch",
+                            "https://git.alpinelinux.org/aports/plain/main/busybox/0002-nslookup-sanitize-all-printed-strings-with-printable.patch",
+                            "https://gitlab.alpinelinux.org/alpine/aports/-/issues/13661"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "busybox",
+                        "purl": "pkg:/",
+                        "type": "",
+                        "upstreams": null,
+                        "version": "1.35.0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "= 1.35.0 (unknown)",
+                                "vulnerabilityID": "CVE-2022-30065"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:busybox:busybox:1.35.0:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 7.8,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-30065",
+                        "description": "A use-after-free in Busybox 1.35-x's awk applet leads to denial of service and possibly code execution when processing a crafted awk pattern in the copyvar function.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2022-30065",
+                        "namespace": "nvd:cpe",
+                        "severity": "High",
+                        "urls": [
+                            "https://bugs.busybox.net/show_bug.cgi?id=14781",
+                            "https://cert-portal.siemens.com/productcert/pdf/ssa-333517.pdf"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "\u003c 2022-09-29 (unknown)",
+                                "vulnerabilityID": "CVE-2022-3647"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 3.3,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 3.1,
+                                    "exploitabilityScore": 1.6,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:A/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-3647",
+                        "description": "** DISPUTED ** A vulnerability, which was classified as problematic, was found in Redis. Affected is the function sigsegvHandler of the file debug.c of the component Crash Report. The manipulation leads to denial of service. The real existence of this vulnerability is still doubted at the moment. The name of the patch is 0bf90d944313919eb8e63d3588bf63a367f020a3. It is recommended to apply a patch to fix this issue. VDB-211962 is the identifier assigned to this vulnerability. NOTE: The vendor claims that this is not a DoS because it applies to the crash logging mechanism which is triggered after a crash has occurred.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2022-3647",
+                        "namespace": "nvd:cpe",
+                        "severity": "Low",
+                        "urls": [
+                            "https://github.com/redis/redis/commit/0bf90d944313919eb8e63d3588bf63a367f020a3",
+                            "https://vuldb.com/?id.211962"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:-:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2022-3734"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 9.8,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 6.3,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-3734",
+                        "description": "** DISPUTED ** A vulnerability was found in a port or fork of Redis. It has been declared as critical. This vulnerability affects unknown code in the library C:/Program Files/Redis/dbghelp.dll. The manipulation leads to uncontrolled search path. The attack can be initiated remotely. The exploit has been disclosed to the public and may be used. The real existence of this vulnerability is still doubted at the moment. The identifier of this vulnerability is VDB-212416. NOTE: The official Redis release is not affected. This issue might affect an unofficial fork or port on Windows only.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2022-3734",
+                        "namespace": "nvd:cpe",
+                        "severity": "Critical",
+                        "urls": [
+                            "https://vuldb.com/?id.212416",
+                            "https://www.cnblogs.com/J0o1ey/p/16829380.html"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcrypto3:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto3:libcrypto:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libcrypto3",
+                        "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r1 (apk)",
+                                "vulnerabilityID": "CVE-2023-0464"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0464",
+                            "description": "A security vulnerability has been identified in all supported versions of OpenSSL related to the verification of X.509 certificate chains that include policy constraints. Attackers may be able to exploit this vulnerability by creating a malicious certificate chain that triggers exponential use of computational resources, leading to a denial-of-service (DoS) attack on affected systems. Policy processing is disabled by default but can be enabled by passing the `-policy' argument to the command line utilities or by calling the `X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0464",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=2017771e2db3e2b96f89bbe8766c3209f6a99545",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=879f7080d7e141f415c79eaa3a8ac4a3dad0348b",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=959c59c7a0164117e7f8366466a32bb1f8d77ff1",
+                                "https://www.openssl.org/news/secadv/20230322.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0464",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r1"
+                            ]
+                        },
+                        "id": "CVE-2023-0464",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "High",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0464"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl3:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl3:libssl:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libssl3",
+                        "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r1 (apk)",
+                                "vulnerabilityID": "CVE-2023-0464"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0464",
+                            "description": "A security vulnerability has been identified in all supported versions of OpenSSL related to the verification of X.509 certificate chains that include policy constraints. Attackers may be able to exploit this vulnerability by creating a malicious certificate chain that triggers exponential use of computational resources, leading to a denial-of-service (DoS) attack on affected systems. Policy processing is disabled by default but can be enabled by passing the `-policy' argument to the command line utilities or by calling the `X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0464",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=2017771e2db3e2b96f89bbe8766c3209f6a99545",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=879f7080d7e141f415c79eaa3a8ac4a3dad0348b",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=959c59c7a0164117e7f8366466a32bb1f8d77ff1",
+                                "https://www.openssl.org/news/secadv/20230322.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0464",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r1"
+                            ]
+                        },
+                        "id": "CVE-2023-0464",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "High",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0464"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcrypto3:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto3:libcrypto:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libcrypto3",
+                        "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r2 (apk)",
+                                "vulnerabilityID": "CVE-2023-0465"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0465",
+                            "description": "Applications that use a non-default option when verifying certificates may be\nvulnerable to an attack from a malicious CA to circumvent certain checks.\n\nInvalid certificate policies in leaf certificates are silently ignored by\nOpenSSL and other certificate policy checks are skipped for that certificate.\nA malicious CA could use this to deliberately assert invalid certificate policies\nin order to circumvent policy checking on the certificate altogether.\n\nPolicy processing is disabled by default but can be enabled by passing\nthe `-policy' argument to the command line utilities or by calling the\n`X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0465",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=1dd43e0709fece299b15208f36cc7c76209ba0bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b013765abfa80036dc779dd0e50602c57bb3bf95",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=facfb1ab745646e97a1920977ae4a9965ea61d5c",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0465",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r2"
+                            ]
+                        },
+                        "id": "CVE-2023-0465",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0465"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl3:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl3:libssl:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libssl3",
+                        "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r2 (apk)",
+                                "vulnerabilityID": "CVE-2023-0465"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0465",
+                            "description": "Applications that use a non-default option when verifying certificates may be\nvulnerable to an attack from a malicious CA to circumvent certain checks.\n\nInvalid certificate policies in leaf certificates are silently ignored by\nOpenSSL and other certificate policy checks are skipped for that certificate.\nA malicious CA could use this to deliberately assert invalid certificate policies\nin order to circumvent policy checking on the certificate altogether.\n\nPolicy processing is disabled by default but can be enabled by passing\nthe `-policy' argument to the command line utilities or by calling the\n`X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0465",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=1dd43e0709fece299b15208f36cc7c76209ba0bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b013765abfa80036dc779dd0e50602c57bb3bf95",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=facfb1ab745646e97a1920977ae4a9965ea61d5c",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0465",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r2"
+                            ]
+                        },
+                        "id": "CVE-2023-0465",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0465"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcrypto3:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto3:libcrypto:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libcrypto3",
+                        "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r3 (apk)",
+                                "vulnerabilityID": "CVE-2023-0466"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0466",
+                            "description": "The function X509_VERIFY_PARAM_add0_policy() is documented to\nimplicitly enable the certificate policy check when doing certificate\nverification. However the implementation of the function does not\nenable the check which allows certificates with invalid or incorrect\npolicies to pass the certificate verification.\n\nAs suddenly enabling the policy check could break existing deployments it was\ndecided to keep the existing behavior of the X509_VERIFY_PARAM_add0_policy()\nfunction.\n\nInstead the applications that require OpenSSL to perform certificate\npolicy check need to use X509_VERIFY_PARAM_set1_policies() or explicitly\nenable the policy check by calling X509_VERIFY_PARAM_set_flags() with\nthe X509_V_FLAG_POLICY_CHECK flag argument.\n\nCertificate policy checks are disabled by default in OpenSSL and are not\ncommonly used by applications.",
+                            "id": "CVE-2023-0466",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=0d16b7e99aafc0b4a6d729eec65a411a7e025f0a",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=51e8a84ce742db0f6c70510d0159dad8f7825908",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=fc814a30fc4f0bc54fcea7d9a7462f5457aab061",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0466",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r3"
+                            ]
+                        },
+                        "id": "CVE-2023-0466",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0466"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl3:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl3:libssl:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libssl3",
+                        "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r3 (apk)",
+                                "vulnerabilityID": "CVE-2023-0466"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0466",
+                            "description": "The function X509_VERIFY_PARAM_add0_policy() is documented to\nimplicitly enable the certificate policy check when doing certificate\nverification. However the implementation of the function does not\nenable the check which allows certificates with invalid or incorrect\npolicies to pass the certificate verification.\n\nAs suddenly enabling the policy check could break existing deployments it was\ndecided to keep the existing behavior of the X509_VERIFY_PARAM_add0_policy()\nfunction.\n\nInstead the applications that require OpenSSL to perform certificate\npolicy check need to use X509_VERIFY_PARAM_set1_policies() or explicitly\nenable the policy check by calling X509_VERIFY_PARAM_set_flags() with\nthe X509_V_FLAG_POLICY_CHECK flag argument.\n\nCertificate policy checks are disabled by default in OpenSSL and are not\ncommonly used by applications.",
+                            "id": "CVE-2023-0466",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=0d16b7e99aafc0b4a6d729eec65a411a7e025f0a",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=51e8a84ce742db0f6c70510d0159dad8f7825908",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=fc814a30fc4f0bc54fcea7d9a7462f5457aab061",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0466",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r3"
+                            ]
+                        },
+                        "id": "CVE-2023-0466",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-0466"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libcrypto3:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto3:libcrypto:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libcrypto:libcrypto:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libcrypto3",
+                        "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r4 (apk)",
+                                "vulnerabilityID": "CVE-2023-1255"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-1255",
+                            "description": "Issue summary: The AES-XTS cipher decryption implementation for 64 bit ARM\nplatform contains a bug that could cause it to read past the input buffer,\nleading to a crash.\n\nImpact summary: Applications that use the AES-XTS algorithm on the 64 bit ARM\nplatform can crash in rare circumstances. The AES-XTS algorithm is usually\nused for disk encryption.\n\nThe AES-XTS cipher decryption implementation for 64 bit ARM platform will read\npast the end of the ciphertext buffer if the ciphertext size is 4 mod 5 in 16\nbyte blocks, e.g. 144 bytes or 1024 bytes. If the memory after the ciphertext\nbuffer is unmapped, this will trigger a crash which results in a denial of\nservice.\n\nIf an attacker can control the size and location of the ciphertext buffer\nbeing decrypted by an application using AES-XTS on 64 bit ARM, the\napplication is affected. This is fairly unlikely making this issue\na Low severity one.",
+                            "id": "CVE-2023-1255",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=02ac9c9420275868472f33b01def01218742b8bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=bc2f61ad70971869b242fc1cb445b98bad50074a"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r4"
+                            ]
+                        },
+                        "id": "CVE-2023-1255",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl3:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl3:libssl:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl3:3.0.8-r0:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libssl:libssl:3.0.8-r0:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Apache-2.0"
+                        ],
+                        "locations": null,
+                        "name": "libssl3",
+                        "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
+                        "type": "apk",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "3.0.8-r0"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.0.8-r4 (apk)",
+                                "vulnerabilityID": "CVE-2023-1255"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.17.2"
+                                },
+                                "namespace": "alpine:distro:alpine:3.17",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "3.0.8-r0"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-1255",
+                            "description": "Issue summary: The AES-XTS cipher decryption implementation for 64 bit ARM\nplatform contains a bug that could cause it to read past the input buffer,\nleading to a crash.\n\nImpact summary: Applications that use the AES-XTS algorithm on the 64 bit ARM\nplatform can crash in rare circumstances. The AES-XTS algorithm is usually\nused for disk encryption.\n\nThe AES-XTS cipher decryption implementation for 64 bit ARM platform will read\npast the end of the ciphertext buffer if the ciphertext size is 4 mod 5 in 16\nbyte blocks, e.g. 144 bytes or 1024 bytes. If the memory after the ciphertext\nbuffer is unmapped, this will trigger a crash which results in a denial of\nservice.\n\nIf an attacker can control the size and location of the ciphertext buffer\nbeing decrypted by an application using AES-XTS on 64 bit ARM, the\napplication is affected. This is fairly unlikely making this issue\na Low severity one.",
+                            "id": "CVE-2023-1255",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=02ac9c9420275868472f33b01def01218742b8bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=bc2f61ad70971869b242fc1cb445b98bad50074a"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.0.8-r4"
+                            ]
+                        },
+                        "id": "CVE-2023-1255",
+                        "namespace": "alpine:distro:alpine:3.17",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-1255"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "\u003c 6.0.19 || \u003e= 6.2.0, \u003c 6.2.12 || \u003e= 7.0.0, \u003c 7.0.11 (unknown)",
+                                "vulnerabilityID": "CVE-2023-28856"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.5,
+                                    "exploitabilityScore": 2.8,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 5.5,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28856",
+                        "description": "Redis is an open source, in-memory database that persists on disk. Authenticated users can use the `HINCRBYFLOAT` command to create an invalid hash field that will crash Redis on access in affected versions. This issue has been addressed in in versions 7.0.11, 6.2.12, and 6.0.19. Users are advised to upgrade. There are no known workarounds for this issue.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-28856",
+                        "namespace": "nvd:cpe",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/redis/redis/commit/bc7fe41e5857a0854d524e2a63a028e9394d2a5c",
+                            "https://github.com/redis/redis/pull/11149",
+                            "https://github.com/redis/redis/security/advisories/GHSA-hjv8-vjf6-wcr6",
+                            "https://lists.debian.org/debian-lts-announce/2023/04/msg00023.html",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/EQ4DJSO4DMR55AWK6OPVJH5UTEB35R2Z/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/LPUTH7NBQTZDVJWFNUD24ZCS6NDUFYS6/",
+                            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/OQGKMKSQE67L32HE6W5EI2I2YKW5VWHI/"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:redislabs:redis:7.0.10:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "redis",
+                        "purl": "pkg:generic/redis@7.0.10",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "7.0.10"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "= 7.0.10 (unknown)",
+                                "vulnerabilityID": "CVE-2023-31655"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:redis:redis:7.0.10:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7.5,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 3.6
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-31655",
+                        "description": "redis-7.0.10 was discovered to contain a segmentation violation.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-31655",
+                        "namespace": "nvd:cpe",
+                        "severity": "High",
+                        "urls": [
+                            "https://github.com/RedisLabs/redisraft/issues/608"
+                        ]
+                    }
+                }
+            ],
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

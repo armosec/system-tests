@@ -1,0 +1,63 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/qorbani/golang-hello-world@sha256:a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
+            "kubescape.io/status": ""
+        },
+        "creationTimestamp": "2023-06-04T21:34:24Z",
+        "labels": {
+            "kubescape.io/image-id": "docker-io-qorbani-golang-hello-world-sha256-a14f3fbf3d5d1c4a000",
+            "kubescape.io/image-name": "docker-io-qorbani-golang-hello-world"
+        },
+        "name": "a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
+        "namespace": "kubescape",
+        "resourceVersion": "29",
+        "uid": "28936255-a80f-4408-bc7f-b126e0edb4db"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
+            "SPDXID": "SPDXRef-DOCUMENT",
+            "annotations": null,
+            "comment": "",
+            "creationInfo": {
+                "comment": "",
+                "created": "2023-06-04T21:34:24Z",
+                "creators": [
+                    "Organization: Anchore, Inc",
+                    "Tool: syft-v0.76.0"
+                ],
+                "licenseListVersion": "3.20"
+            },
+            "dataLicense": "CC0-1.0",
+            "documentDescribes": null,
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/qorbani/golang-hello-world@sha256-a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f-67c168e5-7d97-4a18-824d-cc2833e3c92e",
+            "externalDocumentRefs": null,
+            "files": null,
+            "hasExtractedLicensingInfos": null,
+            "name": "docker.io/qorbani/golang-hello-world@sha256:a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
+            "packages": null,
+            "relationships": [
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-DOCUMENT",
+                    "relationshipType": "DESCRIBES",
+                    "spdxElementId": "SPDXRef-DOCUMENT"
+                }
+            ],
+            "snippets": null,
+            "spdxVersion": "SPDX-2.3"
+        }
+    },
+    "status": {}
+}

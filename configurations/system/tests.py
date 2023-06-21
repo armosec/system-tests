@@ -4,7 +4,9 @@ from .tests_cases import KubescapeTests, KSMicroserviceTests
 from .tests_cases.vulnerability_scanning_tests import VulnerabilityScanningTests
 from .tests_cases.ks_vulnerability_scanning_tests import KsVulnerabilityScanningTests
 from .tests_cases.payments_tests import PaymentTests
+from .tests_cases.relevant_vuln_scanning_tests import RelevantVulnerabilityScanningTests
 from .tests_cases.notifications_tests import NotificationSTests
+
 
 
 def all_tests_names():
@@ -15,8 +17,8 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(KSMicroserviceTests))
     tests.extend(TestUtil.get_class_methods(KsVulnerabilityScanningTests))
     tests.extend(TestUtil.get_class_methods(PaymentTests))
+    tests.extend(TestUtil.get_class_methods(RelevantVulnerabilityScanningTests))
     tests.extend(TestUtil.get_class_methods(NotificationSTests))
- 
     return tests
 
 
@@ -32,6 +34,8 @@ def get_test(test_name):
         return KsVulnerabilityScanningTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(PaymentTests):
         return PaymentTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(RelevantVulnerabilityScanningTests):
+        return RelevantVulnerabilityScanningTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(NotificationSTests):
         return NotificationSTests().__getattribute__(test_name)()
 

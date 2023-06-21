@@ -100,21 +100,21 @@ def generate_stage(platform, test, run_node, backend, delete_test_tenant){
 
 
 def start_minikube(){
-	script{
-		sh '''
-	    #!/bin/bash
+    script{
+        sh '''
+        #!/bin/bash
         ./jenkins_files/k8s/start_profiled_minikube.sh
-	    '''
-	} //script
+        '''
+    } //script
 }
 
 def remove_minikube(){
-	script{
-		sh '''
-	    #!/bin/bash
+    script{
+        sh '''
+        #!/bin/bash
         ./jenkins_files/k8s/remove_minikube.sh
-	    '''
-	} //script
+        '''
+    } //script
 }
 
 

@@ -1,0 +1,1042 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSPDXv2p3Filtered",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+            "kubescape.io/status": "",
+            "kubescape.io/workload-container-name": "golangdynamic"
+        },
+        "creationTimestamp": "2023-06-05T22:21:36Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "golangdynamic",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "golangdynamic"
+        },
+        "name": "1ee8c2d79ec7770ec6b85fd6bea2290e7ba1831e01d72e6fd12613afdb397a05",
+        "namespace": "kubescape",
+        "resourceVersion": "24",
+        "uid": "0a8f17ea-bb13-4314-9935-1acf5bb2232f"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "name": "",
+                "version": "v0.76.0"
+            }
+        },
+        "spdx": {
+            "SPDXID": "SPDXRef-DOCUMENT",
+            "annotations": null,
+            "comment": "",
+            "creationInfo": {
+                "comment": "",
+                "created": "2023-06-05T22:18:14Z",
+                "creators": [
+                    "Organization: Anchore, Inc",
+                    "Tool: syft-v0.76.0",
+                    "Organization: Kubescape",
+                    "Tool: KubescapeNodeAgent"
+                ],
+                "licenseListVersion": "3.20"
+            },
+            "dataLicense": "CC0-1.0",
+            "documentDescribes": null,
+            "documentNamespace": "https://anchore.com/syft/image/docker.io/rcohendockerhub/golang-hello-world@sha256-4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c-68302c6e-b7ee-45f9-aaed-65adb7fbb02f",
+            "externalDocumentRefs": null,
+            "files": [
+                {
+                    "SPDXID": "SPDXRef-60266169ffafd3ef",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:12cf4b26316aa5c30d6fcf62388037d46e3fb19fc4f727f73898200b71217d6f",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/group",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-83f79d9aa5c2c324",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:12cf4b26316aa5c30d6fcf62388037d46e3fb19fc4f727f73898200b71217d6f",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/nsswitch.conf",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                },
+                {
+                    "SPDXID": "SPDXRef-29a80193be90e4b6",
+                    "annotations": null,
+                    "artifactOfs": null,
+                    "attributionTexts": null,
+                    "checksums": [
+                        {
+                            "algorithm": "SHA1",
+                            "checksumValue": "0000000000000000000000000000000000000000"
+                        }
+                    ],
+                    "comment": "layerID: sha256:12cf4b26316aa5c30d6fcf62388037d46e3fb19fc4f727f73898200b71217d6f",
+                    "copyrightText": "",
+                    "fileContributors": null,
+                    "fileDependencies": null,
+                    "fileName": "/etc/passwd",
+                    "fileTypes": null,
+                    "licenseComments": "",
+                    "licenseConcluded": "NOASSERTION",
+                    "licenseInfoInFiles": null,
+                    "noticeText": ""
+                }
+            ],
+            "hasExtractedLicensingInfos": [
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-AND",
+                    "name": "AND",
+                    "seeAlsos": null
+                },
+                {
+                    "comment": "",
+                    "extractedText": "NONE",
+                    "licenseId": "LicenseRef-OR",
+                    "name": "OR",
+                    "seeAlsos": null
+                }
+            ],
+            "name": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+            "packages": [
+                {
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.0-r0?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18_alpha20230329",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "3.4.0-r0"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.0-r0?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18_alpha20230329",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "3.4.0-r0"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "Alpine base dir structure and init scripts",
+                    "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "SECURITY",
+                            "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
+                            "referenceType": "cpe23Type"
+                        },
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.0-r0?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18_alpha20230329",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "GPL-2.0-only",
+                    "licenseDeclared": "GPL-2.0-only",
+                    "licenseInfoFromFiles": null,
+                    "name": "alpine-baselayout-data",
+                    "originator": "Person: Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "3.4.0-r0"
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-go-module-command-line-arguments-f35752bbb15c38",
+                    "annotations": null,
+                    "attributionTexts": null,
+                    "builtDate": "",
+                    "checksums": null,
+                    "comment": "",
+                    "copyrightText": "NOASSERTION",
+                    "description": "",
+                    "downloadLocation": "NOASSERTION",
+                    "externalRefs": [
+                        {
+                            "comment": "",
+                            "referenceCategory": "PACKAGE-MANAGER",
+                            "referenceLocator": "pkg:golang/command-line-arguments@(devel)",
+                            "referenceType": "purl"
+                        }
+                    ],
+                    "files": null,
+                    "filesAnalyzed": false,
+                    "hasFiles": null,
+                    "homepage": "",
+                    "licenseComments": "",
+                    "licenseConcluded": "NONE",
+                    "licenseDeclared": "NONE",
+                    "licenseInfoFromFiles": null,
+                    "name": "command-line-arguments",
+                    "originator": null,
+                    "packageFileName": "",
+                    "packageVerificationCode": null,
+                    "primaryPackagePurpose": "",
+                    "releaseDate": "",
+                    "sourceInfo": "acquired package info from go module information: /main",
+                    "summary": "",
+                    "supplier": null,
+                    "validUntilDate": "",
+                    "versionInfo": "(devel)"
+                }
+            ],
+            "relationships": [
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-29a80193be90e4b6",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-60266169ffafd3ef",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-83f79d9aa5c2c324",
+                    "relationshipType": "CONTAINS",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-92b19c7750fb559d",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-12eba3c88bc205af"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-92b19c7750fb559d",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-binsh-171bbc4761c5954c"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libatomic-204475666a5577d1"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gcc-24cfc420cf28b088"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gcc-24cfc420cf28b088"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-binsh-171bbc4761c5954c",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-262b8a056382ddc0"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-binary-busybox-87d6fccf883ab05e",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-busybox-262b8a056382ddc0"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libc-dev-34cc167c655c7cf2"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-isl26-ec16d093f6543537",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-ca-certificates-bundle-6864f2c66f9058ce"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libstdc---dev-6b2138512653b0e4"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libc-dev-34cc167c655c7cf2",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-cgo-1371e7cbc3db5a6d",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-fix-2ca81d05894086a5",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-binary-go-66f7bd42443f65e3",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-compile-7a98d3f1559d2959",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-pprof-7e55eb22a49f5cec",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-objdump-82109349ca2d05ad",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-buildid-82265d491bbd0cbd",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-test2json-91c570dd48ffae72",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-gofmt-9236978f7a46e734",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-asm-943ee2187123be6e",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-vet-95e8049431248bfc",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-go-98064f2e8d0ba6b",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-dist-a4dde2a0e1c31217",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-link-a662ee09896b202d",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-npm-d3-pprof-acd952c1bc0c6850",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-nm-b018edf2fe49555b",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-pack-bb625a30b40c36a1",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-doc-ca5e1209a3ac30d5",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-addr2line-db2b8ace66de273d",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-covdata-e66712502965b62b",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-trace-f34a95b2b11912cb",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-cover-f74ec8e8fcef78e8",
+                    "relationshipType": "OTHER",
+                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-scanelf-bf6a15a7714a1c18"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libatomic-204475666a5577d1",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-262b8a056382ddc0",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gmp-5de2393e77afe472",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-zlib-a7be9d60929b1603",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-scanelf-bf6a15a7714a1c18",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libgomp-df82d07f83abd524",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-isl26-ec16d093f6543537",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---dev-6b2138512653b0e4",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libgomp-df82d07f83abd524"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libgomp-df82d07f83abd524"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-isl26-ec16d093f6543537"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-isl26-ec16d093f6543537"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-binutils-ee86fddaac348934"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-binutils-ee86fddaac348934"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-libc-utils-392eb9a565659d85",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
+                    "relationshipType": "DEPENDENCY_OF",
+                    "spdxElementId": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04"
+                },
+                {
+                    "comment": "",
+                    "relatedSpdxElement": "SPDXRef-DOCUMENT",
+                    "relationshipType": "DESCRIBES",
+                    "spdxElementId": "SPDXRef-DOCUMENT"
+                }
+            ],
+            "snippets": null,
+            "spdxVersion": "SPDX-2.3"
+        }
+    },
+    "status": {}
+}

@@ -1,0 +1,827 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "creationTimestamp": "2023-05-09T09:00:29Z",
+        "labels": {
+            "kubescape.io/context": "filtered",
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "nginx",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "nginx",
+            "kubescape.io/workload-namespace": "systest-ns-8zcr"
+        },
+        "name": "858830f09ce8dc042e43fde5eade8a8fbd60133b826e69fbb824fa5ca32195df",
+        "namespace": "kubescape",
+        "resourceVersion": "106",
+        "uid": "ae660993-d44e-4884-b5b8-16dcb922220c"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": true
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-09T01:29:44Z",
+                    "checksum": "sha256:4ce4581f09e558a8b73530f2b01f1bb46eca7a1564d64366a4b2fa893a7157c1",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "debian"
+                ],
+                "name": "debian",
+                "version": "11"
+            },
+            "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "libssl1.1",
+                        "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "1.1.1n-0+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2007-6755"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "1.1.1n-0+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2007-6755",
+                            "description": "The NIST SP 800-90A default statement of the Dual Elliptic Curve Deterministic Random Bit Generation (Dual_EC_DRBG) algorithm contains point Q constants with a possible relationship to certain \"skeleton key\" values, which might allow context-dependent attackers to defeat cryptographic protection mechanisms by leveraging knowledge of those values.  NOTE: this is a preliminary CVE for Dual_EC_DRBG; future research may provide additional details about point Q and associated attacks, and could potentially lead to a RECAST or REJECT of this CVE.",
+                            "id": "CVE-2007-6755",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://arstechnica.com/security/2013/09/stop-using-nsa-influence-code-in-our-product-rsa-tells-customers/",
+                                "http://blog.cryptographyengineering.com/2013/09/rsa-warns-developers-against-its-own.html",
+                                "http://blog.cryptographyengineering.com/2013/09/the-many-flaws-of-dualecdrbg.html",
+                                "http://rump2007.cr.yp.to/15-shumow.pdf",
+                                "http://stream.wsj.com/story/latest-headlines/SS-2-63399/SS-2-332655/",
+                                "http://threatpost.com/in-wake-of-latest-crypto-revelations-everything-is-suspect",
+                                "http://www.securityfocus.com/bid/63657",
+                                "https://www.schneier.com/blog/archives/2007/11/the_strange_sto.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2007-6755",
+                        "description": "The NIST SP 800-90A default statement of the Dual Elliptic Curve Deterministic Random Bit Generation (Dual_EC_DRBG) algorithm contains point Q constants with a possible relationship to certain \"skeleton key\" values, which might allow context-dependent attackers to defeat cryptographic protection mechanisms by leveraging knowledge of those values.  NOTE: this is a preliminary CVE for Dual_EC_DRBG; future research may provide additional details about point Q and associated attacks, and could potentially lead to a RECAST or REJECT of this CVE.",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2007-6755",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Negligible",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2007-6755"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:nginx:nginx:1.23.3-1~bullseye:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "nginx",
+                        "purl": "pkg:deb/debian/nginx@1.23.3-1~bullseye?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "1.23.3-1~bullseye"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2009-4487"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "nginx",
+                                    "version": "1.23.3-1~bullseye"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2009-4487",
+                            "description": "nginx 0.7.64 writes data to a log file without sanitizing non-printable characters, which might allow remote attackers to modify a window's title, or possibly execute arbitrary commands or overwrite files, via an HTTP request containing an escape sequence for a terminal emulator.",
+                            "id": "CVE-2009-4487",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://www.securityfocus.com/archive/1/508830/100/0/threaded",
+                                "http://www.securityfocus.com/bid/37711",
+                                "http://www.ush.it/team/ush/hack_httpd_escape/adv.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2009-4487",
+                        "description": "nginx 0.7.64 writes data to a log file without sanitizing non-printable characters, which might allow remote attackers to modify a window's title, or possibly execute arbitrary commands or overwrite files, via an HTTP request containing an escape sequence for a terminal emulator.",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2009-4487",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Negligible",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2009-4487"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "libssl1.1",
+                        "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "1.1.1n-0+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2010-0928"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "1.1.1n-0+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2010-0928",
+                            "description": "OpenSSL 0.9.8i on the Gaisler Research LEON3 SoC on the Xilinx Virtex-II Pro FPGA uses a Fixed Width Exponentiation (FWE) algorithm for certain signature calculations, and does not verify the signature before providing it to a caller, which makes it easier for physically proximate attackers to determine the private key via a modified supply voltage for the microprocessor, related to a \"fault-based attack.\"",
+                            "id": "CVE-2010-0928",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://rdist.root.org/2010/03/08/attacking-rsa-exponentiation-with-fault-injection/",
+                                "http://www.eecs.umich.edu/%7Evaleria/research/publications/DATE10RSA.pdf",
+                                "http://www.networkworld.com/news/2010/030410-rsa-security-attack.html",
+                                "http://www.theregister.co.uk/2010/03/04/severe_openssl_vulnerability/",
+                                "https://exchange.xforce.ibmcloud.com/vulnerabilities/56750"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2010-0928",
+                        "description": "OpenSSL 0.9.8i on the Gaisler Research LEON3 SoC on the Xilinx Virtex-II Pro FPGA uses a Fixed Width Exponentiation (FWE) algorithm for certain signature calculations, and does not verify the signature before providing it to a caller, which makes it easier for physically proximate attackers to determine the private key via a modified supply voltage for the microprocessor, related to a \"fault-based attack.\"",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2010-0928",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Negligible",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2010-0928"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:nginx:nginx:1.23.3-1~bullseye:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "nginx",
+                        "purl": "pkg:deb/debian/nginx@1.23.3-1~bullseye?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "1.23.3-1~bullseye"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2013-0337"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "nginx",
+                                    "version": "1.23.3-1~bullseye"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2013-0337",
+                            "description": "The default configuration of nginx, possibly 1.3.13 and earlier, uses world-readable permissions for the (1) access.log and (2) error.log files, which allows local users to obtain sensitive information by reading the files.",
+                            "id": "CVE-2013-0337",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://security.gentoo.org/glsa/glsa-201310-04.xml",
+                                "http://www.openwall.com/lists/oss-security/2013/02/21/15",
+                                "http://www.openwall.com/lists/oss-security/2013/02/22/1",
+                                "http://www.openwall.com/lists/oss-security/2013/02/24/1"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2013-0337",
+                        "description": "The default configuration of nginx, possibly 1.3.13 and earlier, uses world-readable permissions for the (1) access.log and (2) error.log files, which allows local users to obtain sensitive information by reading the files.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2013-0337",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Low",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2013-0337"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3.0-only"
+                        ],
+                        "locations": null,
+                        "name": "coreutils",
+                        "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64\u0026upstream=coreutils%408.32-4\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "coreutils",
+                                "version": "8.32-4"
+                            }
+                        ],
+                        "version": "8.32-4+b1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2016-2781"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "coreutils",
+                                    "version": "8.32-4+b1"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        },
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2016-2781"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "coreutils",
+                                    "version": "8.32-4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2016-2781",
+                            "description": "chroot in GNU coreutils, when used with --userspec, allows local users to escape to the parent session via a crafted TIOCSTI ioctl call, which pushes characters to the terminal's input buffer.",
+                            "id": "CVE-2016-2781",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://www.openwall.com/lists/oss-security/2016/02/28/2",
+                                "http://www.openwall.com/lists/oss-security/2016/02/28/3",
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2016-2781",
+                        "description": "chroot in GNU coreutils, when used with --userspec, allows local users to escape to the parent session via a crafted TIOCSTI ioctl call, which pushes characters to the terminal's input buffer.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2016-2781",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Low",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2016-2781"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3.0-only"
+                        ],
+                        "locations": null,
+                        "name": "coreutils",
+                        "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64\u0026upstream=coreutils%408.32-4\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "coreutils",
+                                "version": "8.32-4"
+                            }
+                        ],
+                        "version": "8.32-4+b1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2017-18018"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "coreutils",
+                                    "version": "8.32-4+b1"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        },
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2017-18018"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "coreutils",
+                                    "version": "8.32-4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2017-18018",
+                            "description": "In GNU Coreutils through 8.29, chown-core.c in chown and chgrp does not prevent replacement of a plain file with a symlink during use of the POSIX \"-R -L\" options, which allows local users to modify the ownership of arbitrary files by leveraging a race condition.",
+                            "id": "CVE-2017-18018",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://lists.gnu.org/archive/html/coreutils/2017-12/msg00045.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2017-18018",
+                        "description": "In GNU Coreutils through 8.29, chown-core.c in chown and chgrp does not prevent replacement of a plain file with a symlink during use of the POSIX \"-R -L\" options, which allows local users to modify the ownership of arbitrary files by leveraging a race condition.",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2017-18018",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Negligible",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2017-18018"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:nginx:nginx:1.23.3-1~bullseye:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "nginx",
+                        "purl": "pkg:deb/debian/nginx@1.23.3-1~bullseye?arch=amd64\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "1.23.3-1~bullseye"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2020-36309"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "nginx",
+                                    "version": "1.23.3-1~bullseye"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-36309",
+                            "description": "ngx_http_lua_module (aka lua-nginx-module) before 0.10.16 in OpenResty allows unsafe characters in an argument when using the API to mutate a URI, or a request or response header.",
+                            "id": "CVE-2020-36309",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://github.com/openresty/lua-nginx-module/compare/v0.10.15...v0.10.16",
+                                "https://github.com/openresty/lua-nginx-module/pull/1654",
+                                "https://news.ycombinator.com/item?id=26712562",
+                                "https://security.netapp.com/advisory/ntap-20210507-0005/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2020-36309",
+                        "description": "ngx_http_lua_module (aka lua-nginx-module) before 0.10.16 in OpenResty allows unsafe characters in an argument when using the API to mutate a URI, or a request or response header.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2020-36309",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2020-36309"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "libssl1.1",
+                        "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "1.1.1n-0+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-0464"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "1.1.1n-0+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0464",
+                            "description": "A security vulnerability has been identified in all supported versions of OpenSSL related to the verification of X.509 certificate chains that include policy constraints. Attackers may be able to exploit this vulnerability by creating a malicious certificate chain that triggers exponential use of computational resources, leading to a denial-of-service (DoS) attack on affected systems. Policy processing is disabled by default but can be enabled by passing the `-policy' argument to the command line utilities or by calling the `X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0464",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=2017771e2db3e2b96f89bbe8766c3209f6a99545",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=879f7080d7e141f415c79eaa3a8ac4a3dad0348b",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=959c59c7a0164117e7f8366466a32bb1f8d77ff1",
+                                "https://www.openssl.org/news/secadv/20230322.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-0464",
+                        "description": "A security vulnerability has been identified in all supported versions of OpenSSL related to the verification of X.509 certificate chains that include policy constraints. Attackers may be able to exploit this vulnerability by creating a malicious certificate chain that triggers exponential use of computational resources, leading to a denial-of-service (DoS) attack on affected systems. Policy processing is disabled by default but can be enabled by passing the `-policy' argument to the command line utilities or by calling the `X509_VERIFY_PARAM_set1_policies()' function.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-0464",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "High",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-0464"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "libssl1.1",
+                        "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "1.1.1n-0+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-0465"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "1.1.1n-0+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0465",
+                            "description": "Applications that use a non-default option when verifying certificates may be\nvulnerable to an attack from a malicious CA to circumvent certain checks.\n\nInvalid certificate policies in leaf certificates are silently ignored by\nOpenSSL and other certificate policy checks are skipped for that certificate.\nA malicious CA could use this to deliberately assert invalid certificate policies\nin order to circumvent policy checking on the certificate altogether.\n\nPolicy processing is disabled by default but can be enabled by passing\nthe `-policy' argument to the command line utilities or by calling the\n`X509_VERIFY_PARAM_set1_policies()' function.",
+                            "id": "CVE-2023-0465",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=1dd43e0709fece299b15208f36cc7c76209ba0bb",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b013765abfa80036dc779dd0e50602c57bb3bf95",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=facfb1ab745646e97a1920977ae4a9965ea61d5c",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-0465",
+                        "description": "Applications that use a non-default option when verifying certificates may be\nvulnerable to an attack from a malicious CA to circumvent certain checks.\n\nInvalid certificate policies in leaf certificates are silently ignored by\nOpenSSL and other certificate policy checks are skipped for that certificate.\nA malicious CA could use this to deliberately assert invalid certificate policies\nin order to circumvent policy checking on the certificate altogether.\n\nPolicy processing is disabled by default but can be enabled by passing\nthe `-policy' argument to the command line utilities or by calling the\n`X509_VERIFY_PARAM_set1_policies()' function.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-0465",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-0465"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "libssl1.1",
+                        "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64\u0026upstream=openssl\u0026distro=debian-11",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "openssl"
+                            }
+                        ],
+                        "version": "1.1.1n-0+deb11u4"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-0466"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "debian",
+                                    "version": "11"
+                                },
+                                "namespace": "debian:distro:debian:11",
+                                "package": {
+                                    "name": "openssl",
+                                    "version": "1.1.1n-0+deb11u4"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-0466",
+                            "description": "The function X509_VERIFY_PARAM_add0_policy() is documented to\nimplicitly enable the certificate policy check when doing certificate\nverification. However the implementation of the function does not\nenable the check which allows certificates with invalid or incorrect\npolicies to pass the certificate verification.\n\nAs suddenly enabling the policy check could break existing deployments it was\ndecided to keep the existing behavior of the X509_VERIFY_PARAM_add0_policy()\nfunction.\n\nInstead the applications that require OpenSSL to perform certificate\npolicy check need to use X509_VERIFY_PARAM_set1_policies() or explicitly\nenable the policy check by calling X509_VERIFY_PARAM_set_flags() with\nthe X509_V_FLAG_POLICY_CHECK flag argument.\n\nCertificate policy checks are disabled by default in OpenSSL and are not\ncommonly used by applications.",
+                            "id": "CVE-2023-0466",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=0d16b7e99aafc0b4a6d729eec65a411a7e025f0a",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=51e8a84ce742db0f6c70510d0159dad8f7825908",
+                                "https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=fc814a30fc4f0bc54fcea7d9a7462f5457aab061",
+                                "https://security.netapp.com/advisory/ntap-20230414-0001/",
+                                "https://www.openssl.org/news/secadv/20230328.txt"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "https://security-tracker.debian.org/tracker/CVE-2023-0466",
+                        "description": "The function X509_VERIFY_PARAM_add0_policy() is documented to\nimplicitly enable the certificate policy check when doing certificate\nverification. However the implementation of the function does not\nenable the check which allows certificates with invalid or incorrect\npolicies to pass the certificate verification.\n\nAs suddenly enabling the policy check could break existing deployments it was\ndecided to keep the existing behavior of the X509_VERIFY_PARAM_add0_policy()\nfunction.\n\nInstead the applications that require OpenSSL to perform certificate\npolicy check need to use X509_VERIFY_PARAM_set1_policies() or explicitly\nenable the policy check by calling X509_VERIFY_PARAM_set_flags() with\nthe X509_V_FLAG_POLICY_CHECK flag argument.\n\nCertificate policy checks are disabled by default in OpenSSL and are not\ncommonly used by applications.",
+                        "fix": {
+                            "state": "wont-fix",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-0466",
+                        "namespace": "debian:distro:debian:11",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://security-tracker.debian.org/tracker/CVE-2023-0466"
+                        ]
+                    }
+                }
+            ],
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

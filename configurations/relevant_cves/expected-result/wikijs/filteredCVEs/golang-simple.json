@@ -1,0 +1,69 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "creationTimestamp": "2023-06-04T21:37:57Z",
+        "labels": {
+            "kubescape.io/context": "filtered",
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "golang",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "golang"
+        },
+        "name": "c78d07dda55cfe92310cc7e2e6bda821aeb85710e55441867c61e5e9dc7c18f4",
+        "namespace": "kubescape",
+        "resourceVersion": "47",
+        "uid": "a4d977d4-8783-40ba-a23d-d4c033726047"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": true
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": null,
+                "name": "",
+                "version": ""
+            },
+            "matches": null,
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

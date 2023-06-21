@@ -1,0 +1,1841 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "creationTimestamp": "2023-05-28T12:29:13Z",
+        "labels": {
+            "kubescape.io/context": "filtered",
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "mariadb",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "mariadb"
+        },
+        "name": "e7e170b4c446866b19f5d68d432e39cd910a416066009440e508bbafb2a6247e",
+        "namespace": "kubescape",
+        "resourceVersion": "33",
+        "uid": "55b3ae80-bfef-44a7-91bc-17cd5f4cbd37"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": true
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-28T01:31:14Z",
+                    "checksum": "sha256:fe5f7141cbb734a99a5b8fe988d41d426daf4d4f4e12dc0da644e1d54eb9003d",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "ubuntu"
+                ],
+                "name": "ubuntu",
+                "version": "20.04"
+            },
+            "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2016-10228"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2016-10228",
+                            "description": "The iconv program in the GNU C Library (aka glibc or libc6) 2.31 and earlier, when invoked with multiple suffixes in the destination encoding (TRANSLATE or IGNORE) along with the -c option, enters an infinite loop when processing invalid multi-byte input sequences, leading to a denial of service.",
+                            "id": "CVE-2016-10228",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://openwall.com/lists/oss-security/2017/03/01/10",
+                                "http://www.securityfocus.com/bid/96525",
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E",
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202101-20",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=19519",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=19519#c21",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=26224",
+                                "https://www.oracle.com/security-alerts/cpuapr2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-10228",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2016-10228",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Negligible",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-10228"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2016-20013"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2016-20013",
+                            "description": "sha256crypt and sha512crypt through 0.6 allow attackers to cause a denial of service (CPU consumption) because the algorithm's runtime is proportional to the square of the length of the password.",
+                            "id": "CVE-2016-20013",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://akkadia.org/drepper/SHA-crypt.txt",
+                                "https://pthree.org/2018/05/23/do-not-use-sha256crypt-sha512crypt-theyre-dangerous/",
+                                "https://twitter.com/solardiz/status/795601240151457793"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-20013",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2016-20013",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Negligible",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-20013"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:coreutils:coreutils:8.30-3ubuntu2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3.0-only"
+                        ],
+                        "locations": null,
+                        "name": "coreutils",
+                        "purl": "pkg:deb/ubuntu/coreutils@8.30-3ubuntu2?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "8.30-3ubuntu2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2016-2781"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "coreutils",
+                                    "version": "8.30-3ubuntu2"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2016-2781",
+                            "description": "chroot in GNU coreutils, when used with --userspec, allows local users to escape to the parent session via a crafted TIOCSTI ioctl call, which pushes characters to the terminal's input buffer.",
+                            "id": "CVE-2016-2781",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://www.openwall.com/lists/oss-security/2016/02/28/2",
+                                "http://www.openwall.com/lists/oss-security/2016/02/28/3",
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-2781",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2016-2781",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-2781"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2019-25013"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2019-25013",
+                            "description": "The iconv feature in the GNU C Library (aka glibc or libc6) through 2.32, when processing invalid multi-byte input sequences in the EUC-KR encoding, may have a buffer over-read.",
+                            "id": "CVE-2019-25013",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://lists.apache.org/thread.html/r32d767ac804e9b8aad4355bb85960a6a1385eab7afff549a5e98660f@%3Cjira.kafka.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r448bb851cc8e6e3f93f3c28c70032b37062625d81214744474ac49e7@%3Cdev.kafka.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r4806a391091e082bdea17266452ca656ebc176e51bb3932733b3a0a2@%3Cjira.kafka.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r499e4f96d0b5109ef083f2feccd33c51650c1b7d7068aa3bd47efca9@%3Cjira.kafka.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r5af4430421bb6f9973294691a7904bbd260937e9eef96b20556f43ff@%3Cjira.kafka.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r750eee18542bc02bd8350861c424ee60a9b9b225568fa09436a37ece@%3Cissues.zookeeper.apache.org%3E",
+                                "https://lists.apache.org/thread.html/r7a2e94adfe0a2f0a1d42e4927e8c32ecac97d37db9cb68095fe9ddbc@%3Cdev.zookeeper.apache.org%3E",
+                                "https://lists.apache.org/thread.html/rd2354f9ccce41e494fbadcbc5ad87218de6ec0fff8a7b54c8462226c@%3Cissues.zookeeper.apache.org%3E",
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E",
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/4Y6TX47P47KABSFOL26FLDNVCWXDKDEZ/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/TVCUNLQ3HXGS4VPUQKWTJGRAW2KTFGXS/",
+                                "https://security.gentoo.org/glsa/202107-07",
+                                "https://security.netapp.com/advisory/ntap-20210205-0004/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=24973",
+                                "https://sourceware.org/git/?p=glibc.git;a=commit;h=ee7a3144c9922808181009b7b3e50e852fb4999b",
+                                "https://www.oracle.com/security-alerts/cpuapr2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2019-25013",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2019-25013",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2019-25013"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2020-27618"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-27618",
+                            "description": "The iconv function in the GNU C Library (aka glibc or libc6) 2.32 and earlier, when processing invalid multi-byte input sequences in IBM1364, IBM1371, IBM1388, IBM1390, and IBM1399 encodings, fails to advance the input state, which could lead to an infinite loop in applications, resulting in a denial of service, a different vulnerability from CVE-2016-10228.",
+                            "id": "CVE-2020-27618",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202107-07",
+                                "https://security.netapp.com/advisory/ntap-20210401-0006/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=19519#c21",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=26224",
+                                "https://www.oracle.com/security-alerts/cpuapr2022.html",
+                                "https://www.oracle.com/security-alerts/cpujan2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-27618",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2020-27618",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-27618"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2020-29562"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-29562",
+                            "description": "The iconv function in the GNU C Library (aka glibc or libc6) 2.30 to 2.32, when converting UCS4 text containing an irreversible character, fails an assertion in the code path and aborts the program, potentially resulting in a denial of service.",
+                            "id": "CVE-2020-29562",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/TVCUNLQ3HXGS4VPUQKWTJGRAW2KTFGXS/",
+                                "https://security.gentoo.org/glsa/202101-20",
+                                "https://security.netapp.com/advisory/ntap-20210122-0004/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=26923"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-29562",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2020-29562",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-29562"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2020-6096"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-6096",
+                            "description": "An exploitable signed comparison vulnerability exists in the ARMv7 memcpy() implementation of GNU glibc 2.30.9000. Calling memcpy() (on ARMv7 targets that utilize the GNU glibc implementation) with a negative value for the 'num' parameter results in a signed comparison vulnerability. If an attacker underflows the 'num' parameter to memcpy(), this vulnerability could lead to undefined behavior such as writing to out-of-bounds memory and potentially remote code execution. Furthermore, this memcpy() implementation allows for program execution to continue in scenarios where a segmentation fault or crash should have occurred. The dangers occur in that subsequent execution and iterations of this code will be executed with this corrupted data.",
+                            "id": "CVE-2020-6096",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://lists.apache.org/thread.html/rf9fa47ab66495c78bb4120b0754dd9531ca2ff0430f6685ac9b07772@%3Cdev.mina.apache.org%3E",
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SPYXTDOOB4PQGTYAMZAZNJIB3FF6YQXI/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/URXOIA2LDUKHQXK4BE55BQBRI6ZZG3Y6/",
+                                "https://security.gentoo.org/glsa/202101-20",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=25620",
+                                "https://www.talosintelligence.com/vulnerability_reports/TALOS-2020-1019"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-6096",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2020-6096",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-6096"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2021-27645"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-27645",
+                            "description": "The nameserver caching daemon (nscd) in the GNU C Library (aka glibc or libc6) 2.29 through 2.33, when processing a request for netgroup lookup, may crash due to a double-free, potentially resulting in degraded service or Denial of Service on the local system. This is related to netgroupcache.c.",
+                            "id": "CVE-2021-27645",
+                            "namespace": "nvd:cpe",
+                            "severity": "Low",
+                            "urls": [
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/7LZNT6KTMCCWPWXEOGSHD3YLYZKUGMH5/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I7TS26LIZSOBLGJEZMJX4PXT5BQDE2WS/",
+                                "https://security.gentoo.org/glsa/202107-07",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=27462"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-27645",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2021-27645",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-27645"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2021-3326"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3326",
+                            "description": "The iconv function in the GNU C Library (aka glibc or libc6) 2.32 and earlier, when processing invalid input sequences in the ISO-2022-JP-3 encoding, fails an assertion in the code path and aborts the program, potentially resulting in a denial of service.",
+                            "id": "CVE-2021-3326",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://www.openwall.com/lists/oss-security/2021/01/28/2",
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202107-07",
+                                "https://security.netapp.com/advisory/ntap-20210304-0007/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=27256",
+                                "https://sourceware.org/git/?p=glibc.git;a=commit;h=7d88c6142c6efc160c0ee5e4f85cde382c072888",
+                                "https://www.oracle.com/security-alerts/cpuapr2022.html",
+                                "https://www.oracle.com/security-alerts/cpujan2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3326",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2021-3326",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3326"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2021-35942"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-35942",
+                            "description": "The wordexp function in the GNU C Library (aka glibc) through 2.33 may crash or read arbitrary memory in parse_param (in posix/wordexp.c) when called with an untrusted, crafted pattern, potentially resulting in a denial of service or disclosure of information. This occurs because atoi was used but strtoul should have been used to ensure correct calculations.",
+                            "id": "CVE-2021-35942",
+                            "namespace": "nvd:cpe",
+                            "severity": "Critical",
+                            "urls": [
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202208-24",
+                                "https://security.netapp.com/advisory/ntap-20210827-0005/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=28011",
+                                "https://sourceware.org/git/?p=glibc.git;a=commit;h=5adda61f62b77384718b4c0d8336ade8f2b4b35c",
+                                "https://sourceware.org/glibc/wiki/Security%20Exceptions"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-35942",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2021-35942",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-35942"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:mount:mount:2.34-0.1ubuntu9.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "GPL-3.0-only",
+                            "GPL-3.0-or-later",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LGPL-2.0-or-later",
+                            "LGPL-2.1-only",
+                            "LGPL-2.1-or-later",
+                            "LGPL-3.0-only",
+                            "LGPL-3.0-or-later",
+                            "MIT",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "mount",
+                        "purl": "pkg:deb/ubuntu/mount@2.34-0.1ubuntu9.1?arch=amd64\u0026upstream=util-linux\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "util-linux"
+                            }
+                        ],
+                        "version": "2.34-0.1ubuntu9.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.34-0.1ubuntu9.3 (deb)",
+                                "vulnerabilityID": "CVE-2021-3995"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "util-linux",
+                                    "version": "2.34-0.1ubuntu9.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3995",
+                            "description": "A logic error was found in the libmount library of util-linux in the function that allows an unprivileged user to unmount a FUSE filesystem. This flaw allows an unprivileged local attacker to unmount FUSE filesystems that belong to certain other users who have a UID that is a prefix of the UID of the attacker in its string form. An attacker may use this flaw to cause a denial of service to applications that use the affected filesystems.",
+                            "id": "CVE-2021-3995",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://packetstormsecurity.com/files/170176/snap-confine-must_mkdir_and_open_with_perms-Race-Condition.html",
+                                "http://seclists.org/fulldisclosure/2022/Dec/4",
+                                "http://www.openwall.com/lists/oss-security/2022/11/30/2",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2024631https://access.redhat.com/security/cve/CVE-2021-3995",
+                                "https://github.com/util-linux/util-linux/commit/57202f5713afa2af20ffbb6ab5331481d0396f8d",
+                                "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/v2.37.3-ReleaseNotes",
+                                "https://security.netapp.com/advisory/ntap-20221209-0002/",
+                                "https://www.openwall.com/lists/oss-security/2022/01/24/2"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3995",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.34-0.1ubuntu9.3"
+                            ]
+                        },
+                        "id": "CVE-2021-3995",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3995"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:mount:mount:2.34-0.1ubuntu9.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-2-Clause",
+                            "BSD-3-Clause",
+                            "BSD-4-Clause",
+                            "GPL-2.0-only",
+                            "GPL-2.0-or-later",
+                            "GPL-3.0-only",
+                            "GPL-3.0-or-later",
+                            "LicenseRef-LGPL",
+                            "LGPL-2.0-only",
+                            "LGPL-2.0-or-later",
+                            "LGPL-2.1-only",
+                            "LGPL-2.1-or-later",
+                            "LGPL-3.0-only",
+                            "LGPL-3.0-or-later",
+                            "MIT",
+                            "LicenseRef-public-domain"
+                        ],
+                        "locations": null,
+                        "name": "mount",
+                        "purl": "pkg:deb/ubuntu/mount@2.34-0.1ubuntu9.1?arch=amd64\u0026upstream=util-linux\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "util-linux"
+                            }
+                        ],
+                        "version": "2.34-0.1ubuntu9.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.34-0.1ubuntu9.3 (deb)",
+                                "vulnerabilityID": "CVE-2021-3996"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "util-linux",
+                                    "version": "2.34-0.1ubuntu9.1"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3996",
+                            "description": "A logic error was found in the libmount library of util-linux in the function that allows an unprivileged user to unmount a FUSE filesystem. This flaw allows a local user on a vulnerable system to unmount other users' filesystems that are either world-writable themselves (like /tmp) or mounted in a world-writable directory. An attacker may use this flaw to cause a denial of service to applications that use the affected filesystems.",
+                            "id": "CVE-2021-3996",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "http://packetstormsecurity.com/files/170176/snap-confine-must_mkdir_and_open_with_perms-Race-Condition.html",
+                                "http://seclists.org/fulldisclosure/2022/Dec/4",
+                                "http://www.openwall.com/lists/oss-security/2022/11/30/2",
+                                "https://access.redhat.com/security/cve/CVE-2021-3996",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2024628",
+                                "https://github.com/util-linux/util-linux/commit/166e87368ae88bf31112a30e078cceae637f4cdb",
+                                "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/v2.37.3-ReleaseNotes",
+                                "https://security.netapp.com/advisory/ntap-20221209-0002/",
+                                "https://www.openwall.com/lists/oss-security/2022/01/24/2"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3996",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.34-0.1ubuntu9.3"
+                            ]
+                        },
+                        "id": "CVE-2021-3996",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3996"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2021-3999"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-3999",
+                            "description": "A flaw was found in glibc. An off-by-one buffer overflow and underflow in getcwd() may lead to memory corruption when the size of the buffer is exactly 1. A local attacker who can control the input buffer and size passed to getcwd() in a setuid program could use this flaw to potentially execute arbitrary code and escalate their privileges on the system.",
+                            "id": "CVE-2021-3999",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://access.redhat.com/security/cve/CVE-2021-3999",
+                                "https://bugzilla.redhat.com/show_bug.cgi?id=2024637",
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security-tracker.debian.org/tracker/CVE-2021-3999",
+                                "https://security.netapp.com/advisory/ntap-20221104-0001/",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=28769",
+                                "https://sourceware.org/git/gitweb.cgi?p=glibc.git%3Bh=23e0e8f5f1fb5ed150253d986ecccdc90c2dcd5e",
+                                "https://www.openwall.com/lists/oss-security/2022/01/24/4"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3999",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2021-3999",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2021-3999"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2022-23218"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-23218",
+                            "description": "The deprecated compatibility function svcunix_create in the sunrpc module of the GNU C Library (aka glibc) through 2.34 copies its path argument on the stack without validating its length, which may result in a buffer overflow, potentially resulting in a denial of service or (if an application is not built with a stack protector enabled) arbitrary code execution.",
+                            "id": "CVE-2022-23218",
+                            "namespace": "nvd:cpe",
+                            "severity": "Critical",
+                            "urls": [
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202208-24",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=28768",
+                                "https://www.oracle.com/security-alerts/cpujul2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-23218",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2022-23218",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-23218"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:libc-bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc-bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc_bin:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc-bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:libc:libc_bin:2.31-0ubuntu9.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only",
+                            "LGPL-2.1-only"
+                        ],
+                        "locations": null,
+                        "name": "libc-bin",
+                        "purl": "pkg:deb/ubuntu/libc-bin@2.31-0ubuntu9.2?arch=amd64\u0026upstream=glibc\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": [
+                            {
+                                "name": "glibc"
+                            }
+                        ],
+                        "version": "2.31-0ubuntu9.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 2.31-0ubuntu9.7 (deb)",
+                                "vulnerabilityID": "CVE-2022-23219"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "glibc",
+                                    "version": "2.31-0ubuntu9.2"
+                                }
+                            },
+                            "type": "exact-indirect-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-23219",
+                            "description": "The deprecated compatibility function clnt_create in the sunrpc module of the GNU C Library (aka glibc) through 2.34 copies its hostname argument on the stack without validating its length, which may result in a buffer overflow, potentially resulting in a denial of service or (if an application is not built with a stack protector enabled) arbitrary code execution.",
+                            "id": "CVE-2022-23219",
+                            "namespace": "nvd:cpe",
+                            "severity": "Critical",
+                            "urls": [
+                                "https://lists.debian.org/debian-lts-announce/2022/10/msg00021.html",
+                                "https://security.gentoo.org/glsa/202208-24",
+                                "https://sourceware.org/bugzilla/show_bug.cgi?id=22542",
+                                "https://www.oracle.com/security-alerts/cpujul2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-23219",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "2.31-0ubuntu9.7"
+                            ]
+                        },
+                        "id": "CVE-2022-23219",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Low",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-23219"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:opencontainers:runc:v1.0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:G18PGckGdAm3yVQRWDVQ1rLSLntiniKJ0cNRT2Tm5gs="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/opencontainers/runc",
+                        "purl": "pkg:golang/github.com/opencontainers/runc@v1.0.1",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v1.0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c1.1.2 (unknown)",
+                                "vulnerabilityID": "GHSA-f3fp-gc8g-vw66"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-29162",
+                            "description": "runc is a CLI tool for spawning and running containers on Linux according to the OCI specification. A bug was found in runc prior to version 1.1.2 where `runc exec --cap` created processes with non-empty inheritable Linux process capabilities, creating an atypical Linux environment and enabling programs with inheritable file capabilities to elevate those capabilities to the permitted set during execve(2). This bug did not affect the container security sandbox as the inheritable set never contained more capabilities than were included in the container's bounding set. This bug has been fixed in runc 1.1.2. This fix changes `runc exec --cap` behavior such that the additional capabilities granted to the process being executed (as specified via `--cap` arguments) do not include inheritable capabilities. In addition, `runc spec` is changed to not set any inheritable capabilities in the created example OCI spec (`config.json`) file.",
+                            "id": "CVE-2022-29162",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://github.com/opencontainers/runc/commit/d04de3a9b72d7a2455c1885fc75eb36d02cd17b5",
+                                "https://github.com/opencontainers/runc/releases/tag/v1.1.2",
+                                "https://github.com/opencontainers/runc/security/advisories/GHSA-f3fp-gc8g-vw66",
+                                "https://lists.debian.org/debian-lts-announce/2023/03/msg00023.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AVPZBV7ISA7QKRPTC7ZXWKMIQI2HZEBB/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/D77CKD3AXPMU4PMQIQI5Q74SI4JATNND/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/GPQU4YC4AAY54JDXGDQHJEYKSXXG5T2Y/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.9,
+                                    "exploitabilityScore": 2.5,
+                                    "impactScore": 3.4
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-f3fp-gc8g-vw66",
+                        "description": "Default inheritable capabilities for linux container should be empty",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.2"
+                            ]
+                        },
+                        "id": "GHSA-f3fp-gc8g-vw66",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-f3fp-gc8g-vw66"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:opencontainers:runc:v1.0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:G18PGckGdAm3yVQRWDVQ1rLSLntiniKJ0cNRT2Tm5gs="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/opencontainers/runc",
+                        "purl": "pkg:golang/github.com/opencontainers/runc@v1.0.1",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v1.0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c1.1.5 (unknown)",
+                                "vulnerabilityID": "GHSA-g2j6-57v7-gm8c"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-28642",
+                            "description": "runc is a CLI tool for spawning and running containers according to the OCI specification. It was found that AppArmor can be bypassed when `/proc` inside the container is symlinked with a specific mount configuration. This issue has been fixed in runc version 1.1.5, by prohibiting symlinked `/proc`. See PR #3785 for details. users are advised to upgrade. Users unable to upgrade should avoid using an untrusted container image.",
+                            "id": "CVE-2023-28642",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://github.com/opencontainers/runc/pull/3785",
+                                "https://github.com/opencontainers/runc/security/advisories/GHSA-g2j6-57v7-gm8c"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.1,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 3.7
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-g2j6-57v7-gm8c",
+                        "description": "runc AppArmor bypass with symlinked /proc",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.5"
+                            ]
+                        },
+                        "id": "GHSA-g2j6-57v7-gm8c",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-g2j6-57v7-gm8c"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:opencontainers:runc:v1.0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:G18PGckGdAm3yVQRWDVQ1rLSLntiniKJ0cNRT2Tm5gs="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/opencontainers/runc",
+                        "purl": "pkg:golang/github.com/opencontainers/runc@v1.0.1",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v1.0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c1.1.5 (unknown)",
+                                "vulnerabilityID": "GHSA-m8cg-xc2p-r3fc"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-25809",
+                            "description": "runc is a CLI tool for spawning and running containers according to the OCI specification. In affected versions it was found that rootless runc makes `/sys/fs/cgroup` writable in following conditons: 1. when runc is executed inside the user namespace, and the `config.json` does not specify the cgroup namespace to be unshared (e.g.., `(docker|podman|nerdctl) run --cgroupns=host`, with Rootless Docker/Podman/nerdctl) or 2. when runc is executed outside the user namespace, and `/sys` is mounted with `rbind, ro` (e.g., `runc spec --rootless`; this condition is very rare). A container may gain the write access to user-owned cgroup hierarchy `/sys/fs/cgroup/user.slice/...` on the host . Other users's cgroup hierarchies are not affected. Users are advised to upgrade to version 1.1.5. Users unable to upgrade may unshare the cgroup namespace (`(docker|podman|nerdctl) run --cgroupns=private)`. This is the default behavior of Docker/Podman/nerdctl on cgroup v2 hosts. or add `/sys/fs/cgroup` to `maskedPaths`.",
+                            "id": "CVE-2023-25809",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://github.com/opencontainers/runc/commit/0d62b950e60f6980b54fe3bafd9a9c608dc1df17",
+                                "https://github.com/opencontainers/runc/security/advisories/GHSA-m8cg-xc2p-r3fc"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 2.5,
+                                    "exploitabilityScore": 0.8,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:N/I:N/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Low",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-m8cg-xc2p-r3fc",
+                        "description": "rootless: `/sys/fs/cgroup` is writable when cgroupns isn't unshared in runc",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.5"
+                            ]
+                        },
+                        "id": "GHSA-m8cg-xc2p-r3fc",
+                        "namespace": "github:language:go",
+                        "severity": "Low",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-m8cg-xc2p-r3fc"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:golang:x/sys:v0.0.0-20210817142637-7d9622a276b7:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:lQ8Btl/sJr2+f4ql7ffKUKfnV0BsgsICvm0oEeINAQY="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "golang.org/x/sys",
+                        "purl": "pkg:golang/golang.org/x/sys@v0.0.0-20210817142637-7d9622a276b7",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v0.0.0-20210817142637-7d9622a276b7"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c0.0.0-20220412211240-33da011f77ad (unknown)",
+                                "vulnerabilityID": "GHSA-p782-xgp4-8hr8"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-29526",
+                            "description": "Go before 1.17.10 and 1.18.x before 1.18.2 has Incorrect Privilege Assignment. When called with a non-zero flags parameter, the Faccessat function could incorrectly report that a file is accessible.",
+                            "id": "CVE-2022-29526",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://github.com/golang/go/issues/52313",
+                                "https://groups.google.com/g/golang-announce",
+                                "https://groups.google.com/g/golang-announce/c/Y5qrqw_lWdU",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/Q6GE5EQGE4L2KRVGW4T75QVIYAXCLO5X/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/RQXU752ALW53OJAF5MG3WMR5CCZVLWW6/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/Z55VUVGO7E5PJFXIOVAY373NZRHBNCI5/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/ZY2SLWOQR4ZURQ7UBRZ7JIX6H6F5JHJR/",
+                                "https://security.gentoo.org/glsa/202208-02",
+                                "https://security.netapp.com/advisory/ntap-20220729-0001/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 5.3,
+                                    "exploitabilityScore": 3.9,
+                                    "impactScore": 1.4
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-p782-xgp4-8hr8",
+                        "description": "golang.org/x/sys/unix has Incorrect Privilege Assignment",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "0.0.0-20220412211240-33da011f77ad"
+                            ]
+                        },
+                        "id": "GHSA-p782-xgp4-8hr8",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-p782-xgp4-8hr8"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:opencontainers:runc:v1.0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:G18PGckGdAm3yVQRWDVQ1rLSLntiniKJ0cNRT2Tm5gs="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/opencontainers/runc",
+                        "purl": "pkg:golang/github.com/opencontainers/runc@v1.0.1",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v1.0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c1.0.3 (unknown)",
+                                "vulnerabilityID": "GHSA-v95c-p5hm-xq8f"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2021-43784",
+                            "description": "runc is a CLI tool for spawning and running containers on Linux according to the OCI specification. In runc, netlink is used internally as a serialization system for specifying the relevant container configuration to the `C` portion of the code (responsible for the based namespace setup of containers). In all versions of runc prior to 1.0.3, the encoder did not handle the possibility of an integer overflow in the 16-bit length field for the byte array attribute type, meaning that a large enough malicious byte array attribute could result in the length overflowing and the attribute contents being parsed as netlink messages for container configuration. This vulnerability requires the attacker to have some control over the configuration of the container and would allow the attacker to bypass the namespace restrictions of the container by simply adding their own netlink payload which disables all namespaces. The main users impacted are those who allow untrusted images with untrusted configurations to run on their machines (such as with shared cloud infrastructure). runc version 1.0.3 contains a fix for this bug. As a workaround, one may try disallowing untrusted namespace paths from your container. It should be noted that untrusted namespace paths would allow the attacker to disable namespace protections entirely even in the absence of this bug.",
+                            "id": "CVE-2021-43784",
+                            "namespace": "nvd:cpe",
+                            "severity": "Medium",
+                            "urls": [
+                                "https://bugs.chromium.org/p/project-zero/issues/detail?id=2241",
+                                "https://github.com/opencontainers/runc/commit/9c444070ec7bb83995dbc0185da68284da71c554",
+                                "https://github.com/opencontainers/runc/commit/d72d057ba794164c3cce9451a00b72a78b25e1ae",
+                                "https://github.com/opencontainers/runc/commit/f50369af4b571e358f20b139eea52d612eb55eed",
+                                "https://github.com/opencontainers/runc/security/advisories/GHSA-v95c-p5hm-xq8f",
+                                "https://lists.debian.org/debian-lts-announce/2021/12/msg00005.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 3.7
+                                },
+                                "vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:L/A:L",
+                                "vendorMetadata": {
+                                    "base_severity": "Medium",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-v95c-p5hm-xq8f",
+                        "description": "Overflow in netlink bytemsg length field allows attacker to override netlink-based container configuration",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.0.3"
+                            ]
+                        },
+                        "id": "GHSA-v95c-p5hm-xq8f",
+                        "namespace": "github:language:go",
+                        "severity": "Medium",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-v95c-p5hm-xq8f"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:opencontainers:runc:v1.0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "go",
+                        "licenses": [],
+                        "locations": null,
+                        "metadata": {
+                            "architecture": "",
+                            "goCompiledVersion": "",
+                            "h1Digest": "h1:G18PGckGdAm3yVQRWDVQ1rLSLntiniKJ0cNRT2Tm5gs="
+                        },
+                        "metadataType": "GolangBinMetadata",
+                        "name": "github.com/opencontainers/runc",
+                        "purl": "pkg:golang/github.com/opencontainers/runc@v1.0.1",
+                        "type": "go-module",
+                        "upstreams": null,
+                        "version": "v1.0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003e=1.0.0-rc95,\u003c1.1.5 (unknown)",
+                                "vulnerabilityID": "GHSA-vpvm-3wq2-2wvm"
+                            },
+                            "matcher": "go-module-matcher",
+                            "searchedBy": {
+                                "language": "go",
+                                "namespace": "github:language:go"
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-27561",
+                            "description": "runc through 1.1.4 has Incorrect Access Control leading to Escalation of Privileges, related to libcontainer/rootfs_linux.go. To exploit this, an attacker must be able to spawn two containers with custom volume-mount configurations, and be able to run custom images. NOTE: this issue exists because of a CVE-2019-19921 regression.",
+                            "id": "CVE-2023-27561",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://gist.github.com/LiveOverflow/c937820b688922eb127fb760ce06dab9",
+                                "https://github.com/opencontainers/runc/issues/2197#issuecomment-1437617334",
+                                "https://github.com/opencontainers/runc/issues/3751",
+                                "https://lists.debian.org/debian-lts-announce/2023/03/msg00023.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/DHGVGGMKGZSJ7YO67TGGPFEHBYMS63VF/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/FYVE3GB4OG3BNT5DLQHYO4M5SXX33AQ5/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I6BF24VCZRFTYBTT3T7HDZUOTKOTNPLZ/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 7,
+                                    "exploitabilityScore": 1,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {
+                                    "base_severity": "High",
+                                    "status": "N/A"
+                                },
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://github.com/advisories/GHSA-vpvm-3wq2-2wvm",
+                        "description": "Opencontainers runc Incorrect Authorization vulnerability",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.1.5"
+                            ]
+                        },
+                        "id": "GHSA-vpvm-3wq2-2wvm",
+                        "namespace": "github:language:go",
+                        "severity": "High",
+                        "urls": [
+                            "https://github.com/advisories/GHSA-vpvm-3wq2-2wvm"
+                        ]
+                    }
+                }
+            ],
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

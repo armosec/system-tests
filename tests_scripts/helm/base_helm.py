@@ -124,6 +124,8 @@ class BaseHelm(BaseK8S):
                                                           component_tag=statics.KOLLECTOR_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.GATEWAY_COMPONENT_NAME,
                                                           component_tag=statics.GATEWAY_COMPONENT_TAG))
+        component_tag.update(self.extract_tag_from_kwargs(component_name=statics.STORAGE_COMPONENT_NAME,
+                                                          component_tag=statics.STORAGE_COMPONENT_TAG))
         return component_tag
 
     def extract_tag_from_kwargs(self, component_name, component_tag):
@@ -139,7 +141,7 @@ class BaseHelm(BaseK8S):
                         self.test_driver.temp_dir]
 
         TestUtil.run_command(command_args=command_args, timeout=360)
-        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, "charts/kubescape-cloud-operator/")
+        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, self.helm_armo_repo)
 
     def test_helm_chart_tesults(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)

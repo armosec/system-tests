@@ -16,6 +16,8 @@ from datetime import datetime
 from threading import Thread
 
 import requests
+import hashlib
+
 
 from infrastructure import KubectlWrapper
 from infrastructure.helm_wrapper import HelmWrapper
@@ -26,7 +28,7 @@ from systest_utils.sid import SID
 from systest_utils.statics import Statistics
 from systest_utils.wlid import Wlid
 from tests_scripts.dockerize import BaseDockerizeTest
-
+from kubernetes import config, client, dynamic
 
 class BaseK8S(BaseDockerizeTest):
 
@@ -133,7 +135,7 @@ class BaseK8S(BaseDockerizeTest):
         if apply_config_map:
             self.apply_config_map(namespace=namespace, yaml_file=self.test_obj.get_arg("config_map"))
 
-        return cluster, namespace
+        return self.get_cluster_name(), namespace
 
     def __del__(self):
 
@@ -156,6 +158,12 @@ class BaseK8S(BaseDockerizeTest):
             pass
 
         super(BaseK8S, self).__del__()
+
+    @staticmethod
+    def get_cluster_name():
+        clusters, active_cluster = config.list_kube_config_contexts()
+
+        return active_cluster['name']
 
     def remove_all_namespaces(self, remove_cyberarmor_namespace: bool = True):
         for ns in self.namespaces[:]:
@@ -453,6 +461,27 @@ class BaseK8S(BaseDockerizeTest):
             subname = Wlid.get_name(wlid=wlid)
         names = [pod.metadata.name for pod in self.get_running_pods(namespace=namespace, name=subname)]
         return names[0] if len(names) == 1 else names
+    
+    @staticmethod
+    def get_image_ids(pod):
+        return [(container_status.name, container_status.image_id)  for container_status in pod.status.container_statuses]
+    
+    @staticmethod
+    def get_image_tags(pod):
+        return [(container_spec.name, container_spec.image)  for container_spec in pod.spec.containers]
+
+    def get_pod_data(self, get_data_of_pod_call_back, namespace: str = "", subname: str = "", wlid: str = ""):
+        """
+        get pod/s name/s
+        :return:
+        """
+        if get_data_of_pod_call_back is None:
+            raise Exception('empty call back get pod data function')
+        if wlid:
+            namespace = Wlid.get_namespace(wlid=wlid)
+            subname = Wlid.get_name(wlid=wlid)
+        image_ids = [get_data_of_pod_call_back(pod) for pod in self.get_running_pods(namespace=namespace, name=subname)]
+        return image_ids[0] if len(image_ids) == 1 else image_ids
 
     @staticmethod
     def update_workload_metadata_by_wlid(workload: dict, wlid: str):
@@ -470,6 +499,46 @@ class BaseK8S(BaseDockerizeTest):
                     name=workload['metadata']['name'])
         return wlid.get_wlid()
 
+    def get_workload(self, api_version, name, kind, namespace):
+        dyn_client = self.kubernetes_obj.get_dynamic_client(api_version=api_version, kind=kind)
+        return dyn_client.get(name=name, namespace=namespace)
+
+    def get_first_owner_reference(self, workload, namespace):
+        p_workload = self.get_workload(api_version=workload['apiVersion'] ,name=workload['metadata']['name'], kind=workload['kind'], namespace=namespace)
+        if 'ownerReferences' not in p_workload['metadata'].keys():
+            return p_workload
+        return self.get_workload(name=p_workload['metadata']['name'], kind=p_workload['kind'], namespace=namespace)
+
+    def get_owner_reference(self, pod, namespace):
+        if len(pod.metadata.owner_references) == 0:
+            return self.get_workload(api_version=pod.api_version ,name=pod.metadata.name, kind=pod.kind, namespace=namespace)
+        return self.get_workload(api_version=pod.metadata.owner_references[0].api_version ,name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind, namespace=namespace)
+        
+    def get_api_version_from_instance_ID(self, instance_ID: str):
+        return instance_ID.split("/")[0].split("-")[1]
+    
+    def get_namespace_from_instance_ID(self, instance_ID: str):
+        namespace_list = instance_ID.split("-")
+        return "-".join(namespace_list[:3])
+    
+    def get_kind_from_instance_ID(self, instance_ID: str):
+        data = instance_ID.split("-")
+        return "-".join(data[3:4]) 
+
+    def get_workload_name_from_instance_ID(self, instance_ID: str):
+        data = instance_ID.split("-")
+        return "-".join(data[4:5])
+
+    # apiVersion-<>/namespace-<>/kind-<>/name-<>/containerName-<>
+    def calculate_instance_ID(self, pod, namespace):
+        p_workload=self.get_owner_reference(pod, namespace)
+
+        instanceIDs = list()
+        for container in p_workload['spec']['template']['spec']['containers']:
+            instanceIDs.append("apiVersion-" + p_workload["apiVersion"] + "/namespace-" + namespace + "/kind-" + p_workload['kind'] + "/name-" + p_workload['metadata']['name'] + "/containerName-" + container["name"])
+        return instanceIDs
+    
+       
     @staticmethod
     def calculate_sid(secret, **kwargs):
         sid = SID(name=secret['metadata']['name'], **kwargs)
@@ -667,6 +736,13 @@ class BaseK8S(BaseDockerizeTest):
         self.wlids.append(wlid)
         set(self.wlids)
         return wlid
+
+    def get_instance_IDs(self, pods, namespace, **kwargs):
+        instanceIDs = []
+        for pod in pods:
+            instanceIDs_for_pod = self.calculate_instance_ID(pod=pod, namespace=namespace)
+            instanceIDs.append(instanceIDs_for_pod)
+        return instanceIDs
 
     def create_namespace(self, yaml_file=statics.BASIC_NAMESPACE_YAML, path=statics.DEFAULT_NAMESPACE_PATH,
                          unique_name=True, **kwargs):
@@ -884,3 +960,99 @@ class BaseK8S(BaseDockerizeTest):
                 Logger.logger.warning(e)
                 time.sleep(1)
         Logger.logger.info("exiting websocket thread")
+    
+    def get_SBOM_from_storage(self, SBOMKeys):
+        SBOMs = []
+        if isinstance(SBOMKeys, str):
+            SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=SBOMKeys,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_SBOM_PLURAL,
+            )
+            SBOMs.append((SBOMKeys, SBOM_data))
+        elif isinstance(SBOMKeys, list):
+            for key in SBOMKeys:
+              SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=key,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_SBOM_PLURAL,
+            )
+              SBOMs.append((key, SBOM_data))
+        return SBOMs
+
+    def get_CVEs_from_storage(self, CVEsKeys):
+        CVEs = []
+        if isinstance(CVEsKeys, str):
+            CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=CVEsKeys,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_CVES_PLURAL,
+            )
+            CVEs.append((CVEsKeys, CVE_data))
+        elif isinstance(CVEsKeys, list):
+            for key in CVEsKeys:
+                CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=key,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_CVES_PLURAL,
+            )
+                CVEs.append((key, CVE_data))
+        return CVEs
+
+    def get_filtered_SBOM_from_storage(self, filteredSBOMKeys):
+        filteredSBOMs = []
+        if any(isinstance(i, list) for i in filteredSBOMKeys):
+            for keys in filteredSBOMKeys:
+                for key in keys:
+                    filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                        group=statics.STORAGE_AGGREGATED_API_GROUP,
+                        version=statics.STORAGE_AGGREGATED_API_VERSION,
+                        name=key,
+                        namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                        plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
+                    )
+                    filteredSBOMs.append((key, filtered_SBOM_data))
+        elif isinstance(filteredSBOMKeys, list):
+            for key in filteredSBOMKeys:
+              filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=key,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
+            )
+              filteredSBOMs.append((key, filtered_SBOM_data))
+        return filteredSBOMs
+
+    def get_filtered_CVEs_from_storage(self, filteredCVEsKEys):
+        filteredCVEs = []
+        if any(isinstance(i, list) for i in filteredCVEsKEys):
+            for keys in filteredCVEsKEys:
+                for key in keys:
+                    cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                        group=statics.STORAGE_AGGREGATED_API_GROUP,
+                        version=statics.STORAGE_AGGREGATED_API_VERSION,
+                        name=key,
+                        namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                        plural=statics.STORAGE_CVES_PLURAL,
+                    )
+                    filteredCVEs.append((key, cve_data))
+        elif isinstance(filteredCVEsKEys, list):
+            for key in filteredCVEsKEys:
+              cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=key,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_CVES_PLURAL,
+            )
+              filteredCVEs.append((key, cve_data))
+        return filteredCVEs

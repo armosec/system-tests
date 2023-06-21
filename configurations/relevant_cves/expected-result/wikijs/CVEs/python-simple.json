@@ -1,0 +1,252 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
+            "kubescape.io/status": ""
+        },
+        "creationTimestamp": "2023-06-05T10:31:43Z",
+        "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-library-python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f",
+            "kubescape.io/image-name": "docker-io-library-python"
+        },
+        "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
+        "namespace": "kubescape",
+        "resourceVersion": "27",
+        "uid": "64fab614-9ad9-4709-ae72-1b4d0984884a"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.61.0"
+            },
+            "withRelevancy": false
+        },
+        "payload": {
+            "descriptor": {
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/ks/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "grype",
+                "version": "[not provided]"
+            },
+            "distro": {
+                "idLike": [
+                    "alpine"
+                ],
+                "name": "alpine",
+                "version": "3.18.0"
+            },
+            "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:python_software_foundation:python:3.11.3:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [],
+                        "locations": null,
+                        "name": "python",
+                        "purl": "pkg:generic/python@3.11.3",
+                        "type": "UnknownPackage",
+                        "upstreams": null,
+                        "version": "3.11.3"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:python_software_foundation:python:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2007-4559"
+                            },
+                            "matcher": "stock-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:python_software_foundation:python:3.11.3:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2007-4559",
+                        "description": "Directory traversal vulnerability in the (1) extract and (2) extractall functions in the tarfile module in Python allows user-assisted remote attackers to overwrite arbitrary files via a .. (dot dot) sequence in filenames in a TAR archive, a related issue to CVE-2001-1267.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2007-4559",
+                        "namespace": "nvd:cpe",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://mail.python.org/pipermail/python-dev/2007-August/074290.html",
+                            "http://mail.python.org/pipermail/python-dev/2007-August/074292.html",
+                            "http://www.vupen.com/english/advisories/2007/3022",
+                            "https://bugzilla.redhat.com/show_bug.cgi?id=263261"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:pip_developers_project:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developers_project:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig_project:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig_project:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developersproject:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developersproject:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sigproject:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sigproject:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developers_project:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig_project:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developers:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developers:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developersproject:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils-sig:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils-sig:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sigproject:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python-pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python-pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python_pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python_pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip_developers:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils-sig:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:distutils_sig:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pypa:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pypa:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python-pip:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python_pip:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:python:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pypa:pip:22.3.1:*:*:*:*:*:*:*",
+                            "cpe:2.3:a:pip:pip:22.3.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "python",
+                        "licenses": [
+                            "MIT"
+                        ],
+                        "locations": null,
+                        "name": "pip",
+                        "purl": "pkg:pypi/pip@22.3.1",
+                        "type": "python",
+                        "upstreams": null,
+                        "version": "22.3.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "cpes": [
+                                    "cpe:2.3:a:pypa:pip:*:*:*:*:*:*:*:*"
+                                ],
+                                "versionConstraint": "none (unknown)",
+                                "vulnerabilityID": "CVE-2018-20225"
+                            },
+                            "matcher": "python-matcher",
+                            "searchedBy": {
+                                "cpes": [
+                                    "cpe:2.3:a:pypa:pip:22.3.1:*:*:*:*:*:*:*"
+                                ],
+                                "namespace": "nvd:cpe"
+                            },
+                            "type": "cpe-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": null,
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": [
+                            {
+                                "metrics": {
+                                    "baseScore": 6.8,
+                                    "exploitabilityScore": 8.6,
+                                    "impactScore": 6.4
+                                },
+                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                                "vendorMetadata": {},
+                                "version": "2.0"
+                            },
+                            {
+                                "metrics": {
+                                    "baseScore": 7.8,
+                                    "exploitabilityScore": 1.8,
+                                    "impactScore": 5.9
+                                },
+                                "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                                "vendorMetadata": {},
+                                "version": "3.1"
+                            }
+                        ],
+                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2018-20225",
+                        "description": "** DISPUTED ** An issue was discovered in pip (all versions) because it installs the version with the highest version number, even if the user had intended to obtain a private package from a private index. This only affects use of the --extra-index-url option, and exploitation requires that the package does not already exist in the public index (and thus the attacker can put the package there with an arbitrary version number). NOTE: it has been reported that this is intended functionality and the user is responsible for using --extra-index-url securely.",
+                        "fix": {
+                            "state": "unknown",
+                            "versions": []
+                        },
+                        "id": "CVE-2018-20225",
+                        "namespace": "nvd:cpe",
+                        "severity": "High",
+                        "urls": [
+                            "https://bugzilla.redhat.com/show_bug.cgi?id=1835736",
+                            "https://cowlicks.website/posts/arbitrary-code-execution-from-pips-extra-index-url.html",
+                            "https://lists.apache.org/thread.html/rb1adce798445facd032870d644eb39c4baaf9c4a7dd5477d12bb6ab2@%3Cgithub.arrow.apache.org%3E",
+                            "https://pip.pypa.io/en/stable/news/"
+                        ]
+                    }
+                }
+            ],
+            "source": {
+                "target": {
+                    "architecture": "",
+                    "config": null,
+                    "imageID": "",
+                    "imageSize": 0,
+                    "layers": null,
+                    "manifest": null,
+                    "manifestDigest": "",
+                    "mediaType": "",
+                    "os": "",
+                    "repoDigests": [],
+                    "tags": [],
+                    "userInput": ""
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

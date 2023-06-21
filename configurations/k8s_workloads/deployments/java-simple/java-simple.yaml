@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-simple-server
+  labels:
+    app: java-simple-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-simple-server
+  template:
+    metadata:
+      labels:
+        app: java-simple-server
+    spec:
+      containers:
+      - name: java
+        image: jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660

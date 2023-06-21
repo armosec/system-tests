@@ -56,10 +56,23 @@ SCAN_RESULT_IS_RCE_FIELD = "isRce"
 SCAN_RESULT_CONTAINER_SCAN_ID_FIELD = "containersScanID"
 SCAN_RESULT_SEVERITIES_STATS_FIELD = "severitiesStats"
 SCAN_RESULT_SEVERITY_FIELD = "severity"
+SCAN_RESULT_IMAGEHASH_FIELD = "imageHash"
 SCAN_RESULT_ERRORS_FIELD = "errors"
 SCAN_RESULT_STATUS_FIELD = "status"
 SCAN_RESULT_TOTAL_FIELD = 'total'
 SCAN_RESULT_RCETOTAL_FIELD = 'rceTotal'
+SCAN_RESULT_RELEVANT_FIX_COUNT = 'relevantFixCount'
+SCAN_RESULT_RCE_FIX_COUNT = 'rceFixCount'
+SCAN_RESULT_FIX_COUNT_FIELD = 'fixedTotal'
+SCAN_RESULT_IS_FIXED_FIELD = "isFixed"
+SCAN_RESULT_RELEVANT_TOTAL_FIELD = 'relevantTotal'
+SCAN_RESULT_IS_RELEVANT_FIELD = "relevantLabel"
+SCAN_HAS_RELEVANCY_DATA_FIELD = "hasRelevancyData"
+SCAN_RESULT_IS_RELEVANT_FIELD_TRUE = "yes"
+SCAN_RESULT_IS_RELEVANT_FIELD_FALSE = "no"
+SCAN_RESULT_IS_RELEVANT_FIELD_UNKNOWN = ""
+
+DESIGNATORS_FIELD = "designators"
 
 BASIC_NAMESPACE_YAML = "basic_ns.yaml"
 
@@ -68,6 +81,7 @@ __DEFAULT_KEY_ID__ = "99d368694eb64f4d9eef46a60c18af82"
 DEFAULT_XML_PATH = os.path.abspath("results_xml_format")
 
 CLUSTER_ATTRIBUTE_FIELD = "cluster"
+CUSTOMER_GUID_ATTRIBUTE_FIELD = "customerGUID"
 
 AUTO_ATTACH_LABEL = "armo.attach"
 AUTO_ATTACH_SECRET_LABEL = "armo.secret"
@@ -82,7 +96,7 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
-HELM_REPO = "kubescape/kubescape-cloud-operator"
+HELM_REPO = "charts/kubescape-cloud-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
 CA_HELM_NAME = "kubescape"
@@ -107,7 +121,6 @@ CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_ANNOTATION_FIELD = "armo.cloud/registryna
 # armo-system secrets & configs
 CA_VULN_REGISTRY_SCAN_SECRET_HELM_NAME = 'kubescape-registry-scan'
 CA_VULN_REGISTRY_SCAN_CONFIGMAP_HELM_NAME = 'kubescape-registry-scan'
-
 
 CA_VULN_SCAN_RESOURCE_API_VERSION = 'result.vulnscan.com/v1'
 
@@ -140,12 +153,14 @@ OPERATOR_COMPONENT_NAME = 'operator'
 KUBEVULN_COMPONENT_NAME = 'kubevuln'
 KOLLECTOR_COMPONENT_NAME = 'kollector'
 GATEWAY_COMPONENT_NAME = 'gateway'
+STORAGE_COMPONENT_NAME = 'storage'
 
 KUBESCAPE_COMPONENT_TAG = 'kubescape-tag'
 OPERATOR_COMPONENT_TAG = 'operator-tag'
 KUBEVULN_COMPONENT_TAG = 'kubevuln-tag'
 KOLLECTOR_COMPONENT_TAG = 'kollector-tag'
 GATEWAY_COMPONENT_TAG = 'gateway-tag'
+STORAGE_COMPONENT_TAG = 'storage-tag'
 
 TEST_REGISTRY_CONNECTIVITY_PASSED_STATUS = "Passed"
 TEST_REGISTRY_CONNECTIVITY_FAILED_STATUS = "Failed"
@@ -156,6 +171,43 @@ DELETE_REGISTRY_CJ_COMMAND = "deleteRegistryScanCronJob"
 TEST_REGISTRY_CONNECTIVITY_INFORMATION_STATUS = "registryInformation"
 TEST_REGISTRY_CONNECTIVITY_AUTHENTICATION_STATUS = "registryAuthentication"
 TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
+
+# storage aggregated API
+HELM_STORAGE_FEATURE = "kubescapeStorage.enabled"
+STORAGE_SBOM_PLURAL = "sbomspdxv2p3s"
+STORAGE_FILTERED_SBOM_PLURAL = "sbomspdxv2p3filtereds"
+STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
+STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
+STORAGE_AGGREGATED_API_VERSION = "v1beta1"
+STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
+
+STORAGE_CVE_LABEL = "kubescape.io/context"
+STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
+
+RELEVANCY_KIND_LABEL = "kubescape.io/workload-kind"
+RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
+RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
+RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
+
+# relevancy feature
+HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
+HELM_RELEVANCY_FEATURE_ENABLED = "enable"
+HELM_RELEVANCY_FEATURE_DISABLED = "disable"
+HELM_MAX_IMAGE_SIZE = "kubevuln.config.maxImageSize"
+HELM_SCAN_TIMEOUT = "kubevuln.config.scanTimeout"
+HELM_OFFLINE_VULN_DB = "grypeOfflineDB.enabled"
+FILTERED_CVES_KEY = "withRelevancy"
+ALL_CVES_KEY = "AllCVEs"
+
+# in cluster limits
+HELM_NODE_AGENT_REQ_CPU = "nodeAgent.resources.requests.cpu"
+HELM_NODE_AGENT_LIMITS_CPU = "nodeAgent.resources.limits.cpu"
+HELM_NODE_AGENT_REQ_MEMORY = "nodeAgent.resources.requests.memory"
+HELM_NODE_AGENT_LIMITS_MEMORY = "nodeAgent.resources.limits.memory"
+HELM_STORAGE_REQ_CPU = "storage.resources.requests.cpu"
+HELM_STORAGE_LIMITS_CPU = "storage.resources.limits.cpu"
+HELM_STORAGE_REQ_MEMORY = "storage.resources.requests.memory"
+HELM_STORAGE_LIMITS_MEMORY = "storage.resources.limits.memory"
 
 
 class Statistics(object):

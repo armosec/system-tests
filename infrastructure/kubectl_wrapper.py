@@ -4,7 +4,8 @@ from http.client import FOUND
 import time
 from crypt import methods
 
-from kubernetes import client, config
+from kubernetes.client import api_client
+from kubernetes import client, config, dynamic
 from kubernetes.client.exceptions import ApiException
 import requests
 from systest_utils import Logger, TestUtil, statics
@@ -94,6 +95,11 @@ class KubectlWrapper(object):
                 context=active_context['name']))
             self.client_BatchV1beta1Api = client.BatchV1beta1Api(api_client=config.new_client_from_config(
                 context=active_context['name']))
+            self.client_CustomObjectsApi = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
+
+            self.client_dynamic = dynamic.DynamicClient(api_client.ApiClient(configuration=config.load_kube_config())
+    )    
+            # self.client_ = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
             
 
         else:
@@ -338,11 +344,11 @@ class KubectlWrapper(object):
         kind = application['kind'] if isinstance(application, dict) else application.kind
 
         if 'Deployment' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_deployment(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_deployment(namespace=namespace, name=get_name(application))
         elif 'ReplicaSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_replica_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_replica_set(namespace=namespace, name=get_name(application))
         elif 'StatefulSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_stateful_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_stateful_set(namespace=namespace, name=get_name(application))
         elif "ClusterRole" == kind:
             status = self.client_RbacAuthorizationV1Api.delete_cluster_role(name=get_name(application))
         elif "ClusterRoleBinding" == kind:
@@ -350,13 +356,13 @@ class KubectlWrapper(object):
         elif "CustomResourceDefinition" == kind:
             status = self.client_ApiextensionsV1Api.delete_custom_resource_definition(name=application["metadata"]["name"])
         elif 'DaemonSet' == kind:
-            status = self.client_AppsV1Api.delete_namespaced_daemon_set(namespace=namespace, body=application)
+            status = self.client_AppsV1Api.delete_namespaced_daemon_set(namespace=namespace, name=get_name(application))
         elif 'Pod' == kind:
-            status = self.client_CoreV1Api.delete_namespaced_pod(namespace=namespace, body=application)
+            status = self.client_CoreV1Api.delete_namespaced_pod(namespace=namespace, name=get_name(application))
         elif 'Namespace' == kind:
             status = self.client_CoreV1Api.delete_namespace(name=namespace)
         elif 'ConfigMap' == kind:
-            status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace, body=application,
+            status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace,
                                                                         _request_timeout=None)
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))
@@ -520,6 +526,8 @@ class KubectlWrapper(object):
             return wl['apiVersion']
         return ''
 
+    def get_dynamic_client(self, api_version, kind):
+        return self.client_dynamic.resources.get(api_version=api_version, kind=kind)
 
 def get_name(obj: dict):
     return obj["metadata"]["name"]
