@@ -1199,9 +1199,10 @@ class ControlPanelAPI(object):
             'layers of container scan id : {} response {}'.format(container_scan_id, r.json()))
         return r.json()
     
-    def get_unique_values_for_field_scan_summary(self, field, customer_guid):
+    def get_unique_values_for_field_scan_summary(self, since_time, field, customer_guid):
         params = {"customerGUID": customer_guid}
         body = {
+            "since": since_time,
             "fields": {
                 field: "",
             }
@@ -1216,9 +1217,10 @@ class ControlPanelAPI(object):
         
         return r
         
-    def get_summary_with_inner_filters(self, filter, customer_guid):
+    def get_summary_with_inner_filters(self, since_time, filter, customer_guid):
         params = {"customerGUID": customer_guid}
         body = {
+            "since": since_time,
             "innerFilters": [filter],
         }
 
