@@ -14,7 +14,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=Scan,
             policy_scope='framework',
-            policy_name='nsa'
+            policy_name='NSA'
         )
 
     @staticmethod
@@ -24,7 +24,17 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=Scan,
             policy_scope='framework',
-            policy_name='mitre'
+            policy_name='MITRE'
+        )
+    
+    @staticmethod
+    def scan_security():
+        from tests_scripts.kubescape.scan import Scan
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=Scan,
+            policy_scope='framework',
+            policy_name='security'
         )
 
     @staticmethod
@@ -34,7 +44,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanWithExceptions,
             policy_scope='framework',
-            policy_name='mitre',
+            policy_name='MITRE',
             exceptions='kube-ns.json',
             controls_tested=["C-0002"]
         )
@@ -58,7 +68,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanUrl,
             policy_scope='framework',
-            policy_name='mitre',
+            policy_name='MITRE',
             url="https://github.com/armosec/kubescape"
         )
 
@@ -88,7 +98,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanGitRepositoryAndSubmit,
             policy_scope='framework',
-            policy_name='mitre',
+            policy_name='MITRE',
             submit=True,
             account=True,
             git_repository=GitRepository(name='examples', owner="kubernetes", branch="master",
@@ -103,7 +113,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanLocalFile,
             policy_scope='framework',
-            policy_name='nsa',
+            policy_name='NSA',
             yamls=['nginx.yaml'],
             resources=1
         )
@@ -115,7 +125,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanLocalFile,
             policy_scope='framework',
-            policy_name='nsa',
+            policy_name='NSA',
             yamls=['hipster_shop/*.yaml'],
             resources=13
         )
@@ -139,12 +149,28 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAndSubmitToBackend,
             policy_scope='framework',
-            policy_name='nsa',
+            policy_name='NSA',
             submit=True,
             account=True,
             resources_for_test=[
                 {'kind': 'Deployment', 'name': 'apache', 'namespace': 'system-test', 'apiVersion': 'apps/v1'},
                 {'kind': 'Namespace', 'name': 'system-test', 'namespace': '', 'apiVersion': 'v1'}],
+            yaml="apache.yaml",
+            namespace="system-test"
+        )
+    
+    @staticmethod
+    def scan_security_and_submit_to_backend():
+        from tests_scripts.kubescape.scan import ScanAndSubmitToBackend
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAndSubmitToBackend,
+            policy_scope='framework',
+            policy_name='security',
+            submit=True,
+            account=True,
+            resources_for_test=[
+                {'kind': 'Deployment', 'name': 'apache', 'namespace': 'system-test', 'apiVersion': 'apps/v1'}],
             yaml="apache.yaml",
             namespace="system-test"
         )
@@ -156,7 +182,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAndSubmitToBackend,
             policy_scope='framework',
-            policy_name='mitre',
+            policy_name='MITRE',
             submit=True,
             account=True,
             resources_for_test=[
@@ -173,7 +199,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanWithExceptionToBackend,
             policy_scope='framework',
-            policy_name='nsa',
+            policy_name='NSA',
             submit=True,
             account=True,
             exceptions="exclude-control-apache.json,exclude-control-sa-resourceID-apache.json",
@@ -214,7 +240,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=OfflineSupport,
             policy_scope='framework',
-            policy_name='nsa',
+            policy_name='NSA',
             yaml=["apache.yaml"],
             namespace="system-test",
             expected_results='apache.json'

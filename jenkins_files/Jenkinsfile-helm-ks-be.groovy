@@ -26,6 +26,7 @@ def tests = [
              "ks_microservice_delete_cronjob":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "ks_microservice_create_2_cronjob_mitre_and_nsa":                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_with_exceptions":                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_security_and_submit_to_backend":                                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_nsa_and_submit_to_backend":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_mitre_and_submit_to_backend":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_local_repository_and_submit_to_backend":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],

@@ -555,7 +555,7 @@ class BaseKubescape(BaseK8S):
                 # TODO - support list of controls
                 return control['ruleReports'][0]['ruleResponses']
 
-    def test_filed_controls_in_resource(self, cli_result: dict, be_resources: list, cluster: str, kind: str, name: str,
+    def test_failed_controls_in_resource(self, cli_result: dict, be_resources: list, cluster: str, kind: str, name: str,
                                         namespace: str, api_version: str):
         be_affected_controls = BaseKubescape.get_attributes_from_be_resources(be_resources=be_resources, kind=kind,
                                                                               cluster=cluster, name=name,
@@ -679,16 +679,9 @@ class BaseKubescape(BaseK8S):
                                                                                             scored=control['scored'])
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
-        # self.test_filed_controls_in_resource(cli_result=cli_result, be_resources=be_resources, kind='Pod',
-        #                                      cluster=self.kubernetes_obj.get_cluster_name(),
-        #                                      name='kube-controller-manager',
-        #                                      namespace='kube-system')
-        # self.test_filed_controls_in_resource(cli_result=cli_result, be_resources=be_resources, kind='Namespace',
-        #                                      cluster=self.kubernetes_obj.get_cluster_name(),
-        #                                      name='kube-system', namespace='')
         resources_obj = self.test_obj[("resources_for_test", [])]
-        for resource_obj in self.test_obj[("resources_for_test", [])]:
-            self.test_filed_controls_in_resource(cli_result=cli_result, be_resources=be_resources,
+        for resource_obj in resources_obj:
+            self.test_failed_controls_in_resource(cli_result=cli_result, be_resources=be_resources,
                                                  kind=resource_obj['kind'], api_version=resource_obj['apiVersion'],
                                                  cluster=self.kubernetes_obj.get_cluster_name(),
                                                  name=resource_obj['name'], namespace=resource_obj['namespace'])
