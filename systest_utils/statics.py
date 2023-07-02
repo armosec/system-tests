@@ -1,5 +1,10 @@
 import os
 
+
+SECURITY_FRAMEWORKS = ["security"]
+SECURITY_FRAMEWORK_TYPETAG = "security"
+
+
 SUCCESS = True
 FAILURE = False
 

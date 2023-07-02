@@ -34,9 +34,6 @@ LOGIN_METHOD_FRONTEGG_USERNAME = "frontegg_username"
 
 API_FRONTEGG_IDENTITY_RESOURCES_USERS_V2_USERS_V2_ME_TENANTS = "/frontegg/identity/resources/users/v2/me/tenants"
 
-SECURITY_FRAMEWORKS = ["security"]
-SECURITY_FRAMEWORK_TYPETAG = "security"
-
 
 API_STRIPE_BILLING_PORTAL = "/api/v1/tenants/stripe/portal"
 API_STRIPE_CHECKOUT = "/api/v1/tenants/stripe/checkout"
@@ -708,8 +705,8 @@ class ControlPanelAPI(object):
         params = {"pageNum": 1, "pageSize": 1, "orderBy": "timestamp:desc", "innerFilters": [{
             "clusterName": cluster_name, "frameworkName": framework_name}]}
 
-        if framework_name in SECURITY_FRAMEWORKS:
-            params["innerFilters"][0]["typeTags"] = SECURITY_FRAMEWORK_TYPETAG
+        if framework_name in statics.SECURITY_FRAMEWORKS:
+            params["innerFilters"][0]["typeTags"] = statics.SECURITY_FRAMEWORK_TYPETAG
 
         r = self.post(API_POSTURE_CLUSTERSOVERTIME,
                       json=params)
@@ -820,8 +817,8 @@ class ControlPanelAPI(object):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
         
-        if framework_name in SECURITY_FRAMEWORKS:
-            params["innerFilters"][0]["typeTags"] = SECURITY_FRAMEWORK_TYPETAG
+        if framework_name in statics.SECURITY_FRAMEWORKS:
+            params["innerFilters"][0]["typeTags"] = statics.SECURITY_FRAMEWORK_TYPETAG
 
         r = self.post(API_POSTURE_FRAMEWORKS, params={"customerGUID": self.selected_tenant_id},
                       json=params)
