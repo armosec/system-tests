@@ -3,13 +3,15 @@
 ## Test Cases:
 | Test name                                                      |  category  | description                                                            | coverage                      |
 |----------------------------------------------------------------|:----------:|------------------------------------------------------------------------|-------------------------------|
+| `scan_security`                                                | kubescape, security  | simple scan framework security                                              | kubescape                     |
 | `scan_nsa`                                                     | kubescape  | simple scan framework NSA                                              | kubescape                     |
 | `scan_mitre`                                                   | kubescape  | simple scan framework MITRE                                            | kubescape                     |
 | `scan_with_exceptions`                                         | kubescape  | scan framework NSA with exceptions                                     | kubescape                     |
 | `scan_repository`                                              | kubescape  | scan repository                                                        | kubescape                     |
 | `scan_local_file`                                              | kubescape  | scan local file                                                        | kubescape                     |
 | `scan_local_glob_files`                                        | kubescape  | scan local glob files                                                  | kubescape                     |
-| `scan_local_list_of_files`                                     | kubescape  | scan local list of files                                               | kubescape                     |
+| `scan_local_list_of_files`                                     | kubescape  | scan local list of files                                               | kubescape      
+| `scan_security_and_submit_to_backend`                               | kubescape, security  | scan framework NSA and test results against the backend,                | kubescape, backend                 |
 | `scan_nsa_and_submit_to_backend`                               | kubescape  | scan framework NSA and test results against the backend                | kubescape, backend            | 
 | `scan_mitre_and_submit_to_backend`                             | kubescape  | scan framework MITRE and test results against the backend              | kubescape, backend            | 
 | `scan_local_repository_and_submit_to_backend`                  | kubescape  | scan local repository and test results against the backend             | kubescape, backend            | 

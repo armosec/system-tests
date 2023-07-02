@@ -102,12 +102,12 @@ def deco_cookie(func):
         if "cookies" not in kwargs:
             if "/api/v1/admin/" in url:
                 kwargs["cookies"] = ControlPanelAPIObj.login_customer_cookie
-                if "customerGuid" not in kwargs["params"]:
-                    kwargs["params"]["customerGuid"] = ControlPanelAPIObj.login_customer_guid
+                if "customerGUID" not in kwargs["params"]:
+                    kwargs["params"]["customerGUID"] = ControlPanelAPIObj.login_customer_guid
             else:
                 kwargs["cookies"] = ControlPanelAPIObj.selected_tenant_cookie
-                if "customerGuid" not in kwargs["params"]:
-                    kwargs["params"]["customerGuid"] = ControlPanelAPIObj.selected_tenant_id
+                if "customerGUID" not in kwargs["params"]:
+                    kwargs["params"]["customerGUID"] = ControlPanelAPIObj.selected_tenant_id
 
         kwargs['headers'] = kwargs.get("headers", ControlPanelAPIObj.auth)
         kwargs["timeout"] = kwargs.get("timeout", 21)
@@ -704,7 +704,11 @@ class ControlPanelAPI(object):
     def get_posture_clusters_overtime(self, cluster_name: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1, "orderBy": "timestamp:desc", "innerFilters": [{
             "clusterName": cluster_name, "frameworkName": framework_name}]}
-        r = self.post(API_POSTURE_CLUSTERSOVERTIME, params={"customerGUID": self.selected_tenant_id},
+
+        if framework_name in statics.SECURITY_FRAMEWORKS:
+            params["innerFilters"][0]["typeTags"] = statics.SECURITY_FRAMEWORK_TYPETAG
+
+        r = self.post(API_POSTURE_CLUSTERSOVERTIME,
                       json=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -812,6 +816,10 @@ class ControlPanelAPI(object):
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
+        
+        if framework_name in statics.SECURITY_FRAMEWORKS:
+            params["innerFilters"][0]["typeTags"] = statics.SECURITY_FRAMEWORK_TYPETAG
+
         r = self.post(API_POSTURE_FRAMEWORKS, params={"customerGUID": self.selected_tenant_id},
                       json=params)
         if not 200 <= r.status_code < 300:
