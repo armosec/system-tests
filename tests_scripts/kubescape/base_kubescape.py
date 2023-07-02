@@ -727,7 +727,7 @@ class BaseKubescape(BaseK8S):
         report_guid = self.get_report_guid(cluster_name=cluster_name, framework_name=framework_name,
                                            old_report_guid=old_report_guid)
 
-        # "secuirty" framework is excluded from postureClusters report, therefore on this case skippin g testing apui version.
+        # "security" framework is excluded from postureClusters report, therefore on this case skipping testing api version.
         if framework_name not in statics.SECURITY_FRAMEWORKS:
             self.test_api_version_info()
 
