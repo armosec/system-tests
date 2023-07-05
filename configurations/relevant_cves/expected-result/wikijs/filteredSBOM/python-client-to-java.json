@@ -51,28 +51,6 @@
             "externalDocumentRefs": null,
             "files": [
                 {
-                    "SPDXID": "SPDXRef-15565c002b5faa0f",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/group",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
                     "SPDXID": "SPDXRef-34276b4e9d55db8e",
                     "annotations": null,
                     "artifactOfs": null,
@@ -88,50 +66,6 @@
                     "fileContributors": null,
                     "fileDependencies": null,
                     "fileName": "/etc/hosts",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-ff1c9d543f9bda84",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/nsswitch.conf",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-7b8c84ee1caf54a2",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/passwd",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",

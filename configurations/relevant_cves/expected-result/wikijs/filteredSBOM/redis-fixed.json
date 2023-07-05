@@ -73,28 +73,6 @@
                     "noticeText": ""
                 },
                 {
-                    "SPDXID": "SPDXRef-4cf9c3537f896231",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:7cd52847ad775a5ddc4b58326cf884beee34544296402c6292ed76474c686d39",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/nsswitch.conf",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
                     "SPDXID": "SPDXRef-b9bb428a1e709173",
                     "annotations": null,
                     "artifactOfs": null,

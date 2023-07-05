@@ -205,28 +205,6 @@
                     "noticeText": ""
                 },
                 {
-                    "SPDXID": "SPDXRef-b0c4cea372e80f32",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:0eba131dffd015134cb310c284b776c1e44d330146cd2f0e30c4e464d0b76d24",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/bin/cp",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
                     "SPDXID": "SPDXRef-3087ed7a767ed8d2",
                     "annotations": null,
                     "artifactOfs": null,
@@ -396,28 +374,6 @@
                     "fileContributors": null,
                     "fileDependencies": null,
                     "fileName": "/usr/bin/mktemp",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-37d13bdfd70612dd",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:0eba131dffd015134cb310c284b776c1e44d330146cd2f0e30c4e464d0b76d24",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/bin/mount",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
@@ -28543,50 +28499,6 @@
                     "supplier": null,
                     "validUntilDate": "",
                     "versionInfo": "1:10.4.22+maria~focal"
-                },
-                {
-                    "SPDXID": "SPDXRef-Package-deb-mount-fa4ef6b12af7900c",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
-                        {
-                            "comment": "",
-                            "referenceCategory": "SECURITY",
-                            "referenceLocator": "cpe:2.3:a:mount:mount:2.34-0.1ubuntu9.1:*:*:*:*:*:*:*",
-                            "referenceType": "cpe23Type"
-                        },
-                        {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:deb/ubuntu/mount@2.34-0.1ubuntu9.1?arch=amd64\u0026upstream=util-linux\u0026distro=ubuntu-20.04",
-                            "referenceType": "purl"
-                        }
-                    ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND LicenseRef-LGPL AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND MIT AND LicenseRef-public-domain",
-                    "licenseDeclared": "BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND LicenseRef-LGPL AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND MIT AND LicenseRef-public-domain",
-                    "licenseInfoFromFiles": null,
-                    "name": "mount",
-                    "originator": "Person: Ubuntu Developers \u003cubuntu-devel-discuss@lists.ubuntu.com\u003e",
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/mount/copyright, /var/lib/dpkg/info/mount.md5sums, /var/lib/dpkg/status",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "2.34-0.1ubuntu9.1"
                 },
                 {
                     "SPDXID": "SPDXRef-Package-deb-mysql-common-d707aa5784afb723",
@@ -85787,12 +85699,6 @@
                     "relatedSpdxElement": "SPDXRef-ec596261688d39b1",
                     "relationshipType": "CONTAINS",
                     "spdxElementId": "SPDXRef-Package-deb-coreutils-f77283ee51e117fa"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-37d13bdfd70612dd",
-                    "relationshipType": "CONTAINS",
-                    "spdxElementId": "SPDXRef-Package-deb-mount-fa4ef6b12af7900c"
                 },
                 {
                     "comment": "",
