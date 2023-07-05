@@ -49,28 +49,6 @@
             "externalDocumentRefs": null,
             "files": [
                 {
-                    "SPDXID": "SPDXRef-31a349b3be1d23af",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/group",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
                     "SPDXID": "SPDXRef-a3323e15446e44c4",
                     "annotations": null,
                     "artifactOfs": null,
@@ -86,28 +64,6 @@
                     "fileContributors": null,
                     "fileDependencies": null,
                     "fileName": "/etc/hosts",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-1592a8d534782f2",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/etc/passwd",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",

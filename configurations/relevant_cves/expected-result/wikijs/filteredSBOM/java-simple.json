@@ -51,28 +51,6 @@
             "externalDocumentRefs": null,
             "files": [
                 {
-                    "SPDXID": "SPDXRef-692205faf18d5d7a",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/bin/cp",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
                     "SPDXID": "SPDXRef-d4940688928745af",
                     "annotations": null,
                     "artifactOfs": null,
@@ -132,28 +110,6 @@
                     "fileContributors": null,
                     "fileDependencies": null,
                     "fileName": "/usr/bin/grep",
-                    "fileTypes": null,
-                    "licenseComments": "",
-                    "licenseConcluded": "NOASSERTION",
-                    "licenseInfoInFiles": null,
-                    "noticeText": ""
-                },
-                {
-                    "SPDXID": "SPDXRef-14f9bc74e99f648d",
-                    "annotations": null,
-                    "artifactOfs": null,
-                    "attributionTexts": null,
-                    "checksums": [
-                        {
-                            "algorithm": "SHA1",
-                            "checksumValue": "0000000000000000000000000000000000000000"
-                        }
-                    ],
-                    "comment": "layerID: sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
-                    "copyrightText": "",
-                    "fileContributors": null,
-                    "fileDependencies": null,
-                    "fileName": "/usr/bin/mount",
                     "fileTypes": null,
                     "licenseComments": "",
                     "licenseConcluded": "NOASSERTION",
