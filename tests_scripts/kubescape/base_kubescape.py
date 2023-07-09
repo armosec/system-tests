@@ -121,8 +121,8 @@ class BaseKubescape(BaseK8S):
         if self.environment == "dev" or self.environment == "development":
             command.extend(["--env", "dev"])
         if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armo.cloud,"
-                                     "armoui.eustage2.cyberarmorsoft.com,eggauth.eustage2.cyberarmorsoft.com"])
+            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
+                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
 
         Logger.logger.info(" ".join(command))
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
@@ -160,8 +160,8 @@ class BaseKubescape(BaseK8S):
             command.extend(["--account", self.backend.get_customer_guid()])
 
         if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armo.cloud,"
-                                     "armoui.eustage2.cyberarmorsoft.com,eggauth.eustage2.cyberarmorsoft.com"])
+            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
+                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
 
         if self.environment == "dev" or self.environment == "development":
             command.extend(["--env", "dev"])
