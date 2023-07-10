@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - args:
-        - sleep 90; redis-server
+        - sleep 1200; redis-server
         command:
         - /bin/sh
         - -c
