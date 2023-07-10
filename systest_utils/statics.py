@@ -194,6 +194,7 @@ RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
 RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
 RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
+RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
 
 # relevancy feature
