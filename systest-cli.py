@@ -62,8 +62,11 @@ def input_parser():
                         help="leave cyberarmor namespace after running a k8s test, default if false")
     parser.add_argument("-temp", "--temp-dir", action="store", default=os.path.abspath("temp"),
                         help="temp dir location. default: ./temp", required=False)
+    parser.add_argument("--create-first-time-results", action="store_true", default=False,
+                        help="will create first time results", required=False, dest="create_first_time_results")
     parser.add_argument("--kwargs", action="store", required=False, nargs='*', dest='kwargs',
                         help="adding additional values. example: --kwargs k0=v0 k1=v1;v11")
+    
 
     return parser.parse_args()
 
