@@ -193,6 +193,9 @@ RELEVANCY_KIND_LABEL = "kubescape.io/workload-kind"
 RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
 RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
 RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
+RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
+RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
+
 
 # relevancy feature
 HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
@@ -214,6 +217,8 @@ HELM_STORAGE_LIMITS_CPU = "storage.resources.limits.cpu"
 HELM_STORAGE_REQ_MEMORY = "storage.resources.requests.memory"
 HELM_STORAGE_LIMITS_MEMORY = "storage.resources.limits.memory"
 
+# cli arguments
+CREATE_TEST_FIRST_TIME_RESULTS = "create_first_time_results"
 
 class Statistics(object):
     clear_state = "clear"
