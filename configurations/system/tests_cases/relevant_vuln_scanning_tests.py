@@ -83,7 +83,7 @@ class RelevantVulnerabilityScanningTests(object):
             expected_filtered_CVEs = [("redis-sleep" ,"configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
             expected_CVEs = [("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
-            helm_kwargs={"nodeAgent.config.learningPeriod": 2, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
+            helm_kwargs={"nodeAgent.config.learningPeriod": "2m", statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
 
     @staticmethod
