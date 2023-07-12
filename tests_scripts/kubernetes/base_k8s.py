@@ -219,7 +219,7 @@ class BaseK8S(BaseDockerizeTest):
             
             Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
         
-        self.cluster_deleted = True
+            self.cluster_deleted = True
         return True
 
     def apply_secret(self, **kwargs):
