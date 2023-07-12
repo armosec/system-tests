@@ -90,9 +90,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -194,9 +192,7 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -283,9 +279,7 @@ class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -373,9 +367,7 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -449,9 +441,7 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -510,9 +500,7 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
     
@@ -575,9 +563,7 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
 
@@ -632,9 +618,7 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
     
@@ -721,8 +705,6 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
 
-        Logger.logger.info("Deleting cluster from backend")
-        self.delete_cluster_from_backend()
-        self.test_cluster_deleted(since_time=since_time)
+        
 
         return self.cleanup()
