@@ -63,7 +63,7 @@
         ],
         "baseScore": 9,
         "scanningScope": {
-          "matches": [["cluster"]]
+          "matches": ["cluster"]
         }
       },
       {
@@ -235,7 +235,7 @@
         ],
         "baseScore": 6,
         "scanningScope": {
-          "matches": [["cluster"]]
+          "matches": ["cluster"]
         }
       },
       {
@@ -293,7 +293,7 @@
         ],
         "baseScore": 1,
         "scanningScope": {
-          "matches": [["cluster"]]
+          "matches": ["cluster"]
         }
       },
       {
@@ -361,7 +361,7 @@
         ],
         "baseScore": 3,
         "scanningScope": {
-          "matches": [["cluster"]]
+          "matches": ["cluster"]
         }
       },
       {
@@ -428,7 +428,7 @@
         ],
         "baseScore": 4,
         "scanningScope": {
-          "matches": [["cluster"]]
+          "matches": ["cluster"]
         }
       }
     ],

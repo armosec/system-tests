@@ -283,7 +283,7 @@ class KubescapeTests(object):
             account=True,
             framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-scope.json")),
             policy_name="systest-fw-custom-scanning-scope-cluster-only",
-            branch='scanning-scope-support',
+            branch='scope-support',
             scope_control_counter=5,
         )
     
@@ -298,12 +298,12 @@ class KubescapeTests(object):
             yamls=['nginx.yaml'],
             framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-file-scope.json")),
             policy_name="systest-fw-custom-scanning-scope-file",
-            branch='scanning-scope-support',
+            branch='scope-support',
             scope_control_counter=5,
         )
     
     @staticmethod
-    def scan_custom_framework_scanning_cluster_scope_testing():
+    def scan_custom_framework_scanning_cluster_and_file_scope_testing():
         from tests_scripts.kubescape.scan import TestScanningFileScope
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -313,6 +313,6 @@ class KubescapeTests(object):
             yamls=['nginx.yaml'],
             framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-cluster-and-file-scope.json")),
             policy_name="systest-fw-custom-scanning-scope-cluster-and-files",
-            branch='scanning-scope-support',
+            branch='scope-support',
             scope_control_counter=5,
         )
