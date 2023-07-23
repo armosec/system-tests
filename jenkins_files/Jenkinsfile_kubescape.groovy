@@ -2,7 +2,9 @@ def backend = "${env.BACKEND}"
 def ks_branch = "${env.KS_BRANCH}"
 
 // Add ONLY kubescape-CLI tests (do NOT add any HELM related tests)
-def tests = ["scan_nsa":                                                                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+def tests = [
+             "scan_security":                                                                                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_nsa":                                                                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_mitre":                                                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_with_exceptions":                                                                                ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_repository":                                                                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],

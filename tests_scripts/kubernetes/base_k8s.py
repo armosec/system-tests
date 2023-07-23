@@ -196,6 +196,10 @@ class BaseK8S(BaseDockerizeTest):
             Logger.logger.error(e)
 
     def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
+        if self.cluster_deleted:
+            Logger.logger.info("Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
+            return True
+        
         try:
             cluster_name = self.kubernetes_obj.get_cluster_name()
             Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
@@ -215,6 +219,7 @@ class BaseK8S(BaseDockerizeTest):
             
             Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
         
+            self.cluster_deleted = True
         return True
 
     def apply_secret(self, **kwargs):
