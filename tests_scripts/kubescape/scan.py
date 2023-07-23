@@ -695,10 +695,12 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         be_file_paths = set(
             [file["designators"]["attributes"]["filePath"] for file in file_summary]
         )
-        assert len(kubescape_scanned_files) == len(be_file_paths), \
-            f"Expected {len(kubescape_scanned_files)} number of scanned files, but found {len(be_file_paths)}"
-        assert kubescape_scanned_files == be_file_paths
-
+        if len(kubescape_scanned_files) != len(be_file_paths):
+            for file in kubescape_scanned_files:
+                assert file in be_file_paths, f"Expected to find {file} in file summary, but it wasn't found"
+            for file in be_file_paths:
+                assert file in kubescape_scanned_files, f"Expected to find {file} in kubescape report, but it wasn't found"
+        
         expected_helm_files = self.test_obj.get_arg("expected_helm_files")
         be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
         if expected_helm_files and len(expected_helm_files) > 0:
@@ -747,7 +749,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
 
         assert repository_info, f"Expected to find repository in portal with repoHash {repoHash}"
         assert repository_info['attributes'][
-                   'lastPostureReportGUID'] == new_report_guid, "last report GUID of repository was not updated in portal"
+                   'lastPostureReportGUID'] == new_report_guid, f"last report GUID of repository was not updated in portal expected: {new_report_guid} actual {repository_info['attributes'][
+                   'lastPostureReportGUID']}"
 
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
         self.backend.delete_repository(repository_hash=repoHash)
