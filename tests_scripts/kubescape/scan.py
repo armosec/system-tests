@@ -748,10 +748,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         repository_info = next((r for r in customer_repos if r['name'] == repoHash), None)
 
         assert repository_info, f"Expected to find repository in portal with repoHash {repoHash}"
-        assert repository_info['attributes'][
-                   'lastPostureReportGUID'] == new_report_guid, f"last report GUID of repository was not updated in portal expected: {new_report_guid} actual {repository_info['attributes'][
-                   'lastPostureReportGUID']}"
-
+        expected = new_report_guid
+        actual = repository_info['attributes']['lastPostureReportGUID']
+        assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
+        
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
         self.backend.delete_repository(repository_hash=repoHash)
         return statics.SUCCESS, ""
