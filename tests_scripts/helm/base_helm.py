@@ -111,7 +111,6 @@ class BaseHelm(BaseK8S):
         self.remove_armo_system_namespace = True
         self.remove_cluster_from_backend = True
 
-
     def get_in_cluster_tags(self):
         component_tag = {}
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.KUBESCAPE_COMPONENT_NAME,
@@ -126,6 +125,9 @@ class BaseHelm(BaseK8S):
                                                           component_tag=statics.GATEWAY_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.STORAGE_COMPONENT_NAME,
                                                           component_tag=statics.STORAGE_COMPONENT_TAG))
+        component_tag.update(self.extract_tag_from_kwargs(component_name=statics.NODE_AGENT_COMPONENT_NAME,
+                                                          component_tag=statics.STORAGE_COMPONENT_TAG))
+
         return component_tag
 
     def extract_tag_from_kwargs(self, component_name, component_tag):
