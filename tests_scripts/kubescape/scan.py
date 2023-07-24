@@ -397,7 +397,8 @@ class ScanWithCustomFramework(BaseKubescape):
         Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.report_fw['name'],
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-
+        
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Stage 2.2: Get report-guid")
         report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            framework_name=self.report_fw['name'], old_report_guid=old_report_guid)
@@ -451,6 +452,7 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")    
         Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
         self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
@@ -603,7 +605,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 account=self.test_obj.get_arg("account"),
                 url=git_repository.url,
             )
-
+            
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Testing kubescape results")
         self.test_counters(framework_report=kubescape_report)
 
