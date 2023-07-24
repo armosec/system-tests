@@ -361,6 +361,7 @@ class BaseKubescape(BaseK8S):
     def load_results(results_file):
         with open(results_file, 'r') as f:
             res = json.loads(f.read())
+        Logger.logger.debug("results: {}".format(res))
         return res
 
     @staticmethod
