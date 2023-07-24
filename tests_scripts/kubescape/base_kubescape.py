@@ -80,7 +80,7 @@ class BaseKubescape(BaseK8S):
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
-        self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
+        self.environment = '' if self.test_driver.backend_obj == None or self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
         self.remove_cluster_from_backend = False
 
