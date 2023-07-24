@@ -70,27 +70,26 @@ class RelevantCVEs(BaseVulnerabilityScanning):
 
         # # P4 get CVEs results
         # # 4.1 get summary result
-        Logger.logger.info('Get the scan result from Backend')
-        expected_number_of_pods = self.get_expected_number_of_pods(
-            namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
-                                             namespace=namespace, since_time=since_time,
-                                             expected_results=expected_number_of_pods)
-        self.test_no_errors_in_scan_result(be_summary)
+        if self.backend != None:
+            Logger.logger.info('Get the scan result from Backend')
+            expected_number_of_pods = self.get_expected_number_of_pods(
+                namespace=namespace)
+            be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+                                                namespace=namespace, since_time=since_time,
+                                                expected_results=expected_number_of_pods)
+            self.test_no_errors_in_scan_result(be_summary)
 
-        # # 4.2 get container scan id
-        containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-        # # 4.3 get CVEs for containers
+            # # 4.2 get container scan id
+            containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
+            # # 4.3 get CVEs for containers
 
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
-                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = expected_number_of_pods)
+            self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                        be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                            statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = expected_number_of_pods)
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
-
-        
 
         return self.cleanup()
 
@@ -178,15 +177,16 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
 
         # P4 check result
         # 4.1 check results
-        Logger.logger.info('Test no errors in results')
-        self.test_no_errors_in_scan_result(be_summary)
+        if self.backend != None:
+            Logger.logger.info('Test no errors in results')
+            self.test_no_errors_in_scan_result(be_summary)
 
-        containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-    
-        Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
-                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
+            containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
+        
+            Logger.logger.info('Test backend CVEs against storage CVEs')
+            self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                        be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                            statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -256,30 +256,28 @@ class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
         Logger.logger.info('Validate filtered CVEs was created with expected data')
         self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"],namespace=namespace)
 
-        Logger.logger.info('Get the scan result from Backend')
-        be_summary, _ = self.wait_for_report(timeout=560, report_type=self.backend.get_scan_results_sum_summary,
-                                             namespace=namespace, since_time=since_time,
-                                             expected_results=self.get_expected_number_of_pods(
-                                                 namespace=namespace))
+        if self.backend != None:
+            Logger.logger.info('Get the scan result from Backend')
+            be_summary, _ = self.wait_for_report(timeout=560, report_type=self.backend.get_scan_results_sum_summary,
+                                                namespace=namespace, since_time=since_time,
+                                                expected_results=self.get_expected_number_of_pods(
+                                                    namespace=namespace))
 
-        # P4 check result
-        # 4.1 check results
-        Logger.logger.info('Test no errors in results')
-        self.test_no_errors_in_scan_result(be_summary)
+            # P4 check result
+            # 4.1 check results
+            Logger.logger.info('Test no errors in results')
+            self.test_no_errors_in_scan_result(be_summary)
 
-        containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-    
-        Logger.logger.info('Test backend CVEs against storage CVEs')
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
-                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
+            containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
         
+            Logger.logger.info('Test backend CVEs against storage CVEs')
+            self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                        be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                            statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
         
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
-
-        
 
         return self.cleanup()
 
@@ -344,30 +342,29 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
 
         # # P4 get CVEs results
         # # 4.1 get summary result
-        Logger.logger.info('Get the scan result from Backend')
-        expected_number_of_pods = self.get_expected_number_of_pods(
-            namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
-                                             namespace=namespace, since_time=since_time,
-                                             expected_results=expected_number_of_pods)
-        
-        Logger.logger.info('Test no errors in scan result')
-        self.test_no_errors_in_scan_result(be_summary)
+        if self.backend != None:
+            Logger.logger.info('Get the scan result from Backend')
+            expected_number_of_pods = self.get_expected_number_of_pods(
+                namespace=namespace)
+            be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+                                                namespace=namespace, since_time=since_time,
+                                                expected_results=expected_number_of_pods)
+            
+            Logger.logger.info('Test no errors in scan result')
+            self.test_no_errors_in_scan_result(be_summary)
 
-        # # 4.2 get container scan id
-        containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
+            # # 4.2 get container scan id
+            containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
 
-        # # 4.3 get CVEs for containers
-        Logger.logger.info('Test BE CVEs against storage CVEs')
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
-                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: []})
+            # # 4.3 get CVEs for containers
+            Logger.logger.info('Test BE CVEs against storage CVEs')
+            self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                        be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                            statics.FILTERED_CVES_KEY: []})
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
-
-        
 
         return self.cleanup()
 
@@ -574,6 +571,7 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # agenda:
         # 1. install helm-chart with really small timeout in kubevuln
         # 2. apply workload
@@ -682,24 +680,25 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
-        Logger.logger.info('Get the scan result from Backend')
-        expected_number_of_pods = self.get_expected_number_of_pods(
-            namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
-                                             namespace=namespace, since_time=since_time,
-                                             expected_results=expected_number_of_pods)
-        # P4 check result
-        # 4.1 check results (> from expected result)
-        Logger.logger.info('Test no errors in results')
-        self.test_no_errors_in_scan_result(be_summary)
+        if self.backend != None:
+            Logger.logger.info('Get the scan result from Backend')
+            expected_number_of_pods = self.get_expected_number_of_pods(
+                namespace=namespace)
+            be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+                                                namespace=namespace, since_time=since_time,
+                                                expected_results=expected_number_of_pods)
+            # P4 check result
+            # 4.1 check results (> from expected result)
+            Logger.logger.info('Test no errors in results')
+            self.test_no_errors_in_scan_result(be_summary)
 
-         # # 4.2 get container scan id
-        containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
-        # # 4.3 get CVEs for containers
+            # # 4.2 get container scan id
+            containers_scan_id = self.get_container_scan_id(be_summary=be_summary)
+            # # 4.3 get CVEs for containers
 
-        self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
-                                                     be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
-                                                                                          statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
+            self.test_cve_result(since_time=since_time, containers_scan_id=containers_scan_id,
+                                                        be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
+                                                                                            statics.FILTERED_CVES_KEY: filteredCVEs}, expected_number_of_pods = self.get_expected_number_of_pods(namespace=namespace))
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
