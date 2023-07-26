@@ -135,8 +135,6 @@ class BaseHelm(BaseK8S):
         tag = self.test_driver.kwargs.get(component_tag, '')
         if not tag:
             return {}
-        if component_name == statics.NODE_AGENT_COMPONENT_NAME:
-            return {f'nodeAgent.containers.nodeAgent.image.tag': tag.split(':')[-1]}
         return {f'{component_name}.image.tag': tag.split(':')[-1]}
 
     def download_armo_helm_chart_from_branch(self, branch: str):
