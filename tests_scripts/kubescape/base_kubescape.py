@@ -1006,6 +1006,7 @@ class BaseKubescape(BaseK8S):
         for sf in statics.SECURITY_FRAMEWORKS:
             be__current_security_framework = self.get_posture_frameworks(report_guid=report_guid, framework_name=sf)
             if be__current_security_framework:
+                Logger.logger.debug(f"test_backend_vs_kubescape_result - found security framework: {sf} in backend")
                 be_frameworks.append(be__current_security_framework)
 
         assert _CLI_SUMMARY_DETAILS_FIELD in kubescape_result, "expected key {} is not in kubescape result,kubescape_result: {}".format(
