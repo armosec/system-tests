@@ -1,5 +1,6 @@
 import inspect
 from configurations.system.git_repository import GitRepository
+from .structures import TestConfiguration
 
 # from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
 from .structures import KubescapeConfiguration
@@ -268,4 +269,30 @@ class KubescapeTests(object):
             policy_name='C-0052,C-0069,C-0070,C-0092,C-0093,C-0094,C-0095,C-0096,C-0097,C-0098,C-0099,C-0100',
             submit=False,
             account=False,
+        )
+
+    @staticmethod
+    def unified_configuration_config_view():
+        from tests_scripts.kubescape.config import ConfigView
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigView,
+        )
+    
+    @staticmethod
+    def unified_configuration_config_set():
+        from tests_scripts.kubescape.config import ConfigSet
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigSet,
+            set_key="secretKey",
+            set_value="123",
+        )
+    
+    @staticmethod
+    def unified_configuration_config_delete():
+        from tests_scripts.kubescape.config import ConfigDelete
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigDelete,
         )

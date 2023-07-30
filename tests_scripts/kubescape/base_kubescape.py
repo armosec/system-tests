@@ -89,6 +89,11 @@ class BaseKubescape(BaseK8S):
         self.scan(output_format="json", output=res_file, **kwargs)
         return self.load_results(results_file=res_file)
 
+    def default_config(self, **kwargs):
+        res_file = self.get_default_results_file()
+        with open(res_file, "w") as f:
+            return self.config(stdout=f,**kwargs)
+
     def cleanup(self, **kwargs):
         if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
@@ -98,6 +103,9 @@ class BaseKubescape(BaseK8S):
 
     def get_default_results_file(self):
         return os.path.join(self.test_driver.temp_dir, "results.json")
+    
+    def get_kubescape_config_file(self):
+        return os.path.join(os.path.expanduser('~'), ".kubescape", "config.json")
 
     def download_control_input(self):
         output_file = os.path.join(self.test_driver.temp_dir, 'controls-inputs.json')
@@ -130,6 +138,26 @@ class BaseKubescape(BaseK8S):
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
         assert status_code == 0, res
         return res
+
+    def config(self, **kwargs):
+        command = [self.kubescape_exec, "config"]
+        if "view" in kwargs:
+            command.append(kwargs["view"])
+        elif "set" in kwargs:
+            command.append(kwargs["set"])
+            command.append(kwargs["data"][0])
+            command.append(kwargs["data"][1])
+        elif "delete" in kwargs:
+            command.append(kwargs["delete"])
+
+        Logger.logger.info(" ".join(command))
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+
 
     def scan(self, policy_scope: str = None, policy_name: str = None, output_format: str = None, output: str = None,
              **kwargs):
@@ -361,6 +389,13 @@ class BaseKubescape(BaseK8S):
     def load_results(results_file):
         with open(results_file, 'r') as f:
             res = json.loads(f.read())
+        Logger.logger.debug("results: {}".format(res))
+        return res
+
+    @staticmethod
+    def load_bytes_results(data, results_file):
+        with open(results_file, 'r') as f:
+            res = json.loads(data)
         Logger.logger.debug("results: {}".format(res))
         return res
 
