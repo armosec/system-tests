@@ -135,8 +135,6 @@ class BaseHelm(BaseK8S):
         tag = self.test_driver.kwargs.get(component_tag, '')
         if not tag:
             return {}
-        if component_name == statics.NODE_AGENT_COMPONENT_NAME:
-            return {f'nodeAgent.containers.nodeAgent.image.tag': tag.split(':')[-1]}
         return {f'{component_name}.image.tag': tag.split(':')[-1]}
 
     def download_armo_helm_chart_from_branch(self, branch: str):
@@ -145,7 +143,7 @@ class BaseHelm(BaseK8S):
                         self.test_driver.temp_dir]
 
         TestUtil.run_command(command_args=command_args, timeout=360)
-        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, self.helm_armo_repo)
+        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, statics.HELM_REPO_FROM_LOCAL)
 
     def test_helm_chart_tesults(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
