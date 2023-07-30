@@ -28,6 +28,7 @@ class BaseHelm(BaseK8S):
         self.remove_cluster_from_backend = False
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
+        self.disable_security = self.test_obj[("disable_security", False)]
 
     
     @staticmethod
@@ -104,6 +105,11 @@ class BaseHelm(BaseK8S):
             
             helm_kwargs.update(helm_proxy_params)
 
+        if self.disable_security:
+            security_params = {"operator.triggerSecurityFramework": "false"}
+            helm_kwargs.update(security_params)
+
+        
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid(),
                                             environment=self.test_driver.backend_obj.get_name(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
