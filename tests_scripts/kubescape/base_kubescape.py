@@ -1003,7 +1003,7 @@ class BaseKubescape(BaseK8S):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
 
         # check if there are also security fw scanned for report_guid
-        if not self.disable_security:
+        if self.enable_security:
             for sf in statics.SECURITY_FRAMEWORKS:
                 be_current_security_framework = self.get_posture_frameworks(report_guid=report_guid, framework_name=sf)
                 if be_current_security_framework:
