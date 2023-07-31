@@ -103,6 +103,7 @@ class ScanComplianceScore(BaseKubescape):
                                                  kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. run kubescape scan
         # 2. check the compliance score per control matches the resource counters
@@ -181,6 +182,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                                      kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
         # Logger.logger.info(self.install())
 
@@ -215,6 +217,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. Apply namespace "system-test" and Deployment "apache" to cluster
         # 2. Scanning kubescape without exception and test result with backend
@@ -373,6 +376,7 @@ class ScanWithCustomFramework(BaseKubescape):
         self.report_fw = None
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. Add custom framework to backend and check if success
         # 2. Scanning kubescape with custom framework and test result
@@ -433,6 +437,7 @@ class CustomerConfiguration(BaseKubescape):
         self.original_customer_configuration = None
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. scan yaml file and check expected result that control X without configuration Y passed
         # 2. apply control configuration to backend
@@ -566,6 +571,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         )
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
 
         self.install(branch=self.ks_branch)
