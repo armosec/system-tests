@@ -17,6 +17,7 @@ class EmailSettings(BaseNotifications):
 
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
          # Stage 1: Remove all notification types (weekly and push)
         Logger.logger.info("Stage 1: Remove all notification types (weekly and push)")
         all_notify_types_payload = [

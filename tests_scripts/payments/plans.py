@@ -12,6 +12,7 @@ class Plans(BaseStripe):
         super(Plans, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
     
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
     
         response = self.backend.get_stripe_plans()
         assert "plans" in response.json(), "'plans' not found in response"

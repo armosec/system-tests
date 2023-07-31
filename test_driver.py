@@ -24,7 +24,7 @@ class TestDriver(object):
         # set objects
         self.test_name = test_name
         self.credentials_obj: customers.Credentials = customers.CREDENTIALS
-        self.backend_obj: backends.Backend = backends.BACKENDS[backend]
+        self.backend_obj: backends.Backend = backends.BACKENDS[backend] if backend != '' else None
 
         # other test features
         self.agent_location = kwargs["agent"] if "agent" in kwargs else None
@@ -37,15 +37,17 @@ class TestDriver(object):
     def main(self):
 
         # ControlPanelAPI
-        backend = ControlPanelAPI(user_name=self.credentials_obj.get_name(),
-                                  password=self.credentials_obj.get_password(),
-                                  customer=self.credentials_obj.get_customer(),
-                                  client_id=self.credentials_obj.get_client_id(),
-                                  secret_key=self.credentials_obj.get_secret_key(),
-                                  url=self.backend_obj.get_dashboard_url(),
-                                  auth_url=self.backend_obj.get_auth_url(),
-                                  login_method=self.backend_obj.get_login_method(),
-                                  customer_guid=self.backend_obj.get_customer_guid())
+        backend = None
+        if self.backend_obj != None:
+            backend = ControlPanelAPI(user_name=self.credentials_obj.get_name(),
+                                    password=self.credentials_obj.get_password(),
+                                    customer=self.credentials_obj.get_customer(),
+                                    client_id=self.credentials_obj.get_client_id(),
+                                    secret_key=self.credentials_obj.get_secret_key(),
+                                    url=self.backend_obj.get_dashboard_url(),
+                                    auth_url=self.backend_obj.get_auth_url(),
+                                    login_method=self.backend_obj.get_login_method(),
+                                    customer_guid=self.backend_obj.get_customer_guid())
 
         status = statics.FAILURE
         summary = ""

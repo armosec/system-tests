@@ -58,7 +58,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-        if self.remove_cluster_from_backend and not self.cluster_deleted:
+        if self.remove_cluster_from_backend and not self.cluster_deleted and self.backend != None:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
 
@@ -104,8 +104,8 @@ class BaseHelm(BaseK8S):
             
             helm_kwargs.update(helm_proxy_params)
 
-        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid(),
-                                            environment=self.test_driver.backend_obj.get_name(),
+        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
+                                            environment=self.test_driver.backend_obj.get_name() if self.backend != None else "",
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True
