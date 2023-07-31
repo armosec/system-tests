@@ -191,6 +191,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                           auto_protect=False)
         Logger.logger.info('Stage 1.2: apply deployment "apache" to cluster')
         self.apply_yaml_file(yaml_file=self.test_obj.get_arg("yaml"), namespace=namespace)
+        TestUtil.sleep(30, "wait for kubescape scan to report", "info")
 
         old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name"))
@@ -199,7 +200,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
