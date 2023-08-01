@@ -11,6 +11,7 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         # P1 Install Wikijs
@@ -58,6 +59,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                                              kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         self.ignore_agent = True

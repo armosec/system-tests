@@ -101,6 +101,7 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
+HELM_REPO_FROM_LOCAL = "charts/kubescape-cloud-operator"
 HELM_REPO = "kubescape/kubescape-cloud-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
@@ -159,6 +160,7 @@ KUBEVULN_COMPONENT_NAME = 'kubevuln'
 KOLLECTOR_COMPONENT_NAME = 'kollector'
 GATEWAY_COMPONENT_NAME = 'gateway'
 STORAGE_COMPONENT_NAME = 'storage'
+NODE_AGENT_COMPONENT_NAME = 'nodeAgent'
 
 KUBESCAPE_COMPONENT_TAG = 'kubescape-tag'
 OPERATOR_COMPONENT_TAG = 'operator-tag'
@@ -166,6 +168,7 @@ KUBEVULN_COMPONENT_TAG = 'kubevuln-tag'
 KOLLECTOR_COMPONENT_TAG = 'kollector-tag'
 GATEWAY_COMPONENT_TAG = 'gateway-tag'
 STORAGE_COMPONENT_TAG = 'storage-tag'
+NODE_AGENT_COMPONENT_TAG = 'node-agent-tag'
 
 TEST_REGISTRY_CONNECTIVITY_PASSED_STATUS = "Passed"
 TEST_REGISTRY_CONNECTIVITY_FAILED_STATUS = "Failed"

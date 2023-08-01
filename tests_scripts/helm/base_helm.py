@@ -28,6 +28,7 @@ class BaseHelm(BaseK8S):
         self.remove_cluster_from_backend = False
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
+        self.enable_security = self.test_obj[("enable_security", True)]
 
     
     @staticmethod
@@ -58,7 +59,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-        if self.remove_cluster_from_backend and not self.cluster_deleted:
+        if self.remove_cluster_from_backend and not self.cluster_deleted and self.backend != None:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
 
@@ -104,13 +105,17 @@ class BaseHelm(BaseK8S):
             
             helm_kwargs.update(helm_proxy_params)
 
-        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid(),
-                                            environment=self.test_driver.backend_obj.get_name(),
+        if self.enable_security == False:
+            security_params = {"operator.triggerSecurityFramework": "false"}
+            helm_kwargs.update(security_params)
+
+        
+        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
+                                            environment=self.test_driver.backend_obj.get_name() if self.backend != None else "",
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True
         self.remove_cluster_from_backend = True
-
 
     def get_in_cluster_tags(self):
         component_tag = {}
@@ -126,6 +131,9 @@ class BaseHelm(BaseK8S):
                                                           component_tag=statics.GATEWAY_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.STORAGE_COMPONENT_NAME,
                                                           component_tag=statics.STORAGE_COMPONENT_TAG))
+        component_tag.update(self.extract_tag_from_kwargs(component_name=statics.NODE_AGENT_COMPONENT_NAME,
+                                                          component_tag=statics.STORAGE_COMPONENT_TAG))
+
         return component_tag
 
     def extract_tag_from_kwargs(self, component_name, component_tag):
@@ -141,7 +149,7 @@ class BaseHelm(BaseK8S):
                         self.test_driver.temp_dir]
 
         TestUtil.run_command(command_args=command_args, timeout=360)
-        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, self.helm_armo_repo)
+        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, statics.HELM_REPO_FROM_LOCAL)
 
     def test_helm_chart_tesults(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)

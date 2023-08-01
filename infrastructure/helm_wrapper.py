@@ -35,6 +35,9 @@ class HelmWrapper(object):
         # by default use offline vuln DB
         command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
 
+        # disable security framework scan
+        # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
+
         #node agent resources
         # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_CPU}=1000m"])
         # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_CPU}=1000m"])

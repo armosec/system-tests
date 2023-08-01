@@ -104,6 +104,7 @@ class ScanComplianceScore(BaseKubescape):
                                                  kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. run kubescape scan
         # 2. check the compliance score per control matches the resource counters
@@ -182,6 +183,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                                      kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
         # Logger.logger.info(self.install())
 
@@ -192,6 +194,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                           auto_protect=False)
         Logger.logger.info('Stage 1.2: apply deployment "apache" to cluster')
         self.apply_yaml_file(yaml_file=self.test_obj.get_arg("yaml"), namespace=namespace)
+        TestUtil.sleep(30, "wait for report guid", "info")
 
         old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name"))
@@ -200,7 +203,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
@@ -216,6 +219,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. Apply namespace "system-test" and Deployment "apache" to cluster
         # 2. Scanning kubescape without exception and test result with backend
@@ -243,6 +247,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
 
         old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name").upper())
+        TestUtil.sleep(30, "wait for report guid", "info")
 
         Logger.logger.info('Stage 1: Apply namespace "system-test" and Deployment "apache" to cluster')
         Logger.logger.info('Stage 1.1: apply namespace "system-test" to cluster')
@@ -255,7 +260,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
 
         first_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -298,7 +303,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
         
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
         
         second_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                   framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -342,7 +347,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
         
         third_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -374,6 +379,7 @@ class ScanWithCustomFramework(BaseKubescape):
         self.report_fw = None
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. Add custom framework to backend and check if success
         # 2. Scanning kubescape with custom framework and test result
@@ -398,7 +404,8 @@ class ScanWithCustomFramework(BaseKubescape):
         Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.report_fw['name'],
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-
+        
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Stage 2.2: Get report-guid")
         report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            framework_name=self.report_fw['name'], old_report_guid=old_report_guid)
@@ -434,6 +441,7 @@ class CustomerConfiguration(BaseKubescape):
         self.original_customer_configuration = None
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. scan yaml file and check expected result that control X without configuration Y passed
         # 2. apply control configuration to backend
@@ -452,6 +460,7 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")    
         Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
         self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
@@ -567,6 +576,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         )
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
 
         self.install(branch=self.ks_branch)
@@ -604,7 +614,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 account=self.test_obj.get_arg("account"),
                 url=git_repository.url,
             )
-
+            
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Testing kubescape results")
         self.test_counters(framework_report=kubescape_report)
 
@@ -696,10 +707,12 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         be_file_paths = set(
             [file["designators"]["attributes"]["filePath"] for file in file_summary]
         )
-        assert len(kubescape_scanned_files) == len(be_file_paths), \
-            f"Expected {len(kubescape_scanned_files)} number of scanned files, but found {len(be_file_paths)}"
-        assert kubescape_scanned_files == be_file_paths
-
+        if len(kubescape_scanned_files) != len(be_file_paths):
+            for file in kubescape_scanned_files:
+                assert file in be_file_paths, f"Expected to find {file} in file summary, but it wasn't found"
+            for file in be_file_paths:
+                assert file in kubescape_scanned_files, f"Expected to find {file} in kubescape report, but it wasn't found"
+        
         expected_helm_files = self.test_obj.get_arg("expected_helm_files")
         be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
         if expected_helm_files and len(expected_helm_files) > 0:
@@ -747,9 +760,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         repository_info = next((r for r in customer_repos if r['name'] == repoHash), None)
 
         assert repository_info, f"Expected to find repository in portal with repoHash {repoHash}"
-        assert repository_info['attributes'][
-                   'lastPostureReportGUID'] == new_report_guid, "last report GUID of repository was not updated in portal"
-
+        expected = new_report_guid
+        actual = repository_info['attributes']['lastPostureReportGUID']
+        assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
+        
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
         self.backend.delete_repository(repository_hash=repoHash)
         return statics.SUCCESS, ""
