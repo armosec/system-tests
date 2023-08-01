@@ -778,15 +778,13 @@ class TestScanningScope(BaseKubescape):
         # 1. Scanning kubescape with custom framework and test result
 
         Logger.logger.info("Stage 1: Installing kubescape")
-        # Logger.logger.info(self.install())
-        self.install(branch=self.test_obj.get_arg("branch"))
+        self.install()
 
-        Logger.logger.info("Stage 2: Scanning kubescape with custom framework and test result")
-        Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
+        Logger.logger.info("Stage 2: Scanning kubescape with custom-fw")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.get_arg("policy_name"),
-                                       account=self.test_obj.get_arg("account"), use_from=self.test_obj.get_arg("framework_file"))
+                                       keep_local=self.test_obj.get_arg("keep_local"), use_from=self.test_obj.get_arg("framework_file"))
 
-        Logger.logger.info("Stage 3: Test Scanning kubescape with custom framework and test result")
+        Logger.logger.info("Stage 3: Testing result")
         self.test_result(cli_result=cli_result, scope_control_counter=self.test_obj.get_arg("scope_control_counter"))
         return self.cleanup()
     
@@ -807,15 +805,13 @@ class TestScanningFileScope(BaseKubescape):
         # 1. Scanning kubescape with custom framework and test result
 
         Logger.logger.info("Stage 1: Installing kubescape")
-        # Logger.logger.info(self.install())
-        self.install(branch=self.test_obj.get_arg("branch"))
+        self.install()
 
-        Logger.logger.info("Stage 2: Scanning kubescape with custom framework and test result")
-        Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
+        Logger.logger.info("Stage 2: Scanning kubescape with custom-fw")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.get_arg("policy_name"),
-                                       account=self.test_obj.get_arg("account"), use_from=self.test_obj.get_arg("framework_file"), yamls=self.test_obj.get_arg("yamls"))
+                                       keep_local=self.test_obj.get_arg("keep_local"), use_from=self.test_obj.get_arg("framework_file"), yamls=self.test_obj.get_arg("yamls"))
 
-        Logger.logger.info("Stage 3: Test Scanning kubescape with custom framework and test result")
+        Logger.logger.info("Stage 3: Testing result")
         self.test_result(cli_result=cli_result, scope_control_counter=self.test_obj.get_arg("scope_control_counter"))
         return self.cleanup()
     

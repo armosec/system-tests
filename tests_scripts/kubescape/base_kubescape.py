@@ -152,6 +152,8 @@ class BaseKubescape(BaseK8S):
             command.extend(["--output", output])
         if "exceptions" in kwargs:
             command.extend(["--exceptions", kwargs['exceptions']])
+        if "keep_local" in kwargs:
+            command.append("--keep-local")
         if "submit" in kwargs:
             command.append("--submit")
             self.remove_cluster_from_backend = True

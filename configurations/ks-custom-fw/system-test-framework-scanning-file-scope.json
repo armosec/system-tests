@@ -2,6 +2,12 @@
   "name": "systest-fw-custom-scanning-scope-file",
   "description": "framework checking scanning scope for system test for file",
   "typeTags": null,
+  "scanningScope": {
+    "matches": [
+        "cluster",
+        "file"
+    ]
+  },
   "controls": [
     {
       "rulesIDs": [
