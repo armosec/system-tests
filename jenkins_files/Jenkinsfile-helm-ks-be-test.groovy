@@ -53,6 +53,7 @@ def tests = [
             "stripe_webhook" :                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_billing_portal":           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 
