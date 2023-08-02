@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   pr_agent_job:
-    if: ${{ contains( github.event.pull_request.labels.*.name, 'AI') }} 
+    # if: ${{ contains( github.event.pull_request.labels.*.name, 'AI') }} 
     runs-on: ubuntu-latest
     name: Run pr agent on every pull request, respond to user comments
     steps:
