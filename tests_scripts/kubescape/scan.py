@@ -193,6 +193,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                           auto_protect=False)
         Logger.logger.info('Stage 1.2: apply deployment "apache" to cluster')
         self.apply_yaml_file(yaml_file=self.test_obj.get_arg("yaml"), namespace=namespace)
+        TestUtil.sleep(30, "wait for report guid", "info")
 
         old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name"))
@@ -201,7 +202,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
 
         Logger.logger.info("Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
@@ -245,6 +246,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
 
         old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name").upper())
+        TestUtil.sleep(30, "wait for report guid", "info")
 
         Logger.logger.info('Stage 1: Apply namespace "system-test" and Deployment "apache" to cluster')
         Logger.logger.info('Stage 1.1: apply namespace "system-test" to cluster')
@@ -257,7 +259,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
 
         first_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -300,7 +302,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
         
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
         
         second_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                   framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -344,7 +346,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
+        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
         
         third_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
@@ -401,7 +403,8 @@ class ScanWithCustomFramework(BaseKubescape):
         Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.report_fw['name'],
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-
+        
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Stage 2.2: Get report-guid")
         report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            framework_name=self.report_fw['name'], old_report_guid=old_report_guid)
@@ -456,6 +459,7 @@ class CustomerConfiguration(BaseKubescape):
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")    
         Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
         self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
@@ -609,7 +613,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 account=self.test_obj.get_arg("account"),
                 url=git_repository.url,
             )
-
+            
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
         Logger.logger.info("Testing kubescape results")
         self.test_counters(framework_report=kubescape_report)
 

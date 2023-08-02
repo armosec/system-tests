@@ -82,7 +82,9 @@ API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
 API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
-API_NOTIFICATIONS_UNSUBSCRIBE =  "/api/v1/notifications/unsubscribe"
+API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
+API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
+
 
 def deco_cookie(func):
 
@@ -1872,7 +1874,72 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
+    def get_all_alert_channels(self) -> requests.Response:
+        res = self.get(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get all channel alerts "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
 
+    def get_alert_channel(self, guid) -> requests.Response:
+        res = self.get(API_NOTIFICATIONS_ALERTCHANNEL + "/" + guid, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get channel alerts "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def create_alert_channel(self) -> requests.Response:
+        payload = json.dumps(
+                {
+                    "channel": {
+                        "name": "My Teams Channel",
+                        "provider": "teams",
+                        "context": {
+                            "webhook": {
+                                "name": "webhook",
+                                "id": "https://teams/mywebhook"
+                            }
+                        }
+                    },
+                    "notifications": [
+                        {
+                            "notificationType": "push:newClusterAdmin",
+                            "disabled": True
+                        }
+                    ],
+                    "scope": [
+                        {
+                            "cluster": "cluster1",
+                            "namespaces": ["test-system"]
+                        }
+                    ]
+                }
+        )
+
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=payload)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: create channel alert "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def update_alert_channel(self, alert_channel) -> requests.Response:
+        res = self.put(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, json=alert_channel)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update channel alert "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def remove_alert_channel(self, guid) -> requests.Response:
+        res = self.delete(API_NOTIFICATIONS_ALERTCHANNEL + "/" + guid, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: delete channel alert "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
 
 class Solution(object):
     """docstring for Solution"""
