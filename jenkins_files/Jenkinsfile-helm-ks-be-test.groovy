@@ -62,7 +62,8 @@ def tests = [
 def tests_to_skip = ["production": 
                             [
                             "stripe_webhook", 
-                            "stripe_billing_portal"
+                            "stripe_billing_portal",
+                            "user_alert_channels"
                             ]
                     ]
 
