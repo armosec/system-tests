@@ -1,0 +1,448 @@
+{
+    "name": "systest-fw-custom-scanning-scope-cluster-only",
+    "description": "framework checking scanning scope for system test for cluster",
+    "typeTags": null,
+    "scanningScope": {
+      "matches": [
+          "cluster",
+          "file"
+      ]
+    },
+    "controls": [
+      {
+        "rulesIDs": [
+          ""
+        ],
+        "guid": "",
+        "name": "API server insecure port is enabled",
+        "attributes": {
+          "armoBuiltin": true,
+          "attackTracks": [
+            {
+              "attackTrack": "kubeapi",
+              "categories": [
+                "Initial access"
+              ]
+            }
+          ],
+          "controlTypeTags": [
+            "security",
+            "compliance"
+          ]
+        },
+        "controlID": "C-0005",
+        "creationTime": "",
+        "description": "Kubernetes control plane API is running with non-secure port enabled which allows attackers to gain unprotected access to the cluster.",
+        "remediation": "Set the insecure-port flag of the API server to zero.",
+        "rules": [
+          {
+            "guid": "",
+            "name": "insecure-port-flag",
+            "attributes": {
+              "armoBuiltin": true
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\nimport data.cautils as cautils\n\n# Fails if pod has insecure-port flag enabled\ndeny[msga] {\n    pod := input[_]\n    pod.kind == \"Pod\"\n\tcontains(pod.metadata.name, \"kube-apiserver\")\n    container := pod.spec.containers[i]\n\tpath = is_insecure_port_flag(container, i)\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"The API server container: %v has insecure-port flag enabled\", [ container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [path],\n\t\t\"fixPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [pod]\n\t\t}\n\t}\n}\n\t\nis_insecure_port_flag(container, i) = path {\n\tcommand := container.command[j]\n\tcontains(command, \"--insecure-port=1\")\n\tpath := sprintf(\"spec.containers[%v].command[%v]\", [format_int(i, 10), format_int(j, 10)])\n}",
+            "resourceEnumerator": "package armo_builtins\nimport data.cautils as cautils\n\n# Fails if pod has insecure-port flag enabled\ndeny[msga] {\n    pod := input[_]\n    pod.kind == \"Pod\"\n\tcontains(pod.metadata.name, \"kube-apiserver\")\n    container := pod.spec.containers[_]\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"The API server container: %v has insecure-port flag enabled\", [ container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [pod]\n\t\t}\n\t}\n}\n",
+            "ruleLanguage": "Rego",
+            "match": [
+              {
+                "apiGroups": [
+                  ""
+                ],
+                "apiVersions": [
+                  "v1"
+                ],
+                "resources": [
+                  "Pod"
+                ]
+              }
+            ],
+            "ruleDependencies": [],
+            "configInputs": null,
+            "controlConfigInputs": null,
+            "description": "fails if the api server has insecure-port enabled",
+            "remediation": "Make sure that the insecure-port flag of the api server is set to 0",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          }
+        ],
+        "baseScore": 9,
+        "scanningScope": {
+          "matches": ["cluster"]
+        }
+      },
+      {
+        "rulesIDs": [
+          "",
+          ""
+        ],
+        "guid": "",
+        "name": "Exposed sensitive interfaces",
+        "attributes": {
+          "armoBuiltin": true,
+          "controlTypeTags": [
+            "compliance"
+          ],
+          "microsoftMitreColumns": [
+            "Initial access"
+          ],
+          "actionRequired": "configuration"
+        },
+        "controlID": "C-0021",
+        "creationTime": "",
+        "description": "Exposing a sensitive interface to the internet poses a security risk. It might enable attackers to run malicious code or deploy containers in the cluster. This control checks if known components (e.g. Kubeflow, Argo Workflows, etc.) are deployed and exposed services externally.",
+        "remediation": "Consider blocking external interfaces or protect them with appropriate security tools.",
+        "rules": [
+          {
+            "guid": "",
+            "name": "exposed-sensitive-interfaces",
+            "attributes": {
+              "armoBuiltin": true,
+              "microsoftK8sThreatMatrix": "Initial access::Exposed sensitive interfaces",
+              "useUntilKubescapeVersion": "v1.0.133"
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\nimport data.kubernetes.api.client as client\nimport data\n\n# loadbalancer\ndeny[msga] {\n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"LoadBalancer\"\n\n\twl := input[_]\n\tworkload_types = {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\", \"Pod\", \"CronJob\"}\n\tworkload_types[wl.kind]\n\tresult := wl_connectedto_service(wl, service)\n    \n    # see default-config-inputs.json for list values\n    services_names := data.postureControlInputs.servicesNames\n\tservices_names[service.metadata.name]\n    # externalIP := service.spec.externalIPs[_]\n\texternalIP := service.status.loadBalancer.ingress[0].ip\n\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [wl, service]\n\t\t}\n\t}\n}\n\n\n# nodePort\n# get a pod connected to that service, get nodeIP (hostIP?)\n# use ip + nodeport\ndeny[msga] {\n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"NodePort\"\n    \n    # see default-config-inputs.json for list values\n    services_names := data.postureControlInputs.servicesNames\n\tservices_names[service.metadata.name]\n    \n\tpod := input[_]\n\tpod.kind == \"Pod\"\n\n\tresult := wl_connectedto_service(pod, service)\n\n\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [pod, service]\n\t\t}\n\t}\n} \n\n# nodePort\n# get a workload connected to that service, get nodeIP (hostIP?)\n# use ip + nodeport\ndeny[msga] {\n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"NodePort\"\n    \n    # see default-config-inputs.json for list values\n    services_names := data.postureControlInputs.servicesNames\n\tservices_names[service.metadata.name]\n    \n\twl := input[_]\n\tspec_template_spec_patterns := {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\", \"CronJob\"}\n\tspec_template_spec_patterns[wl.kind]\n\n\tresult := wl_connectedto_service(wl, service)\n\n\tpods_resource := client.query_all(\"pods\")\n\tpod := pods_resource.body.items[_]\n\tmy_pods := [pod | startswith(pod.metadata.name, wl.metadata.name)]\n\n\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [wl, service]\n\t\t}\n\t}\n}\n\n# ====================================================================================\n\nwl_connectedto_service(wl, service) = paths{\n\tcount({x | service.spec.selector[x] == wl.metadata.labels[x]}) == count(service.spec.selector)\n\tpaths = [\"spec.selector.matchLabels\", \"service.spec.selector\"]\n}\n\nwl_connectedto_service(wl, service) = paths {\n\twl.spec.selector.matchLabels == service.spec.selector\n\tpaths = [\"spec.selector.matchLabels\", \"service.spec.selector\"]\n}\n",
+            "resourceEnumerator": "",
+            "ruleLanguage": "Rego",
+            "match": [
+              {
+                "apiGroups": [
+                  ""
+                ],
+                "apiVersions": [
+                  "v1"
+                ],
+                "resources": [
+                  "Pod",
+                  "Service"
+                ]
+              },
+              {
+                "apiGroups": [
+                  "apps"
+                ],
+                "apiVersions": [
+                  "v1"
+                ],
+                "resources": [
+                  "Deployment",
+                  "ReplicaSet",
+                  "DaemonSet",
+                  "StatefulSet"
+                ]
+              },
+              {
+                "apiGroups": [
+                  "batch"
+                ],
+                "apiVersions": [
+                  "*"
+                ],
+                "resources": [
+                  "Job",
+                  "CronJob"
+                ]
+              }
+            ],
+            "ruleDependencies": [
+              {
+                "packageName": "kubernetes.api.client"
+              }
+            ],
+            "configInputs": [
+              "settings.postureControlInputs.servicesNames"
+            ],
+            "controlConfigInputs": [
+              {
+                "path": "settings.postureControlInputs.servicesNames",
+                "name": "Service names",
+                "description": "Kubescape will look for the following services that exposes sensitive interfaces of common K8s projects/applications"
+              }
+            ],
+            "description": "fails if known interfaces have exposed services",
+            "remediation": "",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          },
+          {
+            "guid": "",
+            "name": "exposed-sensitive-interfaces-v1",
+            "attributes": {
+              "useFromKubescapeVersion": "v1.0.133",
+              "armoBuiltin": true,
+              "microsoftK8sThreatMatrix": "Initial access::Exposed sensitive interfaces"
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\nimport data.kubernetes.api.client as client\nimport data\n\n# loadbalancer\ndeny[msga] {\n\twl := input[_]\n\tworkload_types = {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\", \"Pod\", \"CronJob\"}\n\tworkload_types[wl.kind]\n\n    # see default-config-inputs.json for list values\n    wl_names := data.postureControlInputs.sensitiveInterfaces\n\twl_name := wl_names[_]\n\tcontains(wl.metadata.name, wl_name)\n\n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"LoadBalancer\"\n\n\tresult := wl_connectedto_service(wl, service)\n    \n    # externalIP := service.spec.externalIPs[_]\n\texternalIP := service.status.loadBalancer.ingress[0].ip\n\n\twlvector = {\"name\": wl.metadata.name,\n\t\t\t\t\"namespace\": wl.metadata.namespace,\n\t\t\t\t\"kind\": wl.kind,\n\t\t\t\t\"relatedObjects\": [service]}\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"fixPaths\":[],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [],\n            \"externalObjects\": wlvector\n\t\t}\n\t}\n}\n\n\n# nodePort\n# get a pod connected to that service, get nodeIP (hostIP?)\n# use ip + nodeport\ndeny[msga] {\n\twl := input[_]\n\twl.kind == \"Pod\"\n    \n    # see default-config-inputs.json for list values\n    wl_names := data.postureControlInputs.sensitiveInterfaces\n\twl_name := wl_names[_]\n\tcontains(wl.metadata.name, wl_name)\n    \n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"NodePort\"\n\n\tresult := wl_connectedto_service(wl, service)\n\n\twlvector = {\"name\": wl.metadata.name,\n\t\t\t\t\"namespace\": wl.metadata.namespace,\n\t\t\t\t\"kind\": wl.kind,\n\t\t\t\t\"relatedObjects\": [service]}\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"fixPaths\":[],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [],\n            \"externalObjects\": wlvector\n\t\t}\n\t}\n} \n\n# nodePort\n# get a workload connected to that service, get nodeIP (hostIP?)\n# use ip + nodeport\ndeny[msga] {\n\twl := input[_]\n\tspec_template_spec_patterns := {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\", \"CronJob\"}\n\tspec_template_spec_patterns[wl.kind]\n    \n    # see default-config-inputs.json for list values\n    wl_names := data.postureControlInputs.sensitiveInterfaces\n\twl_name := wl_names[_]\n\tcontains(wl.metadata.name, wl_name)\n    \n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\tservice.spec.type == \"NodePort\"\n\n\tresult := wl_connectedto_service(wl, service)\n\n\twlvector = {\"name\": wl.metadata.name,\n\t\t\t\t\"namespace\": wl.metadata.namespace,\n\t\t\t\t\"kind\": wl.kind,\n\t\t\t\t\"relatedObjects\": [service]}\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"service: %v is exposed\", [service.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": result,\n\t\t\"fixPaths\":[],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [],\n            \"externalObjects\": wlvector\n\t\t}\n\t}\n}\n\n# ====================================================================================\n\nwl_connectedto_service(wl, service) = paths{\n\tcount({x | service.spec.selector[x] == wl.metadata.labels[x]}) == count(service.spec.selector)\n\tpaths = [\"spec.selector.matchLabels\", \"service.spec.selector\"]\n}\n\nwl_connectedto_service(wl, service) = paths {\n\twl.spec.selector.matchLabels == service.spec.selector\n\tpaths = [\"spec.selector.matchLabels\", \"service.spec.selector\"]\n}",
+            "resourceEnumerator": "package armo_builtins\nimport data.kubernetes.api.client as client\nimport data\n\ndeny[msga] {\n\twl := input[_]\n\tworkload_types = {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\", \"Pod\", \"CronJob\"}\n\tworkload_types[wl.kind]\n\n\t# see default-config-inputs.json for list values\n\twl_names := data.postureControlInputs.sensitiveInterfaces\n\twl_name := wl_names[_]\n\tcontains(wl.metadata.name, wl_name)\n\n\tsrvc := get_wl_connectedto_service(wl)\n\n\twlvector = {\"name\": wl.metadata.name,\n\t\t\t\t\"namespace\": wl.metadata.namespace,\n\t\t\t\t\"kind\": wl.kind,\n\t\t\t\t\"relatedObjects\": srvc}\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"wl: %v is in the cluster\", [wl.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [],\n\t\t\t\"externalObjects\": wlvector\n\t\t}\n\t}\n}\n\nget_wl_connectedto_service(wl) = s {\n\tservice := \tinput[_]\n\tservice.kind == \"Service\"\n\twl_connectedto_service(wl, service)\n\ts = [service]\n}\n\nget_wl_connectedto_service(wl) = s {\n\tservices := [service | service = input[_]; service.kind == \"Service\"]\n\tcount({i | services[i]; wl_connectedto_service(wl, services[i])}) == 0\n\ts = []\n}\n\nwl_connectedto_service(wl, service){\n\tcount({x | service.spec.selector[x] == wl.metadata.labels[x]}) == count(service.spec.selector)\n}",
+            "ruleLanguage": "Rego",
+            "match": [
+              {
+                "apiGroups": [
+                  ""
+                ],
+                "apiVersions": [
+                  "v1"
+                ],
+                "resources": [
+                  "Pod",
+                  "Service"
+                ]
+              },
+              {
+                "apiGroups": [
+                  "apps"
+                ],
+                "apiVersions": [
+                  "v1"
+                ],
+                "resources": [
+                  "Deployment",
+                  "ReplicaSet",
+                  "DaemonSet",
+                  "StatefulSet"
+                ]
+              },
+              {
+                "apiGroups": [
+                  "batch"
+                ],
+                "apiVersions": [
+                  "*"
+                ],
+                "resources": [
+                  "Job",
+                  "CronJob"
+                ]
+              }
+            ],
+            "ruleDependencies": [
+              {
+                "packageName": "kubernetes.api.client"
+              }
+            ],
+            "configInputs": [
+              "settings.postureControlInputs.sensitiveInterfaces"
+            ],
+            "controlConfigInputs": [
+              {
+                "path": "settings.postureControlInputs.sensitiveInterfaces",
+                "name": "Sensitive interfaces",
+                "description": "The following interfaces were seen exploited. Kubescape checks it they are externally exposed."
+              }
+            ],
+            "description": "fails if known interfaces have exposed services",
+            "remediation": "",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          }
+        ],
+        "baseScore": 6,
+        "scanningScope": {
+          "matches": ["cluster"]
+        }
+      },
+      {
+        "rulesIDs": [
+          ""
+        ],
+        "guid": "",
+        "name": "Kubernetes CronJob",
+        "attributes": {
+          "armoBuiltin": true,
+          "controlTypeTags": [
+            "compliance"
+          ],
+          "microsoftMitreColumns": [
+            "Persistence"
+          ]
+        },
+        "controlID": "C-0026",
+        "creationTime": "",
+        "description": "Attackers may use Kubernetes CronJob for scheduling execution of malicious code that would run as a POD in the cluster. This control lists all the CronJobs that exist in the cluster for the user to approve.",
+        "remediation": "Watch Kubernetes CronJobs and make sure they are legitimate.",
+        "rules": [
+          {
+            "guid": "",
+            "name": "rule-deny-cronjobs",
+            "attributes": {
+              "armoBuiltin": true,
+              "m$K8sThreatMatrix": "Persistence::Kubernetes Cronjob"
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\n\n# alert cronjobs\n\n#handles cronjob\ndeny[msga] {\n\n\twl := input[_]\n\twl.kind == \"CronJob\"\n    msga := {\n\t\t\"alertMessage\": sprintf(\"the following cronjobs are defined: %v\", [wl.metadata.name]),\n\t\t\"alertScore\": 2,\n\t\t\"failedPaths\": [],\n\t\t\"fixPaths\": [],\n\t\t\"packagename\": \"armo_builtins\",\n         \"alertObject\": {\n\t\t\t\"k8sApiObjects\": [wl]\n\t\t}\n     }\n}\n",
+            "resourceEnumerator": "",
+            "ruleLanguage": "rego",
+            "match": [
+              {
+                "apiGroups": [
+                  "*"
+                ],
+                "apiVersions": [
+                  "*"
+                ],
+                "resources": [
+                  "CronJob"
+                ]
+              }
+            ],
+            "ruleDependencies": [],
+            "configInputs": null,
+            "controlConfigInputs": null,
+            "description": "determines if it's cronjob",
+            "remediation": "",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          }
+        ],
+        "baseScore": 1,
+        "scanningScope": {
+          "matches": ["cluster"]
+        }
+      },
+      {
+        "rulesIDs": [
+          ""
+        ],
+        "guid": "",
+        "name": "Malicious admission controller (validating)",
+        "attributes": {
+          "armoBuiltin": true,
+          "attackTracks": [
+            {
+              "attackTrack": "kubeapi",
+              "categories": [
+                "Impact - data destruction",
+                "Impact - service injection"
+              ]
+            }
+          ],
+          "controlTypeTags": [
+            "security",
+            "compliance"
+          ],
+          "microsoftMitreColumns": [
+            "Credential access"
+          ]
+        },
+        "controlID": "C-0036",
+        "creationTime": "",
+        "description": "Attackers can use validating webhooks to intercept and discover all the resources in the cluster. This control lists all the validating webhook configurations that must be verified.",
+        "remediation": "Ensure all the webhooks are necessary. Use exception mechanism to prevent repititive notifications.",
+        "rules": [
+          {
+            "guid": "",
+            "name": "list-all-validating-webhooks",
+            "attributes": {
+              "armoBuiltin": true,
+              "m$K8sThreatMatrix": "Credential Access::Malicious admission controller"
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\n\n\ndeny [msga] {\n    admissionwebhooks := [admissionwebhook | admissionwebhook = input[_]; admissionwebhook.kind == \"ValidatingWebhookConfiguration\"]\n    admissionwebhook := admissionwebhooks[_]\n\n    \tmsga := {\n\t\t\"alertMessage\": sprintf(\"The following validating webhook configuration should be checked %v.\", [admissionwebhook.metadata.name]),\n\t\t\"alertScore\": 6,\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"failedPaths\": [],\n\t\t\"fixPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [admissionwebhook]\n\t\t}\n\t}\n}",
+            "resourceEnumerator": "",
+            "ruleLanguage": "Rego",
+            "match": [
+              {
+                "apiGroups": [
+                  "admissionregistration.k8s.io"
+                ],
+                "apiVersions": [
+                  "*"
+                ],
+                "resources": [
+                  "ValidatingWebhookConfiguration"
+                ]
+              }
+            ],
+            "ruleDependencies": [],
+            "configInputs": null,
+            "controlConfigInputs": null,
+            "description": "Returns validating webhook configurations to be verified",
+            "remediation": "Analyze webhook for malicious behavior",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          }
+        ],
+        "baseScore": 3,
+        "scanningScope": {
+          "matches": ["cluster"]
+        }
+      },
+      {
+        "rulesIDs": [
+          ""
+        ],
+        "guid": "",
+        "name": "Malicious admission controller (mutating)",
+        "attributes": {
+          "armoBuiltin": true,
+          "attackTracks": [
+            {
+              "categories": [
+                "Impact - service injection"
+              ],
+              "attackTrack": "kubeapi"
+            }
+          ],
+          "controlTypeTags": [
+            "security",
+            "compliance"
+          ],
+          "microsoftMitreColumns": [
+            "Persistence"
+          ]
+        },
+        "controlID": "C-0039",
+        "creationTime": "",
+        "description": "Attackers may use mutating webhooks to intercept and modify all the resources in the cluster. This control lists all mutating webhook configurations that must be verified.",
+        "remediation": "Ensure all the webhooks are necessary. Use exception mechanism to prevent repititive notifications.",
+        "rules": [
+          {
+            "guid": "",
+            "name": "list-all-mutating-webhooks",
+            "attributes": {
+              "armoBuiltin": true,
+              "m$K8sThreatMatrix": "Persistence::Malicious admission controller"
+            },
+            "creationTime": "",
+            "rule": "package armo_builtins\n\n\ndeny [msga] {\n    mutatingwebhooks := [mutatingwebhook | mutatingwebhook = input[_]; mutatingwebhook.kind == \"MutatingWebhookConfiguration\"]\n    mutatingwebhook := mutatingwebhooks[_]\n\n    \tmsga := {\n\t\t\"alertMessage\": sprintf(\"The following mutating webhook configuration should be checked %v.\", [mutatingwebhook.metadata.name]),\n\t\t\"alertScore\": 6,\n\t\t\"failedPaths\": [],\n\t\t\"fixPaths\": [],\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [mutatingwebhook]\n\t\t}\n\t}\n}",
+            "resourceEnumerator": "",
+            "ruleLanguage": "Rego",
+            "match": [
+              {
+                "apiGroups": [
+                  "admissionregistration.k8s.io"
+                ],
+                "apiVersions": [
+                  "*"
+                ],
+                "resources": [
+                  "MutatingWebhookConfiguration"
+                ]
+              }
+            ],
+            "ruleDependencies": [],
+            "configInputs": null,
+            "controlConfigInputs": null,
+            "description": "Returns mutating webhook configurations to be verified",
+            "remediation": "Analyze webhook for malicious behavior",
+            "ruleQuery": "armo_builtins",
+            "relevantCloudProviders": null
+          }
+        ],
+        "baseScore": 4,
+        "scanningScope": {
+          "matches": ["cluster"]
+        }
+      }
+    ],
+    "controlsIDs": [
+      "C-0005",
+      "C-0021",
+      "C-0026",
+      "C-0036",
+      "C-0039"
+    ]
+  }

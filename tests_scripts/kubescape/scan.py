@@ -3,6 +3,7 @@ import os
 import subprocess
 from time import perf_counter
 import time
+import json
 
 from configurations.system.git_repository import GitRepository
 from systest_utils import Logger, TestUtil, statics
@@ -766,3 +767,56 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
         self.backend.delete_repository(repository_hash=repoHash)
         return statics.SUCCESS, ""
+
+class TestScanningScope(BaseKubescape):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(TestScanningScope, self).__init__(test_obj=test_obj, backend=backend,
+                                                      kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        # test Agenda:
+        # 1. Scanning kubescape with custom framework and test result
+
+        Logger.logger.info("Stage 1: Installing kubescape")
+        self.install()
+
+        Logger.logger.info("Stage 2: Scanning kubescape with custom-fw")
+        cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.get_arg("policy_name"),
+                                       keep_local=self.test_obj.get_arg("keep_local"), use_from=self.test_obj.get_arg("framework_file"))
+
+        Logger.logger.info("Stage 3: Testing result")
+        self.test_result(cli_result=cli_result, scope_control_counter=self.test_obj.get_arg("scope_control_counter"))
+        return self.cleanup()
+    
+    def test_result(self, cli_result, scope_control_counter):
+        assert len(cli_result['summaryDetails']['controls']) == scope_control_counter, f"cli result: number of controls: {len(cli_result['summaryDetails']['controls'])} should be equal to {scope_control_counter}"
+
+    def cleanup(self):
+        return super().cleanup()
+
+
+class TestScanningFileScope(BaseKubescape):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(TestScanningFileScope, self).__init__(test_obj=test_obj, backend=backend,
+                                                      kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        # test Agenda:
+        # 1. Scanning kubescape with custom framework and test result
+
+        Logger.logger.info("Stage 1: Installing kubescape")
+        self.install()
+
+        Logger.logger.info("Stage 2: Scanning kubescape with custom-fw")
+        cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.get_arg("policy_name"),
+                                       keep_local=self.test_obj.get_arg("keep_local"), use_from=self.test_obj.get_arg("framework_file"), yamls=self.test_obj.get_arg("yamls"))
+
+        Logger.logger.info("Stage 3: Testing result")
+        self.test_result(cli_result=cli_result, scope_control_counter=self.test_obj.get_arg("scope_control_counter"))
+        return self.cleanup()
+    
+    def test_result(self, cli_result, scope_control_counter):
+        assert len(cli_result['summaryDetails']['controls']) == scope_control_counter, f"cli result: number of controls: {len(cli_result['summaryDetails']['controls'])} should be equal to {scope_control_counter}"
+
+    def cleanup(self):
+        return super().cleanup()
