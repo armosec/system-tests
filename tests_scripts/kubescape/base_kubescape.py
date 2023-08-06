@@ -134,7 +134,18 @@ class BaseKubescape(BaseK8S):
         return res
     
     def delete_kubescape_config_file(self, **kwargs):
+        if self.kubescape_exec is None:
+            return "kubescape_exec not found"
         command = [self.kubescape_exec, "config", "delete"]
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+    
+    def view_kubescape_config_file(self, **kwargs):
+        command = [self.kubescape_exec, "config", "view"]
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
