@@ -1028,6 +1028,8 @@ class BaseKubescape(BaseK8S):
     def get_report_guid(self, cluster_name: str, framework_name: str = "", old_report_guid: str = "",
                         wait_to_result: bool = False):
         found = False
+        Logger.logger.info("get_report_guid - cluster_name: {}, framework_name: {}, old_report_guid: {}, wait_to_result: {}".format(
+            cluster_name, framework_name, old_report_guid, wait_to_result))
         for i in range(25):
             be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
                                                                      framework_name=framework_name)
@@ -1037,7 +1039,11 @@ class BaseKubescape(BaseK8S):
                                                  be_cluster_overtime[statics.BE_CORDS_FIELD][
                                                      statics.BE_REPORT_GUID_FIELD] != old_report_guid):
                 if found:
+                    Logger.logger.info("get_report_guid - returning found report_guid: {}".format(
+                        be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
+                Logger.logger.info("get_report_guid - found report_guid: {}".format(
+                        be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                 found = True
                 # results where found, this means the backend started the aggregation, we will wait a little for the backend to complete the aggregation
                 time.sleep(20)
