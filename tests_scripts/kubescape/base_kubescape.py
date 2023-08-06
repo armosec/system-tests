@@ -777,9 +777,9 @@ class BaseKubescape(BaseK8S):
             x1=control['previousFailedResourcesCount'], x2=control['failedResourcesCount']
         )
 
-    def get_report_guid_and_timestamp_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
+    def get_report_guid_and_repo_hash_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
                                                          wait_to_result: bool = False) -> Tuple[
-        Optional[str], Optional[datetime]]:
+        Optional[str], Optional[str]]:
         check_intervals = 30
         sleep_sec = 12
 
@@ -795,7 +795,7 @@ class BaseKubescape(BaseK8S):
             scan = next((scan for scan in repository_scans if scan[statics.BE_REPORT_GUID_FIELD] != old_report_guid),
                         None)
             if scan:
-                return scan[statics.BE_REPORT_GUID_FIELD], parser.parse(scan[statics.BE_REPORT_TIMESTAMP_FIELD])
+                return scan[statics.BE_REPORT_GUID_FIELD], scan['designators']['attributes']['repoHash']
             elif not wait_to_result:
                 return None, None
             time.sleep(sleep_sec)

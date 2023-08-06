@@ -89,7 +89,8 @@ class KubescapeTests(object):
                 "examples/helm_chart/templates/serviceaccount.yaml",
                 "examples/helm_chart/templates/cronjob.yaml"
             ],
-            clone_before=False
+            clone_before=False,
+            create_test_tenant=True
         )
 
     @staticmethod
@@ -104,7 +105,8 @@ class KubescapeTests(object):
             account=True,
             git_repository=GitRepository(name='examples', owner="kubernetes", branch="master",
                                          url="https://github.com/kubernetes/examples"),
-            clone_before=True
+            clone_before=True,
+            create_test_tenant=True
         )
 
     @staticmethod
@@ -270,8 +272,6 @@ class KubescapeTests(object):
             submit=False,
             account=False,
         )
-
-    
 
     @staticmethod
     def scan_custom_framework_scanning_cluster_scope_testing():
