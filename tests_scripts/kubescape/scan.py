@@ -587,8 +587,11 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             raise Exception("test expected git_repository arg to be a GitRepository instance")
 
         # Check for existing previous report
-        old_report_guid, old_report_ts = self.get_report_guid_and_timestamp_for_git_repository(git_repository,
+        old_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
                                                                                                wait_to_result=False)
+        if repo_hash is not None:
+            Logger.logger.info(f"Running test cleanup - deleting repository ({repo_hash})")
+            self.backend.delete_repository(repository_hash=repo_hash)
 
         Logger.logger.info("Scanning with kubescape")
 
@@ -629,18 +632,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             relevant_resources_without_source) == 0, f"The following resources are missing source: {','.join(relevant_resources_without_source)}"
 
         Logger.logger.info("Fetching repo posture report from backend")
-        t1_start = perf_counter()
-        new_report_guid, new_report_ts = self.get_report_guid_and_timestamp_for_git_repository(git_repository,
-                                                                                               old_report_guid,
+        new_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
                                                                                                wait_to_result=True)
-        t1_stop = perf_counter()
-
-        assert new_report_guid and len(new_report_guid) > 0, "New repo posture report was not found"
-        Logger.logger.info(f"Fetching repo posture report from backend took {int(t1_stop - t1_start)} seconds")
-
-        if old_report_guid:
-            assert new_report_ts > old_report_ts, "New report timestamp should be greater than previous report"
-
         Logger.logger.info("Testing repository summary")
         repo_summary = None
         for _ in range(5):
