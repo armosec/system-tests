@@ -85,11 +85,13 @@ class BaseKubescape(BaseK8S):
         self.remove_cluster_from_backend = False
 
     def default_scan(self, **kwargs):
+        self.delete_kubescape_config_file(**kwargs)
         res_file = self.get_default_results_file()
         self.scan(output_format="json", output=res_file, **kwargs)
         return self.load_results(results_file=res_file)
 
     def cleanup(self, **kwargs):
+        self.delete_kubescape_config_file(**kwargs)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
@@ -125,6 +127,14 @@ class BaseKubescape(BaseK8S):
                                      "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
 
         Logger.logger.info(" ".join(command))
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+    
+    def delete_kubescape_config_file(self, **kwargs):
+        command = [self.kubescape_exec, "config", "delete"]
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
