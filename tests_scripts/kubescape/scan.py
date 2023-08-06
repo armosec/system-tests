@@ -196,7 +196,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
         self.apply_yaml_file(yaml_file=self.test_obj.get_arg("yaml"), namespace=namespace)
         TestUtil.sleep(30, "wait for report guid", "info")
 
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False,
                                                framework_name=self.test_obj.get_arg("policy_name"))
 
         Logger.logger.info("Scanning kubescape")
@@ -245,7 +245,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
         Logger.logger.info("Delete all exception from backend")
         self.backend.delete_all_posture_exceptions(cluster_name=self.kubernetes_obj.get_cluster_name())
 
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False,
                                                framework_name=self.test_obj.get_arg("policy_name").upper())
         TestUtil.sleep(30, "wait for report guid", "info")
 
@@ -394,7 +394,7 @@ class ScanWithCustomFramework(BaseKubescape):
         fw_object, self.report_fw = self.post_custom_framework(framework_file=self.test_obj.get_arg("framework_file"),
                                                                cluster_name=self.kubernetes_obj.get_cluster_name())
         Logger.logger.info("Stage 1.2: Get old report-guid")
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False,
                                                framework_name=self.report_fw['name'])
 
         Logger.logger.info("Stage 1.3: Check if framework created")
