@@ -38,31 +38,6 @@ class HelmWrapper(object):
         # disable security framework scan
         # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
 
-        #node agent resources
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_MEMORY}=1000Mi"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_MEMORY}=2000Mi"])
-
-        #storage resources
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_MEMORY}=1000Mi"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_MEMORY}=2000Mi"])
-        
-        #node agent resources
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_REQ_MEMORY}=1000Mi"])
-        # command_args.extend(["--set", f"{statics.HELM_NODE_AGENT_LIMITS_MEMORY}=2000Mi"])
-
-        #storage resources
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_CPU}=1000m"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_REQ_MEMORY}=1000Mi"])
-        # command_args.extend(["--set", f"{statics.HELM_STORAGE_LIMITS_MEMORY}=2000Mi"])
-
-        
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
