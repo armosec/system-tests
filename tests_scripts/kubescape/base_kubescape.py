@@ -1028,12 +1028,12 @@ class BaseKubescape(BaseK8S):
     def get_report_guid(self, cluster_name: str, framework_name: str = "", old_report_guid: str = "",
                         wait_to_result: bool = False):
         found = False
-        Logger.logger.info("get_report_guid - cluster_name: {}, framework_name: {}, old_report_guid: {}, wait_to_result: {}".format(
+        Logger.logger.info("cluster_name: {}, framework_name: {}, old_report_guid: {}, wait_to_result: {}".format(
             cluster_name, framework_name, old_report_guid, wait_to_result))
         for i in range(25):
             be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
                                                                      framework_name=framework_name)
-            if wait_to_result and len(be_cluster_overtime) == 0:
+            if not wait_to_result and len(be_cluster_overtime) == 0:
                 return ""
             if len(be_cluster_overtime) > 0 and (old_report_guid == "" or
                                                  be_cluster_overtime[statics.BE_CORDS_FIELD][
@@ -1049,7 +1049,7 @@ class BaseKubescape(BaseK8S):
                 time.sleep(20)
 
             time.sleep(5)
-        raise Exception('Failed to get the report-guid from the last scan.')
+        raise Exception('Failed to get the report-guid for the last scan.')
     
     def test_controls_compliance_score(self, report: dict):
         # for each control check that compliance score is the percentage of passed resources/total resources
