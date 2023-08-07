@@ -1,8 +1,9 @@
+import os
 import inspect
 from configurations.system.git_repository import GitRepository
 from .structures import TestConfiguration
 
-# from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+from systest_utils.statics import DEFAULT_KS_CUSTOM_FW_PATH
 from .structures import KubescapeConfiguration
 
 
@@ -89,7 +90,8 @@ class KubescapeTests(object):
                 "examples/helm_chart/templates/serviceaccount.yaml",
                 "examples/helm_chart/templates/cronjob.yaml"
             ],
-            clone_before=False
+            clone_before=False,
+            create_test_tenant=True
         )
 
     @staticmethod
@@ -104,7 +106,8 @@ class KubescapeTests(object):
             account=True,
             git_repository=GitRepository(name='examples', owner="kubernetes", branch="master",
                                          url="https://github.com/kubernetes/examples"),
-            clone_before=True
+            clone_before=True,
+            create_test_tenant=True
         )
 
     @staticmethod
@@ -295,4 +298,45 @@ class KubescapeTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ConfigDelete,
+        )
+    
+    @staticmethod
+    def scan_custom_framework_scanning_cluster_scope_testing():
+        from tests_scripts.kubescape.scan import TestScanningScope
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=TestScanningScope,
+            policy_scope='framework',
+            keep_local=True,
+            framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-scope.json")),
+            policy_name="systest-fw-custom-scanning-scope-cluster-only",
+            scope_control_counter=5,
+        )
+    
+    @staticmethod
+    def scan_custom_framework_scanning_file_scope_testing():
+        from tests_scripts.kubescape.scan import TestScanningFileScope
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=TestScanningFileScope,
+            policy_scope='framework',
+            keep_local=True,
+            yamls=['nginx.yaml'],
+            framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-file-scope.json")),
+            policy_name="systest-fw-custom-scanning-scope-file",
+            scope_control_counter=5,
+        )
+    
+    @staticmethod
+    def scan_custom_framework_scanning_cluster_and_file_scope_testing():
+        from tests_scripts.kubescape.scan import TestScanningFileScope
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=TestScanningFileScope,
+            policy_scope='framework',
+            keep_local=True,
+            yamls=['nginx.yaml'],
+            framework_file=os.path.abspath(os.path.join(DEFAULT_KS_CUSTOM_FW_PATH, "system-test-framework-scanning-cluster-and-file-scope.json")),
+            policy_name="systest-fw-custom-scanning-scope-cluster-and-files",
+            scope_control_counter=5,
         )

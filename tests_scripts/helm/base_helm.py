@@ -28,8 +28,12 @@ class BaseHelm(BaseK8S):
         self.remove_cluster_from_backend = False
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
+        self.enable_security = self.test_obj[("enable_security", True)]
 
+        self.filtered_sbom_init_time = self.test_driver.kwargs.get("filtered_sbom_init_time", "2m")
+        self.filtered_sbom_update_time = self.test_driver.kwargs.get("filtered_sbom_update_time", "2m")
     
+
     @staticmethod
     def kill_child_processes(parent_pid, sig=signal.SIGTERM):
         try:
@@ -58,7 +62,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-        if self.remove_cluster_from_backend and not self.cluster_deleted:
+        if self.remove_cluster_from_backend and not self.cluster_deleted and self.backend != None:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
 
@@ -104,8 +108,15 @@ class BaseHelm(BaseK8S):
             
             helm_kwargs.update(helm_proxy_params)
 
-        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid(),
-                                            environment=self.test_driver.backend_obj.get_name(),
+        if self.enable_security == False:
+            security_params = {"operator.triggerSecurityFramework": "false"}
+            helm_kwargs.update(security_params)
+
+        helm_kwargs.update({"nodeAgent.config.learningPeriod": self.filtered_sbom_init_time, 
+                            "nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
+        
+        HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
+                                            environment=self.test_driver.backend_obj.get_name() if self.backend != None else "",
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True

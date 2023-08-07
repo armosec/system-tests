@@ -52,7 +52,8 @@ def tests = [
             "stripe_checkout":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_webhook" :                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_billing_portal":           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 
@@ -61,7 +62,8 @@ def tests = [
 def tests_to_skip = ["production": 
                             [
                             "stripe_webhook", 
-                            "stripe_billing_portal"
+                            "stripe_billing_portal",
+                            "user_alert_channels"
                             ]
                     ]
 

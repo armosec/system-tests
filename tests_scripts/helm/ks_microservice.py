@@ -11,6 +11,7 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         # P1 Install Wikijs
@@ -58,6 +59,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                                              kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         self.ignore_agent = True
@@ -206,7 +208,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             Logger.logger.info('get result from kubescape in cluster')
             kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port)
 
-            Logger.logger.info('test result against backend results')
+            Logger.logger.info('test result against backend results, report_guid: {}'.format(report_guid))
             self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
 
             Logger.logger.info('test reported job results')

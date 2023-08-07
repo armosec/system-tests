@@ -80,11 +80,12 @@ class BaseKubescape(BaseK8S):
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
-        self.environment = '' if self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
+        self.environment = '' if self.test_driver.backend_obj == None or self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
         self.remove_cluster_from_backend = False
 
     def default_scan(self, **kwargs):
+        self.delete_kubescape_config_file(**kwargs)
         res_file = self.get_default_results_file()
         self.scan(output_format="json", output=res_file, **kwargs)
         return self.load_results(results_file=res_file)
@@ -95,6 +96,7 @@ class BaseKubescape(BaseK8S):
             return self.config(stdout=f,**kwargs)
 
     def cleanup(self, **kwargs):
+        self.delete_kubescape_config_file(**kwargs)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
             TestUtil.sleep(150, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
@@ -133,6 +135,25 @@ class BaseKubescape(BaseK8S):
                                      "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
 
         Logger.logger.info(" ".join(command))
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+    
+    def delete_kubescape_config_file(self, **kwargs):
+        if self.kubescape_exec is None:
+            return "kubescape_exec not found"
+        command = [self.kubescape_exec, "config", "delete"]
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+    
+    def view_kubescape_config_file(self, **kwargs):
+        command = [self.kubescape_exec, "config", "view"]
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
@@ -180,6 +201,8 @@ class BaseKubescape(BaseK8S):
             command.extend(["--output", output])
         if "exceptions" in kwargs:
             command.extend(["--exceptions", kwargs['exceptions']])
+        if "keep_local" in kwargs:
+            command.append("--keep-local")
         if "submit" in kwargs:
             command.append("--submit")
             self.remove_cluster_from_backend = True
@@ -789,9 +812,9 @@ class BaseKubescape(BaseK8S):
             x1=control['previousFailedResourcesCount'], x2=control['failedResourcesCount']
         )
 
-    def get_report_guid_and_timestamp_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
+    def get_report_guid_and_repo_hash_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
                                                          wait_to_result: bool = False) -> Tuple[
-        Optional[str], Optional[datetime]]:
+        Optional[str], Optional[str]]:
         check_intervals = 30
         sleep_sec = 12
 
@@ -807,7 +830,7 @@ class BaseKubescape(BaseK8S):
             scan = next((scan for scan in repository_scans if scan[statics.BE_REPORT_GUID_FIELD] != old_report_guid),
                         None)
             if scan:
-                return scan[statics.BE_REPORT_GUID_FIELD], parser.parse(scan[statics.BE_REPORT_TIMESTAMP_FIELD])
+                return scan[statics.BE_REPORT_GUID_FIELD], scan['designators']['attributes']['repoHash']
             elif not wait_to_result:
                 return None, None
             time.sleep(sleep_sec)
@@ -1037,6 +1060,14 @@ class BaseKubescape(BaseK8S):
     def test_backend_vs_kubescape_result(self, report_guid, kubescape_result):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
 
+        # check if there are also security fw scanned for report_guid
+        if self.enable_security:
+            for sf in statics.SECURITY_FRAMEWORKS:
+                be_current_security_framework = self.get_posture_frameworks(report_guid=report_guid, framework_name=sf)
+                if be_current_security_framework:
+                    Logger.logger.debug(f"test_backend_vs_kubescape_result - found security framework: {sf} in backend")
+                    be_frameworks.extend(be_current_security_framework)
+
         assert _CLI_SUMMARY_DETAILS_FIELD in kubescape_result, "expected key {} is not in kubescape result,kubescape_result: {}".format(
             _CLI_SUMMARY_DETAILS_FIELD, kubescape_result)
         kbs_r = kubescape_result[_CLI_SUMMARY_DETAILS_FIELD]
@@ -1053,22 +1084,28 @@ class BaseKubescape(BaseK8S):
     def get_report_guid(self, cluster_name: str, framework_name: str = "", old_report_guid: str = "",
                         wait_to_result: bool = False):
         found = False
+        Logger.logger.info("cluster_name: {}, framework_name: {}, old_report_guid: {}, wait_to_result: {}".format(
+            cluster_name, framework_name, old_report_guid, wait_to_result))
         for i in range(25):
             be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
                                                                      framework_name=framework_name)
-            if wait_to_result and len(be_cluster_overtime) == 0:
+            if not wait_to_result and len(be_cluster_overtime) == 0:
                 return ""
             if len(be_cluster_overtime) > 0 and (old_report_guid == "" or
                                                  be_cluster_overtime[statics.BE_CORDS_FIELD][
                                                      statics.BE_REPORT_GUID_FIELD] != old_report_guid):
                 if found:
+                    Logger.logger.info("get_report_guid - returning found report_guid: {}".format(
+                        be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
+                Logger.logger.info("get_report_guid - found report_guid: {}".format(
+                        be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                 found = True
                 # results where found, this means the backend started the aggregation, we will wait a little for the backend to complete the aggregation
                 time.sleep(20)
 
             time.sleep(5)
-        raise Exception('Failed to get the report-guid from the last scan.')
+        raise Exception('Failed to get the report-guid for the last scan.')
     
     def test_controls_compliance_score(self, report: dict):
         # for each control check that compliance score is the percentage of passed resources/total resources

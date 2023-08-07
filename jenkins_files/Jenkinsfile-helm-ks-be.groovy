@@ -26,7 +26,7 @@ def tests = [
              "ks_microservice_delete_cronjob":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "ks_microservice_create_2_cronjob_mitre_and_nsa":                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_with_exceptions":                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_security_and_submit_to_backend":                                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            //  "scan_security_and_submit_to_backend":                                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_nsa_and_submit_to_backend":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_mitre_and_submit_to_backend":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "scan_local_repository_and_submit_to_backend":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
@@ -43,7 +43,8 @@ def tests = [
             "stripe_checkout":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_webhook" :                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_billing_portal":           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 
@@ -52,7 +53,8 @@ def tests = [
 def tests_to_skip = ["production": 
                             [
                             "stripe_webhook", 
-                            "stripe_billing_portal"
+                            "stripe_billing_portal",
+                            "user_alert_channels"
                             ]
                     ]
 

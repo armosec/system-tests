@@ -11,6 +11,7 @@ class Portal(BaseStripe):
         super(Portal, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 
     def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         quantity = 5
 
         Logger.logger.info("Stage 1: create a subscription")

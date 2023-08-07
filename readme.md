@@ -43,6 +43,7 @@
 | `stripe_plans`                                                 | payment |                                                                           | stripe, backend             |
 | `stripe_webhook`                                               | payment |                                                                           | stripe, backend             |
 | `user_email_settings`                                          | users-notification |                                                                | notifications, backend             |
+| `user_alert_channels`                                          | users-notification |                                                                | notifications, backend             |
 
 ### Install:
 * download/clone repository

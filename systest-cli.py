@@ -25,7 +25,7 @@ def input_parser():
 
     parser.add_argument("-t", "--test-name", default="", action="store", required=False, dest="test_name",
                         help="test to run (all is the default.")
-    parser.add_argument("-b", "--backend", default="development", help="backend to run on.", action="store",
+    parser.add_argument("-b", "--backend", default="", help="backend to run on.", action="store",
                         dest="backend")
     parser.add_argument("-c", "--customer", default="CyberArmorTests", help="Customer name", dest="customer")
     parser.add_argument("--logger", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="logger level", default="DEBUG",
@@ -110,7 +110,7 @@ def main():
         print_configurations(args.list)
         exit(0)
 
-    if args.backend not in BACKENDS or args.test_name not in ALL_TESTS or args.customer != CREDENTIALS.customer:
+    if args.test_name not in ALL_TESTS or args.customer != CREDENTIALS.customer:
         print_configurations()
         exit(1)
 
