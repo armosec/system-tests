@@ -1757,6 +1757,7 @@ class ControlPanelAPI(object):
             r = ws.recv()
             if r:
                 r = json.loads(r)
+                Logger.logger.debug("request chunk: {}".format(r))                
                 result.extend(r['response'])
                 nbmsg += 1
         assert nbmsg == totalChunks, 'Excepted %d chunks, receive %d' % (totalChunks, nbmsg)
