@@ -1110,12 +1110,15 @@ class BaseKubescape(BaseK8S):
                                                report_guid=report_guid, cluster_wlid=cluster_wlid)
         return c_panel_info
 
-    def is_ks_cronjob_created(self, framework_name, timeout=60):
+    def is_ks_cronjob_created(self, framework_name, timeout=120):
         start = time.time()
         err = ""
         while time.time() - start < timeout:
-            if self.kubernetes_obj.is_ks_cronjob_created(framework_name=framework_name):
-                return True
+            try:
+                if self.kubernetes_obj.is_ks_cronjob_created(framework_name=framework_name):
+                    return True
+            except Exception as ex:
+                Logger.logger.exception(f"is_ks_cronjob_created returned with error: {ex}")
             time.sleep(10)
         return False
 
@@ -1123,8 +1126,11 @@ class BaseKubescape(BaseK8S):
         start = time.time()
         err = ""
         while time.time() - start < timeout:
-            if self.kubernetes_obj.is_hostsensor_triggered():
-                return True
+            try:
+                if self.kubernetes_obj.is_hostsensor_triggered():
+                    return True
+            except Exception as ex:
+                Logger.logger.exception(f"is_hostsensor_triggered returned with error: {ex}")
             time.sleep(5)
         return False
 
