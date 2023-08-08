@@ -634,13 +634,15 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         Logger.logger.info("Fetching repo posture report from backend")
         new_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
                                                                                                wait_to_result=True)
+        file_summary = self.backend.get_repository_posture_files(new_report_guid)
         Logger.logger.info("Testing repository summary")
         repo_summary = None
         for _ in range(5):
             repo_summaries = self.backend.get_repository_posture_repositories_by_report_guid(new_report_guid)
             if len(repo_summaries) != 0:
                 repo_summary = repo_summaries[0]
-                break
+                if repo_summary["childCount"] == len(file_summary):
+                    break
             else:
                 time.sleep(5)
 
