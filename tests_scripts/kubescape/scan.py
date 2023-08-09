@@ -684,7 +684,13 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             assert len(kubescape_status_to_control_id["skipped"]) == 0
 
         Logger.logger.info("Testing file summary")
-        file_summary = self.backend.get_repository_posture_files(new_report_guid)
+        file_summary = None
+        for _ in range(12):
+            file_summary = self.backend.get_repository_posture_files(new_report_guid)
+            if len(file_summary) == repo_summary["childCount"]:
+                break
+            else:
+                time.sleep(5)
 
         # Compare Files
         assert repo_summary["childCount"] == len(file_summary), \
