@@ -1,6 +1,7 @@
 import os
 import inspect
 from configurations.system.git_repository import GitRepository
+from .structures import TestConfiguration
 
 from systest_utils.statics import DEFAULT_KS_CUSTOM_FW_PATH
 from .structures import KubescapeConfiguration
@@ -273,6 +274,32 @@ class KubescapeTests(object):
             account=False,
         )
 
+    @staticmethod
+    def unified_configuration_config_view():
+        from tests_scripts.kubescape.config import ConfigView
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigView,
+        )
+    
+    @staticmethod
+    def unified_configuration_config_set():
+        from tests_scripts.kubescape.config import ConfigSet
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigSet,
+            set_key="secretKey",
+            set_value="123",
+        )
+    
+    @staticmethod
+    def unified_configuration_config_delete():
+        from tests_scripts.kubescape.config import ConfigDelete
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ConfigDelete,
+        )
+    
     @staticmethod
     def scan_custom_framework_scanning_cluster_scope_testing():
         from tests_scripts.kubescape.scan import TestScanningScope
