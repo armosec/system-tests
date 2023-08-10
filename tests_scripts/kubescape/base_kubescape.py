@@ -95,7 +95,7 @@ class BaseKubescape(BaseK8S):
 
     def create_kubescape_config_file(self):
         config_file_data = {
-            statics.ACCOUNT_ID_KEY: self.backend.get_customer_guid()
+            statics.CLOUD_API_URL_KEY: "any_value"
         }
         with open(file=self.get_kubescape_config_file(), mode="w") as outfile:
             json.dump(config_file_data, outfile)
