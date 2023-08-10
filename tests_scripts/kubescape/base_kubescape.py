@@ -90,7 +90,19 @@ class BaseKubescape(BaseK8S):
         self.scan(output_format="json", output=res_file, **kwargs)
         return self.load_results(results_file=res_file)
 
+    def is_kubescape_config_file_exist(self):
+        return os.path.exists(self.get_kubescape_config_file())
+
+    def create_kubescape_config_file(self):
+        config_file_data = {
+            statics.CLOUD_API_URL_KEY: "any_value"
+        }
+        with open(file=self.get_kubescape_config_file(), mode="w") as outfile:
+            json.dump(config_file_data, outfile)
+
     def default_config(self, **kwargs):
+        if self.is_kubescape_config_file_exist() == False:
+            self.create_kubescape_config_file()
         res_file = self.get_default_results_file()
         with open(res_file, "w") as f:
             return self.config(stdout=f,**kwargs)
