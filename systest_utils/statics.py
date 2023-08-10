@@ -45,6 +45,12 @@ DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 # kubescape
 DEFAULT_EXCEPTIONS_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'exceptions')
 DEFAULT_INPUT_YAML_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'yaml_file')
+# kubescape config
+ACCOUNT_ID_KEY="accountID"
+CLOUD_REPORT_URL_KEY="cloudReportURL"
+CLOUD_API_URL_KEY="cloudAPIURL"
+CLOUD_UI_URL_KEY="cloudUIURL"
+CLOUD_AUTH_URL_KEY="cloudAuthURL"
 
 # vulnerability_scanning paths
 DEFAULT_VULNERABILITY_SCANNING_PATHS = os.path.abspath(os.path.join('configurations', 'vulnerability_scanning'))
