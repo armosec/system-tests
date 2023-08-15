@@ -137,7 +137,7 @@ class BaseHelm(BaseK8S):
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.STORAGE_COMPONENT_NAME,
                                                           component_tag=statics.STORAGE_COMPONENT_TAG))
         component_tag.update(self.extract_tag_from_kwargs(component_name=statics.NODE_AGENT_COMPONENT_NAME,
-                                                          component_tag=statics.STORAGE_COMPONENT_TAG))
+                                                          component_tag=statics.NODE_AGENT_COMPONENT_TAG))
 
         return component_tag
 
