@@ -92,6 +92,12 @@ class BaseKubescape(BaseK8S):
 
     def is_kubescape_config_file_exist(self):
         return os.path.exists(self.get_kubescape_config_file())
+    
+    def is_kubescape_data_dir_exist(self):
+        return os.path.exists(self.get_kubescape_data_dir_path())
+
+    def create_kubescape_data_dir(self):
+        os.mkdir(self.get_kubescape_data_dir_path())
 
     def create_kubescape_config_file(self):
         config_file_data = {
@@ -101,6 +107,8 @@ class BaseKubescape(BaseK8S):
             json.dump(config_file_data, outfile)
 
     def default_config(self, **kwargs):
+        if self.is_kubescape_data_dir_exist() == False:
+            self.create_kubescape_data_dir()
         if self.is_kubescape_config_file_exist() == False:
             self.create_kubescape_config_file()
         res_file = self.get_default_results_file()
@@ -120,6 +128,9 @@ class BaseKubescape(BaseK8S):
     
     def get_kubescape_config_file(self):
         return os.path.join(os.path.expanduser('~'), ".kubescape", "config.json")
+    
+    def get_kubescape_data_dir_path(self):
+        return os.path.join(os.path.expanduser('~'), ".kubescape")
 
     def download_control_input(self):
         output_file = os.path.join(self.test_driver.temp_dir, 'controls-inputs.json')
