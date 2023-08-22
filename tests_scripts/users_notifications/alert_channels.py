@@ -1,3 +1,5 @@
+import json
+
 from systest_utils import Logger
 from .base_notifications import BaseNotifications
 
@@ -45,6 +47,6 @@ class AlertChannels(BaseNotifications):
     def cleanup(self, **kwargs):
         leftovers = self.backend.get_all_alert_channels().content
         if leftovers:
-            for ac in leftovers.json():
+            for ac in json.loads(leftovers.decode("utf-8")):
                 self.backend.remove_alert_channel(ac["channel"]["guid"])
         return super().cleanup(**kwargs)
