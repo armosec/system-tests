@@ -288,8 +288,8 @@ class KubescapeTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ConfigSet,
-            set_key="secretKey",
-            set_value="123",
+            set_key="accountID",
+            set_value="11111111-1111-1111-1111-111111111111",
         )
     
     @staticmethod
