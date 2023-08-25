@@ -23,13 +23,12 @@ class KSMicroserviceTests(object):
     @staticmethod
     def scan_for_attack_chains():
         """
-        install kubescape helm chart and check results of detected attack-chains.
+        install kubescape helm chart, run scan with 'security' framework and check detected attack-chains.
         """
-        from tests_scripts.helm.ks_microservice import ScanWithKubescapeHelmChartWithoutManifests
-        from os.path import join
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanWithKubescapeHelmChartWithoutManifests,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start", "framework": ["security"]}]
         )
 
