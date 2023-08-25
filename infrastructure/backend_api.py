@@ -85,6 +85,8 @@ API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
+API_ATTACK_CHAINS = "/api/v1/attackChains"
+
 
 def deco_cookie(func):
 
@@ -1941,6 +1943,20 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete channel alert "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
+
+    def get_attack_chains(self, guid) -> requests.Response:
+        params = {"customerGUID": self.selected_tenant_id}
+        payload = {
+            "innerFilters": [],
+        }
+        r = self.post(API_ATTACK_CHAINS, params=params, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
 
 class Solution(object):
     """docstring for Solution"""
