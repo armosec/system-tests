@@ -156,7 +156,7 @@ class BaseHelm(BaseK8S):
         TestUtil.run_command(command_args=command_args, timeout=360)
         self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, statics.HELM_REPO_FROM_LOCAL)
 
-    def test_helm_chart_tesults(self, report_guid: str):
+    def test_helm_chart_results(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
 
         assert len(be_frameworks) >= 4, \

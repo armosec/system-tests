@@ -1,8 +1,42 @@
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
+import json
 
 DEFAULT_BRANCH = "release"
 from systest_utils import Logger, TestUtil, statics
+
+class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
+    """ScanWithKubescapeHelmChartWithoutManifests install the kubescape operator and run the scan to check attack-chains."""
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        
+        self.ignore_agent = True
+
+        Logger.logger.info("Stage 1.2: Get old report-guid")
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True)
+
+        Logger.logger.info("Installing kubescape with helm-chart")
+        # 2.1 add and update armo in repo
+        self.add_and_upgrade_armo_to_repo()
+        # 2.2 install armo helm-chart
+        self.install_armo_helm_chart()
+
+        # 2.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        Logger.logger.info("Stage 2.2: Get report-guid")
+        report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                           old_report_guid=old_report_guid)
+
+        r = self.backend.get_attack_chains()
+        response = json.loads(r)
+        print(response)
+
+        return self.cleanup()
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
@@ -48,7 +82,7 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            old_report_guid=old_report_guid)
 
-        self.test_helm_chart_tesults(report_guid=report_guid)
+        self.test_helm_chart_results(report_guid=report_guid)
 
         return self.cleanup()
 
