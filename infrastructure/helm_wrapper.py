@@ -26,7 +26,7 @@ class HelmWrapper(object):
         # os.system("helm repo update armo")
 
     @staticmethod
-    def install_armo_helm_chart(customer: str, environment: str, cluster_name: str,
+    def install_armo_helm_chart(customer: str, server: str, cluster_name: str,
                                 repo: str=statics.HELM_REPO, helm_kwargs:dict={}):
         command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", statics.CA_NAMESPACE_FROM_HELM_NAME,
                         "--create-namespace", "--set", "account={x}".format(x=customer),
@@ -41,11 +41,7 @@ class HelmWrapper(object):
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
-
-        if environment in ["development", "dev", "development-egg", "dev-egg"]:
-            command_args.extend(["--set", "environment=dev"])
-        elif environment in ["staging", "stage", "staging-egg", "stage-egg"]:
-            command_args.extend(["--set", "environment=staging"])
+        command_args.extend(["--set", f"server={server}"])
         return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code, return_obj.stdout, return_obj.stderr)
 

@@ -69,6 +69,8 @@ class FrontEggSecretAPILogin(APILogin):
     
     def login(self):
         auth = self.getToken()        
+        print(f"Bearer: {auth}")
+        print(f'{self.base_url}{API_OPENID_CUSTOMERS}')
         response =  self.session.get(f'{self.base_url}{API_OPENID_CUSTOMERS}',headers= {'Authorization': f'Bearer: {auth}'})
         assert response.status_code == 200, f"got error: {response.text}, status: {response.status_code}"
         json_res = response.json()

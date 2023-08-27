@@ -116,7 +116,7 @@ class BaseHelm(BaseK8S):
                             "nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
         
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
-                                            environment=self.test_driver.backend_obj.get_name() if self.backend != None else "",
+                                            server=self.test_driver.backend_obj.get_api_url(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True

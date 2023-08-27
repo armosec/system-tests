@@ -80,7 +80,9 @@ class BaseKubescape(BaseK8S):
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
-        self.environment = '' if self.test_driver.backend_obj == None or self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
+        if self.test_driver.backend_obj == None:
+            raise Exception('backend_obj must be specified')
+        self.api_url = self.test_driver.backend_obj.get_api_url()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
         self.remove_cluster_from_backend = False
 
@@ -151,12 +153,8 @@ class BaseKubescape(BaseK8S):
         command.extend(['--output', output_file])
         if "account" in kwargs:
             command.extend(["--account", self.backend.get_customer_guid()])
-        if self.environment == "dev" or self.environment == "development":
-            command.extend(["--env", "dev"])
-        if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
-                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
-
+        command.extend(["--server", self.api_url])
+        
         Logger.logger.info(" ".join(command))
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
@@ -233,12 +231,7 @@ class BaseKubescape(BaseK8S):
             assert account_id, "missing account ID, the report will not be submitted"
             command.extend(["--account", self.backend.get_customer_guid()])
 
-        if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
-                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
-
-        if self.environment == "dev" or self.environment == "development":
-            command.extend(["--env", "dev"])
+        command.extend(["--server", self.api_url])
 
         # first check if artifacts are passed to function
         if "use_artifacts" in kwargs and kwargs['use_artifacts'] != "":
