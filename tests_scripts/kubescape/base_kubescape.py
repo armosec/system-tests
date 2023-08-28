@@ -401,7 +401,7 @@ class BaseKubescape(BaseK8S):
 
         # build kubescape (make file) for non-windows machines
         if platform.system() != "Windows" and os.path.exists(os.path.join(ks_path, "Makefile")):
-            return_code, return_obj = TestUtil.run_command(command_args=["make"], cwd=ks_path, timeout=360)
+            return_code, return_obj = TestUtil.run_command(command_args=["make"], cwd=ks_path, timeout=1000)
             assert not return_code, f"Failed to build kubescape (make) from branch {branch} : {return_obj.stderr}"
             shutil.move(os.path.join(ks_path, "kubescape"), kubescape_exec)
         else:
