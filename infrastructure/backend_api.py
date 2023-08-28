@@ -1944,7 +1944,7 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def get_attack_chains(self, guid) -> requests.Response:
+    def get_attack_chains(self) -> requests.Response:
         params = {"customerGUID": self.selected_tenant_id}
         payload = {
             "innerFilters": [],
