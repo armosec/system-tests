@@ -1950,6 +1950,12 @@ class ControlPanelAPI(object):
             "innerFilters": [],
         }
         r = self.post(API_ATTACK_CHAINS, params=params, json=payload)
+        print('{}\n{}\r\n{}\r\n\r\n{}'.format(
+            '-----------START-----------',
+            r.method + ' ' + r.url,
+            '\r\n'.join('{}: {}'.format(k, v) for k, v in r.headers.items()),
+            r.body,
+        ))
 
         if not 200 <= r.status_code < 300:
             raise Exception(
