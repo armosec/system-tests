@@ -29,7 +29,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
-            test_job=[{"trigger_by": "scan_on_start", "framework": ["security"]}]
+            test_job=[{"trigger_by": "scan_on_start"}]
         )
 
     @staticmethod

@@ -85,7 +85,7 @@ API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
-API_ATTACK_CHAINS = "/api/v1/attackChains"
+API_ATTACK_CHAINS = "/api/v1/attackchains"
 
 
 def deco_cookie(func):
@@ -1949,13 +1949,8 @@ class ControlPanelAPI(object):
         payload = {
             "innerFilters": [],
         }
-        r = self.post(API_ATTACK_CHAINS, params=params, json=payload)
-        print('{}\n{}\r\n{}\r\n\r\n{}'.format(
-            '-----------START-----------',
-            r.method + ' ' + r.url,
-            '\r\n'.join('{}: {}'.format(k, v) for k, v in r.headers.items()),
-            r.body,
-        ))
+        r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
 
         if not 200 <= r.status_code < 300:
             raise Exception(

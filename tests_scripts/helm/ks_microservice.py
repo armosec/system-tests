@@ -16,9 +16,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         
         self.ignore_agent = True
 
-        Logger.logger.info("Stage 1.2: Get old report-guid")
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True)
-
         Logger.logger.info("Installing kubescape with helm-chart")
         # 2.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -29,11 +26,10 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
         Logger.logger.info("Stage 2.2: Get report-guid")
-        report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                           old_report_guid=old_report_guid)
+        report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name())
 
         r = self.backend.get_attack_chains()
-        response = json.loads(r)
+        response = json.loads(r.text)
         print(response)
 
         return self.cleanup()
