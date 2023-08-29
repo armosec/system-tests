@@ -76,7 +76,7 @@ class BaseKubescape(BaseK8S):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                          kubernetes_obj=kubernetes_obj)
 
-        self.ks_branch = self.test_driver.kwargs.get("ks_branch", "service-discovery")
+        self.ks_branch = self.test_driver.kwargs.get("ks_branch", DEFAULT_BRANCH)
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
