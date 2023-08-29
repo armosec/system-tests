@@ -204,7 +204,7 @@ class BaseKubescape(BaseK8S):
     def scan(self, policy_scope: str = None, policy_name: str = None, output_format: str = None, output: str = None,
              **kwargs):
 
-        command = [self.kubescape_exec, "scan", "--format-version", "v2"]
+        command = [self.kubescape_exec, "scan", "--logger", "debug", "--format-version", "v2"]
 
         if policy_scope:
             command.append(policy_scope)
