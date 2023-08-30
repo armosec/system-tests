@@ -1,3 +1,4 @@
+from datetime import datetime,timezone
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -17,6 +18,9 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         
         self.ignore_agent = True
 
+        #Logger.logger.info("Stage 1.2: Get old report-guid")
+        #old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True)
+
         Logger.logger.info("Installing kubescape with helm-chart")
         # 2.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
@@ -25,11 +29,13 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-
+        
         start_time = time.time()
-        timeout = 600  # Timeout in seconds
+        timeout = 1200  # Timeout in seconds
         response = ""
         attack_chains_found = False
+        current_datetime = datetime.now(timezone.utc)
+        Logger.logger.info('getting into while loop')
 
         while time.time() - start_time < timeout:
             Logger.logger.info('polling data from backend')
@@ -37,28 +43,33 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             response = json.loads(r.text)
             Logger.logger.info(response)
 
+            # check if old scans are already present
+            # we assume that attackChainsLastScan will have 
+            if response['response']['attackChainsLastScan']:
+                # the following code: `response['response']['attackChainsLastScan'][:-4]+'Z'` is used to convert the date
+                # to an understandable format. '%f' is able to handle until 6 digits.
+                last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
+                last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+                if last_scan_datetime < current_datetime:
+                    Logger.logger.info("attack-chains response is outdated")
+                    time.sleep(10)
+                    continue
+
+            # check if we found a new attack-chain
+            # if the flow arrives here, means that the retrieved response is updated
             if response['total']['value'] != 0:
                 Logger.logger.info('found attack chains')
                 attack_chains_found = True
                 break
-
+                    
             time.sleep(10)
 
         if attack_chains_found:
-            print(response)
-            self.check_expected_result(response)
+            self.check_attack_chains_results(response)
         else:
             Logger.logger.error('no attack chains were detected')
 
         return self.cleanup()
-
-    def check_expected_result(result) -> bool:
-        """Validate the input content with the expected one.
-        
-        :param result: content retrieved from backend.
-        :return: True if all the controls passed, False otherwise.
-        """
-        assert result['total']['value'] == 1
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
