@@ -1,3 +1,4 @@
+import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 import json
@@ -25,14 +26,39 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
-        Logger.logger.info("Stage 2.2: Get report-guid")
-        report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name())
+        start_time = time.time()
+        timeout = 600  # Timeout in seconds
+        response = ""
+        attack_chains_found = False
 
-        r = self.backend.get_attack_chains()
-        response = json.loads(r.text)
-        print(response)
+        while time.time() - start_time < timeout:
+            Logger.logger.info('polling data from backend')
+            r = self.backend.get_attack_chains()
+            response = json.loads(r.text)
+            Logger.logger.info(response)
+
+            if response['total']['value'] != 0:
+                Logger.logger.info('found attack chains')
+                attack_chains_found = True
+                break
+
+            time.sleep(10)
+
+        if attack_chains_found:
+            print(response)
+            self.check_expected_result(response)
+        else:
+            Logger.logger.error('no attack chains were detected')
 
         return self.cleanup()
+
+    def check_expected_result(result) -> bool:
+        """Validate the input content with the expected one.
+        
+        :param result: content retrieved from backend.
+        :return: True if all the controls passed, False otherwise.
+        """
+        assert result['total']['value'] == 1
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
