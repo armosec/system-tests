@@ -1950,6 +1950,7 @@ class ControlPanelAPI(object):
             "innerFilters": [],
         }
         r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.url)
         Logger.logger.info(r.text)
 
         if not 200 <= r.status_code < 300:
