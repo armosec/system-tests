@@ -702,23 +702,23 @@ class BaseK8S(BaseDockerizeTest):
         if not replicas:
             replicas = self.get_expected_number_of_pods(namespace=namespace, workload=name)
 
-        Logger.logger.debug("verifying {} pods are running in namespace {} {}".format(
-            replicas, namespace, "with substring {}".format(name) if name else ""))
+        Logger.logger.debug("verifying {} pods are running within {}s in namespace {} {}".format(
+            replicas, timeout, namespace, "with substring {}".format(name) if name else ""))
         delta_t = 0
         start = datetime.now()
         running_pods = {}
-        total_pods = {}
         while delta_t <= timeout:
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
-            # total_pods = self.get_pods(namespace=namespace, name=name, include_terminating=False)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {timeout - delta_t} seconds")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
-        Logger.logger.error("wrong number of pods are running, timeout: {} seconds. running_pods: {}".
+        total_pods = self.get_pods(namespace=namespace, name=name, include_terminating=False)
+        non_running_pods = [i for i in total_pods if i not in running_pods]
+        Logger.logger.error("wrong number of pods are running, timeout: {} seconds. non_running_pods: {}".
                             format(timeout,
-                                   KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True, indent=2)))
+                                   KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(timeout, replicas, len(running_pods)))  # , len(total_pods)))
