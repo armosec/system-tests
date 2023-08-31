@@ -1,4 +1,5 @@
 from datetime import datetime,timezone
+import sys
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -65,11 +66,59 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             time.sleep(10)
 
         if attack_chains_found:
-            self.check_attack_chains_results(response)
-        else:
-            Logger.logger.error('no attack chains were detected')
+            # retrieve expected attack-chain scenario result
+            Logger.logger.info('loading attack chain scenario to validate it')
+            test_scenario = self.test_driver.kwargs.get("test_scenario", "attack-chain-1.1")
+            f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
+            expected = json.load(f) 
+
+            Logger.logger.info('comparing attack-chains result with expected ones')
+            if not self.check_attack_chains_results(response, expected):
+                Loggger.logger.error('attack-chain response differ from the expected one')
+                raise Exception("Found attack chains don't match the expected ones")
 
         return self.cleanup()
+
+    def compare_nodes(self, obj1, obj2) -> bool:
+        """Walk 2 dictionary object to compare their values.
+
+        :param obj1: dictionary one to be compared.
+        :param obj2: dictionary two to be compared.
+        :return: True if all checks passed, False otherwise.
+        """
+        # check at first if we are managin dictionaries
+        if isinstance(obj1, dict) and isinstance(obj2, dict):
+            # check if key 'nextNodes' is present in the dictionaries
+            if 'nextNodes' in obj1 and 'nextNodes' in obj2:
+                # check if length of the items is the same
+                if len(obj1['nextNodes']) != len(obj2['nextNodes']):
+                    return False
+                # loop over the new nextNodes
+                for node1, node2 in zip(obj1['nextNodes'], obj2['nextNodes']):
+                    if not self.compare_nodes(node1, node2):
+                        return False
+                return True
+            else:
+                if 'name' in obj1 and 'name' in obj2:
+                    return obj1['name'] == obj2['name']
+                return all(self.compare_nodes(obj1[key], obj2[key]) for key in obj1.keys())
+        return False
+
+    def check_attack_chains_results(self, result, expected) -> bool:
+        """Validate the input content with the expected one.
+        
+        :param result: content retrieved from backend.
+        :return: True if all the controls passed, False otherwise.
+        """
+        # Some example of assertion needed to recognize attack-chain-1.1
+        for acid, ac in enumerate(result['response']['attackChains']):
+            ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
+            ac_node_expected = expected['response']['attackChains'][acid]['attackChainNodes']
+            if ac_node_result['name'] != ac_node_expected['name']:
+                return False
+            if not self.compare_nodes(ac_node_result, ac_node_expected):
+                return False
+        return True
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
