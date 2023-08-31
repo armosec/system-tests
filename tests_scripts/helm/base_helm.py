@@ -172,24 +172,6 @@ class BaseHelm(BaseK8S):
                                                framework_name=framework_name, report_guid=report_guid)
         return c_panel_info
 
-    def check_attack_chains_results(self, result) -> bool:
-        """Validate the input content with the expected one.
-        
-        :param result: content retrieved from backend.
-        :return: True if all the controls passed, False otherwise.
-        """
-        # Some example of assertion needed to recognize attack-chain-1.1
-        verified = True
-        if result['total']['value'] != 1:
-            verified = False
-        if result['response']['attackChains'][0]['attackChainNodes']['name'] != "Workload Exposure":
-            verified = False
-        if result['response']['attackChains'][0]['attackChainNodes']['controlIDs'] != ["C-0256", "C-0044"]:
-            verified = False
-       
-        return verified
-        
-
     # ---------------------- helm ------------------------
     @staticmethod
     def add_and_upgrade_armo_to_repo():
