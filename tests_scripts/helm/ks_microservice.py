@@ -30,9 +30,31 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        attack_chains_found, response = self.poll_for_attack_chains()
+
+        if attack_chains_found:
+            # retrieve expected attack-chain scenario result
+            Logger.logger.info('loading attack chain scenario to validate it')
+            test_scenario = self.test_driver.kwargs.get("test_scenario", "attack-chain-1.1")
+            f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
+            expected = json.load(f) 
+
+            Logger.logger.info('comparing attack-chains result with expected ones')
+            if not self.check_attack_chains_results(response, expected):
+                Logger.logger.error('attack-chain response differ from the expected one')
+                raise Exception("Found attack chains don't match the expected ones")
+
+        return self.cleanup()
+
+    def poll_for_attack_chains(self, timeout=600):
+        """Poll attack chains from the backend.
+        Continue polling until an attack chains has been detected or the timeout is reached.
         
+        :param timeout: Timeout
+        :return: True with content of reponse if an attack chain have been found, False otherwise.
+        """
         start_time = time.time()
-        timeout = 1200  # Timeout in seconds
         response = ""
         attack_chains_found = False
         current_datetime = datetime.now(timezone.utc)
@@ -44,11 +66,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             response = json.loads(r.text)
             Logger.logger.info(response)
 
-            # check if old scans are already present
-            # we assume that attackChainsLastScan will have 
             if response['response']['attackChainsLastScan']:
-                # the following code: `response['response']['attackChainsLastScan'][:-4]+'Z'` is used to convert the date
-                # to an understandable format. '%f' is able to handle until 6 digits.
                 last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
                 last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
                 if last_scan_datetime < current_datetime:
@@ -56,28 +74,14 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                     time.sleep(10)
                     continue
 
-            # check if we found a new attack-chain
-            # if the flow arrives here, means that the retrieved response is updated
             if response['total']['value'] != 0:
                 Logger.logger.info('found attack chains')
                 attack_chains_found = True
                 break
-                    
+
             time.sleep(10)
 
-        if attack_chains_found:
-            # retrieve expected attack-chain scenario result
-            Logger.logger.info('loading attack chain scenario to validate it')
-            test_scenario = self.test_driver.kwargs.get("test_scenario", "attack-chain-1.1")
-            f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
-            expected = json.load(f) 
-
-            Logger.logger.info('comparing attack-chains result with expected ones')
-            if not self.check_attack_chains_results(response, expected):
-                Loggger.logger.error('attack-chain response differ from the expected one')
-                raise Exception("Found attack chains don't match the expected ones")
-
-        return self.cleanup()
+        return attack_chains_found, response
 
     def compare_nodes(self, obj1, obj2) -> bool:
         """Walk 2 dictionary object to compare their values.
