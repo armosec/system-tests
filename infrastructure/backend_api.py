@@ -3,7 +3,7 @@ import math
 import sys
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 import inspect
 from typing import Dict, List
 import dateutil.parser
@@ -1944,19 +1944,33 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def get_attack_chains(self) -> requests.Response:
+    def get_attack_chains(self, current_datetime) -> requests.Response:
         params = {"customerGUID": self.selected_tenant_id}
         payload = {
             "innerFilters": [],
         }
         r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
-        Logger.logger.info(r.url)
         Logger.logger.info(r.text)
 
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
+
+        # checks if respose met conditions to be considered valid:
+        # - parameter 'response.attackChainsLastScan' should have a value >= of current time
+        # - parameter 'total.value' shoud be > 0
+        response = json.loads(r.text)
+        if response['response']['attackChainsLastScan']:
+            last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
+            last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+
+            if last_scan_datetime < current_datetime:
+                raise Exception("attack-chains response is outdated")
+
+        if response['total']['value'] == 0:
+            raise Exception("no attack-chains detected yet")
+
         return r
 
 

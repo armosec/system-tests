@@ -31,9 +31,14 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
-        attack_chains_found, response = self.poll_for_attack_chains()
+        current_datetime = datetime.now(timezone.utc)
+        response, t = self.wait_for_report(self.backend.get_attack_chains, 
+                                           timeout=600, 
+                                           current_datetime=current_datetime
+                                           )
+        #attack_chains_found, response = self.poll_for_attack_chains()
 
-        if attack_chains_found:
+        if response != '':
             # retrieve expected attack-chain scenario result
             Logger.logger.info('loading attack chain scenario to validate it')
             test_scenario = self.test_driver.kwargs.get("test_scenario", "attack-chain-1.1")
@@ -57,8 +62,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         start_time = time.time()
         response = ""
         attack_chains_found = False
-        current_datetime = datetime.now(timezone.utc)
-        Logger.logger.info('getting into while loop')
 
         while time.time() - start_time < timeout:
             Logger.logger.info('polling data from backend')
@@ -69,6 +72,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             if response['response']['attackChainsLastScan']:
                 last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
                 last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+
                 if last_scan_datetime < current_datetime:
                     Logger.logger.info("attack-chains response is outdated")
                     time.sleep(10)
