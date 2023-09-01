@@ -231,6 +231,16 @@ class BaseTest(object):
 
     @staticmethod
     def wait_for_report(report_type, timeout=120, sleep_interval=30, ignore_agent: bool = False, **kwargs):
+        """Given a input function, repeats its execution for an interval of time 
+        and returns its result if no exceptions happened.
+
+        :param report_type: Input function we want to run.
+        :param timeout: Timeout time.
+        :param sleep_interval: Interval of time we want to wait before the next run.
+        :param ignore_agent: <parameter not in use>
+        :param **kwargs: Parameters needed for the input function.
+        :return: Result of input function - Time passed since the first run.
+        """
         start = time.time()
         err = ""
         while time.time() - start < timeout:
