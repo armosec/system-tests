@@ -11,11 +11,11 @@ L = San Francisco
 O = My Company
 OU = My Division
 emailAddress = my@email.com
-CN = httpd-proxy.default:80
+CN = httpd-proxy.default
 
 [ req_ext ]
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = httpd-proxy.default:80
+DNS.1 = httpd-proxy.default
 DNS.2 = httpd-proxy
