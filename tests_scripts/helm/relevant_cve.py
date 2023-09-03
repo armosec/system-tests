@@ -68,6 +68,18 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
+        # 3.9 test CVES summaries created as expected result in the storage
+        CVEs_summaries, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_summaries_from_storage,
+                                       CVEsSummariesKeys=self.get_CVEs_summaries_keys(workload_objs), namespace=namespace)
+        # 3.10 test CVES summaries created as expected result in the storage
+        self.validate_expected_CVEs_summaries(CVEs_summaries, self.test_obj["expected_CVEs_summaries"])
+
+        # 3.11 test CVES scope summaries created as expected result in the storage
+        scoped_CVEs_summaries, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_summaries_by_namespace_from_storage,
+                                       CVEsSummariesKeys=[namespace])
+        # 3.12 test CVES scope summaries created as expected result in the storage
+        self.validate_expected_namespace_CVEs_summaries(scoped_CVEs_summaries, self.test_obj["expected_namespace_CVEs_summaries"], namespace=namespace)
+
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
         TestUtil.sleep(150, "Waiting for aggregation to end")
