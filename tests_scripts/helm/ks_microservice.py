@@ -9,7 +9,9 @@ DEFAULT_BRANCH = "release"
 from systest_utils import Logger, TestUtil, statics
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
-    """ScanWithKubescapeHelmChartWithoutManifests install the kubescape operator and run the scan to check attack-chains."""
+    """
+    ScanWithKubescapeHelmChartWithoutManifests install the kubescape operator and run the scan to check attack-chains.
+    """
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanAttackChainsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
