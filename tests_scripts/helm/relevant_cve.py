@@ -17,7 +17,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
 
         # P1 install helm-chart (armo)
         #  1.1 add and update armo in repo
-        # Logger.logger.info('install armo helm-chart')
+        Logger.logger.info('install armo helm-chart')
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
         self.add_and_upgrade_armo_to_repo()
 
@@ -43,41 +43,55 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         # P3 verify results in storage
         # 3 test SBOM and CVEs created as expected in the storage
         Logger.logger.info('Get the scan result from local Storage')
+        
         # 3.1 test SBOM created in the storage
+        Logger.logger.info('Get SBOMs from storage')  
         SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
                                          SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.2 test SBOM created as expected result in the storage
+        Logger.logger.info('Validate SBOMs was created with expected data')                     
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
+
         # 3.3 test CVEs created in the storage
+        Logger.logger.info('Get CVEs from storage')  
         CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.4 test CVES created as expected result in the storage
+        Logger.logger.info('Validate CVEs was created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
         # 3.5 test filtered SBOM created in the storage
+        Logger.logger.info('Get SBOMsp from storage')  
         filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
                                                    namespace=namespace))
-        # 3.6 test filtered CVEs created as expected result in the storage
+        # 3.6 test filtered SBOMs created as expected result in the storage
+        Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"], namespace=namespace)
-        # 3.7 test filtered SBOM created in the storage
         
+        # 3.7 test filtered SBOM created in the storage
+        Logger.logger.info('Get filtered CVEs from storage')
         filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage, filteredCVEsKEys=self.get_filtered_data_keys(pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
+        Logger.logger.info('Validate filtered CVEs was created with expected data')
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
         # 3.9 test CVES summaries created as expected result in the storage
+        Logger.logger.info('Get CVEs summaries from storage')
         CVEs_summaries, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_summaries_from_storage,
-                                       CVEsSummariesKeys=self.get_CVEs_summaries_keys(workload_objs), namespace=namespace)
+                                       CVEs_summaries_keys=self.get_CVEs_summaries_keys(workload_objs), namespace=namespace)
         # 3.10 test CVES summaries created as expected result in the storage
+        Logger.logger.info('Validate CVEs summaries was created with expected data')
         self.validate_expected_CVEs_summaries(CVEs_summaries, self.test_obj["expected_CVEs_summaries"])
 
         # 3.11 test CVES scope summaries created as expected result in the storage
-        scoped_CVEs_summaries, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_summaries_by_namespace_from_storage,
-                                       CVEsSummariesKeys=[namespace])
+        Logger.logger.info('Get CVEs scope summaries from storage')
+        scoped_CVEs_summaries, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_summaries_by_scope_from_storage,
+                                       CVEs_summaries_keys=[namespace])
         # 3.12 test CVES scope summaries created as expected result in the storage
+        Logger.logger.info('Validate CVEs scope summaries was created with expected data')
         self.validate_expected_namespace_CVEs_summaries(scoped_CVEs_summaries, self.test_obj["expected_namespace_CVEs_summaries"], namespace=namespace)
 
         Logger.logger.info('delete armo namespace')

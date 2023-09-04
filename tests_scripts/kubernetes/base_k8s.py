@@ -1069,10 +1069,10 @@ class BaseK8S(BaseDockerizeTest):
               filteredCVEs.append((key, cve_data))
         return filteredCVEs
 
-    def get_CVEs_summaries_from_storage(self, CVEsSummariesKeys, namespace):
-        CVEsSummaries = []
-        if any(isinstance(i, list) for i in CVEsSummariesKeys):
-            for keys in CVEsSummariesKeys:
+    def get_CVEs_summaries_from_storage(self, CVEs_summaries_keys, namespace):
+        CVEs_summaries = []
+        if any(isinstance(i, list) for i in CVEs_summaries_keys):
+            for keys in CVEs_summaries_keys:
                 for key in keys:    
                     CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                     group=statics.STORAGE_AGGREGATED_API_GROUP,
@@ -1081,9 +1081,9 @@ class BaseK8S(BaseDockerizeTest):
                     namespace=namespace,
                     plural=statics.STORAGE_CVES_SUMMARIES_PLURAL,
                     )
-                    CVEsSummaries.append((key, CVE_data))
-        elif isinstance(CVEsSummariesKeys, list):
-            for key in CVEsSummariesKeys:
+                    CVEs_summaries.append((key, CVE_data))
+        elif isinstance(CVEs_summaries_keys, list):
+            for key in CVEs_summaries_keys:
                 CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                 group=statics.STORAGE_AGGREGATED_API_GROUP,
                 version=statics.STORAGE_AGGREGATED_API_VERSION,
@@ -1091,14 +1091,14 @@ class BaseK8S(BaseDockerizeTest):
                 namespace=namespace,
                 plural=statics.STORAGE_CVES_SUMMARIES_PLURAL,
             )
-                CVEsSummaries.append((key, CVE_data))
-        return CVEsSummaries
+                CVEs_summaries.append((key, CVE_data))
+        return CVEs_summaries
 
 
-    def get_CVEs_summaries_by_namespace_from_storage(self, CVEsSummariesKeys):
-        CVEsSummaries = []
-        if any(isinstance(i, list) for i in CVEsSummariesKeys):
-            for keys in CVEsSummariesKeys:
+    def get_CVEs_summaries_by_scope_from_storage(self, CVEs_summaries_keys):
+        CVEs_summaries = []
+        if any(isinstance(i, list) for i in CVEs_summaries_keys):
+            for keys in CVEs_summaries_keys:
                 for key in keys:    
                     CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_cluster_custom_object(
                     group=statics.STORAGE_AGGREGATED_API_GROUP,
@@ -1106,14 +1106,14 @@ class BaseK8S(BaseDockerizeTest):
                     name=key,
                     plural=statics.STORAGE_CVES_SCOPE_SUMMARIES_PLURAL,
                     )
-                    CVEsSummaries.append((key, CVE_data))
-        elif isinstance(CVEsSummariesKeys, list):
-            for key in CVEsSummariesKeys:
+                    CVEs_summaries.append((key, CVE_data))
+        elif isinstance(CVEs_summaries_keys, list):
+            for key in CVEs_summaries_keys:
                 CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_cluster_custom_object(
                 group=statics.STORAGE_AGGREGATED_API_GROUP,
                 version=statics.STORAGE_AGGREGATED_API_VERSION,
                 name=key,
                 plural=statics.STORAGE_CVES_SCOPE_SUMMARIES_PLURAL,
             )
-                CVEsSummaries.append((key, CVE_data))
-        return CVEsSummaries
+                CVEs_summaries.append((key, CVE_data))
+        return CVEs_summaries
