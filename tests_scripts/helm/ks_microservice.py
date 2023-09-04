@@ -6,6 +6,7 @@ from tests_scripts.kubescape.base_kubescape import BaseKubescape
 import json
 
 DEFAULT_BRANCH = "release"
+DEFAULT_AC_SCENARIO = "attack-chain-1.1"
 from systest_utils import Logger, TestUtil, statics
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
@@ -29,17 +30,18 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(20)
 
         current_datetime = datetime.now(timezone.utc)
         response, t = self.wait_for_report(self.backend.get_attack_chains, 
-                                           timeout=600, 
+                                           timeout=300, 
                                            current_datetime=current_datetime
                                            )
 
         if response != '':
             # retrieve expected attack-chain scenario result
             Logger.logger.info('loading attack chain scenario to validate it')
-            test_scenario = self.test_driver.kwargs.get("test_scenario", "attack-chain-1.1")
+            test_scenario = self.test_obj["test_scenario"]
             f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
             expected = json.load(f) 
 
@@ -49,41 +51,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                 raise Exception("Found attack chains don't match the expected ones")
 
         return self.cleanup()
-
-    def poll_for_attack_chains(self, timeout=600):
-        """Poll attack chains from the backend.
-        Continue polling until an attack chains has been detected or the timeout is reached.
-        
-        :param timeout: Timeout
-        :return: True with content of reponse if an attack chain have been found, False otherwise.
-        """
-        start_time = time.time()
-        response = ""
-        attack_chains_found = False
-
-        while time.time() - start_time < timeout:
-            Logger.logger.info('polling data from backend')
-            r = self.backend.get_attack_chains()
-            response = json.loads(r.text)
-            Logger.logger.info(response)
-
-            if response['response']['attackChainsLastScan']:
-                last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
-                last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
-
-                if last_scan_datetime < current_datetime:
-                    Logger.logger.info("attack-chains response is outdated")
-                    time.sleep(10)
-                    continue
-
-            if response['total']['value'] != 0:
-                Logger.logger.info('found attack chains')
-                attack_chains_found = True
-                break
-
-            time.sleep(10)
-
-        return attack_chains_found, response
 
     def compare_nodes(self, obj1, obj2) -> bool:
         """Walk 2 dictionary object to compare their values.
@@ -116,7 +83,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         :param result: content retrieved from backend.
         :return: True if all the controls passed, False otherwise.
         """
-        # Some example of assertion needed to recognize attack-chain-1.1
+        # Some example of assertion needed to recognize attack chain scenarios
         for acid, ac in enumerate(result['response']['attackChains']):
             ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
             ac_node_expected = expected['response']['attackChains'][acid]['attackChainNodes']
