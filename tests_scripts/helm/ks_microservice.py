@@ -30,8 +30,9 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        time.sleep(20)
+        time.sleep(10)
 
+        Logger.logger.info("wait for response from BE")
         current_datetime = datetime.now(timezone.utc)
         response, t = self.wait_for_report(self.backend.get_attack_chains, 
                                            timeout=300, 
@@ -50,6 +51,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                 Logger.logger.error('attack-chain response differ from the expected one')
                 raise Exception("Found attack chains don't match the expected ones")
 
+        Logger.logger.info("attack chain detected")
         return self.cleanup()
 
     def compare_nodes(self, obj1, obj2) -> bool:
