@@ -31,7 +31,6 @@ class KSMicroserviceTests(object):
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start"}],
             test_scenario="attack-chain-1.1"
-            #create_test_tenant = True
         )
 
     @staticmethod
