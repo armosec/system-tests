@@ -1,26 +1,45 @@
 from datetime import datetime,timezone
+import os
 import sys
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
+from systest_utils import Logger, TestUtil, statics
 import json
 
 DEFAULT_BRANCH = "release"
-DEFAULT_AC_SCENARIO = "attack-chain-1.1"
-from systest_utils import Logger, TestUtil, statics
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
     ScanWithKubescapeHelmChartWithoutManifests install the kubescape operator and run the scan to check attack-chains.
     """
+
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanAttackChainsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
-        
+
+        attack_chain_scenarios = "https://github.com/armosec/attack-chains-test-env.git"
+        attack_chain_scenarios_path = "./attack-chain-scenarios"
+        base_dir = './attack-chain-scenarios'
+
         self.ignore_agent = True
+
+        Logger.logger.info("Installing attack-chain-scenario")
+
+        Logger.logger.info("Cloning scenarios repository")
+        cloned = TestUtil.clone_git_repository(attack_chain_scenarios, attack_chain_scenarios_path)
+        if not cloned:
+            Logger.logger.error("Failed to clone repository.")
+            raise Exception("Failed to clone repository")
+
+        Logger.logger.info("Applying scenario manifests")
+        test_scenario = self.test_obj[("test_scenario", None)]
+        deploy_cmd = base_dir + '/' + 'deploy_scenario' + ' ' + base_dir + '/' + test_scenario
+        TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
+        time.sleep(5)
 
         Logger.logger.info("Installing kubescape with helm-chart")
         # 2.1 add and update armo in repo
@@ -35,14 +54,14 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         current_datetime = datetime.now(timezone.utc)
         r, t = self.wait_for_report(self.backend.get_attack_chains, 
-                                           timeout=300, 
+                                           timeout=600, 
                                            current_datetime=current_datetime
                                            )
 
         if r.text != '':
             # retrieve expected attack-chain scenario result
             Logger.logger.info('loading attack chain scenario to validate it')
-            test_scenario = self.test_obj["test_scenario"]
+            
             f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
             expected = json.load(f) 
             response = json.loads(r.text)

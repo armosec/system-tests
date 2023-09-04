@@ -101,6 +101,24 @@ class TestUtil(object):
         Logger.logger.debug("{} dir created".format(dir_name))
 
     @staticmethod
+    def clone_git_repository(repo_url, destination_path):
+        """
+        Clone git repository locally
+
+        :param repo_url: Repository you want to clone.
+        :param destination_path: Destination path to store repository.
+        :return: True if the repository is downloaded properly, False otherwise.
+        """ 
+        try:
+            # Run the git clone command
+            subprocess.check_output(['git', 'clone', repo_url, destination_path], stderr=subprocess.STDOUT, universal_newlines=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            # If the command fails, print the error message and return False
+            print(f"Failed to clone repository: {e.output}")
+            return False
+
+    @staticmethod
     def random_string(length=16):
         if TestUtil.text_book and len(TestUtil.text_book) - length >= 0:
             start_location = random.randint(0, len(TestUtil.text_book) - length)
