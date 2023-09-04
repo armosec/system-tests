@@ -34,17 +34,18 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("wait for response from BE")
         current_datetime = datetime.now(timezone.utc)
-        response, t = self.wait_for_report(self.backend.get_attack_chains, 
+        r, t = self.wait_for_report(self.backend.get_attack_chains, 
                                            timeout=300, 
                                            current_datetime=current_datetime
                                            )
 
-        if response != '':
+        if r.text != '':
             # retrieve expected attack-chain scenario result
             Logger.logger.info('loading attack chain scenario to validate it')
             test_scenario = self.test_obj["test_scenario"]
             f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
             expected = json.load(f) 
+            response = json.loads(r.text)
 
             Logger.logger.info('comparing attack-chains result with expected ones')
             if not self.check_attack_chains_results(response, expected):
