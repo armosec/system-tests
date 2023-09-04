@@ -21,7 +21,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def scan_for_attack_chains():
+    def scan_for_attack_chains_scenario_1_1():
         """
         install kubescape helm chart, run scan with 'security' framework and check detected attack-chains.
         """
@@ -29,7 +29,8 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
-            test_job=[{"trigger_by": "scan_on_start"}]
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-1.1"
             #create_test_tenant = True
         )
 

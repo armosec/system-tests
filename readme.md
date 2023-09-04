@@ -33,7 +33,7 @@
 | `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `scan_for_attack_chains`                                       | helm-chart | use it with `--kwargs test_scenario=attack-chain-x` to test a specific attack chain scenario                                   | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_1_1`                                       | helm-chart |                                    | in-cluster kubescape, backend |
 `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
@@ -105,7 +105,6 @@ Add to environment the following values to connect to the backend:
 | `operator-tag=value`     | install helm-chart with operator from tag: value  |
 | `kollector-tag=value`    | install helm-chart with kollector from tag: value |
 | `gateway-tag=value`      | install helm-chart with gateway from tag: value   |
-| `test_scenario=value`    | test one of the available attack chain scenarios (located under `configurations/attack_chain_expected_values/`. <br>more info here: [https://github.com/armosec/attack-chains-test-env](https://github.com/armosec/attack-chains-test-env) |
 
 
 #### Run command:
