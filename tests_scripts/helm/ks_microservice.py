@@ -21,23 +21,22 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
 
-        attack_chain_scenarios = "https://github.com/armosec/attack-chains-test-env.git"
+        attack_chain_scenarios_repo = "https://github.com/armosec/attack-chains-test-env.git"
         attack_chain_scenarios_path = "./attack-chain-scenarios"
-        base_dir = './attack-chain-scenarios'
 
         self.ignore_agent = True
 
         Logger.logger.info("Installing attack-chain-scenario")
 
         Logger.logger.info("Cloning scenarios repository")
-        cloned = TestUtil.clone_git_repository(attack_chain_scenarios, attack_chain_scenarios_path)
+        cloned = TestUtil.clone_git_repository(attack_chain_scenarios_repo, attack_chain_scenarios_path)
         if not cloned:
             Logger.logger.error("Failed to clone repository.")
             raise Exception("Failed to clone repository")
 
         Logger.logger.info("Applying scenario manifests")
         test_scenario = self.test_obj[("test_scenario", None)]
-        deploy_cmd = base_dir + '/' + 'deploy_scenario' + ' ' + base_dir + '/' + test_scenario
+        deploy_cmd = attack_chain_scenarios_path + '/' + 'deploy_scenario' + ' ' + attack_chain_scenarios_path + '/' + test_scenario
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
         time.sleep(5)
 
