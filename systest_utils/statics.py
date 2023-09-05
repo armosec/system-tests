@@ -107,8 +107,8 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
-HELM_REPO_FROM_LOCAL = "charts/kubescape-cloud-operator"
-HELM_REPO = "kubescape/kubescape-cloud-operator"
+HELM_REPO_FROM_LOCAL = "charts/kubescape-operator"
+HELM_REPO = "kubescape/kubescape-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
 CA_KUBESCAPE_CONFIGMAP_NAME = "kubescape-config"
