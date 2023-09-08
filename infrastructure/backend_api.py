@@ -1944,7 +1944,7 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def get_attack_chains(self, current_datetime) -> requests.Response:
+    def retrieve_attack_chains(self):
         params = {"customerGUID": self.selected_tenant_id}
         payload = {
             "innerFilters": [],
@@ -1956,14 +1956,19 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
+        return r
 
+    def get_attack_chains(self, current_datetime) -> requests.Response:
+        r = self.retrieve_attack_chains()
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
         # - parameter 'total.value' shoud be > 0
         response = json.loads(r.text)
         if response['response']['attackChainsLastScan']:
-            last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'][:-4]+'Z', '%Y-%m-%dT%H:%M:%S.%fZ')
+            last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')
             last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+            print("last scan time: ", response['response']['attackChainsLastScan'])
+            print(last_scan_datetime, current_datetime)
 
             if last_scan_datetime < current_datetime:
                 raise Exception("attack-chains response is outdated")
@@ -1973,6 +1978,14 @@ class ControlPanelAPI(object):
 
         return r
 
+    def get_fixed_attack_chains(self) -> requests.Response:
+        r = self.retrieve_attack_chains()
+
+        response = json.loads(r.text)
+        if not response['total']['value'] == 0:
+            raise Exception("attack-chains not fixed yet")
+
+        return r
 
 class Solution(object):
     """docstring for Solution"""

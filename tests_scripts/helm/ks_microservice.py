@@ -21,10 +21,11 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
 
-        attack_chain_scenarios_repo = "https://github.com/armosec/attack-chains-test-env.git"
         attack_chain_scenarios_path = "./configurations/attack-chains-test-env"
+        attack_chain_expected_values = "./configurations/attack_chains_expected_values"
 
         self.ignore_agent = True
+        cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info("Installing attack-chain-scenario")
 
@@ -41,31 +42,66 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.install_armo_helm_chart()
 
         # 2.3 verify installation
+        current_datetime = datetime.now(timezone.utc)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         time.sleep(10)
 
         Logger.logger.info("wait for response from BE")
+        r, t = self.wait_for_report(
+            self.backend.get_attack_chains, 
+            timeout=600, 
+            current_datetime=current_datetime
+            )
+
+        Logger.logger.info('loading attack chain scenario to validate it')
+        f = open(attack_chain_expected_values + '/'+test_scenario+'.json')
+        expected = json.load(f) 
+        response = json.loads(r.text)
+
+        Logger.logger.info('comparing attack-chains result with expected ones')
+        if not self.check_attack_chains_results(response, expected):
+            Logger.logger.error('attack-chain response differ from the expected one')
+            raise Exception("Found attack chains don't match the expected ones")
+
+        # Fixing phase
+        Logger.logger.info("attack chains detected, applying fix command")
+        self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
+        cluster_name = response['response']['attackChains'][0]['attributes']['cluster']
         current_datetime = datetime.now(timezone.utc)
-        r, t = self.wait_for_report(self.backend.get_attack_chains, 
-                                           timeout=600, 
-                                           current_datetime=current_datetime
-                                           )
+        self.trigger_scan(cluster_name)
+        time.sleep(120)
 
-        if r.text != '':
-            # retrieve expected attack-chain scenario result
-            Logger.logger.info('loading attack chain scenario to validate it')
-            
-            f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
-            expected = json.load(f) 
-            response = json.loads(r.text)
+        Logger.logger.info("wait for response from BE")
+        fixed_r, t = self.wait_for_report(
+            self.backend.get_fixed_attack_chains, 
+            timeout=600, 
+            )
 
-            Logger.logger.info('comparing attack-chains result with expected ones')
-            if not self.check_attack_chains_results(response, expected):
-                Logger.logger.error('attack-chain response differ from the expected one')
-                raise Exception("Found attack chains don't match the expected ones")
+        f = open(attack_chain_expected_values + '/' + test_scenario + '-fix_control.json')
+        expected = json.load(f) 
+        response = json.loads(fixed_r.text)
 
-        Logger.logger.info("attack chain detected")
+        Logger.logger.info('comparing attack-chains result with expected ones (fix)')
+        if not self.check_attack_chains_results(response, expected):
+            Logger.logger.error('attack-chain response differ from the expected one')
+            raise Exception('attack-chain response differ from the expected one')
+
+        Logger.logger.info('attack-chain fixed')
         return self.cleanup()
+
+    def fix_attack_chain(self, attack_chain_scenarios_path, test_scenario):
+        fix_type = self.test_obj[("fix_object", None)]
+        fix_command= attack_chain_scenarios_path + '/' + test_scenario + '/' + 'fix_' + fix_type
+        TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
+        time.sleep(5)
+
+    def trigger_scan(self, cluster_name):
+        self.backend.create_kubescape_job_request(
+            cluster_name=cluster_name,
+            trigger_by="job",
+            framework_list=["security"],
+            with_host_sensor="true"
+            )
 
     def compare_nodes(self, obj1, obj2) -> bool:
         """Walk 2 dictionary object to compare their values.
