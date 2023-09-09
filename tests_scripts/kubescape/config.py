@@ -34,9 +34,17 @@ class ConfigView(BaseHelm, BaseKubescape):
         return self.cleanup()
 
     def compare_view_result(self):
-        cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_KUBESCAPE_CONFIGMAP_NAME)
-        cm_data = cm_obj.data["config.json"]
+        ks_cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_KUBESCAPE_CONFIGMAP_NAME)
+        cm_data = ks_cm_obj.data["config.json"]
         cm_dict = json.loads(cm_data)
+
+        # kubescape reads its URLs from the cloud configmap, so we merge the dict from the cloud configmap with the dict from the kubescape configmap
+        ks_cloud_cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_CONFIG)
+        if statics.CA_CONFIGMAP_SERVICE_DISCOVERY_KEY in ks_cloud_cm_obj.data:
+            ks_cloud_cm_dict = json.loads(ks_cloud_cm_obj.data[statics.CA_CONFIGMAP_SERVICE_DISCOVERY_KEY])
+            cm_dict[statics.CLOUD_REPORT_URL_KEY] = ks_cloud_cm_dict["response"]["event-receiver-http"]
+            cm_dict[statics.CLOUD_API_URL_KEY] = ks_cloud_cm_dict["response"]["api-server"]
+
         with open(self.get_default_results_file()) as f:
             res_dict = json.load(f)
         with open(self.get_kubescape_config_file()) as f:
