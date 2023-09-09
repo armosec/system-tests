@@ -39,6 +39,8 @@ class HelmWrapper(object):
 
         # disable security framework scan
         # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
+        if os.environ.get("DISABLE_RELEVANCY") == "true":
+            command_args.extend(["--set", "capabilities.relevancy=disable"])
 
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
