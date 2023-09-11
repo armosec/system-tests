@@ -84,7 +84,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
                                        CVEs_summaries_keys=self.get_CVEs_summaries_keys(workload_objs), namespace=namespace)
         # 3.10 test CVES summaries created as expected result in the storage
         Logger.logger.info('Validate CVEs summaries was created with expected data')
-        self.validate_expected_CVEs_summaries(CVEs_summaries, self.test_obj["expected_CVEs_summaries"])
+        self.validate_expected_CVEs_summaries(CVEs_summaries, self.read_expected_data_from_files(self.test_obj["expected_CVEs_summaries"]))
 
         # 3.11 test CVES scope summaries created as expected result in the storage
         Logger.logger.info('Get CVEs scope summaries from storage')
@@ -92,7 +92,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
                                        CVEs_summaries_keys=[namespace])
         # 3.12 test CVES scope summaries created as expected result in the storage
         Logger.logger.info('Validate CVEs scope summaries was created with expected data')
-        self.validate_expected_namespace_CVEs_summaries(scoped_CVEs_summaries, self.test_obj["expected_namespace_CVEs_summaries"], namespace=namespace)
+        self.validate_expected_namespace_CVEs_summaries(scoped_CVEs_summaries, self.read_expected_data_from_files(self.test_obj["expected_namespace_CVEs_summaries"]), namespace=namespace)
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
