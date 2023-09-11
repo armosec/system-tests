@@ -764,7 +764,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
         
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
-        self.backend.delete_repository(repository_hash=repoHash)
+        try:
+            self.backend.delete_repository(repository_hash=repoHash)
+        except Exception as e:
+            Logger.logger.warning(f"failed to delete repository - {e}")
         return statics.SUCCESS, ""
 
 class TestScanningScope(BaseKubescape):

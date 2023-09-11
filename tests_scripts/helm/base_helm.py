@@ -116,7 +116,7 @@ class BaseHelm(BaseK8S):
                             "nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
         
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
-                                            environment=self.test_driver.backend_obj.get_name() if self.backend != None else "",
+                                            server=self.test_driver.backend_obj.get_api_url(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
         self.remove_armo_system_namespace = True
@@ -156,7 +156,7 @@ class BaseHelm(BaseK8S):
         TestUtil.run_command(command_args=command_args, timeout=360)
         self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, statics.HELM_REPO_FROM_LOCAL)
 
-    def test_helm_chart_tesults(self, report_guid: str):
+    def test_helm_chart_results(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
 
         assert len(be_frameworks) >= 4, \
