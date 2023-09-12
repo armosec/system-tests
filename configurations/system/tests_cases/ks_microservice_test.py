@@ -21,7 +21,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def scan_for_attack_chains_scenario_1_1():
+    def scan_for_attack_chains_scenario_1_1_fix_control():
         """
         install kubescape helm chart, run scan with 'security' framework and check detected attack-chains.
 
@@ -37,7 +37,8 @@ class KSMicroserviceTests(object):
             fix_object="control"
         )
 
-    def scan_for_attack_chains_scenario_5():
+    @staticmethod
+    def scan_for_attack_chains_scenario_5_fix_control():
         from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -45,6 +46,27 @@ class KSMicroserviceTests(object):
             test_job=[{"trigger_by": "scan_on_start"}],
             test_scenario="attack-chain-5",
             fix_object="control"
+        )
+
+    @staticmethod
+    def scan_for_attack_chains_scenario_1_1_fix_image():
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-1-1",
+            fix_object="image"
+        )
+
+    def scan_for_attack_chains_scenario_5_fix_image():
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-5",
+            fix_object="image"
         )
 
     @staticmethod
