@@ -33,7 +33,17 @@ class KSMicroserviceTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start"}],
-            test_scenario="attack-chain-1.1",
+            test_scenario="attack-chain-1-1",
+            fix_object="control"
+        )
+
+    def scan_for_attack_chains_scenario_5():
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-5",
             fix_object="control"
         )
 
