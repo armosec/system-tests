@@ -1944,10 +1944,15 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def retrieve_attack_chains(self):
+    def get_attack_chains(self, cluster_name=None):
         params = {"customerGUID": self.selected_tenant_id}
+
+        filters = []
+        if cluster_name is not None:
+            filters.append({"clusterName": cluster_name})
+
         payload = {
-            "innerFilters": [],
+            "innerFilters": filters,
         }
         r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
         Logger.logger.info(r.text)
@@ -1958,8 +1963,8 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def get_attack_chains(self, current_datetime) -> requests.Response:
-        r = self.retrieve_attack_chains()
+    def get_attack_chains_list(self, current_datetime, cluster_name=None) -> requests.Response:
+        r = self.get_attack_chains(cluster_name)
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
         # - parameter 'total.value' shoud be > 0
@@ -1978,8 +1983,8 @@ class ControlPanelAPI(object):
 
         return r
 
-    def get_fixed_attack_chains(self) -> requests.Response:
-        r = self.retrieve_attack_chains()
+    def get_fixed_attack_chains_list(self, cluster_name=None) -> requests.Response:
+        r = self.get_attack_chains(cluster_name)
 
         response = json.loads(r.text)
         if not response['total']['value'] == 0:

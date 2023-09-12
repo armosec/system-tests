@@ -1,6 +1,4 @@
 from datetime import datetime,timezone
-import os
-import sys
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -48,9 +46,10 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
-            self.backend.get_attack_chains, 
+            self.backend.get_attack_chains_list, 
             timeout=600, 
-            current_datetime=current_datetime
+            current_datetime=current_datetime,
+            cluster_name=cluster
             )
 
         Logger.logger.info('loading attack chain scenario to validate it')
@@ -66,15 +65,15 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
-        cluster_name = response['response']['attackChains'][0]['attributes']['cluster']
         current_datetime = datetime.now(timezone.utc)
-        self.trigger_scan(cluster_name)
+        self.trigger_scan(cluster)
         time.sleep(120)
 
         Logger.logger.info("wait for response from BE")
         fixed_r, t = self.wait_for_report(
-            self.backend.get_fixed_attack_chains, 
+            self.backend.get_fixed_attack_chains_list, 
             timeout=600, 
+            cluster_name=cluster
             )
 
         f = open(attack_chain_expected_values + '/' + test_scenario + '-fix_control.json')
@@ -86,7 +85,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             Logger.logger.error('attack-chain response differ from the expected one')
             raise Exception('attack-chain response differ from the expected one')
 
-        Logger.logger.info('attack-chain fixed')
+        Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
 
     def fix_attack_chain(self, attack_chain_scenarios_path, test_scenario):
