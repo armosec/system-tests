@@ -66,6 +66,8 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("attack chains detected, applying fix command")
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
         current_datetime = datetime.now(timezone.utc)
+        time.sleep(90)
+        Logger.logger.info("trigger a new scan")
         self.trigger_scan(cluster)
         time.sleep(120)
 
