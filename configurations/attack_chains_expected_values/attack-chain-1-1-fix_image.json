@@ -1,0 +1,14 @@
+{
+    "total": {
+        "value": 0,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+
+        ],
+        "attackChainsLastScan": "2023-09-11T13:34:01Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}
