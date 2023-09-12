@@ -1,0 +1,24 @@
+{
+  "channel": {
+    "name": "My Teams Channel",
+    "provider": "teams",
+    "context": {
+      "webhook": {
+        "name": "webhook",
+        "id": "https://teams/mywebhook"
+      }
+    }
+  },
+  "notifications": [
+    {
+      "notificationType": "push:newClusterAdmin",
+      "disabled": true
+    }
+  ],
+  "scope": [
+    {
+      "cluster": "cluster1",
+      "namespaces": ["test-system"]
+    }
+  ]
+}

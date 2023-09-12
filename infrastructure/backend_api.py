@@ -1893,35 +1893,8 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def create_alert_channel(self) -> requests.Response:
-        payload = json.dumps(
-                {
-                    "channel": {
-                        "name": "My Teams Channel",
-                        "provider": "teams",
-                        "context": {
-                            "webhook": {
-                                "name": "webhook",
-                                "id": "https://teams/mywebhook"
-                            }
-                        }
-                    },
-                    "notifications": [
-                        {
-                            "notificationType": "push:newClusterAdmin",
-                            "disabled": True
-                        }
-                    ],
-                    "scope": [
-                        {
-                            "cluster": "cluster1",
-                            "namespaces": ["test-system"]
-                        }
-                    ]
-                }
-        )
-
-        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=payload)
+    def create_alert_channel(self, payload) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: create channel alert "%s" (code: %d, message: %s)' % (

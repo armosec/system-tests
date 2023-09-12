@@ -19,7 +19,9 @@ class AlertChannels(BaseNotifications):
         assert not get_all_channels_response.content, "Expected alert channels to be empty"
 
         Logger.logger.info("Stage 2: Create new alert channel")
-        created_alert_channel_response = self.backend.create_alert_channel()
+        with open('configurations/notifications/alert-channel-payload.json', 'r') as file:
+            data = json.load(file)
+        created_alert_channel_response = self.backend.create_alert_channel(data)
         assert created_alert_channel_response, "Expected alert channel"
         guid = created_alert_channel_response.json()["channel"]["guid"]
         assert guid, "Expected alert channel's guid"
