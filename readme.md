@@ -33,7 +33,10 @@
 | `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_1_1`                                       | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_1_1_control`                                       | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_1_1_image`                                       | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_5_control`                                       | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_5_image`                                       | helm-chart |                                    | in-cluster kubescape, backend |
 `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
