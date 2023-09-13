@@ -1,4 +1,5 @@
 from datetime import datetime,timezone
+import os
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -29,7 +30,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("Applying scenario manifests")
         test_scenario = self.test_obj[("test_scenario", None)]
-        deploy_cmd = attack_chain_scenarios_path + '/' + 'deploy_scenario' + ' ' + attack_chain_scenarios_path + '/' + test_scenario
+        deploy_cmd = os.path.join(attack_chain_scenarios_path, 'deploy_scenario') + ' ' + os.path.join(attack_chain_scenarios_path , test_scenario)
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
         time.sleep(5)
 
@@ -53,23 +54,19 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             )
 
         Logger.logger.info('loading attack chain scenario to validate it')
-        f = open(attack_chain_expected_values + '/'+test_scenario+'.json')
+        f = open(os.path.join(attack_chain_expected_values, test_scenario+'.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones')
-        if not self.check_attack_chains_results(response, expected):
-            Logger.logger.error('attack-chain response differ from the expected one')
-            raise Exception("Found attack chains don't match the expected ones")
+        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
         current_datetime = datetime.now(timezone.utc)
-        time.sleep(90)
         Logger.logger.info("trigger a new scan")
         self.trigger_scan(cluster)
-        time.sleep(120)
 
         Logger.logger.info("wait for response from BE")
         fixed_r, t = self.wait_for_report(
@@ -78,21 +75,19 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             cluster_name=cluster
             )
 
-        f = open(attack_chain_expected_values + '/' + test_scenario + '-fix_control.json')
+        f = open(os.path.join(attack_chain_expected_values, test_scenario + '-fix_control.json'))
         expected = json.load(f) 
         response = json.loads(fixed_r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones (fix)')
-        if not self.check_attack_chains_results(response, expected):
-            Logger.logger.error('attack-chain response differ from the expected one')
-            raise Exception('attack-chain response differ from the expected one')
+        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
 
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
 
     def fix_attack_chain(self, attack_chain_scenarios_path, test_scenario):
-        fix_type = self.test_obj[("fix_object", None)]
-        fix_command= attack_chain_scenarios_path + '/' + test_scenario + '/' + 'fix_' + fix_type
+        fix_type = self.test_obj[("fix_object", "control")]
+        fix_command= os.path.join(attack_chain_scenarios_path, test_scenario, 'fix_' + fix_type)
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         time.sleep(5)
 
