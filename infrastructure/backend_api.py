@@ -1975,11 +1975,9 @@ class ControlPanelAPI(object):
             print("last scan time: ", response['response']['attackChainsLastScan'])
             print(last_scan_datetime, current_datetime)
 
-            if last_scan_datetime < current_datetime:
-                raise Exception("attack-chains response is outdated")
+            assert last_scan_datetime >= current_datetime, f"attack-chains response is outdated"
 
-        if response['total']['value'] == 0:
-            raise Exception("no attack-chains detected yet")
+        assert response['total']['value'] > 0, f"no attack-chains detected yet"
 
         return r
 
@@ -1987,8 +1985,7 @@ class ControlPanelAPI(object):
         r = self.get_attack_chains(cluster_name)
 
         response = json.loads(r.text)
-        if not response['total']['value'] == 0:
-            raise Exception("attack-chains not fixed yet")
+        assert response['total']['value'] == 0, f"attack-chains not fixed yet"
 
         return r
 

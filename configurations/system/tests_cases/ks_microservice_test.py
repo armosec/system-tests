@@ -59,6 +59,7 @@ class KSMicroserviceTests(object):
             fix_object="image"
         )
 
+    @staticmethod
     def scan_for_attack_chains_scenario_5_fix_image():
         from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
         return TestConfiguration(
