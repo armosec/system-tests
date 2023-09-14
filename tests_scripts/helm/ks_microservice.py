@@ -71,7 +71,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         fixed_r, t = self.wait_for_report(
             self.backend.get_fixed_attack_chains_list, 
-            timeout=600, 
+            timeout=1200, 
             cluster_name=cluster
             )
 
@@ -92,9 +92,8 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         time.sleep(5)
 
     def trigger_scan(self, cluster_name):
-        self.backend.create_kubescape_job_request(
+        self.backend.trigger_posture_scan(
             cluster_name=cluster_name,
-            trigger_by="job",
             framework_list=["security"],
             with_host_sensor="true"
             )

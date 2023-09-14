@@ -1364,6 +1364,19 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
+    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true"):
+        params = {"customerGUID": self.selected_tenant_id}
+        body = []
+        for framework in framework_list:
+            body.append(
+                {"clusterName": cluster_name, "frameworkName": framework, "hostSensor": with_host_sensor})
+        r = self.post(API_POSTURE_SCAN, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
     def create_vuln_scan_job_request(self, cluster_name, namespaces_list: list, schedule_string: str = ''):
         params = {"customerGUID": self.selected_tenant_id}
         body = []
