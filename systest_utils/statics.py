@@ -142,6 +142,8 @@ WARN_RESOURCES_COUNT_FIELD = "warningResources"
 FAILED_RESOURCES_COUNT_FIELD = "failedResources"
 
 FRAMEWORK_REPORTS_FIELD = "frameworkReports"
+RESULTS_FIELD = "results"
+RESOURCES_FIELD = "resources"
 CONTROLS_FIELD = "controls"
 RULE_REPORTS_FIELD = "ruleReports"
 RULE_RESPONSE_FIELD = "ruleResponse"
@@ -194,6 +196,8 @@ STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
 STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"
 STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
+STORAGE_WORKLOAD_CONFIGURATION_SCAN_SUMMARIES_PLURAL = "workloadconfigurationscansummaries"
+STORAGE_WORKLOAD_CONFIGURATION_SCANS_PLURAL = "workloadconfigurationscans"
 
 STORAGE_CVE_LABEL = "kubescape.io/context"
 STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
@@ -205,6 +209,11 @@ RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
 RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
+# helm chart capabilities
+HELM_CAPABILITY_ENABLE = "enable"
+HELM_CAPABILITY_DISABLE = "disable"
+HELM_CAPABILITY_CONTINUOUS_SCAN = "capabilities.continuousScan"
+HELM_CAPABILITY_VULNERABILITY_SCAN = "capabilities.vulnerabilityScan"
 
 # relevancy feature
 HELM_RELEVANCY_FEATURE = "capabilities.relevancy"

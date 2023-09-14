@@ -34,8 +34,9 @@ class HelmWrapper(object):
                         "--set", "server={x}".format(x=server),
                         "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
 
-        # by default use offline vuln DB
-        command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
+        # by default use offline vuln DB (unless it was passed in the helm_kwargs)
+        if statics.HELM_OFFLINE_VULN_DB not in helm_kwargs:
+            command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
 
         # disable security framework scan
         # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])

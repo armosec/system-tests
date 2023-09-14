@@ -389,7 +389,7 @@ class KubectlWrapper(object):
         if isinstance(port,dict):
             cmd=f"kubectl -n {namespace} port-forward {pod_name} {port['exposed']}:{port['source']} --address {ip}" #--address 0.0.0.0
         else:
-            cmd="kubectl -n {} port-forward {} 33334:{}".format(namespace, pod_name, port)
+            cmd="kubectl -n {} port-forward {} {}:{}".format(namespace, pod_name, statics.KS_PORT_FORWARD ,port)
         Logger.logger.info(f'k8s portforward cmd: {cmd}')
         c = subprocess.Popen(cmd, shell=True)
         return c

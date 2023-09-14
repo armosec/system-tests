@@ -1040,29 +1040,43 @@ class BaseKubescape(BaseK8S):
                     break
         return failed_backend_frameworks, failed_ks_frameworks
 
-    def results_ready(self, cluster_name, port, report_guid=''):
+    def scan(self, port, payload) -> str: 
+        """
+        scan the cluster with kubescape microservice, returns the report guid
+        """
+        url = f"http://0.0.0.0:{port}/v1/scan"
+        res = requests.post(url=url, json=payload)
+        if res.status_code >= 200 and res.status_code < 300:
+            return res.json()["id"]
+        
+        raise Exception('failed to scan with kubescape http code {}'.format(res.status_code))
+        
+    def results_ready(self, port, report_guid='', disable_logs=False):
         url = f"http://0.0.0.0:{port}/v1/status"
         if report_guid and len(report_guid) > 0:
             url = f"{url}?id={report_guid}"
 
         for i in range(1, 15):
             try:
-                Logger.logger.debug(f"results_ready - url: {url}")
+                if not disable_logs:
+                    Logger.logger.debug(f"results_ready - url: {url}")
                 res = requests.get(url=url)
                 if res.status_code >= 200 and res.status_code < 300:
                     res = res.json()
                     if "type" not in res:
-                        Logger.logger.warning("response from kubescape is missing 'type'")
+                        if not disable_logs:
+                            Logger.logger.warning("response from kubescape is missing 'type'")
                     elif res["type"] == "notBusy":
-                        Logger.logger.info(f"kubescape results ready. res: {res}")
+                        if not disable_logs:
+                            Logger.logger.info(f"kubescape results ready. res: {res}")
                         return True
             except:
                 pass
             time.sleep(20)
         raise Exception('the last scan results are not ready in {} seconds'.format(10 * 20))
 
-    def get_kubescape_as_server_last_result(self, cluster_name, port, report_guid=''):
-        if self.results_ready(cluster_name, port=port, report_guid=report_guid):
+    def get_kubescape_as_server_last_result(self, port, report_guid=''):
+        if self.results_ready(port=port, report_guid=report_guid):
             url = f"http://0.0.0.0:{port}/v1/results?keep=true"
             if report_guid and len(report_guid) > 0:
                 url += f"&id={report_guid}"
@@ -1199,6 +1213,19 @@ class BaseKubescape(BaseK8S):
                 return True
             time.sleep(5)
         return False
+
+    def get_scan_objects_from_report(self, report: dict):
+        result = []
+        for resource in report[statics.RESOURCES_FIELD]:
+            obj = resource['object']
+            
+            scan_object = dict(kind=obj['kind'],metadata=dict(name=obj['metadata']['name']))
+            if 'apiVersion' in obj:
+                scan_object['apiVersion'] = obj['apiVersion']
+            if 'namespace' in obj['metadata']:
+                scan_object['metadata']['namespace'] = obj['metadata']['namespace']
+            result.append(scan_object)
+        return result
 
     @staticmethod
     def test_host_scanner_results(cli_results: dict):

@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+from typing import Dict, Any, Tuple
 import json
 import operator
 import os
@@ -1068,3 +1068,39 @@ class BaseK8S(BaseDockerizeTest):
             )
               filteredCVEs.append((key, cve_data))
         return filteredCVEs
+    
+    def get_all_workload_configuration_scans_from_storage(self, summary=False) -> Dict[Tuple[str, str], Any]:
+        plural = statics.STORAGE_WORKLOAD_CONFIGURATION_SCAN_SUMMARIES_PLURAL if summary else statics.STORAGE_WORKLOAD_CONFIGURATION_SCANS_PLURAL
+        
+        # list
+        configuration_scan_crds = self.kubernetes_obj.client_CustomObjectsApi.list_cluster_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP, 
+            version=statics.STORAGE_AGGREGATED_API_VERSION, 
+            plural=plural)
+        
+        # get
+        crds = dict()
+        for item in configuration_scan_crds['items']:
+            name = item['metadata']['name']
+            namespace = item['metadata']['namespace']
+            crd_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=name,
+                namespace=namespace,
+                plural=plural,
+            )
+            crds[(name, namespace)] = crd_data
+        return crds
+
+    def delete_all_workload_configuration_scans_from_storage(self, name_namespace_tuple: Tuple[str, str]):
+        for plural in [statics.STORAGE_WORKLOAD_CONFIGURATION_SCAN_SUMMARIES_PLURAL,
+                       statics.STORAGE_WORKLOAD_CONFIGURATION_SCANS_PLURAL]:
+            for item in name_namespace_tuple:
+                self.kubernetes_obj.client_CustomObjectsApi.delete_namespaced_custom_object(
+                        group=statics.STORAGE_AGGREGATED_API_GROUP,
+                        version=statics.STORAGE_AGGREGATED_API_VERSION,
+                        plural=plural,
+                        namespace=item[1],
+                        name=item[0],
+                    )

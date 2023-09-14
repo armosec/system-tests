@@ -34,6 +34,31 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
+    def kubescape_continuous_scan():
+        """
+        install kubescape helm chart, state-based scans (continuous scan) 
+        """
+        from tests_scripts.helm.ks_microservice import ContinuousScanWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ContinuousScanWithKubescapeHelmChart,
+            test_job=[],
+            helm_kwargs={
+                # enable continuous scan, disable vulnerability scan
+                statics.HELM_CAPABILITY_CONTINUOUS_SCAN: statics.HELM_CAPABILITY_ENABLE,
+                statics.HELM_CAPABILITY_VULNERABILITY_SCAN: statics.HELM_CAPABILITY_DISABLE,
+                statics.HELM_OFFLINE_VULN_DB: "false",
+                # set image tags
+                "kubescape.image.tag": "v1.0.0-state-vs-scan",
+                "operator.image.tag": "v0.1.50",
+                "storage.image.tag": "v0.0.18",
+                # no backend server needed
+                "server": "", 
+            },
+            helm_branch="state-vs-scan"
+        )
+    
+    @staticmethod
     def ks_microservice_ns_creation():
         from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
