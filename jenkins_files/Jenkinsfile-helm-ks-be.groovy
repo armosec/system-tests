@@ -13,38 +13,39 @@ if (env.DELETE_TEST_TENANT) {
 
 // Add kubescape-CLI and kubescape-HELM tests that use the BE API
 def tests = [
-            "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_proxy":                                              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_ns_creation":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_on_demand":                                                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_mitre_framework_on_demand":                                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_nsa_and_mitre_framework_demand":                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_triggering_with_cron_job":                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_update_cronjob_schedule":                                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_delete_cronjob":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "ks_microservice_create_2_cronjob_mitre_and_nsa":                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_with_exceptions":                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            //  "scan_security_and_submit_to_backend":                                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_nsa_and_submit_to_backend":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_mitre_and_submit_to_backend":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_local_repository_and_submit_to_backend":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_repository_from_url_and_submit_to_backend":                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_with_exception_to_backend":                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_with_custom_framework":                                                ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_customer_configuration":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_compliance_score":                                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            //  "vulnerability_scanning_cve_exceptions":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            // "vulnerability_scanning_trigger_scan_registry_by_backend":                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_test_public_registry_connectivity_by_backend" :                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy":                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning_proxy":                                                            ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning":                                                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning_trigger_scan_on_new_image":                                        ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_ns_creation":                                                             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_on_demand":                                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_mitre_framework_on_demand":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_nsa_and_mitre_framework_demand":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_triggering_with_cron_job":                                                ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_update_cronjob_schedule":                                                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_delete_cronjob":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "ks_microservice_create_2_cronjob_mitre_and_nsa":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_with_exceptions":                                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            //  "scan_security_and_submit_to_backend":                                                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_nsa_and_submit_to_backend":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_mitre_and_submit_to_backend":                                                        ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_local_repository_and_submit_to_backend":                                             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_repository_from_url_and_submit_to_backend":                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_with_exception_to_backend":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_with_custom_framework":                                                              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_customer_configuration":                                                             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "scan_compliance_score":                                                                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            //  "vulnerability_scanning_cve_exceptions":                                                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            // "vulnerability_scanning_trigger_scan_registry_by_backend":                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+             "vulnerability_scanning_test_public_registry_connectivity_by_backend" :                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "stripe_plans":                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "stripe_checkout":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "stripe_webhook" :                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "stripe_billing_portal":           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "stripe_plans":                                                                             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "stripe_checkout":                                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "stripe_webhook" :                                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "stripe_billing_portal":                                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "user_email_settings":                                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "user_alert_channels":                                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "teams_alerts":                                                                             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 
@@ -189,7 +190,20 @@ def clean_docker_history(){
 
 def run_test(String test_name, String backend, String ks_branch, String helm_branch, String delete_test_tenant){
     try {
-        withCredentials([string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD')]) {
+        withCredentials([
+            string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), 
+            string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD'),
+            string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), 
+            string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), 
+            string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), 
+            string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), 
+            string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), 
+            string(credentialsId: 'teamsID-'+"${env.BACKEND}", variable: 'TEAMS_ID'),
+            string(credentialsId: 'channelId-'+"${env.BACKEND}", variable: 'CHANNEL_ID'),
+            string(credentialsId: 'channelWebhook-'+"${env.BACKEND}", variable: 'CHANNEL_WEBHOOK'),
+            string(credentialsId: 'ms-teams-client-id', variable: 'MS_TEAMS_CLIENT_ID'), 
+            string(credentialsId: 'ms-teams-secret-id', variable: 'MS_TEAMS_CLIENT_SECRET')
+            ]) {
             sh '''
             #!/bin/bash
             echo "Test history:"
