@@ -48,6 +48,10 @@ class KSMicroserviceTests(object):
                 statics.HELM_CAPABILITY_CONTINUOUS_SCAN: statics.HELM_CAPABILITY_ENABLE,
                 statics.HELM_CAPABILITY_VULNERABILITY_SCAN: statics.HELM_CAPABILITY_DISABLE,
                 statics.HELM_OFFLINE_VULN_DB: "false",
+                "kubescape.resources.requests.cpu": "300m",
+                "kubescape.resources.requests.memory": "1000Mi",
+                "kubescape.resources.limits.cpu": "1500m",
+                "kubescape.resources.limits.memory": "2000Mi",
                 # set image tags
                 "kubescape.image.tag": "v1.0.0-state-vs-scan",
                 "operator.image.tag": "v0.1.50",
