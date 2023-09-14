@@ -425,12 +425,26 @@ class ContinuousScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.kill_child_processes(self.port_forward_proc.pid)
         self.port_forward_proc.terminate()
 
+        # get the new CRDs and compare them to the previous ones
         configuration_scan_crds = self.get_all_workload_configuration_scans_from_storage(summary=False)
         configuration_scan_summary_crds = self.get_all_workload_configuration_scans_from_storage(summary=True)
 
-        # TODO: compare CRDs and summaries
-        # full_configuration_scan_crds            should be equal to     configuration_scan_crds
-        # full_configuration_scan_summary_crds    should be equal to     configuration_scan_summary_crds
+        assert len(configuration_scan_crds) == len(full_configuration_scan_crds)
+        assert len(configuration_scan_summary_crds) == len(full_configuration_scan_summary_crds)
+
+        for key in configuration_scan_crds.keys():
+            assert key in full_configuration_scan_crds
+            
+            crd_1 = full_configuration_scan_crds[key]
+            crd_2 = configuration_scan_crds[key]
+
+            controls_map_1 = crd_1['spec']['controls']
+            controls_map_2 = crd_2['spec']['controls']
+
+            assert len(controls_map_1) == len(controls_map_2)
+            for ctrl_id in controls_map_1.keys():
+                assert ctrl_id in controls_map_2
+                assert controls_map_1[ctrl_id]['status'] == controls_map_2[ctrl_id]['status']
 
         # TODO: re-deploy the helm chart with the operator (maybe in a different test)
         #helm_kwargs.update({"operator.replicaCount": 1})
