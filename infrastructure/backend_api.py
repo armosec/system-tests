@@ -1976,7 +1976,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def get_attack_chains_list(self, current_datetime, cluster_name=None) -> requests.Response:
+    def has_active_attack_chains(self, current_datetime, cluster_name=None) -> requests.Response:
         r = self.get_attack_chains(cluster_name)
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
@@ -1994,7 +1994,7 @@ class ControlPanelAPI(object):
 
         return r
 
-    def get_fixed_attack_chains_list(self, cluster_name=None) -> requests.Response:
+    def has_fixed_attack_chains(self, cluster_name=None) -> requests.Response:
         r = self.get_attack_chains(cluster_name)
 
         response = json.loads(r.text)
