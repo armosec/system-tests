@@ -47,7 +47,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
-            self.backend.has_active_attack_chains, 
+            self.backend.get_active_attack_chains, 
             timeout=600, 
             current_datetime=current_datetime,
             cluster_name=cluster
@@ -71,8 +71,8 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         # we set the timeout to 1200s because image scan 
         # cat take more than 15m to get the updated result
-        fixed_r, t = self.wait_for_report(
-            self.backend.has_fixed_attack_chains, 
+        active_attack_chains, t = self.wait_for_report(
+            self.backend.has_active_attack_chains, 
             timeout=1200, 
             cluster_name=cluster
             )
