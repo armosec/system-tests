@@ -1042,6 +1042,14 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def put_custom_framework(self, fw_object: json):
+        r = self.put(API_FRAMEWORK, params={"customerGUID": self.selected_tenant_id}, json=fw_object)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'failed to put custom framework "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
     def delete_custom_framework(self, framework_name: str):
         r = self.delete(API_FRAMEWORK,
                         params={"customerGUID": self.selected_tenant_id, "frameworkName": framework_name})
@@ -1890,6 +1898,15 @@ class ControlPanelAPI(object):
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get channel alerts "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def send_test_message(self, guid) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL + "/" + guid + "/testMessage",
+                        cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: send alert channel test message "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
 
