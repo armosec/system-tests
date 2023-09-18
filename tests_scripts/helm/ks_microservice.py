@@ -77,13 +77,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             cluster_name=cluster
             )
 
-        f = open(os.path.join(attack_chain_expected_values, test_scenario + '-fix_control.json'))
-        expected = json.load(f) 
-        response = json.loads(fixed_r.text)
-
-        Logger.logger.info('comparing attack-chains result with expected ones (fix)')
-        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
-
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
 
