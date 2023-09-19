@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http
+  namespace: alerts
+  labels:
+    app: http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http
+  template:
+    metadata:
+      labels:
+        app: http
+    spec:
+      containers:
+        - image: httpd:2
+          name: http
+          env:
+            - name: app
+              value: http

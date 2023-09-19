@@ -1042,6 +1042,14 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def put_custom_framework(self, fw_object: json):
+        r = self.put(API_FRAMEWORK, params={"customerGUID": self.selected_tenant_id}, json=fw_object)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'failed to put custom framework "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
     def delete_custom_framework(self, framework_name: str):
         r = self.delete(API_FRAMEWORK,
                         params={"customerGUID": self.selected_tenant_id, "frameworkName": framework_name})
@@ -1906,35 +1914,17 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def create_alert_channel(self) -> requests.Response:
-        payload = json.dumps(
-                {
-                    "channel": {
-                        "name": "My Teams Channel",
-                        "provider": "teams",
-                        "context": {
-                            "webhook": {
-                                "name": "webhook",
-                                "id": "https://teams/mywebhook"
-                            }
-                        }
-                    },
-                    "notifications": [
-                        {
-                            "notificationType": "push:newClusterAdmin",
-                            "disabled": True
-                        }
-                    ],
-                    "scope": [
-                        {
-                            "cluster": "cluster1",
-                            "namespaces": ["test-system"]
-                        }
-                    ]
-                }
-        )
+    def send_test_message(self, guid) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL + "/" + guid + "/testMessage",
+                        cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: send alert channel test message "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
 
-        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=payload)
+    def create_alert_channel(self, payload) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: create channel alert "%s" (code: %d, message: %s)' % (

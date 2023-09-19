@@ -139,7 +139,7 @@ class BaseTest(object):
         else:
             raise Exception("in create_ks_exceptions, exception_file is wrong type")
 
-    def create_ks_custom_fw(self, cluster_name: str, framework_file):
+    def create_ks_custom_fw(self, cluster_name: str, framework_file, framework_guid=""):
         if not framework_file:
             return {}
         if isinstance(framework_file, list):
@@ -150,6 +150,8 @@ class BaseTest(object):
                 ks_custom_fw = json.loads(f.read())
             ks_custom_fw['name'] += cluster_name
             ks_custom_fw['description'] += cluster_name
+            if framework_guid != "":
+                ks_custom_fw['guid'] = framework_guid
             return ks_custom_fw['name'], ks_custom_fw
         else:
             raise Exception("in create_ks_custom_fw, framework_file is wrong type")
@@ -346,4 +348,19 @@ class BaseTest(object):
     @staticmethod
     def assertIn(member, container, msg):
         assert member in container, msg
-  
+
+    def get_all_alert_channels_for_cluster(self, cluster):
+        ret = []
+        channels = self.backend.get_all_alert_channels().content
+        if channels:
+            for ac in json.loads(channels.decode("utf-8")):
+                for scope in ac["scope"]:
+                    if scope["cluster"] == "" or scope["cluster"] == cluster:
+                        ret.append(ac)
+                        break
+        return ret
+
+    def delete_all_alert_channels_for_cluster(self, cluster):
+        leftovers = self.get_all_alert_channels_for_cluster(cluster)
+        for ac in leftovers:
+            self.backend.remove_alert_channel(ac["channel"]["guid"])
