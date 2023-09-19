@@ -1,0 +1,138 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "kind-attack-chain-5",
+                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                "kind": "Service",
+                                "name": "alpine-service",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/alpine-service"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "relatedResources": null,
+                            "nextNodes": [
+                                {
+                                    "name": "Data Collection",
+                                    "description": "An attacker can gather data.",
+                                    "controlIDs": [
+                                        "C-0258"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "kind-attack-chain-5",
+                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "kind": "ConfigMap",
+                                                "name": "alpine-configmap",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ConfigMap/alpine-configmap"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Credential access",
+                                    "description": "An attacker can steal account names and passwords.",
+                                    "controlIDs": [
+                                        "C-0261"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "kind-attack-chain-5",
+                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "kind": "ServiceAccount",
+                                                "name": "default",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ServiceAccount/default"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Persistence",
+                                    "description": "An attacker can create a foothold.",
+                                    "controlIDs": [
+                                        "C-0017"
+                                    ],
+                                    "relatedResources": null
+                                },
+                                {
+                                    "name": "Lateral Movement (Network)",
+                                    "description": "An attacker can move through the network.",
+                                    "controlIDs": [
+                                        "C-0260"
+                                    ],
+                                    "relatedResources": null
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "guid": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "name": "workload-external-track",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "kind-attack-chain-5",
+                    "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                    "kind": "Deployment",
+                    "name": "alpine-deployment",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/alpine-deployment"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "kind-attack-chain-5",
+                        "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                        "kind": "Deployment",
+                        "name": "alpine-deployment",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/alpine-deployment"
+                    }
+                },
+                "description": "Exposed alpine-deployment with critical vulnerabilities and 4 severe impacts",
+                "creationTime": "2023-09-18 15:00:44.845533 +0100 +0100",
+                "attackChainID": "385259060",
+                "clusterName": "kind-attack-chain-5",
+                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "latestReportGUID": "4fc54860-b618-4fe8-a8ba-53096c705078",
+                "uiStatus": {
+                    "firstSeen": "2023-09-18 15:00:44.845533 +0100 +0100",
+                    "viewedMainScreen": "2023-09-18 17:00:46 +0100 +0100",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2023-09-18T14:21:36Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}
