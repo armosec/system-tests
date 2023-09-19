@@ -978,6 +978,11 @@ class BaseKubescape(BaseK8S):
         customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind].append(input_name)
         self.update_customer_configuration(customer_config=customer_configuration)
 
+    def remove_from_customer_configuration(self, customer_configuration: dict, input_kind: str, input_name: str):
+        if input_name in customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind]:
+            customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind].remove(input_name)
+        self.update_customer_configuration(customer_config=customer_configuration)
+
     def test_expected_result_against_cli_result(self, cli_result: dict, expected_result_name: str):
         expected_r = self.create_kubescape_expected_results(expected_results=expected_result_name)
         cli_r = cli_result[_CLI_SUMMARY_DETAILS_FIELD]
