@@ -1211,3 +1211,134 @@ class BaseKubescape(BaseK8S):
             assert control_value[_CLI_STATUS_FILED] != 'skipped', \
                 f'Expected not to get skipped status as a result of the controls, ' \
                 f'when the flag enable-host-scan is added, the status of control {control_id} is skipped'
+
+    @staticmethod
+    def parse_cli_args_in_list_to_string(data: list):
+        result = ""
+        for i in data[:-1]:
+            result+=i+","
+        result+=data[-1]
+        return result
+
+    def parse_cli_args(self, **kwargs):
+        cli_args = []
+
+        assert "scan" in kwargs['args'],'cli args must contain \"scan\"'
+        cli_args.append("scan")
+
+        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+
+        trigger = kwargs['args']['trigger']
+        if trigger == "config":
+            cli_args.append("config")
+            if "include-namespaces" in kwargs['args']:
+                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["include-namespaces"])])
+            if "exclude-namespaces" in kwargs['args']:
+                cli_args.extend(["--exclude-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["exclude-namespaces"])])
+            if "submit" in kwargs['args']:
+                cli_args.append("--submit")
+            if "frameworks" in kwargs['args']:
+                cli_args.extend(["--frameworks", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["frameworks"])])
+            if "enable-host-scan" in kwargs['args']:
+                cli_args.append("--enable-host-scan")
+        elif trigger == "vulnerabilities":
+            cli_args.append("vulnerabilities")
+            if "include-namespaces" in kwargs['args']:
+                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["include-namespaces"])])
+        else:
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+
+        return cli_args
+
+    def get_trigger_cli_full_command(self, cli_args: list):
+        command = [self.kubescape_exec, "operator"] 
+        command.extend(cli_args)
+        assert len(command) >= 4, 'minimum cli args should be 3 but we got less. got command: {command}'.format(command=command)
+        return command
+
+    def trigger_in_cluster_components(self, cli_args: str, **kwargs):
+        command = self.get_trigger_cli_full_command(cli_args=cli_args)
+        Logger.logger.info("trigger_in_cluster_components. command: {command}".format(command=command))
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+    def validate_cluster_trigger_as_expected(self, cluster_name: str, **kwargs):
+        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+        trigger = kwargs['args']['trigger']
+
+        if trigger == "config":
+            self.validate_scan_trigger(cluster_name=cluster_name, deployment_name="kubescape", kwargs=kwargs)
+        elif trigger == "vulnerabilities":
+            self.validate_scan_trigger(cluster_name=cluster_name, deployment_name="operator", kwargs=kwargs)
+        else:
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+
+    @staticmethod
+    def parse_string_to_found_in_list_argument(prefix: str, argument: list, postfix: str):
+        string_to_found=prefix
+        for data in argument[:-1]:
+            string_to_found+="\\\""+data+"\\\","
+        string_to_found+="\\\""+argument[-1]+"\\\"" + postfix
+        return string_to_found
+
+    @staticmethod
+    def get_string_to_be_found(cluster_name: str, kwargs):
+        string_to_be_found = []
+
+        assert "scan" in kwargs['args'],'cli args must contain \"scan\"'
+        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+
+        trigger = kwargs['args']['trigger']
+        if trigger == "config":
+            if "include-namespaces" in kwargs['args']:
+                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"includeNamespaces\\\":[", kwargs['args']['include-namespaces'], "]"))
+            if "exclude-namespaces" in kwargs['args']:
+                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"excludedNamespaces\\\":[", kwargs['args']['exclude-namespaces'], "]"))
+            if "submit" in kwargs['args']:
+                string_to_be_found.append("\\\"submit\\\":true")
+            else:
+                string_to_be_found.append("\\\"submit\\\":false")
+            if "frameworks" in kwargs['args']:
+                # \"targetNames\":[\"MITRE\"
+                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"targetNames\\\":[", kwargs['args']['frameworks'], ",\\\"security\\\"]"))
+            if "enable-host-scan" in kwargs['args']:
+                string_to_be_found.append("\\\"hostScanner\\\":true")
+            else:
+                string_to_be_found.append("\\\"hostScanner\\\":false")
+        elif trigger == "vulnerabilities":
+            if "include-namespaces" in kwargs['args']:
+                for ns in kwargs['args']['include-namespaces']:
+                    string_to_be_found.append("{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-"+cluster_name+"/namespace-"+ns)
+            else:
+                string_to_be_found.append("{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-"+cluster_name)
+        else:
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+
+        return string_to_be_found        
+
+
+    def validate_scan_trigger(self, cluster_name: str, deployment_name: str, kwargs):
+        wlid = "wlid://cluster-{cluster_name}/namespace-kubescape/deployment-{deployment_name}".format(cluster_name=cluster_name, deployment_name=deployment_name)
+        pods = self.get_pods(namespace="kubescape", wlid=wlid, include_terminating=False)
+        for pod in pods:
+            pod_owner_reference = self.get_most_ancient_owner_reference(workload=self.get_workload(api_version="v1" ,name=pod.metadata.name, kind="Pod", namespace="kubescape"), namespace="kubescape")
+            if pod_owner_reference['kind'] == "Deployment":
+                desired_pod = pod
+                break
+
+        string_to_be_found = BaseKubescape.get_string_to_be_found(cluster_name=cluster_name, kwargs=kwargs)
+        string_to_be_found_counter=0
+        pod_name=""
+        if deployment_name in desired_pod.metadata.name:
+            pod_name=desired_pod.metadata.name
+            for string in string_to_be_found:
+                try:
+                    self.find_string_in_log(namespace="kubescape", pod_name=desired_pod.metadata.name, containers=deployment_name, previous=False, string_in_log=string)
+                    string_to_be_found_counter+=1
+                except Exception as e:
+                    Logger.logger.warning("expected string not found in pod logs. expected string: {expected_string}".format(expected_string=string))
+
+        assert string_to_be_found_counter == len(string_to_be_found), 'not all expected string found in the log. pod log: {pod_log}'.format(pod_log=self.get_pod_logs(namespace="kubescape", pod_name=pod_name, containers=deployment_name, previous=False))
