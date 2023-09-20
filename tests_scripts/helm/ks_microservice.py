@@ -63,7 +63,9 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
+        time.sleep(20)
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
+        time.sleep(20)
         current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("trigger a new scan")
         self.trigger_scan(cluster)
@@ -73,7 +75,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # cat take more than 15m to get the updated result
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
-            timeout=1200, 
+            timeout=1000, 
             cluster_name=cluster
             )
 
@@ -378,3 +380,38 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             TestUtil.sleep(sleep_time, "wait till delete cronjob will from backend to finish")
             Logger.logger.info("check if kubescape cronjob deleted")
             assert not self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to deleted"
+
+class ControlClusterFromCLI(BaseHelm, BaseKubescape):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ControlClusterFromCLI, self).__init__(test_obj=test_obj, backend=backend,
+                                                             kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        # test check in cluster workloads and kubescape CLI 
+        # assert self.backend == None; f'the test {self.test_driver.test_name} must run without backend'
+
+        # 1 install kubescape in cluster workloads
+        Logger.logger.info("Installing kubescape with helm-chart")
+        # 1.1 add and update armo in repo
+        self.add_and_upgrade_armo_to_repo()
+        # 1.2 install armo helm-chart
+        # self.install_armo_helm_chart()
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
+
+        # 2 install kubescape CLI
+        Logger.logger.info("Installing kubescape CLI")
+        # 2.1 Installing kubescape CLI
+        self.install(branch=self.ks_branch)
+
+        # 3 trigger in cluster components
+        Logger.logger.info("Triggering in cluster components")
+        # 3.1 trigger in cluster components
+        self.trigger_in_cluster_components(cli_args=self.parse_cli_args(args=self.test_obj["cli_args"]))
+
+        # 4 validate cluster trigger 
+        Logger.logger.info("Validate triggering in cluster components")
+        # 4.1 validate cluster trigger
+        self.validate_cluster_trigger_as_expected(cluster_name=self.get_cluster_name(), args=self.test_obj["cli_args"])
+
+        return self.cleanup()
