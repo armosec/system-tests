@@ -21,7 +21,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def scan_for_attack_chains_scenario_5_fix_control():
+    def scan_for_attack_chains_scenario_5_fix_control_with_relevancy():
         """
         install scenario #5 on the cluster, install the kubescape operator and run the scan.
         once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
@@ -58,7 +58,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def scan_for_attack_chains_scenario_alpine_fix_image():
+    def scan_for_attack_chains_scenario_alpine_fi_with_relevancyx_image():
         """
         install scenario 'alpine' on the cluster, install the kubescape operator and run the scan.
         once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
@@ -74,7 +74,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def scan_for_attack_chains_scenario_alpine_fix_control():
+    def scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy():
         """
         install scenario 'alpine' on the cluster, install the kubescape operator and run the scan.
         once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 

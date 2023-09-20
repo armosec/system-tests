@@ -33,9 +33,10 @@
 | `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_5_fix_control`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_image`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_control`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_5_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_5_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
