@@ -21,6 +21,93 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
+    def scan_for_attack_chains_scenario_5_fix_control():
+        """
+        install scenario #5 on the cluster, install the kubescape operator and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new control scan.
+
+        'fix_object' parameter is used to determine which type of fix you want to apply, to test the attack-chain fix functionality.
+        fix_object = ["control", "image"]
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-5",
+            fix_object="control",
+        )
+
+    @staticmethod
+    def scan_for_attack_chains_scenario_5_fix_control_no_relevancy():
+        """
+        install scenario #5 on the cluster, install the kubescape operator disabling relevancy and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new control scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-5",
+            fix_object="control",
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            relevancy_enabled=False
+        )
+
+    @staticmethod
+    def scan_for_attack_chains_scenario_alpine_fix_image():
+        """
+        install scenario 'alpine' on the cluster, install the kubescape operator and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new image scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="alpine",
+            fix_object="image"
+        )
+
+    @staticmethod
+    def scan_for_attack_chains_scenario_alpine_fix_control():
+        """
+        install scenario 'alpine' on the cluster, install the kubescape operator and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new control scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="alpine",
+            fix_object="control"
+        )
+        
+    @staticmethod
+    def scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy():
+        """
+        install scenario 'alpine' on the cluster, install the kubescape operator disabling relevancy and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new image scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="alpine",
+            fix_object="image",
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            relevancy_enabled=False
+        )
+
+    @staticmethod
     def ks_microservice_ns_creation():
         from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH

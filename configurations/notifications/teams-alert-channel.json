@@ -1,0 +1,45 @@
+{
+  "channel": {
+    "name": "My Teams Channel",
+    "provider": "teams",
+    "context": {
+      "webhook": {
+        "name": "webhook",
+        "id": "https://teams/mywebhook"
+      }
+    }
+  },
+  "notifications": [
+    {
+      "notificationType": "push:newClusterAdmin",
+      "disabled": false
+    },
+    {
+      "notificationType": "containerScanPush:newVulnerability",
+      "disabled": false,
+      "parameters": {
+        "minSeverity": 500
+      }
+    },
+    {
+      "notificationType": "containerScanPush:vulnerabilityNewFix",
+      "disabled": false,
+      "parameters": {
+        "minSeverity": 500
+      }
+    },
+    {
+      "notificationType": "push:complianceDrift",
+      "disabled": false,
+      "parameters": {
+        "driftPercentage": 15
+      }
+    }
+  ],
+  "scope": [
+    {
+      "cluster": "cluster",
+      "namespaces": []
+    }
+  ]
+}

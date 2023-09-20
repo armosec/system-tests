@@ -80,7 +80,9 @@ class BaseKubescape(BaseK8S):
         self.artifacts = self.test_driver.kwargs.get("use_artifacts", None)
         self.policies = self.test_driver.kwargs.get("use_from", None)
         self.kubescape_exec = self.test_driver.kwargs.get("kubescape", None)
-        self.environment = '' if self.test_driver.backend_obj == None or self.test_driver.backend_obj.get_name() == "production" else self.test_driver.backend_obj.get_name()
+        if self.test_driver.backend_obj == None:
+            raise Exception('backend_obj must be specified')
+        self.api_url = self.test_driver.backend_obj.get_api_url()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
         self.remove_cluster_from_backend = False
 
@@ -89,6 +91,31 @@ class BaseKubescape(BaseK8S):
         res_file = self.get_default_results_file()
         self.scan(output_format="json", output=res_file, **kwargs)
         return self.load_results(results_file=res_file)
+
+    def is_kubescape_config_file_exist(self):
+        return os.path.exists(self.get_kubescape_config_file())
+    
+    def is_kubescape_data_dir_exist(self):
+        return os.path.exists(self.get_kubescape_data_dir_path())
+
+    def create_kubescape_data_dir(self):
+        os.mkdir(self.get_kubescape_data_dir_path())
+
+    def create_kubescape_config_file(self):
+        config_file_data = {
+            statics.CLOUD_API_URL_KEY: "any_value"
+        }
+        with open(file=self.get_kubescape_config_file(), mode="w") as outfile:
+            json.dump(config_file_data, outfile)
+
+    def default_config(self, **kwargs):
+        if self.is_kubescape_data_dir_exist() == False:
+            self.create_kubescape_data_dir()
+        if self.is_kubescape_config_file_exist() == False:
+            self.create_kubescape_config_file()
+        res_file = self.get_default_results_file()
+        with open(res_file, "w") as f:
+            return self.config(stdout=f,**kwargs)
 
     def cleanup(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
@@ -100,6 +127,12 @@ class BaseKubescape(BaseK8S):
 
     def get_default_results_file(self):
         return os.path.join(self.test_driver.temp_dir, "results.json")
+    
+    def get_kubescape_config_file(self):
+        return os.path.join(os.path.expanduser('~'), ".kubescape", "config.json")
+    
+    def get_kubescape_data_dir_path(self):
+        return os.path.join(os.path.expanduser('~'), ".kubescape")
 
     def download_control_input(self):
         output_file = os.path.join(self.test_driver.temp_dir, 'controls-inputs.json')
@@ -120,12 +153,8 @@ class BaseKubescape(BaseK8S):
         command.extend(['--output', output_file])
         if "account" in kwargs:
             command.extend(["--account", self.backend.get_customer_guid()])
-        if self.environment == "dev" or self.environment == "development":
-            command.extend(["--env", "dev"])
-        if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
-                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
-
+        command.extend(["--server", self.api_url])
+        
         Logger.logger.info(" ".join(command))
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
@@ -134,6 +163,8 @@ class BaseKubescape(BaseK8S):
         return res
     
     def delete_kubescape_config_file(self, **kwargs):
+        if self.kubescape_exec is None:
+            return "kubescape_exec not found"
         command = [self.kubescape_exec, "config", "delete"]
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
@@ -141,10 +172,39 @@ class BaseKubescape(BaseK8S):
         assert status_code == 0, res
         return res
 
+    
+    def view_kubescape_config_file(self, **kwargs):
+        command = [self.kubescape_exec, "config", "view"]
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+    def config(self, **kwargs):
+        command = [self.kubescape_exec, "config"]
+        if "view" in kwargs:
+            command.append(kwargs["view"])
+        elif "set" in kwargs:
+            command.append(kwargs["set"])
+            command.append(kwargs["data"][0])
+            command.append(kwargs["data"][1])
+        elif "delete" in kwargs:
+            command.append(kwargs["delete"])
+
+        Logger.logger.info(" ".join(command))
+        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+                                                stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
+                                                stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
+        assert status_code == 0, res
+        return res
+
+
+
     def scan(self, policy_scope: str = None, policy_name: str = None, output_format: str = None, output: str = None,
              **kwargs):
 
-        command = [self.kubescape_exec, "scan", "--format-version", "v2"]
+        command = [self.kubescape_exec, "scan", "--logger", "debug", "--format-version", "v2"]
 
         if policy_scope:
             command.append(policy_scope)
@@ -171,12 +231,7 @@ class BaseKubescape(BaseK8S):
             assert account_id, "missing account ID, the report will not be submitted"
             command.extend(["--account", self.backend.get_customer_guid()])
 
-        if self.environment == "staging" or self.environment == "stage":
-            command.extend(["--env", "report-ks.eustage2.cyberarmorsoft.com,api-stage.armosec.io,"
-                                     "cloud-stage.armosec.io,eggauth-stage.armosec.io"])
-
-        if self.environment == "dev" or self.environment == "development":
-            command.extend(["--env", "dev"])
+        command.extend(["--server", self.api_url])
 
         # first check if artifacts are passed to function
         if "use_artifacts" in kwargs and kwargs['use_artifacts'] != "":
@@ -346,7 +401,7 @@ class BaseKubescape(BaseK8S):
 
         # build kubescape (make file) for non-windows machines
         if platform.system() != "Windows" and os.path.exists(os.path.join(ks_path, "Makefile")):
-            return_code, return_obj = TestUtil.run_command(command_args=["make"], cwd=ks_path, timeout=360)
+            return_code, return_obj = TestUtil.run_command(command_args=["make"], cwd=ks_path, timeout=1000)
             assert not return_code, f"Failed to build kubescape (make) from branch {branch} : {return_obj.stderr}"
             shutil.move(os.path.join(ks_path, "kubescape"), kubescape_exec)
         else:
@@ -373,6 +428,13 @@ class BaseKubescape(BaseK8S):
     def load_results(results_file):
         with open(results_file, 'r') as f:
             res = json.loads(f.read())
+        Logger.logger.debug("results: {}".format(res))
+        return res
+
+    @staticmethod
+    def load_bytes_results(data, results_file):
+        with open(results_file, 'r') as f:
+            res = json.loads(data)
         Logger.logger.debug("results: {}".format(res))
         return res
 
@@ -766,9 +828,9 @@ class BaseKubescape(BaseK8S):
             x1=control['previousFailedResourcesCount'], x2=control['failedResourcesCount']
         )
 
-    def get_report_guid_and_timestamp_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
+    def get_report_guid_and_repo_hash_for_git_repository(self, git_repository: GitRepository, old_report_guid: str = "",
                                                          wait_to_result: bool = False) -> Tuple[
-        Optional[str], Optional[datetime]]:
+        Optional[str], Optional[str]]:
         check_intervals = 30
         sleep_sec = 12
 
@@ -784,7 +846,7 @@ class BaseKubescape(BaseK8S):
             scan = next((scan for scan in repository_scans if scan[statics.BE_REPORT_GUID_FIELD] != old_report_guid),
                         None)
             if scan:
-                return scan[statics.BE_REPORT_GUID_FIELD], parser.parse(scan[statics.BE_REPORT_TIMESTAMP_FIELD])
+                return scan[statics.BE_REPORT_GUID_FIELD], scan['designators']['attributes']['repoHash']
             elif not wait_to_result:
                 return None, None
             time.sleep(sleep_sec)
@@ -914,6 +976,11 @@ class BaseKubescape(BaseK8S):
 
     def add_to_customer_configuration(self, customer_configuration: dict, input_kind: str, input_name: str):
         customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind].append(input_name)
+        self.update_customer_configuration(customer_config=customer_configuration)
+
+    def remove_from_customer_configuration(self, customer_configuration: dict, input_kind: str, input_name: str):
+        if input_name in customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind]:
+            customer_configuration[_SETTINGS_FILED][_POSTURE_CONTROL_INPUT_FILED][input_kind].remove(input_name)
         self.update_customer_configuration(customer_config=customer_configuration)
 
     def test_expected_result_against_cli_result(self, cli_result: dict, expected_result_name: str):

@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+kubectl delete -n default ingress wordpress-ingress
+kubectl wait ingress/wordpress-ingress --for=delete --timeout=-1s

@@ -4,7 +4,10 @@ from infrastructure.backend_api import *
 
 class Backend(object):
 
-    def __init__(self, name: str, dashboard: str, 
+    def __init__(self, 
+                 name: str, 
+                 dashboard: str, 
+                 api_url: str,
                  auth_url: str = None, 
                  tls_verify: bool = True, 
                  login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
@@ -14,6 +17,7 @@ class Backend(object):
         self.tls_verify = tls_verify
         self.login_method = login_method
         self.customer_guid = customer_guid
+        self.api_url = api_url
 
     def get_dashboard_url(self):
         return self.dashboard
@@ -33,6 +37,9 @@ class Backend(object):
     def get_customer_guid(self):
         return self.customer_guid
 
+    def get_api_url(self):
+        return self.api_url
+
 
 def set_backends():
     backends = list()
@@ -41,6 +48,7 @@ def set_backends():
     # development frontEgg
     backends.append(Backend(name='development',
                             dashboard='https://eggdashbe-dev.armosec.io',
+                            api_url="api-dev.armosec.io",
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
@@ -49,12 +57,14 @@ def set_backends():
     # staging frontEgg
     backends.append(Backend(name='staging',
                             dashboard='https://eggdashbe-stage.armosec.io',
+                            api_url="api-stage.armosec.io",
                             auth_url='https://eggauth-stage.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
     # staging frontEgg
     backends.append(Backend(name='production',
+                            api_url="api.armosec.io",
                             dashboard='https://api.armosec.io',
                             auth_url='https://auth.armosec.io',
                             tls_verify=False,
@@ -96,6 +106,7 @@ def set_backends():
 
 
     backends.append(Backend(name='local',
+                            api_url="localhost:7666",
                             dashboard='http://localhost:7666',
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,

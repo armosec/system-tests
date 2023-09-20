@@ -3,7 +3,7 @@ import math
 import sys
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 import inspect
 from typing import Dict, List
 import dateutil.parser
@@ -84,6 +84,8 @@ API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
+
+API_ATTACK_CHAINS = "/api/v1/attackchains"
 
 
 def deco_cookie(func):
@@ -1040,6 +1042,14 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def put_custom_framework(self, fw_object: json):
+        r = self.put(API_FRAMEWORK, params={"customerGUID": self.selected_tenant_id}, json=fw_object)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'failed to put custom framework "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
     def delete_custom_framework(self, framework_name: str):
         r = self.delete(API_FRAMEWORK,
                         params={"customerGUID": self.selected_tenant_id, "frameworkName": framework_name})
@@ -1355,6 +1365,19 @@ class ControlPanelAPI(object):
                 body.append(
                     {"clusterName": cluster_name, "frameworkName": framework, "cronTabSchedule": schedule_string,
                      "hostSensor": with_host_sensor})
+        r = self.post(API_POSTURE_SCAN, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true"):
+        params = {"customerGUID": self.selected_tenant_id}
+        body = []
+        for framework in framework_list:
+            body.append(
+                {"clusterName": cluster_name, "frameworkName": framework, "hostSensor": with_host_sensor})
         r = self.post(API_POSTURE_SCAN, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1757,6 +1780,7 @@ class ControlPanelAPI(object):
             r = ws.recv()
             if r:
                 r = json.loads(r)
+                Logger.logger.debug("request chunk: {}".format(r))                
                 result.extend(r['response'])
                 nbmsg += 1
         assert nbmsg == totalChunks, 'Excepted %d chunks, receive %d' % (totalChunks, nbmsg)
@@ -1890,35 +1914,17 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def create_alert_channel(self) -> requests.Response:
-        payload = json.dumps(
-                {
-                    "channel": {
-                        "name": "My Teams Channel",
-                        "provider": "teams",
-                        "context": {
-                            "webhook": {
-                                "name": "webhook",
-                                "id": "https://teams/mywebhook"
-                            }
-                        }
-                    },
-                    "notifications": [
-                        {
-                            "notificationType": "push:newClusterAdmin",
-                            "disabled": True
-                        }
-                    ],
-                    "scope": [
-                        {
-                            "cluster": "cluster1",
-                            "namespaces": ["test-system"]
-                        }
-                    ]
-                }
-        )
+    def send_test_message(self, guid) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL + "/" + guid + "/testMessage",
+                        cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: send alert channel test message "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
 
-        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=payload)
+    def create_alert_channel(self, payload) -> requests.Response:
+        res = self.post(API_NOTIFICATIONS_ALERTCHANNEL, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: create channel alert "%s" (code: %d, message: %s)' % (
@@ -1940,6 +1946,51 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete channel alert "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
+
+    def get_attack_chains(self, cluster_name=None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = []
+        if cluster_name is not None:
+            filters.append({"clusterName": cluster_name})
+
+        payload = {
+            "innerFilters": filters,
+        }
+        r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_active_attack_chains(self, current_datetime, cluster_name=None) -> requests.Response:
+        r = self.get_attack_chains(cluster_name)
+        # checks if respose met conditions to be considered valid:
+        # - parameter 'response.attackChainsLastScan' should have a value >= of current time
+        # - parameter 'total.value' shoud be > 0
+        response = json.loads(r.text)
+        if response['response']['attackChainsLastScan']:
+            last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')
+            last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+            print("last scan time: ", response['response']['attackChainsLastScan'])
+            print(last_scan_datetime, current_datetime)
+
+            assert last_scan_datetime >= current_datetime, f"attack-chains response is outdated"
+
+        assert response['total']['value'] > 0, f"no attack-chains detected yet"
+
+        return r
+
+    def has_active_attack_chains(self, cluster_name=None) -> bool:
+        r = self.get_attack_chains(cluster_name)
+
+        response = json.loads(r.text)
+        assert response['total']['value'] == 0, f"attack-chains not fixed yet"
+
+        return True
 
 class Solution(object):
     """docstring for Solution"""

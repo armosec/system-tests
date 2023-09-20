@@ -11,7 +11,7 @@ try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
-# 
+#
 from datetime import datetime
 from threading import Thread
 
@@ -199,7 +199,7 @@ class BaseK8S(BaseDockerizeTest):
         if self.cluster_deleted:
             Logger.logger.info("Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
             return True
-        
+
         try:
             cluster_name = self.kubernetes_obj.get_cluster_name()
             try:
@@ -223,9 +223,9 @@ class BaseK8S(BaseDockerizeTest):
                                                     expected_status_code=404)
             assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
                 format(x=self.kubernetes_obj.get_cluster_name())
-            
+
             Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
-        
+
             self.cluster_deleted = True
         return True
 
@@ -471,13 +471,13 @@ class BaseK8S(BaseDockerizeTest):
         if wlid:
             namespace = Wlid.get_namespace(wlid=wlid)
             subname = Wlid.get_name(wlid=wlid)
-        names = [pod.metadata.name for pod in self.get_running_pods(namespace=namespace, name=subname)]
+        names = [pod.metadata.name for pod in self.get_ready_pods(namespace=namespace, name=subname)]
         return names[0] if len(names) == 1 else names
-    
+
     @staticmethod
     def get_image_ids(pod):
         return [(container_status.name, container_status.image_id)  for container_status in pod.status.container_statuses]
-    
+
     @staticmethod
     def get_image_tags(pod):
         return [(container_spec.name, container_spec.image)  for container_spec in pod.spec.containers]
@@ -492,7 +492,7 @@ class BaseK8S(BaseDockerizeTest):
         if wlid:
             namespace = Wlid.get_namespace(wlid=wlid)
             subname = Wlid.get_name(wlid=wlid)
-        image_ids = [get_data_of_pod_call_back(pod) for pod in self.get_running_pods(namespace=namespace, name=subname)]
+        image_ids = [get_data_of_pod_call_back(pod) for pod in self.get_ready_pods(namespace=namespace, name=subname)]
         return image_ids[0] if len(image_ids) == 1 else image_ids
 
     @staticmethod
@@ -525,17 +525,17 @@ class BaseK8S(BaseDockerizeTest):
         if len(pod.metadata.owner_references) == 0:
             return self.get_workload(api_version=pod.api_version ,name=pod.metadata.name, kind=pod.kind, namespace=namespace)
         return self.get_workload(api_version=pod.metadata.owner_references[0].api_version ,name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind, namespace=namespace)
-        
+
     def get_api_version_from_instance_ID(self, instance_ID: str):
         return instance_ID.split("/")[0].split("-")[1]
-    
+
     def get_namespace_from_instance_ID(self, instance_ID: str):
         namespace_list = instance_ID.split("-")
         return "-".join(namespace_list[:3])
-    
+
     def get_kind_from_instance_ID(self, instance_ID: str):
         data = instance_ID.split("-")
-        return "-".join(data[3:4]) 
+        return "-".join(data[3:4])
 
     def get_workload_name_from_instance_ID(self, instance_ID: str):
         data = instance_ID.split("-")
@@ -549,8 +549,8 @@ class BaseK8S(BaseDockerizeTest):
         for container in p_workload['spec']['template']['spec']['containers']:
             instanceIDs.append("apiVersion-" + p_workload["apiVersion"] + "/namespace-" + namespace + "/kind-" + p_workload['kind'] + "/name-" + p_workload['metadata']['name'] + "/containerName-" + container["name"])
         return instanceIDs
-    
-       
+
+
     @staticmethod
     def calculate_sid(secret, **kwargs):
         sid = SID(name=secret['metadata']['name'], **kwargs)
@@ -645,11 +645,11 @@ class BaseK8S(BaseDockerizeTest):
                     replicas += i.spec.replicas
         return replicas
 
-    def get_running_pods(self, namespace, name: str = None):
+    def get_ready_pods(self, namespace, name: str = None):
         """
-        :return: list of running pods with status true
+        :return: list of running pods with all containers ready
         """
-        return list(filter(lambda x: x.status.phase == "Running", self.get_pods(namespace=namespace, name=name)))
+        return list(filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []), self.get_pods(namespace=namespace, name=name)))
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
         """
@@ -662,7 +662,7 @@ class BaseK8S(BaseDockerizeTest):
             name = Wlid.get_name(wlid=wlid)
             namespace = Wlid.get_namespace(wlid=wlid)
 
-        for j in self.get_running_pods(namespace=namespace):
+        for j in self.get_ready_pods(namespace=namespace):
             if name in j.metadata.name:
                 self.kubernetes_obj.delete_pod(namespace=namespace, name=j.metadata.name)
 
@@ -702,23 +702,23 @@ class BaseK8S(BaseDockerizeTest):
         if not replicas:
             replicas = self.get_expected_number_of_pods(namespace=namespace, workload=name)
 
-        Logger.logger.debug("verifying {} pods are running in namespace {} {}".format(
-            replicas, namespace, "with substring {}".format(name) if name else ""))
+        Logger.logger.debug("verifying {} pods are running within {}s in namespace {} {}".format(
+            replicas, timeout, namespace, "with substring {}".format(name) if name else ""))
         delta_t = 0
         start = datetime.now()
         running_pods = {}
-        total_pods = {}
         while delta_t <= timeout:
-            running_pods = self.get_running_pods(namespace=namespace, name=name)
-            # total_pods = self.get_pods(namespace=namespace, name=name, include_terminating=False)
+            running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {timeout - delta_t} seconds")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
-        Logger.logger.error("wrong number of pods are running, timeout: {} seconds. running_pods: {}".
+        total_pods = self.get_pods(namespace=namespace, name=name, include_terminating=False)
+        non_running_pods = [i for i in total_pods if i not in running_pods]
+        Logger.logger.error("wrong number of pods are running, timeout: {} seconds. non_running_pods: {}".
                             format(timeout,
-                                   KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True, indent=2)))
+                                   KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(timeout, replicas, len(running_pods)))  # , len(total_pods)))
@@ -814,7 +814,7 @@ class BaseK8S(BaseDockerizeTest):
     def get_running_containers(self, namespace: str):
         if self.docker.docker_client is None:
             return []
-        pods = self.get_running_pods(namespace=namespace)
+        pods = self.get_ready_pods(namespace=namespace)
         containers = [i for i in self.docker.docker_client.containers.list()]
         return [j for i in pods for j in containers if i.metadata.name in j.name and "_POD_" not in j.name]
 
@@ -824,7 +824,7 @@ class BaseK8S(BaseDockerizeTest):
     #     self.kubernetes_obj.port
 
     def get_pod_ip(self, wlid: str):
-        ips = [pod.status.pod_ip for pod in self.get_running_pods(namespace=Wlid.get_namespace(wlid=wlid)) if
+        ips = [pod.status.pod_ip for pod in self.get_ready_pods(namespace=Wlid.get_namespace(wlid=wlid)) if
                Wlid.get_name(wlid=wlid) in pod.metadata.name]
         return ips[0] if len(ips) > 0 else ""
 
@@ -836,7 +836,7 @@ class BaseK8S(BaseDockerizeTest):
         return tmp_service[0].spec.cluster_ip
 
     def get_image_tag(self, wlid: str):
-        containers = [container for pod in self.get_running_pods(namespace=Wlid.get_namespace(wlid=wlid)) for container
+        containers = [container for pod in self.get_ready_pods(namespace=Wlid.get_namespace(wlid=wlid)) for container
                       in pod.spec.containers if Wlid.get_name(wlid=wlid) in pod.metadata.name]
         image_tags = [container.image.split(':')[-1] for container in containers]
         return image_tags[0]
@@ -972,7 +972,7 @@ class BaseK8S(BaseDockerizeTest):
                 Logger.logger.warning(e)
                 time.sleep(1)
         Logger.logger.info("exiting websocket thread")
-    
+
     def get_SBOM_from_storage(self, SBOMKeys):
         SBOMs = []
         if isinstance(SBOMKeys, str):

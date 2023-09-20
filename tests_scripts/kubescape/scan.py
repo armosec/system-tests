@@ -456,12 +456,20 @@ class CustomerConfiguration(BaseKubescape):
         self.install(branch=self.ks_branch)
         files = BaseKubescape.get_abs_path(statics.DEFAULT_INPUT_YAML_PATH, self.test_obj.get_arg("yaml"))
 
-        Logger.logger.info("Stage 1.1: Scan yaml file")
+        Logger.logger.info("Stage 1.1: Apply empty customer configuration to backend")
+        self.original_customer_configuration = self.get_customer_configuration()
+        self.original_customer_configuration['name'] = 'CustomerConfig'
+        self.original_customer_configuration['attributes'] = {}
+        self.remove_from_customer_configuration(customer_configuration=copy.deepcopy(self.original_customer_configuration),
+                                             input_kind=self.test_obj.get_arg('input_kind'),
+                                                input_name=self.test_obj.get_arg('input_name'))
+        
+        Logger.logger.info("Stage 1.2: Scan yaml file")
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")    
-        Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
+        Logger.logger.info("Stage 1.3: Test expected result that control X without configuration Y skipped")
         self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
 
@@ -587,8 +595,11 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             raise Exception("test expected git_repository arg to be a GitRepository instance")
 
         # Check for existing previous report
-        old_report_guid, old_report_ts = self.get_report_guid_and_timestamp_for_git_repository(git_repository,
+        old_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
                                                                                                wait_to_result=False)
+        if repo_hash is not None:
+            Logger.logger.info(f"Running test cleanup - deleting repository ({repo_hash})")
+            self.backend.delete_repository(repository_hash=repo_hash)
 
         Logger.logger.info("Scanning with kubescape")
 
@@ -629,18 +640,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             relevant_resources_without_source) == 0, f"The following resources are missing source: {','.join(relevant_resources_without_source)}"
 
         Logger.logger.info("Fetching repo posture report from backend")
-        t1_start = perf_counter()
-        new_report_guid, new_report_ts = self.get_report_guid_and_timestamp_for_git_repository(git_repository,
-                                                                                               old_report_guid,
+        new_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
                                                                                                wait_to_result=True)
-        t1_stop = perf_counter()
-
-        assert new_report_guid and len(new_report_guid) > 0, "New repo posture report was not found"
-        Logger.logger.info(f"Fetching repo posture report from backend took {int(t1_stop - t1_start)} seconds")
-
-        if old_report_guid:
-            assert new_report_ts > old_report_ts, "New report timestamp should be greater than previous report"
-
         Logger.logger.info("Testing repository summary")
         repo_summary = None
         for _ in range(5):
@@ -691,7 +692,13 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             assert len(kubescape_status_to_control_id["skipped"]) == 0
 
         Logger.logger.info("Testing file summary")
-        file_summary = self.backend.get_repository_posture_files(new_report_guid)
+        file_summary = None
+        for _ in range(12):
+            file_summary = self.backend.get_repository_posture_files(new_report_guid)
+            if len(file_summary) == repo_summary["childCount"]:
+                break
+            else:
+                time.sleep(5)
 
         # Compare Files
         assert repo_summary["childCount"] == len(file_summary), \
@@ -765,7 +772,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
         
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
-        self.backend.delete_repository(repository_hash=repoHash)
+        try:
+            self.backend.delete_repository(repository_hash=repoHash)
+        except Exception as e:
+            Logger.logger.warning(f"failed to delete repository - {e}")
         return statics.SUCCESS, ""
 
 class TestScanningScope(BaseKubescape):

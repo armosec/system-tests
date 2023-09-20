@@ -46,6 +46,16 @@ DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 DEFAULT_EXCEPTIONS_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'exceptions')
 DEFAULT_INPUT_YAML_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'yaml_file')
 
+# notifications
+DEFAULT_NOTIFICATIONS_PATHS = os.path.abspath(os.path.join('configurations', 'notifications'))
+DEFAULT_NOTIFICATIONS_DEPLOYMENT_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'deployments')
+
+
+# kubescape config
+ACCOUNT_ID_KEY="accountID"
+CLOUD_REPORT_URL_KEY="cloudReportURL"
+CLOUD_API_URL_KEY="cloudAPIURL"
+
 # vulnerability_scanning paths
 DEFAULT_VULNERABILITY_SCANNING_PATHS = os.path.abspath(os.path.join('configurations', 'vulnerability_scanning'))
 DEFAULT_VULNERABILITY_EXPECTED_RESULTS = os.path.abspath(
@@ -101,12 +111,14 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
-HELM_REPO_FROM_LOCAL = "charts/kubescape-cloud-operator"
-HELM_REPO = "kubescape/kubescape-cloud-operator"
+HELM_REPO_FROM_LOCAL = "charts/kubescape-operator"
+HELM_REPO = "kubescape/kubescape-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
+CA_KUBESCAPE_CONFIGMAP_NAME = "kubescape-config"
 CA_HELM_NAME = "kubescape"
 CA_CONFIG = "ks-cloud-config"
+CA_CONFIGMAP_SERVICE_DISCOVERY_KEY = "services"
 CA_OPERATOR_CONTAINER_FROM_HELM_NAME = "operator"
 CA_OPERATOR_DEPLOYMENT_FROM_HELM_NAME = "operator"
 CA_COLLECTOR_CONTAINER_FROM_HELM_NAME = "kollector"

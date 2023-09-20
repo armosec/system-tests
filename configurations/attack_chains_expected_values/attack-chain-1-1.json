@@ -1,0 +1,127 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "networking.k8s.io/v1",
+                                "cluster": "kind-attack-chain-1-1",
+                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                "kind": "Ingress",
+                                "name": "wordpress-ingress",
+                                "namespace": "default",
+                                "resourceID": "networking.k8s.io/v1/default/Ingress/wordpress-ingress"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "wordpress",
+                                    "imageScanID": "11491887197209110490",
+                                    "names": [
+                                        "CVE-2023-25775"
+                                    ]
+                                }
+                            ],
+                            "relatedResources": null,
+                            "nextNodes": [
+                                {
+                                    "name": "Credential access",
+                                    "description": "",
+                                    "controlIDs": [
+                                        "C-0259",
+                                        "C-0261"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "kind-attack-chain-1-1",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                "kind": "ServiceAccount",
+                                                "name": "default",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ServiceAccount/default"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Persistence",
+                                    "description": "",
+                                    "controlIDs": [
+                                        "C-0017"
+                                    ],
+                                    "relatedResources": null
+                                },
+                                {
+                                    "name": "Lateral Movement (Network)",
+                                    "description": "",
+                                    "controlIDs": [
+                                        "C-0260"
+                                    ],
+                                    "relatedResources": null
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "guid": "5d817063-096f-4d91-b39b-8665240080af",
+                "name": "workload-external-track",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "kind-attack-chain-1-1",
+                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                    "kind": "Deployment",
+                    "name": "wordpress",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/wordpress"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "kind-attack-chain-1-1",
+                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                        "kind": "Deployment",
+                        "name": "wordpress",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/wordpress"
+                    }
+                },
+                "description": "Exposed wordpress with critical vulnerabilities and 3 severe impacts",
+                "creationTime": "2023-09-11 10:42:17.263084 +0100 +0100",
+                "attackChainID": "247139456",
+                "clusterName": "kind-attack-chain-1-1",
+                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                "latestReportGUID": "b911a8c5-643d-4bfb-975e-a49bfb8eef34",
+                "uiStatus": {
+                    "firstSeen": "2023-09-11 10:42:17.263084 +0100 +0100",
+                    "viewedMainScreen": "2023-09-11 15:53:21 +0100 +0100",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2023-09-11T13:29:07Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}
