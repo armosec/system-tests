@@ -247,3 +247,75 @@ class KSMicroserviceTests(object):
                       {"trigger_by": "cronjob", "operation": "create", "framework": ["NSA"], "hostsensor": False}],
             proxy_config={"helm_proxy_url":statics.HELM_PROXY_URL}
         )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_default():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config"},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_exclude_namespaces():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config", "exclude-namespaces": ["kubescape"]},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_include_namespaces():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config", "include-namespaces": ["kubescape"]},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_host_scanner_enabled():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config", "host-scanner-enabled": True},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_submit():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config", "submit": True},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_config_scan_MITRE_framework():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "config", "frameworks": ["MITRE"]},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_vulnerabilities_scan_default():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "vulnerabilities"},
+        )
+
+    @staticmethod
+    def control_cluster_from_CLI_vulnerabilities_scan_include_namespaces():
+        from tests_scripts.helm.ks_microservice import ControlClusterFromCLI
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ControlClusterFromCLI,
+            cli_args={"scan": True, "trigger": "vulnerabilities", "include-namespaces": ["kubescape"]},
+        )
