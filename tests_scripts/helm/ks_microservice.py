@@ -38,7 +38,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # 2.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
         # 2.2 install armo helm-chart
-        self.install_armo_helm_chart()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 2.3 verify installation
         current_datetime = datetime.now(timezone.utc)
@@ -48,7 +48,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=600, 
+            timeout=800,
             current_datetime=current_datetime,
             cluster_name=cluster
             )
