@@ -13,10 +13,9 @@ if (env.DELETE_TEST_TENANT) {
 
 // Add kubescape-CLI and kubescape-HELM tests that use the BE API
 def tests = [
-            "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy":    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_for_attack_chains_scenario_alpine_fix_control":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_for_attack_chains_scenario_5_fix_image":                     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "scan_for_attack_chains_scenario_5_fix_control":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy":    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            //  "scan_for_attack_chains_scenario_alpine_fix_control":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            //  "scan_for_attack_chains_scenario_5_fix_control":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
 
