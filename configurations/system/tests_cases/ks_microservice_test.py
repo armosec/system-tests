@@ -189,7 +189,7 @@ class KSMicroserviceTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start"}],
-            test_scenario="attack-chain-6",
+            test_scenario="attack-chain-3",
             fix_object="control"
         )
 
@@ -205,7 +205,7 @@ class KSMicroserviceTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start"}],
-            test_scenario="attack-chain-6",
+            test_scenario="attack-chain-3",
             fix_object="control",
             helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
             relevancy_enabled=False
