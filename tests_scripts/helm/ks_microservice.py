@@ -63,7 +63,9 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
+        time.sleep(20)
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
+        time.sleep(20)
         current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("trigger a new scan")
         self.trigger_scan(cluster)
@@ -73,7 +75,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # cat take more than 15m to get the updated result
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
-            timeout=1200, 
+            timeout=1000, 
             cluster_name=cluster
             )
 

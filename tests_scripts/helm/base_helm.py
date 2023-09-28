@@ -113,7 +113,8 @@ class BaseHelm(BaseK8S):
             helm_kwargs.update(security_params)
 
         helm_kwargs.update({"nodeAgent.config.learningPeriod": self.filtered_sbom_init_time, 
-                            "nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
+                            "nodeAgent.config.updatePeriod": self.filtered_sbom_update_time,
+                            })
         
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
                                             server=self.test_driver.backend_obj.get_api_url(),

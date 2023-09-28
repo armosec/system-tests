@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: alpine-container
-          image: alpine:3.18.2  # Use the Alpine Linux image
+          image: alpine:3.16.0
           command: ["/bin/sh"]
           args: ["-c", "nc -lnvp 8080"]
           ports:
