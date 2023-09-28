@@ -43,13 +43,16 @@ def tests = [
             "stripe_webhook" :                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "stripe_billing_portal":           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             "user_email_settings":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            "user_alert_channels":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy":      ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE",  "k8s"],
             //"scan_for_attack_chains_scenario_5_fix_control_no_relevancy":       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"scan_for_attack_chains_scenario_1_1_fix_control_no_relevancy":     ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"scan_for_attack_chains_scenario_6_fix_control_no_relevancy":       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            //"scan_for_attack_chains_scenario_3_fix_control_no_relevancy":       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+            //"scan_for_attack_chains_scenario_3_fix_control_no_relevancy":       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy":    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "scan_for_attack_chains_scenario_5_fix_control_no_relevancy":    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            //  "scan_for_attack_chains_scenario_alpine_fix_control":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //  "scan_for_attack_chains_scenario_5_fix_control":                   ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
              ]
 
