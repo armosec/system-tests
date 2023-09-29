@@ -1966,7 +1966,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def get_active_attack_chains(self, current_datetime, cluster_name=None) -> requests.Response:
+    def get_active_attack_chains(self, current_datetime=datetime, cluster_name=None) -> requests.Response:
         r = self.get_attack_chains(cluster_name)
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
@@ -1975,10 +1975,11 @@ class ControlPanelAPI(object):
         if response['response']['attackChainsLastScan']:
             last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')
             last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
+            current_datetime_utc = current_datetime.astimezone(tz=timezone.utc)
             print("last scan time: ", response['response']['attackChainsLastScan'])
-            print(last_scan_datetime, current_datetime)
+            print("current time: ", current_datetime_utc)
 
-            assert last_scan_datetime >= current_datetime, f"attack-chains response is outdated"
+            assert last_scan_datetime >= current_datetime_utc, f"attack-chains response is outdated"
 
         assert response['total']['value'] > 0, f"no attack-chains detected yet"
 
