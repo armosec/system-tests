@@ -1976,7 +1976,7 @@ class ControlPanelAPI(object):
             last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')
             last_scan_datetime = last_scan_datetime.replace(tzinfo=timezone.utc)
             current_datetime_utc = current_datetime.astimezone(tz=timezone.utc)
-            print("last scan time: ", response['response']['attackChainsLastScan'])
+            print("last scan time: ", last_scan_datetime)
             print("current time: ", current_datetime_utc)
 
             assert last_scan_datetime >= current_datetime_utc, f"attack-chains response is outdated"
