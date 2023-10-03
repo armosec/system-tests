@@ -8,6 +8,8 @@ class Backend(object):
                  name: str, 
                  dashboard: str, 
                  api_url: str,
+                 sd_services: str,
+                 sd_metrics: str,
                  auth_url: str = None, 
                  tls_verify: bool = True, 
                  login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
@@ -18,6 +20,8 @@ class Backend(object):
         self.login_method = login_method
         self.customer_guid = customer_guid
         self.api_url = api_url
+        self.sd_services = sd_services
+        self.sd_metrics = sd_metrics
 
     def get_dashboard_url(self):
         return self.dashboard
@@ -39,6 +43,12 @@ class Backend(object):
 
     def get_api_url(self):
         return self.api_url
+    
+    def get_sd_services(self):
+        return self.sd_services
+    
+    def get_sd_metrics(self):
+        return self.sd_metrics
 
 
 def set_backends():
@@ -49,6 +59,8 @@ def set_backends():
     backends.append(Backend(name='development',
                             dashboard='https://eggdashbe-dev.armosec.io',
                             api_url="api-dev.armosec.io",
+                            sd_metrics="otelcol-dev.armosec.io:443",
+                            sd_services='{"version":"v1","response":{"event-receiver-http":"https://report.eudev3.cyberarmorsoft.com","event-receiver-ws":"wss://report.eudev3.cyberarmorsoft.com","gateway":"wss://ens.eudev3.cyberarmorsoft.com","api-server":"https://api-dev.armosec.io","metrics":"otelcol-dev.armosec.io:443"}}',
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
@@ -57,6 +69,8 @@ def set_backends():
     # staging frontEgg
     backends.append(Backend(name='staging',
                             dashboard='https://eggdashbe-stage.armosec.io',
+                            sd_metrics="otelcol-dev.armosec.io:443",
+                            sd_services='{"version":"v1","response":{"event-receiver-http":"https://report-ks.eustage2.cyberarmorsoft.com","event-receiver-ws":"wss://report-ks.eustage2.cyberarmorsoft.com","gateway":"wss://ens.eustage2.cyberarmorsoft.com","api-server":"https://api-stage.armosec.io","metrics":"otelcol-dev.armosec.io:443"}}',
                             api_url="api-stage.armosec.io",
                             auth_url='https://eggauth-stage.armosec.io',
                             tls_verify=False,
@@ -65,6 +79,8 @@ def set_backends():
     # staging frontEgg
     backends.append(Backend(name='production',
                             api_url="api.armosec.io",
+                            sd_metrics="otelcol.armosec.io:443",
+                            sd_services='{"version":"v1","response":{"event-receiver-http":"https://report.armo.cloud","event-receiver-ws":"wss://report.armo.cloud","gateway":"wss://ens.euprod1.cyberarmorsoft.com","api-server":"https://api.armosec.io","metrics":"otelcol.armosec.io:443"}}',
                             dashboard='https://api.armosec.io',
                             auth_url='https://auth.armosec.io',
                             tls_verify=False,
@@ -108,6 +124,8 @@ def set_backends():
     backends.append(Backend(name='local',
                             api_url="localhost:7666",
                             dashboard='http://localhost:7666',
+                            sd_metrics="",
+                            sd_services="",
                             auth_url='https://eggauth-dev.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_USERNAME,
