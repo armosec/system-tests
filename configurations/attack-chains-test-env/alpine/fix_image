@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+kubectl patch deployment alpine-deployment -n default --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"alpine:latest"}]'
+kubectl rollout status deployment alpine-deployment -n default --timeout=90s

@@ -516,15 +516,20 @@ class BaseK8S(BaseDockerizeTest):
         return dyn_client.get(name=name, namespace=namespace)
 
     def get_first_owner_reference(self, workload, namespace):
-        p_workload = self.get_workload(api_version=workload['apiVersion'] ,name=workload['metadata']['name'], kind=workload['kind'], namespace=namespace)
-        if 'ownerReferences' not in p_workload['metadata'].keys():
-            return p_workload
-        return self.get_workload(name=p_workload['metadata']['name'], kind=p_workload['kind'], namespace=namespace)
+        if len(workload['metadata']['ownerReferences']) == 0:
+            return workload
+        return self.get_workload(api_version=workload['metadata']['ownerReferences'][0]['apiVersion'] ,name=workload['metadata']['ownerReferences'][0]['name'], kind=workload['metadata']['ownerReferences'][0]['kind'], namespace=namespace)
 
     def get_owner_reference(self, pod, namespace):
         if len(pod.metadata.owner_references) == 0:
-            return self.get_workload(api_version=pod.api_version ,name=pod.metadata.name, kind=pod.kind, namespace=namespace)
+            return self.get_workload(api_version="v1" ,name=pod.metadata.name, kind="Pod", namespace=namespace)
         return self.get_workload(api_version=pod.metadata.owner_references[0].api_version ,name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind, namespace=namespace)
+
+    def get_most_ancient_owner_reference(self, workload, namespace):
+        if 'ownerReferences' not in workload['metadata'].keys():
+            return workload
+        p_workload = self.get_first_owner_reference(workload=workload, namespace=namespace)
+        return self.get_most_ancient_owner_reference(workload=p_workload, namespace=namespace)
 
     def get_api_version_from_instance_ID(self, instance_ID: str):
         return instance_ID.split("/")[0].split("-")[1]

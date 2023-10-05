@@ -45,6 +45,12 @@ DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 # kubescape
 DEFAULT_EXCEPTIONS_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'exceptions')
 DEFAULT_INPUT_YAML_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'yaml_file')
+
+# notifications
+DEFAULT_NOTIFICATIONS_PATHS = os.path.abspath(os.path.join('configurations', 'notifications'))
+DEFAULT_NOTIFICATIONS_DEPLOYMENT_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'deployments')
+
+
 # kubescape config
 ACCOUNT_ID_KEY="accountID"
 CLOUD_REPORT_URL_KEY="cloudReportURL"

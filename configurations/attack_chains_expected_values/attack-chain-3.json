@@ -1,0 +1,128 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "networking.k8s.io/v1",
+                                "cluster": "kind-systest2",
+                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                "kind": "Ingress",
+                                "name": "wordpress-ingress",
+                                "namespace": "default",
+                                "resourceID": "networking.k8s.io/v1/default/Ingress/wordpress-ingress"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "wordpress",
+                                    "imageScanID": "12099710401721811667",
+                                    "names": [
+                                        "CVE-2020-36694",
+                                        "CVE-2023-25775"
+                                    ]
+                                }
+                            ],
+                            "relatedResources": null,
+                            "nextNodes": [
+                                {
+                                    "name": "Credential access",
+                                    "description": "An attacker can steal account names and passwords.",
+                                    "controlIDs": [
+                                        "C-0259",
+                                        "C-0261"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "kind-systest2",
+                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "kind": "ServiceAccount",
+                                                "name": "my-service-account",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ServiceAccount/my-service-account"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Persistence",
+                                    "description": "An attacker can create a foothold.",
+                                    "controlIDs": [
+                                        "C-0017"
+                                    ],
+                                    "relatedResources": null
+                                },
+                                {
+                                    "name": "Lateral Movement (Network)",
+                                    "description": "An attacker can move through the network.",
+                                    "controlIDs": [
+                                        "C-0260"
+                                    ],
+                                    "relatedResources": null
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "guid": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "name": "workload-external-track",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "kind-systest2",
+                    "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                    "kind": "Deployment",
+                    "name": "wordpress",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/wordpress"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "kind-systest2",
+                        "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                        "kind": "Deployment",
+                        "name": "wordpress",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/wordpress"
+                    }
+                },
+                "description": "Exposed wordpress with critical vulnerabilities and 3 severe impacts",
+                "creationTime": "2023-09-21 11:19:53.198214 +0100 +0100",
+                "attackChainID": "3235937023",
+                "clusterName": "kind-systest2",
+                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "latestReportGUID": "a3e76cfe-2edf-4cd8-a315-27d9c2e94da7",
+                "uiStatus": {
+                    "firstSeen": "2023-09-21 11:19:53.198214 +0100 +0100",
+                    "viewedMainScreen": "2023-09-21 13:23:04 +0100 +0100",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2023-09-21T13:22:33Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}

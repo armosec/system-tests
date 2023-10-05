@@ -140,16 +140,29 @@ def prep_test(){
 
 def run_test(String test_name, String backend, String customer, String ks_b, String vuln_b, String delete_test_tenant){
     try {
-        withCredentials([string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD')]) {
-            sh '''
-            #!/bin/bash
-            echo "Test history:"
-            echo "''' + test_name + ''';;" >/tmp/testhistory
-            cat /tmp/testhistory
-            source systests_python_env/bin/activate
-            python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c ''' + customer + '''  --duration ''' + "${env.DURATION}" + ''' --logger DEBUG --delete_test_tenant '''+ delete_test_tenant +'''  --kwargs ks_branch=''' + ks_b +''' helm_branch='''+vuln_b+'''
-            deactivate
-            '''
+        withCredentials([
+            string(credentialsId: 'REGISTRY_USERNAME', variable: 'REGISTRY_USERNAME'), 
+            string(credentialsId: 'REGISTRY_PASSWORD', variable: 'REGISTRY_PASSWORD'),
+            string(credentialsId: 'customer-for-credentials', variable: 'CUSTOMER'), 
+            string(credentialsId: 'name-for-credentials', variable: 'USERNAME'), 
+            string(credentialsId: 'password-for-credentials', variable: 'PASSWORD'), 
+            string(credentialsId: 'client-id-for-credentials-on-'+"${env.BACKEND}", variable: 'CLIENT_ID'), 
+            string(credentialsId: 'secret-key-for-credentials-on-'+"${env.BACKEND}", variable: 'SECRET_KEY'), 
+            string(credentialsId: 'teamsID-'+"${env.BACKEND}", variable: 'TEAMS_ID'),
+            string(credentialsId: 'channelId-'+"${env.BACKEND}", variable: 'CHANNEL_ID'),
+            string(credentialsId: 'channelWebhook-'+"${env.BACKEND}", variable: 'CHANNEL_WEBHOOK'),
+            string(credentialsId: 'ms-teams-client-id', variable: 'MS_TEAMS_CLIENT_ID'), 
+            string(credentialsId: 'ms-teams-secret-id', variable: 'MS_TEAMS_CLIENT_SECRET')
+            ]) {
+                sh '''
+                #!/bin/bash
+                echo "Test history:"
+                echo "''' + test_name + ''';;" >/tmp/testhistory
+                cat /tmp/testhistory
+                source systests_python_env/bin/activate
+                python3 systest-cli.py -t ''' + test_name + ''' -b ''' + backend + ''' -c ''' + customer + '''  --duration ''' + "${env.DURATION}" + ''' --logger DEBUG --delete_test_tenant '''+ delete_test_tenant +'''  --kwargs ks_branch=''' + ks_b +''' helm_branch='''+vuln_b+'''
+                deactivate
+                '''
         }
     } catch (err) {
         echo "${err}"

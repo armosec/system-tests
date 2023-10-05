@@ -456,12 +456,20 @@ class CustomerConfiguration(BaseKubescape):
         self.install(branch=self.ks_branch)
         files = BaseKubescape.get_abs_path(statics.DEFAULT_INPUT_YAML_PATH, self.test_obj.get_arg("yaml"))
 
-        Logger.logger.info("Stage 1.1: Scan yaml file")
+        Logger.logger.info("Stage 1.1: Apply empty customer configuration to backend")
+        self.original_customer_configuration = self.get_customer_configuration()
+        self.original_customer_configuration['name'] = 'CustomerConfig'
+        self.original_customer_configuration['attributes'] = {}
+        self.remove_from_customer_configuration(customer_configuration=copy.deepcopy(self.original_customer_configuration),
+                                             input_kind=self.test_obj.get_arg('input_kind'),
+                                                input_name=self.test_obj.get_arg('input_name'))
+        
+        Logger.logger.info("Stage 1.2: Scan yaml file")
         result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                    submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"),
                                    yamls=files)
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")    
-        Logger.logger.info("Stage 1.2: Test expected result that control X without configuration Y skipped")
+        Logger.logger.info("Stage 1.3: Test expected result that control X without configuration Y skipped")
         self.test_customer_configuration_result(cli_result=result, expected_result='skipped',
                                                 c_id=self.test_obj.policy_name)
 

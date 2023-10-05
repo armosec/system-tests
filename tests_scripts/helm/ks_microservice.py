@@ -1,6 +1,5 @@
 from datetime import datetime,timezone
 import os
-import sys
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -21,16 +20,17 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
 
-        attack_chain_scenarios_repo = "https://github.com/armosec/attack-chains-test-env.git"
         attack_chain_scenarios_path = "./configurations/attack-chains-test-env"
+        attack_chain_expected_values = "./configurations/attack_chains_expected_values"
 
         self.ignore_agent = True
+        cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info("Installing attack-chain-scenario")
 
         Logger.logger.info("Applying scenario manifests")
         test_scenario = self.test_obj[("test_scenario", None)]
-        deploy_cmd = attack_chain_scenarios_path + '/' + 'deploy_scenario' + ' ' + attack_chain_scenarios_path + '/' + test_scenario
+        deploy_cmd = os.path.join(attack_chain_scenarios_path, 'deploy_scenario') + ' ' + os.path.join(attack_chain_scenarios_path , test_scenario)
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
         time.sleep(5)
 
@@ -38,34 +38,62 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         # 2.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
         # 2.2 install armo helm-chart
-        self.install_armo_helm_chart()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         # 2.3 verify installation
+        current_datetime = datetime.now(timezone.utc)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         time.sleep(10)
 
         Logger.logger.info("wait for response from BE")
+        r, t = self.wait_for_report(
+            self.backend.get_active_attack_chains, 
+            timeout=800,
+            current_datetime=current_datetime,
+            cluster_name=cluster
+            )
+
+        Logger.logger.info('loading attack chain scenario to validate it')
+        f = open(os.path.join(attack_chain_expected_values, test_scenario+'.json'))
+        expected = json.load(f) 
+        response = json.loads(r.text)
+
+        Logger.logger.info('comparing attack-chains result with expected ones')
+        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
+
+        # Fixing phase
+        Logger.logger.info("attack chains detected, applying fix command")
+        time.sleep(20)
+        self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
+        time.sleep(20)
         current_datetime = datetime.now(timezone.utc)
-        r, t = self.wait_for_report(self.backend.get_attack_chains, 
-                                           timeout=600, 
-                                           current_datetime=current_datetime
-                                           )
+        Logger.logger.info("trigger a new scan")
+        self.trigger_scan(cluster)
 
-        if r.text != '':
-            # retrieve expected attack-chain scenario result
-            Logger.logger.info('loading attack chain scenario to validate it')
-            
-            f = open('./configurations/attack_chains_expected_values/'+test_scenario+'.json')
-            expected = json.load(f) 
-            response = json.loads(r.text)
+        Logger.logger.info("wait for response from BE")
+        # we set the timeout to 1200s because image scan 
+        # cat take more than 15m to get the updated result
+        active_attack_chains, t = self.wait_for_report(
+            self.backend.has_active_attack_chains, 
+            timeout=1000, 
+            cluster_name=cluster
+            )
 
-            Logger.logger.info('comparing attack-chains result with expected ones')
-            if not self.check_attack_chains_results(response, expected):
-                Logger.logger.error('attack-chain response differ from the expected one')
-                raise Exception("Found attack chains don't match the expected ones")
-
-        Logger.logger.info("attack chain detected")
+        Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
+
+    def fix_attack_chain(self, attack_chain_scenarios_path, test_scenario):
+        fix_type = self.test_obj[("fix_object", "control")]
+        fix_command= os.path.join(attack_chain_scenarios_path, test_scenario, 'fix_' + fix_type)
+        TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
+        time.sleep(5)
+
+    def trigger_scan(self, cluster_name):
+        self.backend.trigger_posture_scan(
+            cluster_name=cluster_name,
+            framework_list=["security"],
+            with_host_sensor="true"
+            )
 
     def compare_nodes(self, obj1, obj2) -> bool:
         """Walk 2 dictionary object to compare their values.
@@ -452,3 +480,40 @@ class ContinuousScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         #self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
         return self.cleanup()
+
+
+class ControlClusterFromCLI(BaseHelm, BaseKubescape):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ControlClusterFromCLI, self).__init__(test_obj=test_obj, backend=backend,
+                                                             kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        # test check in cluster workloads and kubescape CLI 
+        # assert self.backend == None; f'the test {self.test_driver.test_name} must run without backend'
+
+        # 1 install kubescape in cluster workloads
+        Logger.logger.info("Installing kubescape with helm-chart")
+        # 1.1 add and update armo in repo
+        self.add_and_upgrade_armo_to_repo()
+        # 1.2 install armo helm-chart
+        # self.install_armo_helm_chart()
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
+
+        # 2 install kubescape CLI
+        Logger.logger.info("Installing kubescape CLI")
+        # 2.1 Installing kubescape CLI
+        self.install(branch=self.ks_branch)
+
+        # 3 trigger in cluster components
+        Logger.logger.info("Triggering in cluster components")
+        # 3.1 trigger in cluster components
+        self.trigger_in_cluster_components(cli_args=self.parse_cli_args(args=self.test_obj["cli_args"]))
+
+        # 4 validate cluster trigger 
+        Logger.logger.info("Validate triggering in cluster components")
+        # 4.1 validate cluster trigger
+        self.validate_cluster_trigger_as_expected(cluster_name=self.get_cluster_name(), args=self.test_obj["cli_args"])
+
+        return self.cleanup()
+

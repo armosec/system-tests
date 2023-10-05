@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+kubectl delete -n default service alpine-service
+kubectl wait svc/alpine-service --for=delete --timeout=-1s

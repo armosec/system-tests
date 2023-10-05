@@ -529,5 +529,18 @@ class KubectlWrapper(object):
     def get_dynamic_client(self, api_version, kind):
         return self.client_dynamic.resources.get(api_version=api_version, kind=kind)
 
+    @staticmethod
+    def add_new_service_account_to_cluster_admin(service_account: str, namespace: str):
+        add_sa_cmd = f'kubectl create serviceaccount {service_account}'
+        TestUtil.run_command(add_sa_cmd.split(" "), timeout=None)
+        add_binding_cmd = f'kubectl create clusterrolebinding {service_account}-binding --clusterrole=cluster-admin ' \
+                          f'--serviceaccount={namespace}:{service_account}'
+        TestUtil.run_command(add_binding_cmd.split(" "), timeout=None)
+
+    @staticmethod
+    def add_new_namespace(namespace: str):
+        TestUtil.run_command("kubectl create namespace alerts".split(" "), timeout=None)
+
+
 def get_name(obj: dict):
     return obj["metadata"]["name"]
