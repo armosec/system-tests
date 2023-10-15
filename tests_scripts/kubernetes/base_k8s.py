@@ -1073,3 +1073,27 @@ class BaseK8S(BaseDockerizeTest):
             )
               filteredCVEs.append((key, cve_data))
         return filteredCVEs
+
+    def get_CVEs_summaries_from_storage(self, CVEs_summaries_keys, namespace):
+        CVEs_summaries = []
+        for key in CVEs_summaries_keys:
+            CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            name=key,
+            namespace=namespace,
+            plural=statics.STORAGE_CVES_SUMMARIES_PLURAL)
+            CVEs_summaries.append((key, CVE_data))
+        return CVEs_summaries
+
+
+    def get_CVEs_summaries_by_scope_from_storage(self, CVEs_summaries_keys):
+        CVEs_summaries = []
+        for key in CVEs_summaries_keys:
+            CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_cluster_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            name=key,
+            plural=statics.STORAGE_CVES_SCOPE_SUMMARIES_PLURAL)
+            CVEs_summaries.append((key, CVE_data))
+        return CVEs_summaries

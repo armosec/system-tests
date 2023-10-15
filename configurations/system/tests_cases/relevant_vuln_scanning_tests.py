@@ -23,6 +23,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/CVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/CVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/CVEs/wikijs.json")],
             expected_filtered_SBOMs=[("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/wikijs.json")],
             expected_filtered_CVEs = [("nginx", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/wikijs.json")],
+            expected_CVEs_summaries = [("nginx", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/nginx.json"), ("mariadb", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/mariadb.json"), ("wikijs", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/wikijs.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/wikijs.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/wikijs.json",
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
@@ -182,6 +184,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs= [("python", "configurations/relevant_cves/expected-result/wikijs/CVEs/python-simple.json")],
             expected_filtered_SBOMs=[("python", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/python-simple.json")],
             expected_filtered_CVEs =[("python", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/python-simple.json")],
+            expected_CVEs_summaries =[("python", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/python-simple.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/python.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/python-simple.json",
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
@@ -200,6 +204,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("golang", "configurations/relevant_cves/expected-result/wikijs/CVEs/golang-simple.json")],
             expected_filtered_SBOMs=[("golang", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/golang-simple.json")],
             expected_filtered_CVEs = [("golang", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/golang-simple.json")],
+            expected_CVEs_summaries = [("golang", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/golang-simple.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/golang.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/golang-simple.json",
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
@@ -218,6 +224,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("java", "configurations/relevant_cves/expected-result/wikijs/CVEs/java-simple.json")],
             expected_filtered_SBOMs=[("java", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/java-simple.json")],
             expected_filtered_CVEs = [("java", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/java-simple.json")],
+            expected_CVEs_summaries = [("java", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/java-simple.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/java.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/java-simple.json",
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
@@ -237,6 +245,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs= [("python", "configurations/relevant_cves/expected-result/wikijs/CVEs/python-simple.json"), ("java", "configurations/relevant_cves/expected-result/wikijs/CVEs/java-simple.json")],
             expected_filtered_SBOMs=[("python", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/python-client-to-java.json"), ("java", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/java-simple.json")],
             expected_filtered_CVEs =[("python", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/python-client-to-java.json"), ("java", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/java-simple.json")],
+            expected_CVEs_summaries= [("python", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/python-client-to-java.json"), ("java", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/java-simple.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/java-and-python.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/java-and-python.json",
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
@@ -255,6 +265,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs= [("golang", "configurations/relevant_cves/expected-result/wikijs/CVEs/golang-dynamic-simple.json")],
             expected_filtered_SBOMs=[("golang", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/golang-dynamic-simple.json")],
             expected_filtered_CVEs =[("golang", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/golang-dynamic-simple.json")],
+            expected_CVEs_summaries= [("golang", "configurations/relevant_cves/expected-result/wikijs/CVESSummaries/golang-dynamic.json")],
+            expected_namespace_CVEs_summaries = [("namespace", "configurations/relevant_cves/expected-result/wikijs/namespaceCVESSummaries/golang-dynamic.json")],
             expected_results= "configurations/relevant_cves/expected-result/wikijs/BE_CVEs/golang-dynamic.json",
             test_obj=RelevantCVEs,
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True, statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
