@@ -1973,9 +1973,8 @@ class ControlPanelAPI(object):
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
         # - parameter 'total.value' shoud be > 0
-        #TestUtil.run_command(command_args="kubectl get pods -n kubescape", display_stdout=True, timeout=300)
-        result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(result.stdout)
+        #result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #print(result.stdout)
         response = json.loads(r.text)
         if response['response']['attackChainsLastScan']:
             last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')
