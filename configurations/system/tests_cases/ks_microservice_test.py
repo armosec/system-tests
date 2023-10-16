@@ -74,6 +74,22 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
+    def scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy_with_cronjob():
+        """
+        install scenario 'alpine' on the cluster, install the kubescape operator and run the scan triggered by a cronjob.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new image scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True}],
+            test_scenario="alpine",
+            fix_object="image"
+        )
+
+    @staticmethod
     def scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy():
         """
         install scenario 'alpine' on the cluster, install the kubescape operator and run the scan.
@@ -101,6 +117,24 @@ class KSMicroserviceTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanAttackChainsWithKubescapeHelmChart,
             test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="alpine",
+            fix_object="image",
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            relevancy_enabled=False
+        )
+
+    @staticmethod
+    def scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob():
+        """
+        install scenario 'alpine' on the cluster, install the kubescape operator disabling relevancy and run the scan triggered by a cronjob.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new image scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True}],
             test_scenario="alpine",
             fix_object="image",
             helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
