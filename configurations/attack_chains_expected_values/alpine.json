@@ -18,7 +18,7 @@
                             "attributes": {
                                 "apiVersion": "v1",
                                 "cluster": "kind-attack-chain-5",
-                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                                 "kind": "Service",
                                 "name": "alpine-service",
                                 "namespace": "default",
@@ -30,6 +30,15 @@
                         {
                             "name": "Execution (Vulnerable Image)",
                             "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "alpine-container",
+                                    "imageScanID": "14560133534155478808",
+                                    "names": [
+                                        "CVE-2022-37434"
+                                    ]
+                                }
+                            ],
                             "relatedResources": null,
                             "nextNodes": [
                                 {
@@ -44,7 +53,7 @@
                                             "attributes": {
                                                 "apiVersion": "v1",
                                                 "cluster": "kind-attack-chain-5",
-                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                                                 "kind": "ConfigMap",
                                                 "name": "alpine-configmap",
                                                 "namespace": "default",
@@ -65,7 +74,7 @@
                                             "attributes": {
                                                 "apiVersion": "v1",
                                                 "cluster": "kind-attack-chain-5",
-                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                                                 "kind": "ServiceAccount",
                                                 "name": "default",
                                                 "namespace": "default",
@@ -73,6 +82,14 @@
                                             }
                                         }
                                     ]
+                                },
+                                {
+                                    "name": "Privilege Escalation (Node)",
+                                    "description": "An attacker can gain permissions and access node resources.",
+                                    "controlIDs": [
+                                        "C-0211"
+                                    ],
+                                    "relatedResources": null
                                 },
                                 {
                                     "name": "Persistence",
@@ -94,12 +111,12 @@
                         }
                     ]
                 },
-                "guid": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "guid": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                 "name": "workload-external-track",
                 "attributes": {
                     "apiVersion": "apps/v1",
                     "cluster": "kind-attack-chain-5",
-                    "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                    "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                     "kind": "Deployment",
                     "name": "alpine-deployment",
                     "namespace": "default",
@@ -110,28 +127,27 @@
                     "attributes": {
                         "apiVersion": "apps/v1",
                         "cluster": "kind-attack-chain-5",
-                        "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                        "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                         "kind": "Deployment",
                         "name": "alpine-deployment",
                         "namespace": "default",
                         "resourceID": "apps/v1/default/Deployment/alpine-deployment"
                     }
                 },
-                "description": "Exposed alpine-deployment with critical vulnerabilities and 4 severe impacts",
-                "creationTime": "2023-09-18 15:00:44.845533 +0100 +0100",
-                "attackChainID": "385259060",
+                "description": "Exposed alpine-deployment with critical vulnerabilities and 5 severe impacts",
+                "creationTime": "2023-10-18 09:14:27.939435 +0100 +0100",
+                "attackChainID": "210270836",
                 "clusterName": "kind-attack-chain-5",
-                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
-                "latestReportGUID": "4fc54860-b618-4fe8-a8ba-53096c705078",
+                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                "latestReportGUID": "0362c9ae-e5fe-4add-b68f-4878f8539c82",
                 "uiStatus": {
-                    "firstSeen": "2023-09-18 15:00:44.845533 +0100 +0100",
-                    "viewedMainScreen": "2023-09-18 17:00:46 +0100 +0100",
+                    "firstSeen": "2023-10-18 09:14:27.939435 +0100 +0100",
                     "processingStatus": "done"
                 },
                 "status": "active"
             }
         ],
-        "attackChainsLastScan": "2023-09-18T14:21:36Z",
+        "attackChainsLastScan": "2023-10-18T08:34:46Z",
         "frameworkName": "security"
     },
     "cursor": ""
