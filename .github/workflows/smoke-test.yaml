@@ -1,0 +1,27 @@
+name: smoke-test
+
+on:
+  push:
+
+jobs:
+  get-current-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      current_branch: ${{ steps.get_branch.outputs.branch }}
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: get_branch
+
+  system-tests:
+    uses: kubescape/workflows/.github/workflows/sanity-check.yaml@master
+    with:
+      GH_RUNNER: "ubuntu-latest"
+      SYSTEM_TESTS_BRANCH: ${{ needs.get-current-branch.outputs.current_branch }}
+      BINARY_TESTS: '[
+                      "scan_nsa_and_submit_to_backend",
+                    ]'
+    secrets: inherit
+
+
