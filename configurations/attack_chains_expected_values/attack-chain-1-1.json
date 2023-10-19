@@ -1,162 +1,162 @@
 {
-    "total":{
-       "value":1,
-       "relation":"eq"
+    "total": {
+        "value": 1,
+        "relation": "eq"
     },
-    "response":{
-       "attackChains":[
-          {
-             "attackChainNodes":{
-                "name":"Initial Access",
-                "description":"An attacker can access the Kubernetes environment.",
-                "controlIDs":[
-                   "C-0256"
-                ],
-                "relatedResources":[
-                   {
-                      "designatorType":"Attributes",
-                      "attributes":{
-                         "apiVersion":"networking.k8s.io/v1",
-                         "cluster":"afe07daf4c1a3e2329db",
-                         "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-                         "kind":"Ingress",
-                         "name":"wordpress-ingress",
-                         "namespace":"default",
-                         "resourceID":"networking.k8s.io/v1/default/Ingress/wordpress-ingress"
-                      }
-                   },
-                   {
-                      "designatorType":"Attributes",
-                      "attributes":{
-                         "apiVersion":"v1",
-                         "cluster":"afe07daf4c1a3e2329db",
-                         "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-                         "kind":"Service",
-                         "name":"wordpress",
-                         "namespace":"default",
-                         "resourceID":"/v1/default/Service/wordpress"
-                      }
-                   }
-                ],
-                "nextNodes":[
-                   {
-                      "name":"Execution (Vulnerable Image)",
-                      "description":"An attacker can execute malicious code by exploiting vulnerable images.",
-                      "vulnerabilities":[
-                         {
-                            "containerName":"wordpress",
-                            "imageScanID":"5030765979577856764",
-                            "names":[
-                               "CVE-2020-36694",
-                               "CVE-2021-30473",
-                               "CVE-2021-30474",
-                               "CVE-2021-30475",
-                               "CVE-2021-46848",
-                               "CVE-2022-1253",
-                               "CVE-2022-1586",
-                               "CVE-2022-1587",
-                               "CVE-2022-24963",
-                               "CVE-2022-32221",
-                               "CVE-2022-36760",
-                               "CVE-2022-37434",
-                               "CVE-2022-37454",
-                               "CVE-2023-23914",
-                               "CVE-2023-25690",
-                               "CVE-2023-27536",
-                               "CVE-2023-28879"
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "networking.k8s.io/v1",
+                                "cluster": "afe07daf4c1a3e2329db",
+                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                                "kind": "Ingress",
+                                "name": "wordpress-ingress",
+                                "namespace": "default",
+                                "resourceID": "networking.k8s.io/v1/default/Ingress/wordpress-ingress"
+                            }
+                        },
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "afe07daf4c1a3e2329db",
+                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                                "kind": "Service",
+                                "name": "wordpress",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/wordpress"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "wordpress",
+                                    "imageScanID": "5030765979577856764",
+                                    "names": [
+                                        "CVE-2020-36694",
+                                        "CVE-2021-30473",
+                                        "CVE-2021-30474",
+                                        "CVE-2021-30475",
+                                        "CVE-2021-46848",
+                                        "CVE-2022-1253",
+                                        "CVE-2022-1586",
+                                        "CVE-2022-1587",
+                                        "CVE-2022-24963",
+                                        "CVE-2022-32221",
+                                        "CVE-2022-36760",
+                                        "CVE-2022-37434",
+                                        "CVE-2022-37454",
+                                        "CVE-2023-23914",
+                                        "CVE-2023-25690",
+                                        "CVE-2023-27536",
+                                        "CVE-2023-28879"
+                                    ]
+                                }
+                            ],
+                            "relatedResources": "None",
+                            "nextNodes": [
+                                {
+                                    "name": "Credential access",
+                                    "description": "An attacker can steal account names and passwords.",
+                                    "controlIDs": [
+                                        "C-0259",
+                                        "C-0261"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "afe07daf4c1a3e2329db",
+                                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                                                "kind": "ServiceAccount",
+                                                "name": "default",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ServiceAccount/default"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Privilege Escalation (Node)",
+                                    "description": "An attacker can gain permissions and access node resources.",
+                                    "controlIDs": [
+                                        "C-0211"
+                                    ],
+                                    "relatedResources": "None"
+                                },
+                                {
+                                    "name": "Persistence",
+                                    "description": "An attacker can create a foothold.",
+                                    "controlIDs": [
+                                        "C-0017"
+                                    ],
+                                    "relatedResources": "None"
+                                },
+                                {
+                                    "name": "Lateral Movement (Network)",
+                                    "description": "An attacker can move through the network.",
+                                    "controlIDs": [
+                                        "C-0260"
+                                    ],
+                                    "relatedResources": "None"
+                                }
                             ]
-                         }
-                      ],
-                      "relatedResources":"None",
-                      "nextNodes":[
-                         {
-                            "name":"Credential access",
-                            "description":"An attacker can steal account names and passwords.",
-                            "controlIDs":[
-                               "C-0259",
-                               "C-0261"
-                            ],
-                            "relatedResources":[
-                               {
-                                  "designatorType":"Attributes",
-                                  "attributes":{
-                                     "apiVersion":"v1",
-                                     "cluster":"afe07daf4c1a3e2329db",
-                                     "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-                                     "kind":"ServiceAccount",
-                                     "name":"default",
-                                     "namespace":"default",
-                                     "resourceID":"/v1/default/ServiceAccount/default"
-                                  }
-                               }
-                            ]
-                         },
-                         {
-                            "name":"Privilege Escalation (Node)",
-                            "description":"An attacker can gain permissions and access node resources.",
-                            "controlIDs":[
-                               "C-0211"
-                            ],
-                            "relatedResources":"None"
-                         },
-                         {
-                            "name":"Persistence",
-                            "description":"An attacker can create a foothold.",
-                            "controlIDs":[
-                               "C-0017"
-                            ],
-                            "relatedResources":"None"
-                         },
-                         {
-                            "name":"Lateral Movement (Network)",
-                            "description":"An attacker can move through the network.",
-                            "controlIDs":[
-                               "C-0260"
-                            ],
-                            "relatedResources":"None"
-                         }
-                      ]
-                   }
-                ]
-             },
-             "guid":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-             "name":"workload-external-track",
-             "attributes":{
-                "apiVersion":"apps/v1",
-                "cluster":"afe07daf4c1a3e2329db",
-                "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-                "kind":"Deployment",
-                "name":"wordpress",
-                "namespace":"default",
-                "resourceID":"apps/v1/default/Deployment/wordpress"
-             },
-             "resource":{
-                "designatorType":"attributes",
-                "attributes":{
-                   "apiVersion":"apps/v1",
-                   "cluster":"afe07daf4c1a3e2329db",
-                   "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-                   "kind":"Deployment",
-                   "name":"wordpress",
-                   "namespace":"default",
-                   "resourceID":"apps/v1/default/Deployment/wordpress"
-                }
-             },
-             "description":"Exposed wordpress with critical vulnerabilities and 4 severe impacts",
-             "creationTime":"2023-10-19 12:27:04.842485 +0100 +0100",
-             "attackChainID":"3342321712",
-             "clusterName":"afe07daf4c1a3e2329db",
-             "customerGUID":"3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
-             "latestReportGUID":"f41dfb39-5266-446f-81bb-8bde95ca0f6b",
-             "uiStatus":{
-                "firstSeen":"2023-10-19 12:27:04.842485 +0100 +0100",
-                "processingStatus":"done"
-             },
-             "status":"active"
-          }
-       ],
-       "attackChainsLastScan":"2023-10-19T11:27:17Z",
-       "frameworkName":"security"
+                        }
+                    ]
+                },
+                "guid": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                "name": "workload-external-track",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "afe07daf4c1a3e2329db",
+                    "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                    "kind": "Deployment",
+                    "name": "wordpress",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/wordpress"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "afe07daf4c1a3e2329db",
+                        "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                        "kind": "Deployment",
+                        "name": "wordpress",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/wordpress"
+                    }
+                },
+                "description": "Exposed wordpress with critical vulnerabilities and 4 severe impacts",
+                "creationTime": "2023-10-19 12:27:04.842485 +0100 +0100",
+                "attackChainID": "3342321712",
+                "clusterName": "afe07daf4c1a3e2329db",
+                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                "latestReportGUID": "f41dfb39-5266-446f-81bb-8bde95ca0f6b",
+                "uiStatus": {
+                    "firstSeen": "2023-10-19 12:27:04.842485 +0100 +0100",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2023-10-19T11:27:17Z",
+        "frameworkName": "security"
     },
-    "cursor":""
+    "cursor": ""
 }
