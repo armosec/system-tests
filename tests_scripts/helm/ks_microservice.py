@@ -4,6 +4,7 @@ import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 from systest_utils import Logger, TestUtil, statics
+from struct_diff import Comparator,JSONFormatter
 import json
 
 DEFAULT_BRANCH = "release"
@@ -59,7 +60,13 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         response = json.loads(r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones')
-        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
+        if not self.check_attack_chains_results(response, expected):
+            cmp = Comparator()
+            d = cmp.diff(expected, response)
+            difference = JSONFormatter(d, {'max_elisions': 1})
+            print(difference)
+            Logger.logger.error('attack-chain response differ from the expected one')
+            raise Exception('response differ from expected')
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
