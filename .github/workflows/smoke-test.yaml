@@ -14,8 +14,8 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: get_branch
 
-  system-tests:
-    uses: kubescape/workflows/.github/workflows/sanity-check.yaml@master
+  smoke-tests:
+    uses: kubescape/workflows/.github/workflows/sanity-check.yaml@main
     with:
       GH_RUNNER: "ubuntu-latest"
       SYSTEM_TESTS_BRANCH: ${{ needs.get-current-branch.outputs.current_branch }}
