@@ -60,13 +60,11 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         response = json.loads(r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones')
-        if not self.check_attack_chains_results(response, expected):
-            cmp = Comparator()
-            d = cmp.diff(expected, response)
-            difference = JSONFormatter(d, {'max_elisions': 1})
-            print(difference)
-            Logger.logger.error('attack-chain response differ from the expected one')
-            raise Exception('response differ from expected')
+        cmp = Comparator()
+        d = cmp.diff(expected, response)
+        difference = JSONFormatter(d, {'max_elisions': 1})
+        Logger.logger.info('diff: %s', difference)
+        assert self.check_attack_chains_results(response, expected), f"Attack chain response differs from the expected one."
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
