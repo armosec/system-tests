@@ -783,24 +783,34 @@ class ControlPanelAPI(object):
         return r.json()["response"]
 
     def get_repository_posture_resources(self, report_guid: str):
+        page_size = 100
         params = {
             "pageNum": 1,
-            "pageSize": 1000,
-            "orderBy": "timestamp:desc",
+            "pageSize": page_size,
+            "orderBy": "timestamp:desc,name:desc",
             "innerFilters": [{"reportGUID": report_guid}],
         }
 
-        r = self.post(
-            API_REPOSITORYPOSTURE_RESOURCES,
-            params={"customerGUID": self.selected_tenant_id},
-            json=params,
-        )
+        r = self.post(API_REPOSITORYPOSTURE_RESOURCES, params={"customerGUID": self.selected_tenant_id}, json=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of repositoryPosture/resources "%s" (code: %d, message: %s)'
                 % (self.customer, r.status_code, r.text)
             )
-        return r.json()["response"]
+        result_length = r.json()['total']['value']
+        
+        result = []
+        for i in range(1, math.ceil(result_length / page_size)+1):
+            params['pageNum'] = i
+            r = self.post(API_REPOSITORYPOSTURE_RESOURCES, params={"customerGUID": self.selected_tenant_id}, json=params)
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error accessing dashboard. Request: results of repositoryPosture/resources "%s" (code: %d, message: %s)'
+                    % (self.customer, r.status_code, r.text)
+                )
+            result.extend(r.json()['response'])
+            
+        return result
 
     def get_job_report_info(self, report_guid: str, cluster_wlid):
         json = {"pageNum": 1, "pageSize": 100,
