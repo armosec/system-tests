@@ -1,4 +1,6 @@
 # CYBER-ARMOR SYSTEM TESTS
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests?ref=badge_shield)
+
 
 ## Test Cases:
 | Test name                                                      |  category  | description                                                            | coverage                      |
@@ -136,3 +138,7 @@ Deactivate environment
 deactivate
 ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests?ref=badge_large)
