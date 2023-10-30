@@ -17,12 +17,24 @@
                             "designatorType": "Attributes",
                             "attributes": {
                                 "apiVersion": "networking.k8s.io/v1",
-                                "cluster": "kind-systest2",
-                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                "cluster": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                                 "kind": "Ingress",
                                 "name": "wordpress-ingress",
                                 "namespace": "default",
                                 "resourceID": "networking.k8s.io/v1/default/Ingress/wordpress-ingress"
+                            }
+                        },
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                                "kind": "Service",
+                                "name": "wordpress",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/wordpress"
                             }
                         }
                     ],
@@ -33,10 +45,26 @@
                             "vulnerabilities": [
                                 {
                                     "containerName": "wordpress",
-                                    "imageScanID": "12099710401721811667",
+                                    "imageScanID": "7286386622948403969",
                                     "names": [
+                                        "CVE-2019-8457",
                                         "CVE-2020-36694",
-                                        "CVE-2023-25775"
+                                        "CVE-2021-30473",
+                                        "CVE-2021-30474",
+                                        "CVE-2021-30475",
+                                        "CVE-2021-46848",
+                                        "CVE-2022-1253",
+                                        "CVE-2022-1586",
+                                        "CVE-2022-1587",
+                                        "CVE-2022-24963",
+                                        "CVE-2022-32221",
+                                        "CVE-2022-36760",
+                                        "CVE-2022-37434",
+                                        "CVE-2022-37454",
+                                        "CVE-2023-23914",
+                                        "CVE-2023-25690",
+                                        "CVE-2023-27536",
+                                        "CVE-2023-28879"
                                     ]
                                 }
                             ],
@@ -54,8 +82,8 @@
                                             "designatorType": "Attributes",
                                             "attributes": {
                                                 "apiVersion": "v1",
-                                                "cluster": "kind-systest2",
-                                                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                                                "cluster": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                                                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                                                 "kind": "ServiceAccount",
                                                 "name": "my-service-account",
                                                 "namespace": "default",
@@ -63,6 +91,14 @@
                                             }
                                         }
                                     ]
+                                },
+                                {
+                                    "name": "Privilege Escalation (Node)",
+                                    "description": "An attacker can gain permissions and access node resources.",
+                                    "controlIDs": [
+                                        "C-0211"
+                                    ],
+                                    "relatedResources": null
                                 },
                                 {
                                     "name": "Persistence",
@@ -84,12 +120,12 @@
                         }
                     ]
                 },
-                "guid": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                "guid": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                 "name": "workload-external-track",
                 "attributes": {
                     "apiVersion": "apps/v1",
-                    "cluster": "kind-systest2",
-                    "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                    "cluster": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                    "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                     "kind": "Deployment",
                     "name": "wordpress",
                     "namespace": "default",
@@ -99,29 +135,28 @@
                     "designatorType": "attributes",
                     "attributes": {
                         "apiVersion": "apps/v1",
-                        "cluster": "kind-systest2",
-                        "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
+                        "cluster": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                        "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
                         "kind": "Deployment",
                         "name": "wordpress",
                         "namespace": "default",
                         "resourceID": "apps/v1/default/Deployment/wordpress"
                     }
                 },
-                "description": "Exposed wordpress with critical vulnerabilities and 3 severe impacts",
-                "creationTime": "2023-09-21 11:19:53.198214 +0100 +0100",
-                "attackChainID": "3235937023",
-                "clusterName": "kind-systest2",
-                "customerGUID": "02c3ca29-9b31-46f3-a993-8c7ac550b729",
-                "latestReportGUID": "a3e76cfe-2edf-4cd8-a315-27d9c2e94da7",
+                "description": "Exposed wordpress with critical vulnerabilities and 4 severe impacts",
+                "creationTime": "2023-10-30 19:12:39.938311 +0100 +0100",
+                "attackChainID": "1611859878",
+                "clusterName": "kind-systets-f23b252e-7c17-465d-b8c4-35d924469a2f",
+                "customerGUID": "3f4a257e-11ea-4cee-8bc0-ca8daa65a833",
+                "latestReportGUID": "9264b791-2ce9-4525-a646-f729360f95d2",
                 "uiStatus": {
-                    "firstSeen": "2023-09-21 11:19:53.198214 +0100 +0100",
-                    "viewedMainScreen": "2023-09-21 13:23:04 +0100 +0100",
+                    "firstSeen": "2023-10-30 19:12:39.938311 +0100 +0100",
                     "processingStatus": "done"
                 },
                 "status": "active"
             }
         ],
-        "attackChainsLastScan": "2023-09-21T13:22:33Z",
+        "attackChainsLastScan": "2023-10-30T18:12:48Z",
         "frameworkName": "security"
     },
     "cursor": ""
