@@ -86,7 +86,10 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-    def install_armo_helm_chart(self, helm_kwargs: dict = {}):
+    def install_armo_helm_chart(self, helm_kwargs: dict = None):
+        if helm_kwargs is None:
+            helm_kwargs = {}
+            
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
 
