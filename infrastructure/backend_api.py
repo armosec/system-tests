@@ -78,7 +78,7 @@ API_CUSTOMERCONFIGURATION = "/api/v1/customerConfiguration"
 
 API_POSTUREEXCEPTIONPOLICY = "/api/v1/postureExceptionPolicy"
 
-
+API_ACCESS_KEYS = "/api/v1/authentication/accessKeys"
 API_ADMIN_TENANTS = "/api/v1/admin/tenants"
 API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
@@ -189,6 +189,7 @@ class ControlPanelAPI(object):
 
         # the auth retrieved for the admin tenant
         self.auth = None
+        self.access_key = ""
 
         self.api_login = APILogin()
 
@@ -216,6 +217,19 @@ class ControlPanelAPI(object):
 
         self.selected_tenant_id = self.login_customer_guid
         self.selected_tenant_cookie = self.login_customer_cookie
+        
+        # set access keys
+        access_keys_response = self.get_access_keys()
+        access_keys = access_keys_response.json()
+        assert len(access_keys) != 0, f"Expected access keys, found none"
+        assert "value" in access_keys[0], f"failed to get access key value"
+        self.set_access_key(access_keys[0]["value"])
+
+    def set_access_key(self, access_key: str):
+        self.access_key = access_key
+        if self.auth is None:
+            self.auth = {}
+        self.auth["X-API-KEY"] = self.access_key
 
     ## ************** Tenants Backend APIs ************** ##
 
@@ -277,8 +291,10 @@ class ControlPanelAPI(object):
 
         res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": self.api_login.get_frontEgg_user_id()}, cookies=None, headers={"Authorization": f"Bearer {self.api_login.get_frontEgg_auth_user_id()}"})
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
-        assert res.json().get("tenantId", {}) != {}, f"TenantId is empty: {res.text}"
-        return res, res.json()["tenantId"]
+        json_response = res.json()
+        assert json_response.get("tenantId", {}) != {}, f"tenantId is empty: {res.text}"
+        assert json_response.get("agentAccessKey", {}).get("value", {}) != {}, f"agentAccessKey['value'] is empty: {res.text}"
+        return json_response["tenantId"], json_response["agentAccessKey"]["value"]
     
     def delete_tenant(self, tenant_id) -> requests.Response:
         """
@@ -303,8 +319,14 @@ class ControlPanelAPI(object):
         return res
 
     
-
-
+    def get_access_keys(self) -> requests.Response:
+        """
+            Returns the access keys of the selected tenant.
+        """
+        res = self.get(API_ACCESS_KEYS)
+        assert res.status_code == client.OK, f"failed to get access keys for tenant_id {self.selected_tenant_id}. Response: {res.text}"
+        return res
+    
     ## ************** Stripe Backend APIs ************** ##
 
     def stripe_billing_portal(self) -> requests.Response:
@@ -396,6 +418,9 @@ class ControlPanelAPI(object):
     def get_secret_key(self):
         return self.secret_key
 
+    def get_access_key(self):
+        return self.access_key
+    
     def cleanup(self, namespace=str(), ca_cluster=str()):
         Logger.logger.info("ControlPanelAPI Clean Up")
 
