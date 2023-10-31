@@ -239,10 +239,11 @@ class TestUtil(object):
             command_args = command_args.split(" ")
         start = time.time()
         try:
-            if env is None:
-                env = {}
-            return_obj = subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, cwd=cwd, env=env) if cwd \
-                else subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, env=env)
+            subprocess_env = dict(os.environ)
+            if env:
+                subprocess_env.update(env)
+            return_obj = subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, cwd=cwd, env=subprocess_env) if cwd \
+                else subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, env=subprocess_env)
         except Exception as e:
             Logger.logger.error(e)
             raise Exception(e)
