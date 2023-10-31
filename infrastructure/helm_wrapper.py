@@ -26,13 +26,16 @@ class HelmWrapper(object):
         # os.system("helm repo update armo")
 
     @staticmethod
-    def install_armo_helm_chart(customer: str, server: str, cluster_name: str,
+    def install_armo_helm_chart(customer: str, access_key: str, server: str, cluster_name: str,
                                 repo: str=statics.HELM_REPO, helm_kwargs:dict={}):
         command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", statics.CA_NAMESPACE_FROM_HELM_NAME,
                         "--create-namespace",
                         "--set", "account={x}".format(x=customer),
                         "--set", "server={x}".format(x=server),
                         "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
+
+        if access_key != "":
+            command_args.extend(["--set", "accessKey={x}".format(x=access_key)])
 
         # by default use offline vuln DB
         command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])

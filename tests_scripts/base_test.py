@@ -87,7 +87,8 @@ class BaseTest(object):
         # prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
         prefix = prefix if prefix is not None else ""
         tenantName = self.create_tenant_name(prefix)
-        res, test_tenant_id = self.backend.create_tenant(tenantName)
+        test_tenant_id, test_tenant_access_key = self.backend.create_tenant(tenantName)
+        self.backend.set_access_key(test_tenant_access_key)
         Logger.logger.info(f"created tenant name '{tenantName}' with tenant id {test_tenant_id}")
         self.backend.select_tenant(test_tenant_id)
         return test_tenant_id
