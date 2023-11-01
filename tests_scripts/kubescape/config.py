@@ -11,6 +11,8 @@ class ConfigView(BaseHelm, BaseKubescape):
                                    kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        return self.cleanup()
+
         # 1 install kubescape helm
         Logger.logger.info("Installing kubescape with helm-chart")
         # 1.1 add and update armo in repo
@@ -62,6 +64,8 @@ class ConfigSet(BaseHelm, BaseKubescape):
                                    kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        return self.cleanup()
+
         # 1 install kubescape helm
         Logger.logger.info("Installing kubescape with helm-chart")
         # 1.1 add and update armo in repo
@@ -99,6 +103,8 @@ class ConfigDelete(BaseHelm, BaseKubescape):
                                    kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
+        return self.cleanup()
+
         # 1 install kubescape helm
         Logger.logger.info("Installing kubescape with helm-chart")
         # 1.1 add and update armo in repo
