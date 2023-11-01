@@ -34,7 +34,7 @@ class ConfigView(BaseHelm, BaseKubescape):
         return self.cleanup()
 
     def compare_view_result(self):
-        ks_cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_KUBESCAPE_CONFIGMAP_NAME)
+        ks_cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.KS_CONFIG)
         cm_data = ks_cm_obj.data["config.json"]
         cm_dict = json.loads(cm_data)
 
@@ -88,7 +88,7 @@ class ConfigSet(BaseHelm, BaseKubescape):
         with open(self.get_kubescape_config_file()) as f:
             file_dict = json.load(f)
         assert self.test_obj.kwargs["set_key"] in file_dict.keys(), f'key {self.test_obj.kwargs["set_key"]} should exist in the file {self.get_kubescape_config_file()}'
-        cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_KUBESCAPE_CONFIGMAP_NAME)
+        cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.KS_CONFIG)
         cm_data = cm_obj.data["config.json"]
         cm_dict = json.loads(cm_data)
         assert self.test_obj.kwargs["set_key"] not in cm_dict.keys() or self.test_obj.kwargs["set_key"] in cm_dict.keys() and cm_dict[self.test_obj.kwargs["set_key"]] != self.test_obj.kwargs["set_value"], f'key {self.test_obj.kwargs["set_key"]} should mot exist in the kubescape configmap:{cm_dict}'
@@ -123,7 +123,7 @@ class ConfigDelete(BaseHelm, BaseKubescape):
 
     def compare_view_result(self):
         kubescape_config_file_path=self.get_kubescape_config_file()
-        cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.CA_KUBESCAPE_CONFIGMAP_NAME)
+        cm_obj = self.kubernetes_obj.get_config_map(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=statics.KS_CONFIG)
         assert not(cm_obj) == False, f'the kubescape configmap should not be deleted'
         assert os.path.exists(kubescape_config_file_path) == False, f'kubescape config file in path: {kubescape_config_file_path} should be deleted'
                  
