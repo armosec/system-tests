@@ -266,6 +266,32 @@ class KSMicroserviceTests(object):
         )
     
     @staticmethod
+    def kubescape_continuous_scan_pre_install_workloads():
+        """
+        install kubescape helm chart, state-based scans (continuous scan) 
+        """
+        from tests_scripts.helm.ks_microservice import ContinuousScanWithKubescapeHelmChartTriggerByOperator
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ContinuousScanWithKubescapeHelmChartTriggerByOperator,
+            test_job=[],
+            pre_install_workloads=True,
+            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
+            secret="wikijs.yaml",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
+            helm_kwargs={
+                # enable continuous scan, disable vulnerability scan
+                statics.HELM_CAPABILITY_CONTINUOUS_SCAN: statics.HELM_CAPABILITY_ENABLE,
+                statics.HELM_CAPABILITY_VULNERABILITY_SCAN: statics.HELM_CAPABILITY_DISABLE,
+                statics.HELM_OFFLINE_VULN_DB: "false",
+                "server": "", 
+            },
+        )
+
+    @staticmethod
     def kubescape_continuous_scan_post_install_workloads():
         """
         install kubescape helm chart, state-based scans (continuous scan) 

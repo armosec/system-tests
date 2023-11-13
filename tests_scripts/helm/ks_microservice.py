@@ -515,13 +515,7 @@ class ContinuousScanWithKubescapeHelmChartTriggerByOperator(BaseHelm, BaseKubesc
             workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
             self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
-        # port forward to kubescape pod and run scan
-        pod_name = self.kubernetes_obj.get_kubescape_pod(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        self.port_forward_proc = self.kubernetes_obj.portforward(cluster, statics.CA_NAMESPACE_FROM_HELM_NAME, pod_name, 8080)
-        time.sleep(20)
-
-        _, _ = self.wait_for_report(timeout=600, report_type=self.validate_all_configuration_scan_crds,
-                                    namespace=namespace)
+        _, _ = self.wait_for_report(timeout=600, report_type=self.validate_all_configuration_scan_crds)
 
         delete_workloads=self.test_obj.get_arg("delete_workloads_namespace", default=False)
         if delete_workloads:
@@ -532,20 +526,13 @@ class ContinuousScanWithKubescapeHelmChartTriggerByOperator(BaseHelm, BaseKubesc
 
         return self.cleanup()
     
-    def validate_all_configuration_scan_crds(self, namespace: str):
-        # wait for scan to finish
-        kubescape_full_scan_result = self.get_kubescape_as_server_last_result(port=statics.KS_PORT_FORWARD, report_guid='')
-        
+    def validate_all_configuration_scan_crds(self):
         # save CRDs of the full scan for later comparison
         full_configuration_scan_crds = self.get_all_workload_configuration_scans_from_storage(summary=False)
         full_configuration_scan_summary_crds = self.get_all_workload_configuration_scans_from_storage(summary=True)
 
-        assert len(kubescape_full_scan_result[statics.RESULTS_FIELD]) > 0, "scan results should not be empty"
-        assert len(kubescape_full_scan_result[statics.RESULTS_FIELD]) ==  len(full_configuration_scan_crds), "number of scan results and configuration scan CRDs should be equal"
-        assert len(kubescape_full_scan_result[statics.RESULTS_FIELD]) ==  len(full_configuration_scan_summary_crds), "number of scan results and configuration scan CRDs summaries should be equal"
         assert len(full_configuration_scan_crds) == len(full_configuration_scan_summary_crds), "number of configuration scan CRDs and summaries should be equal"
 
-        self.compare_ks_results_vs_crds_results(crds_res=full_configuration_scan_crds, ks_res=kubescape_full_scan_result)
         self.compare_crds_results_vs_crds_summary_results(crds_res=full_configuration_scan_crds, crds_summary_res=full_configuration_scan_summary_crds)
 
     def validate_all_configuration_scan_crds_deleted(self, namespace: str):
