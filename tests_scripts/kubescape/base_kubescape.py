@@ -1,3 +1,6 @@
+import hashlib
+import re
+from difflib import SequenceMatcher
 from datetime import datetime
 import json
 import os
@@ -1219,17 +1222,31 @@ class BaseKubescape(BaseK8S):
             time.sleep(5)
         return False
 
+    @staticmethod
+    def parse_scan_object(obj): 
+        inner_dict_name = obj['metadata']['name'] if 'metadata' in obj else obj['name']
+        namespace = obj['metadata']['namespace'] if 'metadata' in obj and 'namespace' in obj['metadata'] else ""
+        if namespace == "":
+            namespace = obj['namespace'] if 'namespace' in obj else ""
+        scan_object = dict(kind=obj['kind'],metadata=dict(name=inner_dict_name)) 
+        if 'apiVersion' in obj:
+            scan_object['apiVersion'] = obj['apiVersion']
+        if namespace != "":
+            scan_object['metadata']['namespace'] = namespace
+        return scan_object
+
     def get_scan_objects_from_report(self, report: dict):
         result = []
         for resource in report[statics.RESOURCES_FIELD]:
-            obj = resource['object']
-            
-            scan_object = dict(kind=obj['kind'],metadata=dict(name=obj['metadata']['name']))
-            if 'apiVersion' in obj:
-                scan_object['apiVersion'] = obj['apiVersion']
-            if 'namespace' in obj['metadata']:
-                scan_object['metadata']['namespace'] = obj['metadata']['namespace']
-            result.append(scan_object)
+            obj = resource['object']    
+            if 'relatedObjects' in obj:
+                if isinstance(obj['relatedObjects'], list):
+                    for o in obj['relatedObjects']:
+                        result.append(self.parse_scan_object(o))    
+                else:
+                    result.append(self.parse_scan_object(obj))
+            else:    
+                result.append(self.parse_scan_object(obj))
         return result
 
     @staticmethod
@@ -1369,3 +1386,131 @@ class BaseKubescape(BaseK8S):
                     Logger.logger.warning("expected string not found in pod logs. expected string: {expected_string}".format(expected_string=string))
 
         assert string_to_be_found_counter == len(string_to_be_found), 'not all expected string found in the log. pod log: {pod_log}'.format(pod_log=self.get_pod_logs(namespace="kubescape", pod_name=pod_name, containers=deployment_name, previous=False))
+
+    @staticmethod
+    def sanitize_crd_name(instance_id):
+        if len(instance_id) >= 243:
+            return instance_id[:243]
+        return instance_id
+
+    @staticmethod
+    def string_to_slug(data: str):
+        instance_id_slug_hash_length = 4
+        hashed_id = hashlib.sha256(data.encode()).hexdigest()
+        leading_digest = hashed_id[:instance_id_slug_hash_length]
+        trailing_digest = hashed_id[len(hashed_id)-instance_id_slug_hash_length:]
+        # Define a regular expression to match non-DNS characters (anything other than letters, numbers, and hyphens)
+        non_dns_pattern = re.compile(r'[^a-zA-Z0-9\-\.]')
+        # Replace non-DNS characters with hyphens
+        sanitized_str = re.sub(non_dns_pattern, '-', data)
+        crd_name = sanitized_str.strip("-")
+        crd_name = BaseKubescape.sanitize_crd_name(crd_name)
+        crd_name = "%s-%s-%s" % (crd_name, leading_digest, trailing_digest)
+        crd_name = crd_name.lower()
+        return crd_name
+
+    @staticmethod
+    def get_namespace(ks_obj):
+        namespace = ks_obj[statics.KS_OBJECT]['metadata']['namespace'] if 'metadata' in ks_obj[statics.KS_OBJECT] and 'namespace' in ks_obj[statics.KS_OBJECT]['metadata'] else ""
+        if namespace=="":
+            namespace=ks_obj[statics.KS_OBJECT]['namespace'] if statics.KS_OBJECT in ks_obj and 'namespace' in ks_obj[statics.KS_OBJECT] else ""
+        return namespace
+    
+    @staticmethod
+    def get_api_version(ks_obj):
+        api_version = ks_obj[statics.KS_OBJECT]['apiVersion'] if statics.KS_OBJECT in ks_obj and 'apiVersion' in ks_obj[statics.KS_OBJECT] else ""
+        if api_version=="":
+            #TODO: In the k8s inner results(in the ks DISK) apiVersion is consider as apiGroup - should be fixed.  
+            api_version = ks_obj[statics.KS_OBJECT]['apiGroup'] if statics.KS_OBJECT in ks_obj and 'apiGroup' in ks_obj[statics.KS_OBJECT] else "" 
+        return api_version
+
+    def is_resource_match(self, crd_obj, ks_obj):
+        ks_obj_name=""
+        ks_obj_api_version = BaseKubescape.get_api_version(ks_obj=ks_obj)
+        ks_obj_namespace = BaseKubescape.get_namespace(ks_obj=ks_obj) 
+        ks_obj_name = ks_obj[statics.KS_OBJECT]['metadata']['name'] if 'metadata' in ks_obj[statics.KS_OBJECT] and 'name' in ks_obj[statics.KS_OBJECT]['metadata'] else ks_obj[statics.KS_OBJECT]['name']
+        resource=ks_obj_api_version + "-" + ks_obj[statics.KS_OBJECT]['kind'] + "-" + ks_obj_namespace + "-" + ks_obj_name 
+        if 'relatedObjects' in ks_obj[statics.KS_OBJECT] and len(ks_obj[statics.KS_OBJECT]['relatedObjects']) > 0 and isinstance(ks_obj[statics.KS_OBJECT]['relatedObjects'], list):
+            role=""
+            role_binding=""
+            for obj in ks_obj[statics.KS_OBJECT]['relatedObjects']:
+                if obj['kind'].lower()=='role':
+                    role=obj['apiVersion'] + "-" + obj['kind'] + "-" + obj['metadata']['namespace'] + "-" + obj['metadata']['name']
+                elif obj['kind'].lower()=='clusterrole':
+                    role=obj['apiVersion'] + "-" + obj['kind'] + "-" + "-" + obj['metadata']['name'] 
+                elif obj['kind'].lower()=='rolebinding':
+                    role_binding=obj['apiVersion'] + "-" + obj['kind'] + "-" + obj['metadata']['namespace'] + "-" + obj['metadata']['name'] 
+                elif obj['kind'].lower()=='clusterrolebinding':
+                    role_binding=obj['apiVersion'] + "-" + obj['kind'] + "-" + "-" + obj['metadata']['name']
+            ks_obj_name=self.string_to_slug(data="%s-%s-%s" % (resource, role, role_binding))
+        else:
+            ks_obj_name=self.string_to_slug(data=resource)
+        return ks_obj_name == crd_obj['metadata']['name']
+    
+    @staticmethod
+    def get_result_obj(kubescape_scan_result, resource_ID: str):
+        for res_obj in  kubescape_scan_result[statics.RESULTS_FIELD]:
+            if res_obj[statics.RESOURCE_ID_FIELD] == resource_ID:
+                return res_obj
+        assert "resource ID {resource_ID} not found in kubescape scan result {kubescape_scan_result}".format(resource_ID=resource_ID, kubescape_scan_result=kubescape_scan_result)
+
+    @staticmethod
+    def compare_control_status(ks_ctrl, crd_ctrl):
+        for key in ks_ctrl.keys():
+            if key == statics.CONTROL_ID_FIELD or key == statics.CONTROL_NAME:
+                assert ks_ctrl[key] == crd_ctrl[key], "kubescape control[{key}]={ks_key} should be equal crd control[{key}]={crd_ctrl}".format(key=key, ks_key=ks_ctrl[key], crd_ctrl=crd_ctrl[key])
+            elif key == statics.CONTROL_STATUS_FIELD:
+                if key in crd_ctrl.keys():
+                    for inner_key in ks_ctrl[key].keys():
+                        if inner_key in crd_ctrl[key].keys():
+                            assert ks_ctrl[key][inner_key] == crd_ctrl[key][inner_key], "kubescape control[{key}][{inner_key}]={ks_key} should be equal crd control[{key}][{inner_key}]={crd_ctrl}".format(key=key, inner_key=inner_key, ks_key=ks_ctrl[key][inner_key], crd_ctrl=crd_ctrl[key][inner_key])  
+    
+    def compare_ks_results_vs_crds_results(self, crds_res, ks_res):
+        for key in crds_res.keys():
+            crd = crds_res[key]
+            is_crd_found=False
+            for obj in ks_res[statics.RESOURCES_FIELD]:
+                if self.is_resource_match(crd_obj=crd, ks_obj=obj): 
+                    res_obj=self.get_result_obj(ks_res, obj[statics.RESOURCE_ID_FIELD])
+                    controls_map_crd = crd[statics.SPEC][statics.CONTROLS_FIELD]
+                    assert len(controls_map_crd) == len(res_obj[statics.CONTROLS_FIELD]), "resource_key={resource_key}, resource_ID={resource_ID}. number of controls in the crd {name} and in the kubescape result should be equal crd: {controls_map_crd} kubescape: {kubescape_ctrls}".format(resource_key=key, resource_ID=res_obj[statics.RESOURCE_ID_FIELD], name=crd['metadata']['name'], controls_map_crd=controls_map_crd, kubescape_ctrls=res_obj[statics.CONTROLS_FIELD])
+                    for ctrl_obj in res_obj[statics.CONTROLS_FIELD]:
+                        # Validate control in the ks object exist in the CRD 
+                        assert ctrl_obj[statics.CONTROL_ID_FIELD] in controls_map_crd, "resource_key={resource_key}, resource_ID={resource_ID}. control {ctrl_id} should be in {controls_map_crd}".format(resource_key=key, resource_ID=obj[statics.RESOURCE_ID_FIELD], ctrl_id=ctrl_obj[statics.CONTROL_ID_FIELD], controls_map_crd=controls_map_crd)
+
+                        # Validate control status in the ks object has the same status in the CRD
+                        self.compare_control_status(ctrl_obj, controls_map_crd[ctrl_obj[statics.CONTROL_ID_FIELD]])
+                        
+                    is_crd_found=True
+                    break
+            assert is_crd_found==True, "crd {name} not found in kubescape scan results: {crd_value}".format(name=crd['metadata']['name'], crd_value=crd)
+
+    @staticmethod
+    def compare_configuration_workload_metadata(crd_meta, crd_summary_meta):
+        assert crd_meta["labels"]==crd_summary_meta["labels"], "crd and crd summary labels should be equal. crd_labels: {crd_labels} crd_summary_labels: {crd_summary_labels}".format(crd_labels=crd_meta["labels"], crd_summary_labels=crd_summary_meta["labels"]) 
+        assert crd_meta["annotations"]==crd_summary_meta["annotations"], "crd and crd summary annotations should be equal. crd_annotations: {crd_annotations} crd_summary_annotations: {crd_summary_annotations}".format(crd_annotations=crd_meta["annotations"], crd_summary_annotations=crd_summary_meta["annotations"]) 
+        if 'namespace' in crd_meta:
+            assert crd_meta["namespace"]==crd_summary_meta["namespace"], "crd and crd summary namespace should be equal. crd_namespace: {crd_namespace} crd_summary_namespace: {crd_summary_namespace}".format(crd_namespace=crd_meta["namespace"], crd_summary_namespace=crd_summary_meta["namespace"])
+
+    @staticmethod
+    def compare_configuration_workload_spec(crd_spec, crd_summary_spec):
+        controls_map_crd = crd_spec[statics.CONTROLS_FIELD]
+        controls_map_crd_summary = crd_summary_spec[statics.CONTROLS_FIELD]
+        assert len(controls_map_crd) == len(controls_map_crd_summary), "number of controls in the crd {name} and in the crd summary should be equal crd: {controls_map_crd} crd_summary: {controls_map_crd_summary}".format(controls_map_crd=controls_map_crd, controls_map_crd_summary=controls_map_crd_summary)
+        for crd_key in controls_map_crd:
+            assert crd_key in controls_map_crd_summary, "crd_key {crd_key} should be in crd summary object {controls_map_crd_summary}".format(crd_key=crd_key, controls_map_crd_summary=controls_map_crd_summary)
+            for inner_key in controls_map_crd_summary[crd_key].keys():
+                assert controls_map_crd[crd_key][inner_key]==controls_map_crd_summary[crd_key][inner_key], "crd_obj[{crd_key}][{inner_key}]={crd_data} should be equal crd summary control[{crd_key}][{inner_key}]={crd_summary_data}".format(crd_key=crd_key, inner_key=inner_key, crd_data=controls_map_crd[crd_key][inner_key], crd_summary_data=controls_map_crd_summary[crd_key][inner_key])
+
+    def compare_crds_results_vs_crds_summary_results(self, crds_res, crds_summary_res):
+        for crd_key in crds_res.keys():
+            crd = crds_res[crd_key]
+            is_crd_found=False
+            for crd_summary_key in crds_summary_res.keys():
+                crd_summary = crds_summary_res[crd_summary_key]
+                if crd_key == crd_summary_key:
+                    self.compare_configuration_workload_metadata(crd_meta=crd['metadata'], crd_summary_meta=crd_summary['metadata'])
+                    self.compare_configuration_workload_spec(crd_spec=crd['spec'], crd_summary_spec=crd_summary['spec'])
+                    is_crd_found=True
+                    break
+            assert is_crd_found, "crd {crd_key} not found in the crds-summary {crd_summary_keys}".format(crd_key=crd_key, crd_summary_keys=crds_summary_res.keys())
