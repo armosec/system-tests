@@ -86,7 +86,10 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-    def install_armo_helm_chart(self, helm_kwargs: dict = {}):
+    def install_armo_helm_chart(self, helm_kwargs: dict = None):
+        if helm_kwargs is None:
+            helm_kwargs = {}
+            
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
 
@@ -117,6 +120,7 @@ class BaseHelm(BaseK8S):
                             })
         
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
+                                            access_key=self.backend.get_access_key() if self.backend != None else "",
                                             server=self.test_driver.backend_obj.get_api_url(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)

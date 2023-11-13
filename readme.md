@@ -1,4 +1,6 @@
 # CYBER-ARMOR SYSTEM TESTS
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests?ref=badge_shield)
+
 
 ## Test Cases:
 | Test name                                                      |  category  | description                                                            | coverage                      |
@@ -40,8 +42,10 @@
 | `scan_for_attack_chains_scenario_1_1_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `scan_for_attack_chains_scenario_1_1_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy_with_cronjob`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
 | `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
@@ -134,3 +138,7 @@ Deactivate environment
 deactivate
 ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests?ref=badge_large)

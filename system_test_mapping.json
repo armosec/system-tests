@@ -1,0 +1,653 @@
+{
+    "scan_security": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_nsa": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_mitre": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_with_exceptions": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_repository": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_local_file": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_local_glob_files": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_local_list_of_files": {
+        "Target": [
+            "CLI"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "scan_security_and_submit_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "scan_nsa_and_submit_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe"
+        ],
+        "description": ""
+    },
+    "scan_mitre_and_submit_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe"
+        ],
+        "description": ""
+    },
+    "scan_local_repository_and_submit_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "scan_repository_from_url_and_submit_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "scan_with_exception_to_backend": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "scan_with_custom_framework": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "scan_compliance_score": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver"
+        ],
+        "description": ""
+    },
+    "scan_customer_configuration": {
+        "Target": [
+            "CLI",
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "host_scanner": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver"
+        ],
+        "description": ""
+    },
+    "host_scanner_with_hostsensorrule": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "users-notification-service",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_proxy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_trigger_scan_on_new_image": {
+        "Target": [
+            "In cluster "
+        ],
+        "Target_Repositories": [
+            "event-receiver"
+        ],
+        "description": ""
+    },
+    "ks_microservice_ns_creation": {
+        "Target": [
+            "In cluster "
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "ks_microservice_on_demand": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_mitre_framework_on_demand": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_nsa_and_mitre_framework_demand": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_triggering_with_cron_job": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_update_cronjob_schedule": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_delete_cronjob": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_create_2_cronjob_mitre_and_nsa": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_5_fix_control_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_5_fix_control_with_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_3_fix_control_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_3_fix_control_with_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_6_fix_control_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_6_fix_control_with_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_1_1_fix_image_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "scan_for_attack_chains_scenario_1_1_fix_control_no_relevancy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_trigger_scan_public_registry": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_trigger_scan_public_registry_excluded": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_trigger_scan_private_quay_registry": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "vulnerability_scanning_triggering_with_cron_job": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "config-service",
+            "gateway"
+        ],
+        "description": ""
+    },
+    "stripe_checkout": {
+        "Target": [
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "stripe_billing_portal": {
+        "Target": [
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "stripe_plans": {
+        "Target": [
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "stripe_webhook": {
+        "Target": [
+            "Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "user_email_settings": {
+        "Target": [
+            "Backend",
+            "users-notification-service"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "user_alert_channels": {
+        "Target": [
+            "Backend",
+            "users-notification-service"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "relevant_data_is_appended,": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevantCVEs": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "relevancy_disabled_installation": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_storage_disabled": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_enabled_stop_sniffing": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_large_image": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_extra_large_image": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_fix_vuln": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [
+            "cadashboardbe",
+            "event-receiver",
+            "event-ingester-service",
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": ""
+    },
+    "relevancy_python": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_golang": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_java": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_java_and_python": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    },
+    "relevancy_golang_dynamic": {
+        "Target": [
+            "In cluster + Backend"
+        ],
+        "Target_Repositories": [],
+        "description": ""
+    }
+}

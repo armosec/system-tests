@@ -1,5 +1,6 @@
 # encoding: utf-8
 import math
+import subprocess
 import sys
 import time
 import traceback
@@ -14,6 +15,7 @@ from systest_utils import statics
 
 from systest_utils.tests_logger import Logger
 from systest_utils.wlid import Wlid
+from systest_utils import TestUtil
 
 import json
 from infrastructure.api_login import *
@@ -76,7 +78,7 @@ API_CUSTOMERCONFIGURATION = "/api/v1/customerConfiguration"
 
 API_POSTUREEXCEPTIONPOLICY = "/api/v1/postureExceptionPolicy"
 
-
+API_ACCESS_KEYS = "/api/v1/authentication/accessKeys"
 API_ADMIN_TENANTS = "/api/v1/admin/tenants"
 API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
@@ -187,6 +189,7 @@ class ControlPanelAPI(object):
 
         # the auth retrieved for the admin tenant
         self.auth = None
+        self.access_key = ""
 
         self.api_login = APILogin()
 
@@ -214,6 +217,19 @@ class ControlPanelAPI(object):
 
         self.selected_tenant_id = self.login_customer_guid
         self.selected_tenant_cookie = self.login_customer_cookie
+        
+        # set access keys
+        access_keys_response = self.get_access_keys()
+        access_keys = access_keys_response.json()
+        assert len(access_keys) != 0, f"Expected access keys, found none"
+        assert "value" in access_keys[0], f"failed to get access key value"
+        self.set_access_key(access_keys[0]["value"])
+
+    def set_access_key(self, access_key: str):
+        self.access_key = access_key
+        if self.auth is None:
+            self.auth = {}
+        self.auth["X-API-KEY"] = self.access_key
 
     ## ************** Tenants Backend APIs ************** ##
 
@@ -275,8 +291,10 @@ class ControlPanelAPI(object):
 
         res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": self.api_login.get_frontEgg_user_id()}, cookies=None, headers={"Authorization": f"Bearer {self.api_login.get_frontEgg_auth_user_id()}"})
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
-        assert res.json().get("tenantId", {}) != {}, f"TenantId is empty: {res.text}"
-        return res, res.json()["tenantId"]
+        json_response = res.json()
+        assert json_response.get("tenantId", {}) != {}, f"tenantId is empty: {res.text}"
+        assert json_response.get("agentAccessKey", {}).get("value", {}) != {}, f"agentAccessKey['value'] is empty: {res.text}"
+        return json_response["tenantId"], json_response["agentAccessKey"]["value"]
     
     def delete_tenant(self, tenant_id) -> requests.Response:
         """
@@ -301,8 +319,14 @@ class ControlPanelAPI(object):
         return res
 
     
-
-
+    def get_access_keys(self) -> requests.Response:
+        """
+            Returns the access keys of the selected tenant.
+        """
+        res = self.get(API_ACCESS_KEYS)
+        assert res.status_code == client.OK, f"failed to get access keys for tenant_id {self.selected_tenant_id}. Response: {res.text}"
+        return res
+    
     ## ************** Stripe Backend APIs ************** ##
 
     def stripe_billing_portal(self) -> requests.Response:
@@ -394,6 +418,9 @@ class ControlPanelAPI(object):
     def get_secret_key(self):
         return self.secret_key
 
+    def get_access_key(self):
+        return self.access_key
+    
     def cleanup(self, namespace=str(), ca_cluster=str()):
         Logger.logger.info("ControlPanelAPI Clean Up")
 
@@ -781,24 +808,34 @@ class ControlPanelAPI(object):
         return r.json()["response"]
 
     def get_repository_posture_resources(self, report_guid: str):
+        page_size = 100
         params = {
             "pageNum": 1,
-            "pageSize": 1000,
-            "orderBy": "timestamp:desc",
+            "pageSize": page_size,
+            "orderBy": "timestamp:desc,name:desc",
             "innerFilters": [{"reportGUID": report_guid}],
         }
 
-        r = self.post(
-            API_REPOSITORYPOSTURE_RESOURCES,
-            params={"customerGUID": self.selected_tenant_id},
-            json=params,
-        )
+        r = self.post(API_REPOSITORYPOSTURE_RESOURCES, params={"customerGUID": self.selected_tenant_id}, json=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of repositoryPosture/resources "%s" (code: %d, message: %s)'
                 % (self.customer, r.status_code, r.text)
             )
-        return r.json()["response"]
+        result_length = r.json()['total']['value']
+        
+        result = []
+        for i in range(1, math.ceil(result_length / page_size)+1):
+            params['pageNum'] = i
+            r = self.post(API_REPOSITORYPOSTURE_RESOURCES, params={"customerGUID": self.selected_tenant_id}, json=params)
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error accessing dashboard. Request: results of repositoryPosture/resources "%s" (code: %d, message: %s)'
+                    % (self.customer, r.status_code, r.text)
+                )
+            result.extend(r.json()['response'])
+            
+        return result
 
     def get_job_report_info(self, report_guid: str, cluster_wlid):
         json = {"pageNum": 1, "pageSize": 100,
@@ -1971,6 +2008,8 @@ class ControlPanelAPI(object):
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
         # - parameter 'total.value' shoud be > 0
+        #result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #print(result.stdout)
         response = json.loads(r.text)
         if response['response']['attackChainsLastScan']:
             last_scan_datetime = datetime.strptime(response['response']['attackChainsLastScan'], '%Y-%m-%dT%H:%M:%SZ')

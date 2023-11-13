@@ -234,13 +234,16 @@ class TestUtil(object):
         return False
 
     @staticmethod
-    def run_command(command_args: list, timeout=60, display_stdout: bool = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd: str=""):
+    def run_command(command_args: list, timeout=60, display_stdout: bool = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd: str="", env=None):
         if isinstance(command_args, str):
             command_args = command_args.split(" ")
         start = time.time()
         try:
-            return_obj = subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, cwd=cwd) if cwd \
-                else subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr)
+            subprocess_env = dict(os.environ)
+            if env:
+                subprocess_env.update(env)
+            return_obj = subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, cwd=cwd, env=subprocess_env) if cwd \
+                else subprocess.run(command_args, timeout=timeout, stdout=stdout, stderr=stderr, env=subprocess_env)
         except Exception as e:
             Logger.logger.error(e)
             raise Exception(e)

@@ -735,12 +735,21 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         else:
             assert len(be_helm_files) == 0
 
-        Logger.logger.info("Testing resources summary")
-        be_resources = self.backend.get_repository_posture_resources(new_report_guid)
+        max_retries = 10
+        retry = 1
+        while True:
+            Logger.logger.info(f"Testing resources summary (retry #{retry})")
+            be_resources = self.backend.get_repository_posture_resources(new_report_guid)
+            cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
+            if len(be_resources) == len(cli_resources):
+                break
 
-        cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
-        # Check Total # of Resources
-        if len(be_resources) != len(cli_resources):
+            Logger.logger.info("Number of resources in BE and CLI are not equal, retrying in 30 seconds")
+            if retry < max_retries:
+                retry += 1
+                time.sleep(30)
+                continue
+
             l = [i["resourceID"] for i in be_resources if any(i["resourceID"] != j["resourceID"] for j in cli_resources)]
             li = [i["resourceID"] for i in cli_resources if any(i["resourceID"] != j["resourceID"] for j in be_resources)]
             raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}."\

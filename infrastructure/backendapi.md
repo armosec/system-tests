@@ -90,8 +90,8 @@ This allows test isolation for a specifc tenant which can be easily deleted once
 
 In order to populate the selected tenant, best practice will be to first create it and then "select" it:
 
-```go
-res, test_tenant_id = self.backend.create_tenant(tenantName)
+```python
+test_tenant_id, test_tenant_access_key = self.backend.create_tenant(tenantName)
 self.backend.select_tenant(test_tenant_id)
 ```
 
@@ -99,7 +99,7 @@ Once the tenant is selected, all apis calls will use it's cookie (selected_tenan
 
 At the end of the test, need to delete the selected tenant:
 
-```go
+```python
 self.backend.delete_tenant(tenant_id)
 ```
 

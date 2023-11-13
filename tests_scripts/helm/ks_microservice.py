@@ -4,6 +4,7 @@ import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 from systest_utils import Logger, TestUtil, statics
+#from struct_diff import Comparator,JSONFormatter
 import json
 
 DEFAULT_BRANCH = "release"
@@ -39,16 +40,16 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.add_and_upgrade_armo_to_repo()
         # 2.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+        current_datetime = datetime.now(timezone.utc)
 
         # 2.3 verify installation
-        current_datetime = datetime.now(timezone.utc)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         time.sleep(10)
 
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=800,
+            timeout=1200,
             current_datetime=current_datetime,
             cluster_name=cluster
             )
@@ -59,19 +60,24 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         response = json.loads(r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones')
-        assert self.check_attack_chains_results(response, expected), f"attack-chain response differ from the expected one: {expected}"
+        #cmp = Comparator()
+        #d = cmp.diff(expected, response)
+        #difference = JSONFormatter(d, {'max_elisions': 1})
+        #Logger.logger.info('diff: %s', difference)
+        assert self.check_attack_chains_results(response, expected), f"Attack chain response differs from the expected one. Response: {response}, Expected: {expected}"
+
 
         # Fixing phase
         Logger.logger.info("attack chains detected, applying fix command")
-        time.sleep(20)
         self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
         time.sleep(20)
         current_datetime = datetime.now(timezone.utc)
-        Logger.logger.info("trigger a new scan")
-        self.trigger_scan(cluster)
+        Logger.logger.info("triggering a new scan")
+        trigger = self.test_obj["test_job"][0]["trigger_by"]
+        self.trigger_scan(cluster, trigger)
 
         Logger.logger.info("wait for response from BE")
-        # we set the timeout to 1200s because image scan 
+        # we set the timeout to 1000s because image scan 
         # cat take more than 15m to get the updated result
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
@@ -88,12 +94,25 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         time.sleep(5)
 
-    def trigger_scan(self, cluster_name):
-        self.backend.trigger_posture_scan(
-            cluster_name=cluster_name,
-            framework_list=["security"],
-            with_host_sensor="true"
+    def trigger_scan(self, cluster_name, trigger_by) -> None:
+        """trigger_scan create a new scan action from the backend
+
+        :param cluster_name: name of the cluster you want to scan
+        :param trigger_by: the kind of event that trigger the scan ("cronjob", "scan_on_start")
+        """
+        if trigger_by == "cronjob":
+            self.backend.create_kubescape_job_request(
+                cluster_name=cluster_name,
+                trigger_by=trigger_by,
+                framework_list=["security"],
+                with_host_sensor="true"
             )
+        else:
+            self.backend.trigger_posture_scan(
+                cluster_name=cluster_name,
+                framework_list=["security"],
+                with_host_sensor="true"
+                )
 
     def compare_nodes(self, obj1, obj2) -> bool:
         """Walk 2 dictionary object to compare their values.

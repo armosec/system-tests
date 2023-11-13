@@ -154,12 +154,17 @@ class BaseKubescape(BaseK8S):
             command.append(policy_name)
 
         command.extend(['--output', output_file])
+
+        env = {}
         if "account" in kwargs:
             command.extend(["--account", self.backend.get_customer_guid()])
+            env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
         command.extend(["--server", self.api_url])
         
         Logger.logger.info(" ".join(command))
-        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+        status_code, res = TestUtil.run_command(command_args=command,
+                                                env=env,
+                                                timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
         assert status_code == 0, res
@@ -206,7 +211,6 @@ class BaseKubescape(BaseK8S):
 
     def scan(self, policy_scope: str = None, policy_name: str = None, output_format: str = None, output: str = None,
              **kwargs):
-
         command = [self.kubescape_exec, "scan", "--logger", "debug", "--format-version", "v2"]
 
         if policy_scope:
@@ -227,12 +231,16 @@ class BaseKubescape(BaseK8S):
             command.extend(["--exceptions", kwargs['exceptions']])
         if "keep_local" in kwargs:
             command.append("--keep-local")
+        
+        env = {}
         if "submit" in kwargs:
             command.append("--submit")
             self.remove_cluster_from_backend = True
             account_id = kwargs["account"] if "account" in kwargs else self.backend.get_customer_guid()
             assert account_id, "missing account ID, the report will not be submitted"
             command.extend(["--account", self.backend.get_customer_guid()])
+            # set the access key with env var until it will be supported as a flag
+            env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
 
         command.extend(["--server", self.api_url])
 
@@ -252,10 +260,6 @@ class BaseKubescape(BaseK8S):
             command.extend(["--include-namespaces", kwargs['include_namespaces']])
         if "enable_host_scan" in kwargs:
             command.append("--enable-host-scan")
-        if "client_id" in kwargs:
-            command.append(f"--client-id={self.backend.get_client_id()}")
-        if "secret_key" in kwargs:
-            command.append(f"--secret-key={self.backend.get_secret_key()}")
 
         if "host_scan_yaml" in kwargs and kwargs['host_scan_yaml'] != "":
             command.append(f"--host-scan-yaml={kwargs['host_scan_yaml']}")
@@ -266,7 +270,9 @@ class BaseKubescape(BaseK8S):
 
         Logger.logger.info(" ".join(command))
 
-        status_code, res = TestUtil.run_command(command_args=command, timeout=360,
+        status_code, res = TestUtil.run_command(command_args=command, 
+                                                env=env,
+                                                timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
         assert status_code == 0, res
