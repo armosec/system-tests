@@ -20,7 +20,6 @@
           "Initial Access"
         ],
         "actionRequired": "configuration",
-        "armoBuiltin": true,
         "attackTracks": [
           {
             "attackTrack": "container",
@@ -43,7 +42,6 @@
           "guid": "",
           "name": "rule-identify-blocklisted-image-registries",
           "attributes": {
-            "armoBuiltin": true,
             "m$K8sThreatMatrix": "Initial Access::Compromised images in registry"
           },
           "creationTime": "",
@@ -108,7 +106,6 @@
       "guid": "",
       "name": "Exec into container",
       "attributes": {
-        "armoBuiltin": true,
         "controlTypeTags": [
           "compliance",
           "security-impact"
@@ -127,7 +124,6 @@
           "guid": "",
           "name": "exec-into-container",
           "attributes": {
-            "armoBuiltin": true,
             "m$K8sThreatMatrix": "Privilege Escalation::Exec into container",
             "useUntilKubescapeVersion": "v1.0.133"
           },
@@ -167,7 +163,6 @@
           "guid": "",
           "name": "exec-into-container-v1",
           "attributes": {
-            "armoBuiltin": true,
             "m$K8sThreatMatrix": "Privilege Escalation::Exec into container",
             "resourcesAggregator": "subject-role-rolebinding",
             "useFromKubescapeVersion": "v1.0.133"
@@ -217,7 +212,6 @@
       "name": "Resources memory limit and request",
       "attributes": {
         "actionRequired": "configuration",
-        "armoBuiltin": true,
         "attackTracks": [
           {
             "attackTrack": "container",
@@ -240,7 +234,6 @@
           "guid": "",
           "name": "resources-memory-limit-and-request",
           "attributes": {
-            "armoBuiltin": true
           },
           "creationTime": "",
           "rule": "package armo_builtins\n\n# Fails if pod does not have container with memory-limit or request\ndeny[msga] {\n\tpod := input[_]\n\tpod.kind == \"Pod\"\n\tcontainer := pod.spec.containers[i]\n\tnot request_or_limit_memory(container)\n\tfixPaths := [\n\t\t{\"path\": sprintf(\"spec.containers[%v].resources.limits.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t\t{\"path\": sprintf(\"spec.containers[%v].resources.requests.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t]\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v does not have memory-limit or request\", [container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPaths,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [pod]},\n\t}\n}\n\n# Fails if workload does not have container with memory-limit or request\ndeny[msga] {\n\twl := input[_]\n\tspec_template_spec_patterns := {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\"}\n\tspec_template_spec_patterns[wl.kind]\n\tcontainer := wl.spec.template.spec.containers[i]\n\tnot request_or_limit_memory(container)\n\tfixPaths := [\n\t\t{\"path\": sprintf(\"spec.template.spec.containers[%v].resources.limits.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t\t{\"path\": sprintf(\"spec.template.spec.containers[%v].resources.requests.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t]\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v in %v: %v   does not have memory-limit or request\", [container.name, wl.kind, wl.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPaths,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [wl]},\n\t}\n}\n\n# Fails if cronjob does not have container with memory-limit or request\ndeny[msga] {\n\twl := input[_]\n\twl.kind == \"CronJob\"\n\tcontainer = wl.spec.jobTemplate.spec.template.spec.containers[i]\n\tnot request_or_limit_memory(container)\n\tfixPaths := [\n\t\t{\"path\": sprintf(\"spec.jobTemplate.spec.template.spec.containers[%v].resources.limits.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t\t{\"path\": sprintf(\"spec.jobTemplate.spec.template.spec.containers[%v].resources.requests.memory\", [format_int(i, 10)]), \"value\": \"YOUR_VALUE\"},\n\t]\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v in %v: %v   does not have memory-limit or request\", [container.name, wl.kind, wl.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPaths,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [wl]},\n\t}\n}\n\nrequest_or_limit_memory(container) {\n\tcontainer.resources.limits.memory\n\tcontainer.resources.requests.memory\n}\n\n######################################################################################################\n\n# Fails if pod exceeds memory-limit or request\ndeny[msga] {\n\tpod := input[_]\n\tpod.kind == \"Pod\"\n\tcontainer := pod.spec.containers[i]\n\trequest_or_limit_memory(container)\n\tresource := is_min_max_exceeded_memory(container)\n\tresource != \"\"\n\n\tfailed_paths := sprintf(\"spec.containers[%v].%v\", [format_int(i, 10), resource])\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v exceeds memory-limit or request\", [container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [failed_paths],\n\t\t\"fixPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [pod]},\n\t}\n}\n\n# Fails if workload exceeds memory-limit or request\ndeny[msga] {\n\twl := input[_]\n\tspec_template_spec_patterns := {\"Deployment\", \"ReplicaSet\", \"DaemonSet\", \"StatefulSet\", \"Job\"}\n\tspec_template_spec_patterns[wl.kind]\n\tcontainer := wl.spec.template.spec.containers[i]\n\n\trequest_or_limit_memory(container)\n\tresource := is_min_max_exceeded_memory(container)\n\tresource != \"\"\n\n\tfailed_paths := sprintf(\"spec.template.spec.containers[%v].%v\", [format_int(i, 10), resource])\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v in %v: %v exceeds memory-limit or request\", [container.name, wl.kind, wl.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [failed_paths],\n\t\t\"fixPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [wl]},\n\t}\n}\n\n# Fails if cronjob exceeds memory-limit or request\ndeny[msga] {\n\twl := input[_]\n\twl.kind == \"CronJob\"\n\tcontainer = wl.spec.jobTemplate.spec.template.spec.containers[i]\n\n\trequest_or_limit_memory(container)\n\tresource := is_min_max_exceeded_memory(container)\n\tresource != \"\"\n\n\tfailed_paths := sprintf(\"spec.jobTemplate.spec.template.spec.containers[%v].%v\", [format_int(i, 10), resource])\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"Container: %v in %v: %v exceeds memory-limit or request\", [container.name, wl.kind, wl.metadata.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"failedPaths\": [failed_paths],\n\t\t\"fixPaths\": [],\n\t\t\"alertObject\": {\"k8sApiObjects\": [wl]},\n\t}\n}\n\n######################################################################################################\n\nis_min_max_exceeded_memory(container) = \"resources.limits.memory\" {\n\tmemory_limit := container.resources.limits.memory\n\tis_limit_exceeded_memory(memory_limit)\n} else = \"resouces.requests.memory\" {\n\tmemory_req := container.resources.requests.memory\n\tis_req_exceeded_memory(memory_req)\n} else = \"\" {\n\ttrue\n}\n\nis_limit_exceeded_memory(memory_limit) {\n\tis_min_limit_exceeded_memory(memory_limit)\n}\n\nis_limit_exceeded_memory(memory_limit) {\n\tis_max_limit_exceeded_memory(memory_limit)\n}\n\nis_req_exceeded_memory(memory_req) {\n\tis_max_request_exceeded_memory(memory_req)\n}\n\nis_req_exceeded_memory(memory_req) {\n\tis_min_request_exceeded_memory(memory_req)\n}\n\n# helpers\n\nis_max_limit_exceeded_memory(memory_limit) {\n\tmemory_limit_max :=data.postureControlInputs.memory_limit_max[_]\n\tcompare_max(memory_limit_max, memory_limit)\n}\n\nis_min_limit_exceeded_memory(memory_limit) {\n\tmemory_limit_min := data.postureControlInputs.memory_limit_min[_]\n\tcompare_min(memory_limit_min, memory_limit)\n}\n\nis_max_request_exceeded_memory(memory_req) {\n\tmemory_req_max := data.postureControlInputs.memory_request_max[_]\n\tcompare_max(memory_req_max, memory_req)\n}\n\nis_min_request_exceeded_memory(memory_req) {\n\tmemory_req_min := data.postureControlInputs.memory_request_min[_]\n\tcompare_min(memory_req_min, memory_req)\n}\n\n##############\n# helpers\n\n# Compare according to unit - max\ncompare_max(max, given) {\n\tendswith(max, \"Mi\")\n\tendswith(given, \"Mi\")\n\tsplit_max :=  split(max, \"Mi\")[0]\n\tsplit_given :=  split(given, \"Mi\")[0]\n\tsplit_given > split_max\n}\n\ncompare_max(max, given) {\n\tendswith(max, \"M\")\n\tendswith(given, \"M\")\n\tsplit_max :=  split(max, \"M\")[0]\n\tsplit_given :=  split(given, \"M\")[0]\n\tsplit_given > split_max\n}\n\ncompare_max(max, given) {\n\tendswith(max, \"m\")\n\tendswith(given, \"m\")\n\tsplit_max :=  split(max, \"m\")[0]\n\tsplit_given :=  split(given, \"m\")[0]\n\tsplit_given > split_max\n}\n\ncompare_max(max, given) {\n\tnot is_special_measure(max)\n\tnot is_special_measure(given)\n\tgiven > max\n}\n\n\n\n################\n# Compare according to unit - min\ncompare_min(min, given) {\n\tendswith(min, \"Mi\")\n\tendswith(given, \"Mi\")\n\tsplit_min :=  split(min, \"Mi\")[0]\n\tsplit_given :=  split(given, \"Mi\")[0]\n\tsplit_given < split_min\n}\n\ncompare_min(min, given) {\n\tendswith(min, \"M\")\n\tendswith(given, \"M\")\n\tsplit_min :=  split(min, \"M\")[0]\n\tsplit_given :=  split(given, \"M\")[0]\n\tsplit_given < split_min\n}\n\ncompare_min(min, given) {\n\tendswith(min, \"m\")\n\tendswith(given, \"m\")\n\tsplit_min :=  split(min, \"m\")[0]\n\tsplit_given :=  split(given, \"m\")[0]\n\tsplit_given < split_min\n}\n\ncompare_min(min, given) {\n\tnot is_special_measure(min)\n\tnot is_special_measure(given)\n\tgiven < min\n}\n\n\n# Check that is same unit\nis_special_measure(unit) {\n\tendswith(unit, \"m\")\n}\n\nis_special_measure(unit) {\n\tendswith(unit, \"M\")\n}\n\nis_special_measure(unit) {\n\tendswith(unit, \"Mi\")\n}\n",
@@ -316,7 +309,6 @@
       "guid": "",
       "name": "Data Destruction",
       "attributes": {
-        "armoBuiltin": true,
         "controlTypeTags": [
           "compliance"
         ],
@@ -334,7 +326,6 @@
           "guid": "",
           "name": "rule-excessive-delete-rights",
           "attributes": {
-            "armoBuiltin": true,
             "m$K8sThreatMatrix": "Impact::Data Destruction",
             "useUntilKubescapeVersion": "v1.0.133"
           },
@@ -371,7 +362,6 @@
           "name": "rule-excessive-delete-rights-v1",
           "attributes": {
             "useFromKubescapeVersion": "v1.0.133",
-            "armoBuiltin": true,
             "m$K8sThreatMatrix": "Impact::Data Destruction",
             "resourcesAggregator": "subject-role-rolebinding"
           },
@@ -419,7 +409,6 @@
       "guid": "",
       "name": "Resource limits",
       "attributes": {
-        "armoBuiltin": true,
         "attackTracks": [
           {
             "attackTrack": "container",
@@ -441,7 +430,6 @@
           "guid": "",
           "name": "resource-policies",
           "attributes": {
-            "armoBuiltin": true
           },
           "creationTime": "",
           "rule": "package armo_builtins\n\n\n# Check if container has limits\ndeny[msga] {\n  \tpods := [pod | pod = input[_]; pod.kind == \"Pod\"]\n    pod := pods[_]\n\tcontainer := pod.spec.containers[i]\n\t\n\t\n\tbeggining_of_path := \"spec.\"\n\tfixPath := is_no_cpu_and_memory_limits_defined(container, beggining_of_path, i)\n\t\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"there are no cpu and memory  limits defined for container : %v\",  [container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPath,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [pod]\n\t\t}\n\t}\n}\n\n\n# Check if container has limits - for workloads\n# If there is no limits specified in the workload, we check the namespace, since if limits are only specified for namespace\n# and not in workload, it won't be on the yaml\ndeny[msga] {\n\twl := input[_]\n\tspec_template_spec_patterns := {\"Deployment\",\"ReplicaSet\",\"DaemonSet\",\"StatefulSet\",\"Job\"}\n\tspec_template_spec_patterns[wl.kind]\n\tcontainer := wl.spec.template.spec.containers[i]\n\t\n\tbeggining_of_path\t:= \"spec.template.spec.\"\n\tfixPath := is_no_cpu_and_memory_limits_defined(container, beggining_of_path, i)\n\t\n\t\n\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"there are no cpu and memory limits defined for container : %v\",  [container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPath,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [wl]\n\t\t}\n\t}\n\t\n}\n\n# Check if container has limits - for cronjobs\n# If there is no limits specified in the cronjob, we check the namespace, since if limits are only specified for namespace\n# and not in cronjob, it won't be on the yaml\ndeny [msga] {\n    wl := input[_]\n\twl.kind == \"CronJob\"\n\tcontainer := wl.spec.jobTemplate.spec.template.spec.containers[i]\n\t\n\tbeggining_of_path := \"spec.jobTemplate.spec.template.spec.\"\n\tfixPath := is_no_cpu_and_memory_limits_defined(container, beggining_of_path, i)\n\t\n\tmsga := {\n\t\t\"alertMessage\": sprintf(\"there are no cpu and memory limits defined for container : %v\",  [container.name]),\n\t\t\"packagename\": \"armo_builtins\",\n\t\t\"alertScore\": 7,\n\t\t\"fixPaths\": fixPath,\n\t\t\"failedPaths\": [],\n\t\t\"alertObject\": {\n\t\t\t\"k8sApiObjects\": [wl]\n\t\t}\n\t}\n}\n\n# no limits at all\nis_no_cpu_and_memory_limits_defined(container, beggining_of_path, i) =  fixPath {\n\tnot container.resources.limits\n\tfixPath = [{\"path\": sprintf(\"%vcontainers[%v].resources.limits.cpu\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}, {\"path\": sprintf(\"%vcontainers[%v].resources.limits.memory\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}]\n}\n\n# only memory limit\nis_no_cpu_and_memory_limits_defined(container, beggining_of_path, i) = fixPath {\n\tcontainer.resources.limits\n\tnot container.resources.limits.cpu\n\tcontainer.resources.limits.memory\n\tfixPath = [{\"path\": sprintf(\"%vcontainers[%v].resources.limits.cpu\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}]\n}\n\n# only cpu limit\nis_no_cpu_and_memory_limits_defined(container, beggining_of_path, i) =fixPath {\n\tcontainer.resources.limits\n\tnot container.resources.limits.memory\n\tcontainer.resources.limits.cpu\n\tfixPath = [{\"path\": sprintf(\"%vcontainers[%v].resources.limits.memory\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}]\n\tfailed_path = \"\"\n}\n# limits but without capu and memory \nis_no_cpu_and_memory_limits_defined(container, beggining_of_path, i) = fixPath {\n\tcontainer.resources.limits\n\tnot container.resources.limits.memory\n\tnot container.resources.limits.cpu\n\tfixPath = [{\"path\": sprintf(\"%vcontainers[%v].resources.limits.cpu\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}, {\"path\": sprintf(\"%vcontainers[%v].resources.limits.memory\", [beggining_of_path, format_int(i, 10)]), \"value\":\"YOUR_VALUE\"}]\n}",
