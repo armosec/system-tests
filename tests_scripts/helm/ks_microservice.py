@@ -264,7 +264,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                            old_report_guid=old_report_guid)
 
         Logger.logger.info('get result from kubescape in cluster')
-        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port, report_guid=report_guid)
+        kubescape_result = self.get_kubescape_as_server_last_result(port=port, report_guid=report_guid)
 
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
@@ -300,7 +300,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                            framework_name=framework_list[0])
 
         Logger.logger.info('get result from kubescape in cluster')
-        kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port, report_guid)
+        kubescape_result = self.get_kubescape_as_server_last_result(port, report_guid)
 
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
@@ -357,7 +357,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                                framework_name=framework_list[0])
 
             Logger.logger.info('get result from kubescape in cluster')
-            kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port)
+            kubescape_result = self.get_kubescape_as_server_last_result(port=port)
 
             Logger.logger.info('test result against backend results, report_guid: {}'.format(report_guid))
             self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
@@ -400,6 +400,150 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             Logger.logger.info("check if kubescape cronjob deleted")
             assert not self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to deleted"
 
+
+class ContinuousScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
+    """
+    ContinuousScanWithKubescapeHelmChart install the kubescape operator and run continuous scans (state-based)
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ContinuousScanWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        Logger.logger.info("Installing kubescape with helm-chart")
+    
+        # add and update armo in repo
+        self.add_and_upgrade_armo_to_repo()
+        # self.helm_branch = self.test_obj.get_arg("helm_branch", DEFAULT_BRANCH)
+
+        # install helm-chart - without the operator
+        helm_kwargs = self.test_obj.get_arg("helm_kwargs", default={})
+        helm_kwargs.update({"operator.replicaCount": 0})
+
+        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
+        time.sleep(10)
+
+        # verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(10)
+
+        # port forward to kubescape pod and run scan
+        cluster_name = self.kubernetes_obj.get_cluster_name()
+        pod_name = self.kubernetes_obj.get_kubescape_pod(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.port_forward_proc = self.kubernetes_obj.portforward(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME, pod_name, 8080)
+        time.sleep(20)
+
+        Logger.logger.info("Triggering Kubescape cluster-wide scan")
+        base_scan_payload = {
+                "hostScanner": False,
+                "keepLocal": True,
+                "targetType": "framework",
+                "targetNames": ["nsa", "mitre"]
+                }
+        report_guid = self.scan(port=statics.KS_PORT_FORWARD, payload=base_scan_payload)
+
+        # wait for scan to finish
+        kubescape_full_scan_result = self.get_kubescape_as_server_last_result(port=statics.KS_PORT_FORWARD, report_guid=report_guid)
+        
+        # save CRDs of the full scan for later comparison
+        full_configuration_scan_crds = self.get_all_workload_configuration_scans_from_storage(summary=False)
+        full_configuration_scan_summary_crds = self.get_all_workload_configuration_scans_from_storage(summary=True)
+
+        assert len(kubescape_full_scan_result[statics.RESULTS_FIELD]) > 0, "scan results should not be empty"
+        assert len(kubescape_full_scan_result[statics.RESULTS_FIELD]) ==  len(full_configuration_scan_crds), "number of scan results and configuration scan CRDs should be equal"
+        assert len(full_configuration_scan_crds) == len(full_configuration_scan_summary_crds), "number of configuration scan CRDs and summaries should be equal"
+
+        # stop port forwarding
+        self.kill_child_processes(self.port_forward_proc.pid)
+        self.port_forward_proc.terminate()
+
+        # compare CRDs results with kubescape results
+        self.compare_ks_results_vs_crds_results(crds_res=full_configuration_scan_crds, ks_res=kubescape_full_scan_result)
+        
+        # compare CRDs results with kubescape results
+        self.compare_crds_results_vs_crds_summary_results(crds_res=full_configuration_scan_crds, crds_summary_res=full_configuration_scan_summary_crds)
+        
+        return self.cleanup()
+    
+class ContinuousScanWithKubescapeHelmChartTriggerByOperator(BaseHelm, BaseKubescape):
+    """
+    ContinuousScanWithKubescapeHelmChartTriggerByOperator install the kubescape operator and run continuous scans (state-based)
+    """
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ContinuousScanWithKubescapeHelmChartTriggerByOperator, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        cluster, namespace = self.setup(apply_services=False)
+
+        pre_install=self.test_obj.get_arg("pre_install_workloads", default=False)
+        if pre_install:
+            Logger.logger.info('apply install before kubescape-operator')
+            Logger.logger.info('apply services')
+            self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+            Logger.logger.info('apply config-maps')
+            self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+            Logger.logger.info('apply workloads')
+            workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+            self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
+
+        Logger.logger.info("Installing kubescape with helm-chart")
+        # add and update armo in repo
+        self.add_and_upgrade_armo_to_repo()
+        self.helm_branch = self.test_obj.get_arg("helm_branch", DEFAULT_BRANCH)
+
+        # install helm-chart
+        helm_kwargs = self.test_obj.get_arg("helm_kwargs", default={})
+
+        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
+        time.sleep(10)
+
+        # verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(10)
+
+        post_install=self.test_obj.get_arg("post_install_workloads", default=False)
+        if post_install:
+            Logger.logger.info('apply install workloads after kubescape-operator')
+            Logger.logger.info('apply install before kubescape-operator')
+            Logger.logger.info('apply services')
+            self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+            Logger.logger.info('apply config-maps')
+            self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+            Logger.logger.info('apply workloads')
+            workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+            self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
+
+        _, _ = self.wait_for_report(timeout=600, report_type=self.validate_all_configuration_scan_crds)
+
+        delete_workloads=self.test_obj.get_arg("delete_workloads_namespace", default=False)
+        if delete_workloads:
+            Logger.logger.info('delete installed workloads by delete namespace')
+            self.delete_namespace(namespace=namespace)
+            _, _ = self.wait_for_report(timeout=600, report_type=self.validate_all_configuration_scan_crds_deleted,
+                                    namespace=namespace)
+
+        return self.cleanup()
+    
+    def validate_all_configuration_scan_crds(self):
+        # save CRDs of the full scan for later comparison
+        full_configuration_scan_crds = self.get_all_workload_configuration_scans_from_storage(summary=False)
+        full_configuration_scan_summary_crds = self.get_all_workload_configuration_scans_from_storage(summary=True)
+
+        assert len(full_configuration_scan_crds) == len(full_configuration_scan_summary_crds), "number of configuration scan CRDs and summaries should be equal"
+
+        self.compare_crds_results_vs_crds_summary_results(crds_res=full_configuration_scan_crds, crds_summary_res=full_configuration_scan_summary_crds)
+
+    def validate_all_configuration_scan_crds_deleted(self, namespace: str):
+        full_configuration_scan_crds = self.get_all_workload_configuration_scans_from_storage(summary=False)
+        full_configuration_scan_summary_crds = self.get_all_workload_configuration_scans_from_storage(summary=True)
+        namespaced_CRDs = [value for key, value in full_configuration_scan_crds if namespace in key]
+        namespaced_CRDs_summaries = [value for key, value in full_configuration_scan_summary_crds if namespace in key]
+        assert len(namespaced_CRDs) == 0, "CRDs should be deleted"
+        assert len(namespaced_CRDs_summaries) == 0, "CRDs summaries should be deleted"
+
+
 class ControlClusterFromCLI(BaseHelm, BaseKubescape):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ControlClusterFromCLI, self).__init__(test_obj=test_obj, backend=backend,
@@ -434,3 +578,4 @@ class ControlClusterFromCLI(BaseHelm, BaseKubescape):
         self.validate_cluster_trigger_as_expected(cluster_name=self.get_cluster_name(), args=self.test_obj["cli_args"])
 
         return self.cleanup()
+
