@@ -232,6 +232,16 @@ class TestUtil(object):
                 return True
             TestUtil.sleep(wait)
         return False
+    
+    @staticmethod
+    def load_objs_from_json_files(file_paths: list):
+        objs_list = []
+        for file_path in file_paths:
+            with open(file_path) as f:
+                    obj = json.load(f)
+                    objs_list.append(obj)
+
+        return objs_list
 
     @staticmethod
     def run_command(command_args: list, timeout=60, display_stdout: bool = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd: str="", env=None):

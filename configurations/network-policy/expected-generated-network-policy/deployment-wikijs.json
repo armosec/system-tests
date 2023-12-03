@@ -1,0 +1,128 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "GeneratedNetworkPolicy",
+    "metadata": {
+        "creationTimestamp": "2023-11-30T09:41:13Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-kind": "deployment",
+            "kubescape.io/workload-name": "wikijs"
+        },
+        "name": "deployment-wikijs",
+        "namespace": "systest-ns-ggjg"
+    },
+    "policyRef": [
+        {
+            "dns": "google.com.",
+            "ipBlock": "74.125.201.138/32",
+            "name": "google.com.",
+            "originalIP": "74.125.201.138"
+        },
+        {
+            "dns": "wikipedia.org.",
+            "ipBlock": "208.80.154.224/32",
+            "name": "wikipedia.org.",
+            "originalIP": "208.80.154.224"
+        }
+    ],
+    "spec": {
+        "apiVersion": "networking.k8s.io/v1",
+        "kind": "NetworkPolicy",
+        "metadata": {
+            "annotations": {
+                "generated-by": "kubescape"
+            },
+            "creationTimestamp": null,
+            "labels": {
+                "kubescape.io/workload-api-group": "apps",
+                "kubescape.io/workload-api-version": "v1",
+                "kubescape.io/workload-kind": "deployment",
+                "kubescape.io/workload-name": "wikijs"
+            },
+            "name": "deployment-wikijs",
+            "namespace": "systest-ns-ggjg"
+        },
+        "spec": {
+            "egress": [
+                {
+                    "ports": [
+                        {
+                            "port": 443,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "to": [
+                        {
+                            "ipBlock": {
+                                "cidr": "74.125.201.138/32"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ports": [
+                        {
+                            "port": 443,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "to": [
+                        {
+                            "ipBlock": {
+                                "cidr": "208.80.154.224/32"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ports": [
+                        {
+                            "port": 53,
+                            "protocol": "UDP"
+                        }
+                    ],
+                    "to": [
+                        {
+                            "namespaceSelector": {
+                                "matchLabels": {
+                                    "kubernetes.io/metadata.name": "kube-system"
+                                }
+                            },
+                            "podSelector": {
+                                "matchLabels": {
+                                    "k8s-app": "kube-dns"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ports": [
+                        {
+                            "port": 3306,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "to": [
+                        {
+                            "podSelector": {
+                                "matchLabels": {
+                                    "app": "mariadb"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "podSelector": {
+                "matchLabels": {
+                    "app": "wikijs"
+                }
+            },
+            "policyTypes": [
+                "Egress"
+            ]
+        }
+    }
+}

@@ -18,7 +18,8 @@ def tests = ["vulnerability_scanning":                                          
             "relevancy_enabled_stop_sniffing":                                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "relevant_data_is_appended":                                                  ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "relevancy_extra_large_image":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
-            "relevancy_large_image":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
+            "relevancy_large_image":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
              
              ]
 

@@ -1,0 +1,63 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "GeneratedNetworkPolicy",
+    "metadata": {
+        "creationTimestamp": "2023-12-03T09:10:06Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-kind": "deployment",
+            "kubescape.io/workload-name": "mariadb"
+        },
+        "name": "deployment-mariadb",
+        "namespace": "systest-ns-uzhe"
+    },
+    "policyRef": [],
+    "spec": {
+        "apiVersion": "networking.k8s.io/v1",
+        "kind": "NetworkPolicy",
+        "metadata": {
+            "annotations": {
+                "generated-by": "kubescape"
+            },
+            "creationTimestamp": null,
+            "labels": {
+                "kubescape.io/workload-api-group": "apps",
+                "kubescape.io/workload-api-version": "v1",
+                "kubescape.io/workload-kind": "deployment",
+                "kubescape.io/workload-name": "mariadb"
+            },
+            "name": "deployment-mariadb",
+            "namespace": "systest-ns-uzhe"
+        },
+        "spec": {
+            "ingress": [
+                {
+                    "from": [
+                        {
+                            "podSelector": {
+                                "matchLabels": {
+                                    "app": "wikijs"
+                                }
+                            }
+                        }
+                    ],
+                    "ports": [
+                        {
+                            "port": 3306,
+                            "protocol": "TCP"
+                        }
+                    ]
+                }
+            ],
+            "podSelector": {
+                "matchLabels": {
+                    "app": "mariadb"
+                }
+            },
+            "policyTypes": [
+                "Ingress"
+            ]
+        }
+    }
+}

@@ -201,6 +201,11 @@ STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"
 STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
 
+GENERATED_NETWORK_POLICY_PLURAL = "generatednetworkpolicies"
+
+NETWORK_NEIGHBOR_PLURAL = "networkneighborses"
+NETWORK_NEIGHBOR_KIND = "NetworkNeighbors"
+
 STORAGE_CVE_LABEL = "kubescape.io/context"
 STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
 
@@ -213,6 +218,9 @@ RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
 
 # relevancy feature
+HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"
+HELM_NODE_AGENT_LEARNING_PERIOD = "nodeAgent.config.learningPeriod"
+HELM_NODE_AGENT_UPDATE_PERIOD = "nodeAgent.config.updatePeriod"
 HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
 HELM_RELEVANCY_FEATURE_ENABLED = "enable"
 HELM_RELEVANCY_FEATURE_DISABLED = "disable"

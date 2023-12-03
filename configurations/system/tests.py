@@ -1,3 +1,4 @@
+from configurations.system.tests_cases.network_policy_tests import NetworkPolicyTests
 from systest_utils import TestUtil
 
 from .tests_cases import KubescapeTests, KSMicroserviceTests
@@ -18,6 +19,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(KsVulnerabilityScanningTests))
     tests.extend(TestUtil.get_class_methods(PaymentTests))
     tests.extend(TestUtil.get_class_methods(RelevantVulnerabilityScanningTests))
+    tests.extend(TestUtil.get_class_methods(NetworkPolicyTests))
     tests.extend(TestUtil.get_class_methods(NotificationSTests))
     return tests
 
@@ -36,6 +38,8 @@ def get_test(test_name):
         return PaymentTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(RelevantVulnerabilityScanningTests):
         return RelevantVulnerabilityScanningTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(NetworkPolicyTests):
+        return NetworkPolicyTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(NotificationSTests):
         return NotificationSTests().__getattribute__(test_name)()
 
