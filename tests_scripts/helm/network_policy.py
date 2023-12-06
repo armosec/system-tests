@@ -17,7 +17,8 @@ class NetworkPolicy(BaseNetworkPolicy):
         4. Validate network neighbors
         5. Validate generated network policies
         6. TODO: Check BE APIs
-        7. Uninstall Armo helm-chart
+        7. TODO: Check deletion flow
+        8. Uninstall Armo helm-chart
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -67,6 +68,8 @@ class NetworkPolicy(BaseNetworkPolicy):
         
         #TODO: check BE APIs
 
+        #TODO: check deletion flow
+
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
 
@@ -89,7 +92,8 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         6. Check second generate network neighbors
         7. Check second generated network policies
         8. TODO: Check BE APIs
-        9. Uninstall Armo helm-chart
+        9. TODO: Check deletion flow
+        10. Uninstall Armo helm-chart
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -148,6 +152,8 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
 
         #TODO: check BE APIs
 
+        # TODO: check deletion flow
+
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
 
@@ -168,7 +174,8 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         4. Validate network neighbors
         5. Validate generated network policies
         6. TODO: Check BE APIs
-        7. Uninstall Armo helm-chart
+        7. TODO: Check deletion flow
+        8. Uninstall Armo helm-chart
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -237,7 +244,8 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         4. Validate network neighbors (data is aggregated from all pods)
         5. Validate generated network policies (data is aggregated from all pods)
         6. TODO: Check BE APIs
-        7. Uninstall Armo helm-chart
+        7. TODO: Check deletion flow
+        8. Uninstall Armo helm-chart
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -278,6 +286,8 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
 
         
         #TODO: check BE APIs
+
+        # TODO: check deletion flow
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
