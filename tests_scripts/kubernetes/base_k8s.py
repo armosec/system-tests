@@ -1014,6 +1014,14 @@ class BaseK8S(BaseDockerizeTest):
         )
 
         return generated_network_policy
+    
+    def create_known_servers(self, body):
+        self.kubernetes_obj.client_CustomObjectsApi.create_cluster_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            plural=statics.KNOWN_SERVERS_PLURAL,
+            body=body,
+        )
 
     def get_network_neighbors(self, name: str, namespace: str):
         network_neighbors = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(

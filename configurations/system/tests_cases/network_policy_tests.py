@@ -94,3 +94,20 @@ class NetworkPolicyTests(object):
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED, statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
         )
+
+
+    @staticmethod
+    def network_policy_known_servers():
+        from tests_scripts.helm.network_policy import NetworkPolicyKnownServers
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "busybox"),
+            knownservers = join(statics.DEFAULT_KNOWN_SERVERS_PATH, "known-server.json"),
+            test_obj=NetworkPolicyKnownServers,
+            expected_network_neighbors = ["configurations/network-policy/expected-network-neighbors/busybox-known-server.json",
+            ],
+            expected_generated_network_policies = [
+                "configurations/network-policy/expected-generated-network-policy/busybox-known-server.json",
+            ],
+            helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED, statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+        )

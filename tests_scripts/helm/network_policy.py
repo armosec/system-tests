@@ -285,7 +285,78 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         Logger.logger.info("validated expected generated network policies")
 
         
-        #TODO: check BE APIs
+        # TODO: check BE APIs
+
+        # TODO: check deletion flow
+
+        Logger.logger.info('delete armo namespace')
+        self.uninstall_armo_helm_chart()
+
+        return self.cleanup()
+
+class NetworkPolicyKnownServers(BaseNetworkPolicy):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(NetworkPolicyKnownServers, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                    kubernetes_obj=kubernetes_obj)
+        
+        
+    def start(self):
+        """
+        Test plan:
+        1. Install Armo helm-chart
+        2. Apply workloads
+        3. Apply Known Servers
+        4. Send request from within Pod to the Known Server
+        5. Validate network policy
+        6. TODO: Check BE APIs
+        7. TODO: Check deletion flow
+        """
+
+        cluster, namespace = self.setup(apply_services=False)
+
+        helm_kwargs = self.test_obj.get_arg("helm_kwargs")
+
+        Logger.logger.info('install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        
+        Logger.logger.info('apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
+        
+        
+        
+        pods_list = list(map(lambda obj: obj['metadata']['name'], workload_objs))
+        pods = self.get_ready_pods(namespace=namespace, name=pods_list[0])
+        pod_name = pods[0].metadata.name
+
+        Logger.logger.info(f"pod {pod_name} is ready. Triggering exec command")
+        self.wait_for_report(timeout=180, report_type=self.run_exec_cmd, namespace=namespace, pod_name=pod_name, cmd="wget 142.250.1.104")
+        
+
+        known_servers_file = self.test_obj.get_arg("knownservers")
+        known_servers_body = TestUtil.load_objs_from_json_files([known_servers_file])
+        self.create_known_servers( body=known_servers_body[0])
+        
+        
+        duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
+        TestUtil.sleep(2 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+
+        expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
+
+        Logger.logger.info("validating expected network neighbors")
+        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
+        Logger.logger.info("validated expected network neighbors")
+
+        expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
+
+        Logger.logger.info("validating expected generated network policies")
+        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+        Logger.logger.info("validated expected generated network policies")
+
+        
+        # TODO: check BE APIs
 
         # TODO: check deletion flow
 
