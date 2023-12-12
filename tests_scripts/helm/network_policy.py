@@ -170,7 +170,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         Test plan:
         1. Apply workloads
         2. Install Armo helm-chart
-        3. Generate traffic
+        3. Restart workloads
         4. Validate network neighbors
         5. Validate generated network policies
         6. TODO: Check BE APIs
@@ -223,6 +223,8 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
 
         
         #TODO: check BE APIs
+        
+        #TODO: check deletion flow
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -307,9 +309,10 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         2. Apply workloads
         3. Apply Known Servers
         4. Send request from within Pod to the Known Server
-        5. Validate network policy
-        6. TODO: Check BE APIs
-        7. TODO: Check deletion flow
+        5. Validate network neighbors
+        6. Validate network policy
+        7. TODO: Check BE APIs
+        8. TODO: Check deletion flow
         """
 
         cluster, namespace = self.setup(apply_services=False)
