@@ -16,13 +16,15 @@
         {
             "dns": "google.com.",
             "ipBlock": "74.125.201.138/32",
-            "name": "google.com.",
+            "name": "",
+            "server": "",
             "originalIP": "74.125.201.138"
         },
         {
             "dns": "wikipedia.org.",
             "ipBlock": "208.80.154.224/32",
-            "name": "wikipedia.org.",
+            "name": "",
+            "server": "",
             "originalIP": "208.80.154.224"
         }
     ],

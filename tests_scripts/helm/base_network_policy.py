@@ -97,10 +97,13 @@ class BaseNetworkPolicy(BaseHelm):
 
                     is_labels = True
                     if expected_entry["namespaceSelector"] is not None:
-                        for key, label  in expected_entry["namespaceSelector"]["matchLabels"].items():
-                            if actual_entry["namespaceSelector"]["matchLabels"][key] != label:
-                                is_labels = False
-                                break
+                        if actual_entry["namespaceSelector"] is not None:
+                            for key, label  in expected_entry["namespaceSelector"]["matchLabels"].items():
+                                if actual_entry["namespaceSelector"]["matchLabels"][key] != label:
+                                    is_labels = False
+                                    break
+                        else:
+                            is_labels = False
                     
                     if not is_labels:
                         continue
@@ -277,6 +280,7 @@ class BaseNetworkPolicy(BaseHelm):
             for actual_policy_ref in actual_policy_refs:
                 if expected_policy_ref['dns'] == actual_policy_ref['dns']:
                     assert expected_policy_ref['name'] == actual_policy_ref['name'], f"name is not equal, actual: {actual_policy_ref['name']}, expected: {expected_policy_ref['name']}"
+                    assert expected_policy_ref['server'] == actual_policy_ref['server'], f"server is not equal, actual: {actual_policy_ref['server']}, expected: {expected_policy_ref['server']}"
                     verified_refs += 1
                     break
 

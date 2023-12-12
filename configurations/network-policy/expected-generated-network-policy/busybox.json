@@ -16,13 +16,15 @@
         {
             "dns": "google.com.",
             "ipBlock": "142.251.171.102/32",
-            "name": "google.com.",
+            "name": "",
+            "server": "",
             "originalIP": "142.251.171.102"
         },
         {
             "dns": "www.google.com.",
             "ipBlock": "173.194.192.99/32",
-            "name": "www.google.com.",
+            "name": "",
+            "server": "",
             "originalIP": "173.194.192.99"
         }
     ],

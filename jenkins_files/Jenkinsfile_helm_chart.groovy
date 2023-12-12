@@ -27,7 +27,8 @@ def tests = [
             "network_policy":                                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "network_policy_data_appended":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
             "network_policy_pod_restarted":                                                         ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
-            "network_policy_multiple_replicas":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
+            "network_policy_multiple_replicas":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy_known_servers":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
              ]
 
 def parallelStagesMap = tests.collectEntries {
