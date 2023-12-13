@@ -23,7 +23,12 @@ def tests = [
              "vulnerability_scanning_triggering_with_cron_job":                           ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "registry_scanning_triggering_with_cron_job":                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vulnerability_scanning_test_public_registry_connectivity_by_backend" :                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"]
+             "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend":             ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
+            "network_policy":                                                                      ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy_data_appended":                                                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy_pod_restarted":                                                         ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy_multiple_replicas":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"],
+            "network_policy_known_servers":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-2X-LARGE-RELEVANCY",  "k8s"]
              ]
 
 def parallelStagesMap = tests.collectEntries {

@@ -650,6 +650,19 @@ class BaseK8S(BaseDockerizeTest):
                     replicas += i.spec.replicas
         return replicas
 
+    
+    def get_pod_if_ready(self, namespace: str, name: str):
+        """
+        Return pod if it is ready. Otherwise, raise an exception.
+        param: namespace: namespace of the pod
+        param: name: name of the pod
+        """
+        ready_pods = self.get_ready_pods(namespace=namespace, name=name)
+        for pod in ready_pods:
+            if name in pod.metadata.name and pod.metadata.namespace == namespace:
+                return pod
+        raise Exception("pod is not ready")
+
     def get_ready_pods(self, namespace, name: str = None):
         """
         :return: list of running pods with all containers ready
@@ -978,6 +991,49 @@ class BaseK8S(BaseDockerizeTest):
                 time.sleep(1)
         Logger.logger.info("exiting websocket thread")
 
+    def run_exec_cmd(self, pod_name: str, namespace: str, cmd: str):
+        """ 
+        Run a command inside a pod
+        :param pod_name: pod name
+        :param namespace: namespace
+        :param cmd: command to run
+        """
+        result = self.kubernetes_obj.exec_pod(namespace=namespace, name=pod_name, command=cmd)
+
+        if result[0] != 0:
+            raise Exception(f"failed to run command {cmd} on pod {pod_name} in namespace {namespace}")
+
+
+    def get_generated_network_policy(self, namespace: str, name: str):
+        generated_network_policy = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            name=name,
+            namespace=namespace,
+            plural=statics.GENERATED_NETWORK_POLICY_PLURAL,
+        )
+
+        return generated_network_policy
+    
+    def create_known_servers(self, body):
+        self.kubernetes_obj.client_CustomObjectsApi.create_cluster_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            plural=statics.KNOWN_SERVERS_PLURAL,
+            body=body,
+        )
+
+    def get_network_neighbors(self, name: str, namespace: str):
+        network_neighbors = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            name=name,
+            namespace=namespace,
+            plural=statics.NETWORK_NEIGHBOR_PLURAL,
+        )
+
+        return network_neighbors
+    
     def get_SBOM_from_storage(self, SBOMKeys):
         SBOMs = []
         if isinstance(SBOMKeys, str):

@@ -31,6 +31,7 @@ DEFAULT_GRYPE_BINARIES_PATH = os.path.abspath('grype-versioning/grype-binaries')
 # k8s paths
 DEFAULT_K8S_PATHS = os.path.abspath(os.path.join('configurations', 'k8s_workloads'))
 DEFAULT_DEPLOYMENT_PATH = os.path.join(DEFAULT_K8S_PATHS, 'deployments')
+DEFAULT_KNOWN_SERVERS_PATH = os.path.join(DEFAULT_K8S_PATHS, 'known-servers')
 DEFAULT_SERVICE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'services')
 DEFAULT_SERVICE_ACCOUNT_PATH = os.path.join(DEFAULT_K8S_PATHS, 'service-accounts')
 DEFAULT_CLUSTER_ROLE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'rbac')
@@ -201,6 +202,11 @@ STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"
 STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
 
+KNOWN_SERVERS_PLURAL = "knownservers"
+GENERATED_NETWORK_POLICY_PLURAL = "generatednetworkpolicies"
+
+NETWORK_NEIGHBOR_PLURAL = "networkneighborses"
+
 STORAGE_CVE_LABEL = "kubescape.io/context"
 STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
 
@@ -213,6 +219,9 @@ RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
 
 # relevancy feature
+HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"
+HELM_NODE_AGENT_LEARNING_PERIOD = "nodeAgent.config.learningPeriod"
+HELM_NODE_AGENT_UPDATE_PERIOD = "nodeAgent.config.updatePeriod"
 HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
 HELM_RELEVANCY_FEATURE_ENABLED = "enable"
 HELM_RELEVANCY_FEATURE_DISABLED = "disable"

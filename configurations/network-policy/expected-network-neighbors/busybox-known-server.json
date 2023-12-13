@@ -1,0 +1,81 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "NetworkNeighbors",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/status": "complete"
+        },
+        "creationTimestamp": "2023-12-11T11:02:21Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-kind": "deployment",
+            "kubescape.io/workload-name": "busybox-deployment"
+        },
+        "name": "deployment-busybox-deployment",
+        "namespace": "systest-ns-d3qk",
+        "resourceVersion": "1",
+        "uid": "ac1da60e-d171-4c72-a070-882744d16a9c"
+    },
+    "spec": {
+        "egress": [
+            {
+                "dns": "",
+                "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
+                "ipAddress": "",
+                "namespaceSelector": {
+                    "matchLabels": {
+                        "kubernetes.io/metadata.name": "kube-system"
+                    }
+                },
+                "podSelector": {
+                    "matchLabels": {
+                        "k8s-app": "kube-dns"
+                    }
+                },
+                "ports": [
+                    {
+                        "name": "UDP-53",
+                        "port": 53,
+                        "protocol": "UDP"
+                    }
+                ],
+                "type": "internal"
+            },
+            {
+                "dns": "www.google.com.",
+                "identifier": "a63c2f7904d77cfedc655bf8c629d0bcb638a949bd7ef94ae5825a7a397b1b60",
+                "ipAddress": "64.233.183.104",
+                "namespaceSelector": null,
+                "podSelector": null,
+                "ports": [
+                    {
+                        "name": "TCP-80",
+                        "port": 80,
+                        "protocol": "TCP"
+                    }
+                ],
+                "type": "external"
+            },
+            {
+                "dns": "",
+                "identifier": "9a1817356173a94001deda15a1a8c56bb9969454691f48661cbda6ce7f662bd4",
+                "ipAddress": "142.250.1.104",
+                "namespaceSelector": null,
+                "podSelector": null,
+                "ports": [
+                    {
+                        "name": "TCP-80",
+                        "port": 80,
+                        "protocol": "TCP"
+                    }
+                ],
+                "type": "external"
+            }
+        ],
+        "ingress": [],
+        "matchLabels": {
+            "app": "busybox"
+        }
+    }
+}
