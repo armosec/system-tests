@@ -2,7 +2,7 @@
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
     "kind": "GeneratedNetworkPolicy",
     "metadata": {
-        "creationTimestamp": "2023-11-30T09:41:41Z",
+        "creationTimestamp": "2023-12-14T09:24:41Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -10,7 +10,7 @@
             "kubescape.io/workload-name": "mariadb"
         },
         "name": "deployment-mariadb",
-        "namespace": "systest-ns-ggjg"
+        "namespace": "systest-ns-pjqm"
     },
     "policyRef": [],
     "spec": {
@@ -28,7 +28,7 @@
                 "kubescape.io/workload-name": "mariadb"
             },
             "name": "deployment-mariadb",
-            "namespace": "systest-ns-ggjg"
+            "namespace": "systest-ns-pjqm"
         },
         "spec": {
             "ingress": [
