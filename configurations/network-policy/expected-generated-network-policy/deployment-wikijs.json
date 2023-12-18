@@ -2,7 +2,7 @@
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
     "kind": "GeneratedNetworkPolicy",
     "metadata": {
-        "creationTimestamp": "2023-11-30T09:41:13Z",
+        "creationTimestamp": "2023-12-14T09:22:59Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -10,22 +10,22 @@
             "kubescape.io/workload-name": "wikijs"
         },
         "name": "deployment-wikijs",
-        "namespace": "systest-ns-ggjg"
+        "namespace": "systest-ns-pjqm"
     },
     "policyRef": [
         {
             "dns": "google.com.",
-            "ipBlock": "74.125.201.138/32",
+            "ipBlock": "108.177.120.100/32",
             "name": "",
-            "server": "",
-            "originalIP": "74.125.201.138"
+            "originalIP": "108.177.120.100",
+            "server": ""
         },
         {
             "dns": "wikipedia.org.",
             "ipBlock": "208.80.154.224/32",
             "name": "",
-            "server": "",
-            "originalIP": "208.80.154.224"
+            "originalIP": "208.80.154.224",
+            "server": ""
         }
     ],
     "spec": {
@@ -43,7 +43,7 @@
                 "kubescape.io/workload-name": "wikijs"
             },
             "name": "deployment-wikijs",
-            "namespace": "systest-ns-ggjg"
+            "namespace": "systest-ns-pjqm"
         },
         "spec": {
             "egress": [
@@ -57,19 +57,9 @@
                     "to": [
                         {
                             "ipBlock": {
-                                "cidr": "74.125.201.138/32"
+                                "cidr": "108.177.120.100/32"
                             }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 443,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
+                        },
                         {
                             "ipBlock": {
                                 "cidr": "208.80.154.224/32"

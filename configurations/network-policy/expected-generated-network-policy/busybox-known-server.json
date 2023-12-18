@@ -2,6 +2,7 @@
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
     "kind": "GeneratedNetworkPolicy",
     "metadata": {
+        "creationTimestamp": "2023-12-14T09:45:53Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -9,22 +10,22 @@
             "kubescape.io/workload-name": "busybox-deployment"
         },
         "name": "deployment-busybox-deployment",
-        "namespace": "systest-ns-d3qk"
+        "namespace": "systest-ns-z9z7"
     },
     "policyRef": [
-        {
-            "dns": "www.google.com.",
-            "ipBlock": "64.233.183.104/32",
-            "name": "",
-            "originalIP": "64.233.183.104",
-            "server": ""
-        },
         {
             "dns": "",
             "ipBlock": "142.250.1.104/24",
             "name": "github-workflows",
             "originalIP": "142.250.1.104",
             "server": "github.com"
+        },
+        {
+            "dns": "www.google.com.",
+            "ipBlock": "209.85.146.106/32",
+            "name": "",
+            "originalIP": "209.85.146.106",
+            "server": ""
         }
     ],
     "spec": {
@@ -34,6 +35,7 @@
             "annotations": {
                 "generated-by": "kubescape"
             },
+            "creationTimestamp": null,
             "labels": {
                 "kubescape.io/workload-api-group": "apps",
                 "kubescape.io/workload-api-version": "v1",
@@ -41,10 +43,30 @@
                 "kubescape.io/workload-name": "busybox-deployment"
             },
             "name": "deployment-busybox-deployment",
-            "namespace": "systest-ns-d3qk"
+            "namespace": "systest-ns-z9z7"
         },
         "spec": {
             "egress": [
+                {
+                    "ports": [
+                        {
+                            "port": 80,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "to": [
+                        {
+                            "ipBlock": {
+                                "cidr": "142.250.1.104/24"
+                            }
+                        },
+                        {
+                            "ipBlock": {
+                                "cidr": "209.85.146.106/32"
+                            }
+                        }
+                    ]
+                },
                 {
                     "ports": [
                         {
@@ -63,36 +85,6 @@
                                 "matchLabels": {
                                     "k8s-app": "kube-dns"
                                 }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 80,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "ipBlock": {
-                                "cidr": "64.233.183.104/32"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 80,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "ipBlock": {
-                                "cidr": "142.250.1.104/24"
                             }
                         }
                     ]
