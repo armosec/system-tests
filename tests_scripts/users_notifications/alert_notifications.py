@@ -1,8 +1,10 @@
 import json
 import os
+import time
 from datetime import datetime
 
 import requests
+from slack_sdk import WebClient
 
 from infrastructure import KubectlWrapper
 from systest_utils import Logger, statics, TestUtil
@@ -11,6 +13,14 @@ from ..helm.base_helm import BaseHelm
 NOTIFICATIONS_SVC_DELAY = 6 * 60
 
 TEST_NAMESPACE = "alerts"
+
+
+def enrich_teams_alert_channel(data):
+    data["channel"]["context"]["webhook"]["id"] = os.getenv("CHANNEL_WEBHOOK")
+
+
+def enrich_slack_alert_channel(data):
+    data["channel"]["context"]["channel"]["id"] = os.getenv("SLACK_CHANNEL_ID")
 
 
 def get_access_token():
@@ -29,8 +39,9 @@ def get_access_token():
 
 
 def get_messages_from_teams_channel(before_test):
+    before_test_utc = datetime.utcfromtimestamp(before_test).isoformat() + "Z"
     endpoint = f'https://graph.microsoft.com/v1.0/teams/{os.getenv("TEAMS_ID")}/channels/{os.getenv("CHANNEL_ID")}' \
-               f'/messages/delta?$filter=lastModifiedDateTime gt {before_test}'
+               f'/messages/delta?$filter=lastModifiedDateTime gt {before_test_utc}'
     headers = {
         'Authorization': 'Bearer ' + get_access_token(),
         'Accept': 'application/json',
@@ -40,10 +51,10 @@ def get_messages_from_teams_channel(before_test):
     return response.json().get('value', [])
 
 
-def assert_test_message_sent(before_test):
-    messages = get_messages_from_teams_channel(before_test)
-    assert len(messages) == 1, "expected to be only one message"
-    assert "Test Alert" in str(messages[0]), "expected message to be a Test Alert"
+def get_messages_from_slack_channel(before_test):
+    client = WebClient(token=os.getenv("SLACK_TOKEN"))
+    result = client.conversations_history(channel=f'{os.getenv("SLACK_CHANNEL_ID")}', oldest=before_test)
+    return result['messages']
 
 
 def assert_vulnerability_message_sent(messages, cluster):
@@ -71,21 +82,6 @@ def assert_misconfiguration_message_sent(messages, cluster):
         if "Your complaince score has decreased" in message_string and cluster in message_string:
             found += 1
     assert found == 1, "expected to have exactly one new misconfiguration message"
-
-
-def assert_all_messages_sent(begin_time, cluster):
-    TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for notifications")
-    for i in range(5):
-        try:
-            messages = get_messages_from_teams_channel(begin_time)
-            assert str(messages).count(cluster) > 2, "expected to have at least 3 messages"
-            assert_vulnerability_message_sent(messages, cluster)
-            assert_new_admin_message_sent(messages, cluster)
-            assert_misconfiguration_message_sent(messages, cluster)
-        except AssertionError:
-            if i == 4:
-                raise
-            TestUtil.sleep(30, "waiting additional 30 seconds for messages to arrive")
 
 
 class AlertNotifications(BaseHelm):
@@ -120,11 +116,12 @@ class AlertNotifications(BaseHelm):
         channel_guid = self.create_alert_channel(self.cluster)
 
         Logger.logger.info("Stage 3: Send Test Alert message")
+        before_test_message_ts = time.time()
         before_test_message = datetime.utcnow().isoformat() + "Z"
         self.backend.send_test_message(channel_guid)
 
         Logger.logger.info("Stage 4: Read Test Alert message")
-        assert_test_message_sent(before_test_message)
+        self.assert_test_message_sent(before_test_message_ts)
 
         Logger.logger.info('Stage 5: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=TEST_NAMESPACE)
@@ -142,13 +139,14 @@ class AlertNotifications(BaseHelm):
                                   framework_guid=fw['guid'], cluster_name=self.cluster)
 
         Logger.logger.info('Stage 9: Add SA to cluster-admin')
-        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account", namespace=TEST_NAMESPACE)
+        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
+                                                                namespace=TEST_NAMESPACE)
 
         Logger.logger.info('Stage 10: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
 
         Logger.logger.info('Stage 11: Assert all messages sent')
-        assert_all_messages_sent(before_test_message, self.cluster)
+        self.assert_all_messages_sent(before_test_message, self.cluster)
         return self.cleanup()
 
     def cleanup(self, **kwargs):
@@ -186,6 +184,25 @@ class AlertNotifications(BaseHelm):
         with open(self.test_obj["alert_channel_file"], 'r') as file:
             data = json.load(file)
         data["channel"]["name"] = cluster_name + "_cluster"
-        data["channel"]["context"]["webhook"]["id"] = os.getenv("CHANNEL_WEBHOOK")
         data["scope"][0]["cluster"] = cluster_name
+        self.test_obj["enrichAlertChannelFunc"](data)
         return data
+
+    def assert_all_messages_sent(self, begin_time, cluster):
+        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for notifications")
+        for i in range(5):
+            try:
+                messages = self.test_obj["getMessagesFunc"](begin_time)
+                assert str(messages).count(cluster) > 2, "expected to have at least 3 messages"
+                assert_vulnerability_message_sent(messages, cluster)
+                assert_new_admin_message_sent(messages, cluster)
+                assert_misconfiguration_message_sent(messages, cluster)
+            except AssertionError:
+                if i == 4:
+                    raise
+                TestUtil.sleep(30, "waiting additional 30 seconds for messages to arrive")
+
+    def assert_test_message_sent(self, before_test):
+        messages = self.test_obj["getMessagesFunc"](before_test)
+        assert len(messages) == 1, "expected to be only one message"
+        assert "Test Alert" in str(messages[0]), "expected message to be a Test Alert"
