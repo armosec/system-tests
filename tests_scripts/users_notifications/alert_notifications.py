@@ -117,7 +117,6 @@ class AlertNotifications(BaseHelm):
 
         Logger.logger.info("Stage 3: Send Test Alert message")
         before_test_message_ts = time.time()
-        before_test_message = datetime.utcnow().isoformat() + "Z"
         self.backend.send_test_message(channel_guid)
 
         Logger.logger.info("Stage 4: Read Test Alert message")
@@ -146,7 +145,7 @@ class AlertNotifications(BaseHelm):
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
 
         Logger.logger.info('Stage 11: Assert all messages sent')
-        self.assert_all_messages_sent(before_test_message, self.cluster)
+        self.assert_all_messages_sent(before_test_message_ts, self.cluster)
         return self.cleanup()
 
     def cleanup(self, **kwargs):
