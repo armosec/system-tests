@@ -37,3 +37,4 @@ junit_xml
 wheel
 psutil
 deepdiff
+slack_sdk
