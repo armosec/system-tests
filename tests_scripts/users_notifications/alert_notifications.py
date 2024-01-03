@@ -12,6 +12,8 @@ from ..helm.base_helm import BaseHelm
 
 NOTIFICATIONS_SVC_DELAY = 6 * 60
 
+TEST_MESSAGE_DELAY = 10
+
 TEST_NAMESPACE = "alerts"
 
 
@@ -202,6 +204,8 @@ class AlertNotifications(BaseHelm):
                 TestUtil.sleep(30, "waiting additional 30 seconds for messages to arrive")
 
     def assert_test_message_sent(self, before_test):
+        TestUtil.sleep(TEST_MESSAGE_DELAY, "waiting for test message")
         messages = self.test_obj["getMessagesFunc"](before_test)
-        assert len(messages) == 1, "expected to be only one message"
+        assert len(messages) > 0, "no messages found"
+        assert len(messages) < 2, "expected to be only one message"
         assert "Test Alert" in str(messages[0]), "expected message to be a Test Alert"
