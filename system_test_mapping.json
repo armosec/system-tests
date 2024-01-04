@@ -39,6 +39,30 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "vulnerability_scanning_test_public_registry_connectivity_by_backend": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "scan_local_file": {
         "target": [
             "CLI"
