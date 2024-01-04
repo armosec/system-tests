@@ -27,7 +27,9 @@
         "target": [
             "CLI"
         ],
-        "target_repositories": [],
+        "target_repositories": [
+            "cadashboardbe"
+        ],
         "description": "",
         "skip_on_environment": ""
     },
@@ -41,26 +43,40 @@
     },
     "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob": {
         "target": [
-            "CLI"
+            "CLI",
+            "Backend"
         ],
-        "target_repositories": [],
-        "description": "",
+        "target_repositories": [
+            "cadashboardbe",
+            "event-ingester-service"
+        ],
+        "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
         "skip_on_environment": ""
     },
     "vulnerability_scanning_test_public_registry_connectivity_by_backend": {
         "target": [
-            "CLI"
+            "Backend",
+            "In cluster"
         ],
-        "target_repositories": [],
-        "description": "",
+        "target_repositories": [
+            "cadashboardbe",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "checks public registry scan capabilities",
         "skip_on_environment": ""
     },
     "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend": {
         "target": [
-            "CLI"
+            "Backend",
+            "In cluster"
         ],
-        "target_repositories": [],
-        "description": "",
+        "target_repositories": [
+            "cadashboardbe",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "checks public registry scan capabilities",
         "skip_on_environment": ""
     },
     "scan_local_file": {
@@ -263,7 +279,9 @@
         "target": [
             "In cluster "
         ],
-        "target_repositories": [],
+        "target_repositories": [
+            "cadashboardbe"
+        ],
         "description": "",
         "skip_on_environment": ""
     },
@@ -286,6 +304,7 @@
             "Backend"
         ],
         "target_repositories": [
+            "cadashboardbe",
             "gateway"
         ],
         "description": "",
@@ -297,6 +316,7 @@
             "Backend"
         ],
         "target_repositories": [
+            "cadashboardbe",
             "gateway"
         ],
         "description": "",
@@ -777,6 +797,28 @@
         ],
         "target_repositories": [],
         "description": "",
+        "skip_on_environment": ""
+    },
+    "teams_alerts": {
+        "target": [
+            "Backend"
+        ],
+        "target_repositories": [
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": "testing teams alert channels with compliance and vulnerabilities notifications",
+        "skip_on_environment": ""
+    },
+    "slack_alerts": {
+        "target": [
+            "Backend"
+        ],
+        "target_repositories": [
+            "users-notification-service",
+            "config-service"
+        ],
+        "description": "testing slack alert channels with compliance and vulnerabilities notifications",
         "skip_on_environment": ""
     }
 }
