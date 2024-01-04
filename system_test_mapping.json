@@ -267,7 +267,7 @@
     },
     "vulnerability_scanning_trigger_scan_on_new_image": {
         "target": [
-            "In cluster "
+            "In cluster"
         ],
         "target_repositories": [
             "event-receiver"
@@ -277,7 +277,7 @@
     },
     "ks_microservice_ns_creation": {
         "target": [
-            "In cluster "
+            "In cluster"
         ],
         "target_repositories": [
             "cadashboardbe"
