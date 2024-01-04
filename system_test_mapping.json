@@ -818,7 +818,7 @@
             "users-notification-service",
             "config-service"
         ],
-        "description": "testing slack alert channels with compliance and vulnerabilities notifications",
+        "description": "testing slack alert channels with compliance and vulnerabilities notifications ",
         "skip_on_environment": ""
     }
 }
