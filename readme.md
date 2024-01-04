@@ -1,6 +1,32 @@
 # CYBER-ARMOR SYSTEM TESTS
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Farmosec%2Fsystem-tests?ref=badge_shield)
 
+---
+
+### Important Notice for Test Creation
+
+When adding new tests, it is crucial to include them in the `system_test_mapping.json` file. Failing to do so will result in the tests not being executed. Please ensure to specify the following parameters for each test:
+
+- `target`: This parameter defines the context in which the test will run. The available options are:
+  - **CLI**
+  - **Backend**
+  - **In cluster**
+
+- `target_repositories`: Specify the repository or repositories where the test should be executed. The options include:
+  - `cadashboardbe`
+  - `event-receiver`
+  - `event-ingester-service`
+  - `config-service`
+  - `gateway`
+
+- `skip_on_environment`: Use this parameter if the test should not be executed in a specific environment. The environments can be:
+  - **Production**
+  - **Staging**
+  - **Development**
+
+- `description`: Provide a brief yet comprehensive description of the test.
+
+Please ensure all these details are accurately filled to maintain the effectiveness and organization of our testing process.
 
 ## Test Cases:
 | Test name                                                      |  category  | description                                                            | coverage                      |
