@@ -6,7 +6,7 @@ import sys
 from datetime import datetime
 from logging import DEBUG, ERROR
 from random import seed
-
+import json
 import requests
 import socket
 
@@ -15,6 +15,19 @@ from systest_utils import Logger, TestUtil
 from test_driver import TestDriver
 
 
+def validate_test(test_name, json_file_path):
+    """
+    Validates if the test is defined in the provided JSON file.
+    """
+    with open(json_file_path, 'r') as file:
+        tests_json = json.load(file)
+
+    if test_name in tests_json:
+        Logger.logger.info(f"Test '{test_name}' is defined in ['{json_file_path}'] JSON.")
+        return True
+    else:
+        Logger.logger.error(f"Test '{test_name}' is not defined in ['{json_file_path}'] JSON. Please add the test and try again.")
+        return False
 
 def input_parser():
     # get arguments
@@ -33,7 +46,7 @@ def input_parser():
 
     parser.add_argument("--delete_test_tenant", choices=["ALWAYS", "TEST_PASSED", "NEVER"], help="when to delete test tenant", default="ALWAYS",
                         dest="delete_test_tenant")
-    
+
     parser.add_argument("-f", "--fresh", action="store_true", dest="fresh", default=False,
                         help="refresh local docker images, build new ones (and remove the old ones).")
 
@@ -66,7 +79,7 @@ def input_parser():
                         help="will create first time results", required=False, dest="create_first_time_results")
     parser.add_argument("--kwargs", action="store", required=False, nargs='*', dest='kwargs',
                         help="adding additional values. example: --kwargs k0=v0 k1=v1;v11")
-    
+
 
     return parser.parse_args()
 
@@ -96,7 +109,6 @@ def setup_logger(level=DEBUG, name: str = ""):
 
 
 def main():
-
     # parse input
     args = input_parser()
     setup_logger(level=args.logger_level, name=args.test_name)
@@ -110,6 +122,10 @@ def main():
         print_configurations(args.list)
         exit(0)
 
+    # Validate if the test is defined in the JSON file
+    if not validate_test(args.test_name, json_file_path='system_test_mapping.json'):
+        exit(1)
+
     if args.test_name not in ALL_TESTS or args.customer != CREDENTIALS.customer:
         print_configurations()
         exit(1)
@@ -117,12 +133,13 @@ def main():
     # ignore https requests warnings
     requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
     # set default timeout to 11 minutes
-    socket.setdefaulttimeout(11*60)
+    socket.setdefaulttimeout(11 * 60)
 
     t = TestDriver(**vars(args))
     res = t.main()
     Logger.logger.debug('Logger file location: {}'.format(Logger.get_file_location()))
     exit(res)
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+name: Validate System Test JSON Format
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'system_test_mapping.json'
+
+jobs:
+  validate_json:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8.13'
+        cache: 'pip'
+
+    - name: Check JSON format
+      run: |
+        python3 -c "import json; \
+        try: \
+            with open('system_test_mapping.json', 'r') as file: \
+                json.load(file); \
+            print('The file system_test_mapping.json looks good.') \
+        except json.JSONDecodeError as e: \
+            print(f'JSON format error in system_test_mapping.json: {e}'); \
+            exit(1)"
+
