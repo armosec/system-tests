@@ -15,6 +15,30 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "scan_custom_framework_scanning_file_scope_testing": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "scan_custom_framework_scanning_cluster_scope_testing": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "scan_mitre": {
         "target": [
             "CLI"
