@@ -119,7 +119,7 @@ class KSMicroserviceTests(object):
             test_job=[{"trigger_by": "scan_on_start"}],
             test_scenario="alpine",
             fix_object="image",
-            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED, "grypeOfflineDB.enabled": "true"},
             relevancy_enabled=False
         )
 
@@ -137,7 +137,7 @@ class KSMicroserviceTests(object):
             test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True}],
             test_scenario="alpine",
             fix_object="image",
-            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED, "grypeOfflineDB.enabled": "true"},
             relevancy_enabled=False
         )
 
@@ -173,7 +173,7 @@ class KSMicroserviceTests(object):
             test_job=[{"trigger_by": "scan_on_start"}],
             test_scenario="attack-chain-1-1",
             fix_object="image",
-            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED, "grypeOfflineDB.enabled": "true"},
             relevancy_enabled=False
         )
 
