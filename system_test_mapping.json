@@ -555,6 +555,20 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "registry_scanning_triggering_with_cron_job": {
+        "target": [
+            "Backend",
+            "In cluster"
+        ],
+        "target_repositories": [
+            "operator",
+            "helm-chart",
+            "cadashboardbe",
+            "event-receiver"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
         "target": [
             "In cluster",
