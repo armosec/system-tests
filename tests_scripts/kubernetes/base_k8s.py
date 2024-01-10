@@ -646,8 +646,11 @@ class BaseK8S(BaseDockerizeTest):
                     continue
                 if kind == 'DaemonSet':
                     replicas += nodes_num
+                    Logger.logger.debug("For namespace {} daemonset {} replicas: {}".format(namespace, i.metadata.name, nodes_num))
                 else:
                     replicas += i.spec.replicas
+                    Logger.logger.debug("For namespace {} {} replicas: {}".format(namespace, i.metadata.name,
+                                                                                   i.spec.replicas))
         return replicas
 
     
