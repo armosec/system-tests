@@ -162,9 +162,10 @@ class BaseNetworkPolicy(BaseHelm):
 
         self.validate_basic_metadata( actual_obj=actual_network_policy,expected_obj= expected_network_policy, namespace= namespace)
 
-        actual_policies_refs = actual_network_policy['policyRef']
-        expected_policies_refs = expected_network_policy['policyRef']
-        self.validate_policy_refs(actual_policy_refs=actual_policies_refs, expected_policy_refs=expected_policies_refs)
+        if 'policyRef' in actual_network_policy and 'policyRef' in expected_network_policy:
+            actual_policies_refs = actual_network_policy['policyRef']
+            expected_policies_refs = expected_network_policy['policyRef']
+            self.validate_policy_refs(actual_policy_refs=actual_policies_refs, expected_policy_refs=expected_policies_refs)
 
         actual_policy = actual_network_policy['spec']
         expected_policy = expected_network_policy['spec']
