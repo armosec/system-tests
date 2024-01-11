@@ -591,6 +591,21 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "vulnerability_scanning_trigger_scan_private_quay_registry": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "operator",
+            "cadashboardbe",
+            "event-receiver",
+            "gateway"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "network_policy_multiple_replicas": {
         "target": [
             "In cluster"
