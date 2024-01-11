@@ -49,7 +49,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=1200,
+            timeout=1800,
             current_datetime=current_datetime,
             cluster_name=cluster
             )
