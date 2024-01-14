@@ -675,6 +675,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 kubescape_status_to_control_id[control["status"]] = []
             kubescape_status_to_control_id[control["status"]].append(c_id)
 
+        Logger.logger.info("kubescape_status_to_control_id: %s", json.dumps(kubescape_status_to_control_id, indent=4))
+        Logger.logger.info('repo_summary.controlsInfo contents: %s', json.dumps(repo_summary["controlsInfo"], indent=4))
+        Logger.logger.info('repo_summary.controlsStats contents: %s', json.dumps(repo_summary["controlsStats"], indent=4))
+
         # Check controlsStats counters in Repo Summary
         assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"])
         assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"])
