@@ -4,20 +4,15 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
-            "kubescape.io/instance-id": "apiVersion-apps/v1/namespace-systest-ns-vuiz/kind-ReplicaSet/name-wikijs-59d8c5c9b9/containerName-wikijs",
-            "kubescape.io/wlid": "wlid://cluster-gke_armo-test-clusters_us-central1-c_dwertent-syft/namespace-systest-ns-vuiz/deployment-wikijs",
             "kubescape.io/workload-container-name": "wikijs"
         },
         "creationTimestamp": "2024-01-14T13:12:09Z",
         "labels": {
-            "kubescape.io/instance-template-hash": "59d8c5c9b9",
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "wikijs",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "wikijs",
-            "kubescape.io/workload-namespace": "systest-ns-vuiz",
-            "kubescape.io/workload-resource-version": "11271927"
+            "kubescape.io/workload-name": "wikijs"
         },
         "name": "replicaset-wikijs-59d8c5c9b9-wikijs-d84a-a9dc",
         "namespace": "kubescape",

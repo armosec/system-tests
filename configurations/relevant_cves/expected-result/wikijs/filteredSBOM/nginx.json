@@ -4,20 +4,15 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
-            "kubescape.io/instance-id": "apiVersion-apps/v1/namespace-systest-ns-vuiz/kind-ReplicaSet/name-nginx-86469d69f9/containerName-nginx",
-            "kubescape.io/wlid": "wlid://cluster-gke_armo-test-clusters_us-central1-c_dwertent-syft/namespace-systest-ns-vuiz/deployment-nginx",
             "kubescape.io/workload-container-name": "nginx"
         },
         "creationTimestamp": "2024-01-14T13:12:07Z",
         "labels": {
-            "kubescape.io/instance-template-hash": "86469d69f9",
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "nginx",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "nginx",
-            "kubescape.io/workload-namespace": "systest-ns-vuiz",
-            "kubescape.io/workload-resource-version": "11271915"
+            "kubescape.io/workload-name": "nginx"
         },
         "name": "replicaset-nginx-86469d69f9-nginx-1999-fae4",
         "namespace": "kubescape",

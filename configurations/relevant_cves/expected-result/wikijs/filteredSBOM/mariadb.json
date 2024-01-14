@@ -4,20 +4,15 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
-            "kubescape.io/instance-id": "apiVersion-apps/v1/namespace-systest-ns-vuiz/kind-ReplicaSet/name-mariadb-86d99cf856/containerName-mariadb",
-            "kubescape.io/wlid": "wlid://cluster-gke_armo-test-clusters_us-central1-c_dwertent-syft/namespace-systest-ns-vuiz/deployment-mariadb",
             "kubescape.io/workload-container-name": "mariadb"
         },
         "creationTimestamp": "2024-01-14T13:12:08Z",
         "labels": {
-            "kubescape.io/instance-template-hash": "86d99cf856",
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
             "kubescape.io/workload-container-name": "mariadb",
             "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "mariadb",
-            "kubescape.io/workload-namespace": "systest-ns-vuiz",
-            "kubescape.io/workload-resource-version": "11271932"
+            "kubescape.io/workload-name": "mariadb"
         },
         "name": "replicaset-mariadb-86d99cf856-mariadb-30d0-bd7c",
         "namespace": "kubescape",

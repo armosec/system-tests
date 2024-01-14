@@ -193,7 +193,7 @@ class BaseK8S(BaseDockerizeTest):
             Logger.logger.debug("remove {} namespace".format(namespace))
             self.kubernetes_obj.delete_namespace(namespace=namespace)
         except Exception as e:
-            Logger.logger.error(e)
+            pass
 
     def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
         if self.cluster_deleted:
