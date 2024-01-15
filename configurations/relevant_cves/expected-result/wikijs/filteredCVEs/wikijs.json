@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
             "kubescape.io/workload-container-name": "wikijs"
         },
-        "creationTimestamp": "2024-01-14T13:14:54Z",
+        "creationTimestamp": "2024-01-15T13:27:49Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -15,10 +15,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "wikijs"
         },
-        "name": "replicaset-wikijs-59d8c5c9b9-wikijs-d84a-a9dc",
+        "name": "replicaset-wikijs-59d8c5c9b9-wikijs-345c-97c1",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "d3c008f8-7ec9-4b60-9cb8-a1e004f41183"
+        "uid": "d9efb57e-44a4-474c-afb0-a30375dde7e0"
     },
     "spec": {
         "metadata": {
@@ -51,6 +51,82 @@
                 "version": "3.14.3"
             },
             "matches": [
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:busybox:busybox:1.33.1-r6:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-2.0-only"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:29e520e214dff615678f370ac1e14265e2f1b45e2aa8608ef9f985dd48076764",
+                                "path": "/lib/apk/db/installed"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "busybox",
+                        "purl": "pkg:apk/alpine/busybox@1.33.1-r6?arch=x86_64\u0026distro=alpine-3.14.3",
+                        "type": "apk",
+                        "upstreams": null,
+                        "version": "1.33.1-r6"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 1.33.1-r7 (apk)",
+                                "vulnerabilityID": "CVE-2022-28391"
+                            },
+                            "matcher": "apk-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "alpine",
+                                    "version": "3.14.3"
+                                },
+                                "namespace": "alpine:distro:alpine:3.14",
+                                "package": {
+                                    "name": "busybox",
+                                    "version": "1.33.1-r6"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-28391",
+                            "description": "BusyBox through 1.35.0 allows remote attackers to execute arbitrary code if netstat is used to print a DNS PTR record's value to a VT compatible terminal. Alternatively, the attacker could choose to change the terminal's colors.",
+                            "id": "CVE-2022-28391",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "https://git.alpinelinux.org/aports/plain/main/busybox/0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch",
+                                "https://git.alpinelinux.org/aports/plain/main/busybox/0002-nslookup-sanitize-all-printed-strings-with-printable.patch",
+                                "https://gitlab.alpinelinux.org/alpine/aports/-/issues/13661"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-28391",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.33.1-r7"
+                            ]
+                        },
+                        "id": "CVE-2022-28391",
+                        "namespace": "alpine:distro:alpine:3.14",
+                        "severity": "High",
+                        "urls": [
+                            "http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-28391"
+                        ]
+                    }
+                },
                 {
                     "artifact": {
                         "cpes": [

@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
             "kubescape.io/workload-container-name": "nginx"
         },
-        "creationTimestamp": "2024-01-14T13:14:52Z",
+        "creationTimestamp": "2024-01-15T13:27:47Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -15,10 +15,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "nginx"
         },
-        "name": "replicaset-nginx-86469d69f9-nginx-1999-fae4",
+        "name": "replicaset-nginx-86469d69f9-nginx-10eb-0cd9",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "9cca6b9e-7204-4553-9be8-b7535f3b58f9"
+        "uid": "c1a8ba94-4ba7-4a23-acfb-55bcab6fe3ff"
     },
     "spec": {
         "metadata": {

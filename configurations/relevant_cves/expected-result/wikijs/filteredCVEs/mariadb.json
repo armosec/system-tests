@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
             "kubescape.io/workload-container-name": "mariadb"
         },
-        "creationTimestamp": "2024-01-14T13:14:53Z",
+        "creationTimestamp": "2024-01-15T13:27:45Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -15,10 +15,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "mariadb"
         },
-        "name": "replicaset-mariadb-86d99cf856-mariadb-30d0-bd7c",
+        "name": "replicaset-mariadb-86d99cf856-mariadb-bd9c-44a1",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "a1fba7ad-2ecd-4aae-a72d-ac9290797460"
+        "uid": "e0c2d014-7c1b-4ee2-ac41-78de2c9ed766"
     },
     "spec": {
         "metadata": {
@@ -132,6 +132,102 @@
                         "severity": "Low",
                         "urls": [
                             "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-2781"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:dpkg:dpkg:1.19.7ubuntu3:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "BSD-2-clause",
+                            "GPL-2",
+                            "GPL-2+",
+                            "public-domain-md5",
+                            "public-domain-s-s-d"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:0eba131dffd015134cb310c284b776c1e44d330146cd2f0e30c4e464d0b76d24",
+                                "path": "/usr/share/doc/dpkg/copyright"
+                            },
+                            {
+                                "layerID": "sha256:0eba131dffd015134cb310c284b776c1e44d330146cd2f0e30c4e464d0b76d24",
+                                "path": "/var/lib/dpkg/info/dpkg.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:0eba131dffd015134cb310c284b776c1e44d330146cd2f0e30c4e464d0b76d24",
+                                "path": "/var/lib/dpkg/info/dpkg.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "dpkg",
+                        "purl": "pkg:deb/ubuntu/dpkg@1.19.7ubuntu3?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "1.19.7ubuntu3"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 1.19.7ubuntu3.2 (deb)",
+                                "vulnerabilityID": "CVE-2022-1664"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "dpkg",
+                                    "version": "1.19.7ubuntu3"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-1664",
+                            "description": "Dpkg::Source::Archive in dpkg, the Debian package management system, before version 1.21.8, 1.20.10, 1.19.8, 1.18.26 is prone to a directory traversal vulnerability. When extracting untrusted source packages in v2 and v3 source package formats that include a debian.tar, the in-place extraction can lead to directory traversal situations on specially crafted orig.tar and debian.tar tarballs.",
+                            "id": "CVE-2022-1664",
+                            "namespace": "nvd:cpe",
+                            "severity": "Critical",
+                            "urls": [
+                                "https://git.dpkg.org/cgit/dpkg/dpkg.git/commit/?id=1f23dddc17f69c9598477098c7fb9936e15fa495",
+                                "https://git.dpkg.org/cgit/dpkg/dpkg.git/commit/?id=58814cacee39c4ce9e2cd0e3a3b9b57ad437eff5",
+                                "https://git.dpkg.org/cgit/dpkg/dpkg.git/commit/?id=7a6c03cb34d4a09f35df2f10779cbf1b70a5200b",
+                                "https://git.dpkg.org/cgit/dpkg/dpkg.git/commit/?id=faa4c92debe45412bfcf8a44f26e827800bb24be",
+                                "https://lists.debian.org/debian-lts-announce/2022/05/msg00033.html",
+                                "https://lists.debian.org/debian-security-announce/2022/msg00115.html",
+                                "https://security.netapp.com/advisory/ntap-20221007-0002/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-1664",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "1.19.7ubuntu3.2"
+                            ]
+                        },
+                        "id": "CVE-2022-1664",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-1664"
                         ]
                     }
                 },
@@ -1720,6 +1816,549 @@
                         "severity": "Negligible",
                         "urls": [
                             "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-0466"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:perl:perl:5.30.0-9ubuntu0.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Artistic",
+                            "Artistic-2",
+                            "Artistic-dist",
+                            "BSD-3-clause",
+                            "BSD-3-clause-GENERIC",
+                            "BSD-3-clause-with-weird-numbering",
+                            "BSD-4-clause-POWERDOG",
+                            "BZIP",
+                            "DONT-CHANGE-THE-GPL",
+                            "Expat",
+                            "GPL-1",
+                            "GPL-1+",
+                            "GPL-2",
+                            "GPL-2+",
+                            "GPL-3+-WITH-BISON-EXCEPTION",
+                            "HSIEH-BSD",
+                            "HSIEH-DERIVATIVE",
+                            "LGPL-2.1",
+                            "REGCOMP",
+                            "REGCOMP,",
+                            "RRA-KEEP-THIS-NOTICE",
+                            "SDBM-PUBLIC-DOMAIN",
+                            "TEXT-TABS",
+                            "Unicode",
+                            "ZLIB"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/usr/share/doc/perl/copyright"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/perl.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/perl.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "perl",
+                        "purl": "pkg:deb/ubuntu/perl@5.30.0-9ubuntu0.2?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "5.30.0-9ubuntu0.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "none (deb)",
+                                "vulnerabilityID": "CVE-2023-31484"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "perl",
+                                    "version": "5.30.0-9ubuntu0.2"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2023-31484",
+                            "description": "CPAN.pm before 2.35 does not verify TLS certificates when downloading distributions over HTTPS.",
+                            "id": "CVE-2023-31484",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://www.openwall.com/lists/oss-security/2023/04/29/1",
+                                "http://www.openwall.com/lists/oss-security/2023/05/03/3",
+                                "http://www.openwall.com/lists/oss-security/2023/05/03/5",
+                                "http://www.openwall.com/lists/oss-security/2023/05/07/2",
+                                "https://blog.hackeriet.no/perl-http-tiny-insecure-tls-default-affects-cpan-modules/",
+                                "https://github.com/andk/cpanpm/pull/175",
+                                "https://metacpan.org/dist/CPAN/changes",
+                                "https://www.openwall.com/lists/oss-security/2023/04/18/14"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-31484",
+                        "fix": {
+                            "state": "not-fixed",
+                            "versions": []
+                        },
+                        "id": "CVE-2023-31484",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2023-31484"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:perl:perl:5.30.0-9ubuntu0.2:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "Artistic",
+                            "Artistic-2",
+                            "Artistic-dist",
+                            "BSD-3-clause",
+                            "BSD-3-clause-GENERIC",
+                            "BSD-3-clause-with-weird-numbering",
+                            "BSD-4-clause-POWERDOG",
+                            "BZIP",
+                            "DONT-CHANGE-THE-GPL",
+                            "Expat",
+                            "GPL-1",
+                            "GPL-1+",
+                            "GPL-2",
+                            "GPL-2+",
+                            "GPL-3+-WITH-BISON-EXCEPTION",
+                            "HSIEH-BSD",
+                            "HSIEH-DERIVATIVE",
+                            "LGPL-2.1",
+                            "REGCOMP",
+                            "REGCOMP,",
+                            "RRA-KEEP-THIS-NOTICE",
+                            "SDBM-PUBLIC-DOMAIN",
+                            "TEXT-TABS",
+                            "Unicode",
+                            "ZLIB"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/usr/share/doc/perl/copyright"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/perl.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/perl.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "perl",
+                        "purl": "pkg:deb/ubuntu/perl@5.30.0-9ubuntu0.2?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "5.30.0-9ubuntu0.2"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 5.30.0-9ubuntu0.3 (deb)",
+                                "vulnerabilityID": "CVE-2020-16156"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "perl",
+                                    "version": "5.30.0-9ubuntu0.2"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2020-16156",
+                            "description": "CPAN 2.28 allows Signature Verification Bypass.",
+                            "id": "CVE-2020-16156",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://blogs.perl.org/users/neilb/2021/11/addressing-cpan-vulnerabilities-related-to-checksums.html",
+                                "https://blog.hackeriet.no/cpan-signature-verification-vulnerabilities/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SD6RYOJII7HRJ6WVORFNVTYNOFY5JDXN/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SZ32AJIV4RHJMLWLU5QULGKMMIHYOMDC/",
+                                "https://metacpan.org/pod/distribution/CPAN/scripts/cpan"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-16156",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "5.30.0-9ubuntu0.3"
+                            ]
+                        },
+                        "id": "CVE-2020-16156",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2020-16156"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:rsync:rsync:3.1.3-8ubuntu0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/usr/share/doc/rsync/copyright"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "rsync",
+                        "purl": "pkg:deb/ubuntu/rsync@3.1.3-8ubuntu0.1?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "3.1.3-8ubuntu0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.1.3-8ubuntu0.4 (deb)",
+                                "vulnerabilityID": "CVE-2022-37434"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "rsync",
+                                    "version": "3.1.3-8ubuntu0.1"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-37434",
+                            "description": "zlib through 1.2.12 has a heap-based buffer over-read or buffer overflow in inflate in inflate.c via a large gzip header extra field. NOTE: only applications that call inflateGetHeader are affected. Some common applications bundle the affected zlib source code but may be unable to call inflateGetHeader (e.g., see the nodejs/node reference).",
+                            "id": "CVE-2022-37434",
+                            "namespace": "nvd:cpe",
+                            "severity": "Critical",
+                            "urls": [
+                                "http://seclists.org/fulldisclosure/2022/Oct/37",
+                                "http://seclists.org/fulldisclosure/2022/Oct/38",
+                                "http://seclists.org/fulldisclosure/2022/Oct/41",
+                                "http://seclists.org/fulldisclosure/2022/Oct/42",
+                                "http://www.openwall.com/lists/oss-security/2022/08/05/2",
+                                "http://www.openwall.com/lists/oss-security/2022/08/09/1",
+                                "https://github.com/curl/curl/issues/9271",
+                                "https://github.com/ivd38/zlib_overflow",
+                                "https://github.com/madler/zlib/blob/21767c654d31d2dccdde4330529775c6c5fd5389/zlib.h#L1062-L1063",
+                                "https://github.com/madler/zlib/commit/eff308af425b67093bab25f80f1ae950166bece1",
+                                "https://github.com/nodejs/node/blob/75b68c6e4db515f76df73af476eccf382bbcb00a/deps/zlib/inflate.c#L762-L764",
+                                "https://lists.debian.org/debian-lts-announce/2022/09/msg00012.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/JWN4VE3JQR4O2SOUS5TXNLANRPMHWV4I/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PAVPQNCG3XRLCLNSQRM3KAN5ZFMVXVTY/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/X5U7OTKZSHY2I3ZFJSR2SHFHW72RKGDK/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/",
+                                "https://security.netapp.com/advisory/ntap-20220901-0005/",
+                                "https://security.netapp.com/advisory/ntap-20230427-0007/",
+                                "https://support.apple.com/kb/HT213488",
+                                "https://support.apple.com/kb/HT213489",
+                                "https://support.apple.com/kb/HT213490",
+                                "https://support.apple.com/kb/HT213491",
+                                "https://support.apple.com/kb/HT213493",
+                                "https://support.apple.com/kb/HT213494",
+                                "https://www.debian.org/security/2022/dsa-5218"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-37434",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.1.3-8ubuntu0.4"
+                            ]
+                        },
+                        "id": "CVE-2022-37434",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-37434"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:rsync:rsync:3.1.3-8ubuntu0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/usr/share/doc/rsync/copyright"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "rsync",
+                        "purl": "pkg:deb/ubuntu/rsync@3.1.3-8ubuntu0.1?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "3.1.3-8ubuntu0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.1.3-8ubuntu0.5 (deb)",
+                                "vulnerabilityID": "CVE-2022-29154"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "rsync",
+                                    "version": "3.1.3-8ubuntu0.1"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-29154",
+                            "description": "An issue was discovered in rsync before 3.2.5 that allows malicious remote servers to write arbitrary files inside the directories of connecting peers. The server chooses which files/directories are sent to the client. However, the rsync client performs insufficient validation of file names. A malicious rsync server (or Man-in-The-Middle attacker) can overwrite arbitrary files in the rsync client target directory and subdirectories (for example, overwrite the .ssh/authorized_keys file).",
+                            "id": "CVE-2022-29154",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://www.openwall.com/lists/oss-security/2022/08/02/1",
+                                "https://github.com/WayneD/rsync/tags",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NMBOJ77A7T7PQCARMDUK75TE6LLESZ3O/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/YRQAI7H4M4RQZ2IWZUEEXECBE5D56BH2/"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-29154",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.1.3-8ubuntu0.5"
+                            ]
+                        },
+                        "id": "CVE-2022-29154",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2022-29154"
+                        ]
+                    }
+                },
+                {
+                    "artifact": {
+                        "cpes": [
+                            "cpe:2.3:a:rsync:rsync:3.1.3-8ubuntu0.1:*:*:*:*:*:*:*"
+                        ],
+                        "language": "",
+                        "licenses": [
+                            "GPL-3"
+                        ],
+                        "locations": [
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/usr/share/doc/rsync/copyright"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.conffiles"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/info/rsync.md5sums"
+                            },
+                            {
+                                "layerID": "sha256:5f3dd02c224a2bfcf0842aca5c275fa40c5f7c9942051359e758482247f504a5",
+                                "path": "/var/lib/dpkg/status"
+                            }
+                        ],
+                        "metadata": null,
+                        "name": "rsync",
+                        "purl": "pkg:deb/ubuntu/rsync@3.1.3-8ubuntu0.1?arch=amd64\u0026distro=ubuntu-20.04",
+                        "type": "deb",
+                        "upstreams": null,
+                        "version": "3.1.3-8ubuntu0.1"
+                    },
+                    "matchDetails": [
+                        {
+                            "found": {
+                                "versionConstraint": "\u003c 3.1.3-8ubuntu0.3 (deb)",
+                                "vulnerabilityID": "CVE-2018-25032"
+                            },
+                            "matcher": "dpkg-matcher",
+                            "searchedBy": {
+                                "distro": {
+                                    "type": "ubuntu",
+                                    "version": "20.04"
+                                },
+                                "namespace": "ubuntu:distro:ubuntu:20.04",
+                                "package": {
+                                    "name": "rsync",
+                                    "version": "3.1.3-8ubuntu0.1"
+                                }
+                            },
+                            "type": "exact-direct-match"
+                        }
+                    ],
+                    "relatedVulnerabilities": [
+                        {
+                            "cvss": null,
+                            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2018-25032",
+                            "description": "zlib before 1.2.12 allows memory corruption when deflating (i.e., when compressing) if the input has many distant matches.",
+                            "id": "CVE-2018-25032",
+                            "namespace": "nvd:cpe",
+                            "severity": "High",
+                            "urls": [
+                                "http://seclists.org/fulldisclosure/2022/May/33",
+                                "http://seclists.org/fulldisclosure/2022/May/35",
+                                "http://seclists.org/fulldisclosure/2022/May/38",
+                                "http://www.openwall.com/lists/oss-security/2022/03/25/2",
+                                "http://www.openwall.com/lists/oss-security/2022/03/26/1",
+                                "https://cert-portal.siemens.com/productcert/pdf/ssa-333517.pdf",
+                                "https://github.com/madler/zlib/commit/5c44459c3b28a9bd3283aaceab7c615f8020c531",
+                                "https://github.com/madler/zlib/compare/v1.2.11...v1.2.12",
+                                "https://github.com/madler/zlib/issues/605",
+                                "https://lists.debian.org/debian-lts-announce/2022/04/msg00000.html",
+                                "https://lists.debian.org/debian-lts-announce/2022/05/msg00008.html",
+                                "https://lists.debian.org/debian-lts-announce/2022/09/msg00023.html",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/DCZFIJBJTZ7CL5QXBFKTQ22Q26VINRUF/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/DF62MVMH3QUGMBDCB3DY2ERQ6EBHTADB/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/JZZPTWRYQULAOL3AW7RZJNVZ2UONXCV4/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/NS2D2GFPFGOJUL4WQ3DUAY7HF4VWQ77F/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VOKNP2L734AEL47NRYGVZIKEFOUBQY5Y/",
+                                "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/XOKFMSNQ5D5WGMALBNBXU3GE442V74WU/",
+                                "https://security.gentoo.org/glsa/202210-42",
+                                "https://security.netapp.com/advisory/ntap-20220526-0009/",
+                                "https://security.netapp.com/advisory/ntap-20220729-0004/",
+                                "https://support.apple.com/kb/HT213255",
+                                "https://support.apple.com/kb/HT213256",
+                                "https://support.apple.com/kb/HT213257",
+                                "https://www.debian.org/security/2022/dsa-5111",
+                                "https://www.openwall.com/lists/oss-security/2022/03/24/1",
+                                "https://www.openwall.com/lists/oss-security/2022/03/28/1",
+                                "https://www.openwall.com/lists/oss-security/2022/03/28/3",
+                                "https://www.oracle.com/security-alerts/cpujul2022.html"
+                            ]
+                        }
+                    ],
+                    "vulnerability": {
+                        "advisories": null,
+                        "cvss": null,
+                        "dataSource": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2018-25032",
+                        "fix": {
+                            "state": "fixed",
+                            "versions": [
+                                "3.1.3-8ubuntu0.3"
+                            ]
+                        },
+                        "id": "CVE-2018-25032",
+                        "namespace": "ubuntu:distro:ubuntu:20.04",
+                        "severity": "Medium",
+                        "urls": [
+                            "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2018-25032"
                         ]
                     }
                 },

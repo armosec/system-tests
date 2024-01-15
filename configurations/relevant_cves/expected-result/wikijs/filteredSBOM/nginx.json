@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/nginx@sha256:aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2",
             "kubescape.io/workload-container-name": "nginx"
         },
-        "creationTimestamp": "2024-01-14T13:12:07Z",
+        "creationTimestamp": "2024-01-15T13:15:17Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -14,19 +14,19 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "nginx"
         },
-        "name": "replicaset-nginx-86469d69f9-nginx-1999-fae4",
+        "name": "replicaset-nginx-86469d69f9-nginx-8053-4bab",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "6947e4a5-2375-4357-ab2f-801be43d6ff8"
+        "uid": "2b36fd91-f949-4a13-b7bd-a5bf6d6e084e"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": null
+                "createdAt": "2024-01-15T13:14:23Z"
             },
             "tool": {
-                "name": "",
-                "version": ""
+                "name": "syft",
+                "version": "v0.98.0"
             }
         },
         "syft": {
@@ -130,9 +130,295 @@
                     "child": "dde8af16ea5c2216",
                     "parent": "e8a217187cf852f4",
                     "type": "contains"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "3acd4d4682e04fdf",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "42850cdaa640a27b",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "4aef186fd1228e90",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "ad79cedcb9523157",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "b79f82bf5740541e",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e5b9d661ddd579eb",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e8a217187cf852f4",
+                    "parent": "0044d2a48e586853",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "6cf17249fcb904b4",
+                    "parent": "17ce48d7b7f75ac2",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "205ca68e886d3b1b",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "3acd4d4682e04fdf",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "b79f82bf5740541e",
+                    "parent": "3acd4d4682e04fdf",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "42850cdaa640a27b",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e5b9d661ddd579eb",
+                    "parent": "42850cdaa640a27b",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "3acd4d4682e04fdf",
+                    "parent": "48e9d1b7dc64663d",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "846b77a6ffbb0856",
+                    "parent": "48e9d1b7dc64663d",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "4aef186fd1228e90",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "70a2151f78173127",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "0044d2a48e586853",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "17ce48d7b7f75ac2",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "205ca68e886d3b1b",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "3acd4d4682e04fdf",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "42850cdaa640a27b",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "48e9d1b7dc64663d",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "4aef186fd1228e90",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "6cf17249fcb904b4",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "70a2151f78173127",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "846b77a6ffbb0856",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "ad79cedcb9523157",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "b79f82bf5740541e",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "e5b9d661ddd579eb",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "e8a217187cf852f4",
+                    "parent": "942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967",
+                    "type": "contains"
+                },
+                {
+                    "child": "48e9d1b7dc64663d",
+                    "parent": "9bffdacf5ac49f23",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "afd7950e13f2f61d",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "e26da712183e1600",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "e55053937caa9306",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "28ee10cbaf9e6342",
+                    "parent": "e5b9d661ddd579eb",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "ad79cedcb9523157",
+                    "parent": "e5b9d661ddd579eb",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "0044d2a48e586853",
+                    "parent": "e8a217187cf852f4",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "527a3762934b8a11",
+                    "parent": "e8a217187cf852f4",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "9bffdacf5ac49f23",
+                    "parent": "e8a217187cf852f4",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "0044d2a48e586853",
+                    "parent": "ffc3039a23191421",
+                    "type": "dependency-of"
                 }
             ],
             "artifacts": [
+                {
+                    "cpes": [
+                        "cpe:2.3:a:adduser:adduser:3.118:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "e26da712183e1600",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/adduser/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/adduser/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/adduser/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/adduser/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/adduser.conffiles",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/adduser.conffiles"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/adduser.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/adduser.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "adduser",
+                    "purl": "pkg:deb/debian/adduser@3.118?arch=all\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "3.118"
+                },
                 {
                     "cpes": [
                         "cpe:2.3:a:base-files:base-files:11.1\\+deb11u6:*:*:*:*:*:*:*",
@@ -254,6 +540,67 @@
                 },
                 {
                     "cpes": [
+                        "cpe:2.3:a:debconf:debconf:1.5.77:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "48e9d1b7dc64663d",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/debconf/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/debconf/copyright"
+                                }
+                            ],
+                            "spdxExpression": "BSD-2-Clause",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-2-clause"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/debconf/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/debconf/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/debconf.conffiles",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/debconf.conffiles"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/debconf.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/debconf.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "debconf",
+                    "purl": "pkg:deb/debian/debconf@1.5.77?arch=all\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "1.5.77"
+                },
+                {
+                    "cpes": [
                         "cpe:2.3:a:findutils:findutils:4.8.0-1:*:*:*:*:*:*:*"
                     ],
                     "foundBy": "dpkg-db-cataloger",
@@ -317,6 +664,198 @@
                     "purl": "pkg:deb/debian/findutils@4.8.0-1?arch=amd64\u0026distro=debian-11",
                     "type": "deb",
                     "version": "4.8.0-1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libacl1:libacl1:2.2.53-10:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "205ca68e886d3b1b",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libacl1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libacl1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libacl1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libacl1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libacl1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libacl1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libacl1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libacl1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.1-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2.1"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/libacl1/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/libacl1/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/libacl1:amd64.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/libacl1:amd64.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "libacl1",
+                    "purl": "pkg:deb/debian/libacl1@2.2.53-10?arch=amd64\u0026upstream=acl\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "2.2.53-10"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libattr1:libattr1:1\\:2.4.48-6:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "afd7950e13f2f61d",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libattr1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libattr1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libattr1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libattr1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libattr1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libattr1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libattr1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libattr1/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.1-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2.1"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/libattr1/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/libattr1/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/libattr1:amd64.conffiles",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/libattr1:amd64.conffiles"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/libattr1:amd64.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/libattr1:amd64.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "libattr1",
+                    "purl": "pkg:deb/debian/libattr1@1:2.4.48-6?arch=amd64\u0026upstream=attr\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "1:2.4.48-6"
                 },
                 {
                     "cpes": [
@@ -430,6 +969,221 @@
                     "purl": "pkg:deb/debian/libcrypt1@1:4.4.18-4?arch=amd64\u0026upstream=libxcrypt\u0026distro=debian-11",
                     "type": "deb",
                     "version": "1:4.4.18-4"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libgcc-s1:libgcc-s1:10.2.1-6:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libgcc-s1:libgcc_s1:10.2.1-6:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libgcc_s1:libgcc-s1:10.2.1-6:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libgcc_s1:libgcc_s1:10.2.1-6:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libgcc:libgcc-s1:10.2.1-6:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libgcc:libgcc_s1:10.2.1-6:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "ffc3039a23191421",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Artistic"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GFDL-1.2-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GFDL-1.2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-3.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-3"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/gcc-10-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/libgcc-s1/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/gcc-10-base/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/libgcc-s1:amd64.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/libgcc-s1:amd64.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "libgcc-s1",
+                    "purl": "pkg:deb/debian/libgcc-s1@10.2.1-6?arch=amd64\u0026upstream=gcc-10\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "10.2.1-6"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libgmp10:libgmp10:2\\:6.2.1\\+dfsg-1\\+deb11u1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "70a2151f78173127",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgmp10/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libgmp10/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgmp10/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libgmp10/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgmp10/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libgmp10/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-3.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-3"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/libgmp10/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/libgmp10/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-3.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-3"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/libgmp10/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/libgmp10/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/libgmp10:amd64.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/libgmp10:amd64.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "libgmp10",
+                    "purl": "pkg:deb/debian/libgmp10@2:6.2.1+dfsg-1+deb11u1?arch=amd64\u0026upstream=gmp\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "2:6.2.1+dfsg-1+deb11u1"
                 },
                 {
                     "cpes": [
@@ -586,6 +1340,130 @@
                 },
                 {
                     "cpes": [
+                        "cpe:2.3:a:lsb-base:lsb-base:11.1.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:lsb-base:lsb_base:11.1.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:lsb_base:lsb-base:11.1.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:lsb_base:lsb_base:11.1.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:lsb:lsb-base:11.1.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:lsb:lsb_base:11.1.0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "e55053937caa9306",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/lsb-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/lsb-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "BSD-3-Clause",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-3-clause"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/lsb-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/lsb-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/lsb-base/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/lsb-base/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/lsb-base.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/lsb-base.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "lsb-base",
+                    "purl": "pkg:deb/debian/lsb-base@11.1.0?arch=all\u0026upstream=lsb\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "11.1.0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:mawk:mawk:1.3.4.20200120-2:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "17ce48d7b7f75ac2",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/mawk/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/mawk/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/mawk/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/mawk/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/mawk.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/mawk.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "mawk",
+                    "purl": "pkg:deb/debian/mawk@1.3.4.20200120-2?arch=amd64\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "1.3.4.20200120-2"
+                },
+                {
+                    "cpes": [
                         "cpe:2.3:a:nginx:nginx:1.23.3-1\\~bullseye:*:*:*:*:*:*:*"
                     ],
                     "foundBy": "dpkg-db-cataloger",
@@ -677,6 +1555,376 @@
                     "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64\u0026distro=debian-11",
                     "type": "deb",
                     "version": "1.1.1n-0+deb11u4"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:perl-base:perl-base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:perl-base:perl_base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:perl_base:perl-base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:perl_base:perl_base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:perl:perl-base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:perl:perl_base:5.32.1-4\\+deb11u2:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "dpkg-db-cataloger",
+                    "id": "9bffdacf5ac49f23",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Artistic"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "Artistic-2.0",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Artistic-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Artistic-dist"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "BSD-3-Clause",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-3-clause"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-3-clause-GENERIC"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-3-clause-with-weird-numbering"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-4-clause-POWERDOG"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BZIP"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "DONT-CHANGE-THE-GPL"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Expat"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-1.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-1"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-1.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-1+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2+"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-3+-WITH-BISON-EXCEPTION"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "HSIEH-BSD"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "HSIEH-DERIVATIVE"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.1-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2.1"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "REGCOMP"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "REGCOMP,"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "RRA-KEEP-THIS-NOTICE"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "SDBM-PUBLIC-DOMAIN"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "TEXT-TABS"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Unicode"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/share/doc/perl-base/copyright",
+                                    "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                                    "path": "/usr/share/doc/perl-base/copyright"
+                                }
+                            ],
+                            "spdxExpression": "Zlib",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "ZLIB"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/share/doc/perl-base/copyright",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/usr/share/doc/perl-base/copyright"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/info/perl-base.md5sums",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+                            "path": "/var/lib/dpkg/info/perl-base.md5sums"
+                        },
+                        {
+                            "accessPath": "/var/lib/dpkg/status",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4dc5cd799a08ff49a603870c8378ea93083bfc2a4176f56e5531997e94c195d0",
+                            "path": "/var/lib/dpkg/status"
+                        }
+                    ],
+                    "name": "perl-base",
+                    "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64\u0026upstream=perl\u0026distro=debian-11",
+                    "type": "deb",
+                    "version": "5.32.1-4+deb11u2"
                 },
                 {
                     "cpes": [
