@@ -64,25 +64,31 @@ class RelevantVulnerabilityScanningTests(object):
 
     @staticmethod
     def relevancy_enabled_stop_sniffing():
-        from tests_scripts.helm.relevant_cve import RelevancyEnabledStopSniffingAfterTime
+        from tests_scripts.helm.relevant_cve import RelevantDataIsAppended
         from systest_utils import statics
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
-            test_obj=RelevancyEnabledStopSniffingAfterTime,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis-sleep"),
+            test_obj=RelevantDataIsAppended,
             expected_SBOMs=[
-                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_entrypoint_SBOM.json")],
-            expected_filtered_SBOMs=[("redis-sleep",
-                                      "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_long.json")],
-            expected_results="configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-sleep.json",
-            expected_filtered_CVEs=[("redis-sleep",
-                                     "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_long.json")],
+                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_sleep.json")],
             expected_CVEs=[
-                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep_long.json")],
+                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/CVEs/redis_sleep.json")],
+            expected_filtered_SBOMs=[
+                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep.json")],
+            expected_filtered_CVEs=[
+                ("redis-sleep", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep.json")],
+            expected_updated_filtered_SBOMs=[("redis-sleep",
+                                              "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep.json")],
+            expected_updated_filtered_CVEs=[("redis-sleep",
+                                             "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep.json")],
             helm_kwargs={statics.HELM_STORAGE_FEATURE: True,
-                         statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
+                         statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
+                         "nodeAgent.config.learningPeriod": "0.5m",
+                         "nodeAgent.config.updatePeriod": "0.5m",
+                         "nodeAgent.config.maxLearningPeriod": "2m"}
 
         )
 
@@ -116,6 +122,7 @@ class RelevantVulnerabilityScanningTests(object):
     def relevancy_enabled_deleted_image():
         from tests_scripts.helm.relevant_cve import RelevancyEnabledDeletedImage
         from systest_utils import statics
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -208,7 +215,7 @@ class RelevantVulnerabilityScanningTests(object):
                 ("redis-fixed", "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis-fixed.json")],
             expected_results="configurations/relevant_cves/expected-result/wikijs/BE_CVEs/redis-fixed.json",
             test_obj=RelevancyFixVuln,
-            helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True,
+            helm_kwargs={statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
 

@@ -81,7 +81,6 @@ class BaseHelm(BaseK8S):
                 pass
 
     def install_armo_helm_chart(self, helm_kwargs: dict = None):
-        # return
         if helm_kwargs is None:
             helm_kwargs = {}
 

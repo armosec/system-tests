@@ -54,10 +54,7 @@ class RelevantCVEs(BaseVulnerabilityScanning):
 
         # 3.5 test filtered SBOM created in the storage
         filteredSBOM, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_SBOM_from_storage,
-                                               filteredSBOMKeys=self.get_filtered_data_keys(
-                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
-                                                                                                     namespace=namespace),
-                                                   namespace=namespace))
+                                               filteredSBOMKeys=self.get_filtered_data_keys( pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace), namespace=namespace))
         # 3.6 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"],
                                               namespace=namespace)
@@ -155,7 +152,7 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         # P1 install helm-chart (armo)
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
-        
+
         # 1.2 install armo helm-chart
         Logger.logger.info('install armo helm-chart')
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
@@ -185,10 +182,10 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
         Logger.logger.info('2. Test relevancy')
         Logger.logger.info('Get filtered SBOMs from storage')
         filtered_sbom, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_SBOM_from_storage,
-                                               filteredSBOMKeys=self.get_filtered_data_keys(
-                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
-                                                                                                     namespace=namespace),
-                                                   namespace=namespace))
+                                                filteredSBOMKeys=self.get_filtered_data_keys(
+                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
+                                                                                                      namespace=namespace),
+                                                    namespace=namespace))
 
         Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_filtered_SBOMs(filtered_sbom, self.test_obj["expected_filtered_SBOMs"],
@@ -226,7 +223,8 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
                                                    namespace=namespace))
 
         Logger.logger.info('Validate filtered CVEs was created with expected data')
-        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_updated_filtered_CVEs"], namespace=namespace)
+        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_updated_filtered_CVEs"],
+                                             namespace=namespace)
 
         return self.cleanup()
 
@@ -338,79 +336,6 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
                              be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                   statics.FILTERED_CVES_KEY: filteredCVEs},
                              expected_number_of_pods=self.get_expected_number_of_pods(namespace=namespace))
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
-
-        return self.cleanup()
-
-
-# Tests that sniffer stop sniffing after X time
-class RelevancyEnabledStopSniffingAfterTime(BaseVulnerabilityScanning):
-    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(RelevancyEnabledStopSniffingAfterTime, self).__init__(test_driver=test_driver, test_obj=test_obj,
-                                                                    backend=backend,
-                                                                    kubernetes_obj=kubernetes_obj)
-
-    def start(self):
-        # agenda:
-        # 1. install helm-chart with relevancy enabled
-        # 2. create workload with an sleep as entrypoint
-        # 3. check that files opened after X time are no in SBOMp list and relevant CVEs, by comparing SBOM, SBOMp, CVEs and CVEsp
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
-        cluster, namespace = self.setup(apply_services=False)
-
-        # P1 install helm-chart (armo)
-        # 1.1 add and update armo in repo
-        self.add_and_upgrade_armo_to_repo()
-
-        # 1.2 install armo helm-chart
-        Logger.logger.info('install armo helm-chart')
-        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
-
-        # # 1.3 verify installation
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-
-        # P2 create wl
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
-
-        # P3 CHECK sbom and sbom'
-        Logger.logger.info('Get SBOMs from storage')
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
-                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
-
-        Logger.logger.info('Validate SBOMs was created with expected data')
-        self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
-
-        Logger.logger.info('Get SBOMsp from storage')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
-                                               filteredSBOMKeys=self.get_filtered_data_keys(
-                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
-                                                                                                     namespace=namespace),
-                                                   namespace=namespace))
-
-        Logger.logger.info('Validate SBOMsp was created with expected data')
-        self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"],
-                                              namespace=namespace)
-
-        Logger.logger.info('Get CVEs from storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
-                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
-
-        Logger.logger.info('Validate CVEs was created with expected data')
-        self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
-
-        Logger.logger.info('Get filtered CVEs from storage')
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
-                                               filteredCVEsKEys=self.get_filtered_data_keys(
-                                                   pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
-                                                                                                     namespace=namespace),
-                                                   namespace=namespace))
-
-        Logger.logger.info('Validate filtered CVEs was created with expected data')
-        self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -798,7 +723,6 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -821,18 +745,18 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         # 3 test SBOM and CVEs created as expected in the storage
         Logger.logger.info('Get the scan result from local Storage')
         # 3.1 test SBOM created in the storage
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+        SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.2 test SBOM created as expected result in the storage
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
         # 3.3 test CVEs created in the storage
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.4 test CVES created as expected result in the storage
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
         # 3.5 test filtered SBOM created in the storage
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+        filteredSBOM, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -842,17 +766,13 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
                                               namespace=namespace)
         # 3.7 test filtered SBOM created in the storage
 
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
+        filteredCVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
                                                    namespace=namespace))
         # 3.8 test filtered CVEs created as expected result in the storage
         self.validate_expected_filtered_CVEs(filteredCVEs, self.test_obj["expected_filtered_CVEs"], namespace=namespace)
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
 
         return self.cleanup()
 
