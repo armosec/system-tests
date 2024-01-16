@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2024-01-14T06:10:58Z",
+        "creationTimestamp": "2024-01-15T15:21:07Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-library-mariadb-sha256-821d0411208eaa88f9e1f0daccd1d5",
@@ -15,7 +15,7 @@
         "name": "mariadb-sha256-821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66-0b6c66",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "de70def7-1d60-47db-8e74-e9993e6d0a4d"
+        "uid": "bf08f4a1-04c5-4deb-aeb5-4a763d4465cd"
     },
     "spec": {
         "metadata": {

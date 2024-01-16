@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2024-01-14T06:10:54Z",
+        "creationTimestamp": "2024-01-15T15:21:06Z",
         "labels": {
             "kubescape.io/image-id": "docker-io-library-mariadb-sha256-821d0411208eaa88f9e1f0daccd1d5",
             "kubescape.io/image-name": "docker-io-library-mariadb"
@@ -14,12 +14,12 @@
         "name": "mariadb-sha256-821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66-0b6c66",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "b6271da4-7891-4234-b531-811646e2d8f0"
+        "uid": "7ed86681-58a0-4381-91b8-31f1630aa223"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": "2024-01-14T06:10:52Z"
+                "createdAt": "2024-01-15T15:21:05Z"
             },
             "tool": {
                 "name": "syft",

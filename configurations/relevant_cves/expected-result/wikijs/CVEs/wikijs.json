@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
             "kubescape.io/status": ""
         },
-        "creationTimestamp": "2024-01-14T06:11:29Z",
+        "creationTimestamp": "2024-01-15T15:20:55Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac",
@@ -15,7 +15,7 @@
         "name": "requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-87439d",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "01d51364-52ae-40d4-be0c-31dcf8b1461a"
+        "uid": "2a3517c4-fef8-4404-9283-cbef1a9dfa62"
     },
     "spec": {
         "metadata": {
@@ -14276,8 +14276,8 @@
                         ],
                         "locations": [
                             {
-                                "layerID": "sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
-                                "path": "/usr/local/lib/node_modules/npm/node_modules/minimatch/package.json"
+                                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e",
+                                "path": "/wiki/node_modules/minimatch/package.json"
                             }
                         ],
                         "metadata": null,
@@ -14364,8 +14364,8 @@
                         ],
                         "locations": [
                             {
-                                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e",
-                                "path": "/wiki/node_modules/minimatch/package.json"
+                                "layerID": "sha256:be2ae69cd53081271aaf38ff6884a6603fa3152ba85540ca3bf281799c0928c2",
+                                "path": "/usr/local/lib/node_modules/npm/node_modules/minimatch/package.json"
                             }
                         ],
                         "metadata": null,
@@ -20647,7 +20647,7 @@
                         "locations": [
                             {
                                 "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e",
-                                "path": "/wiki/node_modules/express/node_modules/qs/package.json"
+                                "path": "/wiki/node_modules/body-parser/node_modules/qs/package.json"
                             }
                         ],
                         "metadata": null,
@@ -20733,7 +20733,7 @@
                         "locations": [
                             {
                                 "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e",
-                                "path": "/wiki/node_modules/body-parser/node_modules/qs/package.json"
+                                "path": "/wiki/node_modules/express/node_modules/qs/package.json"
                             }
                         ],
                         "metadata": null,
