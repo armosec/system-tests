@@ -198,7 +198,6 @@ class BaseK8S(BaseDockerizeTest):
 
     def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
         if self.cluster_deleted:
-            Logger.logger.info("Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
             return True
 
         try:
