@@ -108,7 +108,7 @@ class BaseHelm(BaseK8S):
 
             helm_kwargs.update(helm_proxy_params)
 
-        if self.enable_security == False:
+        if not self.enable_security:
             security_params = {"operator.triggerSecurityFramework": "false"}
             helm_kwargs.update(security_params)
 
