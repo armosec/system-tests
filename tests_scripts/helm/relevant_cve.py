@@ -337,10 +337,6 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
                                                                   statics.FILTERED_CVES_KEY: filteredCVEs},
                              expected_number_of_pods=self.get_expected_number_of_pods(namespace=namespace))
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
-
         return self.cleanup()
 
 
@@ -467,10 +463,6 @@ class RelevancyDisabledBackendTest(BaseVulnerabilityScanning):
                              be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                   statics.FILTERED_CVES_KEY: []})
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
-
         return self.cleanup()
 
 
@@ -538,10 +530,6 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         filteredSBOMs = self.get_filtered_SBOM_from_storage(filteredSBOM_keys)
         assert filteredSBOMs == {}, "filtered SBOMs were not deleted"
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
-
         return self.cleanup()
 
 
@@ -594,10 +582,6 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"],
                                               namespace=namespace)
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
-
         return self.cleanup()
 
 
@@ -613,7 +597,6 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
@@ -624,9 +607,6 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
-        # 1.3 verify installation
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-
         # P2 apply workloads
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -634,14 +614,14 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
 
         # P3 verify results in storage
         Logger.logger.info('Test SBOM was created in storage')
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+        SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
         Logger.logger.info('Get SBOMsp from storage')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+        filteredSBOM, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -650,10 +630,6 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         Logger.logger.info('Validate SBOMsp was created with expected data')
         self.validate_expected_filtered_SBOMs(filteredSBOM, self.test_obj["expected_filtered_SBOMs"],
                                               namespace=namespace)
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
 
         return self.cleanup()
 
@@ -704,10 +680,6 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         # 4.1 check results (> from expected result)
         Logger.logger.info('Test no errors in results')
         self.test_no_errors_in_scan_result(be_summary)
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
 
         return self.cleanup()
 
@@ -840,9 +812,5 @@ class RelevancyFixVulnBackendTest(BaseVulnerabilityScanning):
                              be_summary=be_summary, storage_CVEs={statics.ALL_CVES_KEY: CVEs,
                                                                   statics.FILTERED_CVES_KEY: filteredCVEs},
                              expected_number_of_pods=self.get_expected_number_of_pods(namespace=namespace))
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-        TestUtil.sleep(150, "Waiting for aggregation to end")
 
         return self.cleanup()

@@ -152,9 +152,9 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             test_obj=RelevancyEnabledLargeImage,
             expected_SBOMs=[
-                ("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+                ("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete.json")],
             expected_filtered_SBOMs=[
-                ("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
+                ("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_incomplete.json")],
             helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5, statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
@@ -170,9 +170,9 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             test_obj=RelevancyEnabledExtraLargeImage,
             expected_SBOMs=[
-                ("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete_SBOM.json")],
+                ("redis", "configurations/relevant_cves/expected-result/wikijs/SBOM/redis_incomplete.json")],
             expected_filtered_SBOMs=[
-                ("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/incomplete.json")],
+                ("redis", "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_incomplete.json")],
             helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )

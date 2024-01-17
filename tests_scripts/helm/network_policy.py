@@ -65,13 +65,9 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
         Logger.logger.info("validated expected generated network policies")
 
-        
-        #TODO: check BE APIs
+        # TODO: check BE APIs
 
-        #TODO: check deletion flow
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
+        # TODO: check deletion flow
 
         return self.cleanup()
 
@@ -150,12 +146,9 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
         Logger.logger.info("validated updated expected generated network policies")
 
-        #TODO: check BE APIs
+        # TODO: check BE APIs
 
         # TODO: check deletion flow
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
 
         return self.cleanup()
 
@@ -221,15 +214,9 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
         Logger.logger.info("validated expected generated network policies")
 
-        
         #TODO: check BE APIs
         
-        #TODO: check deletion flow
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-
-        return self.cleanup() 
+        return self.cleanup()
 
 
 class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
@@ -291,10 +278,8 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
 
         # TODO: check deletion flow
 
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
-
         return self.cleanup()
+
 
 class NetworkPolicyKnownServers(BaseNetworkPolicy):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -358,12 +343,8 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
         Logger.logger.info("validated expected generated network policies")
 
-        
         # TODO: check BE APIs
 
         # TODO: check deletion flow
-
-        Logger.logger.info('delete armo namespace')
-        self.uninstall_armo_helm_chart()
 
         return self.cleanup()

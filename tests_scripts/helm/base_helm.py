@@ -50,10 +50,9 @@ class BaseHelm(BaseK8S):
         if self.remove_kubescape_namespace:
             self.namespaces.append(statics.CA_NAMESPACE_FROM_HELM_NAME)
             try:
-                if self.remove_kubescape_namespace:
-                    Logger.logger.info('uninstall armo helm-chart')
-                    self.uninstall_armo_helm_chart()
-                    self.remove_armo_from_repo()
+                Logger.logger.info('uninstall armo helm-chart')
+                self.uninstall_kubescape_chart()
+                self.remove_armo_from_repo()
             except:
                 pass
             if self.backend:
@@ -65,6 +64,8 @@ class BaseHelm(BaseK8S):
     def display_armo_system_logs(self, level=Logger.logger.debug):
         pods = self.get_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         for pod in pods:
+            if "storage" in pod.metadata.name:
+                continue
             try:
                 level(self.get_pod_logs(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                         pod_name=pod.metadata.name,
@@ -180,8 +181,8 @@ class BaseHelm(BaseK8S):
         HelmWrapper.upgrade_armo_in_repo()
 
     @staticmethod
-    def uninstall_armo_helm_chart():
-        HelmWrapper.uninstall_armo_helm_chart()
+    def uninstall_kubescape_chart():
+        HelmWrapper.uninstall_kubescape_chart()
 
     @staticmethod
     def remove_armo_from_repo():
