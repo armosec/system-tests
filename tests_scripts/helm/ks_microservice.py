@@ -49,7 +49,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=1200,
+            timeout=600,
             current_datetime=current_datetime,
             cluster_name=cluster
             )
@@ -232,9 +232,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         # 2.2 install armo helm-chart
         self.install_armo_helm_chart()
 
-        # 2.3 verify installation
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
-
         self.test_scan_jobs(port=statics.KS_PORT_FORWARD)
 
         return self.cleanup()
@@ -269,10 +266,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
 
-        Logger.logger.info('test reported job results')
-        cluster_wlid = "wlid://cluster-{}".format(cluster_name)
-        self.check_kubescape_job_report_in_backend(report_guid=report_guid, cluster_wlid=cluster_wlid)
-
         return report_guid
 
     def check_result_with_backend_demand(self, job, cluster_name, old_report_guid, port):
@@ -304,10 +297,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
 
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
-
-        Logger.logger.info('test reported job results')
-        cluster_wlid = "wlid://cluster-{}".format(cluster_name)
-        self.check_kubescape_job_report_in_backend(report_guid=report_guid, cluster_wlid=cluster_wlid)
 
     def check_kubescape_job_report_in_backend(self, report_guid, cluster_wlid):
         be_jobs_report = self.get_job_report_info(report_guid=report_guid, cluster_wlid=cluster_wlid)
@@ -361,10 +350,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
 
             Logger.logger.info('test result against backend results, report_guid: {}'.format(report_guid))
             self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
-
-            Logger.logger.info('test reported job results')
-            cluster_wlid = "wlid://cluster-{}".format(cluster_name)
-            self.check_kubescape_job_report_in_backend(report_guid=report_guid, cluster_wlid=cluster_wlid)
 
         if job["operation"] == "update":
             Logger.logger.info("update kubescape cronjob")

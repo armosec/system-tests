@@ -116,7 +116,7 @@ class RelevantCVEsBackendTest(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from Backend')
         expected_number_of_pods = self.get_expected_number_of_pods(
             namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+        be_summary, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_scan_results_sum_summary,
                                              namespace=namespace, since_time=since_time,
                                              expected_results=expected_number_of_pods)
         self.test_no_errors_in_scan_result(be_summary)
@@ -266,14 +266,14 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
         # 3 check backend data against cluster data before entrypoint changed
         # 3.1 get CVEs
         Logger.logger.info('Get CVEs from storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
 
         # 3.2 get filtered CVEs
         Logger.logger.info('Get filtered CVEs from storage')
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
+        filteredCVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -304,14 +304,14 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
         # 5 check backend data against cluster data after entrypoint changed
         # 5.1 get CVEs
         Logger.logger.info('Get CVEs from storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
 
         # 5.2 get filteredCVEs
         Logger.logger.info('Get filtered CVEs from storage')
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
+        filteredCVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -439,7 +439,7 @@ class RelevancyDisabledBackendTest(BaseVulnerabilityScanning):
 
         # 3.3 get CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         # # P4 get CVEs results
@@ -447,7 +447,7 @@ class RelevancyDisabledBackendTest(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from Backend')
         expected_number_of_pods = self.get_expected_number_of_pods(
             namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+        be_summary, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_scan_results_sum_summary,
                                              namespace=namespace, since_time=since_time,
                                              expected_results=expected_number_of_pods)
 
@@ -496,16 +496,16 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         # 3 test SBOM created as expected in the storage
         Logger.logger.info('Test SBOM was created in storage')
         # 3.1 test SBOM created in the storage
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+        SBOMs, _ = self.wait_for_report(timeout=600, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         # 3.2 test CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOMp was created')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+        filteredSBOM, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -565,14 +565,14 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
 
         # P3 verify results in storage
         Logger.logger.info('Test SBOM was created in storage')
-        SBOMs, _ = self.wait_for_report(timeout=1200, report_type=self.get_SBOM_from_storage,
+        SBOMs, _ = self.wait_for_report(timeout=600, report_type=self.get_SBOM_from_storage,
                                         SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
         Logger.logger.info('Get SBOMsp from storage')
-        filteredSBOM, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_SBOM_from_storage,
+        filteredSBOM, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_SBOM_from_storage,
                                                filteredSBOMKeys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -673,7 +673,7 @@ class RelevancyStorageDisabled(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from Backend')
         expected_number_of_pods = self.get_expected_number_of_pods(
             namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+        be_summary, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_scan_results_sum_summary,
                                              namespace=namespace, since_time=since_time,
                                              expected_results=expected_number_of_pods)
         # P4 check result
@@ -785,10 +785,10 @@ class RelevancyFixVulnBackendTest(BaseVulnerabilityScanning):
 
         # P3 get results in storage
         # 3 get CVEs created as expected in the storage
-        CVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_CVEs_from_storage,
+        CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
                                        CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
-        filteredCVEs, _ = self.wait_for_report(timeout=1200, report_type=self.get_filtered_CVEs_from_storage,
+        filteredCVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(
                                                    pods=self.kubernetes_obj.get_namespaced_workloads(kind='Pod',
                                                                                                      namespace=namespace),
@@ -797,7 +797,7 @@ class RelevancyFixVulnBackendTest(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from Backend')
         expected_number_of_pods = self.get_expected_number_of_pods(
             namespace=namespace)
-        be_summary, _ = self.wait_for_report(timeout=1200, report_type=self.backend.get_scan_results_sum_summary,
+        be_summary, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_scan_results_sum_summary,
                                              namespace=namespace, since_time=since_time,
                                              expected_results=expected_number_of_pods)
         # P4 check result
