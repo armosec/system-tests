@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/qorbani/golang-hello-world@sha256:a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T20:39:11Z",
         "labels": {

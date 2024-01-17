@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T21:17:49Z",
         "labels": {

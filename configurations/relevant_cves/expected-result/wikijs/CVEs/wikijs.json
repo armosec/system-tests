@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-15T15:20:55Z",
         "labels": {

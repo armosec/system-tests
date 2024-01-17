@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T20:56:34Z",
         "labels": {

@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T14:02:10Z",
         "labels": {

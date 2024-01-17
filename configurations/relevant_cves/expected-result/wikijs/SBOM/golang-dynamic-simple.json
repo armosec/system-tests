@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T21:08:01Z",
         "labels": {

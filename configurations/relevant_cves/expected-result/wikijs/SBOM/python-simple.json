@@ -4,7 +4,7 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
-            "kubescape.io/status": ""
+            "kubescape.io/status": "ready"
         },
         "creationTimestamp": "2024-01-16T20:32:00Z",
         "labels": {
