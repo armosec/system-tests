@@ -114,7 +114,9 @@ class RelevantVulnerabilityScanningTests(object):
                                               "configurations/relevant_cves/expected-result/wikijs/filteredSBOM/redis_sleep_updated.json")],
             expected_updated_filtered_CVEs=[("redis-sleep",
                                              "configurations/relevant_cves/expected-result/wikijs/filteredCVEs/redis_sleep_updated.json")],
-            helm_kwargs={"nodeAgent.config.learningPeriod": "1m", statics.HELM_STORAGE_FEATURE: True,
+            helm_kwargs={"nodeAgent.config.learningPeriod": "0.5m",
+                         "nodeAgent.config.updatePeriod": "0.5m",
+                         statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
 
