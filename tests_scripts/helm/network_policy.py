@@ -331,7 +331,7 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(2 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
+        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(self.test_obj["expected_network_neighbors"])
 
         Logger.logger.info("validating expected network neighbors")
         self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)

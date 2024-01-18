@@ -541,14 +541,13 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
     def start(self):
 
         # FIXME: Currently not supported
-        return self.cleanup()
+        return statics.SUCCESS, ""
 
         # agenda:
         # 1. install helm-chart with really small maxImageSize in kubevuln
         # 2. apply workload
         # 3. verify that an SBOM was created with an incomplete annotation
         # 4. verify that SBOMp was created with an incomplete annotation
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
         cluster, namespace = self.setup(apply_services=False)
 
         # P1 install helm-chart (armo)
