@@ -52,15 +52,7 @@ class BaseDockerizeTest(base_test.BaseTest):
     def cleanup(self, ignore_agent=False, ignore_containers_logs: bool = False,
                 **kwargs):
         agent_stat, summary = "", ""
-        self.test_summery_data.update(self.container_statistics)
-        for i in self.wlids[:]:
-            try:
-                jobs = self.backend.get_finished_jobs_of_wlid(i)
-                Logger.logger.info(
-                    f"Jobs of wlid: ({i}): {json.dumps(jobs['response'], indent=4)}")
-            except Exception as ex:
-                Logger.logger.error(
-                    f"failed to get_finished_jobs_of_wlid ({i}): {ex}")
+        self.test_summery_data.update(self.container_statistics)        
 
         if not ignore_containers_logs:
             # remove docker containers
