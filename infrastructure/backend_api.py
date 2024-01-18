@@ -44,7 +44,6 @@ API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
 API_TENANT_CREATE= "/api/v1/tenants/createTenant"
 API_CLUSTER = "/api/v1/cluster"
 API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan" 
-API_JOBREPORTS = "/api/v1/jobReports"
 API_POSTURE_CLUSTERSOVERTIME = "/api/v1/posture/clustersOvertime"
 API_POSTURE_FRAMEWORKS =  "/api/v1/posture/frameworks"
 API_POSTURE_CONTROLS = "/api/v1/posture/controls"
@@ -440,23 +439,6 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_CLUSTER}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
-    def get_finished_jobs_of_wlid(self, wlid: str):
-        # TODO: page on if need for
-        post_body = {
-            "pageSize": 100,
-            "pageNum": 1,
-            "innerFilters": [
-                {
-                    "target": wlid,
-                    "status": "failure,done"
-                }
-            ]
-        }
-        r = self.post(
-            API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json=post_body)
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
-
     def get_info_from_wlid(self, wlid):
         # TODO update to v2
         url = "/v1/microservicesOverview"
@@ -509,13 +491,6 @@ class ControlPanelAPI(object):
         url = "/v1/neighbours"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
-
-    def get_job_events_for_job(self, job_id: str):
-        r = self.post(API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json={
-            "pageNum": 1, "pageSize": 100, "innerFilters": [{"jobID": job_id}]})
-        Logger.logger.debug("return_job_status: {0}".format(r.status_code))
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
     def get_incidents(self, **kwargs):
@@ -836,23 +811,6 @@ class ControlPanelAPI(object):
             result.extend(r.json()['response'])
             
         return result
-
-    def get_job_report_info(self, report_guid: str, cluster_wlid):
-        json = {"pageNum": 1, "pageSize": 100,
-                "innerFilters": [
-                    {
-                        "target": cluster_wlid
-                    }
-                ]
-                }
-        r = self.post("/v2/jobReports", params={"customerGUID": self.selected_tenant_id}, json=json)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: results of posture frameworks "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        if len(r.json()['response']) == 0:
-            raise Exception('Error accessing dashboard. Request: results of posture frameworks is empty')
-        return r.json()['response']
 
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{

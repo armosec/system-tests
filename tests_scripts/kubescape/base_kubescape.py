@@ -1187,12 +1187,6 @@ class BaseKubescape(BaseK8S):
             framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
 
 
-
-    def get_job_report_info(self, report_guid, cluster_wlid: str = ""):
-        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_job_report_info,
-                                               report_guid=report_guid, cluster_wlid=cluster_wlid)
-        return c_panel_info
-
     def is_ks_cronjob_created(self, framework_name, timeout=60):
         start = time.time()
         err = ""
