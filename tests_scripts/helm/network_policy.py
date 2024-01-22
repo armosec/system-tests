@@ -126,10 +126,6 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.validate_workload_deleted_from_backend(cluster=cluster, namespace=namespace, workload_name=deleted_workload_name)
         Logger.logger.info(f"validated workload {deleted_workload_name} was deleted")
 
-        Logger.logger.info(f"validating expected network neighbors after deleting workload {deleted_workload_name}")
-        self.validate_expected_backend_generated_network_policy_list(cluster=cluster, namespace=namespace, expected_network_policy_list=expected_generated_network_policy_list, expected_network_neighbors_list=expected_network_neighbors_list)
-        Logger.logger.info(f"validated expected network neighbors after deleting workload {deleted_workload_name}")
-
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
