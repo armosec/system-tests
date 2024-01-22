@@ -1,7 +1,59 @@
 from systest_utils.systests_utilities import TestUtil
 from tests_scripts.helm.base_network_policy import BaseNetworkPolicy
 from systest_utils import statics, Logger
+import json
 
+
+
+
+# class NetworkPolicyTest(BaseNetworkPolicy):
+#     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+#         super(NetworkPolicyTest, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+#                                                     kubernetes_obj=kubernetes_obj)
+
+#     def start(self):
+#         """
+#         Test plan:
+#         1. Install Armo helm-chart
+#         2. Apply workloads
+#         3. Generate traffic
+#         4. Validate network neighbors
+#         5. Validate generated network policies
+#         6. TODO: Check BE APIs
+#         7. TODO: Check deletion flow
+#         8. Uninstall Armo helm-chart
+#         """
+
+#         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
+#         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
+
+
+#         namespace = "systest-ns-jiwx"
+#         cluster = "eranbla2"
+#         # Logger.logger.info("validating expected generated network policies")
+#         # self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+#         # Logger.logger.info("validated expected generated network policies")
+
+#         self.validate_expected_backend_generated_network_policy_list(cluster=cluster, namespace=namespace, expected_network_policy_list=expected_generated_network_policy_list, expected_network_neighbors_list=expected_network_neighbors_list)
+        
+#         # #TODO: check BE APIs
+#         # res = self.wait_for_report(timeout=180, report_type=self.backend.get_network_policies_generate, cluster_name=cluster, workload_name="wikijs", namespace=namespace)
+
+#         # response = json.loads(res[0].text)
+#         # backendGeneratedNetworkPolicy = response[0]["networkPolicies"]["kubernetes"]["new"]
+#         # self.validate_expected_backend_network_policy(expected_generated_network_policy_list[0],backendGeneratedNetworkPolicy, namespace)
+       
+#         # backend_graph = response[0]["graph"]
+
+#         # self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=backend_graph, expected_network_neighbors=expected_network_neighbors_list[0])
+
+
+
+#         Logger.logger.info('delete armo namespace')
+#         self.uninstall_armo_helm_chart()
+
+#         return self.cleanup()
+    
 
 class NetworkPolicy(BaseNetworkPolicy):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -16,8 +68,8 @@ class NetworkPolicy(BaseNetworkPolicy):
         3. Generate traffic
         4. Validate network neighbors
         5. Validate generated network policies
-        6. TODO: Check BE APIs
-        7. TODO: Check deletion flow
+        6. Check BE APIs
+        7. Check deletion flow
         8. Uninstall Armo helm-chart
         """
 
@@ -55,20 +107,29 @@ class NetworkPolicy(BaseNetworkPolicy):
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
-        Logger.logger.info("validating expected network neighbors")
-        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
-        Logger.logger.info("validated expected network neighbors")
-
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("validating expected generated network policies")
-        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
-        Logger.logger.info("validated expected generated network policies")
+        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        
-        #TODO: check BE APIs
+        self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        #TODO: check deletion flow
+
+        deleted_workload_name = workload_objs[0]['metadata']['name']
+        Logger.logger.info(f"deleting workload {deleted_workload_name} from kubernetes")
+        self.kubernetes_obj.delete_workload(namespace=namespace, application=workload_objs[0])
+        TestUtil.sleep(120, "wait for workload deletion", "info")
+
+        deleted_workload_nn = expected_network_neighbors_list.pop(0)
+        deleted_workload_np = expected_generated_network_policy_list.pop(0)
+
+        Logger.logger.info(f"validating workload {deleted_workload_name} was deleted")
+        self.validate_workload_deleted_from_backend(cluster=cluster, namespace=namespace, workload_name=deleted_workload_name)
+        Logger.logger.info(f"validated workload {deleted_workload_name} was deleted")
+
+        Logger.logger.info(f"validating expected network neighbors after deleting workload {deleted_workload_name}")
+        self.validate_expected_backend_generated_network_policy_list(cluster=cluster, namespace=namespace, expected_network_policy_list=expected_generated_network_policy_list, expected_network_neighbors_list=expected_network_neighbors_list)
+        Logger.logger.info(f"validated expected network neighbors after deleting workload {deleted_workload_name}")
+
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -150,9 +211,8 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
         Logger.logger.info("validated updated expected generated network policies")
 
-        #TODO: check BE APIs
+        self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_updated_network_neighbors_list, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
 
-        # TODO: check deletion flow
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -211,20 +271,20 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
-        Logger.logger.info("validating expected network neighbors")
-        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
-        Logger.logger.info("validated expected network neighbors")
+        # Logger.logger.info("validating expected network neighbors")
+        # self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
+        # Logger.logger.info("validated expected network neighbors")
 
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("validating expected generated network policies")
-        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
-        Logger.logger.info("validated expected generated network policies")
+        # Logger.logger.info("validating expected generated network policies")
+        # self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+        # Logger.logger.info("validated expected generated network policies")
+        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
         
-        #TODO: check BE APIs
-        
-        #TODO: check deletion flow
+        self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
+
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -276,20 +336,21 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
-        Logger.logger.info("validating expected network neighbors")
-        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
-        Logger.logger.info("validated expected network neighbors")
+        # Logger.logger.info("validating expected network neighbors")
+        # self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
+        # Logger.logger.info("validated expected network neighbors")
 
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("validating expected generated network policies")
-        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
-        Logger.logger.info("validated expected generated network policies")
+        # Logger.logger.info("validating expected generated network policies")
+        # self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+        # Logger.logger.info("validated expected generated network policies")
 
         
-        # TODO: check BE APIs
+        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        # TODO: check deletion flow
+        self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
+
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()
@@ -348,20 +409,22 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
-        Logger.logger.info("validating expected network neighbors")
-        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
-        Logger.logger.info("validated expected network neighbors")
+        # Logger.logger.info("validating expected network neighbors")
+        # self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
+        # Logger.logger.info("validated expected network neighbors")
 
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("validating expected generated network policies")
-        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
-        Logger.logger.info("validated expected generated network policies")
+        # Logger.logger.info("validating expected generated network policies")
+        # self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+        # Logger.logger.info("validated expected generated network policies")
 
         
-        # TODO: check BE APIs
+        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        # TODO: check deletion flow
+        self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
+
+
 
         Logger.logger.info('delete armo namespace')
         self.uninstall_armo_helm_chart()

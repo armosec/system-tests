@@ -88,6 +88,9 @@ API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
 API_ATTACK_CHAINS = "/api/v1/attackchains"
 
+API_NETWORK_POLICIES = "/api/v1/networkpolicies"
+API_NETWORK_POLICIES_GENERATE = "/api/v1/networkpolicies/generate"
+
 
 def deco_cookie(func):
 
@@ -1960,6 +1963,58 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def get_network_policies(self, cluster_name, namespace) -> (requests.Response, dict, dict):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+            "innerFilters": [{"clusterShortName": cluster_name, "namespace": namespace}],
+        }
+
+        r = self.post(API_NETWORK_POLICIES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        workloads_list = json.loads(r.text)
+
+        # verify there is a response
+        assert len(workloads_list) > 0, "network policies response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        return r, workloads_list
+
+    def get_network_policies_generate(self, cluster_name, workload_name, namespace) -> (requests.Response, dict, dict):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+            "innerFilters": [{"cluster": cluster_name, "name": workload_name, "namespace": namespace}],
+        }
+
+        r = self.post(API_NETWORK_POLICIES_GENERATE, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        response = json.loads(r.text)
+
+        # verify there is a response
+        assert len(response) > 0, "network policies generate response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+        
+        np = response[0].get("networkPolicies", None).get("kubernetes", None).get("new", None)
+        # verify there is a 'new' network policy
+        assert np is not None, "no 'new' NetworkPolicy '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        graph = response[0].get("graph", None)
+        # verify there is a 'graph'
+        assert graph is not None, "No 'graph' '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        return r, np, graph
 
     def get_active_attack_chains(self, current_datetime=datetime, cluster_name=None) -> requests.Response:
         r = self.get_attack_chains(cluster_name)
