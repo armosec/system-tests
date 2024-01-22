@@ -103,7 +103,7 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.wait_for_report(timeout=180, report_type=self.run_exec_cmd, namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org")
         
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
-        TestUtil.sleep(2 * int(update_period_in_seconds), "wait for node-agent update period", "info")
+        TestUtil.sleep(3 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
@@ -195,7 +195,7 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         self.wait_for_report(timeout=180, report_type=self.run_exec_cmd, namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org")
 
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
-        TestUtil.sleep(2 * int(update_period_in_seconds), "wait for node-agent update period", "info")
+        TestUtil.sleep(3 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
         Logger.logger.info("validating updated expected network neighbors")
         expected_updated_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_updated_network_neighbors"])
@@ -328,7 +328,7 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
 
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(2 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(3 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
 
