@@ -1979,10 +1979,13 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         
-        workloads_list = json.loads(r.text)
+        response = json.loads(r.text)
+        workloads_list = response.get("response", None)
 
-        # verify there is a response
-        assert len(workloads_list) > 0, "network policies response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+        assert workloads_list is not None, "network policies response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        assert len(workloads_list) > 0, "network policies workloads list is 0 '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
 
         return r, workloads_list
 
