@@ -591,6 +591,18 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "network_policy_known_servers_cache": {
+        "target": [
+            "In cluster"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "vulnerability_scanning_trigger_scan_private_quay_registry": {
         "target": [
             "In cluster",
