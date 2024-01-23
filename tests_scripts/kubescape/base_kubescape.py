@@ -737,9 +737,9 @@ class BaseKubescape(BaseK8S):
         for be_ctrl in be_results:
             for id, control in cli_result["summaryDetails"]["controls"].items():
                 # check that there is no control with higher failed resources that is not in top 5 controls response
-                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters'][
-                    "failedResources"] and id not in be_ctrl_ids:
-                    assert False, "Control {ctrl} should be in top controls".format(ctrl=id)
+                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters']["failedResources"]:
+                    assert False, "Control {ctrl} Resource counters dont match. be: {be}, results: {r}".format(ctrl=id, be=be_ctrl['clusters'][0]['resourcesCount'], r=control['ResourceCounters']["failedResources"])
+                assert id in be_ctrl_ids, "Control {ctrl} should be in top controls, top controls from BE: {be}, ".format(ctrl=id, be=be_ctrl_ids)
 
                 # check control data and failed resources
                 if be_ctrl["id"] == id:
