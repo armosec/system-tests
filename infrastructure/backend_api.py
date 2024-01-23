@@ -873,8 +873,15 @@ class ControlPanelAPI(object):
         return r.json()['response']
 
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None):
-        body={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None, order_by=None):
+        
+        if order_by is None:
+            order_by = "timestamp:desc"
+        
+        body={"pageNum": 1, 
+              "pageSize": 150, 
+             "orderBy": order_by,
+              "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
                           "designators.attributes.name": resource_name}]}
         if namespace is not None:
