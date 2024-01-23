@@ -304,10 +304,11 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None, order_by=None):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
                                                framework_name=framework_name, report_guid=report_guid,
-                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace)
+                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace,
+                                               order_by=order_by)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -614,7 +615,7 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def get_attributes_from_be_resources(be_resources: list, cluster: str, kind: str, name: str, namespace: str):
         for resource in be_resources:
-            attributes = resource['designators']['attributes']
+            attributes = resource['designators']['attributes']                
             if attributes['cluster'] == cluster and attributes['kind'] == kind and name in attributes['name'] and \
                     (len(namespace) == 0 or attributes['namespace'] == namespace):
                 return [control for x in resource['statusToControls'].values() for control in x]
@@ -790,9 +791,6 @@ class BaseKubescape(BaseK8S):
                                    resource_name: str, has_related: bool, has_applied: bool, namespace=None):
         be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid, 
                                                   resource_name=resource_name,related_exceptions="true",namespace=namespace)
-        # be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
-        #                                                      control_id=control_id, report_guid=report_guid,
-        #                                                      framework_name=framework_name)
         resource = BaseKubescape.get_resource_from_be_resources(be_resources=be_resources, resource_name=resource_name)
         assert has_applied and len(resource["exceptionApplied"]) > 0 or not has_applied and \
                len(resource["exceptionApplied"]) == 0, "Applied-exception was received, " \
@@ -871,7 +869,8 @@ class BaseKubescape(BaseK8S):
         self.test_controls_from_backend(be_controls=be_controls, be_frameworks=be_frameworks, cli_controls=cli_controls)
 
     def compare_resources_data(self, cli_result, framework_name, report_guid):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
+                                                  order_by="criticalSeverityControls:desc,highSeverityControls:desc,mediumSeverityControls:desc,lowSeverityControls:desc")
         self.test_resources_from_backend(be_resources=be_resources, cli_result=cli_result)
 
     def compare_top_controls_data(self, cli_result, cluster_name, report_guid, framework_name):
