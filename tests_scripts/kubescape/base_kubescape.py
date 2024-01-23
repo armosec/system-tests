@@ -120,7 +120,7 @@ class BaseKubescape(BaseK8S):
     def cleanup(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
-            TestUtil.sleep(150, "Waiting for aggregation to end")
+            TestUtil.sleep(50, "Waiting for aggregation to end")
             self.cluster_deleted = self.delete_cluster_from_backend()
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
@@ -729,6 +729,18 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
+
+    def get_top_failed_controls_from_cli(self, cli_result, top_x = 5):
+           # Filter out only failed controls
+        failed_controls = {key: value for key, value in cli_result.items() if value['status'] == 'failed'}
+
+        # Sort the controls first by failedResources in descending order and then by controlID in ascending order
+        sorted_controls = sorted(failed_controls.items(), key=lambda x: (-x[1]['ResourceCounters']['failedResources'], x[0]))
+
+        # Return only the top X controls
+        return dict(sorted_controls[:top_x])
+
+
     """
     testing top controls from the BE. Comparing if the results received from the BE are aligned with the CLI results 
     """
@@ -736,16 +748,19 @@ class BaseKubescape(BaseK8S):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
         assert 1 <= len(be_ctrl_ids) <= 5, f"Top controls count should be between 1 to 5 but was {len(be_ctrl_ids)}"
 
+        cl_top_failed = self.get_top_failed_controls_from_cli(cli_result["summaryDetails"]["controls"])
+
         for be_ctrl in be_results:
-            for id, cli_control in cli_result["summaryDetails"]["controls"].items():
-                if id in be_ctrl_ids:
+            for id, cli_control in cl_top_failed.items():
+                # assert id in be_ctrl_ids, f"Control {id} should be in the top controls list"
+                if be_ctrl['id'] == id:
                     if be_ctrl['clusters'][0]['resourcesCount'] < cli_control['ResourceCounters']["failedResources"]:
-                        assert False, f"Control {id} Resource counters don't match. BE: {be_ctrl['clusters'][0]['resourcesCount']}, Results: {cli_control['ResourceCounters']['failedResources']}"
-                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, f"Control {be_ctrl['id']} reportGUID should be {report_guid}"
-                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, f"Control {be_ctrl['id']} framework name should be {framework_name}"
-                    assert be_ctrl['clusters'][0]['resourcesCount'] == cli_control['ResourceCounters']["failedResources"], f"Control {be_ctrl['id']} should have {cli_control['ResourceCounters']['failedResources']} failed resources"
-                    assert be_ctrl['name'] == cli_control['name'], f"Control {be_ctrl['id']} should have name {cli_control['name']}"
-                    assert be_ctrl['baseScore'] == cli_control['scoreFactor'], f"Control {be_ctrl['id']} should have scored {cli_control['scoreFactor']}"
+                        assert False, f"Control {id} Resource counters don't match. BE: {be_ctrl['clusters'][0]['resourcesCount']}, Results: {cli_control['ResourceCounters']['failedResources']} but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, f"Control {be_ctrl['id']} reportGUID should be {report_guid} but was {be_ctrl['clusters'][0]['reportGUID']}"
+                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, f"Control {be_ctrl['id']} framework name should be {framework_name} but was {be_ctrl['clusters'][0]['topFailedFramework']}"
+                    assert be_ctrl['clusters'][0]['resourcesCount'] == cli_control['ResourceCounters']["failedResources"], f"Control {be_ctrl['id']} should have {cli_control['ResourceCounters']['failedResources']} failed resources but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['name'] == cli_control['name'], f"Control {be_ctrl['id']} should have name {cli_control['name']} but was {be_ctrl['name']}"
+                    assert be_ctrl['baseScore'] == cli_control['scoreFactor'], f"Control {be_ctrl['id']} should have scored {cli_control['scoreFactor']} but was {be_ctrl['baseScore']}"
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         resources_obj = self.test_obj[("resources_for_test", [])]
