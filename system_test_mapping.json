@@ -557,50 +557,92 @@
     },
     "network_policy": {
         "target": [
-            "In cluster"
+            "In cluster",
+            "Backend"
         ],
         "target_repositories": [
             "helm-chart",
             "node-agent",
-            "storage"
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
-        "description": "",
+        "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
         "skip_on_environment": ""
     },
     "network_policy_data_appended": {
         "target": [
-            "In cluster"
+            "In cluster",
+            "Backend"
         ],
         "target_repositories": [
             "helm-chart",
             "node-agent",
-            "storage"
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
-        "description": "",
+        "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
         "skip_on_environment": ""
     },
     "network_policy_pod_restarted": {
         "target": [
-            "In cluster"
+            "In cluster",
+            "Backend"
         ],
         "target_repositories": [
             "helm-chart",
             "node-agent",
-            "storage"
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
-        "description": "",
+        "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after pod restarted",
         "skip_on_environment": ""
     },
     "network_policy_known_servers_cache": {
         "target": [
-            "In cluster"
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe"
+        ],
+        "description": "Checks knownserverscache backend api endpoint returns 200",
+        "skip_on_environment": ""
+    },
+    "network_policy_multiple_replicas": {
+        "target": [
+            "In cluster",
+            "Backend"
         ],
         "target_repositories": [
             "helm-chart",
             "node-agent",
-            "storage"
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
-        "description": "",
+        "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
+        "skip_on_environment": ""
+    },
+    "network_policy_known_servers": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
+
+        ],
+        "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
         "skip_on_environment": ""
     },
     "vulnerability_scanning_trigger_scan_private_quay_registry": {
@@ -614,30 +656,6 @@
             "cadashboardbe-dummy",
             "event-receiver",
             "gateway"
-        ],
-        "description": "",
-        "skip_on_environment": ""
-    },
-    "network_policy_multiple_replicas": {
-        "target": [
-            "In cluster"
-        ],
-        "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage"
-        ],
-        "description": "",
-        "skip_on_environment": ""
-    },
-    "network_policy_known_servers": {
-        "target": [
-            "In cluster"
-        ],
-        "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage"
         ],
         "description": "",
         "skip_on_environment": ""
