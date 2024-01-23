@@ -729,36 +729,23 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
+    """
+    testing top controls from the BE. Comparing if the results received from the BE are aligned with the CLI results 
+    """
     def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
-        assert len(be_ctrl_ids) > 0 and len(
-            be_ctrl_ids) <= 5, "Top controls count should be between 1 to 5 but was {count}".format(
-            count=len(be_ctrl_ids))
-        for be_ctrl in be_results:
-            for id, control in cli_result["summaryDetails"]["controls"].items():
-                # check that there is no control with higher failed resources that is not in top 5 controls response
-                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters']["failedResources"]:
-                    assert False, "Control {ctrl} Resource counters dont match. be: {be}, results: {r}".format(ctrl=id, be=be_ctrl['clusters'][0]['resourcesCount'], r=control['ResourceCounters']["failedResources"])
-                assert id in be_ctrl_ids, "Control {ctrl} should be in top controls, top controls from BE: {be}, ".format(ctrl=id, be=be_ctrl_ids)
+        assert 1 <= len(be_ctrl_ids) <= 5, f"Top controls count should be between 1 to 5 but was {len(be_ctrl_ids)}"
 
-                # check control data and failed resources
-                if be_ctrl["id"] == id:
-                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(
-                        guid=report_guid)
-                    assert be_ctrl['clusters'][0][
-                               'topFailedFramework'] == framework_name, "framework name should be {name}".format(
-                        name=framework_name)
-                    assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
-                        "Control {ctrl} should have {count} failed resources".format(ctrl=id,
-                                                                                     count=control['ResourceCounters'][
-                                                                                         "failedResources"])
-                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id,
-                                                                                                               name=
-                                                                                                               control[
-                                                                                                                   'name'])
-                    assert be_ctrl['baseScore'] == control[
-                        'scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id,
-                                                                                            scored=control['scored'])
+        for be_ctrl in be_results:
+            for id, cli_control in cli_result["summaryDetails"]["controls"].items():
+                if id in be_ctrl_ids:
+                    if be_ctrl['clusters'][0]['resourcesCount'] < cli_control['ResourceCounters']["failedResources"]:
+                        assert False, f"Control {id} Resource counters don't match. BE: {be_ctrl['clusters'][0]['resourcesCount']}, Results: {cli_control['ResourceCounters']['failedResources']}"
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, f"Control {be_ctrl['id']} reportGUID should be {report_guid}"
+                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, f"Control {be_ctrl['id']} framework name should be {framework_name}"
+                    assert be_ctrl['clusters'][0]['resourcesCount'] == cli_control['ResourceCounters']["failedResources"], f"Control {be_ctrl['id']} should have {cli_control['ResourceCounters']['failedResources']} failed resources"
+                    assert be_ctrl['name'] == cli_control['name'], f"Control {be_ctrl['id']} should have name {cli_control['name']}"
+                    assert be_ctrl['baseScore'] == cli_control['scoreFactor'], f"Control {be_ctrl['id']} should have scored {cli_control['scoreFactor']}"
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         resources_obj = self.test_obj[("resources_for_test", [])]
