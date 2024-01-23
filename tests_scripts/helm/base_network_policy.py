@@ -142,7 +142,12 @@ class BaseNetworkPolicy(BaseHelm):
         assert len(verified_entries) == len(expected_entries), f"verified_entries length is not equal to expected_entries length, actual: {verified_entries}, expected: {expected_entries}"
 
     def validate_expected_network_neighbors_and_generated_network_policies_lists(self, namespace, expected_network_neighbors_list, expected_generated_network_policy_list):
-
+        """
+        Validate expected network neighbors and generated network policies lists. It validates the expected network neighbors list and the expected generated network policies list
+        param namespace: namespace of the object
+        param expected_network_neighbors_list: list of expected network neighbors
+        param expected_generated_network_policy_list: list of expected generated network policies
+        """
         Logger.logger.info("validating expected network neighbors")
         self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
         Logger.logger.info("validated expected network neighbors")
@@ -153,6 +158,13 @@ class BaseNetworkPolicy(BaseHelm):
 
 
     def validate_expected_backend_results(self, cluster, namespace, expected_workloads_list, expected_network_neighbors_list, expected_generated_network_policy_list):
+        """
+        Validate expected backend results. It validates the expected backend workloads list and the expected backend generated network policies list
+        param cluster: cluster name
+        param namespace: namespace of the object
+        param expected_workloads_list: list of expected workloads
+        param expected_network_neighbors_list: list of expected network neighbors
+        """
         Logger.logger.info("validating expected backend workloads list")
         self.validate_expected_backend_workloads_list(cluster=cluster, namespace=namespace, expected_workloads_list=expected_workloads_list)
         Logger.logger.info("validated expected backend workloads list")
@@ -163,6 +175,12 @@ class BaseNetworkPolicy(BaseHelm):
 
 
     def is_workload_deleted_from_backend(self, cluster, workload_name, namespace) -> bool:
+        """
+        Is workload deleted from backend. It pulls the actual network neighbors and validates that the workload is not in the list
+        param cluster: cluster name
+        param workload_name: workload name
+        param namespace: namespace of the object
+        """
         try:
             r, np, graph = self.backend.get_network_policies_generate(cluster_name=cluster, workload_name=workload_name, namespace=namespace)
         except Exception as e:
@@ -203,7 +221,7 @@ class BaseNetworkPolicy(BaseHelm):
                                                 cluster_name=cluster, 
                                                 namespace=namespace)
         workloads_list = res[1]
-        assert len(workloads_list) == len(expected_workloads_list), f"workloads_list length is not equal to expected_workloads_list length, actual: len:{len(workloads_list)}, list: {workloads_list}, expected: len:{len(expected_workloads_list)}, list: {expected_workloads_list}"
+        assert len(workloads_list) == len(expected_workloads_list), f"workloads_list length is not equal to expected_workloads_list length, actual: len:{len(workloads_list)}, expected: len:{len(expected_workloads_list)}; actual results: {workloads_list}, expected results: {expected_workloads_list}"
 
 
     def validate_expected_backend_generated_network_policy_list(self, cluster, namespace, expected_network_policy_list, expected_network_neighbors_list):
@@ -274,7 +292,6 @@ class BaseNetworkPolicy(BaseHelm):
 
         actual_policy = converted_actual_network_policy['spec']
         expected_policy = expected_network_policy['spec']['spec']
-        # expected_policy["metadata"] = expected_network_policy["metadata"]
         self.validate_network_policy_spec(actual_network_policy_spec=actual_policy, expected_network_policy_spec=expected_policy, namespace=namespace)
 
 

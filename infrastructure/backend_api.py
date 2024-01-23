@@ -90,6 +90,7 @@ API_ATTACK_CHAINS = "/api/v1/attackchains"
 
 API_NETWORK_POLICIES = "/api/v1/networkpolicies"
 API_NETWORK_POLICIES_GENERATE = "/api/v1/networkpolicies/generate"
+API_NETWORK_POLICIES_KNOWNSERVERSCACHE = "/api/v1/networkpolicies/knownserverscache"
 
 
 def deco_cookie(func):
@@ -1961,6 +1962,15 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_known_servers_cache(self) -> requests.Response:
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(API_NETWORK_POLICIES_KNOWNSERVERSCACHE, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get known servers cache "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
 
