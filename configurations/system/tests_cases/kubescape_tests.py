@@ -160,7 +160,8 @@ class KubescapeTests(object):
                 {'kind': 'Deployment', 'name': 'apache', 'namespace': 'system-test', 'apiVersion': 'apps/v1'},
                 {'kind': 'Namespace', 'name': 'system-test', 'namespace': '', 'apiVersion': 'v1'}],
             yaml="apache.yaml",
-            namespace="system-test"
+            namespace="system-test",
+            create_test_tenant = True
         )
     
     @staticmethod
