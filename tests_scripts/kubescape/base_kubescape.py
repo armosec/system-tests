@@ -84,6 +84,7 @@ class BaseKubescape(BaseK8S):
             raise Exception('backend_obj must be specified')
         self.api_url = self.test_driver.backend_obj.get_api_url()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
+        self.remove_cluster_from_backend = self.test_driver.kwargs.get("remove_cluster_from_backend", True)
 
     def default_scan(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
