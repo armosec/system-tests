@@ -3,7 +3,7 @@ from systest_utils import statics, Logger, TestUtil
 from tests_scripts.helm.base_helm import BaseHelm
 from pkg_resources import parse_version
 from tests_scripts.kubernetes.base_k8s import BaseK8S
-from deepdiff import DeepDiff
+import copy
 
 
 class BaseNetworkPolicy(BaseHelm):
@@ -18,21 +18,18 @@ class BaseNetworkPolicy(BaseHelm):
         param expected_obj: expected object
         param namespace: namespace of the object
         """
-        assert actual_obj['apiVersion'] == expected_obj['apiVersion'], f"apiVersion is not equal, actual: {actual_obj['apiVersion']}, expected: {expected_obj['apiVersion']}"
-
-        assert actual_obj['kind'] == expected_obj['kind'], f"kind is not equal, actual: {actual_obj['kind']}, expected: {expected_obj['kind']}"
-
-
-        assert actual_obj['metadata']['name'] == expected_obj['metadata']['name'], f"name is not equal, actual: {actual_obj['metadata']['name']}, expected: {expected_obj['metadata']['name']}"
-        assert actual_obj['metadata']['namespace'] == namespace, f"namespace is not equal, actual: {actual_obj['metadata']['namespace']}, expected: {namespace}"
+        assert actual_obj['apiVersion'] == expected_obj['apiVersion'], f"in validate_basic_metadata: apiVersion is not equal, actual: {actual_obj['apiVersion']}, expected: {expected_obj['apiVersion']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['kind'] == expected_obj['kind'], f"in validate_basic_metadata: kind is not equal, actual: {actual_obj['kind']}, expected: {expected_obj['kind']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['metadata']['name'] == expected_obj['metadata']['name'], f"in validate_basic_metadata: name is not equal, actual: {actual_obj['metadata']['name']}, expected: {expected_obj['metadata']['name']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['metadata']['namespace'] == namespace, f"in validate_basic_metadata: namespace is not equal, actual: {actual_obj['metadata']['namespace']}, expected: {namespace}, actual object: {actual_obj}, expected object: {expected_obj}"
 
 
         if 'annotations' in expected_obj['metadata']:
             for key, annotation in expected_obj['metadata']['annotations'].items():
-                assert actual_obj['metadata']['annotations'][key] == annotation, f"annotation {key} is not equal, actual: {actual_obj['metadata']['annotations'][key]}, expected: {annotation}"
+                assert actual_obj['metadata']['annotations'][key] == annotation, f"annotation {key} is not equal, actual: {actual_obj['metadata']['annotations'][key]}, expected: {annotation}, actual object: {actual_obj}, expected object: {expected_obj}"
 
         for key, label in expected_obj['metadata']['labels'].items():
-            assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}"
+            assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}, actual object: {actual_obj}, expected object: {expected_obj}"
         
     
     def validate_expected_network_neighbors_list(self, namespace, expected_network_neighbors_list):
@@ -139,7 +136,160 @@ class BaseNetworkPolicy(BaseHelm):
                     verified_entries.append(expected_entry)
                     break
     
-        assert len(verified_entries) == len(expected_entries), f"verified_entries length is not equal to expected_entries length, actual: {verified_entries}, expected: {expected_entries}"
+        assert len(verified_entries) == len(expected_entries), f"in validate_network_neighbor_entry: verified_entries length is not equal to expected_entries length, actual length: {len(verified_entries)}, expected length: {len(expected_entries)}, actual results: {verified_entries}, expected results: {expected_entries}"
+
+    def validate_expected_network_neighbors_and_generated_network_policies_lists(self, namespace, expected_network_neighbors_list, expected_generated_network_policy_list):
+        """
+        Validate expected network neighbors and generated network policies lists. It validates the expected network neighbors list and the expected generated network policies list
+        param namespace: namespace of the object
+        param expected_network_neighbors_list: list of expected network neighbors
+        param expected_generated_network_policy_list: list of expected generated network policies
+        """
+        Logger.logger.info("validating expected network neighbors")
+        self.validate_expected_network_neighbors_list(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list)
+        Logger.logger.info("validated expected network neighbors")
+
+        Logger.logger.info("validating expected generated network policies")
+        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_generated_network_policy_list)
+        Logger.logger.info("validated expected generated network policies")
+
+
+    def validate_expected_backend_results(self, cluster, namespace, expected_workloads_list, expected_network_neighbors_list, expected_generated_network_policy_list):
+        """
+        Validate expected backend results. It validates the expected backend workloads list and the expected backend generated network policies list
+        param cluster: cluster name
+        param namespace: namespace of the object
+        param expected_workloads_list: list of expected workloads
+        param expected_network_neighbors_list: list of expected network neighbors
+        """
+        Logger.logger.info("validating expected backend workloads list")
+        self.validate_expected_backend_workloads_list(cluster=cluster, namespace=namespace, expected_workloads_list=expected_workloads_list)
+        Logger.logger.info("validated expected backend workloads list")
+
+        Logger.logger.info("validating expected backend generated network policies")
+        self.validate_expected_backend_generated_network_policy_list(cluster=cluster, namespace=namespace, expected_network_policy_list=expected_generated_network_policy_list, expected_network_neighbors_list=expected_network_neighbors_list)
+        Logger.logger.info("validated expected backend generated network policies")
+
+
+    def is_workload_deleted_from_backend(self, cluster, workload_name, namespace) -> bool:
+        """
+        Is workload deleted from backend. It pulls the actual network neighbors and validates that the workload is not in the list
+        param cluster: cluster name
+        param workload_name: workload name
+        param namespace: namespace of the object
+        """
+        try:
+            r, np, graph = self.backend.get_network_policies_generate(cluster_name=cluster, workload_name=workload_name, namespace=namespace)
+        except Exception as e:
+            return True
+        return False
+    
+
+
+    def validate_workload_deleted_from_backend(self, cluster, workload_name, namespace):
+        """
+        Validate workload deleted from backend. It pulls the actual network neighbors and validates that the workload is not in the list
+        param cluster: cluster name
+        param workload_name: workload name
+        param namespace: namespace of the object
+        """
+
+        deleted, t = self.wait_for_report(timeout=100, 
+                                        sleep_interval=5,
+                                        report_type=self.is_workload_deleted_from_backend, 
+                                        cluster=cluster, 
+                                        workload_name=workload_name, 
+                                        namespace=namespace)
+
+
+        assert deleted == True, f"workload {workload_name} is not deleted from backend"
+
+
+    def validate_expected_backend_workloads_list(self, cluster, namespace, expected_workloads_list):
+        """
+        validate_expected_backend_workloads_list validates the expected backend workloads list. It pulls the actual workloads and validates each one of them
+        param cluster: cluster name
+        param namespace: namespace of the object
+        param expected_workloads_list: list of expected workloads
+        """
+        res, t = self.wait_for_report(timeout=100, 
+                                                sleep_interval=5,
+                                                report_type=self.backend.get_network_policies, 
+                                                cluster_name=cluster, 
+                                                namespace=namespace)
+        workloads_list = res[1]
+        assert len(workloads_list) == len(expected_workloads_list), f"workloads_list length is not equal to expected_workloads_list length, actual: len:{len(workloads_list)}, expected: len:{len(expected_workloads_list)}; actual results: {workloads_list}, expected results: {expected_workloads_list}"
+
+
+    def validate_expected_backend_generated_network_policy_list(self, cluster, namespace, expected_network_policy_list, expected_network_neighbors_list):
+        """
+        validate_expected_backend_generated_network_policy_list validates the expected backend generated network policies list. It pulls the actual generated network policies and validates each one of them
+        param cluster: cluster name
+        param namespace: namespace of the object
+        param expected_network_policy_list: list of expected backend generated network policies
+        param expected_network_neighbors_list: list of expected network neighbors
+        """
+
+        errors = []
+        for i in range(0, len(expected_network_policy_list)):
+            workload_name = expected_network_policy_list[i]['metadata']['labels']['kubescape.io/workload-name']
+            try:
+                res, t = self.wait_for_report(timeout=100, 
+                                        sleep_interval=5,
+                                        report_type=self.backend.get_network_policies_generate, 
+                                        cluster_name=cluster, 
+                                        workload_name=workload_name, 
+                                        namespace=namespace)
+            except Exception as e:
+                errors.append(e)
+                continue
+            
+            backend_generated_network_policy = res[1]
+            graph = res[2]
+            
+            self.validate_expected_backend_network_policy(expected_network_policy_list[i],backend_generated_network_policy, namespace)
+
+            self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=graph, expected_network_neighbors=expected_network_neighbors_list[i])
+
+        assert len(errors) == 0, f"Errors in validate_expected_backend_generated_network_policy_list: {errors}"
+
+    def convert_backend_network_policy_to_generated_network_policy(self, backend_network_policy) -> dict:
+        """
+        convert_backend_network_policy_to_generated_network_policy converts backend network policy to generated network policy.
+        param backend_network_policy: backend network policy
+        """
+
+        new_backend_policy = copy.deepcopy(backend_network_policy)
+        new_backend_policy["kind"] = "GeneratedNetworkPolicy"
+        new_backend_policy["apiVersion"] = "spdx.softwarecomposition.kubescape.io/v1beta1"
+        new_backend_policy["spec"]["apiVersion"] = "networking.k8s.io/v1"
+        new_backend_policy["spec"]["kind"] = "NetworkPolicy"
+        new_backend_policy["spec"]["metadata"] = new_backend_policy["metadata"]
+        del(new_backend_policy["spec"]["apiVersion"])
+        del(new_backend_policy["spec"]["kind"])
+
+        return new_backend_policy
+
+
+
+    def validate_expected_backend_network_policy(self, expected_network_policy, actual_network_policy, namespace: str):
+        """
+        Validate expected backend network policy. It validates the basic metadata and then validates the policy refs and the network policy
+        param expected_network_policy: expected backend network policy
+        param actual_network_policy: actual backend network policy
+        """
+
+        converted_actual_network_policy = self.convert_backend_network_policy_to_generated_network_policy(actual_network_policy)
+        self.validate_basic_metadata( actual_obj=converted_actual_network_policy,expected_obj= expected_network_policy, namespace= namespace)
+
+        if 'policyRef' in converted_actual_network_policy and 'policyRef' in expected_network_policy:
+            actual_policies_refs = converted_actual_network_policy['policyRef']
+            expected_policies_refs = expected_network_policy['policyRef']
+            self.validate_policy_refs(actual_policy_refs=actual_policies_refs, expected_policy_refs=expected_policies_refs)
+
+        actual_policy = converted_actual_network_policy['spec']
+        expected_policy = expected_network_policy['spec']['spec']
+        self.validate_network_policy_spec(actual_network_policy_spec=actual_policy, expected_network_policy_spec=expected_policy, namespace=namespace)
 
 
     def validate_expected_generated_network_policy_list(self, namespace, expected_generated_network_policy_list):
@@ -182,14 +332,26 @@ class BaseNetworkPolicy(BaseHelm):
 
         self.validate_basic_metadata(actual_obj=actual_network_policy, expected_obj=expected_network_policy, namespace=namespace)
 
-        if 'Ingress' in expected_network_policy['spec']['policyTypes']:
-            expected_network_policy_entries = expected_network_policy['spec']['ingress']
-            actual_network_policy_entries = actual_network_policy['spec']['ingress']
+        self.validate_network_policy_spec(actual_network_policy_spec=actual_network_policy['spec'], expected_network_policy_spec=expected_network_policy['spec'], namespace=namespace)
+
+
+    def validate_network_policy_spec(self, actual_network_policy_spec, expected_network_policy_spec, namespace: str):
+        """
+        Validate network policy. It validates the basic metadata and then validates the network policy entries
+        param actual_network_policy: actual network policy
+        param expected_network_policy: expected network policy
+        param namespace: namespace of the object
+        """
+
+
+        if 'Ingress' in expected_network_policy_spec['policyTypes']:
+            expected_network_policy_entries = expected_network_policy_spec['ingress']
+            actual_network_policy_entries = actual_network_policy_spec['ingress']
             self.validate_network_policy_entry(expected_network_policy_entries=expected_network_policy_entries, actual_network_policy_entries=actual_network_policy_entries) 
 
-        if 'Egress' in expected_network_policy['spec']['policyTypes']:
-            expected_network_policy_entries = expected_network_policy['spec']['egress']
-            actual_network_policy_entries = actual_network_policy['spec']['egress']
+        if 'Egress' in expected_network_policy_spec['policyTypes']:
+            expected_network_policy_entries = expected_network_policy_spec['egress']
+            actual_network_policy_entries = actual_network_policy_spec['egress']
             self.validate_network_policy_entry(expected_network_policy_entries=expected_network_policy_entries,actual_network_policy_entries=actual_network_policy_entries)
 
     
@@ -225,7 +387,7 @@ class BaseNetworkPolicy(BaseHelm):
                 verified_entries += 1
                 break
 
-        assert verified_entries == len(expected_network_policy_entries), f"verified_entries is not equal, actual: {verified_entries}, expected: {len(expected_network_policy_entries)}"
+        assert verified_entries == len(expected_network_policy_entries), f"in validate_network_policy_entry: verified_entries is not equal, actual: {verified_entries}, expected: {len(expected_network_policy_entries)}"
 
 
     def verify_network_policy_entries(self, expected_entries, actual_entries):
@@ -280,12 +442,12 @@ class BaseNetworkPolicy(BaseHelm):
         for expected_policy_ref in expected_policy_refs:
             for actual_policy_ref in actual_policy_refs:
                 if expected_policy_ref['dns'] == actual_policy_ref['dns']:
-                    assert expected_policy_ref['name'] == actual_policy_ref['name'], f"name is not equal, actual: {actual_policy_ref['name']}, expected: {expected_policy_ref['name']}"
-                    assert expected_policy_ref['server'] == actual_policy_ref['server'], f"server is not equal, actual: {actual_policy_ref['server']}, expected: {expected_policy_ref['server']}"
+                    assert expected_policy_ref['name'] == actual_policy_ref['name'], f"in validate_policy_refs: name is not equal, actual: {actual_policy_ref['name']}, expected: {expected_policy_ref['name']}, actual object: {actual_policy_ref}, expected object: {expected_policy_ref}"
+                    assert expected_policy_ref['server'] == actual_policy_ref['server'], f"in validate_policy_refs: server is not equal, actual: {actual_policy_ref['server']}, expected: {expected_policy_ref['server']}, actual object: {actual_policy_ref}, expected object: {expected_policy_ref}"
                     verified_refs += 1
                     break
 
-        assert verified_refs == len(expected_policy_refs), f"verified_refs is not equal, actual: {verified_refs}, expected: {len(expected_policy_refs)}"
+        assert verified_refs == len(expected_policy_refs), f"in validate_policy_refs: verified_refs is not equal, actual: {verified_refs}, expected: {len(expected_policy_refs)}"
     
 
     def cleanup(self, **kwargs):

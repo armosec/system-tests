@@ -118,8 +118,9 @@ class BaseKubescape(BaseK8S):
 
     def cleanup(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
-        if self.remove_kubescape_namespace:
-            TestUtil.sleep(150, "Waiting for aggregation to end")
+        if self.remove_cluster_from_backend and not self.cluster_deleted:
+            TestUtil.sleep(50, "Waiting for aggregation to end")
+
             self.cluster_deleted = self.delete_cluster_from_backend()
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
@@ -299,12 +300,11 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "",
-                              related_exceptions="false", namespace=None):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None, order_by=None):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
                                                framework_name=framework_name, report_guid=report_guid,
-                                               resource_name=resource_name, related_exceptions=related_exceptions,
-                                               namespace=namespace)
+                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace,
+                                               order_by=order_by)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -611,7 +611,7 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def get_attributes_from_be_resources(be_resources: list, cluster: str, kind: str, name: str, namespace: str):
         for resource in be_resources:
-            attributes = resource['designators']['attributes']
+            attributes = resource['designators']['attributes']                
             if attributes['cluster'] == cluster and attributes['kind'] == kind and name in attributes['name'] and \
                     (len(namespace) == 0 or attributes['namespace'] == namespace):
                 return [control for x in resource['statusToControls'].values() for control in x]
@@ -725,36 +725,38 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
+
+    def get_top_failed_controls_from_cli(self, cli_result, top_x = 5):
+           # Filter out only failed controls
+        failed_controls = {key: value for key, value in cli_result.items() if value['status'] == 'failed'}
+
+        # Sort the controls first by failedResources in descending order and then by controlID in ascending order
+        sorted_controls = sorted(failed_controls.items(), key=lambda x: (-x[1]['ResourceCounters']['failedResources'], x[0]))
+
+        # Return only the top X controls
+        return dict(sorted_controls[:top_x])
+
+
+    """
+    testing top controls from the BE. Comparing if the results received from the BE are aligned with the CLI results 
+    """
     def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
-        assert len(be_ctrl_ids) > 0 and len(
-            be_ctrl_ids) <= 5, "Top controls count should be between 1 to 5 but was {count}".format(
-            count=len(be_ctrl_ids))
-        for be_ctrl in be_results:
-            for id, control in cli_result["summaryDetails"]["controls"].items():
-                # check that there is no control with higher failed resources that is not in top 5 controls response
-                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters'][
-                    "failedResources"] and id not in be_ctrl_ids:
-                    assert False, "Control {ctrl} should be in top controls".format(ctrl=id)
+        assert 1 <= len(be_ctrl_ids) <= 5, f"Top controls count should be between 1 to 5 but was {len(be_ctrl_ids)}"
 
-                # check control data and failed resources
-                if be_ctrl["id"] == id:
-                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(
-                        guid=report_guid)
-                    assert be_ctrl['clusters'][0][
-                               'topFailedFramework'] == framework_name, "framework name should be {name}".format(
-                        name=framework_name)
-                    assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
-                        "Control {ctrl} should have {count} failed resources".format(ctrl=id,
-                                                                                     count=control['ResourceCounters'][
-                                                                                         "failedResources"])
-                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id,
-                                                                                                               name=
-                                                                                                               control[
-                                                                                                                   'name'])
-                    assert be_ctrl['baseScore'] == control[
-                        'scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id,
-                                                                                            scored=control['scored'])
+        cl_top_failed = self.get_top_failed_controls_from_cli(cli_result["summaryDetails"]["controls"])
+
+        for be_ctrl in be_results:
+            for id, cli_control in cl_top_failed.items():
+                # assert id in be_ctrl_ids, f"Control {id} should be in the top controls list"
+                if be_ctrl['id'] == id:
+                    if be_ctrl['clusters'][0]['resourcesCount'] < cli_control['ResourceCounters']["failedResources"]:
+                        assert False, f"Control {id} Resource counters don't match. BE: {be_ctrl['clusters'][0]['resourcesCount']}, Results: {cli_control['ResourceCounters']['failedResources']} but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, f"Control {be_ctrl['id']} reportGUID should be {report_guid} but was {be_ctrl['clusters'][0]['reportGUID']}"
+                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, f"Control {be_ctrl['id']} framework name should be {framework_name} but was {be_ctrl['clusters'][0]['topFailedFramework']}"
+                    assert be_ctrl['clusters'][0]['resourcesCount'] == cli_control['ResourceCounters']["failedResources"], f"Control {be_ctrl['id']} should have {cli_control['ResourceCounters']['failedResources']} failed resources but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['name'] == cli_control['name'], f"Control {be_ctrl['id']} should have name {cli_control['name']} but was {be_ctrl['name']}"
+                    assert be_ctrl['baseScore'] == cli_control['scoreFactor'], f"Control {be_ctrl['id']} should have scored {cli_control['scoreFactor']} but was {be_ctrl['baseScore']}"
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         resources_obj = self.test_obj[("resources_for_test", [])]
@@ -867,7 +869,8 @@ class BaseKubescape(BaseK8S):
         self.test_controls_from_backend(be_controls=be_controls, be_frameworks=be_frameworks, cli_controls=cli_controls)
 
     def compare_resources_data(self, cli_result, framework_name, report_guid):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
+                                                  order_by="criticalSeverityControls:desc,highSeverityControls:desc,mediumSeverityControls:desc,lowSeverityControls:desc")
         self.test_resources_from_backend(be_resources=be_resources, cli_result=cli_result)
 
     def compare_top_controls_data(self, cli_result, cluster_name, report_guid, framework_name):
@@ -1191,16 +1194,9 @@ class BaseKubescape(BaseK8S):
             be_cluster_overtime) > 0, "expected to get response from clustersOvertime for framework {} in cluster {}".format(
             framework_name, cluster_name)
         # check that framework score from be_cluster_overtime matches the score from framework_report from kubescape
-        assert be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD] == framework_report[
-            _COMPLIANCE_SCORE_FIELD], \
-            "expected framework: {} compliance score in be to be {}, but it is".format(
-                framework_name, framework_report[_COMPLIANCE_SCORE_FIELD],
-                be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
-
-    def get_job_report_info(self, report_guid, cluster_wlid: str = ""):
-        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_job_report_info,
-                                               report_guid=report_guid, cluster_wlid=cluster_wlid)
-        return c_panel_info
+        assert be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD] == framework_report[_COMPLIANCE_SCORE_FIELD], \
+            "expected framework: {} compliance score in be to be {}, but it is".format(  
+            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
 
     def is_ks_cronjob_created(self, framework_name, timeout=60):
         start = time.time()

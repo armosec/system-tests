@@ -298,19 +298,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         Logger.logger.info('test result against backend results')
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
 
-    def check_kubescape_job_report_in_backend(self, report_guid, cluster_wlid):
-        be_jobs_report = self.get_job_report_info(report_guid=report_guid, cluster_wlid=cluster_wlid)
-
-        found = False
-        assert len(be_jobs_report) > 0, 'Received empty job report from backend'
-        for job in be_jobs_report:
-            if "done" == job["status"] \
-                    and "kubescapeScan" == job["action"] \
-                    and "Websocket" == job["reporter"]:
-                found = True
-                break
-        assert found, f"can't find a job report that indicates that kubescape finished successfully: {be_jobs_report}"
-
     def check_result_with_backend_cronjob(self, job, cluster_name, old_report_guid, port):
         sleep_time = 120
 

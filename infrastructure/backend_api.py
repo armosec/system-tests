@@ -44,7 +44,6 @@ API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
 API_TENANT_CREATE= "/api/v1/tenants/createTenant"
 API_CLUSTER = "/api/v1/cluster"
 API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan" 
-API_JOBREPORTS = "/api/v1/jobReports"
 API_POSTURE_CLUSTERSOVERTIME = "/api/v1/posture/clustersOvertime"
 API_POSTURE_FRAMEWORKS =  "/api/v1/posture/frameworks"
 API_POSTURE_CONTROLS = "/api/v1/posture/controls"
@@ -88,6 +87,10 @@ API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
 API_ATTACK_CHAINS = "/api/v1/attackchains"
+
+API_NETWORK_POLICIES = "/api/v1/networkpolicies"
+API_NETWORK_POLICIES_GENERATE = "/api/v1/networkpolicies/generate"
+API_NETWORK_POLICIES_KNOWNSERVERSCACHE = "/api/v1/networkpolicies/knownserverscache"
 
 
 def deco_cookie(func):
@@ -440,23 +443,6 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_CLUSTER}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
-    def get_finished_jobs_of_wlid(self, wlid: str):
-        # TODO: page on if need for
-        post_body = {
-            "pageSize": 100,
-            "pageNum": 1,
-            "innerFilters": [
-                {
-                    "target": wlid,
-                    "status": "failure,done"
-                }
-            ]
-        }
-        r = self.post(
-            API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json=post_body)
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
-
     def get_info_from_wlid(self, wlid):
         # TODO update to v2
         url = "/v1/microservicesOverview"
@@ -509,13 +495,6 @@ class ControlPanelAPI(object):
         url = "/v1/neighbours"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
-
-    def get_job_events_for_job(self, job_id: str):
-        r = self.post(API_JOBREPORTS, params={"customerGUID": self.selected_tenant_id}, json={
-            "pageNum": 1, "pageSize": 100, "innerFilters": [{"jobID": job_id}]})
-        Logger.logger.debug("return_job_status: {0}".format(r.status_code))
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_JOBREPORTS}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
     def get_incidents(self, **kwargs):
@@ -837,23 +816,6 @@ class ControlPanelAPI(object):
             
         return result
 
-    def get_job_report_info(self, report_guid: str, cluster_wlid):
-        json = {"pageNum": 1, "pageSize": 100,
-                "innerFilters": [
-                    {
-                        "target": cluster_wlid
-                    }
-                ]
-                }
-        r = self.post("/v2/jobReports", params={"customerGUID": self.selected_tenant_id}, json=json)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: results of posture frameworks "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        if len(r.json()['response']) == 0:
-            raise Exception('Error accessing dashboard. Request: results of posture frameworks is empty')
-        return r.json()['response']
-
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
@@ -911,8 +873,15 @@ class ControlPanelAPI(object):
         return r.json()['response']
 
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None):
-        body={"pageNum": 1, "pageSize": 150, "orderBy": "timestamp:desc", "innerFilters": [{
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None, order_by=None):
+        
+        if order_by is None:
+            order_by = "timestamp:desc"
+        
+        body={"pageNum": 1, 
+              "pageSize": 150, 
+             "orderBy": order_by,
+              "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
                           "designators.attributes.name": resource_name}]}
         if namespace is not None:
@@ -2002,6 +1971,70 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def get_known_servers_cache(self) -> requests.Response:
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(API_NETWORK_POLICIES_KNOWNSERVERSCACHE, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get known servers cache "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_network_policies(self, cluster_name, namespace) -> (requests.Response, dict, dict):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+            "innerFilters": [{"clusterShortName": cluster_name, "namespace": namespace}],
+        }
+
+        r = self.post(API_NETWORK_POLICIES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        response = json.loads(r.text)
+        workloads_list = response.get("response", None)
+
+        assert workloads_list is not None, "network policies response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        assert len(workloads_list) > 0, "network policies workloads list is 0 '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+
+        return r, workloads_list
+
+    def get_network_policies_generate(self, cluster_name, workload_name, namespace) -> (requests.Response, dict, dict):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+            "innerFilters": [{"cluster": cluster_name, "name": workload_name, "namespace": namespace}],
+        }
+
+        r = self.post(API_NETWORK_POLICIES_GENERATE, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        response = json.loads(r.text)
+
+        # verify there is a response
+        assert len(response) > 0, "network policies generate response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+        
+        np = response[0].get("networkPolicies", None).get("kubernetes", None).get("new", None)
+        # verify there is a 'new' network policy
+        assert np is not None, "no 'new' NetworkPolicy '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        graph = response[0].get("graph", None)
+        # verify there is a 'graph'
+        assert graph is not None, "No 'graph' '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        return r, np, graph
 
     def get_active_attack_chains(self, current_datetime=datetime, cluster_name=None) -> requests.Response:
         r = self.get_attack_chains(cluster_name)

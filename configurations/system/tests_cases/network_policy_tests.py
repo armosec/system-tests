@@ -4,6 +4,7 @@ from systest_utils import statics
 from .structures import TestConfiguration
 from os.path import join
 
+
 class NetworkPolicyTests(object):
 
     @staticmethod
@@ -110,4 +111,12 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/busybox-known-server.json",
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED, statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+        )
+
+    @staticmethod
+    def network_policy_known_servers_cache():
+        from tests_scripts.helm.network_policy import NetworkPolicyKnownServersCache
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=NetworkPolicyKnownServersCache
         )
