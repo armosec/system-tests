@@ -18,21 +18,18 @@ class BaseNetworkPolicy(BaseHelm):
         param expected_obj: expected object
         param namespace: namespace of the object
         """
-        assert actual_obj['apiVersion'] == expected_obj['apiVersion'], f"apiVersion is not equal, actual: {actual_obj['apiVersion']}, expected: {expected_obj['apiVersion']}"
-
-        assert actual_obj['kind'] == expected_obj['kind'], f"kind is not equal, actual: {actual_obj['kind']}, expected: {expected_obj['kind']}"
-
-
-        assert actual_obj['metadata']['name'] == expected_obj['metadata']['name'], f"name is not equal, actual: {actual_obj['metadata']['name']}, expected: {expected_obj['metadata']['name']}"
-        assert actual_obj['metadata']['namespace'] == namespace, f"namespace is not equal, actual: {actual_obj['metadata']['namespace']}, expected: {namespace}"
+        assert actual_obj['apiVersion'] == expected_obj['apiVersion'], f"in validate_basic_metadata: apiVersion is not equal, actual: {actual_obj['apiVersion']}, expected: {expected_obj['apiVersion']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['kind'] == expected_obj['kind'], f"in validate_basic_metadata: kind is not equal, actual: {actual_obj['kind']}, expected: {expected_obj['kind']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['metadata']['name'] == expected_obj['metadata']['name'], f"in validate_basic_metadata: name is not equal, actual: {actual_obj['metadata']['name']}, expected: {expected_obj['metadata']['name']}, actual object: {actual_obj}, expected object: {expected_obj}"
+        assert actual_obj['metadata']['namespace'] == namespace, f"in validate_basic_metadata: namespace is not equal, actual: {actual_obj['metadata']['namespace']}, expected: {namespace}, actual object: {actual_obj}, expected object: {expected_obj}"
 
 
         if 'annotations' in expected_obj['metadata']:
             for key, annotation in expected_obj['metadata']['annotations'].items():
-                assert actual_obj['metadata']['annotations'][key] == annotation, f"annotation {key} is not equal, actual: {actual_obj['metadata']['annotations'][key]}, expected: {annotation}"
+                assert actual_obj['metadata']['annotations'][key] == annotation, f"annotation {key} is not equal, actual: {actual_obj['metadata']['annotations'][key]}, expected: {annotation}, actual object: {actual_obj}, expected object: {expected_obj}"
 
         for key, label in expected_obj['metadata']['labels'].items():
-            assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}"
+            assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}, actual object: {actual_obj}, expected object: {expected_obj}"
         
     
     def validate_expected_network_neighbors_list(self, namespace, expected_network_neighbors_list):
@@ -139,7 +136,7 @@ class BaseNetworkPolicy(BaseHelm):
                     verified_entries.append(expected_entry)
                     break
     
-        assert len(verified_entries) == len(expected_entries), f"verified_entries length is not equal to expected_entries length, actual: {verified_entries}, expected: {expected_entries}"
+        assert len(verified_entries) == len(expected_entries), f"in validate_network_neighbor_entry: verified_entries length is not equal to expected_entries length, actual length: {len(verified_entries)}, expected length: {len(expected_entries)}, actual results: {verified_entries}, expected results: {expected_entries}"
 
     def validate_expected_network_neighbors_and_generated_network_policies_lists(self, namespace, expected_network_neighbors_list, expected_generated_network_policy_list):
         """
@@ -390,7 +387,7 @@ class BaseNetworkPolicy(BaseHelm):
                 verified_entries += 1
                 break
 
-        assert verified_entries == len(expected_network_policy_entries), f"verified_entries is not equal, actual: {verified_entries}, expected: {len(expected_network_policy_entries)}"
+        assert verified_entries == len(expected_network_policy_entries), f"in validate_network_policy_entry: verified_entries is not equal, actual: {verified_entries}, expected: {len(expected_network_policy_entries)}"
 
 
     def verify_network_policy_entries(self, expected_entries, actual_entries):
@@ -445,12 +442,12 @@ class BaseNetworkPolicy(BaseHelm):
         for expected_policy_ref in expected_policy_refs:
             for actual_policy_ref in actual_policy_refs:
                 if expected_policy_ref['dns'] == actual_policy_ref['dns']:
-                    assert expected_policy_ref['name'] == actual_policy_ref['name'], f"name is not equal, actual: {actual_policy_ref['name']}, expected: {expected_policy_ref['name']}"
-                    assert expected_policy_ref['server'] == actual_policy_ref['server'], f"server is not equal, actual: {actual_policy_ref['server']}, expected: {expected_policy_ref['server']}"
+                    assert expected_policy_ref['name'] == actual_policy_ref['name'], f"in validate_policy_refs: name is not equal, actual: {actual_policy_ref['name']}, expected: {expected_policy_ref['name']}, actual object: {actual_policy_ref}, expected object: {expected_policy_ref}"
+                    assert expected_policy_ref['server'] == actual_policy_ref['server'], f"in validate_policy_refs: server is not equal, actual: {actual_policy_ref['server']}, expected: {expected_policy_ref['server']}, actual object: {actual_policy_ref}, expected object: {expected_policy_ref}"
                     verified_refs += 1
                     break
 
-        assert verified_refs == len(expected_policy_refs), f"verified_refs is not equal, actual: {verified_refs}, expected: {len(expected_policy_refs)}"
+        assert verified_refs == len(expected_policy_refs), f"in validate_policy_refs: verified_refs is not equal, actual: {verified_refs}, expected: {len(expected_policy_refs)}"
     
 
     def cleanup(self, **kwargs):
