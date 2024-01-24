@@ -93,9 +93,7 @@ class BaseTest(object):
         self.backend.select_tenant(test_tenant_id)
         return test_tenant_id
 
-
     def delete_tenants(self):
-
         if self.test_tenant_id == "":
             Logger.logger.info(f"test_tenant_id is empty or was deleted, not deleting")
             return
@@ -111,8 +109,7 @@ class BaseTest(object):
             Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_TEST_PASSED}' and test failed, not deleting")
             Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
             return
-        
-   
+
         response = self.backend.delete_tenant(self.test_tenant_id)
         if response.status_code != client.OK:
             Logger.logger.error(f"delete tenant failed {self.test_tenant_id}")
@@ -120,8 +117,6 @@ class BaseTest(object):
             Logger.logger.info(f"deleted tenant {self.test_tenant_id}")
             self.test_tenant_id = ""
 
-
-    
     def create_ks_exceptions(self, cluster_name: str, exceptions_file):
         if not exceptions_file:
             return {}

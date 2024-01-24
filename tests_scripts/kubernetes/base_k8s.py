@@ -42,7 +42,7 @@ class BaseK8S(BaseDockerizeTest):
             cluster_name=TestUtil.get_arg_from_dict(self.test_driver.kwargs, "cluster", "minikube"))
 
         self.service_obj = None
-        self.remove_cyberarmor_namespace = not test_driver.kwargs["leave_cyberarmor_namespace"]
+        self.remove_kubescape_namespace = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "remove_kubescape_namespace", True)
 
         self.env = {"ARMO_TEST_NAME": self.test_obj.get_name()}
         # agent_crash_report = False
@@ -70,8 +70,6 @@ class BaseK8S(BaseDockerizeTest):
 
         self.display_kube_system_container_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
                                                                                    "display_kube_system_logs", False)
-
-        self.ignore_ca_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "ignore_ca_system_logs", False)
 
     # setup kubernetes
     def setup(self, cluster: str = None, namespace: str = None, auto_attach: bool = False, auto_protect: bool = False,
@@ -153,7 +151,7 @@ class BaseK8S(BaseDockerizeTest):
             pass
 
         try:
-            self.remove_all_namespaces(remove_cyberarmor_namespace=self.remove_cyberarmor_namespace)
+            self.remove_all_namespaces(remove_kubescape_namespace=self.remove_kubescape_namespace)
         except:
             pass
 
@@ -165,7 +163,7 @@ class BaseK8S(BaseDockerizeTest):
 
         return active_cluster['name']
 
-    def remove_all_namespaces(self, remove_cyberarmor_namespace: bool = True):
+    def remove_all_namespaces(self, remove_kubescape_namespace: bool = True):
         for ns in self.namespaces[:]:
             try:
                 self.delete_namespace(namespace=ns)
@@ -183,6 +181,9 @@ class BaseK8S(BaseDockerizeTest):
         if self.display_kube_system_container_logs:
             self.display_kube_system_logs()
 
+        for ns in self.namespaces:
+            self.kubernetes_obj.cleanup(namespace=ns)
+
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
 
@@ -193,11 +194,10 @@ class BaseK8S(BaseDockerizeTest):
             Logger.logger.debug("remove {} namespace".format(namespace))
             self.kubernetes_obj.delete_namespace(namespace=namespace)
         except Exception as e:
-            Logger.logger.error(e)
+            pass
 
     def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
         if self.cluster_deleted:
-            Logger.logger.info("Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
             return True
 
         try:
@@ -782,7 +782,6 @@ class BaseK8S(BaseDockerizeTest):
         namespace_obj = self.apply_yaml_file(
             yaml_file=yaml_file, path=path, namespace='', unique_name=unique_name, **kwargs)
         self.namespaces.append(self.get_workload_metadata_name(namespace_obj))
-        TestUtil.sleep(t=10, m="loading namespace")
         return self.get_workload_metadata_name(namespace_obj)
 
     def display_kube_system_logs(self):

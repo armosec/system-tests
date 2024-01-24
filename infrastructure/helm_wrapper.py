@@ -52,7 +52,7 @@ class HelmWrapper(object):
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code, return_obj.stdout, return_obj.stderr)
 
     @staticmethod
-    def uninstall_armo_helm_chart():
+    def uninstall_kubescape_chart():
         TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
 
     @staticmethod

@@ -1,13 +1,12 @@
 {
     "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "SBOMSPDXv2p3Filtered",
+    "kind": "SBOMSyftFiltered",
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
-            "kubescape.io/status": "",
             "kubescape.io/workload-container-name": "golangdynamic"
         },
-        "creationTimestamp": "2023-06-05T22:21:36Z",
+        "creationTimestamp": "2024-01-16T21:09:49Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -15,643 +14,151 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "golangdynamic"
         },
-        "name": "1ee8c2d79ec7770ec6b85fd6bea2290e7ba1831e01d72e6fd12613afdb397a05",
+        "name": "replicaset-golangdynamic-746c4ddd9f-golangdynamic-0542-805e",
         "namespace": "kubescape",
-        "resourceVersion": "24",
-        "uid": "0a8f17ea-bb13-4314-9935-1acf5bb2232f"
+        "resourceVersion": "1",
+        "uid": "f1b50366-7d7b-44dc-b6a7-77c58236397e"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": null
+                "createdAt": "2024-01-16T21:08:00Z"
             },
             "tool": {
-                "name": "",
-                "version": "v0.76.0"
+                "name": "syft",
+                "version": "v0.98.0"
             }
         },
-        "spdx": {
-            "SPDXID": "SPDXRef-DOCUMENT",
-            "annotations": null,
-            "comment": "",
-            "creationInfo": {
-                "comment": "",
-                "created": "2023-06-05T22:18:14Z",
-                "creators": [
-                    "Organization: Anchore, Inc",
-                    "Tool: syft-v0.76.0",
-                    "Organization: Kubescape",
-                    "Tool: KubescapeNodeAgent"
-                ],
-                "licenseListVersion": "3.20"
-            },
-            "dataLicense": "CC0-1.0",
-            "documentDescribes": null,
-            "documentNamespace": "https://anchore.com/syft/image/docker.io/rcohendockerhub/golang-hello-world@sha256-4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c-68302c6e-b7ee-45f9-aaed-65adb7fbb02f",
-            "externalDocumentRefs": null,
-            "files": [
-            ],
-            "hasExtractedLicensingInfos": [
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-AND",
-                    "name": "AND",
-                    "seeAlsos": null
+        "syft": {
+            "artifactRelationships": null,
+            "artifacts": null,
+            "descriptor": {
+                "configuration": {
+                    "base-path": "",
+                    "catalogers": null,
+                    "default-image-pull-source": "",
+                    "exclude": null,
+                    "exclude-binary-overlap-by-ownership": true,
+                    "file-contents": {
+                        "cataloger": {
+                            "enabled": false,
+                            "scope": "squashed"
+                        },
+                        "globs": null,
+                        "skip-files-above-size": 1048576
+                    },
+                    "file-metadata": {
+                        "cataloger": {
+                            "enabled": false,
+                            "scope": "squashed"
+                        },
+                        "digests": [
+                            "sha256"
+                        ]
+                    },
+                    "golang": {
+                        "local-mod-cache-dir": "",
+                        "no-proxy": "",
+                        "proxy": "",
+                        "search-local-mod-cache-licenses": false,
+                        "search-remote-licenses": false
+                    },
+                    "java": {
+                        "maven-url": "",
+                        "max-parent-recursive-depth": 0,
+                        "use-network": false
+                    },
+                    "linux-kernel": {
+                        "catalog-modules": true
+                    },
+                    "name": "",
+                    "package": {
+                        "cataloger": {
+                            "enabled": true,
+                            "scope": "squashed"
+                        },
+                        "search-indexed-archives": true,
+                        "search-unindexed-archives": false
+                    },
+                    "parallelism": 4,
+                    "platform": "",
+                    "python": {
+                        "guess-unpinned-requirements": false
+                    },
+                    "registry": {
+                        "auth": null,
+                        "ca-cert": "",
+                        "insecure-skip-tls-verify": false,
+                        "insecure-use-http": false
+                    },
+                    "source": {
+                        "file": {
+                            "digests": [
+                                "sha256"
+                            ]
+                        },
+                        "name": "",
+                        "version": ""
+                    }
                 },
-                {
-                    "comment": "",
-                    "extractedText": "NONE",
-                    "licenseId": "LicenseRef-OR",
-                    "name": "OR",
-                    "seeAlsos": null
-                }
-            ],
-            "name": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
-            "packages": [
-                {
-                    "SPDXID": "SPDXRef-Package-go-module-command-line-arguments-f35752bbb15c38",
-                    "annotations": null,
-                    "attributionTexts": null,
-                    "builtDate": "",
-                    "checksums": null,
-                    "comment": "",
-                    "copyrightText": "NOASSERTION",
-                    "description": "",
-                    "downloadLocation": "NOASSERTION",
-                    "externalRefs": [
+                "name": "docker.io-rcohendockerhub-golang-hello-world-sha256-4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c-1acf3c",
+                "version": "v0.98.0"
+            },
+            "distro": {
+                "bugReportURL": "https://gitlab.alpinelinux.org/alpine/aports/-/issues",
+                "homeURL": "https://alpinelinux.org/",
+                "id": "alpine",
+                "name": "Alpine Linux",
+                "prettyName": "Alpine Linux edge",
+                "versionID": "3.18_alpha20230329"
+            },
+            "schema": {
+                "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-13.0.0.json",
+                "version": "13.0.0"
+            },
+            "source": {
+                "id": "4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+                "metadata": {
+                    "architecture": "amd64",
+                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi4vbWFpbiJdLCJJbWFnZSI6InNoYTI1Njo4OTViMzdlY2Y1YWUwMmQxMDNlZWMyZGU2YmYyYmY0ZWZjNThjNDQ4NzM5YWE5ZjEzZDQ3YWFmMWQ4NmY0ZThjIiwiVm9sdW1lcyI6bnVsbCwiV29ya2luZ0RpciI6IiIsIkVudHJ5cG9pbnQiOm51bGwsIk9uQnVpbGQiOm51bGwsIkxhYmVscyI6bnVsbH0sImNvbnRhaW5lciI6ImQ4Mzg4NjI0ZmVjODVhNTc1YWVhMDg0NDVlMzk4ZDg5OWI3NWI0YjIwMTZhNjNkYzhhNGE0ZjVmMTQzM2JjZDIiLCJjb250YWluZXJfY29uZmlnIjp7Ikhvc3RuYW1lIjoiZDgzODg2MjRmZWM4IiwiRG9tYWlubmFtZSI6IiIsIlVzZXIiOiIiLCJBdHRhY2hTdGRpbiI6ZmFsc2UsIkF0dGFjaFN0ZG91dCI6ZmFsc2UsIkF0dGFjaFN0ZGVyciI6ZmFsc2UsIlR0eSI6ZmFsc2UsIk9wZW5TdGRpbiI6ZmFsc2UsIlN0ZGluT25jZSI6ZmFsc2UsIkVudiI6WyJQQVRIPS91c3IvbG9jYWwvc2JpbjovdXNyL2xvY2FsL2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbiJdLCJDbWQiOlsiL2Jpbi9zaCIsIi1jIiwiIyhub3ApICIsIkNNRCBbXCIuL21haW5cIl0iXSwiSW1hZ2UiOiJzaGEyNTY6ODk1YjM3ZWNmNWFlMDJkMTAzZWVjMmRlNmJmMmJmNGVmYzU4YzQ0ODczOWFhOWYxM2Q0N2FhZjFkODZmNGU4YyIsIlZvbHVtZXMiOm51bGwsIldvcmtpbmdEaXIiOiIiLCJFbnRyeXBvaW50IjpudWxsLCJPbkJ1aWxkIjpudWxsLCJMYWJlbHMiOnt9fSwiY3JlYXRlZCI6IjIwMjMtMDYtMDVUMjE6NDI6MzkuMDQ5ODUxMjY1WiIsImRvY2tlcl92ZXJzaW9uIjoiMjAuMTAuMjEiLCJoaXN0b3J5IjpbeyJjcmVhdGVkIjoiMjAyMy0wMy0yOVQxODoxOToyMC4xMTQxOTczOTRaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApIEFERCBmaWxlOjIzMDQ0OTk5Nzg1YjEwZjM4NzcyOTBiZDNjOWQ4ZGIzYzljYjFmYWM4ZWRmYjQwYzc3NTEzN2FiNzNlMGQ0MWQgaW4gLyAifSx7ImNyZWF0ZWQiOiIyMDIzLTAzLTI5VDE4OjE5OjIwLjI0NDI2ODcwOVoiLCJjcmVhdGVkX2J5IjoiL2Jpbi9zaCAtYyAjKG5vcCkgIENNRCBbXCIvYmluL3NoXCJdIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDYtMDVUMjE6MTg6MTQuNjY1OTE2Nzc3WiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jIGFwayBhZGQgLS1uby1jYWNoZSAtLXVwZGF0ZSBnbyBnY2MgZysrIn0seyJjcmVhdGVkIjoiMjAyMy0wNi0wNVQyMTo0MjoyNy40OTg5NzczMzRaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApIEFERCBkaXI6Y2U3ZTZiN2ExNmMyZjZiMDM3NWQyMjZhYmZmM2NmNzY4ZGEyOWUyMzFjOWQ5NjdkNzE5OWM5MGM3NDFlODc2ZSBpbiAuICJ9LHsiY3JlYXRlZCI6IjIwMjMtMDYtMDVUMjE6NDI6MzguNjczNjEyMjUxWiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jIENHT19FTkFCTEVEPTEgR09PUz1saW51eCBnbyBidWlsZCBtYWluLmdvIn0seyJjcmVhdGVkIjoiMjAyMy0wNi0wNVQyMTo0MjozOS4wNDk4NTEyNjVaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApICBDTUQgW1wiLi9tYWluXCJdIiwiZW1wdHlfbGF5ZXIiOnRydWV9XSwib3MiOiJsaW51eCIsInJvb3RmcyI6eyJ0eXBlIjoibGF5ZXJzIiwiZGlmZl9pZHMiOlsic2hhMjU2OjEyY2Y0YjI2MzE2YWE1YzMwZDZmY2Y2MjM4ODAzN2Q0NmUzZmIxOWZjNGY3MjdmNzM4OTgyMDBiNzEyMTdkNmYiLCJzaGEyNTY6ZGZmMzc5MDdiYjBjZjQzMjZjZjRjZmZmZDI3NDhmMmQ0MmQyYjU5ODY2ZTBmMmY4MjhjYjRjZGMyYTBkY2EzOCIsInNoYTI1NjoyZTU2NjhiNGY5ZjA2MjgxN2U1OTM5YjhmNzNhZDgwZDY4NjY5ODE3ZjQ3MjI1OGM2ODc4MTk5MWVkYmU5N2ZlIiwic2hhMjU2OmJkMzQ1NDgzZTg4NGVmOWZkY2FmNzY5MmRjNjI0NjQ5Mzg3N2FmYmUxNDJjNzRlN2Y2YWU0YTk1ZjhhZTc2ODMiXX19",
+                    "imageID": "sha256:ee8a6db6a63e312a3ddc45feddb3f7c6f43e5c03cf4d455d600ea28716c4dd13",
+                    "imageSize": 467571078,
+                    "layers": [
                         {
-                            "comment": "",
-                            "referenceCategory": "PACKAGE-MANAGER",
-                            "referenceLocator": "pkg:golang/command-line-arguments@(devel)",
-                            "referenceType": "purl"
+                            "digest": "sha256:12cf4b26316aa5c30d6fcf62388037d46e3fb19fc4f727f73898200b71217d6f",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 7830603
+                        },
+                        {
+                            "digest": "sha256:dff37907bb0cf4326cf4cfffd2748f2d42d2b59866e0f2f828cb4cdc2a0dca38",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 376953184
+                        },
+                        {
+                            "digest": "sha256:2e5668b4f9f062817e5939b8f73ad80d68669817f472258c68781991edbe97fe",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 56168910
+                        },
+                        {
+                            "digest": "sha256:bd345483e884ef9fdcaf7692dc6246493877afbe142c74e7f6ae4a95f8ae7683",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 26618381
                         }
                     ],
-                    "files": null,
-                    "filesAnalyzed": false,
-                    "hasFiles": null,
-                    "homepage": "",
-                    "licenseComments": "",
-                    "licenseConcluded": "NONE",
-                    "licenseDeclared": "NONE",
-                    "licenseInfoFromFiles": null,
-                    "name": "command-line-arguments",
-                    "originator": null,
-                    "packageFileName": "",
-                    "packageVerificationCode": null,
-                    "primaryPackagePurpose": "",
-                    "releaseDate": "",
-                    "sourceInfo": "acquired package info from go module information: /main",
-                    "summary": "",
-                    "supplier": null,
-                    "validUntilDate": "",
-                    "versionInfo": "(devel)"
-                }
-            ],
-            "relationships": [
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-92b19c7750fb559d",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-busybox-binsh-171bbc4761c5954c"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libatomic-204475666a5577d1"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gcc-24cfc420cf28b088"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gcc-24cfc420cf28b088"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-binsh-171bbc4761c5954c",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-busybox-262b8a056382ddc0"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-binary-busybox-87d6fccf883ab05e",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-busybox-262b8a056382ddc0"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libc-dev-34cc167c655c7cf2"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-isl26-ec16d093f6543537",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-gmp-5de2393e77afe472"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-ca-certificates-bundle-6864f2c66f9058ce"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libstdc---dev-6b2138512653b0e4"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libc-dev-34cc167c655c7cf2",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-zlib-a7be9d60929b1603"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-cgo-1371e7cbc3db5a6d",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-fix-2ca81d05894086a5",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-binary-go-66f7bd42443f65e3",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-compile-7a98d3f1559d2959",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-pprof-7e55eb22a49f5cec",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-objdump-82109349ca2d05ad",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-buildid-82265d491bbd0cbd",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-test2json-91c570dd48ffae72",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-gofmt-9236978f7a46e734",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-asm-943ee2187123be6e",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-vet-95e8049431248bfc",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-go-98064f2e8d0ba6b",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-dist-a4dde2a0e1c31217",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-link-a662ee09896b202d",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-npm-d3-pprof-acd952c1bc0c6850",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-nm-b018edf2fe49555b",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-pack-bb625a30b40c36a1",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-doc-ca5e1209a3ac30d5",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-addr2line-db2b8ace66de273d",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-covdata-e66712502965b62b",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-trace-f34a95b2b11912cb",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
-                    "relatedSpdxElement": "SPDXRef-Package-go-module-cmd-cover-f74ec8e8fcef78e8",
-                    "relationshipType": "OTHER",
-                    "spdxElementId": "SPDXRef-Package-apk-go-bf34a28a21a4d939"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-scanelf-bf6a15a7714a1c18"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libatomic-204475666a5577d1",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-busybox-262b8a056382ddc0",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-mpc1-5b6216d0bc6abfe1",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gmp-5de2393e77afe472",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-mpfr4-6e17fcc738fdecc3",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-dev-7fb6f24a08a3eddf",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libgcc-85a26ca07ec89c26",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-zlib-a7be9d60929b1603",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-scanelf-bf6a15a7714a1c18",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libgomp-df82d07f83abd524",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-isl26-ec16d093f6543537",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-c2e74c282c51bed9"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libcrypto3-cb7768b98f649863"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libstdc---dev-6b2138512653b0e4",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-binutils-ee86fddaac348934",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libstdc---d101bf803f774b0a"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libgomp-df82d07f83abd524"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libgomp-df82d07f83abd524"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-isl26-ec16d093f6543537"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-g---92fd6206cf202560",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-isl26-ec16d093f6543537"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-gcc-24cfc420cf28b088",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-binutils-ee86fddaac348934"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-go-bf34a28a21a4d939",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-binutils-ee86fddaac348934"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-libc-utils-392eb9a565659d85",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-musl-utils-f71ecf5267e6c37b"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-ae72e621593faf21",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-dbf31a28c843b124",
-                    "relationshipType": "DEPENDENCY_OF",
-                    "spdxElementId": "SPDXRef-Package-apk-libssl3-fbe18103231a6a04"
-                },
-                {
-                    "comment": "",
-                    "relatedSpdxElement": "SPDXRef-DOCUMENT",
-                    "relationshipType": "DESCRIBES",
-                    "spdxElementId": "SPDXRef-DOCUMENT"
-                }
-            ],
-            "snippets": null,
-            "spdxVersion": "SPDX-2.3"
+                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMjE4NywKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZWU4YTZkYjZhNjNlMzEyYTNkZGM0NWZlZGRiM2Y3YzZmNDNlNWMwM2NmNGQ0NTVkNjAwZWEyODcxNmM0ZGQxMyIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDM0ODE4NTAsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjljODdmMjIyM2Q3OWFmY2I1NzNhZGYwZDM2Nzk2ODZkYjRlMDRkMjhkMjQ0OTg1OGJiZmRkYzQzY2IzODhlNTkiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxMzIxOTAxODIsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OmJhMjRjN2QwZTA3OTFiZjMxMDdmNTYzM2NlNWRhOTY2OTAwMzFlN2ZkMWQ0MzkxM2MzNjliOWFlNWQxOGViMzkiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAyNDcxNzY4MywKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NTlmNjYzYjYwZWQxNTZiOGQ4ZDk5OTViN2Y0ODE4NTY4ZDQxNDc0MGU0MTBhODg3ZjhmNjdkNDgzM2Q2MDhmYSIKICAgICAgfSwKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDY3NTU1NTIsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OmY4ZWY0ZTExNWY2NDcxZGYwOGU2MjI2ZTdkM2M4Nzk0NWZmYjQxOWM3NDA4NjM3ZmEyNjdkNDBmOTlmMzZmOWQiCiAgICAgIH0KICAgXQp9",
+                    "manifestDigest": "sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c",
+                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                    "os": "linux",
+                    "repoDigests": [
+                        "index.docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c"
+                    ],
+                    "tags": [],
+                    "userInput": "docker.io/rcohendockerhub/golang-hello-world@sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c"
+                },
+                "name": "docker.io/rcohendockerhub/golang-hello-world",
+                "type": "image",
+                "version": "sha256:4cabc6988f0473e47f12bc6010aecfd244e84b77ae10b845a95f469fa41acf3c"
+            }
         }
     },
     "status": {}

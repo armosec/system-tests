@@ -149,14 +149,14 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
 
         expected_updated_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_updated_network_neighbors"])
         expected_updated_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_updated_generated_network_policies"])
+
+        self.validate_expected_generated_network_policy_list(namespace=namespace, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
+        Logger.logger.info("validated updated expected generated network policies")
         
         self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_updated_network_neighbors_list, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
 
         Logger.logger.info("6. Validating backend expected network neighbors and generated network policies after generating traffic")
         self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_updated_network_neighbors_list, expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
-
-        Logger.logger.info('7. Uninstall armo helm-chart')
-        self.uninstall_armo_helm_chart()
 
         return self.cleanup()
 
@@ -217,9 +217,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")        
         self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-
         Logger.logger.info('6. Uninstall armo helm-chart')
-        self.uninstall_armo_helm_chart()
 
         return self.cleanup() 
 
@@ -273,11 +271,10 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
         self.validate_expected_backend_results(cluster=cluster, namespace=namespace, expected_workloads_list=workload_objs, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-
         Logger.logger.info('6. Uninstall armo helm-chart')
-        self.uninstall_armo_helm_chart()
 
         return self.cleanup()
+
 
 class NetworkPolicyKnownServers(BaseNetworkPolicy):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -329,7 +326,7 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(5 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
+        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(self.test_obj["expected_network_neighbors"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
 
         Logger.logger.info("5. Validating in-cluster expected network neighbors and generated network policies")

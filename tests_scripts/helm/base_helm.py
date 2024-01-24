@@ -8,7 +8,6 @@ import psutil
 
 DEFAULT_BRANCH = "release"
 
-
 HTTPD_PROXY_CRT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.crt")
 HTTPD_PROXY_KEY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.key")
 
@@ -21,18 +20,14 @@ class BaseHelm(BaseK8S):
         self.helm_armo_repo = self.test_driver.kwargs.get("helm_repo", statics.HELM_REPO)
         self.helm_branch = self.test_driver.kwargs.get("helm_branch", DEFAULT_BRANCH)
         self.local_helm_chart = self.test_driver.kwargs.get("local_helm_chart", None)
-        self.remove_armo_system_namespace = False
-        self.remove_cyberarmor_namespace = False
-        self.ignore_as_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
-                                                               "ignore_armo_system_logs", False)
-        self.remove_cluster_from_backend = False
+        self.print_kubescape_chart_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
+                                                                             "print_kubescape_chart_logs", True)
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
         self.enable_security = self.test_obj[("enable_security", True)]
 
         self.filtered_sbom_init_time = self.test_driver.kwargs.get("filtered_sbom_init_time", "2m")
         self.filtered_sbom_update_time = self.test_driver.kwargs.get("filtered_sbom_update_time", "2m")
-    
 
     @staticmethod
     def kill_child_processes(parent_pid, sig=signal.SIGTERM):
@@ -45,32 +40,32 @@ class BaseHelm(BaseK8S):
             process.send_signal(sig)
 
     def cleanup(self, **kwargs):
-        if self.port_forward_proc != None:
+        if self.port_forward_proc:
             self.kill_child_processes(self.port_forward_proc.pid)
             self.port_forward_proc.terminate()
 
-        if not self.ignore_as_logs:
+        if self.print_kubescape_chart_logs:
             self.display_armo_system_logs()
 
-        if self.remove_armo_system_namespace:
+        if self.remove_kubescape_namespace:
             self.namespaces.append(statics.CA_NAMESPACE_FROM_HELM_NAME)
             try:
-                if self.remove_cyberarmor_namespace:
-                    Logger.logger.info('uninstall armo helm-chart')
-                    self.uninstall_armo_helm_chart()
-                    self.remove_armo_from_repo()
+                Logger.logger.info('uninstall armo helm-chart')
+                self.uninstall_kubescape_chart()
+                self.remove_armo_from_repo()
             except:
                 pass
-
-        if self.remove_cluster_from_backend and not self.cluster_deleted and self.backend != None:
-            TestUtil.sleep(150, "Waiting for aggregation to end")
-            self.cluster_deleted = self.delete_cluster_from_backend()
+            if self.backend:
+                TestUtil.sleep(150, "Waiting for aggregation to end")
+                self.cluster_deleted = self.delete_cluster_from_backend()
 
         return super().cleanup(**kwargs)
 
     def display_armo_system_logs(self, level=Logger.logger.debug):
         pods = self.get_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         for pod in pods:
+            if "storage" in pod.metadata.name:
+                continue
             try:
                 level(self.get_pod_logs(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                         pod_name=pod.metadata.name,
@@ -89,7 +84,7 @@ class BaseHelm(BaseK8S):
     def install_armo_helm_chart(self, helm_kwargs: dict = None):
         if helm_kwargs is None:
             helm_kwargs = {}
-            
+
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
 
@@ -103,31 +98,31 @@ class BaseHelm(BaseK8S):
             helm_proxy_url = self.proxy_config.get("helm_proxy_url", None)
             if helm_proxy_url is None:
                 helm_proxy_url = statics.HELM_PROXY_URL
-                Logger.logger.warning(f"helm_proxy_url is not defined in proxy_config, using default {statics.HELM_PROXY_URL}")
+                Logger.logger.warning(
+                    f"helm_proxy_url is not defined in proxy_config, using default {statics.HELM_PROXY_URL}")
             else:
                 Logger.logger.info(f"helm_proxy_url is defined in proxy_config, using {helm_proxy_url}")
 
-            helm_proxy_params = HelmWrapper.configure_helm_proxy(helm_proxy_url=helm_proxy_url, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-            
+            helm_proxy_params = HelmWrapper.configure_helm_proxy(helm_proxy_url=helm_proxy_url,
+                                                                 namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
             helm_kwargs.update(helm_proxy_params)
 
-        if self.enable_security == False:
+        if not self.enable_security:
             security_params = {"operator.triggerSecurityFramework": "false"}
             helm_kwargs.update(security_params)
 
         if "nodeAgent.config.learningPeriod" not in helm_kwargs:
             helm_kwargs.update({"nodeAgent.config.learningPeriod": self.filtered_sbom_init_time})
-            
+
         if "nodeAgent.config.updatePeriod" not in helm_kwargs:
             helm_kwargs.update({"nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
-        
+
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
                                             access_key=self.backend.get_access_key() if self.backend != None else "",
                                             server=self.test_driver.backend_obj.get_api_url(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
-        self.remove_armo_system_namespace = True
-        self.remove_cluster_from_backend = True
 
     def get_in_cluster_tags(self):
         component_tag = {}
@@ -186,10 +181,9 @@ class BaseHelm(BaseK8S):
         HelmWrapper.upgrade_armo_in_repo()
 
     @staticmethod
-    def uninstall_armo_helm_chart():
-        HelmWrapper.uninstall_armo_helm_chart()
+    def uninstall_kubescape_chart():
+        HelmWrapper.uninstall_kubescape_chart()
 
     @staticmethod
     def remove_armo_from_repo():
         HelmWrapper.remove_armo_from_repo()
-

@@ -49,7 +49,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=1800,
+            timeout=600,
             current_datetime=current_datetime,
             cluster_name=cluster
             )
@@ -232,9 +232,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         # 2.2 install armo helm-chart
         self.install_armo_helm_chart()
 
-        # 2.3 verify installation
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
-
         self.test_scan_jobs(port=statics.KS_PORT_FORWARD)
 
         return self.cleanup()
@@ -267,7 +264,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port, report_guid=report_guid)
 
         Logger.logger.info('test result against backend results')
-        self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)      
+        self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
 
         return report_guid
 
