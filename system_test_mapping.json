@@ -618,12 +618,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage",
-            "operator",
-            "cadashboardbe",
-            "event-ingester-service"
+            "helm-chart-dummy",
+            "node-agent-dummy",
+            "storage-dummy",
+            "operator-dummy",
+            "cadashboardbe-dummy",
+            "event-ingester-service-dummy"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
         "skip_on_environment": ""
