@@ -56,7 +56,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
             if self.backend:
-                TestUtil.sleep(150, "Waiting for aggregation to end")
+                TestUtil.sleep(50, "Waiting for aggregation to end")
                 self.cluster_deleted = self.delete_cluster_from_backend()
 
         return super().cleanup(**kwargs)
