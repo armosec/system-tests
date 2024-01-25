@@ -362,7 +362,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                         report_guid=third_report_guid, has_related=False, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
-
         return self.cleanup()
 
     def cleanup(self):
