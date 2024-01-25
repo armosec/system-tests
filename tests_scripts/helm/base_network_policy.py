@@ -212,11 +212,8 @@ class BaseNetworkPolicy(BaseHelm):
         param namespace: namespace of the object
         param expected_workloads_list: list of expected workloads
         """
-        res, t = self.wait_for_report(timeout=100, 
-                                                sleep_interval=5,
-                                                report_type=self.backend.get_network_policies, 
-                                                cluster_name=cluster, 
-                                                namespace=namespace)
+        res = self.backend.get_network_policies(cluster_name=cluster, namespace=namespace)
+
         workloads_list = res[1]
         assert len(workloads_list) == len(expected_workloads_list), f"workloads_list length is not equal to expected_workloads_list length, actual: len:{len(workloads_list)}, expected: len:{len(expected_workloads_list)}; actual results: {workloads_list}, expected results: {expected_workloads_list}"
 
@@ -230,19 +227,10 @@ class BaseNetworkPolicy(BaseHelm):
         param expected_network_neighbors_list: list of expected network neighbors
         """
 
-        errors = []
         for i in range(0, len(expected_network_policy_list)):
             workload_name = expected_network_policy_list[i]['metadata']['labels']['kubescape.io/workload-name']
-            try:
-                res, t = self.wait_for_report(timeout=100, 
-                                        sleep_interval=5,
-                                        report_type=self.backend.get_network_policies_generate, 
-                                        cluster_name=cluster, 
-                                        workload_name=workload_name, 
-                                        namespace=namespace)
-            except Exception as e:
-                errors.append(e)
-                continue
+            res = self.backend.get_network_policies_generate(cluster_name=cluster, workload_name=workload_name, namespace=namespace)
+  
             
             backend_generated_network_policy = res[1]
             graph = res[2]
@@ -251,7 +239,6 @@ class BaseNetworkPolicy(BaseHelm):
 
             self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=graph, expected_network_neighbors=expected_network_neighbors_list[i])
 
-        assert len(errors) == 0, f"Errors in validate_expected_backend_generated_network_policy_list: {errors}"
 
     def convert_backend_network_policy_to_generated_network_policy(self, backend_network_policy) -> dict:
         """
