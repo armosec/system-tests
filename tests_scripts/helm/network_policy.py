@@ -275,7 +275,7 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
 
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(4 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_network_neighbors"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files( self.test_obj["expected_generated_network_policies"])
@@ -284,7 +284,7 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace, expected_network_neighbors_list=expected_network_neighbors_list, expected_generated_network_policy_list=expected_generated_network_policy_list)
 
         Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120, 
+        self.wait_for_report(timeout=180, 
                             sleep_interval=5,
                             report_type=self.validate_expected_backend_results, 
                             cluster=cluster, 
