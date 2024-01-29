@@ -64,8 +64,8 @@ class BaseHelm(BaseK8S):
     def display_armo_system_logs(self, level=Logger.logger.debug):
         pods = self.get_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         for pod in pods:
-            if "storage" in pod.metadata.name:
-                continue
+            # if "storage" in pod.metadata.name:
+            #     continue
             try:
                 level(self.get_pod_logs(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                         pod_name=pod.metadata.name,
