@@ -634,12 +634,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage",
-            "operator",
-            "cadashboardbe",
-            "event-ingester-service"
+            "helm-chart_dummy",
+            "node-agent_dummy",
+            "storage_dummy",
+            "operator_dummy",
+            "cadashboardbe_dummy",
+            "event-ingester-service_dummy"
 
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
