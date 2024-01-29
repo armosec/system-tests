@@ -4,9 +4,10 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660",
+            "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "java"
         },
-        "creationTimestamp": "2024-01-16T20:58:23Z",
+        "creationTimestamp": "2024-01-29T15:48:11Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -14,19 +15,19 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "java-simple-server"
         },
-        "name": "replicaset-java-simple-server-6c9c95ccf8-java-ab0c-06c8",
+        "name": "replicaset-java-simple-server-6c9c95ccf8-java-2e78-14cc",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "8fa7ce60-ab64-441e-9d7d-cf54c27d388c"
+        "uid": "ada8bfb3-068c-4c02-a534-22afc99b3f4b"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": "2024-01-16T20:56:34Z"
+                "createdAt": "2024-01-29T15:47:54Z"
             },
             "tool": {
                 "name": "syft",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             }
         },
         "syft": {
@@ -187,11 +188,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "4d8457f13cfed269",
-                    "parent": "71573e4198f8ba85",
-                    "type": "evident-by"
-                },
-                {
                     "child": "85bce0cf20399665",
                     "parent": "730cd4b277fe7eb0",
                     "type": "evident-by"
@@ -215,6 +211,11 @@
                     "child": "523f0fb066be60b4",
                     "parent": "92d47ade42ecea5f",
                     "type": "contains"
+                },
+                {
+                    "child": "4d8457f13cfed269",
+                    "parent": "9733a699bcaec92d",
+                    "type": "evident-by"
                 },
                 {
                     "child": "8596744793374676",
@@ -532,11 +533,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "71573e4198f8ba85",
-                    "parent": "4c93f5ca8cf11f2f88d650e3e017d6333aad0cf0d6c97cc6528a4051f79d49f7",
-                    "type": "contains"
-                },
-                {
                     "child": "730cd4b277fe7eb0",
                     "parent": "4c93f5ca8cf11f2f88d650e3e017d6333aad0cf0d6c97cc6528a4051f79d49f7",
                     "type": "contains"
@@ -558,6 +554,11 @@
                 },
                 {
                     "child": "92d47ade42ecea5f",
+                    "parent": "4c93f5ca8cf11f2f88d650e3e017d6333aad0cf0d6c97cc6528a4051f79d49f7",
+                    "type": "contains"
+                },
+                {
+                    "child": "9733a699bcaec92d",
                     "parent": "4c93f5ca8cf11f2f88d650e3e017d6333aad0cf0d6c97cc6528a4051f79d49f7",
                     "type": "contains"
                 },
@@ -1311,58 +1312,6 @@
                     "purl": "pkg:deb/ubuntu/dpkg@1.21.1ubuntu2.2?arch=amd64\u0026distro=ubuntu-22.04",
                     "type": "deb",
                     "version": "1.21.1ubuntu2.2"
-                },
-                {
-                    "cpes": [
-                        "cpe:2.3:a:compiler:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:eclipse:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:batch:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:compiler:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:compiler:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:core:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:eclipse:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:compiler:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:compiler:jdt:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ecj:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:eclipse:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:jdt:compiler:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:batch:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:eclipse:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:eclipse:jdt:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:batch:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:core:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:batch:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:batch:jdt:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:core:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ecj:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:jdt:batch:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:core:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:core:jdt:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ecj:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:jdt:core:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ecj:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ecj:jdt:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:jdt:ecj:3.19.0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:jdt:jdt:3.19.0:*:*:*:*:*:*:*"
-                    ],
-                    "foundBy": "java-archive-cataloger",
-                    "id": "71573e4198f8ba85",
-                    "language": "java",
-                    "licenses": [],
-                    "locations": [
-                        {
-                            "accessPath": "/usr/local/jetty/lib/apache-jsp/org.eclipse.jdt.ecj-3.19.0.jar",
-                            "annotations": {
-                                "evidence": "primary"
-                            },
-                            "layerID": "sha256:4b3700be806b7728ac695f8a55b5d1f5e481349ab6246602b6ad3db4705be879",
-                            "path": "/usr/local/jetty/lib/apache-jsp/org.eclipse.jdt.ecj-3.19.0.jar"
-                        }
-                    ],
-                    "name": "ecj",
-                    "purl": "pkg:maven/org.eclipse.jdt.core.compiler.batch/ecj@3.19.0",
-                    "type": "java-archive",
-                    "version": "3.19.0"
                 },
                 {
                     "cpes": [
@@ -3688,6 +3637,58 @@
                 },
                 {
                     "cpes": [
+                        "cpe:2.3:a:org.eclipse.jdt.ecj:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:compiler:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:org.eclipse.jdt.ecj:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:eclipse:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:batch:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:org.eclipse.jdt.ecj:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:core:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:org.eclipse.jdt.ecj:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:jdt:org.eclipse.jdt.ecj:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:org.eclipse.jdt.ecj:jdt:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:compiler:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:eclipse:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:batch:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:compiler:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:compiler:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:core:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:eclipse:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:compiler:jdt:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:eclipse:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:jdt:compiler:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:batch:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:eclipse:jdt:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:batch:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:core:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:batch:jdt:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:core:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:jdt:batch:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:core:jdt:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:jdt:core:3.19.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:jdt:jdt:3.19.0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "java-archive-cataloger",
+                    "id": "9733a699bcaec92d",
+                    "language": "java",
+                    "licenses": [],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/local/jetty/lib/apache-jsp/org.eclipse.jdt.ecj-3.19.0.jar",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:4b3700be806b7728ac695f8a55b5d1f5e481349ab6246602b6ad3db4705be879",
+                            "path": "/usr/local/jetty/lib/apache-jsp/org.eclipse.jdt.ecj-3.19.0.jar"
+                        }
+                    ],
+                    "name": "org.eclipse.jdt.ecj",
+                    "purl": "pkg:maven/org.eclipse.jdt.core.compiler.batch/org.eclipse.jdt.ecj@3.19.0",
+                    "type": "java-archive",
+                    "version": "3.19.0"
+                },
+                {
+                    "cpes": [
                         "cpe:2.3:a:oracle-corporation:resources:1.8.0_372:*:*:*:*:*:*:*",
                         "cpe:2.3:a:oracle_corporation:resources:1.8.0_372:*:*:*:*:*:*:*",
                         "cpe:2.3:a:resources:resources:1.8.0_372:*:*:*:*:*:*:*",
@@ -4437,75 +4438,127 @@
             ],
             "descriptor": {
                 "configuration": {
-                    "base-path": "",
-                    "catalogers": null,
-                    "default-image-pull-source": "",
-                    "exclude": null,
-                    "exclude-binary-overlap-by-ownership": true,
-                    "file-contents": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "globs": null,
-                        "skip-files-above-size": 1048576
-                    },
-                    "file-metadata": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "digests": [
-                            "sha256"
-                        ]
-                    },
-                    "golang": {
-                        "local-mod-cache-dir": "",
-                        "no-proxy": "",
-                        "proxy": "",
-                        "search-local-mod-cache-licenses": false,
-                        "search-remote-licenses": false
-                    },
-                    "java": {
-                        "maven-url": "",
-                        "max-parent-recursive-depth": 0,
-                        "use-network": false
-                    },
-                    "linux-kernel": {
-                        "catalog-modules": true
-                    },
-                    "name": "",
-                    "package": {
-                        "cataloger": {
-                            "enabled": true,
-                            "scope": "squashed"
-                        },
-                        "search-indexed-archives": true,
-                        "search-unindexed-archives": false
-                    },
-                    "parallelism": 4,
-                    "platform": "",
-                    "python": {
-                        "guess-unpinned-requirements": false
-                    },
-                    "registry": {
-                        "auth": null,
-                        "ca-cert": "",
-                        "insecure-skip-tls-verify": false,
-                        "insecure-use-http": false
-                    },
-                    "source": {
-                        "file": {
-                            "digests": [
-                                "sha256"
+                    "catalogers": {
+                        "requested": {
+                            "default": [
+                                "image"
                             ]
                         },
-                        "name": "",
-                        "version": ""
+                        "used": [
+                            "alpm-db-cataloger",
+                            "apk-db-cataloger",
+                            "binary-cataloger",
+                            "cargo-auditable-binary-cataloger",
+                            "conan-info-cataloger",
+                            "dotnet-portable-executable-cataloger",
+                            "dpkg-db-cataloger",
+                            "go-module-binary-cataloger",
+                            "graalvm-native-image-cataloger",
+                            "java-archive-cataloger",
+                            "javascript-package-cataloger",
+                            "nix-store-cataloger",
+                            "php-composer-installed-cataloger",
+                            "portage-cataloger",
+                            "python-installed-package-cataloger",
+                            "r-package-cataloger",
+                            "rpm-db-cataloger",
+                            "ruby-installed-gemspec-cataloger",
+                            "sbom-cataloger"
+                        ]
+                    },
+                    "data-generation": {
+                        "generate-cpes": true
+                    },
+                    "files": {
+                        "content": {
+                            "globs": null,
+                            "skip-files-above-size": 0
+                        },
+                        "hashers": [
+                            "sha-1",
+                            "sha-256"
+                        ],
+                        "selection": "owned-by-package"
+                    },
+                    "packages": {
+                        "binary": [
+                            "python-binary",
+                            "python-binary-lib",
+                            "pypy-binary-lib",
+                            "go-binary",
+                            "julia-binary",
+                            "helm",
+                            "redis-binary",
+                            "java-binary-openjdk",
+                            "java-binary-ibm",
+                            "java-binary-oracle",
+                            "nodejs-binary",
+                            "go-binary-hint",
+                            "busybox-binary",
+                            "haproxy-binary",
+                            "perl-binary",
+                            "php-cli-binary",
+                            "php-fpm-binary",
+                            "php-apache-binary",
+                            "php-composer-binary",
+                            "httpd-binary",
+                            "memcached-binary",
+                            "traefik-binary",
+                            "postgresql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "xtrabackup-binary",
+                            "mariadb-binary",
+                            "rust-standard-library-linux",
+                            "rust-standard-library-macos",
+                            "ruby-binary",
+                            "erlang-binary",
+                            "consul-binary",
+                            "nginx-binary",
+                            "bash-binary",
+                            "openssl-binary",
+                            "gcc-binary",
+                            "wordpress-cli-binary"
+                        ],
+                        "golang": {
+                            "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+                            "proxies": [
+                                "https://proxy.golang.org",
+                                "direct"
+                            ],
+                            "search-local-mod-cache-licenses": false,
+                            "search-remote-licenses": false
+                        },
+                        "java-archive": {
+                            "include-indexed-archives": true,
+                            "include-unindexed-archives": false,
+                            "maven-base-url": "https://repo1.maven.org/maven2",
+                            "max-parent-recursive-depth": 5,
+                            "use-network": false
+                        },
+                        "javascript": {
+                            "npm-base-url": "https://registry.npmjs.org",
+                            "search-remote-licenses": false
+                        },
+                        "linux-kernel": {
+                            "catalog-modules": true
+                        },
+                        "python": {
+                            "guess-unpinned-requirements": false
+                        }
+                    },
+                    "relationships": {
+                        "exclude-binary-packages-with-file-ownership-overlap": true,
+                        "package-file-ownership": true,
+                        "package-file-ownership-overlap": true
+                    },
+                    "search": {
+                        "scope": "squashed"
                     }
                 },
                 "name": "jetty-sha256-30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660-1d6660",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             },
             "distro": {
                 "bugReportURL": "https://bugs.launchpad.net/ubuntu/",
@@ -4524,10 +4577,28 @@
             },
             "files": [
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "4454f78d17ab341ef4664024c01b0deefb87dcef"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "8138bbaea6a31dbcd47cca87d5f0a30980d352888374ec894f6dae473b215bde"
+                        }
+                    ],
                     "id": "098a75eec3380001",
                     "location": {
                         "layerID": "sha256:dd23345671cc7d1818acb5e37151bde70fb4f4e7522e1eb8e43c80a3eedd08aa",
                         "path": "/etc/locale.alias"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 2996,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
@@ -4559,122 +4630,428 @@
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "92ab8b62375eae26758b91d285ec24a39af1abe8"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f7c621ae0ceb26a76802743830bc469288996f64342901ae5292950ff713e981"
+                        }
+                    ],
                     "id": "d4940688928745af",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/egrep"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 755,
+                        "size": 28,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "078551d7e12640ae00dddf69b1ca69d7317137e7"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "3ef43371e88b02f18f9bb069a8345517e6a0a44d6c88e5c67b0e829044dc7459"
+                        }
+                    ],
                     "id": "8aa19cb671ab79f5",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/expr"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 108960,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "4364e3437c75199361968b77f556d29c097b93e5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "73abb4280520053564fd4917286909ba3b054598b32c9cdfaf1d733e0202cc96"
+                        }
+                    ],
                     "id": "9487e9cc6e8ef919",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/grep"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 182728,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "99fb90d8f6bee2ff00996ee0ffe125f9e7623534"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "905d3966fe3278eba743d732f22e16bc3d374335f9ee0682fff1e10f36d3bc30"
+                        }
+                    ],
                     "id": "7aed8ff100eafbf8",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/rm"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 59904,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a75b5dbf955f9df6a1e6bda70d46347f22555f6d"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "726a35dc0c786da86cff059a10345244a28e6edae8df057139a839e523619ed0"
+                        }
+                    ],
                     "id": "523f0fb066be60b4",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/sed"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 113224,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "676b1c4e1b9b6ad0223b4c96e5bfa35918be2d44"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4bff6a2b2b537d818b83689b1d47b4a76ece01c80b89c45412fdfe40d88e6bb0"
+                        }
+                    ],
                     "id": "e80927c746df0e61",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/bin/whoami"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 31232,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d563fdc2e71a5bccf1b18b37420b7bc7f50c3a99"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "a8af5639c6f7d2cf9c39f5b4166a3ad8c08a4ee2af1fc82ff67c10d045e615f6"
+                        }
+                    ],
                     "id": "5ce2bc1cdbbb9273",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/octet-stream",
+                        "mode": 644,
+                        "size": 27002,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "b15b01bc41f38f544d6c51ffdb61e3ca50889bf5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "b35d4bbf00844a585e02502b8a1db17b740a0127e2fb9a4428a83eaa0f23be65"
+                        }
+                    ],
                     "id": "b3d910bfba395f1c",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libacl.so.1.1.2301"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 34888,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "8f7d59c6f95b0cf57a8db165033296dda91d1239"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "568740b06a8afa26db4874f8cf61985ecbc6dd127f4229416fe95da8f9ec13fb"
+                        }
+                    ],
                     "id": "3113776abf7e0188",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libc.so.6"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 2216304,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d309aab331b09a9be3f1184aeb451aa05dde3e93"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "787c61913cd82312ae966c108b147646d6dcbd3c0ae66d4e34605015646e71f0"
+                        }
+                    ],
                     "id": "ad2f6f0bfd44c64c",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libdl.so.2"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 14432,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "bafc0659fa63deee8ba79600a8ed15c79a111cfc"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4dc20a901c6951e678e216e959da2534bcef7053e6efdf1492509baf142282b0"
+                        }
+                    ],
                     "id": "ed5c5beb0e0b0140",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libgmp.so.10.4.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 526896,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "88846daee5e3c181577f6d5c4c3865bd0a7d9acd"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d7b0aaa48ff82292924bdd3f69dede1323126485444b7ab3b644ef43f11c6faf"
+                        }
+                    ],
                     "id": "0777c0a2d8ef17e7",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libm.so.6"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 940560,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "f5a7dd20f604d76aea5aef4d472fc6cbb38e70e1"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "baae995e98223eee1afe6c640f21bdbba91b9c170584ce766418b59810d98a93"
+                        }
+                    ],
                     "id": "310d5721af4c6ff0",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libpcre.so.3.13.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 477296,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "41e8b494781ca0892a15c4a2d06a6f5dff94d2ba"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f887eed7d0df7073f3d8bdc9e60d35082453b10165cf45359b5019e33ba2b9ec"
+                        }
+                    ],
                     "id": "fa69dc8ca8f7da4c",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.10.4"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 613064,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "333bf91a79523878ef3382c8f6d4c784d0b8e01c"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "727d4b0bdf0d1bb1df9e2340dc51b4a6c2c86d3be92a7b456f2d1aecb4e9fa7e"
+                        }
+                    ],
                     "id": "efb1a043e61bc713",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libpthread.so.0"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 21448,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "40c0c4bc262b599e199350deab53282e1f85a03f"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d13178e6d54537ecb05aaabeb2fc5fbd3794675c0709e2ffa3dc61add20a7550"
+                        }
+                    ],
                     "id": "58f94da83f895068",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/librt.so.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 14664,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "6744576d271f98f56d2d776fcdb941b6c6c26da7"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "624eb1e6a7510e0983e9caa1bbf3e1966acb64fd6d3ad4db94528addbe1e7224"
+                        }
+                    ],
                     "id": "1ccf0c6c66716471",
                     "location": {
                         "layerID": "sha256:966e94ab6e166fb358a208cfd8169d22dea352501c96700eb7f45092a2962ee6",
                         "path": "/usr/lib/x86_64-linux-gnu/libselinux.so.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 644,
+                        "size": 166280,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
@@ -4937,10 +5314,28 @@
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d0b8991654116e9395714102c41d858c1454b3bd"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "8b85846791ab2c8a5463c83a5be3c043e2570d7448434d41398969ed47e3e6f2"
+                        }
+                    ],
                     "id": "6a5f4bf29c06f62c",
                     "location": {
                         "layerID": "sha256:dd23345671cc7d1818acb5e37151bde70fb4f4e7522e1eb8e43c80a3eedd08aa",
                         "path": "/usr/share/zoneinfo/Etc/UTC"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/tzif",
+                        "mode": 644,
+                        "size": 114,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 }
             ],

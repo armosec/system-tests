@@ -4,9 +4,10 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
+            "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "python"
         },
-        "creationTimestamp": "2024-01-16T22:04:42Z",
+        "creationTimestamp": "2024-01-29T16:06:21Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -14,19 +15,19 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "python"
         },
-        "name": "replicaset-python-5dcc6bc7cc-python-ee30-ddec",
+        "name": "replicaset-python-5dcc6bc7cc-python-294e-2f92",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "cb552495-4e12-436d-9514-db2b48f7e76a"
+        "uid": "54856369-e79d-4596-b955-46749678dcb8"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": "2024-01-16T20:31:59Z"
+                "createdAt": "2024-01-29T15:37:21Z"
             },
             "tool": {
                 "name": "syft",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             }
         },
         "syft": {
@@ -82,11 +83,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "645302876e0adc49",
-                    "parent": "b1bea0c87cb64e01",
-                    "type": "evident-by"
-                },
-                {
                     "child": "6ea5524f47e7e9f3",
                     "parent": "b3bb83957982f9c3",
                     "type": "evident-by"
@@ -105,6 +101,11 @@
                     "child": "e2739fc7a22849e0",
                     "parent": "e34727cd06d86e15",
                     "type": "contains"
+                },
+                {
+                    "child": "645302876e0adc49",
+                    "parent": "e8bd7a0fc2aa2042",
+                    "type": "evident-by"
                 },
                 {
                     "child": "18e5911103cbf51c",
@@ -197,11 +198,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "b1bea0c87cb64e01",
-                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
-                    "type": "contains"
-                },
-                {
                     "child": "b3bb83957982f9c3",
                     "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
                     "type": "contains"
@@ -213,6 +209,11 @@
                 },
                 {
                     "child": "e34727cd06d86e15",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "e8bd7a0fc2aa2042",
                     "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
                     "type": "contains"
                 },
@@ -717,9 +718,22 @@
                         "cpe:2.3:a:python:setuptools:65.5.1:*:*:*:*:*:*:*"
                     ],
                     "foundBy": "python-installed-package-cataloger",
-                    "id": "b1bea0c87cb64e01",
+                    "id": "e8bd7a0fc2aa2042",
                     "language": "python",
-                    "licenses": [],
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/LICENSE",
+                                    "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/LICENSE"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "concluded",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
                     "locations": [
                         {
                             "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/METADATA",
@@ -941,75 +955,127 @@
             ],
             "descriptor": {
                 "configuration": {
-                    "base-path": "",
-                    "catalogers": null,
-                    "default-image-pull-source": "",
-                    "exclude": null,
-                    "exclude-binary-overlap-by-ownership": true,
-                    "file-contents": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "globs": null,
-                        "skip-files-above-size": 1048576
-                    },
-                    "file-metadata": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "digests": [
-                            "sha256"
-                        ]
-                    },
-                    "golang": {
-                        "local-mod-cache-dir": "",
-                        "no-proxy": "",
-                        "proxy": "",
-                        "search-local-mod-cache-licenses": false,
-                        "search-remote-licenses": false
-                    },
-                    "java": {
-                        "maven-url": "",
-                        "max-parent-recursive-depth": 0,
-                        "use-network": false
-                    },
-                    "linux-kernel": {
-                        "catalog-modules": true
-                    },
-                    "name": "",
-                    "package": {
-                        "cataloger": {
-                            "enabled": true,
-                            "scope": "squashed"
-                        },
-                        "search-indexed-archives": true,
-                        "search-unindexed-archives": false
-                    },
-                    "parallelism": 4,
-                    "platform": "",
-                    "python": {
-                        "guess-unpinned-requirements": false
-                    },
-                    "registry": {
-                        "auth": null,
-                        "ca-cert": "",
-                        "insecure-skip-tls-verify": false,
-                        "insecure-use-http": false
-                    },
-                    "source": {
-                        "file": {
-                            "digests": [
-                                "sha256"
+                    "catalogers": {
+                        "requested": {
+                            "default": [
+                                "image"
                             ]
                         },
-                        "name": "",
-                        "version": ""
+                        "used": [
+                            "alpm-db-cataloger",
+                            "apk-db-cataloger",
+                            "binary-cataloger",
+                            "cargo-auditable-binary-cataloger",
+                            "conan-info-cataloger",
+                            "dotnet-portable-executable-cataloger",
+                            "dpkg-db-cataloger",
+                            "go-module-binary-cataloger",
+                            "graalvm-native-image-cataloger",
+                            "java-archive-cataloger",
+                            "javascript-package-cataloger",
+                            "nix-store-cataloger",
+                            "php-composer-installed-cataloger",
+                            "portage-cataloger",
+                            "python-installed-package-cataloger",
+                            "r-package-cataloger",
+                            "rpm-db-cataloger",
+                            "ruby-installed-gemspec-cataloger",
+                            "sbom-cataloger"
+                        ]
+                    },
+                    "data-generation": {
+                        "generate-cpes": true
+                    },
+                    "files": {
+                        "content": {
+                            "globs": null,
+                            "skip-files-above-size": 0
+                        },
+                        "hashers": [
+                            "sha-1",
+                            "sha-256"
+                        ],
+                        "selection": "owned-by-package"
+                    },
+                    "packages": {
+                        "binary": [
+                            "python-binary",
+                            "python-binary-lib",
+                            "pypy-binary-lib",
+                            "go-binary",
+                            "julia-binary",
+                            "helm",
+                            "redis-binary",
+                            "java-binary-openjdk",
+                            "java-binary-ibm",
+                            "java-binary-oracle",
+                            "nodejs-binary",
+                            "go-binary-hint",
+                            "busybox-binary",
+                            "haproxy-binary",
+                            "perl-binary",
+                            "php-cli-binary",
+                            "php-fpm-binary",
+                            "php-apache-binary",
+                            "php-composer-binary",
+                            "httpd-binary",
+                            "memcached-binary",
+                            "traefik-binary",
+                            "postgresql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "xtrabackup-binary",
+                            "mariadb-binary",
+                            "rust-standard-library-linux",
+                            "rust-standard-library-macos",
+                            "ruby-binary",
+                            "erlang-binary",
+                            "consul-binary",
+                            "nginx-binary",
+                            "bash-binary",
+                            "openssl-binary",
+                            "gcc-binary",
+                            "wordpress-cli-binary"
+                        ],
+                        "golang": {
+                            "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+                            "proxies": [
+                                "https://proxy.golang.org",
+                                "direct"
+                            ],
+                            "search-local-mod-cache-licenses": false,
+                            "search-remote-licenses": false
+                        },
+                        "java-archive": {
+                            "include-indexed-archives": true,
+                            "include-unindexed-archives": false,
+                            "maven-base-url": "https://repo1.maven.org/maven2",
+                            "max-parent-recursive-depth": 5,
+                            "use-network": false
+                        },
+                        "javascript": {
+                            "npm-base-url": "https://registry.npmjs.org",
+                            "search-remote-licenses": false
+                        },
+                        "linux-kernel": {
+                            "catalog-modules": true
+                        },
+                        "python": {
+                            "guess-unpinned-requirements": false
+                        }
+                    },
+                    "relationships": {
+                        "exclude-binary-packages-with-file-ownership-overlap": true,
+                        "package-file-ownership": true,
+                        "package-file-ownership-overlap": true
+                    },
+                    "search": {
+                        "scope": "squashed"
                     }
                 },
                 "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             },
             "distro": {
                 "bugReportURL": "https://gitlab.alpinelinux.org/alpine/aports/-/issues",
@@ -1021,80 +1087,278 @@
             },
             "files": [
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "043eb324a653456caa1a73e2e2d49f77792bb0c5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e3998dbe02b51dada33de87ae43d18a93ab6915b9e34f5a751bf2b9b25a55492"
+                        }
+                    ],
                     "id": "34276b4e9d55db8e",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/etc/hosts"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 79,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2765f580ad4b51233ca5d8fc0ea7b67819204a51"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "23057ab41286bfaff1b121b086ce17c927c6a3d6a45ab3c4b5757eacc32d97ac"
+                        }
+                    ],
                     "id": "d263cdd2cb6dfb83",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/etc/ssl/openssl.cnf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 12292,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "5adcbfa23f38f04c7cb7ba4e74177dfd2b77bf06"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "c6b3288ba48945a21ede7ccf6f7a257d41bacf2c061236726ff9b5def383a766"
+                        }
+                    ],
                     "id": "a7e43f4ec1f24beb",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/lib/ld-musl-x86_64.so.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 617072,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "0235120a70f32d7b6d69e6b83078cfad93047936"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9ec9a27c455af033247e18781e33907a84446281f0b51f4b9b3b1b43cb01dd56"
+                        }
+                    ],
                     "id": "e2739fc7a22849e0",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/lib/libcrypto.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 4257168,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "dc76da41505b923236e09815a2fdfda1106fffe6"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "72bbcf719bd93c00701f9b86e240f86d771b49f3ab00f2436275e58d11940292"
+                        }
+                    ],
                     "id": "e8968fef25120085",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/lib/libssl.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 544848,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a2b67349f3f99c4501b270e5dc96b6d1f06584ba"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "283ce5128c73d6124e56ff866c05f867398d5fbe9e2166e6c7d0c8ff3f7bba00"
+                        }
+                    ],
                     "id": "e82f2715117f4ee8",
                     "location": {
                         "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
                         "path": "/lib/libuuid.so.1.3.0"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 30632,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "db729620754c73e0fafb66ec33f7bade6e1e519b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e0df969fd057eeaeb3064663b0f0af0f776fa42c697b56726a3eec6b13ca6986"
+                        }
+                    ],
                     "id": "8ce5665c33f73953",
                     "location": {
                         "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
                         "path": "/lib/libz.so.1.2.13"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 100264,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "ba92089ff435361df4436657b2254273777e5407"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "576957b6b941945280e1efed992421bab2110a1076eca257ea4bc41e97fa6d0f"
+                        }
+                    ],
                     "id": "633b224642e3a1b4",
                     "location": {
                         "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
                         "path": "/usr/lib/libbz2.so.1.0.8"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 74528,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1293655e1634947d8762f81c0788105be3774537"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0389bc05a81aa6a0852c51d65e58c76f531e6ef4d7e705c1216a7d95093a2185"
+                        }
+                    ],
                     "id": "1a0492981f0ba0b3",
                     "location": {
                         "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
                         "path": "/usr/lib/libexpat.so.1.8.10"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 132944,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "14067059a796355a95fa41bce2fe1fb2787a281c"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0662ade92f3d738d199bc9e11edd5b0d31f2c811c42f52abc24bb7d72a1c1a01"
+                        }
+                    ],
                     "id": "520d5ebd5dfae6ee",
                     "location": {
                         "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
                         "path": "/usr/lib/libffi.so.8.1.2"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 38944,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "7b0f80461af167385069067e0f734f5e950c835b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "fcee0477fdef76f12779e72982f068854fcf4711978cc2088ad21f506889a77a"
+                        }
+                    ],
                     "id": "ff73ae6b60b43438",
                     "location": {
                         "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
                         "path": "/usr/lib/liblzma.so.5.4.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 223056,
+                        "type": "RegularFile",
+                        "userID": 0
                     }
                 },
                 {

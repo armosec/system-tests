@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660",
             "kubescape.io/status": "ready"
         },
-        "creationTimestamp": "2024-01-16T20:56:42Z",
+        "creationTimestamp": "2024-01-29T15:48:02Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-library-jetty-sha256-30fb2e30885acafd65073eed25c682d3",
@@ -15,7 +15,7 @@
         "name": "jetty-sha256-30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660-1d6660",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "1a6e8217-8520-4ecd-a0e2-264847316f07"
+        "uid": "519e01f3-94c6-480f-837a-ba93ef39c38c"
     },
     "spec": {
         "metadata": {
@@ -25,7 +25,7 @@
             "tool": {
                 "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
                 "name": "",
-                "version": "v0.73.4"
+                "version": "v0.74.2"
             },
             "withRelevancy": false
         },

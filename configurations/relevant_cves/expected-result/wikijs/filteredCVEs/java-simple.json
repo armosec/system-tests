@@ -4,9 +4,10 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660",
+            "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "java"
         },
-        "creationTimestamp": "2024-01-16T20:58:27Z",
+        "creationTimestamp": "2024-01-29T15:48:15Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -15,10 +16,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "java-simple-server"
         },
-        "name": "replicaset-java-simple-server-6c9c95ccf8-java-ab0c-06c8",
+        "name": "replicaset-java-simple-server-6c9c95ccf8-java-2e78-14cc",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "d0cc0837-6ef5-4b09-b9fd-9c66942b8454"
+        "uid": "5a2fe3f4-9d3c-4ef0-8da0-142738a0fd2b"
     },
     "spec": {
         "metadata": {
@@ -28,7 +29,7 @@
             "tool": {
                 "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
                 "name": "",
-                "version": "v0.73.4"
+                "version": "v0.74.2"
             },
             "withRelevancy": true
         },

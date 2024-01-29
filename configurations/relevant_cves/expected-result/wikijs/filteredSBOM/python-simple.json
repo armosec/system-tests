@@ -4,9 +4,10 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
+            "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "python"
         },
-        "creationTimestamp": "2024-01-16T20:34:47Z",
+        "creationTimestamp": "2024-01-29T15:37:45Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -14,19 +15,19 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "python"
         },
-        "name": "replicaset-python-67b9c87d44-python-9497-efc3",
+        "name": "replicaset-python-67b9c87d44-python-417e-561c",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "becac8f1-7950-43b9-974e-8a80a29a7829"
+        "uid": "958ab976-4e89-4ba6-89b0-073b504dcae9"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": "2024-01-16T20:31:59Z"
+                "createdAt": "2024-01-29T15:37:21Z"
             },
             "tool": {
                 "name": "syft",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             }
         },
         "syft": {
@@ -76,75 +77,127 @@
             ],
             "descriptor": {
                 "configuration": {
-                    "base-path": "",
-                    "catalogers": null,
-                    "default-image-pull-source": "",
-                    "exclude": null,
-                    "exclude-binary-overlap-by-ownership": true,
-                    "file-contents": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "globs": null,
-                        "skip-files-above-size": 1048576
-                    },
-                    "file-metadata": {
-                        "cataloger": {
-                            "enabled": false,
-                            "scope": "squashed"
-                        },
-                        "digests": [
-                            "sha256"
-                        ]
-                    },
-                    "golang": {
-                        "local-mod-cache-dir": "",
-                        "no-proxy": "",
-                        "proxy": "",
-                        "search-local-mod-cache-licenses": false,
-                        "search-remote-licenses": false
-                    },
-                    "java": {
-                        "maven-url": "",
-                        "max-parent-recursive-depth": 0,
-                        "use-network": false
-                    },
-                    "linux-kernel": {
-                        "catalog-modules": true
-                    },
-                    "name": "",
-                    "package": {
-                        "cataloger": {
-                            "enabled": true,
-                            "scope": "squashed"
-                        },
-                        "search-indexed-archives": true,
-                        "search-unindexed-archives": false
-                    },
-                    "parallelism": 4,
-                    "platform": "",
-                    "python": {
-                        "guess-unpinned-requirements": false
-                    },
-                    "registry": {
-                        "auth": null,
-                        "ca-cert": "",
-                        "insecure-skip-tls-verify": false,
-                        "insecure-use-http": false
-                    },
-                    "source": {
-                        "file": {
-                            "digests": [
-                                "sha256"
+                    "catalogers": {
+                        "requested": {
+                            "default": [
+                                "image"
                             ]
                         },
-                        "name": "",
-                        "version": ""
+                        "used": [
+                            "alpm-db-cataloger",
+                            "apk-db-cataloger",
+                            "binary-cataloger",
+                            "cargo-auditable-binary-cataloger",
+                            "conan-info-cataloger",
+                            "dotnet-portable-executable-cataloger",
+                            "dpkg-db-cataloger",
+                            "go-module-binary-cataloger",
+                            "graalvm-native-image-cataloger",
+                            "java-archive-cataloger",
+                            "javascript-package-cataloger",
+                            "nix-store-cataloger",
+                            "php-composer-installed-cataloger",
+                            "portage-cataloger",
+                            "python-installed-package-cataloger",
+                            "r-package-cataloger",
+                            "rpm-db-cataloger",
+                            "ruby-installed-gemspec-cataloger",
+                            "sbom-cataloger"
+                        ]
+                    },
+                    "data-generation": {
+                        "generate-cpes": true
+                    },
+                    "files": {
+                        "content": {
+                            "globs": null,
+                            "skip-files-above-size": 0
+                        },
+                        "hashers": [
+                            "sha-1",
+                            "sha-256"
+                        ],
+                        "selection": "owned-by-package"
+                    },
+                    "packages": {
+                        "binary": [
+                            "python-binary",
+                            "python-binary-lib",
+                            "pypy-binary-lib",
+                            "go-binary",
+                            "julia-binary",
+                            "helm",
+                            "redis-binary",
+                            "java-binary-openjdk",
+                            "java-binary-ibm",
+                            "java-binary-oracle",
+                            "nodejs-binary",
+                            "go-binary-hint",
+                            "busybox-binary",
+                            "haproxy-binary",
+                            "perl-binary",
+                            "php-cli-binary",
+                            "php-fpm-binary",
+                            "php-apache-binary",
+                            "php-composer-binary",
+                            "httpd-binary",
+                            "memcached-binary",
+                            "traefik-binary",
+                            "postgresql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "xtrabackup-binary",
+                            "mariadb-binary",
+                            "rust-standard-library-linux",
+                            "rust-standard-library-macos",
+                            "ruby-binary",
+                            "erlang-binary",
+                            "consul-binary",
+                            "nginx-binary",
+                            "bash-binary",
+                            "openssl-binary",
+                            "gcc-binary",
+                            "wordpress-cli-binary"
+                        ],
+                        "golang": {
+                            "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+                            "proxies": [
+                                "https://proxy.golang.org",
+                                "direct"
+                            ],
+                            "search-local-mod-cache-licenses": false,
+                            "search-remote-licenses": false
+                        },
+                        "java-archive": {
+                            "include-indexed-archives": true,
+                            "include-unindexed-archives": false,
+                            "maven-base-url": "https://repo1.maven.org/maven2",
+                            "max-parent-recursive-depth": 5,
+                            "use-network": false
+                        },
+                        "javascript": {
+                            "npm-base-url": "https://registry.npmjs.org",
+                            "search-remote-licenses": false
+                        },
+                        "linux-kernel": {
+                            "catalog-modules": true
+                        },
+                        "python": {
+                            "guess-unpinned-requirements": false
+                        }
+                    },
+                    "relationships": {
+                        "exclude-binary-packages-with-file-ownership-overlap": true,
+                        "package-file-ownership": true,
+                        "package-file-ownership-overlap": true
+                    },
+                    "search": {
+                        "scope": "squashed"
                     }
                 },
                 "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
-                "version": "v0.98.0"
+                "version": "v0.101.1"
             },
             "distro": {
                 "bugReportURL": "https://gitlab.alpinelinux.org/alpine/aports/-/issues",

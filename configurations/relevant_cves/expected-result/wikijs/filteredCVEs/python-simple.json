@@ -4,9 +4,10 @@
     "metadata": {
         "annotations": {
             "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
+            "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "python"
         },
-        "creationTimestamp": "2024-01-16T20:34:48Z",
+        "creationTimestamp": "2024-01-29T15:37:45Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -15,10 +16,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "python"
         },
-        "name": "replicaset-python-67b9c87d44-python-9497-efc3",
+        "name": "replicaset-python-67b9c87d44-python-417e-561c",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "c677552d-cfb6-4a26-a335-a90cf075b46c"
+        "uid": "391757ec-f43a-46d0-82d2-0e6f1f262af7"
     },
     "spec": {
         "metadata": {
@@ -28,7 +29,7 @@
             "tool": {
                 "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
                 "name": "",
-                "version": "v0.73.4"
+                "version": "v0.74.2"
             },
             "withRelevancy": true
         },
