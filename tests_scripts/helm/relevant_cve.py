@@ -540,9 +540,6 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
 
     def start(self):
 
-        # FIXME: Currently not supported
-        return statics.SUCCESS, ""
-
         # agenda:
         # 1. install helm-chart with really small maxImageSize in kubevuln
         # 2. apply workload
