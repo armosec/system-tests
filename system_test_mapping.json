@@ -65,7 +65,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob": {
+    "ac_alpine_fix_image_no_relevancy_with_cronjob": {
         "target": [
             "CLI",
             "Backend"
@@ -77,7 +77,7 @@
         "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_test_public_registry_connectivity_by_backend": {
+    "vuln_scan_test_public_registry_connectivity_by_backend": {
         "target": [
             "Backend",
             "In cluster"
@@ -90,7 +90,7 @@
         "description": "checks public registry scan capabilities",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend": {
+    "vuln_scan_test_public_registry_connectivity_excluded_by_backend": {
         "target": [
             "Backend",
             "In cluster"
@@ -261,7 +261,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning": {
+    "vuln_scan": {
         "target": [
             "In cluster",
             "Backend"
@@ -277,7 +277,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_proxy": {
+    "vuln_scan_proxy": {
         "target": [
             "In cluster",
             "Backend"
@@ -289,7 +289,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_trigger_scan_on_new_image": {
+    "vuln_scan_trigger_scan_on_new_image": {
         "target": [
             "In cluster"
         ],
@@ -401,7 +401,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_5_fix_control_no_relevancy": {
+    "ac_5_fix_control_no_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -415,7 +415,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_5_fix_control_with_relevancy": {
+    "ac_5_fix_control_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -429,7 +429,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy": {
+    "ac_alpine_fix_image_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -443,7 +443,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy": {
+    "ac_alpine_fix_control_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -457,7 +457,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy": {
+    "ac_alpine_fix_image_no_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -471,7 +471,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_3_fix_control_no_relevancy": {
+    "ac_3_fix_control_no_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -485,7 +485,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_3_fix_control_with_relevancy": {
+    "ac_3_fix_control_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -499,7 +499,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_6_fix_control_no_relevancy": {
+    "ac_6_fix_control_no_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -513,7 +513,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_6_fix_control_with_relevancy": {
+    "ac_6_fix_control_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -527,7 +527,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_for_attack_chains_scenario_1_1_fix_control_no_relevancy": {
+    "ac_1_1_fix_control_no_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -645,7 +645,7 @@
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_trigger_scan_private_quay_registry": {
+    "vuln_scan_trigger_scan_private_quay_registry": {
         "target": [
             "In cluster",
             "Backend"
@@ -673,7 +673,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_trigger_scan_public_registry": {
+    "vuln_scan_trigger_scan_public_registry": {
         "target": [
             "In cluster",
             "Backend"
@@ -687,7 +687,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_trigger_scan_public_registry_excluded": {
+    "vuln_scan_trigger_scan_public_registry_excluded": {
         "target": [
             "In cluster",
             "Backend"
@@ -701,7 +701,7 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "vulnerability_scanning_triggering_with_cron_job": {
+    "vuln_scan_triggering_with_cron_job": {
         "target": [
             "In cluster",
             "Backend"

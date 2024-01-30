@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from systest_utils.wlid import Wlid
 
-from tests_scripts.helm.base_vulnerability_scanning import BaseVulnerabilityScanning
+from tests_scripts.helm.base_vuln_scan import BaseVulnerabilityScanning
 
 DEFAULT_BRANCH = "release"
 
