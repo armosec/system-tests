@@ -2,8 +2,8 @@ from configurations.system.tests_cases.network_policy_tests import NetworkPolicy
 from systest_utils import TestUtil
 
 from .tests_cases import KubescapeTests, KSMicroserviceTests
-from .tests_cases.vulnerability_scanning_tests import VulnerabilityScanningTests
-from .tests_cases.ks_vulnerability_scanning_tests import KsVulnerabilityScanningTests
+from .tests_cases.vuln_scan_tests import VulnerabilityScanningTests
+from .tests_cases.ks_vuln_scan_tests import KsVulnerabilityScanningTests
 from .tests_cases.payments_tests import PaymentTests
 from .tests_cases.relevant_vuln_scanning_tests import RelevantVulnerabilityScanningTests
 from .tests_cases.notifications_tests import NotificationSTests

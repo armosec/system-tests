@@ -1,7 +1,7 @@
 import inspect
 
 from infrastructure import supported_systemsAPI
-from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningRegistry
+from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistry
 from .structures import TestConfiguration
 from systest_utils import statics
 
@@ -9,8 +9,8 @@ from systest_utils import statics
 class VulnerabilityScanningTests(object):
 
     @staticmethod
-    def vulnerability_scanning_proxy():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningProxy
+    def vuln_scan_proxy():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningProxy
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
         return TestConfiguration(
@@ -26,8 +26,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanning
+    def vuln_scan():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanning
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
         return TestConfiguration(
@@ -44,8 +44,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_trigger_scan_on_new_image():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningTriggerScanOnNewImage
+    def vuln_scan_trigger_scan_on_new_image():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTriggerScanOnNewImage
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -56,8 +56,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_cve_exceptions():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningCVEExceptions
+    def vuln_scan_cve_exceptions():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningCVEExceptions
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -68,8 +68,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_trigger_scan_public_registry():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningRegistry
+    def vuln_scan_trigger_scan_public_registry():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistry
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH
         from os.path import join
         return TestConfiguration(
@@ -86,8 +86,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_trigger_scan_public_registry_excluded():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningRegistry
+    def vuln_scan_trigger_scan_public_registry_excluded():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistry
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH
         from os.path import join
         return TestConfiguration(
@@ -106,7 +106,7 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_trigger_scan_private_quay_registry():
+    def vuln_scan_trigger_scan_private_quay_registry():
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH
         from os.path import join
         return TestConfiguration(
@@ -124,8 +124,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_trigger_scan_registry_by_backend():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningRegistryBackendTrigger
+    def vuln_scan_trigger_scan_registry_by_backend():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistryBackendTrigger
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH
         from os.path import join
         return TestConfiguration(
@@ -142,8 +142,8 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_triggering_with_cron_job():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningTriggeringWithCronJob
+    def vuln_scan_triggering_with_cron_job():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTriggeringWithCronJob
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
         return TestConfiguration(
@@ -159,7 +159,7 @@ class VulnerabilityScanningTests(object):
 
     @staticmethod
     def registry_scanning_triggering_with_cron_job():
-        from tests_scripts.helm.vulnerability_scanning import RegistryScanningTriggeringWithCronJob
+        from tests_scripts.helm.vuln_scan import RegistryScanningTriggeringWithCronJob
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
         return TestConfiguration(
@@ -179,16 +179,16 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vulnerability_scanning_test_public_registry_connectivity_by_backend():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningTestRegistryConnectivity
+    def vuln_scan_test_public_registry_connectivity_by_backend():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTestRegistryConnectivity
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityScanningTestRegistryConnectivity,
         )
 
     @staticmethod
-    def vulnerability_scanning_test_public_registry_connectivity_excluded_by_backend():
-        from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningTestRegistryConnectivity
+    def vuln_scan_test_public_registry_connectivity_excluded_by_backend():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTestRegistryConnectivity
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityScanningTestRegistryConnectivity,

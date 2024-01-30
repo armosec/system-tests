@@ -10,7 +10,7 @@ import json
 from systest_utils import statics, Logger, TestUtil
 from datetime import datetime, timezone
 
-from tests_scripts.helm.base_vulnerability_scanning import BaseVulnerabilityScanning
+from tests_scripts.helm.base_vuln_scan import BaseVulnerabilityScanning
 from systest_utils.wlid import Wlid
 
 DEFAULT_BRANCH = "release"

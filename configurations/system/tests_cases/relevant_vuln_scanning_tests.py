@@ -1,7 +1,7 @@
 import inspect
 
 from infrastructure import supported_systemsAPI
-from tests_scripts.helm.vulnerability_scanning import VulnerabilityScanningRegistry
+from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistry
 from .structures import TestConfiguration
 
 

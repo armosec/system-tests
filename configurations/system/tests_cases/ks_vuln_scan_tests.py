@@ -9,7 +9,7 @@ from .structures import TestConfiguration, K8SConnection
 class KsVulnerabilityScanningTests(object):
     @staticmethod
     def scan_image_controls():
-        from tests_scripts.helm.ks_vulnerability_scanning import ScanImageControls
+        from tests_scripts.helm.ks_vuln_scan import ScanImageControls
         from configurations.system.network_policy import NetworkPolicy
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
