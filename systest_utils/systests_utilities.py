@@ -315,7 +315,12 @@ class TestUtil(object):
 
     @staticmethod
     def get_arg_from_dict(dic: dict, arg, default=None):
-        return dic[arg] if arg in dic and dic[arg] is not None else default
+        if arg in dic and dic[arg] is not None:
+            val = dic[arg]
+            if type(val) == str and val.lower() == 'false':
+                return False
+            return val
+        return default
 
     @staticmethod
     def load_yaml_file(path: str, file: str):

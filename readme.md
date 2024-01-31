@@ -50,9 +50,9 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `scan_customer_configuration`                                  | kubescape  | scan controls with customer configuration                              | kubescape, backend            |
 | `host_scanner`                                                 | kubescape  | scan with host scanner                                                 | kubescape                     |
 | `host_scanner_with_hostsensorrule`                             | kubescape  | scan with host scanner using rules with `hostSensorRule: true`         | kubescape                     |
-| `vulnerability_scanning`                                       | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_trigger_scan_on_new_image`             | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan`                                       | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan_trigger_scan_on_new_image`             | helm-chart |                                                                        | kubevuln, backend             |
 | `ks_microservice_ns_creation`                                  | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_mitre_framework_on_demand`                    | helm-chart |                                                                        | in-cluster kubescape, backend |
@@ -61,22 +61,22 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_5_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_5_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_3_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_3_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_1_1_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_1_1_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_image_with_relevancy_with_cronjob`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_control_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `scan_for_attack_chains_scenario_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_scenario_5_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_5_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_3_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_3_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_1_1_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_1_1_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_fix_image_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_fix_image_with_relevancy_with_cronjob`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_fix_control_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `vulnerability_scanning_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
-| `vulnerability_scanning_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
+| `vuln_scan_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_scan_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`                                              | payment |                                                                           | stripe, backend             |
 | `stripe_billing_portal`                                        | payment |                                                                           | stripe, backend             |
 | `stripe_plans`                                                 | payment |                                                                           | stripe, backend             |
@@ -102,8 +102,8 @@ Add to environment the following values to connect to the backend:
 | `PASSWORD`          | password for login to keycloak      | for all tests                                                      |
 | `CLIENT_ID`         | part of api-token                   | for scan_image_controls test                                       |
 | `SECRET_KEY`        | part of api-token                   | for scan_image_controls test                                       |
-| `registry_username` |                                     | for vulnerability_scanning_trigger_scan_private_quay_registry test |
-| `registry_password` |                                     | for vulnerability_scanning_trigger_scan_private_quay_registry test |
+| `registry_username` |                                     | for vuln_scan_trigger_scan_private_quay_registry test |
+| `registry_password` |                                     | for vuln_scan_trigger_scan_private_quay_registry test |
 
 
 #### Run Arguments:

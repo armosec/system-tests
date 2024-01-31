@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - args:
-        - sleep 1200; redis-server
+        - apk -h; date; echo "Sleeping for 200 seconds"; sleep 200; date; echo "Waking up, starting redis-server"; redis-server
         command:
         - /bin/sh
         - -c

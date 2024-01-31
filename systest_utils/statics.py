@@ -57,13 +57,13 @@ ACCOUNT_ID_KEY="accountID"
 CLOUD_REPORT_URL_KEY="cloudReportURL"
 CLOUD_API_URL_KEY="cloudAPIURL"
 
-# vulnerability_scanning paths
-DEFAULT_VULNERABILITY_SCANNING_PATHS = os.path.abspath(os.path.join('configurations', 'vulnerability_scanning'))
+# vuln_scan paths
+DEFAULT_VULNERABILITY_SCANNING_PATHS = os.path.abspath(os.path.join('configurations', 'vuln_scan'))
 DEFAULT_VULNERABILITY_EXPECTED_RESULTS = os.path.abspath(
     os.path.join(DEFAULT_VULNERABILITY_SCANNING_PATHS, 'expected_results'))
 DEFAULT_KUBESCAPE_EXPECTED_RESULTS = os.path.abspath(os.path.join('configurations', 'ks-expected-results'))
 
-# vulnerability_scanning be_results
+# vuln_scan be_results
 SCAN_RESULT_CATEGORIES_FIELD = "categories"
 SCAN_RESULT_CONTAINER_NAME_FIELD = "containerName"
 SCAN_RESULT_IMAGE_TAG_NAME_FIELD = "imageTag"
@@ -195,8 +195,8 @@ TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
 
 # storage aggregated API
 HELM_STORAGE_FEATURE = "kubescapeStorage.enabled"
-STORAGE_SBOM_PLURAL = "sbomspdxv2p3s"
-STORAGE_FILTERED_SBOM_PLURAL = "sbomspdxv2p3filtereds"
+STORAGE_SBOM_PLURAL = "sbomsyfts"
+STORAGE_FILTERED_SBOM_PLURAL = "sbomsyftfiltereds"
 STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
 STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"

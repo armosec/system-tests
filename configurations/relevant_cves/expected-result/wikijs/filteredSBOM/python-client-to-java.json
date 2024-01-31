@@ -1,1 +1,1448 @@
-{"kind": "SBOMSPDXv2p3Filtered", "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1", "metadata": {"name": "replicaset-python-6644fdb794", "namespace": "kubescape", "uid": "53c78cae-05b9-42e7-9ad9-97d5cf459813", "resourceVersion": "1", "creationTimestamp": "2023-07-10T19:43:40Z", "labels": {"kubescape.io/workload-api-group": "apps", "kubescape.io/workload-api-version": "v1", "kubescape.io/workload-container-name": "python", "kubescape.io/workload-kind": "Deployment", "kubescape.io/workload-name": "python"}, "annotations": {"kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07", "kubescape.io/status": "", "kubescape.io/workload-container-name": "python"}}, "spec": {"metadata": {"tool": {"name": "", "version": "v0.76.0"}, "report": {"createdAt": null}}, "spdx": {"documentDescribes": null, "spdxVersion": "SPDX-2.3", "dataLicense": "CC0-1.0", "SPDXID": "SPDXRef-DOCUMENT", "name": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07", "documentNamespace": "https://anchore.com/syft/image/docker.io/library/python@sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-b3490d7d-3178-43cc-b9a1-f904b69b7670", "externalDocumentRefs": null, "comment": "", "creationInfo": {"licenseListVersion": "3.20", "creators": ["Organization: Anchore, Inc", "Tool: syft-v0.76.0", "Organization: Kubescape", "Tool: KubescapeNodeAgent"], "created": "2023-07-10T19:39:46Z", "comment": ""}, "packages": [{"hasFiles": null, "name": "alpine-baselayout-data", "SPDXID": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942", "versionInfo": "3.4.3-r1", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://git.alpinelinux.org/cgit/aports/tree/main/alpine-baselayout", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "GPL-2.0-only", "licenseInfoFromFiles": null, "licenseDeclared": "GPL-2.0-only", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "Alpine base dir structure and init scripts", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64&upstream=alpine-baselayout&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libbz2", "SPDXID": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0", "versionInfo": "1.0.8-r5", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://sourceware.org/bzip2/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "bzip2-1.0.6", "licenseInfoFromFiles": null, "licenseDeclared": "bzip2-1.0.6", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "Shared library for bz2", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libbz2:libbz2:1.0.8-r5:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libbz2:libbz:1.0.8-r5:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libbz:libbz2:1.0.8-r5:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libbz:libbz:1.0.8-r5:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libbz2@1.0.8-r5?arch=x86_64&upstream=bzip2&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libcrypto3", "SPDXID": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "versionInfo": "3.1.0-r4", "packageFileName": "", "supplier": null, "originator": "Person: Ariadne Conill \\\\u003cariadne@dereferenced.org\\\\u003e", "downloadLocation": "https://www.openssl.org/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "Apache-2.0", "licenseInfoFromFiles": null, "licenseDeclared": "Apache-2.0", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "Crypto library from openssl", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto3:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto3:libcrypto:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libcrypto3@3.1.0-r4?arch=x86_64&upstream=openssl&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libcrypto3", "SPDXID": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "versionInfo": "3.1.0-r4", "packageFileName": "", "supplier": null, "originator": "Person: Ariadne Conill \\\\u003cariadne@dereferenced.org\\\\u003e", "downloadLocation": "https://www.openssl.org/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "Apache-2.0", "licenseInfoFromFiles": null, "licenseDeclared": "Apache-2.0", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "Crypto library from openssl", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto3:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto3:libcrypto:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libcrypto:libcrypto:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libcrypto3@3.1.0-r4?arch=x86_64&upstream=openssl&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libexpat", "SPDXID": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b", "versionInfo": "2.5.0-r1", "packageFileName": "", "supplier": null, "originator": "Person: Carlo Landmeter \\\\u003cclandmeter@alpinelinux.org\\\\u003e", "downloadLocation": "https://libexpat.github.io/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "MIT", "licenseInfoFromFiles": null, "licenseDeclared": "MIT", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "XML Parser library written in C (libraries)", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libexpat:libexpat:2.5.0-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libexpat@2.5.0-r1?arch=x86_64&upstream=expat&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libffi", "SPDXID": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f", "versionInfo": "3.4.4-r2", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://sourceware.org/libffi/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "MIT", "licenseInfoFromFiles": null, "licenseDeclared": "MIT", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "portable, high level programming interface to various calling conventions.", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libffi:libffi:3.4.4-r2:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libffi@3.4.4-r2?arch=x86_64&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libssl3", "SPDXID": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "versionInfo": "3.1.0-r4", "packageFileName": "", "supplier": null, "originator": "Person: Ariadne Conill \\\\u003cariadne@dereferenced.org\\\\u003e", "downloadLocation": "https://www.openssl.org/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "Apache-2.0", "licenseInfoFromFiles": null, "licenseDeclared": "Apache-2.0", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "SSL shared libraries", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libssl3:libssl3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libssl3:libssl:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libssl:libssl3:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libssl:libssl:3.1.0-r4:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libssl3@3.1.0-r4?arch=x86_64&upstream=openssl&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "libuuid", "SPDXID": "SPDXRef-Package-apk-libuuid-fa9aec2305890935", "versionInfo": "2.38.1-r7", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://git.kernel.org/cgit/utils/util-linux/util-linux.git", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "BSD-3-Clause", "licenseInfoFromFiles": null, "licenseDeclared": "BSD-3-Clause", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "DCE compatible Universally Unique Identifier library", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:libuuid:libuuid:2.38.1-r7:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/libuuid@2.38.1-r7?arch=x86_64&upstream=util-linux&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "musl", "SPDXID": "SPDXRef-Package-apk-musl-893992c587eda47c", "versionInfo": "1.2.4-r0", "packageFileName": "", "supplier": null, "originator": "Person: Timo Ter\u00e4s \\\\u003ctimo.teras@iki.fi\\\\u003e", "downloadLocation": "https://musl.libc.org/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "MIT", "licenseInfoFromFiles": null, "licenseDeclared": "MIT", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "the musl c library (libc) implementation", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:musl-libc:musl:1.2.4-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:musl_libc:musl:1.2.4-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:musl:musl:1.2.4-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/musl@1.2.4-r0?arch=x86_64&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "pip", "SPDXID": "SPDXRef-Package-python-pip-3100cd295b5bdd40", "versionInfo": "22.3.1", "packageFileName": "", "supplier": null, "originator": "Person: The pip developers (distutils-sig@python.org)", "downloadLocation": "NOASSERTION", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from installed python package manifest file: /usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA, /usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/RECORD, /usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/top_level.txt", "licenseConcluded": "MIT", "licenseInfoFromFiles": null, "licenseDeclared": "MIT", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers_project:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers_project:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developersproject:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developersproject:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers_project:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developersproject:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-pip:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-pip:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_pip:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_pip:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip_developers:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pypa:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pypa:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip:python-pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip:python_pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-pip:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_pip:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pypa:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:pip:pip:22.3.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:pypi/pip@22.3.1", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "python", "SPDXID": "SPDXRef-Package-binary-python-4c11d100367fab02", "versionInfo": "3.11.3", "packageFileName": "", "supplier": null, "originator": null, "downloadLocation": "NOASSERTION", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from the following paths: /usr/local/bin/python3.11, /usr/local/lib/libpython3.11.so.1.0", "licenseConcluded": "NONE", "licenseInfoFromFiles": null, "licenseDeclared": "NONE", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_software_foundation:python:3.11.3:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:generic/python@3.11.3", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "setuptools", "SPDXID": "SPDXRef-Package-python-setuptools-e46aceb087f273c", "versionInfo": "65.5.1", "packageFileName": "", "supplier": null, "originator": "Person: Python Packaging Authority (distutils-sig@python.org)", "downloadLocation": "NOASSERTION", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from installed python package manifest file: /usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/METADATA, /usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/RECORD, /usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/top_level.txt", "licenseConcluded": "NONE", "licenseInfoFromFiles": null, "licenseDeclared": "NONE", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority_project:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority_project:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authorityproject:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authorityproject:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority_project:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authorityproject:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_packaging_authority:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig_project:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sigproject:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-setuptools:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_setuptools:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils-sig:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:distutils_sig:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python-setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python_setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:setuptools:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:setuptools:65.5.1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:pypi/setuptools@65.5.1", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "wheel", "SPDXID": "SPDXRef-Package-python-wheel-b5901a77ad9bd010", "versionInfo": "0.40.0", "packageFileName": "", "supplier": null, "originator": "Person: Daniel Holth \\\\u003cdholth@fastmail.fm\\\\u003e", "downloadLocation": "NOASSERTION", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from installed python package manifest file: /usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/METADATA, /usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/RECORD", "licenseConcluded": "NONE", "licenseInfoFromFiles": null, "licenseDeclared": "NONE", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth_project:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth_project:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholthproject:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholthproject:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth_project:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel-holth-\\<dholth:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel-holth-\\<dholth:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholthproject:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel-holth-\\<dholth:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:daniel_holth_\\<dholth:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-wheel:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-wheel:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_wheel:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_wheel:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python-wheel:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python_wheel:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:wheel:python-wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:wheel:python_wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:python:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:wheel:wheel:0.40.0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:pypi/wheel@0.40.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "xz-libs", "SPDXID": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928", "versionInfo": "5.4.3-r0", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://tukaani.org/xz", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "GPL-2.0-or-later AND LicenseRef-AND AND LicenseRef-Public-Domain AND LicenseRef-AND AND LGPL-2.1-or-later", "licenseInfoFromFiles": null, "licenseDeclared": "GPL-2.0-or-later AND LicenseRef-AND AND LicenseRef-Public-Domain AND LicenseRef-AND AND LGPL-2.1-or-later", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "Library and CLI tools for XZ and LZMA compressed files (libraries)", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz-libs:xz-libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz-libs:xz_libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz_libs:xz-libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz_libs:xz_libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz:xz-libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:xz:xz_libs:5.4.3-r0:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/xz-libs@5.4.3-r0?arch=x86_64&upstream=xz&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}, {"hasFiles": null, "name": "zlib", "SPDXID": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9", "versionInfo": "1.2.13-r1", "packageFileName": "", "supplier": null, "originator": "Person: Natanael Copa \\\\u003cncopa@alpinelinux.org\\\\u003e", "downloadLocation": "https://zlib.net/", "filesAnalyzed": false, "packageVerificationCode": null, "checksums": null, "homepage": "", "sourceInfo": "acquired package info from APK DB: /lib/apk/db/installed", "licenseConcluded": "Zlib", "licenseInfoFromFiles": null, "licenseDeclared": "Zlib", "licenseComments": "", "copyrightText": "NOASSERTION", "summary": "", "description": "A compression/decompression Library", "comment": "", "externalRefs": [{"referenceCategory": "SECURITY", "referenceType": "cpe23Type", "referenceLocator": "cpe:2.3:a:zlib:zlib:1.2.13-r1:*:*:*:*:*:*:*", "comment": ""}, {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:apk/alpine/zlib@1.2.13-r1?arch=x86_64&distro=alpine-3.18.0", "comment": ""}], "attributionTexts": null, "primaryPackagePurpose": "", "releaseDate": "", "builtDate": "", "validUntilDate": "", "files": null, "annotations": null}], "files": [{"fileName": "/etc/hosts", "SPDXID": "SPDXRef-34276b4e9d55db8e", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/etc/ssl/openssl.cnf", "SPDXID": "SPDXRef-d263cdd2cb6dfb83", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/lib/ld-musl-x86_64.so.1", "SPDXID": "SPDXRef-a7e43f4ec1f24beb", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/lib/libcrypto.so.3", "SPDXID": "SPDXRef-e2739fc7a22849e0", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/lib/libssl.so.3", "SPDXID": "SPDXRef-e8968fef25120085", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/lib/libuuid.so.1.3.0", "SPDXID": "SPDXRef-e82f2715117f4ee8", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/lib/libz.so.1.2.13", "SPDXID": "SPDXRef-8ce5665c33f73953", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/usr/lib/libbz2.so.1.0.8", "SPDXID": "SPDXRef-633b224642e3a1b4", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/usr/lib/libexpat.so.1.8.10", "SPDXID": "SPDXRef-1a0492981f0ba0b3", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/usr/lib/libffi.so.8.1.2", "SPDXID": "SPDXRef-520d5ebd5dfae6ee", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}, {"fileName": "/usr/lib/liblzma.so.5.4.3", "SPDXID": "SPDXRef-ff73ae6b60b43438", "fileTypes": null, "checksums": [{"algorithm": "SHA1", "checksumValue": "0000000000000000000000000000000000000000"}], "licenseConcluded": "NOASSERTION", "licenseInfoInFiles": null, "licenseComments": "", "copyrightText": "", "artifactOfs": null, "comment": "layerID: sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8", "noticeText": "", "fileContributors": null, "attributionTexts": null, "fileDependencies": null, "annotations": null}], "hasExtractedLicensingInfos": [{"licenseId": "LicenseRef-", "extractedText": "NONE", "name": "", "seeAlsos": null, "comment": ""}, {"licenseId": "LicenseRef-AND", "extractedText": "NONE", "name": "AND", "seeAlsos": null, "comment": ""}, {"licenseId": "LicenseRef-Public-Domain", "extractedText": "NONE", "name": "Public-Domain", "seeAlsos": null, "comment": ""}], "relationships": [{"spdxElementId": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f", "relatedSpdxElement": "SPDXRef-520d5ebd5dfae6ee", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libpanelw-32930215fba37e48", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relatedSpdxElement": "SPDXRef-e8968fef25120085", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libintl-4683c5e9f4a38553", "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-ca-certificates-bundle-4e13527f0d53db92", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-ncurses-terminfo-base-53f4f6c8df74a1ad", "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-ncurses-terminfo-base-53f4f6c8df74a1ad", "relatedSpdxElement": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168", "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168", "relatedSpdxElement": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149", "relatedSpdxElement": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149", "relatedSpdxElement": "SPDXRef-Package-binary-busybox-ab348b7311a7f008", "relationshipType": "OTHER", "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by"}, {"spdxElementId": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b", "relatedSpdxElement": "SPDXRef-1a0492981f0ba0b3", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9", "relatedSpdxElement": "SPDXRef-8ce5665c33f73953", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-d263cdd2cb6dfb83", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-e2739fc7a22849e0", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0", "relatedSpdxElement": "SPDXRef-633b224642e3a1b4", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-scanelf-7eed4e4d0586ba77", "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-keyutils-libs-88434b371539e615", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libffi-2d7de62e38aa521f", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libpanelw-32930215fba37e48", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libssl3-443847d53cea327d", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libintl-4683c5e9f4a38553", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-readline-5430e9ecc79b81bf", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libncursesw-5b45e9ea830c4168", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-busybox-5b92ebe1017f4149", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libexpat-6a21704d69c36c8b", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-zlib-702742ee6a92bcb9", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libcrypto3-7762995c105b665c", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libbz2-7ed210bced9262f0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-scanelf-7eed4e4d0586ba77", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-keyutils-libs-88434b371539e615", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libverto-a153395c3cb48c77", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-a7e43f4ec1f24beb", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-sqlite-libs-ac3256975e225a0a", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-apk-tools-b233d39a00b2292", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libcom-err-bc4f7d820866d6d8", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-ssl-client-c0859458465a2712", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-libuuid-fa9aec2305890935", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-893992c587eda47c", "relatedSpdxElement": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libverto-a153395c3cb48c77", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505", "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-206b74577cfae6ce", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-busybox-binsh-a9b67c3631d1a505", "relatedSpdxElement": "SPDXRef-Package-apk-ca-certificates-ecd30b5b75879886", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-sqlite-libs-ac3256975e225a0a", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942", "relatedSpdxElement": "SPDXRef-Package-apk-alpine-baselayout-206b74577cfae6ce", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-alpine-baselayout-data-ae0ef197058e8942", "relatedSpdxElement": "SPDXRef-34276b4e9d55db8e", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libcom-err-bc4f7d820866d6d8", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-krb5-conf-cc48ed0a37d6d922", "relatedSpdxElement": "SPDXRef-Package-apk-krb5-libs-a4ebcf7305f560b0", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libtirpc-conf-d6d5d2a0992c9c3e", "relatedSpdxElement": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-xz-libs-e4227f45226c6928", "relatedSpdxElement": "SPDXRef-ff73ae6b60b43438", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4", "relatedSpdxElement": "SPDXRef-Package-apk-libnsl-2e4b4ffaf5d0d181", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libtirpc-ed755fe7aff4a1d4", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-gdbm-f3ec688143b82b8f", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libuuid-fa9aec2305890935", "relatedSpdxElement": "SPDXRef-Package-apk-.python-rundeps-b5d3b1673505a27e", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-libuuid-fa9aec2305890935", "relatedSpdxElement": "SPDXRef-e82f2715117f4ee8", "relationshipType": "CONTAINS", "comment": ""}, {"spdxElementId": "SPDXRef-Package-apk-musl-utils-fcb26f8dc58e9786", "relatedSpdxElement": "SPDXRef-Package-apk-libc-utils-bc2b0db44f9f8773", "relationshipType": "DEPENDENCY_OF", "comment": ""}, {"spdxElementId": "SPDXRef-DOCUMENT", "relatedSpdxElement": "SPDXRef-DOCUMENT", "relationshipType": "DESCRIBES", "comment": ""}], "annotations": null, "snippets": null}}, "status": {}}
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSyftFiltered",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07",
+            "kubescape.io/status": "ready",
+            "kubescape.io/workload-container-name": "python"
+        },
+        "creationTimestamp": "2024-01-29T16:06:21Z",
+        "labels": {
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "python",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "python"
+        },
+        "name": "replicaset-python-5dcc6bc7cc-python-294e-2f92",
+        "namespace": "kubescape",
+        "resourceVersion": "1",
+        "uid": "54856369-e79d-4596-b955-46749678dcb8"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": "2024-01-29T15:37:21Z"
+            },
+            "tool": {
+                "name": "syft",
+                "version": "v0.101.1"
+            }
+        },
+        "syft": {
+            "artifactRelationships": [
+                {
+                    "child": "932994cd534ba7ac",
+                    "parent": "0e6fa7223cf79373",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "e2af1af5bff799a5",
+                    "parent": "16e31905a33b97b1",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "633b224642e3a1b4",
+                    "parent": "18e5911103cbf51c",
+                    "type": "contains"
+                },
+                {
+                    "child": "ff73ae6b60b43438",
+                    "parent": "3fc9290470704359",
+                    "type": "contains"
+                },
+                {
+                    "child": "520d5ebd5dfae6ee",
+                    "parent": "4398410e101bab31",
+                    "type": "contains"
+                },
+                {
+                    "child": "e8968fef25120085",
+                    "parent": "499be243fff44916",
+                    "type": "contains"
+                },
+                {
+                    "child": "1a0492981f0ba0b3",
+                    "parent": "6951899b6edd345d",
+                    "type": "contains"
+                },
+                {
+                    "child": "e82f2715117f4ee8",
+                    "parent": "7887465f4fef8753",
+                    "type": "contains"
+                },
+                {
+                    "child": "34276b4e9d55db8e",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "a7e43f4ec1f24beb",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "contains"
+                },
+                {
+                    "child": "6ea5524f47e7e9f3",
+                    "parent": "b3bb83957982f9c3",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "8ce5665c33f73953",
+                    "parent": "c8e7fc9f117e52bc",
+                    "type": "contains"
+                },
+                {
+                    "child": "d263cdd2cb6dfb83",
+                    "parent": "e34727cd06d86e15",
+                    "type": "contains"
+                },
+                {
+                    "child": "e2739fc7a22849e0",
+                    "parent": "e34727cd06d86e15",
+                    "type": "contains"
+                },
+                {
+                    "child": "645302876e0adc49",
+                    "parent": "e8bd7a0fc2aa2042",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "18e5911103cbf51c",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "3fc9290470704359",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "4398410e101bab31",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "499be243fff44916",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "6951899b6edd345d",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "7887465f4fef8753",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "c8e7fc9f117e52bc",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e34727cd06d86e15",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "0e6fa7223cf79373",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "16e31905a33b97b1",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "18e5911103cbf51c",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "3fc9290470704359",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "4398410e101bab31",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "499be243fff44916",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "6951899b6edd345d",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "7887465f4fef8753",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "85e34641ddeca26c",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "99fec84f02b3ac20",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "b3bb83957982f9c3",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "c8e7fc9f117e52bc",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "e34727cd06d86e15",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "e8bd7a0fc2aa2042",
+                    "parent": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "type": "contains"
+                },
+                {
+                    "child": "499be243fff44916",
+                    "parent": "e34727cd06d86e15",
+                    "type": "dependency-of"
+                }
+            ],
+            "artifacts": [
+                {
+                    "cpes": [
+                        "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "85e34641ddeca26c",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "alpine-baselayout-data",
+                    "purl": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "3.4.3-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libbz2:libbz2:1.0.8-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libbz2:libbz:1.0.8-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libbz:libbz2:1.0.8-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libbz:libbz:1.0.8-r5:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "18e5911103cbf51c",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "bzip2-1.0.6",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "bzip2-1.0.6"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libbz2",
+                    "purl": "pkg:apk/alpine/libbz2@1.0.8-r5?arch=x86_64\u0026upstream=bzip2\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "1.0.8-r5"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libcrypto3:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto3:libcrypto:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto:libcrypto3:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto:libcrypto:3.1.0-r4:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "e34727cd06d86e15",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Apache-2.0",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Apache-2.0"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libcrypto3",
+                    "purl": "pkg:apk/alpine/libcrypto3@3.1.0-r4?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "3.1.0-r4"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libexpat:libexpat:2.5.0-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "6951899b6edd345d",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libexpat",
+                    "purl": "pkg:apk/alpine/libexpat@2.5.0-r1?arch=x86_64\u0026upstream=expat\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "2.5.0-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libffi:libffi:3.4.4-r2:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "4398410e101bab31",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libffi",
+                    "purl": "pkg:apk/alpine/libffi@3.4.4-r2?arch=x86_64\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "3.4.4-r2"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libssl3:libssl3:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl3:libssl:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl:libssl3:3.1.0-r4:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl:libssl:3.1.0-r4:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "499be243fff44916",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Apache-2.0",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Apache-2.0"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libssl3",
+                    "purl": "pkg:apk/alpine/libssl3@3.1.0-r4?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "3.1.0-r4"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libuuid:libuuid:2.38.1-r7:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "7887465f4fef8753",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "BSD-3-Clause",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-3-Clause"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libuuid",
+                    "purl": "pkg:apk/alpine/libuuid@2.38.1-r7?arch=x86_64\u0026upstream=util-linux\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "2.38.1-r7"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:musl-libc:musl:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl_libc:musl:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl:musl:1.2.4-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "99fec84f02b3ac20",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "musl",
+                    "purl": "pkg:apk/alpine/musl@1.2.4-r0?arch=x86_64\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "1.2.4-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:pip_developers_project:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developers_project:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developersproject:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developersproject:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developers_project:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developers:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developers:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developersproject:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip_developers:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pypa:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pypa:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip:python-pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip:python_pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-pip:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_pip:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pypa:pip:22.3.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:pip:pip:22.3.1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "python-installed-package-cataloger",
+                    "id": "0e6fa7223cf79373",
+                    "language": "python",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA",
+                                    "path": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/RECORD",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/RECORD"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/top_level.txt",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/top_level.txt"
+                        }
+                    ],
+                    "name": "pip",
+                    "purl": "pkg:pypi/pip@22.3.1",
+                    "type": "python",
+                    "version": "22.3.1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:python_software_foundation:python:3.11.3:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python:3.11.3:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "binary-cataloger",
+                    "id": "16e31905a33b97b1",
+                    "language": "",
+                    "licenses": [],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/local/bin/python3.11",
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/usr/local/bin/python3.11"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/libpython3.11.so.1.0",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/usr/local/lib/libpython3.11.so.1.0"
+                        }
+                    ],
+                    "name": "python",
+                    "purl": "pkg:generic/python@3.11.3",
+                    "type": "binary",
+                    "version": "3.11.3"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:python_packaging_authority_project:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authority_project:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authorityproject:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authorityproject:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authority_project:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authority:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authority:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authorityproject:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_packaging_authority:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig_project:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sigproject:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-setuptools:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_setuptools:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:setuptools:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:setuptools:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils-sig:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:distutils_sig:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python-setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python_setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:setuptools:setuptools:65.5.1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:setuptools:65.5.1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "python-installed-package-cataloger",
+                    "id": "e8bd7a0fc2aa2042",
+                    "language": "python",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/LICENSE",
+                                    "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/LICENSE"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "concluded",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/METADATA",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/METADATA"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/RECORD",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/RECORD"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/top_level.txt",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/top_level.txt"
+                        }
+                    ],
+                    "name": "setuptools",
+                    "purl": "pkg:pypi/setuptools@65.5.1",
+                    "type": "python",
+                    "version": "65.5.1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth_project:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth_project:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholthproject:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholthproject:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth_project:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel-holth-\\\u003cdholth:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel-holth-\\\u003cdholth:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholthproject:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel-holth-\\\u003cdholth:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:daniel_holth_\\\u003cdholth:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-wheel:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-wheel:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_wheel:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_wheel:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python-wheel:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python_wheel:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:wheel:python-wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:wheel:python_wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:python:wheel:0.40.0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:wheel:wheel:0.40.0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "python-installed-package-cataloger",
+                    "id": "b3bb83957982f9c3",
+                    "language": "python",
+                    "licenses": [],
+                    "locations": [
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/METADATA",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/METADATA"
+                        },
+                        {
+                            "accessPath": "/usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/RECORD",
+                            "annotations": {
+                                "evidence": "supporting"
+                            },
+                            "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "path": "/usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/RECORD"
+                        }
+                    ],
+                    "name": "wheel",
+                    "purl": "pkg:pypi/wheel@0.40.0",
+                    "type": "python",
+                    "version": "0.40.0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:xz-libs:xz-libs:5.4.3-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:xz-libs:xz_libs:5.4.3-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:xz_libs:xz-libs:5.4.3-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:xz_libs:xz_libs:5.4.3-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:xz:xz-libs:5.4.3-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:xz:xz_libs:5.4.3-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "3fc9290470704359",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "AND"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-or-later"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "LGPL-2.1-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "LGPL-2.1-or-later"
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Public-Domain"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "xz-libs",
+                    "purl": "pkg:apk/alpine/xz-libs@5.4.3-r0?arch=x86_64\u0026upstream=xz\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "5.4.3-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:zlib:zlib:1.2.13-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "c8e7fc9f117e52bc",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Zlib",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Zlib"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "zlib",
+                    "purl": "pkg:apk/alpine/zlib@1.2.13-r1?arch=x86_64\u0026distro=alpine-3.18.0",
+                    "type": "apk",
+                    "version": "1.2.13-r1"
+                }
+            ],
+            "descriptor": {
+                "configuration": {
+                    "catalogers": {
+                        "requested": {
+                            "default": [
+                                "image"
+                            ]
+                        },
+                        "used": [
+                            "alpm-db-cataloger",
+                            "apk-db-cataloger",
+                            "binary-cataloger",
+                            "cargo-auditable-binary-cataloger",
+                            "conan-info-cataloger",
+                            "dotnet-portable-executable-cataloger",
+                            "dpkg-db-cataloger",
+                            "go-module-binary-cataloger",
+                            "graalvm-native-image-cataloger",
+                            "java-archive-cataloger",
+                            "javascript-package-cataloger",
+                            "nix-store-cataloger",
+                            "php-composer-installed-cataloger",
+                            "portage-cataloger",
+                            "python-installed-package-cataloger",
+                            "r-package-cataloger",
+                            "rpm-db-cataloger",
+                            "ruby-installed-gemspec-cataloger",
+                            "sbom-cataloger"
+                        ]
+                    },
+                    "data-generation": {
+                        "generate-cpes": true
+                    },
+                    "files": {
+                        "content": {
+                            "globs": null,
+                            "skip-files-above-size": 0
+                        },
+                        "hashers": [
+                            "sha-1",
+                            "sha-256"
+                        ],
+                        "selection": "owned-by-package"
+                    },
+                    "packages": {
+                        "binary": [
+                            "python-binary",
+                            "python-binary-lib",
+                            "pypy-binary-lib",
+                            "go-binary",
+                            "julia-binary",
+                            "helm",
+                            "redis-binary",
+                            "java-binary-openjdk",
+                            "java-binary-ibm",
+                            "java-binary-oracle",
+                            "nodejs-binary",
+                            "go-binary-hint",
+                            "busybox-binary",
+                            "haproxy-binary",
+                            "perl-binary",
+                            "php-cli-binary",
+                            "php-fpm-binary",
+                            "php-apache-binary",
+                            "php-composer-binary",
+                            "httpd-binary",
+                            "memcached-binary",
+                            "traefik-binary",
+                            "postgresql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "xtrabackup-binary",
+                            "mariadb-binary",
+                            "rust-standard-library-linux",
+                            "rust-standard-library-macos",
+                            "ruby-binary",
+                            "erlang-binary",
+                            "consul-binary",
+                            "nginx-binary",
+                            "bash-binary",
+                            "openssl-binary",
+                            "gcc-binary",
+                            "wordpress-cli-binary"
+                        ],
+                        "golang": {
+                            "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+                            "proxies": [
+                                "https://proxy.golang.org",
+                                "direct"
+                            ],
+                            "search-local-mod-cache-licenses": false,
+                            "search-remote-licenses": false
+                        },
+                        "java-archive": {
+                            "include-indexed-archives": true,
+                            "include-unindexed-archives": false,
+                            "maven-base-url": "https://repo1.maven.org/maven2",
+                            "max-parent-recursive-depth": 5,
+                            "use-network": false
+                        },
+                        "javascript": {
+                            "npm-base-url": "https://registry.npmjs.org",
+                            "search-remote-licenses": false
+                        },
+                        "linux-kernel": {
+                            "catalog-modules": true
+                        },
+                        "python": {
+                            "guess-unpinned-requirements": false
+                        }
+                    },
+                    "relationships": {
+                        "exclude-binary-packages-with-file-ownership-overlap": true,
+                        "package-file-ownership": true,
+                        "package-file-ownership-overlap": true
+                    },
+                    "search": {
+                        "scope": "squashed"
+                    }
+                },
+                "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
+                "version": "v0.101.1"
+            },
+            "distro": {
+                "bugReportURL": "https://gitlab.alpinelinux.org/alpine/aports/-/issues",
+                "homeURL": "https://alpinelinux.org/",
+                "id": "alpine",
+                "name": "Alpine Linux",
+                "prettyName": "Alpine Linux v3.18",
+                "versionID": "3.18.0"
+            },
+            "files": [
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "043eb324a653456caa1a73e2e2d49f77792bb0c5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e3998dbe02b51dada33de87ae43d18a93ab6915b9e34f5a751bf2b9b25a55492"
+                        }
+                    ],
+                    "id": "34276b4e9d55db8e",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/etc/hosts"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 79,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2765f580ad4b51233ca5d8fc0ea7b67819204a51"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "23057ab41286bfaff1b121b086ce17c927c6a3d6a45ab3c4b5757eacc32d97ac"
+                        }
+                    ],
+                    "id": "d263cdd2cb6dfb83",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/etc/ssl/openssl.cnf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 12292,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "5adcbfa23f38f04c7cb7ba4e74177dfd2b77bf06"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "c6b3288ba48945a21ede7ccf6f7a257d41bacf2c061236726ff9b5def383a766"
+                        }
+                    ],
+                    "id": "a7e43f4ec1f24beb",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/lib/ld-musl-x86_64.so.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 617072,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "0235120a70f32d7b6d69e6b83078cfad93047936"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9ec9a27c455af033247e18781e33907a84446281f0b51f4b9b3b1b43cb01dd56"
+                        }
+                    ],
+                    "id": "e2739fc7a22849e0",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/lib/libcrypto.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 4257168,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "dc76da41505b923236e09815a2fdfda1106fffe6"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "72bbcf719bd93c00701f9b86e240f86d771b49f3ab00f2436275e58d11940292"
+                        }
+                    ],
+                    "id": "e8968fef25120085",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/lib/libssl.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 544848,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a2b67349f3f99c4501b270e5dc96b6d1f06584ba"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "283ce5128c73d6124e56ff866c05f867398d5fbe9e2166e6c7d0c8ff3f7bba00"
+                        }
+                    ],
+                    "id": "e82f2715117f4ee8",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/lib/libuuid.so.1.3.0"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 30632,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "db729620754c73e0fafb66ec33f7bade6e1e519b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e0df969fd057eeaeb3064663b0f0af0f776fa42c697b56726a3eec6b13ca6986"
+                        }
+                    ],
+                    "id": "8ce5665c33f73953",
+                    "location": {
+                        "layerID": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                        "path": "/lib/libz.so.1.2.13"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 100264,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "ba92089ff435361df4436657b2254273777e5407"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "576957b6b941945280e1efed992421bab2110a1076eca257ea4bc41e97fa6d0f"
+                        }
+                    ],
+                    "id": "633b224642e3a1b4",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/usr/lib/libbz2.so.1.0.8"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 74528,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1293655e1634947d8762f81c0788105be3774537"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0389bc05a81aa6a0852c51d65e58c76f531e6ef4d7e705c1216a7d95093a2185"
+                        }
+                    ],
+                    "id": "1a0492981f0ba0b3",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/usr/lib/libexpat.so.1.8.10"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 132944,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "14067059a796355a95fa41bce2fe1fb2787a281c"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0662ade92f3d738d199bc9e11edd5b0d31f2c811c42f52abc24bb7d72a1c1a01"
+                        }
+                    ],
+                    "id": "520d5ebd5dfae6ee",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/usr/lib/libffi.so.8.1.2"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 38944,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "7b0f80461af167385069067e0f734f5e950c835b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "fcee0477fdef76f12779e72982f068854fcf4711978cc2088ad21f506889a77a"
+                        }
+                    ],
+                    "id": "ff73ae6b60b43438",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/usr/lib/liblzma.so.5.4.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 223056,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "id": "e2af1af5bff799a5",
+                    "location": {
+                        "layerID": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                        "path": "/usr/local/lib/libpython3.11.so.1.0"
+                    }
+                },
+                {
+                    "id": "932994cd534ba7ac",
+                    "location": {
+                        "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                        "path": "/usr/local/lib/python3.11/site-packages/pip-22.3.1.dist-info/METADATA"
+                    }
+                },
+                {
+                    "id": "645302876e0adc49",
+                    "location": {
+                        "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                        "path": "/usr/local/lib/python3.11/site-packages/setuptools-65.5.1.dist-info/METADATA"
+                    }
+                },
+                {
+                    "id": "6ea5524f47e7e9f3",
+                    "location": {
+                        "layerID": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                        "path": "/usr/local/lib/python3.11/site-packages/wheel-0.40.0.dist-info/METADATA"
+                    }
+                }
+            ],
+            "schema": {
+                "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-13.0.0.json",
+                "version": "13.0.0"
+            },
+            "source": {
+                "id": "caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                "metadata": {
+                    "architecture": "amd64",
+                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL2JpbjovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iLCJMQU5HPUMuVVRGLTgiLCJHUEdfS0VZPUEwMzVDOEMxOTIxOUJBODIxRUNFQTg2QjY0RTYyOEY4RDY4NDY5NkQiLCJQWVRIT05fVkVSU0lPTj0zLjExLjMiLCJQWVRIT05fUElQX1ZFUlNJT049MjIuMy4xIiwiUFlUSE9OX1NFVFVQVE9PTFNfVkVSU0lPTj02NS41LjEiLCJQWVRIT05fR0VUX1BJUF9VUkw9aHR0cHM6Ly9naXRodWIuY29tL3B5cGEvZ2V0LXBpcC9yYXcvMGQ4NTcwZGM0NDc5NmY0MzY5YjY1MjIyMmNmMTc2YjNkYjZhYzcwZS9wdWJsaWMvZ2V0LXBpcC5weSIsIlBZVEhPTl9HRVRfUElQX1NIQTI1Nj05NjQ2MWRlY2VkNWMyYTQ4N2RkYzY1MjA3ZWM1YTljZmZlY2EwZDM0ZTdhZjdlYTFhZmM0NzBmZjBkNzQ2MjA3Il0sIkNtZCI6WyJweXRob24zIl0sIkFyZ3NFc2NhcGVkIjp0cnVlLCJPbkJ1aWxkIjpudWxsfSwiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiaGlzdG9yeSI6W3siY3JlYXRlZCI6IjIwMjMtMDUtMDlUMjM6MTE6MTAuMDA3MjE3NTUzWiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jICMobm9wKSBBREQgZmlsZTo3NjI1ZGRmZDU4OWZiODI0ZWUzOWYxYjFlYjM4N2I5OGYzNjc2NDIwZmY1MmYyNmViOWQ5NzUxNTFlODg5NjY3IGluIC8gIn0seyJjcmVhdGVkIjoiMjAyMy0wNS0wOVQyMzoxMToxMC4xMzIxNDc1MjZaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApICBDTUQgW1wiL2Jpbi9zaFwiXSIsImVtcHR5X2xheWVyIjp0cnVlfSx7ImNyZWF0ZWQiOiIyMDIzLTA1LTEwVDEwOjEwOjExWiIsImNyZWF0ZWRfYnkiOiJFTlYgUEFUSD0vdXNyL2xvY2FsL2JpbjovdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iLCJjb21tZW50IjoiYnVpbGRraXQuZG9ja2VyZmlsZS52MCIsImVtcHR5X2xheWVyIjp0cnVlfSx7ImNyZWF0ZWQiOiIyMDIzLTA1LTEwVDEwOjEwOjExWiIsImNyZWF0ZWRfYnkiOiJFTlYgTEFORz1DLlVURi04IiwiY29tbWVudCI6ImJ1aWxka2l0LmRvY2tlcmZpbGUudjAiLCJlbXB0eV9sYXllciI6dHJ1ZX0seyJjcmVhdGVkIjoiMjAyMy0wNS0xMFQxMDoxMDoxMVoiLCJjcmVhdGVkX2J5IjoiUlVOIC9iaW4vc2ggLWMgc2V0IC1ldXg7IFx0YXBrIGFkZCAtLW5vLWNhY2hlIFx0XHRjYS1jZXJ0aWZpY2F0ZXMgXHRcdHR6ZGF0YSBcdDsgIyBidWlsZGtpdCIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIn0seyJjcmVhdGVkIjoiMjAyMy0wNS0xMFQxMDoxMDoxMVoiLCJjcmVhdGVkX2J5IjoiRU5WIEdQR19LRVk9QTAzNUM4QzE5MjE5QkE4MjFFQ0VBODZCNjRFNjI4RjhENjg0Njk2RCIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IkVOViBQWVRIT05fVkVSU0lPTj0zLjExLjMiLCJjb21tZW50IjoiYnVpbGRraXQuZG9ja2VyZmlsZS52MCIsImVtcHR5X2xheWVyIjp0cnVlfSx7ImNyZWF0ZWQiOiIyMDIzLTA1LTEwVDEwOjEwOjExWiIsImNyZWF0ZWRfYnkiOiJSVU4gL2Jpbi9zaCAtYyBzZXQgLWV1eDsgXHRcdGFwayBhZGQgLS1uby1jYWNoZSAtLXZpcnR1YWwgLmJ1aWxkLWRlcHMgXHRcdGdudXBnIFx0XHR0YXIgXHRcdHh6IFx0XHRcdFx0Ymx1ZXotZGV2IFx0XHRiemlwMi1kZXYgXHRcdGRwa2ctZGV2IGRwa2cgXHRcdGV4cGF0LWRldiBcdFx0ZmluZHV0aWxzIFx0XHRnY2MgXHRcdGdkYm0tZGV2IFx0XHRsaWJjLWRldiBcdFx0bGliZmZpLWRldiBcdFx0bGlibnNsLWRldiBcdFx0bGlidGlycGMtZGV2IFx0XHRsaW51eC1oZWFkZXJzIFx0XHRtYWtlIFx0XHRuY3Vyc2VzLWRldiBcdFx0b3BlbnNzbC1kZXYgXHRcdHBheC11dGlscyBcdFx0cmVhZGxpbmUtZGV2IFx0XHRzcWxpdGUtZGV2IFx0XHR0Y2wtZGV2IFx0XHR0ayBcdFx0dGstZGV2IFx0XHR1dGlsLWxpbnV4LWRldiBcdFx0eHotZGV2IFx0XHR6bGliLWRldiBcdDsgXHRcdHdnZXQgLU8gcHl0aG9uLnRhci54eiBcImh0dHBzOi8vd3d3LnB5dGhvbi5vcmcvZnRwL3B5dGhvbi8ke1BZVEhPTl9WRVJTSU9OJSVbYS16XSp9L1B5dGhvbi0kUFlUSE9OX1ZFUlNJT04udGFyLnh6XCI7IFx0d2dldCAtTyBweXRob24udGFyLnh6LmFzYyBcImh0dHBzOi8vd3d3LnB5dGhvbi5vcmcvZnRwL3B5dGhvbi8ke1BZVEhPTl9WRVJTSU9OJSVbYS16XSp9L1B5dGhvbi0kUFlUSE9OX1ZFUlNJT04udGFyLnh6LmFzY1wiOyBcdEdOVVBHSE9NRT1cIiQobWt0ZW1wIC1kKVwiOyBleHBvcnQgR05VUEdIT01FOyBcdGdwZyAtLWJhdGNoIC0ta2V5c2VydmVyIGhrcHM6Ly9rZXlzLm9wZW5wZ3Aub3JnIC0tcmVjdi1rZXlzIFwiJEdQR19LRVlcIjsgXHRncGcgLS1iYXRjaCAtLXZlcmlmeSBweXRob24udGFyLnh6LmFzYyBweXRob24udGFyLnh6OyBcdGdwZ2NvbmYgLS1raWxsIGFsbDsgXHRybSAtcmYgXCIkR05VUEdIT01FXCIgcHl0aG9uLnRhci54ei5hc2M7IFx0bWtkaXIgLXAgL3Vzci9zcmMvcHl0aG9uOyBcdHRhciAtLWV4dHJhY3QgLS1kaXJlY3RvcnkgL3Vzci9zcmMvcHl0aG9uIC0tc3RyaXAtY29tcG9uZW50cz0xIC0tZmlsZSBweXRob24udGFyLnh6OyBcdHJtIHB5dGhvbi50YXIueHo7IFx0XHRjZCAvdXNyL3NyYy9weXRob247IFx0Z251QXJjaD1cIiQoZHBrZy1hcmNoaXRlY3R1cmUgLS1xdWVyeSBERUJfQlVJTERfR05VX1RZUEUpXCI7IFx0Li9jb25maWd1cmUgXHRcdC0tYnVpbGQ9XCIkZ251QXJjaFwiIFx0XHQtLWVuYWJsZS1sb2FkYWJsZS1zcWxpdGUtZXh0ZW5zaW9ucyBcdFx0LS1lbmFibGUtb3B0aW1pemF0aW9ucyBcdFx0LS1lbmFibGUtb3B0aW9uLWNoZWNraW5nPWZhdGFsIFx0XHQtLWVuYWJsZS1zaGFyZWQgXHRcdC0td2l0aC1sdG8gXHRcdC0td2l0aC1zeXN0ZW0tZXhwYXQgXHRcdC0td2l0aG91dC1lbnN1cmVwaXAgXHQ7IFx0bnByb2M9XCIkKG5wcm9jKVwiOyBcdEVYVFJBX0NGTEFHUz1cIi1EVEhSRUFEX1NUQUNLX1NJWkU9MHgxMDAwMDBcIjsgXHRMREZMQUdTPVwiJHtMREZMQUdTOi0tV2x9LC0tc3RyaXAtYWxsXCI7IFx0bWFrZSAtaiBcIiRucHJvY1wiIFx0XHRcIkVYVFJBX0NGTEFHUz0ke0VYVFJBX0NGTEFHUzotfVwiIFx0XHRcIkxERkxBR1M9JHtMREZMQUdTOi19XCIgXHRcdFwiUFJPRklMRV9UQVNLPSR7UFJPRklMRV9UQVNLOi19XCIgXHQ7IFx0cm0gcHl0aG9uOyBcdG1ha2UgLWogXCIkbnByb2NcIiBcdFx0XCJFWFRSQV9DRkxBR1M9JHtFWFRSQV9DRkxBR1M6LX1cIiBcdFx0XCJMREZMQUdTPSR7TERGTEFHUzotLVdsfSwtcnBhdGg9J1xcJFxcJE9SSUdJTi8uLi9saWInXCIgXHRcdFwiUFJPRklMRV9UQVNLPSR7UFJPRklMRV9UQVNLOi19XCIgXHRcdHB5dGhvbiBcdDsgXHRtYWtlIGluc3RhbGw7IFx0XHRjZCAvOyBcdHJtIC1yZiAvdXNyL3NyYy9weXRob247IFx0XHRmaW5kIC91c3IvbG9jYWwgLWRlcHRoIFx0XHRcXCggXHRcdFx0XFwoIC10eXBlIGQgLWEgXFwoIC1uYW1lIHRlc3QgLW8gLW5hbWUgdGVzdHMgLW8gLW5hbWUgaWRsZV90ZXN0IFxcKSBcXCkgXHRcdFx0LW8gXFwoIC10eXBlIGYgLWEgXFwoIC1uYW1lICcqLnB5YycgLW8gLW5hbWUgJyoucHlvJyAtbyAtbmFtZSAnbGlicHl0aG9uKi5hJyBcXCkgXFwpIFx0XHRcXCkgLWV4ZWMgcm0gLXJmICd7fScgKyBcdDsgXHRcdGZpbmQgL3Vzci9sb2NhbCAtdHlwZSBmIC1leGVjdXRhYmxlIC1ub3QgXFwoIC1uYW1lICcqdGtpbnRlcionIFxcKSAtZXhlYyBzY2FuZWxmIC0tbmVlZGVkIC0tbm9iYW5uZXIgLS1mb3JtYXQgJyVuI3AnICd7fScgJzsnIFx0XHR8IHRyICcsJyAnXFxuJyBcdFx0fCBzb3J0IC11IFx0XHR8IGF3ayAnc3lzdGVtKFwiWyAtZSAvdXNyL2xvY2FsL2xpYi9cIiAkMSBcIiBdXCIpID09IDAgeyBuZXh0IH0geyBwcmludCBcInNvOlwiICQxIH0nIFx0XHR8IHhhcmdzIC1ydCBhcGsgYWRkIC0tbm8tbmV0d29yayAtLXZpcnR1YWwgLnB5dGhvbi1ydW5kZXBzIFx0OyBcdGFwayBkZWwgLS1uby1uZXR3b3JrIC5idWlsZC1kZXBzOyBcdFx0cHl0aG9uMyAtLXZlcnNpb24gIyBidWlsZGtpdCIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIn0seyJjcmVhdGVkIjoiMjAyMy0wNS0xMFQxMDoxMDoxMVoiLCJjcmVhdGVkX2J5IjoiUlVOIC9iaW4vc2ggLWMgc2V0IC1ldXg7IFx0Zm9yIHNyYyBpbiBpZGxlMyBweWRvYzMgcHl0aG9uMyBweXRob24zLWNvbmZpZzsgZG8gXHRcdGRzdD1cIiQoZWNobyBcIiRzcmNcIiB8IHRyIC1kIDMpXCI7IFx0XHRbIC1zIFwiL3Vzci9sb2NhbC9iaW4vJHNyY1wiIF07IFx0XHRbICEgLWUgXCIvdXNyL2xvY2FsL2Jpbi8kZHN0XCIgXTsgXHRcdGxuIC1zdlQgXCIkc3JjXCIgXCIvdXNyL2xvY2FsL2Jpbi8kZHN0XCI7IFx0ZG9uZSAjIGJ1aWxka2l0IiwiY29tbWVudCI6ImJ1aWxka2l0LmRvY2tlcmZpbGUudjAifSx7ImNyZWF0ZWQiOiIyMDIzLTA1LTEwVDEwOjEwOjExWiIsImNyZWF0ZWRfYnkiOiJFTlYgUFlUSE9OX1BJUF9WRVJTSU9OPTIyLjMuMSIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IkVOViBQWVRIT05fU0VUVVBUT09MU19WRVJTSU9OPTY1LjUuMSIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IkVOViBQWVRIT05fR0VUX1BJUF9VUkw9aHR0cHM6Ly9naXRodWIuY29tL3B5cGEvZ2V0LXBpcC9yYXcvMGQ4NTcwZGM0NDc5NmY0MzY5YjY1MjIyMmNmMTc2YjNkYjZhYzcwZS9wdWJsaWMvZ2V0LXBpcC5weSIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IkVOViBQWVRIT05fR0VUX1BJUF9TSEEyNTY9OTY0NjFkZWNlZDVjMmE0ODdkZGM2NTIwN2VjNWE5Y2ZmZWNhMGQzNGU3YWY3ZWExYWZjNDcwZmYwZDc0NjIwNyIsImNvbW1lbnQiOiJidWlsZGtpdC5kb2NrZXJmaWxlLnYwIiwiZW1wdHlfbGF5ZXIiOnRydWV9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IlJVTiAvYmluL3NoIC1jIHNldCAtZXV4OyBcdFx0d2dldCAtTyBnZXQtcGlwLnB5IFwiJFBZVEhPTl9HRVRfUElQX1VSTFwiOyBcdGVjaG8gXCIkUFlUSE9OX0dFVF9QSVBfU0hBMjU2ICpnZXQtcGlwLnB5XCIgfCBzaGEyNTZzdW0gLWMgLTsgXHRcdGV4cG9ydCBQWVRIT05ET05UV1JJVEVCWVRFQ09ERT0xOyBcdFx0cHl0aG9uIGdldC1waXAucHkgXHRcdC0tZGlzYWJsZS1waXAtdmVyc2lvbi1jaGVjayBcdFx0LS1uby1jYWNoZS1kaXIgXHRcdC0tbm8tY29tcGlsZSBcdFx0XCJwaXA9PSRQWVRIT05fUElQX1ZFUlNJT05cIiBcdFx0XCJzZXR1cHRvb2xzPT0kUFlUSE9OX1NFVFVQVE9PTFNfVkVSU0lPTlwiIFx0OyBcdHJtIC1mIGdldC1waXAucHk7IFx0XHRwaXAgLS12ZXJzaW9uICMgYnVpbGRraXQiLCJjb21tZW50IjoiYnVpbGRraXQuZG9ja2VyZmlsZS52MCJ9LHsiY3JlYXRlZCI6IjIwMjMtMDUtMTBUMTA6MTA6MTFaIiwiY3JlYXRlZF9ieSI6IkNNRCBbXCJweXRob24zXCJdIiwiY29tbWVudCI6ImJ1aWxka2l0LmRvY2tlcmZpbGUudjAiLCJlbXB0eV9sYXllciI6dHJ1ZX1dLCJvcyI6ImxpbnV4Iiwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6YmIwMWJkN2UzMmI1OGI2Njk0YzhjMzYyMmMyMzAxNzFmMWNlYzI0MDAxYTgyMDY4YThkMzBkMzM4ZjQyMGQ2YyIsInNoYTI1NjoyMDg5NzdhYzgxZDc5YTMzMDgyYmFiY2I2MmU2OTcxMDE4ZWMyOGRmM2I3YTJkN2M4ZDFjNDAzNDI1MWNmYTFjIiwic2hhMjU2OjhlMGU0OTg1MTRjNjFmMjZkOTZlNzI4OWJhMmNiZGExMjUyMzgxODhmMzQyNTFjM2FjOWFlNTQyZTUxNjRjYjgiLCJzaGEyNTY6MDdjMjkyNzNhYWU2N2I1ODExNTAwMTJjMmRmMGZmZmJjMjQ3NGVlMTdjZjRhZDc1MzU4ZDk1NmRmYmVlZjI3ZiIsInNoYTI1NjoxYWEwZWZhYzBlNjU2OTcxNTk3NWVlZjE1MGIzNzVjY2FkMGUxMjliZDM5MWRhMzg1OTkxMjQzZjMwZDkyMWJiIl19fQ==",
+                    "imageID": "sha256:b6b068cda0cf592463549591ed736c4e87a6c5404335c09e01ba5b3eb0e9970b",
+                    "imageSize": 51845034,
+                    "layers": [
+                        {
+                            "digest": "sha256:bb01bd7e32b58b6694c8c3622c230171f1cec24001a82068a8d30d338f420d6c",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 7322585
+                        },
+                        {
+                            "digest": "sha256:208977ac81d79a33082babcb62e6971018ec28df3b7a2d7c8d1c4034251cfa1c",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 1629642
+                        },
+                        {
+                            "digest": "sha256:8e0e498514c61f26d96e7289ba2cbda125238188f34251c3ac9ae542e5164cb8",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 31903840
+                        },
+                        {
+                            "digest": "sha256:07c29273aae67b581150012c2df0fffbc2474ee17cf4ad75358d956dfbeef27f",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 0
+                        },
+                        {
+                            "digest": "sha256:1aa0efac0e6569715975eef150b375ccad0e129bd391da385991243f30d921bb",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 10988967
+                        }
+                    ],
+                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogNjI2NSwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YjZiMDY4Y2RhMGNmNTkyNDYzNTQ5NTkxZWQ3MzZjNGU4N2E2YzU0MDQzMzVjMDllMDFiYTViM2ViMGU5OTcwYiIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDMzOTc0OTAsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjhhNDlmZGIzYjZhNWZmMmJkOGVjNmE4NmMwNWIyOTIyYTBmNzQ1NDU3OWVjYzA3NjM3ZTk0ZGZkMWQwNjM5YjYiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiA2MjIzMDEsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjAzNTc5MjJlNTNhYTg2NzFlMTc1ZjU4ZDQ2YmZkMjQ1OTA4MDQ3YjgxZTY2MzcwZjYzNDg2Mzc4NWZlMGM3MGUiCiAgICAgIH0sCiAgICAgIHsKICAgICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQuZG9ja2VyLmltYWdlLnJvb3Rmcy5kaWZmLnRhci5nemlwIiwKICAgICAgICAgInNpemUiOiAxMjQxMzExNiwKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6OTY3NmI2ZDRiOTY0NWI4ZDlhNjdkMWVjMTZjNWQyYzcyY2U4NDA2YTljYzcyZmQ0ZmM5ZTdkNWMxYjU5MTZjZCIKICAgICAgfSwKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDI0MCwKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ZGRiZDAzZWUxMDU5NDA4NTNmNWVlMzRmZGI0NDFjNGYxODdmYTI2NDc2ZGZhNzEwNzU2MGUxNzJkZWI2YzM3MSIKICAgICAgfSwKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDMwODA0OTUsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2Ojg3N2EwNTM4MzZhMzQ1ZjUzM2FhYzQzY2M0YjQ0ZjM0OGQ3NGIwYzMyYWQzNzc4MTQ3ZDRjNGExNDNiNWNlNjgiCiAgICAgIH0KICAgXQp9",
+                    "manifestDigest": "sha256:caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7",
+                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                    "os": "linux",
+                    "repoDigests": [
+                        "index.docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07"
+                    ],
+                    "tags": [],
+                    "userInput": "docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07"
+                },
+                "name": "docker.io/library/python",
+                "type": "image",
+                "version": "sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07"
+            }
+        }
+    },
+    "status": {}
+}

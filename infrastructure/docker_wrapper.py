@@ -120,14 +120,14 @@ class DockerWrapper(object):
     try:        
         api_client = docker.APIClient()
     except Exception as ex:
-        print("docker sock not found. only non-docker tests are allowed", ex)    
+        pass
 
     def __init__(self):
         self.docker_client = None
         try:
             self.docker_client = docker.DockerClient()
         except Exception as ex:
-            print("docker sock not found. only non-docker tests are allowed", ex)
+            pass
 
         # tcp
         self._tcp_dump_img = 'kaazing/tcpdump:latest'

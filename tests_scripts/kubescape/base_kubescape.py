@@ -84,7 +84,7 @@ class BaseKubescape(BaseK8S):
             raise Exception('backend_obj must be specified')
         self.api_url = self.test_driver.backend_obj.get_api_url()
         self.host_scan_yaml = self.test_driver.kwargs.get("host_scan_yaml", None)
-        self.remove_cluster_from_backend = False
+        self.remove_cluster_from_backend = self.test_driver.kwargs.get("remove_cluster_from_backend", True)
 
     def default_scan(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
@@ -94,7 +94,7 @@ class BaseKubescape(BaseK8S):
 
     def is_kubescape_config_file_exist(self):
         return os.path.exists(self.get_kubescape_config_file())
-    
+
     def is_kubescape_data_dir_exist(self):
         return os.path.exists(self.get_kubescape_data_dir_path())
 
@@ -115,22 +115,23 @@ class BaseKubescape(BaseK8S):
             self.create_kubescape_config_file()
         res_file = self.get_default_results_file()
         with open(res_file, "w") as f:
-            return self.config(stdout=f,**kwargs)
+            return self.config(stdout=f, **kwargs)
 
     def cleanup(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
-            TestUtil.sleep(150, "Waiting for aggregation to end")
+            TestUtil.sleep(50, "Waiting for aggregation to end")
+
             self.cluster_deleted = self.delete_cluster_from_backend()
         super().cleanup(**kwargs)
         return statics.SUCCESS, ""
 
     def get_default_results_file(self):
         return os.path.join(self.test_driver.temp_dir, "results.json")
-    
+
     def get_kubescape_config_file(self):
         return os.path.join(os.path.expanduser('~'), ".kubescape", "config.json")
-    
+
     def get_kubescape_data_dir_path(self):
         return os.path.join(os.path.expanduser('~'), ".kubescape")
 
@@ -157,7 +158,7 @@ class BaseKubescape(BaseK8S):
             command.extend(["--account", self.backend.get_customer_guid()])
             env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
         command.extend(["--server", self.api_url])
-        
+
         Logger.logger.info(" ".join(command))
         status_code, res = TestUtil.run_command(command_args=command,
                                                 env=env,
@@ -166,7 +167,7 @@ class BaseKubescape(BaseK8S):
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
         assert status_code == 0, res
         return res
-    
+
     def delete_kubescape_config_file(self, **kwargs):
         if self.kubescape_exec is None:
             return "kubescape_exec not found"
@@ -177,7 +178,6 @@ class BaseKubescape(BaseK8S):
         assert status_code == 0, res
         return res
 
-    
     def view_kubescape_config_file(self, **kwargs):
         command = [self.kubescape_exec, "config", "view"]
         status_code, res = TestUtil.run_command(command_args=command, timeout=360,
@@ -204,8 +204,6 @@ class BaseKubescape(BaseK8S):
         assert status_code == 0, res
         return res
 
-
-
     def scan(self, policy_scope: str = None, policy_name: str = None, output_format: str = None, output: str = None,
              **kwargs):
         command = [self.kubescape_exec, "scan", "--logger", "debug", "--format-version", "v2"]
@@ -228,11 +226,10 @@ class BaseKubescape(BaseK8S):
             command.extend(["--exceptions", kwargs['exceptions']])
         if "keep_local" in kwargs:
             command.append("--keep-local")
-        
+
         env = {}
         if "submit" in kwargs:
             command.append("--submit")
-            self.remove_cluster_from_backend = True
             account_id = kwargs["account"] if "account" in kwargs else self.backend.get_customer_guid()
             assert account_id, "missing account ID, the report will not be submitted"
             command.extend(["--account", self.backend.get_customer_guid()])
@@ -267,7 +264,7 @@ class BaseKubescape(BaseK8S):
 
         Logger.logger.info(" ".join(command))
 
-        status_code, res = TestUtil.run_command(command_args=command, 
+        status_code, res = TestUtil.run_command(command_args=command,
                                                 env=env,
                                                 timeout=360,
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
@@ -304,10 +301,11 @@ class BaseKubescape(BaseK8S):
         result = self.backend.ws_extract_receive(ws)
         return result
 
-    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None):
+    def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions="false", namespace=None, order_by=None):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_resources,
                                                framework_name=framework_name, report_guid=report_guid,
-                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace)
+                                               resource_name=resource_name, related_exceptions=related_exceptions,namespace=namespace,
+                                               order_by=order_by)
         return c_panel_info
 
     def get_top_controls_results(self, cluster_name):
@@ -614,7 +612,7 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def get_attributes_from_be_resources(be_resources: list, cluster: str, kind: str, name: str, namespace: str):
         for resource in be_resources:
-            attributes = resource['designators']['attributes']
+            attributes = resource['designators']['attributes']                
             if attributes['cluster'] == cluster and attributes['kind'] == kind and name in attributes['name'] and \
                     (len(namespace) == 0 or attributes['namespace'] == namespace):
                 return [control for x in resource['statusToControls'].values() for control in x]
@@ -637,7 +635,7 @@ class BaseKubescape(BaseK8S):
                 return control['ruleReports'][0]['ruleResponses']
 
     def test_failed_controls_in_resource(self, cli_result: dict, be_resources: list, cluster: str, kind: str, name: str,
-                                        namespace: str, api_version: str):
+                                         namespace: str, api_version: str):
         be_affected_controls = BaseKubescape.get_attributes_from_be_resources(be_resources=be_resources, kind=kind,
                                                                               cluster=cluster, name=name,
                                                                               namespace=namespace)
@@ -728,44 +726,46 @@ class BaseKubescape(BaseK8S):
                 break
         return False
 
+
+    def get_top_failed_controls_from_cli(self, cli_result, top_x = 5):
+           # Filter out only failed controls
+        failed_controls = {key: value for key, value in cli_result.items() if value['status'] == 'failed'}
+
+        # Sort the controls first by failedResources in descending order and then by controlID in ascending order
+        sorted_controls = sorted(failed_controls.items(), key=lambda x: (-x[1]['ResourceCounters']['failedResources'], x[0]))
+
+        # Return only the top X controls
+        return dict(sorted_controls[:top_x])
+
+
+    """
+    testing top controls from the BE. Comparing if the results received from the BE are aligned with the CLI results 
+    """
     def test_top_controls_from_backend(self, cli_result: dict, be_results: list, report_guid: str, framework_name: str):
         be_ctrl_ids = [be_ctrl["id"] for be_ctrl in be_results]
-        assert len(be_ctrl_ids) > 0 and len(
-            be_ctrl_ids) <= 5, "Top controls count should be between 1 to 5 but was {count}".format(
-            count=len(be_ctrl_ids))
-        for be_ctrl in be_results:
-            for id, control in cli_result["summaryDetails"]["controls"].items():
-                # check that there is no control with higher failed resources that is not in top 5 controls response
-                if be_ctrl['clusters'][0]['resourcesCount'] < control['ResourceCounters'][
-                    "failedResources"] and id not in be_ctrl_ids:
-                    assert False, "Control {ctrl} should be in top controls".format(ctrl=id)
+        assert 1 <= len(be_ctrl_ids) <= 5, f"Top controls count should be between 1 to 5 but was {len(be_ctrl_ids)}"
 
-                # check control data and failed resources
-                if be_ctrl["id"] == id:
-                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, "reportGUID should be {guid}".format(
-                        guid=report_guid)
-                    assert be_ctrl['clusters'][0][
-                               'topFailedFramework'] == framework_name, "framework name should be {name}".format(
-                        name=framework_name)
-                    assert be_ctrl['clusters'][0]['resourcesCount'] == control['ResourceCounters']["failedResources"], \
-                        "Control {ctrl} should have {count} failed resources".format(ctrl=id,
-                                                                                     count=control['ResourceCounters'][
-                                                                                         "failedResources"])
-                    assert be_ctrl['name'] == control['name'], "Control {ctrl} should have name {name}".format(ctrl=id,
-                                                                                                               name=
-                                                                                                               control[
-                                                                                                                   'name'])
-                    assert be_ctrl['baseScore'] == control[
-                        'scoreFactor'], "Control {ctrl} should have scored {scored}".format(ctrl=id,
-                                                                                            scored=control['scored'])
+        cl_top_failed = self.get_top_failed_controls_from_cli(cli_result["summaryDetails"]["controls"])
+
+        for be_ctrl in be_results:
+            for id, cli_control in cl_top_failed.items():
+                # assert id in be_ctrl_ids, f"Control {id} should be in the top controls list"
+                if be_ctrl['id'] == id:
+                    if be_ctrl['clusters'][0]['resourcesCount'] < cli_control['ResourceCounters']["failedResources"]:
+                        assert False, f"Control {id} Resource counters don't match. BE: {be_ctrl['clusters'][0]['resourcesCount']}, Results: {cli_control['ResourceCounters']['failedResources']} but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['clusters'][0]['reportGUID'] == report_guid, f"Control {be_ctrl['id']} reportGUID should be {report_guid} but was {be_ctrl['clusters'][0]['reportGUID']}"
+                    assert be_ctrl['clusters'][0]['topFailedFramework'] == framework_name, f"Control {be_ctrl['id']} framework name should be {framework_name} but was {be_ctrl['clusters'][0]['topFailedFramework']}"
+                    assert be_ctrl['clusters'][0]['resourcesCount'] == cli_control['ResourceCounters']["failedResources"], f"Control {be_ctrl['id']} should have {cli_control['ResourceCounters']['failedResources']} failed resources but was {be_ctrl['clusters'][0]['resourcesCount']}"
+                    assert be_ctrl['name'] == cli_control['name'], f"Control {be_ctrl['id']} should have name {cli_control['name']} but was {be_ctrl['name']}"
+                    assert be_ctrl['baseScore'] == cli_control['scoreFactor'], f"Control {be_ctrl['id']} should have scored {cli_control['scoreFactor']} but was {be_ctrl['baseScore']}"
 
     def test_resources_from_backend(self, cli_result: dict, be_resources: list):
         resources_obj = self.test_obj[("resources_for_test", [])]
         for resource_obj in resources_obj:
             self.test_failed_controls_in_resource(cli_result=cli_result, be_resources=be_resources,
-                                                 kind=resource_obj['kind'], api_version=resource_obj['apiVersion'],
-                                                 cluster=self.kubernetes_obj.get_cluster_name(),
-                                                 name=resource_obj['name'], namespace=resource_obj['namespace'])
+                                                  kind=resource_obj['kind'], api_version=resource_obj['apiVersion'],
+                                                  cluster=self.kubernetes_obj.get_cluster_name(),
+                                                  name=resource_obj['name'], namespace=resource_obj['namespace'])
 
     def test_api_version_info(self):
         cli_info = self.kubernetes_obj.get_info_version().to_dict()
@@ -788,11 +788,10 @@ class BaseKubescape(BaseK8S):
 
     def test_related_applied_in_be(self, control_name: str, control_id: str, report_guid: str, framework_name: str,
                                    resource_name: str, has_related: bool, has_applied: bool, namespace=None):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid, 
-                                                  resource_name=resource_name,related_exceptions="true",namespace=namespace)
-        # be_resources = self.get_posture_resources_by_control(related_exceptions="true", control_name=control_name,
-        #                                                      control_id=control_id, report_guid=report_guid,
-        #                                                      framework_name=framework_name)
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
+                                                  resource_name=resource_name, related_exceptions="true",
+                                                  namespace=namespace)
+
         resource = BaseKubescape.get_resource_from_be_resources(be_resources=be_resources, resource_name=resource_name)
         assert has_applied and len(resource["exceptionApplied"]) > 0 or not has_applied and \
                len(resource["exceptionApplied"]) == 0, "Applied-exception was received, " \
@@ -812,8 +811,8 @@ class BaseKubescape(BaseK8S):
         if framework_name not in statics.SECURITY_FRAMEWORKS:
             self.test_api_version_info()
             self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid,
-                                        framework_name=framework_name)
-            
+                                           framework_name=framework_name)
+
         # self.compare_framework_data(cli_result, framework_name, report_guid)
         self.compare_controls_data(cli_result, framework_name, report_guid)
         self.compare_resources_data(cli_result, framework_name, report_guid)
@@ -871,7 +870,8 @@ class BaseKubescape(BaseK8S):
         self.test_controls_from_backend(be_controls=be_controls, be_frameworks=be_frameworks, cli_controls=cli_controls)
 
     def compare_resources_data(self, cli_result, framework_name, report_guid):
-        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid)
+        be_resources = self.get_posture_resources(framework_name=framework_name, report_guid=report_guid,
+                                                  order_by="criticalSeverityControls:desc,highSeverityControls:desc,mediumSeverityControls:desc,lowSeverityControls:desc")
         self.test_resources_from_backend(be_resources=be_resources, cli_result=cli_result)
 
     def compare_top_controls_data(self, cli_result, cluster_name, report_guid, framework_name):
@@ -1126,14 +1126,14 @@ class BaseKubescape(BaseK8S):
                         be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                     return be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]
                 Logger.logger.info("get_report_guid - found report_guid: {}".format(
-                        be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
+                    be_cluster_overtime[statics.BE_CORDS_FIELD][statics.BE_REPORT_GUID_FIELD]))
                 found = True
                 # results where found, this means the backend started the aggregation, we will wait a little for the backend to complete the aggregation
                 time.sleep(20)
 
             time.sleep(5)
         raise Exception('Failed to get the report-guid for the last scan.')
-    
+
     def test_controls_compliance_score(self, report: dict):
         # for each control check that compliance score is the percentage of passed resources/total resources
         for _, control in report[_CLI_SUMMARY_DETAILS_FIELD][_CONTROLS_FIELD].items():
@@ -1146,52 +1146,58 @@ class BaseKubescape(BaseK8S):
                     passed_resources += amount
             if total_resources == 0:
                 if control[_CLI_STATUS_INFO_FIELD][_CLI_STATUS_FILED] == _CLI_STATUS_PASSED:
-                    assert control[_COMPLIANCE_SCORE_FIELD] == 100, "expected passed control to have compliance score of 100, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
+                    assert control[
+                               _COMPLIANCE_SCORE_FIELD] == 100, "expected passed control to have compliance score of 100, but it is {}".format(
+                        control[_COMPLIANCE_SCORE_FIELD])
                 else:
-                    assert control[_COMPLIANCE_SCORE_FIELD] == 0, "expected compliance score to be 0, but it is {}".format(control[_COMPLIANCE_SCORE_FIELD])
+                    assert control[
+                               _COMPLIANCE_SCORE_FIELD] == 0, "expected compliance score to be 0, but it is {}".format(
+                        control[_COMPLIANCE_SCORE_FIELD])
             else:
-                assert round(control[_COMPLIANCE_SCORE_FIELD], 2) == round((passed_resources / total_resources) * 100, 2), \
-                    "expected compliance score to be {}, but it is {}".format(round((passed_resources / total_resources) * 100, 2), round(control[_COMPLIANCE_SCORE_FIELD]), 2)
-    
+                assert round(control[_COMPLIANCE_SCORE_FIELD], 2) == round((passed_resources / total_resources) * 100,
+                                                                           2), \
+                    "expected compliance score to be {}, but it is {}".format(
+                        round((passed_resources / total_resources) * 100, 2), round(control[_COMPLIANCE_SCORE_FIELD]),
+                        2)
+
     def test_frameworks_compliance_score(self, report: dict):
         #  for each framework check that compliance score is the average of controls scores
         for framework in report[_CLI_SUMMARY_DETAILS_FIELD][_CLI_FRAMEWORKS_FIELD]:
             sum_scores = 0
             for c_id, control in framework[_CONTROLS_FIELD].items():
                 sum_scores += control[_COMPLIANCE_SCORE_FIELD]
-            assert round(framework[_COMPLIANCE_SCORE_FIELD], 2) == round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), \
-                "expected compliance score to be {}, but it is {}".format(round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), round(framework[_COMPLIANCE_SCORE_FIELD]), 2)
-
+            assert round(framework[_COMPLIANCE_SCORE_FIELD], 2) == round(sum_scores / len(framework[_CONTROLS_FIELD]),
+                                                                         2), \
+                "expected compliance score to be {}, but it is {}".format(
+                    round(sum_scores / len(framework[_CONTROLS_FIELD]), 2), round(framework[_COMPLIANCE_SCORE_FIELD]),
+                    2)
 
     def test_controls_compliance_score_from_backend(self, framework_report, report_guid, framework_name: str = ""):
         controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
         for control in controls:
-          c_id = control['id']
-          assert control[_COMPLIANCE_SCORE_FIELD] == framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], \
-            "in framework {}, expected compliance score in be of control: {} to be {}, but it is {}".format(
-              framework_name, c_id, framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], control[_COMPLIANCE_SCORE_FIELD])
+            c_id = control['id']
+            assert control[_COMPLIANCE_SCORE_FIELD] == framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD], \
+                "in framework {}, expected compliance score in be of control: {} to be {}, but it is {}".format(
+                    framework_name, c_id, framework_report[_CONTROLS_FIELD][c_id][_COMPLIANCE_SCORE_FIELD],
+                    control[_COMPLIANCE_SCORE_FIELD])
 
     def test_frameworks_compliance_score_from_backend(self, framework_report, report_guid, framework_name: str = ""):
         be_frameworks = self.get_posture_frameworks(framework_name=framework_name, report_guid=report_guid)
         assert framework_report[_COMPLIANCE_SCORE_FIELD] == be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1], \
             "expected framework: {} compliance score in be to be {}, but it is".format(
-            framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1])
+                framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_frameworks[0][_COMPLIANCE_SCORE_FIELDV1])
 
-
-    def test_compliance_score_in_clusters_overtime(self, cluster_name: str, framework_report: dict, framework_name: str = ""):
-        be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name, framework_name=framework_name)
-        assert len(be_cluster_overtime) > 0 , "expected to get response from clustersOvertime for framework {} in cluster {}".format(framework_name, cluster_name)
+    def test_compliance_score_in_clusters_overtime(self, cluster_name: str, framework_report: dict,
+                                                   framework_name: str = ""):
+        be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
+                                                                 framework_name=framework_name)
+        assert len(
+            be_cluster_overtime) > 0, "expected to get response from clustersOvertime for framework {} in cluster {}".format(
+            framework_name, cluster_name)
         # check that framework score from be_cluster_overtime matches the score from framework_report from kubescape
         assert be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD] == framework_report[_COMPLIANCE_SCORE_FIELD], \
             "expected framework: {} compliance score in be to be {}, but it is".format(  
             framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
-
-
-
-    def get_job_report_info(self, report_guid, cluster_wlid: str = ""):
-        c_panel_info, t = self.wait_for_report(report_type=self.backend.get_job_report_info,
-                                               report_guid=report_guid, cluster_wlid=cluster_wlid)
-        return c_panel_info
 
     def is_ks_cronjob_created(self, framework_name, timeout=60):
         start = time.time()
@@ -1222,44 +1228,50 @@ class BaseKubescape(BaseK8S):
     def parse_cli_args_in_list_to_string(data: list):
         result = ""
         for i in data[:-1]:
-            result+=i+","
-        result+=data[-1]
+            result += i + ","
+        result += data[-1]
         return result
 
     def parse_cli_args(self, **kwargs):
         cli_args = []
 
-        assert "scan" in kwargs['args'],'cli args must contain \"scan\"'
+        assert "scan" in kwargs['args'], 'cli args must contain \"scan\"'
         cli_args.append("scan")
 
-        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+        assert "trigger" in kwargs[
+            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
 
         trigger = kwargs['args']['trigger']
         if trigger == "config":
             cli_args.append("config")
             if "include-namespaces" in kwargs['args']:
-                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["include-namespaces"])])
+                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(
+                    data=kwargs['args']["include-namespaces"])])
             if "exclude-namespaces" in kwargs['args']:
-                cli_args.extend(["--exclude-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["exclude-namespaces"])])
+                cli_args.extend(["--exclude-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(
+                    data=kwargs['args']["exclude-namespaces"])])
             if "submit" in kwargs['args']:
                 cli_args.append("--submit")
             if "frameworks" in kwargs['args']:
-                cli_args.extend(["--frameworks", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["frameworks"])])
+                cli_args.extend(
+                    ["--frameworks", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["frameworks"])])
             if "enable-host-scan" in kwargs['args']:
                 cli_args.append("--enable-host-scan")
         elif trigger == "vulnerabilities":
             cli_args.append("vulnerabilities")
             if "include-namespaces" in kwargs['args']:
-                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(data=kwargs['args']["include-namespaces"])])
+                cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(
+                    data=kwargs['args']["include-namespaces"])])
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
 
         return cli_args
 
     def get_trigger_cli_full_command(self, cli_args: list):
-        command = [self.kubescape_exec, "operator"] 
+        command = [self.kubescape_exec, "operator"]
         command.extend(cli_args)
-        assert len(command) >= 4, 'minimum cli args should be 3 but we got less. got command: {command}'.format(command=command)
+        assert len(command) >= 4, 'minimum cli args should be 3 but we got less. got command: {command}'.format(
+            command=command)
         return command
 
     def trigger_in_cluster_components(self, cli_args: str, **kwargs):
@@ -1272,7 +1284,8 @@ class BaseKubescape(BaseK8S):
         return res
 
     def validate_cluster_trigger_as_expected(self, cluster_name: str, **kwargs):
-        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+        assert "trigger" in kwargs[
+            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
         trigger = kwargs['args']['trigger']
 
         if trigger == "config":
@@ -1280,36 +1293,44 @@ class BaseKubescape(BaseK8S):
         elif trigger == "vulnerabilities":
             self.validate_scan_trigger(cluster_name=cluster_name, deployment_name="operator", kwargs=kwargs)
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
 
     @staticmethod
     def parse_string_to_found_in_list_argument(prefix: str, argument: list, postfix: str):
-        string_to_found=prefix
+        string_to_found = prefix
         for data in argument[:-1]:
-            string_to_found+="\\\""+data+"\\\","
-        string_to_found+="\\\""+argument[-1]+"\\\"" + postfix
+            string_to_found += "\\\"" + data + "\\\","
+        string_to_found += "\\\"" + argument[-1] + "\\\"" + postfix
         return string_to_found
 
     @staticmethod
     def get_string_to_be_found(cluster_name: str, kwargs):
         string_to_be_found = []
 
-        assert "scan" in kwargs['args'],'cli args must contain \"scan\"'
-        assert "trigger" in kwargs['args'],'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+        assert "scan" in kwargs['args'], 'cli args must contain \"scan\"'
+        assert "trigger" in kwargs[
+            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
 
         trigger = kwargs['args']['trigger']
         if trigger == "config":
             if "include-namespaces" in kwargs['args']:
-                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"includeNamespaces\\\":[", kwargs['args']['include-namespaces'], "]"))
+                string_to_be_found.append(
+                    BaseKubescape.parse_string_to_found_in_list_argument("\\\"includeNamespaces\\\":[",
+                                                                         kwargs['args']['include-namespaces'], "]"))
             if "exclude-namespaces" in kwargs['args']:
-                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"excludedNamespaces\\\":[", kwargs['args']['exclude-namespaces'], "]"))
+                string_to_be_found.append(
+                    BaseKubescape.parse_string_to_found_in_list_argument("\\\"excludedNamespaces\\\":[",
+                                                                         kwargs['args']['exclude-namespaces'], "]"))
             if "submit" in kwargs['args']:
                 string_to_be_found.append("\\\"submit\\\":true")
             else:
                 string_to_be_found.append("\\\"submit\\\":false")
             if "frameworks" in kwargs['args']:
                 # \"targetNames\":[\"MITRE\"
-                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"targetNames\\\":[", kwargs['args']['frameworks'], ",\\\"security\\\"]"))
+                string_to_be_found.append(BaseKubescape.parse_string_to_found_in_list_argument("\\\"targetNames\\\":[",
+                                                                                               kwargs['args'][
+                                                                                                   'frameworks'],
+                                                                                               ",\\\"security\\\"]"))
             if "enable-host-scan" in kwargs['args']:
                 string_to_be_found.append("\\\"hostScanner\\\":true")
             else:
@@ -1317,34 +1338,44 @@ class BaseKubescape(BaseK8S):
         elif trigger == "vulnerabilities":
             if "include-namespaces" in kwargs['args']:
                 for ns in kwargs['args']['include-namespaces']:
-                    string_to_be_found.append("{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-"+cluster_name+"/namespace-"+ns)
+                    string_to_be_found.append(
+                        "{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-" + cluster_name + "/namespace-" + ns)
             else:
-                string_to_be_found.append("{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-"+cluster_name)
+                string_to_be_found.append(
+                    "{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-" + cluster_name)
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")  
+            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
 
-        return string_to_be_found        
-
+        return string_to_be_found
 
     def validate_scan_trigger(self, cluster_name: str, deployment_name: str, kwargs):
-        wlid = "wlid://cluster-{cluster_name}/namespace-kubescape/deployment-{deployment_name}".format(cluster_name=cluster_name, deployment_name=deployment_name)
+        wlid = "wlid://cluster-{cluster_name}/namespace-kubescape/deployment-{deployment_name}".format(
+            cluster_name=cluster_name, deployment_name=deployment_name)
         pods = self.get_pods(namespace="kubescape", wlid=wlid, include_terminating=False)
         for pod in pods:
-            pod_owner_reference = self.get_most_ancient_owner_reference(workload=self.get_workload(api_version="v1" ,name=pod.metadata.name, kind="Pod", namespace="kubescape"), namespace="kubescape")
+            pod_owner_reference = self.get_most_ancient_owner_reference(
+                workload=self.get_workload(api_version="v1", name=pod.metadata.name, kind="Pod", namespace="kubescape"),
+                namespace="kubescape")
             if pod_owner_reference['kind'] == "Deployment":
                 desired_pod = pod
                 break
 
         string_to_be_found = BaseKubescape.get_string_to_be_found(cluster_name=cluster_name, kwargs=kwargs)
-        string_to_be_found_counter=0
-        pod_name=""
+        string_to_be_found_counter = 0
+        pod_name = ""
         if deployment_name in desired_pod.metadata.name:
-            pod_name=desired_pod.metadata.name
+            pod_name = desired_pod.metadata.name
             for string in string_to_be_found:
                 try:
-                    self.find_string_in_log(namespace="kubescape", pod_name=desired_pod.metadata.name, containers=deployment_name, previous=False, string_in_log=string)
-                    string_to_be_found_counter+=1
+                    self.find_string_in_log(namespace="kubescape", pod_name=desired_pod.metadata.name,
+                                            containers=deployment_name, previous=False, string_in_log=string)
+                    string_to_be_found_counter += 1
                 except Exception as e:
-                    Logger.logger.warning("expected string not found in pod logs. expected string: {expected_string}".format(expected_string=string))
+                    Logger.logger.warning(
+                        "expected string not found in pod logs. expected string: {expected_string}".format(
+                            expected_string=string))
 
-        assert string_to_be_found_counter == len(string_to_be_found), 'not all expected string found in the log. pod log: {pod_log}'.format(pod_log=self.get_pod_logs(namespace="kubescape", pod_name=pod_name, containers=deployment_name, previous=False))
+        assert string_to_be_found_counter == len(
+            string_to_be_found), 'not all expected string found in the log. pod log: {pod_log}'.format(
+            pod_log=self.get_pod_logs(namespace="kubescape", pod_name=pod_name, containers=deployment_name,
+                                      previous=False))
