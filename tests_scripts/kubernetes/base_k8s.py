@@ -18,7 +18,6 @@ from threading import Thread
 import requests
 import hashlib
 
-
 from infrastructure import KubectlWrapper
 from infrastructure.helm_wrapper import HelmWrapper
 from infrastructure.thread_wrapper import WebsocketWrapper
@@ -29,6 +28,7 @@ from systest_utils.statics import Statistics
 from systest_utils.wlid import Wlid
 from tests_scripts.dockerize import BaseDockerizeTest
 from kubernetes import config, client, dynamic
+
 
 class BaseK8S(BaseDockerizeTest):
 
@@ -42,7 +42,8 @@ class BaseK8S(BaseDockerizeTest):
             cluster_name=TestUtil.get_arg_from_dict(self.test_driver.kwargs, "cluster", "minikube"))
 
         self.service_obj = None
-        self.remove_kubescape_namespace = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "remove_kubescape_namespace", True)
+        self.remove_kubescape_namespace = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
+                                                                     "remove_kubescape_namespace", True)
 
         self.env = {"ARMO_TEST_NAME": self.test_obj.get_name()}
         # agent_crash_report = False
@@ -50,6 +51,8 @@ class BaseK8S(BaseDockerizeTest):
             self.env["CAA_ENABLE_CRASH_REPORTER"] = "1"
 
         self.env.update(self.test_obj.get_arg("env", {}))
+
+        self.docker_default_secret = os.getenv("IMAGE_PULL_SECRET", default=None)
 
         # oracle_agent_logs_envs = {"CAA_ORACLE_UPDATES_INFO": "1", "CAA_ORACLE_UPDATES_INFO_DATA": "1"}
         # self.env.update(oracle_agent_logs_envs)
@@ -206,9 +209,11 @@ class BaseK8S(BaseDockerizeTest):
                 self.backend.get_cluster(cluster_name=cluster_name, expected_status_code=200)
             except Exception as ex:
                 if str(ex).find('received "404"') > -1:
-                    Logger.logger.info("Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
+                    Logger.logger.info(
+                        "Cluster '{}' was confirmed as already deleted from backend".format(cluster_name))
                     return True
-                Logger.logger.info("Cluster '{}' wasn't confirmed as already deleted from backend. Error: {}".format(cluster_name, ex))
+                Logger.logger.info(
+                    "Cluster '{}' wasn't confirmed as already deleted from backend. Error: {}".format(cluster_name, ex))
             Logger.logger.info("Deleting cluster '{}' from backend".format(cluster_name))
             self.backend.delete_cluster(cluster_name=cluster_name)
         except requests.ReadTimeout as e:
@@ -219,8 +224,8 @@ class BaseK8S(BaseDockerizeTest):
         if confirm_deletion:
             # verify cluster was deleted from backend
             cluster_result, _ = self.wait_for_report(report_type=self.backend.get_cluster, timeout=300,
-                                                    cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                    expected_status_code=404)
+                                                     cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                     expected_status_code=404)
             assert cluster_result, 'Failed to verify deleting cluster {x} from backend'. \
                 format(x=self.kubernetes_obj.get_cluster_name())
 
@@ -476,11 +481,12 @@ class BaseK8S(BaseDockerizeTest):
 
     @staticmethod
     def get_image_ids(pod):
-        return [(container_status.name, container_status.image_id)  for container_status in pod.status.container_statuses]
+        return [(container_status.name, container_status.image_id) for container_status in
+                pod.status.container_statuses]
 
     @staticmethod
     def get_image_tags(pod):
-        return [(container_spec.name, container_spec.image)  for container_spec in pod.spec.containers]
+        return [(container_spec.name, container_spec.image) for container_spec in pod.spec.containers]
 
     def get_pod_data(self, get_data_of_pod_call_back, namespace: str = "", subname: str = "", wlid: str = ""):
         """
@@ -518,12 +524,16 @@ class BaseK8S(BaseDockerizeTest):
     def get_first_owner_reference(self, workload, namespace):
         if len(workload['metadata']['ownerReferences']) == 0:
             return workload
-        return self.get_workload(api_version=workload['metadata']['ownerReferences'][0]['apiVersion'] ,name=workload['metadata']['ownerReferences'][0]['name'], kind=workload['metadata']['ownerReferences'][0]['kind'], namespace=namespace)
+        return self.get_workload(api_version=workload['metadata']['ownerReferences'][0]['apiVersion'],
+                                 name=workload['metadata']['ownerReferences'][0]['name'],
+                                 kind=workload['metadata']['ownerReferences'][0]['kind'], namespace=namespace)
 
     def get_owner_reference(self, pod, namespace):
         if len(pod.metadata.owner_references) == 0:
-            return self.get_workload(api_version="v1" ,name=pod.metadata.name, kind="Pod", namespace=namespace)
-        return self.get_workload(api_version=pod.metadata.owner_references[0].api_version ,name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind, namespace=namespace)
+            return self.get_workload(api_version="v1", name=pod.metadata.name, kind="Pod", namespace=namespace)
+        return self.get_workload(api_version=pod.metadata.owner_references[0].api_version,
+                                 name=pod.metadata.owner_references[0].name, kind=pod.metadata.owner_references[0].kind,
+                                 namespace=namespace)
 
     def get_most_ancient_owner_reference(self, workload, namespace):
         if 'ownerReferences' not in workload['metadata'].keys():
@@ -548,13 +558,14 @@ class BaseK8S(BaseDockerizeTest):
 
     # apiVersion-<>/namespace-<>/kind-<>/name-<>/containerName-<>
     def calculate_instance_ID(self, pod, namespace):
-        p_workload=self.get_owner_reference(pod, namespace)
+        p_workload = self.get_owner_reference(pod, namespace)
 
         instanceIDs = list()
         for container in p_workload['spec']['template']['spec']['containers']:
-            instanceIDs.append("apiVersion-" + p_workload["apiVersion"] + "/namespace-" + namespace + "/kind-" + p_workload['kind'] + "/name-" + p_workload['metadata']['name'] + "/containerName-" + container["name"])
+            instanceIDs.append(
+                "apiVersion-" + p_workload["apiVersion"] + "/namespace-" + namespace + "/kind-" + p_workload[
+                    'kind'] + "/name-" + p_workload['metadata']['name'] + "/containerName-" + container["name"])
         return instanceIDs
-
 
     @staticmethod
     def calculate_sid(secret, **kwargs):
@@ -646,14 +657,14 @@ class BaseK8S(BaseDockerizeTest):
                     continue
                 if kind == 'DaemonSet':
                     replicas += nodes_num
-                    Logger.logger.debug("For namespace {} daemonset {} replicas: {}".format(namespace, i.metadata.name, nodes_num))
+                    Logger.logger.debug(
+                        "For namespace {} daemonset {} replicas: {}".format(namespace, i.metadata.name, nodes_num))
                 else:
                     replicas += i.spec.replicas
                     Logger.logger.debug("For namespace {} {} replicas: {}".format(namespace, i.metadata.name,
-                                                                                   i.spec.replicas))
+                                                                                  i.spec.replicas))
         return replicas
 
-    
     def get_pod_if_ready(self, namespace: str, name: str):
         """
         Return pod if it is ready. Otherwise, raise an exception.
@@ -670,7 +681,9 @@ class BaseK8S(BaseDockerizeTest):
         """
         :return: list of running pods with all containers ready
         """
-        return list(filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []), self.get_pods(namespace=namespace, name=name)))
+        return list(
+            filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []),
+                   self.get_pods(namespace=namespace, name=name)))
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
         """
@@ -782,7 +795,45 @@ class BaseK8S(BaseDockerizeTest):
         namespace_obj = self.apply_yaml_file(
             yaml_file=yaml_file, path=path, namespace='', unique_name=unique_name, **kwargs)
         self.namespaces.append(self.get_workload_metadata_name(namespace_obj))
-        return self.get_workload_metadata_name(namespace_obj)
+        namespace_name = self.get_workload_metadata_name(namespace_obj)
+
+        if self.docker_default_secret:
+            self.patch_docker_default_secret(namespace=namespace_name, secret=self.docker_default_secret)
+        return namespace_name
+
+    def patch_docker_default_secret(self, namespace: str, secret: str):
+        """
+        Create secret:
+        kubectl create secret docker-registry docker-default-secret \
+          --docker-server=https://index.docker.io/v1/ \
+          --docker-username=your-dockerhub-username \
+          --docker-password=your-dockerhub-password \
+          --docker-email=your-dockerhub-email
+        kubectl get secret docker-default-secret -o jsonpath='{.data..dockerconfigjson}' | base64 --decode
+
+        set the IMAGE_PULL_SECRET env var from the value of
+        "kubectl get secret docker-default-secret -o jsonpath='{.data.\.dockerconfigjson}'"
+        """
+        secret_name = "docker-default-secret"
+        body = {
+            "kind": "Secret",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": secret_name
+            },
+            "type": "kubernetes.io/dockerconfigjson",
+            "data": {
+                ".dockerconfigjson": secret
+            },
+        }
+        self.apply_workload(workload=body, namespace=namespace)
+        p = {
+                "op": "add",
+                "path": "/secrets/0/imagePullSecrets/-",
+                "value": {"name": secret_name}
+            }
+        p = {"imagePullSecrets": [{"name": secret_name}]}
+        self.kubernetes_obj.patch_workload(namespace=namespace, name="default", kind="ServiceAccount", application=p)
 
     def display_kube_system_logs(self):
         self.display_apiserver_logs()
@@ -1005,7 +1056,6 @@ class BaseK8S(BaseDockerizeTest):
         if result[0] != 0:
             raise Exception(f"failed to run command {cmd} on pod {pod_name} in namespace {namespace}")
 
-
     def get_generated_network_policy(self, namespace: str, name: str):
         generated_network_policy = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
             group=statics.STORAGE_AGGREGATED_API_GROUP,
@@ -1016,7 +1066,7 @@ class BaseK8S(BaseDockerizeTest):
         )
 
         return generated_network_policy
-    
+
     def create_known_servers(self, body):
         self.kubernetes_obj.client_CustomObjectsApi.create_cluster_custom_object(
             group=statics.STORAGE_AGGREGATED_API_GROUP,
@@ -1035,7 +1085,7 @@ class BaseK8S(BaseDockerizeTest):
         )
 
         return network_neighbors
-    
+
     def get_SBOM_from_storage(self, SBOMKeys):
         SBOMs = []
         if isinstance(SBOMKeys, str):
@@ -1049,14 +1099,14 @@ class BaseK8S(BaseDockerizeTest):
             SBOMs.append((SBOMKeys, SBOM_data))
         elif isinstance(SBOMKeys, list):
             for key in SBOMKeys:
-              SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                group=statics.STORAGE_AGGREGATED_API_GROUP,
-                version=statics.STORAGE_AGGREGATED_API_VERSION,
-                name=key,
-                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                plural=statics.STORAGE_SBOM_PLURAL,
-            )
-              SBOMs.append((key, SBOM_data))
+                SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=key,
+                    namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                    plural=statics.STORAGE_SBOM_PLURAL,
+                )
+                SBOMs.append((key, SBOM_data))
         return SBOMs
 
     def get_CVEs_from_storage(self, CVEsKeys):
@@ -1073,12 +1123,12 @@ class BaseK8S(BaseDockerizeTest):
         elif isinstance(CVEsKeys, list):
             for key in CVEsKeys:
                 CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                group=statics.STORAGE_AGGREGATED_API_GROUP,
-                version=statics.STORAGE_AGGREGATED_API_VERSION,
-                name=key,
-                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                plural=statics.STORAGE_CVES_PLURAL,
-            )
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=key,
+                    namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                    plural=statics.STORAGE_CVES_PLURAL,
+                )
                 CVEs.append((key, CVE_data))
         return CVEs
 
@@ -1097,14 +1147,14 @@ class BaseK8S(BaseDockerizeTest):
                     filteredSBOMs.append((key, filtered_SBOM_data))
         elif isinstance(filteredSBOMKeys, list):
             for key in filteredSBOMKeys:
-              filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                group=statics.STORAGE_AGGREGATED_API_GROUP,
-                version=statics.STORAGE_AGGREGATED_API_VERSION,
-                name=key,
-                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
-            )
-              filteredSBOMs.append((key, filtered_SBOM_data))
+                filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=key,
+                    namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                    plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
+                )
+                filteredSBOMs.append((key, filtered_SBOM_data))
         return filteredSBOMs
 
     def get_filtered_CVEs_from_storage(self, filteredCVEsKEys):
@@ -1122,12 +1172,12 @@ class BaseK8S(BaseDockerizeTest):
                     filteredCVEs.append((key, cve_data))
         elif isinstance(filteredCVEsKEys, list):
             for key in filteredCVEsKEys:
-              cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                group=statics.STORAGE_AGGREGATED_API_GROUP,
-                version=statics.STORAGE_AGGREGATED_API_VERSION,
-                name=key,
-                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                plural=statics.STORAGE_CVES_PLURAL,
-            )
-              filteredCVEs.append((key, cve_data))
+                cve_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=key,
+                    namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                    plural=statics.STORAGE_CVES_PLURAL,
+                )
+                filteredCVEs.append((key, cve_data))
         return filteredCVEs
