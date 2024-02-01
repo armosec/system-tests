@@ -827,11 +827,6 @@ class BaseK8S(BaseDockerizeTest):
             },
         }
         self.apply_workload(workload=body, namespace=namespace)
-        p = {
-                "op": "add",
-                "path": "/secrets/0/imagePullSecrets/-",
-                "value": {"name": secret_name}
-            }
         p = {"imagePullSecrets": [{"name": secret_name}]}
         self.kubernetes_obj.patch_workload(namespace=namespace, name="default", kind="ServiceAccount", application=p)
 

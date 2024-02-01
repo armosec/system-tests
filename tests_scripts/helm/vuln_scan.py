@@ -521,7 +521,7 @@ class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):
         kwargs = {"triggerNewImageScan": True}
         if helm_kwargs:
             kwargs.update(helm_kwargs)
-        self.install_armo_helm_chart(kwargs)
+        self.install_armo_helm_chart(helm_kwargs=kwargs)
 
         # 2.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
