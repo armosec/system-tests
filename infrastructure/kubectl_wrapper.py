@@ -262,22 +262,24 @@ class KubectlWrapper(object):
         return status
 
     # apply kubernetes command
-    def patch_workload(self, namespace: str, application: dict, kind: str, name: str = None):
+    def patch_workload(self, namespace: str, application: any, kind: str, name: str = None):
 
         if 'Namespace' in kind:
             return self.run(method=self.client_CoreV1Api.patch_namespace, name=name, body=application)
         elif 'Deployment' in kind:
             method = self.client_AppsV1Api.patch_namespaced_deployment
-        elif 'Service' in kind:
+        elif 'Service' == kind:
             method = self.client_CoreV1Api.patch_namespaced_service
+        elif 'ServiceAccount' == kind:
+            method = self.client_CoreV1Api.patch_namespaced_service_account
         # elif 'ReplicaSet' in kind:
         #     status = self.client_AppsV1Api.create_namespaced_replica_set(namespace=namespace, body=application)
         # elif 'StatefulSet' in kind:
         #     status = self.client_AppsV1Api.patch_namespaced_stateful_set(namespace=namespace, body=application)
         # elif 'DaemonSet' in kind:
         #     status = self.client_AppsV1Api.patch_namespaced_daemon_set(namespace=namespace, body=application)
-        # elif 'Secret' in kind:
-        #     status = self.client_CoreV1Api.create_namespaced_secret(namespace=namespace, body=application)
+        elif 'Secret' in kind:
+            method = self.client_CoreV1Api.patch_namespaced_secret
         else:
             raise Exception('Unsupported Kind ,{0}, patching workload failed'.format(kind))
         return self.run(method=method, namespace=namespace, name=name, body=application)

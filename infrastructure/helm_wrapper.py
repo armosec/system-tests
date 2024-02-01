@@ -3,13 +3,11 @@ import os
 from systest_utils import TestUtil, statics, Logger
 import yaml
 
-
 CREATE_CERTIFICATE_SCRIPT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "create_certificate.sh")
 CREATE_CONFIGMAPS_SCRIPT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "create_configmaps.sh")
 BASE64_ENCODED_SECRET_SCRIPT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "base64_encoded_secret.sh")
 SAN_SCR_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "san_scr.cnf")
 HTTPD_CONF_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd.conf")
-
 
 
 class HelmWrapper(object):
@@ -18,7 +16,8 @@ class HelmWrapper(object):
 
     @staticmethod
     def add_armo_to_repo():
-        TestUtil.run_command(command_args=["helm", "repo", "add", "kubescape", "https://kubescape.github.io/helm-charts/"])
+        TestUtil.run_command(
+            command_args=["helm", "repo", "add", "kubescape", "https://kubescape.github.io/helm-charts/"])
 
     @staticmethod
     def upgrade_armo_in_repo():
@@ -27,12 +26,15 @@ class HelmWrapper(object):
 
     @staticmethod
     def install_armo_helm_chart(customer: str, access_key: str, server: str, cluster_name: str,
-                                repo: str=statics.HELM_REPO, helm_kwargs:dict={}):
-        command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", statics.CA_NAMESPACE_FROM_HELM_NAME,
-                        "--create-namespace",
+                                repo: str = statics.HELM_REPO, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME,
+                                create_namespace: bool = True,
+                                helm_kwargs: dict = {}):
+        command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,
                         "--set", "account={x}".format(x=customer),
                         "--set", "server={x}".format(x=server),
                         "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
+        if create_namespace:
+            command_args.append("--create-namespace")
 
         if access_key != "":
             command_args.extend(["--set", "accessKey={x}".format(x=access_key)])
@@ -49,17 +51,18 @@ class HelmWrapper(object):
             command_args.extend(["--set", f"{k}={v}"])
 
         return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
-        assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code, return_obj.stdout, return_obj.stderr)
+        assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code,
+                                                                                                    return_obj.stdout,
+                                                                                                    return_obj.stderr)
 
     @staticmethod
     def uninstall_kubescape_chart():
-        TestUtil.run_command(command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
+        TestUtil.run_command(
+            command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
 
     @staticmethod
     def remove_armo_from_repo():
         TestUtil.run_command(command_args=["helm", "repo", "remove", "kubescape"])
-
-
 
     ################### Helm proxy related functions
 
@@ -67,15 +70,16 @@ class HelmWrapper(object):
     def create_helm_proxy_certificates():
         TestUtil.run_command(command_args=f"chmod u+x {CREATE_CERTIFICATE_SCRIPT_PATH}")
         status, return_obj = TestUtil.run_command(command_args=[CREATE_CERTIFICATE_SCRIPT_PATH])
-        assert status == 0, "Failed to get certificates for helm proxy. return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(status, return_obj.stdout, return_obj.stderr)
+        assert status == 0, "Failed to get certificates for helm proxy. return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(
+            status, return_obj.stdout, return_obj.stderr)
         Logger.logger.info('Helm proxy certificates were created.')
-
 
     @staticmethod
     def create_helm_proxy_configmaps():
         TestUtil.run_command(command_args=f"chmod u+x {CREATE_CONFIGMAPS_SCRIPT_PATH}")
         status, return_obj = TestUtil.run_command(command_args=[CREATE_CONFIGMAPS_SCRIPT_PATH])
-        assert status == 0, "Failed to create configmaps for helm proxy. return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(status, return_obj.stdout, return_obj.stderr)
+        assert status == 0, "Failed to create configmaps for helm proxy. return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(
+            status, return_obj.stdout, return_obj.stderr)
         Logger.logger.info('Helm proxy configmaps were created.')
 
     @staticmethod
@@ -119,12 +123,11 @@ class HelmWrapper(object):
         HelmWrapper.create_helm_proxy_certificates()
         HelmWrapper.create_helm_proxy_configmaps()
 
-
         TestUtil.run_command(command_args=f"chmod u+x {BASE64_ENCODED_SECRET_SCRIPT_PATH}")
-        status, return_obj =  TestUtil.run_command(command_args=[BASE64_ENCODED_SECRET_SCRIPT_PATH], display_stdout=False)
+        status, return_obj = TestUtil.run_command(command_args=[BASE64_ENCODED_SECRET_SCRIPT_PATH],
+                                                  display_stdout=False)
 
         Logger.logger.info(f"Helm proxy with url: '{helm_proxy_url}' configured successfully.")
 
-        return {"global.httpsProxy": helm_proxy_url, 
+        return {"global.httpsProxy": helm_proxy_url,
                 "global.proxySecretFile": return_obj.stdout.decode("utf-8")}
-        
