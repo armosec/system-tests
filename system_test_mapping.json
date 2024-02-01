@@ -561,27 +561,27 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage",
-            "cadashboardbe",
-            "event-ingester-service"
+            "helm-chart-dummy",
+            "node-agent-dummy",
+            "storage-dummy",
+            "cadashboardbe-dummy",
+            "event-ingester-service-dummy"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
         "skip_on_environment": ""
     },
     "network_policy_data_appended": {
         "target": [
-            "In cluster",
-            "Backend"
+            "In cluster-dummy",
+            "Backend-dummy"
         ],
         "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage",
-            "operator",
-            "cadashboardbe",
-            "event-ingester-service"
+            "helm-chart-dummy",
+            "node-agent-dummy",
+            "storage-dummy",
+            "operator-dummy",
+            "cadashboardbe-dummy",
+            "event-ingester-service-dummy"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
         "skip_on_environment": ""
@@ -592,12 +592,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart",
-            "node-agent",
-            "storage",
-            "operator",
-            "cadashboardbe",
-            "event-ingester-service"
+            "helm-chart-dummy",
+            "node-agent-dummy",
+            "storage-dummy",
+            "operator-dummy",
+            "cadashboardbe-dummy",
+            "event-ingester-service-dummy"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after pod restarted",
         "skip_on_environment": ""
