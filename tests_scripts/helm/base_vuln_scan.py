@@ -1010,6 +1010,8 @@ class BaseVulnerabilityScanning(BaseHelm):
             del result_data['metadata']['annotations'][statics.RELEVANCY_INSTANCE_ID_LABEL]
             del result_data['metadata']['annotations'][statics.RELEVANCY_WLID_ANNOTATION]
             del result_data['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL]
+            del result_data['metadata']['labels'][statics.RELEVANCY_TEMPLATE_HASH_LABEL]
+            del result_data['metadata']['labels'][statics.RELEVANCY_RESOURCE_VERSION_LABEL]
             with open(store_path, 'w') as f:
                 json.dump(result_data, f)
 
@@ -1064,6 +1066,8 @@ class BaseVulnerabilityScanning(BaseHelm):
         verified_CVEs = 0
         for expected_CVE in expected_CVEs_path:
             for CVE in CVEs:
+                if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
+                    self.store_filter_data_for_first_time_results(result=CVE, store_path=expected_CVE[1])
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)

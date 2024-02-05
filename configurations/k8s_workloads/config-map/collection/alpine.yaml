@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  example-config.txt: |
+    dmVyeSBpbXBvcnRhbnQgZmlsZQ==
+kind: ConfigMap
+metadata:
+  name: alpine-configmap
