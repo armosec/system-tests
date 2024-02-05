@@ -958,9 +958,10 @@ class BaseVulnerabilityScanning(BaseHelm):
                 files.append(fileData['name'])
         return files
 
-    def get_annotations_from_SBOM(self, SBOM):
+    @staticmethod
+    def get_annotations_from_crd(obj):
         annotations = {}
-        for key, annotation in SBOM['metadata']['annotations'].items():
+        for key, annotation in obj['metadata']['annotations'].items():
             annotations[key] = annotation
         return annotations
 
@@ -975,8 +976,8 @@ class BaseVulnerabilityScanning(BaseHelm):
                 expected_SBOM_data = json.loads(content)
 
                 if expected_SBOM_data['metadata']['name'] in SBOM[1]['metadata']['name']:
-                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
-                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                    SBOM_annotations = self.get_annotations_from_crd(SBOM[1])
+                    expected_SBOM_annotations = self.get_annotations_from_crd(expected_SBOM_data)
                     for key, annotation in expected_SBOM_annotations.items():
                         assert SBOM_annotations[
                                    key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
@@ -1024,24 +1025,36 @@ class BaseVulnerabilityScanning(BaseHelm):
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
-                if expected_SBOM_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] == \
-                        SBOM[1]['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] \
-                        and SBOM[1]['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL] == namespace:
 
-                    SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
-                    expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
+                if SBOM[1]['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL] != namespace:
+                    continue
+                if not self.is_mathing_filtered_crd(a=expected_SBOM_data, b=SBOM[1]):
+                    continue
 
-                    if SBOM_annotations[statics.RELEVANCY_IMAGE_ANNOTATIONS] != expected_SBOM_annotations[
-                        statics.RELEVANCY_IMAGE_ANNOTATIONS] or SBOM_annotations[statics.RELEVANCY_CONTAINER_LABEL] != \
-                            expected_SBOM_annotations[statics.RELEVANCY_CONTAINER_LABEL]:
-                        continue
-
-                    expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
-                    SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                    assert expected_SBOM_file_list == SBOM_file_list, f"the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
-                    verified_SBOMs += 1
-                    break
+                expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
+                SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
+                assert expected_SBOM_file_list == SBOM_file_list, f"the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
+                verified_SBOMs += 1
+                break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
+
+    @staticmethod
+    def is_mathing_filtered_crd(a, b):
+
+        a_labels = a['metadata']['labels']
+        b_labels = b['metadata']['labels']
+
+        a_annotations = BaseVulnerabilityScanning.get_annotations_from_crd(a)
+        b_annotations = BaseVulnerabilityScanning.get_annotations_from_crd(b)
+
+        if a_labels[statics.RELEVANCY_NAME_LABEL] != b_labels[statics.RELEVANCY_NAME_LABEL]:
+            return False
+
+        if a_annotations[statics.RELEVANCY_IMAGE_ANNOTATIONS] != b_annotations[statics.RELEVANCY_IMAGE_ANNOTATIONS]:
+            return False
+        if a_annotations[statics.RELEVANCY_CONTAINER_LABEL] != b_annotations[statics.RELEVANCY_CONTAINER_LABEL]:
+            return False
+        return True
 
     def validate_expected_filtered_CVEs(self, CVEs, expected_CVEs_path, namespace):
         verified_CVEs = 0
@@ -1053,14 +1066,17 @@ class BaseVulnerabilityScanning(BaseHelm):
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
-                instanceID = CVE[0]
-                if expected_CVE_data['metadata']['labels'][statics.RELEVANCY_NAME_LABEL] in instanceID and \
-                        CVE[1]['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL] == namespace:
-                    expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
-                    SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
-                    assert expected_SBOM_file_list == SBOM_file_list, f"the files in the CVEs in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
-                    verified_CVEs += 1
-                    break
+
+                if CVE[1]['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL] != namespace:
+                    continue
+                if not self.is_mathing_filtered_crd(a=expected_CVE_data, b=CVE[1]):
+                    continue
+
+                expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
+                SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
+                assert expected_SBOM_file_list == SBOM_file_list, f"the files in the CVEs in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
+                verified_CVEs += 1
+                break
         assert verified_CVEs == len(expected_CVEs_path), "not all CVEs were verified"
 
     def validate_expected_CVEs(self, CVEs, expected_CVEs_path):

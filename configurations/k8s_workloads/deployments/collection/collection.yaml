@@ -33,7 +33,7 @@ spec:
             - mountPath: /etc/config
               name: config-volume
         - args:
-            - "wget https://kubernetes.io/; sleep 30; wget https://cloud.armosec.io/; sleep 30; wget https://console.cloud.google.com/; sleep 30; redis-server"
+            - "wget https://kubernetes.io/ --background; sleep 1; wget https://cloud.armosec.io/ --background; wget https://console.cloud.google.com/ --background; redis-server "
           command:
             - "/bin/sh"
             - "-c"

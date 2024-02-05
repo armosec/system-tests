@@ -8,7 +8,7 @@
             "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "redis"
         },
-        "creationTimestamp": "2024-02-04T15:28:25Z",
+        "creationTimestamp": "2024-02-05T14:00:24Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -16,15 +16,15 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "collection"
         },
-        "name": "replicaset-collection-64f69cb746-redis-31b9-159b",
+        "name": "replicaset-collection-785d56d6d5-redis-e576-2e6b",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "3f7628ce-a371-4b1e-9835-77a0a3b7cd80"
+        "uid": "f2a43e4b-30d7-4ea1-85ec-f85fd26a230c"
     },
     "spec": {
         "metadata": {
             "report": {
-                "createdAt": "2024-02-04T15:26:31Z"
+                "createdAt": "2024-02-05T13:35:49Z"
             },
             "tool": {
                 "name": "syft",
@@ -34,19 +34,9 @@
         "syft": {
             "artifactRelationships": [
                 {
-                    "child": "4fdfbb03676f495b",
-                    "parent": "008bcc1445f44203",
-                    "type": "contains"
-                },
-                {
-                    "child": "0fab6f59514f4740",
-                    "parent": "4cb49698ca5c72c1",
-                    "type": "contains"
-                },
-                {
-                    "child": "d7486c5ba43c6e31",
-                    "parent": "b37d6e2e45f66f33",
-                    "type": "contains"
+                    "child": "ae6ff334fd58f681",
+                    "parent": "447c9d9ac25e4f16",
+                    "type": "evident-by"
                 },
                 {
                     "child": "5c67196b8e1d1558",
@@ -64,11 +54,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "b37d6e2e45f66f33",
-                    "parent": "adaa708f703652d6",
-                    "type": "dependency-of"
-                },
-                {
                     "child": "c0756f35a5e6d8b3",
                     "parent": "adaa708f703652d6",
                     "type": "dependency-of"
@@ -79,17 +64,7 @@
                     "type": "dependency-of"
                 },
                 {
-                    "child": "b37d6e2e45f66f33",
-                    "parent": "c0756f35a5e6d8b3",
-                    "type": "dependency-of"
-                },
-                {
-                    "child": "008bcc1445f44203",
-                    "parent": "c2473bf9553fcd0ca17d495ac4bdc9bb52ec475b86fe3fc10ac29715fb9bac90",
-                    "type": "contains"
-                },
-                {
-                    "child": "4cb49698ca5c72c1",
+                    "child": "447c9d9ac25e4f16",
                     "parent": "c2473bf9553fcd0ca17d495ac4bdc9bb52ec475b86fe3fc10ac29715fb9bac90",
                     "type": "contains"
                 },
@@ -99,11 +74,6 @@
                     "type": "contains"
                 },
                 {
-                    "child": "b37d6e2e45f66f33",
-                    "parent": "c2473bf9553fcd0ca17d495ac4bdc9bb52ec475b86fe3fc10ac29715fb9bac90",
-                    "type": "contains"
-                },
-                {
                     "child": "c0756f35a5e6d8b3",
                     "parent": "c2473bf9553fcd0ca17d495ac4bdc9bb52ec475b86fe3fc10ac29715fb9bac90",
                     "type": "contains"
@@ -114,127 +84,12 @@
                     "type": "contains"
                 },
                 {
-                    "child": "b37d6e2e45f66f33",
-                    "parent": "e5d4a79033ba84db",
-                    "type": "dependency-of"
-                },
-                {
                     "child": "c0756f35a5e6d8b3",
                     "parent": "e5d4a79033ba84db",
                     "type": "dependency-of"
-                },
-                {
-                    "child": "ae6ff334fd58f681",
-                    "parent": "447c9d9ac25e4f16",
-                    "type": "evident-by"
-                },
-                {
-                    "child": "447c9d9ac25e4f16",
-                    "parent": "c2473bf9553fcd0ca17d495ac4bdc9bb52ec475b86fe3fc10ac29715fb9bac90",
-                    "type": "contains"
                 }
             ],
             "artifacts": [
-                {
-                    "cpes": [
-                        "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.0-r0:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.0-r0:*:*:*:*:*:*:*"
-                    ],
-                    "foundBy": "apk-db-cataloger",
-                    "id": "008bcc1445f44203",
-                    "language": "",
-                    "licenses": [
-                        {
-                            "locations": [
-                                {
-                                    "accessPath": "/lib/apk/db/installed",
-                                    "annotations": {
-                                        "evidence": "primary"
-                                    },
-                                    "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                                    "path": "/lib/apk/db/installed"
-                                }
-                            ],
-                            "spdxExpression": "GPL-2.0-only",
-                            "type": "declared",
-                            "urls": [],
-                            "value": "GPL-2.0-only"
-                        }
-                    ],
-                    "locations": [
-                        {
-                            "accessPath": "/lib/apk/db/installed",
-                            "annotations": {
-                                "evidence": "primary"
-                            },
-                            "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                            "path": "/lib/apk/db/installed"
-                        }
-                    ],
-                    "name": "alpine-baselayout-data",
-                    "purl": "pkg:apk/alpine/alpine-baselayout-data@3.4.0-r0?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.17.2",
-                    "type": "apk",
-                    "version": "3.4.0-r0"
-                },
-                {
-                    "cpes": [
-                        "cpe:2.3:a:ca-certificates-bundle:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca-certificates-bundle:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca_certificates_bundle:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca_certificates_bundle:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca-certificates:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca-certificates:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca_certificates:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca_certificates:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:mozilla:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:mozilla:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca:ca-certificates-bundle:20220614-r4:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ca:ca_certificates_bundle:20220614-r4:*:*:*:*:*:*:*"
-                    ],
-                    "foundBy": "apk-db-cataloger",
-                    "id": "4cb49698ca5c72c1",
-                    "language": "",
-                    "licenses": [
-                        {
-                            "locations": [
-                                {
-                                    "accessPath": "/lib/apk/db/installed",
-                                    "annotations": {
-                                        "evidence": "primary"
-                                    },
-                                    "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                                    "path": "/lib/apk/db/installed"
-                                }
-                            ],
-                            "spdxExpression": "MPL-2.0 AND MIT",
-                            "type": "declared",
-                            "urls": [],
-                            "value": "MPL-2.0 AND MIT"
-                        }
-                    ],
-                    "locations": [
-                        {
-                            "accessPath": "/lib/apk/db/installed",
-                            "annotations": {
-                                "evidence": "primary"
-                            },
-                            "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                            "path": "/lib/apk/db/installed"
-                        }
-                    ],
-                    "name": "ca-certificates-bundle",
-                    "purl": "pkg:apk/alpine/ca-certificates-bundle@20220614-r4?arch=x86_64\u0026upstream=ca-certificates\u0026distro=alpine-3.17.2",
-                    "type": "apk",
-                    "version": "20220614-r4"
-                },
                 {
                     "cpes": [
                         "cpe:2.3:a:libcrypto3:libcrypto3:3.0.8-r0:*:*:*:*:*:*:*",
@@ -362,51 +217,6 @@
                     "purl": "pkg:apk/alpine/musl@1.2.3-r4?arch=x86_64\u0026distro=alpine-3.17.2",
                     "type": "apk",
                     "version": "1.2.3-r4"
-                },
-                {
-                    "cpes": [
-                        "cpe:2.3:a:ssl-client:ssl-client:1.35.0-r29:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ssl-client:ssl_client:1.35.0-r29:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ssl_client:ssl-client:1.35.0-r29:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ssl_client:ssl_client:1.35.0-r29:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ssl:ssl-client:1.35.0-r29:*:*:*:*:*:*:*",
-                        "cpe:2.3:a:ssl:ssl_client:1.35.0-r29:*:*:*:*:*:*:*"
-                    ],
-                    "foundBy": "apk-db-cataloger",
-                    "id": "b37d6e2e45f66f33",
-                    "language": "",
-                    "licenses": [
-                        {
-                            "locations": [
-                                {
-                                    "accessPath": "/lib/apk/db/installed",
-                                    "annotations": {
-                                        "evidence": "primary"
-                                    },
-                                    "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                                    "path": "/lib/apk/db/installed"
-                                }
-                            ],
-                            "spdxExpression": "GPL-2.0-only",
-                            "type": "declared",
-                            "urls": [],
-                            "value": "GPL-2.0-only"
-                        }
-                    ],
-                    "locations": [
-                        {
-                            "accessPath": "/lib/apk/db/installed",
-                            "annotations": {
-                                "evidence": "primary"
-                            },
-                            "layerID": "sha256:7756136e56e49b8f53e6bb45297af7d01193782870726cfe341fe2fe2b3b4c25",
-                            "path": "/lib/apk/db/installed"
-                        }
-                    ],
-                    "name": "ssl_client",
-                    "purl": "pkg:apk/alpine/ssl_client@1.35.0-r29?arch=x86_64\u0026upstream=busybox\u0026distro=alpine-3.17.2",
-                    "type": "apk",
-                    "version": "1.35.0-r29"
                 },
                 {
                     "cpes": [
@@ -570,56 +380,6 @@
                     "digests": [
                         {
                             "algorithm": "sha1",
-                            "value": "043eb324a653456caa1a73e2e2d49f77792bb0c5"
-                        },
-                        {
-                            "algorithm": "sha256",
-                            "value": "e3998dbe02b51dada33de87ae43d18a93ab6915b9e34f5a751bf2b9b25a55492"
-                        }
-                    ],
-                    "id": "4fdfbb03676f495b",
-                    "location": {
-                        "layerID": "sha256:7cd52847ad775a5ddc4b58326cf884beee34544296402c6292ed76474c686d39",
-                        "path": "/etc/hosts"
-                    },
-                    "metadata": {
-                        "groupID": 0,
-                        "mimeType": "text/plain",
-                        "mode": 644,
-                        "size": 79,
-                        "type": "RegularFile",
-                        "userID": 0
-                    }
-                },
-                {
-                    "digests": [
-                        {
-                            "algorithm": "sha1",
-                            "value": "0fc963623ee95ec46ae1dfde1c6358074198d7e2"
-                        },
-                        {
-                            "algorithm": "sha256",
-                            "value": "92dd040a840947f00a14f66e9e17a799051ad7f88ddcde851b3711ee0a78a7ac"
-                        }
-                    ],
-                    "id": "0fab6f59514f4740",
-                    "location": {
-                        "layerID": "sha256:7cd52847ad775a5ddc4b58326cf884beee34544296402c6292ed76474c686d39",
-                        "path": "/etc/ssl/certs/ca-certificates.crt"
-                    },
-                    "metadata": {
-                        "groupID": 0,
-                        "mimeType": "text/plain",
-                        "mode": 644,
-                        "size": 214222,
-                        "type": "RegularFile",
-                        "userID": 0
-                    }
-                },
-                {
-                    "digests": [
-                        {
-                            "algorithm": "sha1",
                             "value": "7ea62afe227ac7bd5c4e9afc7dc3b8ffa220c908"
                         },
                         {
@@ -687,31 +447,6 @@
                         "mimeType": "application/x-sharedlib",
                         "mode": 755,
                         "size": 602120,
-                        "type": "RegularFile",
-                        "userID": 0
-                    }
-                },
-                {
-                    "digests": [
-                        {
-                            "algorithm": "sha1",
-                            "value": "dd2841de918c0cbf11eecaaf0d578b38167a3f74"
-                        },
-                        {
-                            "algorithm": "sha256",
-                            "value": "99a0361fb672afb60c11e11ae4139f69af1aad2ca7b38c5be8035a2551db683d"
-                        }
-                    ],
-                    "id": "d7486c5ba43c6e31",
-                    "location": {
-                        "layerID": "sha256:7cd52847ad775a5ddc4b58326cf884beee34544296402c6292ed76474c686d39",
-                        "path": "/usr/bin/ssl_client"
-                    },
-                    "metadata": {
-                        "groupID": 0,
-                        "mimeType": "application/x-sharedlib",
-                        "mode": 755,
-                        "size": 14320,
                         "type": "RegularFile",
                         "userID": 0
                     }

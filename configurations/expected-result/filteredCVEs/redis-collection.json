@@ -8,7 +8,7 @@
             "kubescape.io/status": "ready",
             "kubescape.io/workload-container-name": "redis"
         },
-        "creationTimestamp": "2024-02-04T15:28:26Z",
+        "creationTimestamp": "2024-02-05T14:00:26Z",
         "labels": {
             "kubescape.io/context": "filtered",
             "kubescape.io/workload-api-group": "apps",
@@ -17,10 +17,10 @@
             "kubescape.io/workload-kind": "Deployment",
             "kubescape.io/workload-name": "collection"
         },
-        "name": "replicaset-collection-64f69cb746-redis-31b9-159b",
+        "name": "replicaset-collection-785d56d6d5-redis-e576-2e6b",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "65cf879c-0597-477c-a598-e9e1027bf2ec"
+        "uid": "fa54942d-2d8b-4906-88ac-0340d84af53b"
     },
     "spec": {
         "metadata": {
