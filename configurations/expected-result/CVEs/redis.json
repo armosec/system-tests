@@ -6,7 +6,7 @@
             "kubescape.io/image-id": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
             "kubescape.io/status": "ready"
         },
-        "creationTimestamp": "2024-01-16T21:17:45Z",
+        "creationTimestamp": "2024-02-04T15:26:31Z",
         "labels": {
             "kubescape.io/context": "non-filtered",
             "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
@@ -15,7 +15,7 @@
         "name": "docker.io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-9722c2",
         "namespace": "kubescape",
         "resourceVersion": "1",
-        "uid": "5a6a24a9-fd15-41ac-b209-9cf21a82784b"
+        "uid": "8bcbb477-bcdd-4628-98da-fd0d8ab235ef"
     },
     "spec": {
         "metadata": {
@@ -25,7 +25,7 @@
             "tool": {
                 "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
                 "name": "",
-                "version": "v0.73.4"
+                "version": "v0.74.2"
             },
             "withRelevancy": false
         },
@@ -66,7 +66,83 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/etc"
+                                },
+                                {
+                                    "path": "/etc/ssl"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/certs"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/CA.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/private"
+                                },
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/afalg.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/capi.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/loader_attic.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/padlock.so"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules/legacy.so"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libcrypto3",
                         "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -150,7 +226,83 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/etc"
+                                },
+                                {
+                                    "path": "/etc/ssl"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/certs"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/CA.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/private"
+                                },
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/afalg.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/capi.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/loader_attic.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/padlock.so"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules/legacy.so"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libcrypto3",
                         "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -232,7 +384,83 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/etc"
+                                },
+                                {
+                                    "path": "/etc/ssl"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/certs"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/CA.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/private"
+                                },
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/afalg.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/capi.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/loader_attic.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/padlock.so"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules/legacy.so"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libcrypto3",
                         "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -317,7 +545,83 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/etc"
+                                },
+                                {
+                                    "path": "/etc/ssl"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/ct_log_list.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf"
+                                },
+                                {
+                                    "path": "/etc/ssl/openssl.cnf.dist"
+                                },
+                                {
+                                    "path": "/etc/ssl/certs"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/CA.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget"
+                                },
+                                {
+                                    "path": "/etc/ssl/misc/tsget.pl"
+                                },
+                                {
+                                    "path": "/etc/ssl/private"
+                                },
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libcrypto.so.3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/afalg.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/capi.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/loader_attic.so"
+                                },
+                                {
+                                    "path": "/usr/lib/engines-3/padlock.so"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules"
+                                },
+                                {
+                                    "path": "/usr/lib/ossl-modules/legacy.so"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libcrypto3",
                         "purl": "pkg:apk/alpine/libcrypto3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -402,7 +706,26 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libssl.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libssl.so.3"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libssl3",
                         "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -486,7 +809,26 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libssl.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libssl.so.3"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libssl3",
                         "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -568,7 +910,26 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libssl.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libssl.so.3"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libssl3",
                         "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",
@@ -653,7 +1014,26 @@
                                 "path": "/lib/apk/db/installed"
                             }
                         ],
-                        "metadata": null,
+                        "metadata": {
+                            "files": [
+                                {
+                                    "path": "/lib"
+                                },
+                                {
+                                    "path": "/lib/libssl.so.3"
+                                },
+                                {
+                                    "path": "/usr"
+                                },
+                                {
+                                    "path": "/usr/lib"
+                                },
+                                {
+                                    "path": "/usr/lib/libssl.so.3"
+                                }
+                            ]
+                        },
+                        "metadataType": "ApkMetadata",
                         "name": "libssl3",
                         "purl": "pkg:apk/alpine/libssl3@3.0.8-r0?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.17.2",
                         "type": "apk",

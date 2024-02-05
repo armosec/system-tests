@@ -219,6 +219,9 @@ RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
 RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
+RELEVANCY_CONTAINER_ANNOTATIONS = "kubescape.io/workload-container-name"
+RELEVANCY_IMAGE_ANNOTATIONS = "kubescape.io/image-id"
+
 
 # relevancy feature
 HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"

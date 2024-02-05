@@ -1,0 +1,84 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/alpine@sha256:e1c082e3d3c45cccac829840a25941e679c25d438cc8412c2fa221cf1a824e6a",
+            "kubescape.io/image-tag": "docker.io/library/alpine@sha256:e1c082e3d3c45cccac829840a25941e679c25d438cc8412c2fa221cf1a824e6a",
+            "kubescape.io/status": "ready",
+            "kubescape.io/workload-container-name": "alpine-container"
+        },
+        "creationTimestamp": "2024-02-05T07:44:52Z",
+        "labels": {
+            "kubescape.io/context": "filtered",
+            "kubescape.io/workload-api-group": "apps",
+            "kubescape.io/workload-api-version": "v1",
+            "kubescape.io/workload-container-name": "alpine-container",
+            "kubescape.io/workload-kind": "Deployment",
+            "kubescape.io/workload-name": "collection"
+        },
+        "name": "replicaset-collection-6fd65dbbc9-alpine-container-8379-c749",
+        "namespace": "kubescape",
+        "resourceVersion": "1",
+        "uid": "26f2e94f-8d59-472a-a6c4-bc40f61e4a19"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.74.2"
+            },
+            "withRelevancy": true
+        },
+        "payload": {
+            "descriptor": {
+                "configuration": null,
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/nonroot/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "",
+                "version": ""
+            },
+            "distro": {
+                "idLike": [],
+                "name": "alpine",
+                "version": "3.14.2"
+            },
+            "matches": null,
+            "source": {
+                "target": {
+                    "architecture": "amd64",
+                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giXSwiSW1hZ2UiOiJzaGEyNTY6ZDNlMGI2MjU4ZWMyZjcyNWMxOTY2OGYxMWFlNTMyM2MzYjAyNDVlMTk3ZWM0Nzg0MjRlYzZhODc5MzU2OTBlYiIsIlZvbHVtZXMiOm51bGwsIldvcmtpbmdEaXIiOiIiLCJFbnRyeXBvaW50IjpudWxsLCJPbkJ1aWxkIjpudWxsLCJMYWJlbHMiOm51bGx9LCJjb250YWluZXIiOiIzMzAyODljNjQ5ZGI4NmY1ZmIxYWU1YmZlZjE4NTAxMDEyYjU1MGFkYjA2MzhiOTE5M2Q0YTNhNGI2NWEyZjliIiwiY29udGFpbmVyX2NvbmZpZyI6eyJIb3N0bmFtZSI6IjMzMDI4OWM2NDlkYiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giLCItYyIsIiMobm9wKSAiLCJDTUQgW1wiL2Jpbi9zaFwiXSJdLCJJbWFnZSI6InNoYTI1NjpkM2UwYjYyNThlYzJmNzI1YzE5NjY4ZjExYWU1MzIzYzNiMDI0NWUxOTdlYzQ3ODQyNGVjNmE4NzkzNTY5MGViIiwiVm9sdW1lcyI6bnVsbCwiV29ya2luZ0RpciI6IiIsIkVudHJ5cG9pbnQiOm51bGwsIk9uQnVpbGQiOm51bGwsIkxhYmVscyI6e319LCJjcmVhdGVkIjoiMjAyMS0wOC0yN1QxNzoxOTo0NS43NTg2MTE1MjNaIiwiZG9ja2VyX3ZlcnNpb24iOiIyMC4xMC43IiwiaGlzdG9yeSI6W3siY3JlYXRlZCI6IjIwMjEtMDgtMjdUMTc6MTk6NDUuNTUzMDkyMzYzWiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jICMobm9wKSBBREQgZmlsZTphYWQ0MjkwZDI3NTgwY2MxYTA5NGZmYWY5OGMzY2EyZmM1ZDY5OWZlNjk1ZGZiOGU2ZTlmYWMyMGYxMTI5NDUwIGluIC8gIn0seyJjcmVhdGVkIjoiMjAyMS0wOC0yN1QxNzoxOTo0NS43NTg2MTE1MjNaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApICBDTUQgW1wiL2Jpbi9zaFwiXSIsImVtcHR5X2xheWVyIjp0cnVlfV0sIm9zIjoibGludXgiLCJyb290ZnMiOnsidHlwZSI6ImxheWVycyIsImRpZmZfaWRzIjpbInNoYTI1NjplMmViMDZkOGFmODIxOGNmZWM4MjEwMTQ3MzU3YTY4YjdlMTNmN2M0ODViOTkxYzI4OGMyZDAxZGMyMjhiYjY4Il19fQ==",
+                    "imageID": "sha256:14119a10abf4669e8cdbdff324a9f9605d99697215a0d21c360fe8dfa8471bab",
+                    "imageSize": 5590942,
+                    "layers": [
+                        {
+                            "digest": "sha256:e2eb06d8af8218cfec8210147357a68b7e13f7c485b991c288c2d01dc228bb68",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 5590942
+                        }
+                    ],
+                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMTQ3MSwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MTQxMTlhMTBhYmY0NjY5ZThjZGJkZmYzMjRhOWY5NjA1ZDk5Njk3MjE1YTBkMjFjMzYwZmU4ZGZhODQ3MWJhYiIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDI4MTQ0NDYsCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OmEwZDBhMGQ0NmY4YjUyNDczOTgyYTNjNDY2MzE4ZjQ3OTc2NzU3NzU1MWE1M2ZmYzkwNzRjOWZhNzAzNTk4MmUiCiAgICAgIH0KICAgXQp9",
+                    "manifestDigest": "sha256:69704ef328d05a9f806b6b8502915e6a0a4faa4d72018dc42343f511490daf8a",
+                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                    "os": "linux",
+                    "repoDigests": [
+                        "index.docker.io/library/alpine@sha256:e1c082e3d3c45cccac829840a25941e679c25d438cc8412c2fa221cf1a824e6a"
+                    ],
+                    "tags": [],
+                    "userInput": "docker.io/library/alpine@sha256:e1c082e3d3c45cccac829840a25941e679c25d438cc8412c2fa221cf1a824e6a"
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

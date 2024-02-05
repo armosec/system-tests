@@ -1,0 +1,79 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "VulnerabilityManifest",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1",
+            "kubescape.io/status": "ready"
+        },
+        "creationTimestamp": "2024-02-04T15:26:28Z",
+        "labels": {
+            "kubescape.io/context": "non-filtered",
+            "kubescape.io/image-id": "docker-io-library-alpine-sha256-82d1e9d7ed48a7523bdebc18cf6290b",
+            "kubescape.io/image-name": "docker-io-library-alpine"
+        },
+        "name": "docker.io-library-alpine-sha256-82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1-ea94d1",
+        "namespace": "kubescape",
+        "resourceVersion": "1",
+        "uid": "f019a679-106d-4056-95f2-d4970295d764"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": null
+            },
+            "tool": {
+                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                "name": "",
+                "version": "v0.74.2"
+            },
+            "withRelevancy": false
+        },
+        "payload": {
+            "descriptor": {
+                "configuration": null,
+                "db": {
+                    "built": "2023-05-29T01:31:19Z",
+                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+                    "error": null,
+                    "location": "/home/nonroot/.cache/grype/db/5",
+                    "schemaVersion": 5
+                },
+                "name": "",
+                "version": ""
+            },
+            "distro": {
+                "idLike": [],
+                "name": "alpine",
+                "version": "3.18.2"
+            },
+            "matches": null,
+            "source": {
+                "target": {
+                    "architecture": "amd64",
+                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giXSwiSW1hZ2UiOiJzaGEyNTY6NWI4NjU4NzAxYzk2YWNlZmUxY2QzYTIxYjJhODAyMjBiYWRmOTEyNDg5MWFkNDQwZDk1YTdmYTUwMGQ0ODc2NSIsIlZvbHVtZXMiOm51bGwsIldvcmtpbmdEaXIiOiIiLCJFbnRyeXBvaW50IjpudWxsLCJPbkJ1aWxkIjpudWxsLCJMYWJlbHMiOm51bGx9LCJjb250YWluZXIiOiJiZmM4MDc4YzE2OTYzN2Q3MGU0MGNlNTkxYjVjMmZlOGQyNjMyOTkxOGRhZmNiOTZlYmM5MzA0ZGRmZjE2MmVhIiwiY29udGFpbmVyX2NvbmZpZyI6eyJIb3N0bmFtZSI6ImJmYzgwNzhjMTY5NiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giLCItYyIsIiMobm9wKSAiLCJDTUQgW1wiL2Jpbi9zaFwiXSJdLCJJbWFnZSI6InNoYTI1Njo1Yjg2NTg3MDFjOTZhY2VmZTFjZDNhMjFiMmE4MDIyMGJhZGY5MTI0ODkxYWQ0NDBkOTVhN2ZhNTAwZDQ4NzY1IiwiVm9sdW1lcyI6bnVsbCwiV29ya2luZ0RpciI6IiIsIkVudHJ5cG9pbnQiOm51bGwsIk9uQnVpbGQiOm51bGwsIkxhYmVscyI6e319LCJjcmVhdGVkIjoiMjAyMy0wNi0xNFQyMDo0MTo1OS4wNzk3OTUxMjVaIiwiZG9ja2VyX3ZlcnNpb24iOiIyMC4xMC4yMyIsImhpc3RvcnkiOlt7ImNyZWF0ZWQiOiIyMDIzLTA2LTE0VDIwOjQxOjU4Ljk1MDE3ODIwNFoiLCJjcmVhdGVkX2J5IjoiL2Jpbi9zaCAtYyAjKG5vcCkgQUREIGZpbGU6MWRhNzU2ZDEyNTUxYTBlM2U3OTNlMDJlZjg3NDMyZDY5ZDQ5Njg5MzdiZDExYmVkMGFmMjE1ZGIxOWRkOTRjZCBpbiAvICJ9LHsiY3JlYXRlZCI6IjIwMjMtMDYtMTRUMjA6NDE6NTkuMDc5Nzk1MTI1WiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jICMobm9wKSAgQ01EIFtcIi9iaW4vc2hcIl0iLCJlbXB0eV9sYXllciI6dHJ1ZX1dLCJvcyI6ImxpbnV4Iiwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6NzhhODIyZmUyYTJkMmM4NGYzZGU0YTQwMzE4OGM0NWY2MjMwMTdkNmE0NTIxZDIzMDQ3YzlmYmIwODAxNzk0YyJdfX0=",
+                    "imageID": "sha256:c1aabb73d2339c5ebaa3681de2e9d9c18d57485045a4e311d9f8004bec208d67",
+                    "imageSize": 7326745,
+                    "layers": [
+                        {
+                            "digest": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 7326745
+                        }
+                    ],
+                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMTQ3MiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YzFhYWJiNzNkMjMzOWM1ZWJhYTM2ODFkZTJlOWQ5YzE4ZDU3NDg1MDQ1YTRlMzExZDlmODAwNGJlYzIwOGQ2NyIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDMzOTc4NzksCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjMxZTM1Mjc0MGY1MzRmOWFkMTcwZjc1Mzc4YTg0ZmU0NTNkNjE1NmU0MDcwMGI4ODJkNzM3YThmNGE2OTg4YTMiCiAgICAgIH0KICAgXQp9",
+                    "manifestDigest": "sha256:25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                    "os": "linux",
+                    "repoDigests": [
+                        "index.docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1"
+                    ],
+                    "tags": [],
+                    "userInput": "docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1"
+                },
+                "type": "image"
+            }
+        }
+    },
+    "status": {}
+}

@@ -275,7 +275,6 @@ class BaseVulnerabilityScanning(BaseHelm):
             self.test_results_details_against_results_sum_summary(containers_cve=containers_cve, be_summary=be_summary)
         except Exception as e:
             Logger.logger.warning("test_results_details_against_results_sum_summary failed: {}".format(e))
-            
 
     def test_image_scan_status(self):
         image_scan_stats = self.get_image_scan_stats()
@@ -1031,9 +1030,11 @@ class BaseVulnerabilityScanning(BaseHelm):
 
                     SBOM_annotations = self.get_annotations_from_SBOM(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_SBOM(expected_SBOM_data)
-                    for key, annotation in expected_SBOM_annotations.items():
-                        assert SBOM_annotations[
-                                   key] == annotation, f"annotation {key}:{annotation} in the SBOM in the storage is not as expected"
+
+                    if SBOM_annotations[statics.RELEVANCY_IMAGE_ANNOTATIONS] != expected_SBOM_annotations[
+                        statics.RELEVANCY_IMAGE_ANNOTATIONS] or SBOM_annotations[statics.RELEVANCY_CONTAINER_LABEL] != \
+                            expected_SBOM_annotations[statics.RELEVANCY_CONTAINER_LABEL]:
+                        continue
 
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
                     SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
@@ -1066,8 +1067,6 @@ class BaseVulnerabilityScanning(BaseHelm):
         verified_CVEs = 0
         for expected_CVE in expected_CVEs_path:
             for CVE in CVEs:
-                if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
-                    self.store_filter_data_for_first_time_results(result=CVE, store_path=expected_CVE[1])
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
@@ -1117,7 +1116,7 @@ class BaseVulnerabilityScanning(BaseHelm):
     def get_filtered_data_key(self, instance_id, namespace):
         container_name = BaseVulnerabilityScanning.get_container_from_instance_id(instance_id)
         slug = "%s-%s" % (BaseVulnerabilityScanning.get_kind_from_instance_id(instance_id),
-                                               BaseVulnerabilityScanning.get_name_from_instance_id(instance_id))
+                          BaseVulnerabilityScanning.get_name_from_instance_id(instance_id))
         if container_name != "":
             slug += "-" + container_name
         return self.sanitize_instance_id(instance_id, slug, container_name).lower()
@@ -1230,6 +1229,9 @@ class BaseVulnerabilityScanning(BaseHelm):
         images_container_ids: list = [
             self.get_pod_data(get_data_of_pod_call_back=BaseK8S.get_image_ids, namespace=namespace,
                               subname=i["metadata"]["name"]) for i in workload_objs]
+        images_container_ids.extend([
+            self.get_pod_data(get_data_of_pod_call_back=BaseK8S.get_image_ids, namespace=namespace,
+                              subname=i["metadata"]["name"]) for i in workload_objs])
         return images_container_ids
 
     @staticmethod
