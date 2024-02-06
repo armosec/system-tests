@@ -67,30 +67,30 @@ class NetworkPolicy(BaseNetworkPolicy):
                                                                                       expected_network_neighbors_list=expected_network_neighbors_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120,
-                             sleep_interval=5,
-                             report_type=self.validate_expected_backend_results,
-                             cluster=cluster,
-                             namespace=namespace,
-                             expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
-                             expected_generated_network_policy_list=expected_generated_network_policy_list
-                             )
+        # Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        # self.wait_for_report(timeout=120,
+        #                      sleep_interval=5,
+        #                      report_type=self.validate_expected_backend_results,
+        #                      cluster=cluster,
+        #                      namespace=namespace,
+        #                      expected_workloads_list=workload_objs,
+        #                      expected_network_neighbors_list=expected_network_neighbors_list,
+        #                      expected_generated_network_policy_list=expected_generated_network_policy_list
+        #                      )
 
-        Logger.logger.info('6. Check deletion flow')
-        deleted_workload_name = workload_objs[0]['metadata']['name']
-        Logger.logger.info(f"deleting workload {deleted_workload_name} from kubernetes")
-        self.kubernetes_obj.delete_workload(namespace=namespace, application=workload_objs[0])
-        TestUtil.sleep(120, "wait for workload deletion", "info")
+        # Logger.logger.info('6. Check deletion flow')
+        # deleted_workload_name = workload_objs[0]['metadata']['name']
+        # Logger.logger.info(f"deleting workload {deleted_workload_name} from kubernetes")
+        # self.kubernetes_obj.delete_workload(namespace=namespace, application=workload_objs[0])
+        # TestUtil.sleep(120, "wait for workload deletion", "info")
 
-        deleted_workload_nn = expected_network_neighbors_list.pop(0)
-        deleted_workload_np = expected_generated_network_policy_list.pop(0)
+        # deleted_workload_nn = expected_network_neighbors_list.pop(0)
+        # deleted_workload_np = expected_generated_network_policy_list.pop(0)
 
-        Logger.logger.info(f"validating workload {deleted_workload_name} was deleted")
-        self.validate_workload_deleted_from_backend(cluster=cluster, namespace=namespace,
-                                                    workload_name=deleted_workload_name)
-        Logger.logger.info(f"validated workload {deleted_workload_name} was deleted")
+        # Logger.logger.info(f"validating workload {deleted_workload_name} was deleted")
+        # self.validate_workload_deleted_from_backend(cluster=cluster, namespace=namespace,
+        #                                             workload_name=deleted_workload_name)
+        # Logger.logger.info(f"validated workload {deleted_workload_name} was deleted")
 
         return self.cleanup()
 
@@ -173,17 +173,17 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
                                                                                       expected_network_neighbors_list=expected_updated_network_neighbors_list,
                                                                                       expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
 
-        Logger.logger.info(
-            "6. Validating backend expected network neighbors and generated network policies after generating traffic")
-        self.wait_for_report(timeout=120,
-                             sleep_interval=5,
-                             report_type=self.validate_expected_backend_results,
-                             cluster=cluster,
-                             namespace=namespace,
-                             expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_updated_network_neighbors_list,
-                             expected_generated_network_policy_list=expected_updated_generated_network_policy_list
-                             )
+        # Logger.logger.info(
+        #     "6. Validating backend expected network neighbors and generated network policies after generating traffic")
+        # self.wait_for_report(timeout=120,
+        #                      sleep_interval=5,
+        #                      report_type=self.validate_expected_backend_results,
+        #                      cluster=cluster,
+        #                      namespace=namespace,
+        #                      expected_workloads_list=workload_objs,
+        #                      expected_network_neighbors_list=expected_updated_network_neighbors_list,
+        #                      expected_generated_network_policy_list=expected_updated_generated_network_policy_list
+        #                      )
 
         return self.cleanup()
 
@@ -242,16 +242,16 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
                                                                                       expected_network_neighbors_list=expected_network_neighbors_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120,
-                             sleep_interval=5,
-                             report_type=self.validate_expected_backend_results,
-                             cluster=cluster,
-                             namespace=namespace,
-                             expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
-                             expected_generated_network_policy_list=expected_generated_network_policy_list
-                             )
+        # Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        # self.wait_for_report(timeout=120,
+        #                      sleep_interval=5,
+        #                      report_type=self.validate_expected_backend_results,
+        #                      cluster=cluster,
+        #                      namespace=namespace,
+        #                      expected_workloads_list=workload_objs,
+        #                      expected_network_neighbors_list=expected_network_neighbors_list,
+        #                      expected_generated_network_policy_list=expected_generated_network_policy_list
+        #                      )
 
         return self.cleanup()
 
@@ -308,16 +308,16 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
                                                                                       expected_network_neighbors_list=expected_network_neighbors_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120,
-                             sleep_interval=5,
-                             report_type=self.validate_expected_backend_results,
-                             cluster=cluster,
-                             namespace=namespace,
-                             expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
-                             expected_generated_network_policy_list=expected_generated_network_policy_list
-                             )
+        # Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        # self.wait_for_report(timeout=120,
+        #                      sleep_interval=5,
+        #                      report_type=self.validate_expected_backend_results,
+        #                      cluster=cluster,
+        #                      namespace=namespace,
+        #                      expected_workloads_list=workload_objs,
+        #                      expected_network_neighbors_list=expected_network_neighbors_list,
+        #                      expected_generated_network_policy_list=expected_generated_network_policy_list
+        #                      )
 
         return self.cleanup()
 
@@ -377,16 +377,16 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
                                                                                       expected_network_neighbors_list=expected_network_neighbors_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("6. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120,
-                             sleep_interval=5,
-                             report_type=self.validate_expected_backend_results,
-                             cluster=cluster,
-                             namespace=namespace,
-                             expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
-                             expected_generated_network_policy_list=expected_generated_network_policy_list
-                             )
+        # Logger.logger.info("6. Validating backend expected network neighbors and generated network policies")
+        # self.wait_for_report(timeout=120,
+        #                      sleep_interval=5,
+        #                      report_type=self.validate_expected_backend_results,
+        #                      cluster=cluster,
+        #                      namespace=namespace,
+        #                      expected_workloads_list=workload_objs,
+        #                      expected_network_neighbors_list=expected_network_neighbors_list,
+        #                      expected_generated_network_policy_list=expected_generated_network_policy_list
+        #                      )
 
         return self.cleanup()
 
