@@ -127,19 +127,6 @@
         "description": "",
         "skip_on_environment": ""
     },
-    "scan_security_and_submit_to_backend": {
-        "target": [
-            "CLI",
-            "Backend"
-        ],
-        "target_repositories": [
-            "cadashboardbe-dummy",
-            "event-receiver",
-            "config-service"
-        ],
-        "description": "",
-        "skip_on_environment": ""
-    },
     "scan_nsa_and_submit_to_backend": {
         "target": [
             "CLI",
