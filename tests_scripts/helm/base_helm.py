@@ -21,7 +21,7 @@ class BaseHelm(BaseK8S):
         self.helm_branch = self.test_driver.kwargs.get("helm_branch", DEFAULT_BRANCH)
         self.local_helm_chart = self.test_driver.kwargs.get("local_helm_chart", None)
         self.print_kubescape_chart_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
-                                                                           "print_kubescape_chart_logs", True)
+                                                                           "print_kubescape_chart_logs", False)
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
         self.enable_security = self.test_obj[("enable_security", True)]

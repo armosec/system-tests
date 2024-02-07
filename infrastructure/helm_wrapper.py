@@ -50,7 +50,8 @@ class HelmWrapper(object):
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
-        return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
+        return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360, display_stdout=True)
+
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code,
                                                                                                     return_obj.stdout,
                                                                                                     return_obj.stderr)
