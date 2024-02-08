@@ -894,7 +894,7 @@
         ],
         "target_repositories": [
             "users-notification-service",
-            "config-service"
+            "config-service-dummy"
         ],
         "description": "testing teams alert channels with compliance and vulnerabilities notifications",
         "skip_on_environment": ""
