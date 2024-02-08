@@ -182,7 +182,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "config-service-dummy"
+            "config-service"
         ],
         "description": "",
         "skip_on_environment": ""
