@@ -253,14 +253,7 @@
             "In cluster",
             "Backend"
         ],
-        "target_repositories": [
-            "cadashboardbe-dummy",
-            "event-receiver",
-            "event-ingester-service",
-            "users-notification-service",
-            "config-service",
-            "gateway"
-        ],
+        "target_repositories": [],
         "description": "",
         "skip_on_environment": ""
     },
