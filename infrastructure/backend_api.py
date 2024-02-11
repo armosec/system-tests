@@ -92,6 +92,10 @@ API_NETWORK_POLICIES = "/api/v1/networkpolicies"
 API_NETWORK_POLICIES_GENERATE = "/api/v1/networkpolicies/generate"
 API_NETWORK_POLICIES_KNOWNSERVERSCACHE = "/api/v1/networkpolicies/knownserverscache"
 
+API_KUBERNETES_RESOURCES = "/api/v1/kubernetesresources"
+KUBERNETES_RESOURCES_METADATA_KEY = 'kubernetesResourcesMetadata'
+KUBERNETES_RESOURCES_OBJECT_KEY = 'kubernetesResourceObject'
+
 
 def deco_cookie(func):
 
@@ -2064,7 +2068,33 @@ class ControlPanelAPI(object):
         assert response['total']['value'] == 0, f"attack-chains not fixed yet"
 
         return True
+    
+    def get_kubernetes_resources(self, cluster_name: str, namespace:str=None, with_resource: bool=False):
+        params = {"customerGUID": self.selected_tenant_id}
+        if with_resource:
+            params["enrichObjects"] = "true"
+         
+        payload = {
+            "innerFilters": [{"cluster": cluster_name}],
+        }
 
+        if namespace:
+            payload["innerFilters"][0]["namespace"] = namespace
+
+        r = self.post(API_KUBERNETES_RESOURCES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: POST kubernetes resources generate "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        response = json.loads(r.text)
+        be_resources = response.get("response", None)
+        assert be_resources is not None, "kubernetes resources response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
+
+        return be_resources
+    
 class Solution(object):
     """docstring for Solution"""
 

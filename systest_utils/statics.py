@@ -43,6 +43,9 @@ DEFAULT_SECRETE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'secrets')
 DEFAULT_NAMESPACE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'namespaces')
 DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 
+# synchronizer tests
+DEFAULT_SYNCHRONIZER_PATH = os.path.join(DEFAULT_K8S_PATHS, 'synchronizer')
+
 # kubescape
 DEFAULT_EXCEPTIONS_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'exceptions')
 DEFAULT_INPUT_YAML_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'yaml_file')

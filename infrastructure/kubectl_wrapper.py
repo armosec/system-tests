@@ -179,6 +179,28 @@ class KubectlWrapper(object):
 
         return pod_events
 
+    def get_all_namespaced_workloads(self, namespace='Default'):
+        kinds = ["Deployment", "ReplicationController", "ReplicaSet", "StatefulSet", "DaemonSet"]
+        items = list()
+
+        for kind in kinds:
+            if kind == 'Deployment':
+                method = self.client_AppsV1Api.list_namespaced_deployment
+            elif "ReplicationController" in kind:
+                method = self.client_CoreV1Api.list_namespaced_replication_controller
+            elif 'ReplicaSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_replica_set
+            elif 'StatefulSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_stateful_set
+            elif 'DaemonSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_daemon_set
+            status = self.run(method=method, namespace=namespace)
+            for item in status.items:
+                item.kind = kind
+                items.append(item)
+
+        return items
+    
     def get_namespaced_workloads(self, kind='Deployment', namespace='Default'):
         if 'Deployment' in kind:
             method = self.client_AppsV1Api.list_namespaced_deployment
@@ -541,8 +563,24 @@ class KubectlWrapper(object):
 
     @staticmethod
     def add_new_namespace(namespace: str):
-        TestUtil.run_command("kubectl create namespace alerts".split(" "), timeout=None)
+        TestUtil.run_command(f"kubectl create namespace {namespace}".split(" "), timeout=None)
 
+    @staticmethod
+    def restart_workloads_in_namespace(namespace: str, kind: str, name: str):
+        if kind == "Deployment":
+            TestUtil.run_command(f"kubectl rollout restart deployment {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "ReplicationController":
+            TestUtil.run_command(f"kubectl rollout restart replicationcontroller {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "StatefulSet":
+            TestUtil.run_command(f"kubectl rollout restart statefulset {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "DaemonSet":
+            TestUtil.run_command(f"kubectl rollout restart daemonset {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "ReplicaSet":
+            # for replica set we scale down to 0 and then scale up to 1
+            TestUtil.run_command(f"kubectl scale --replicas=0 replicaset {name} -n {namespace}".split(" "), timeout=None)
+            TestUtil.run_command(f"kubectl scale --replicas=1 replicaset {name} -n {namespace}".split(" "), timeout=None)
+        else:
+            raise Exception(f"kind {kind} is not supported")
 
 def get_name(obj: dict):
     return obj["metadata"]["name"]

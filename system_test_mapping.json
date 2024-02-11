@@ -534,6 +534,22 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "synchronizer": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer flow",
+        "skip_on_environment": ""
+    },
     "network_policy": {
         "target": [
             "In cluster",
