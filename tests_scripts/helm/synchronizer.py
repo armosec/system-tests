@@ -108,6 +108,8 @@ class Synchronizer(BaseSynchronizer):
         cluster, namespace = self.setup(apply_services=False)
 
         helm_kwargs = self.test_obj.get_arg("helm_kwargs")
+        helm_kwargs['synchronizer.image.repository'] = 'quay.io/matthiasb_1/synchronizer'
+        helm_kwargs['synchronizer.image.tag'] = 'latest'
 
         Logger.logger.info('1. Install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
@@ -118,10 +120,6 @@ class Synchronizer(BaseSynchronizer):
         workload_objs: list = self.apply_directory(path=self.test_obj["workloads"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
         TestUtil.sleep(20, "wait for synchronization", "info")
-        
-        # FIXME: no need to restart the synchronizer
-        # we need to restart the synchronizer to make sure that the resource version is updated - it's a bug!
-        self.kubernetes_obj.restart_workloads_in_namespace(namespace='kubescape', kind='Deployment', name='synchronizer')
 
         Logger.logger.info('3. Check BE vs. Cluster - updated resource version')
         self.verify_backend_resources(cluster, namespace)        
@@ -129,10 +127,6 @@ class Synchronizer(BaseSynchronizer):
         Logger.logger.info('4. Restart workloads')
         self.restart_all_workloads(namespace)
         TestUtil.sleep(20, "wait for synchronization", "info")
-        
-        # FIXME: no need to restart the synchronizer
-        # we need to restart the synchronizer to make sure that the resource version is updated - it's a bug!
-        self.kubernetes_obj.restart_workloads_in_namespace(namespace='kubescape', kind='Deployment', name='synchronizer')
 
         Logger.logger.info('5. Check BE vs. Cluster - updated resource version')
         self.verify_backend_resources(cluster, namespace)        
