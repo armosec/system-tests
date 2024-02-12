@@ -893,7 +893,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "users-notification-service",
+            "users-notification-service-dummy",
             "config-service-dummy"
         ],
         "description": "testing teams alert channels with compliance and vulnerabilities notifications",
@@ -904,7 +904,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "users-notification-service",
+            "users-notification-service-dummy",
             "config-service-dummy"
         ],
         "description": "testing slack alert channels with compliance and vulnerabilities notifications",
