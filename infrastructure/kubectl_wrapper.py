@@ -5,7 +5,7 @@ import time
 from crypt import methods
 
 from kubernetes.client import api_client
-from kubernetes import client, config, dynamic
+from kubernetes import client, config, dynamic, utils
 from kubernetes.client.exceptions import ApiException
 import requests
 from systest_utils import Logger, TestUtil, statics
@@ -581,6 +581,31 @@ class KubectlWrapper(object):
             TestUtil.run_command(f"kubectl scale --replicas=1 replicaset {name} -n {namespace}".split(" "), timeout=None)
         else:
             raise Exception(f"kind {kind} is not supported")
+
+    @staticmethod
+    def scale(namespace: str, kind: str, name: str, replicas: int):
+        TestUtil.run_command(f"kubectl scale --replicas={replicas} {kind} {name} -n {namespace}".split(" "), timeout=None)
+
+    def create_network_policy(self, namespace: str, policy: dict, timeout=360):
+        network_policy = {
+            'apiVersion': 'networking.k8s.io/v1', 
+            'kind': 'NetworkPolicy',
+            'metadata': {
+                'name': policy["metadata"]["name"], 
+                'namespace': namespace
+            }, 
+            'spec': {
+                'podSelector': policy["spec"]["podSelector"],
+                'policyTypes': policy["spec"]["policyTypes"],
+            }
+        }
+
+        if "ingress" in policy["spec"]:
+            network_policy['spec']["ingress"] = policy["spec"]["ingress"]
+
+        if "engress" in policy["spec"]:
+            network_policy['spec']["engress"] = policy["spec"]["engress"]
+        return utils.create_from_dict(k8s_client=self.client.ApiClient(), data=network_policy, namespace=namespace, verbose=True)
 
 def get_name(obj: dict):
     return obj["metadata"]["name"]
