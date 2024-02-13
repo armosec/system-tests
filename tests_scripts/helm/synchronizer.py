@@ -28,6 +28,7 @@ class BaseSynchronizer(BaseHelm):
             "capabilities.vulnerabilityScan": "disable",
             "capabilities.runtimeObservability": "enable",
             "synchronizer.image.tag": "v0.0.52",
+            "grypeOfflineDB.enabled": "false",
         }
 
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
@@ -402,7 +403,7 @@ class SynchronizerProxy(BaseSynchronizer):
         self.verify_backend_resources(cluster, namespace_1)
         self.verify_backend_resources(cluster, namespace_2)
 
-        Logger.logger.info("5. Removing proxy to simulate network disconnection")
+        Logger.logger.info("4. Removing proxy to simulate network disconnection")
         self.scale_down_proxy_server()
         TestUtil.sleep(60)
 
@@ -411,22 +412,69 @@ class SynchronizerProxy(BaseSynchronizer):
             self.restart_all_workloads(namespace=namespace_1)
             TestUtil.sleep(1)
 
-        Logger.logger.info("6. Delete workload 2")
+        Logger.logger.info("6. Delete workload 2 & Create workload 3")
         self.delete_all_workloads(namespace=namespace_2)
-
-        Logger.logger.info("6. Create workload 3")
         workload_3 = self.apply_yaml_file(yaml_file=self.test_obj["workload_3"], namespace=namespace_1)
         self.verify_all_pods_are_running(namespace=namespace_1, workload=workload_3, timeout=180)
 
         TestUtil.sleep(60, "simulating network issue for 1 minute", "info")
-
-        Logger.logger.info("5. Restoring proxy to restore network connection")
+        Logger.logger.info("7. Restoring proxy to restore network connection")
         self.scale_up_proxy_server()
 
         Logger.logger.info("8. Check BE vs. Cluster - resources are updated / created")
         self.verify_backend_resources(cluster, namespace_1, iterations=20, sleep_time=30) 
 
-        Logger.logger.info("7. Check BE vs. Cluster - resources deleted from BE")
+        Logger.logger.info("9. Check BE vs. Cluster - resources deleted from BE")
         self.verify_backend_resources_deleted(cluster, namespace_2, iterations=20, sleep_time=30)
+
+        return self.cleanup()
+
+
+class SynchronizerRaceCondition(BaseSynchronizer):
+    def __init__(
+        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
+    ):
+        super(SynchronizerRaceCondition, self).__init__(
+            test_driver=test_driver,
+            test_obj=test_obj,
+            backend=backend,
+            kubernetes_obj=kubernetes_obj,
+        )
+
+    def start(self):
+        """
+        Test plan:
+        1. Apply workload 
+        2. Install Helm chart
+        3. Check workload is reported
+        4. Update env var in a loop
+        5. Check workload is reported
+        """
+        assert (
+            self.backend != None
+        ), f"the test {self.test_driver.test_name} must run with backend"
+
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info(f"1. Apply workload")
+        workload = self.apply_yaml_file(yaml_file=self.test_obj["workload"], namespace=namespace)
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload, timeout=180)
+
+        Logger.logger.info("2. Install Helm Chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        TestUtil.sleep(20, "wait for synchronization")
+
+        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
+        self.verify_backend_resources(cluster, namespace)
+
+        Logger.logger.info("4. Update env var 300 times to simulate multiple changes")
+        for i in range(300):
+            self.kubernetes_obj.update_env(namespace, workload['metadata']['name'], {"TEST_ENV": f"test_env_{i}"}, workload['kind'])
+        TestUtil.sleep(20, "wait for synchronization")
+
+        Logger.logger.info("5. Check BE vs. Cluster - last resource version")
+        self.verify_backend_resources(cluster, namespace) 
 
         return self.cleanup()

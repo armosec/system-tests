@@ -40,3 +40,13 @@ class SynchronizerTests(object):
             proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
 
+    @staticmethod
+    def synchronizer_race_condition():
+        from tests_scripts.helm.synchronizer import SynchronizerRaceCondition
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            workload=join(statics.DEFAULT_SYNCHRONIZER_PATH, "deployment.yaml"),
+            test_obj=SynchronizerRaceCondition,
+        )
+
