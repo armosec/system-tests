@@ -13,15 +13,7 @@ class SynchronizerTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             workloads=statics.DEFAULT_SYNCHRONIZER_PATH,
-            test_obj=Synchronizer,
-            helm_kwargs={'capabilities.relevancy': 'disable',
-                         'capabilities.configurationScan': 'disable',
-                         'capabilities.continuousScan': 'disable',
-                         'capabilities.nodeScan': 'disable',
-                         'capabilities.vulnerabilityScan': 'disable',
-                         'capabilities.runtimeObservability': 'enable',
-                         'synchronizer.image.tag': 'v0.0.51',
-                         })
+            test_obj=Synchronizer)
 
     @staticmethod
     def synchronizer_reconciliation():
@@ -32,14 +24,19 @@ class SynchronizerTests(object):
             workload_1=join(statics.DEFAULT_SYNCHRONIZER_PATH, "deployment.yaml"),
             workload_2=join(statics.DEFAULT_SYNCHRONIZER_PATH, "replicaset.yaml"),
             test_obj=SynchronizerReconciliation,
-            reconciliation_interval_minutes=10,
-            helm_kwargs={'capabilities.relevancy': 'disable',
-                         'capabilities.configurationScan': 'disable',
-                         'capabilities.continuousScan': 'disable',
-                         'capabilities.nodeScan': 'disable',
-                         'capabilities.vulnerabilityScan': 'disable',
-                         'capabilities.runtimeObservability': 'enable',
-                         'synchronizer.image.tag': 'v0.0.51',
-                         })
+            reconciliation_interval_minutes=10
+            )
 
+    @staticmethod
+    def synchronizer_proxy():
+        from tests_scripts.helm.synchronizer import SynchronizerProxy
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            workload_1=join(statics.DEFAULT_SYNCHRONIZER_PATH, "deployment.yaml"),
+            workload_2=join(statics.DEFAULT_SYNCHRONIZER_PATH, "replicaset.yaml"),
+            workload_3=join(statics.DEFAULT_SYNCHRONIZER_PATH, "statefulset.yaml"),
+            test_obj=SynchronizerProxy,
+            proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
+        )
 

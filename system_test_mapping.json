@@ -566,6 +566,22 @@
         "description": "Checks synchronizer reconciliation flow",
         "skip_on_environment": ""
     },
+    "synchronizer_proxy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer proxy and disconnection",
+        "skip_on_environment": ""
+    },
     "network_policy": {
         "target": [
             "In cluster",
