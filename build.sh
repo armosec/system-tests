@@ -39,7 +39,7 @@ if [ "$(uname)" == "Darwin" ]; then
   brew install openssl
   brew link openssl --force
   source systests_python_env/bin/activate
-  LDFLAGS="-L$(brew --prefix openssl@1.1)/lib" CFLAGS="-I$(brew --prefix openssl@1.1)/include" pip3.8 install -r requirements.txt
+  LDFLAGS="-L$(brew --prefix openssl@1.1)/lib" CFLAGS="-I$(brew --prefix openssl@1.1)/include" pip3 install -r requirements.txt
   brew unlink openssl
 else
   echo "OS: Linux"
