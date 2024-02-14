@@ -24,7 +24,7 @@ class SynchronizerTests(object):
             workload_1=join(statics.DEFAULT_SYNCHRONIZER_PATH, "deployment.yaml"),
             workload_2=join(statics.DEFAULT_SYNCHRONIZER_PATH, "replicaset.yaml"),
             test_obj=SynchronizerReconciliation,
-            reconciliation_interval_minutes=10
+            reconciliation_interval_minutes=15
             )
 
     @staticmethod
