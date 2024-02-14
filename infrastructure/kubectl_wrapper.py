@@ -14,6 +14,30 @@ import subprocess
 class KubectlWrapper(object):
     """ CaKube provides kubernetes wrapper and helper functions"""
 
+    kubescape_namespaced_kinds = {
+        'ApplicationActivity': 'applicationactivities',
+        'ApplicationProfile': 'applicationprofiles',
+        'ApplicationProfileSummary': 'applicationprofilesummaries',
+        'GeneratedNetworkPolicy': 'generatednetworkpolicies',
+        'NetworkNeighbors': 'networkneighborses',
+        'OpenVulnerabilityExchangeContainer': 'openvulnerabilityexchangecontainers',
+        'SBOMSPDXv2p3Filtered': 'sbomspdxv2p3filtereds',
+        'SBOMSPDXv2p3': 'sbomspdxv2p3s',
+        'SBOMSummary': 'sbomsummaries',
+        'SBOMSyftFiltered': 'sbomsyftfiltereds',
+        'SBOMSyft': 'sbomsyfts',
+        'VulnerabilityManifest': 'vulnerabilitymanifests',
+        'VulnerabilityManifestSummary': 'vulnerabilitymanifestsummaries',
+        'WorkloadConfigurationScan': 'workloadconfigurationscans',
+        'WorkloadConfigurationScanSummary': 'workloadconfigurationscansummaries'
+    }
+
+    kubescape_non_namespaced_kinds = {
+        'ConfigurationScanSummary': 'configurationscansummaries',
+        'KnownServer': 'knownservers',
+        'VulnerabilitySummary': 'vulnerabilitysummaries',
+    }
+
     all_kinds = ["ComponentStatus", "ConfigMap", "ControllerRevision", "CronJob",
                  "CustomResourceDefinition", "DaemonSet", "Deployment", "Endpoints", "Event", "HorizontalPodAutoscaler",
                  "Ingress", "Job", "Lease", "LimitRange", "LocalSubjectAccessReview", "MutatingWebhookConfiguration",
@@ -201,6 +225,37 @@ class KubectlWrapper(object):
 
         return items
     
+    def get_all_namespaced_kubescape_crds(self, namespace='Default'):
+        items = list()
+
+        for kind, plural in self.kubescape_namespaced_kinds.items():
+            status = self.client_CustomObjectsApi.list_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                namespace=namespace,
+                plural=plural
+            )
+            for item in status['items']:
+                item['kind'] = kind
+                items.append(item)
+
+        return items
+
+    def get_all_non_namespaced_kubescape_crds(self):
+        items = list()
+
+        for kind, plural in self.kubescape_non_namespaced_kinds.items():
+            status = self.client_CustomObjectsApi.list_cluster_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                plural=plural
+            )
+            for item in status['items']:
+                item['kind'] = kind
+                items.append(item)
+
+        return items
+    
     def get_namespaced_workloads(self, kind='Deployment', namespace='Default'):
         if 'Deployment' in kind:
             method = self.client_AppsV1Api.list_namespaced_deployment
@@ -278,6 +333,21 @@ class KubectlWrapper(object):
             return status
         elif 'Namespace' == kind:
             return self.run(method=self.client_CoreV1Api.create_namespace, body=application, _request_timeout=timeout)
+        elif kind in self.kubescape_namespaced_kinds:
+            return self.client_CustomObjectsApi.create_namespaced_custom_object(
+                     group=statics.STORAGE_AGGREGATED_API_GROUP,
+                     version=statics.STORAGE_AGGREGATED_API_VERSION,
+                     body=application,
+                     plural=self.kubescape_namespaced_kinds[kind],
+                     namespace=namespace
+                )
+        elif kind in self.kubescape_non_namespaced_kinds:
+            return self.client_CustomObjectsApi.create_cluster_custom_object(
+                     group=statics.STORAGE_AGGREGATED_API_GROUP,
+                     version=statics.STORAGE_AGGREGATED_API_VERSION,
+                     body=application,
+                     plural=self.kubescape_non_namespaced_kinds[kind],
+                )
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))
         status = self.run(method=method, namespace=namespace, body=application, _request_timeout=timeout)
@@ -388,6 +458,20 @@ class KubectlWrapper(object):
         elif 'ConfigMap' == kind:
             status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace,
                                                                         _request_timeout=None)
+        elif kind in self.kubescape_namespaced_kinds:
+            status = self.client_CustomObjectsApi.delete_namespaced_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=get_name(application),
+                    plural=self.kubescape_namespaced_kinds[kind],
+                    namespace=namespace
+            )
+        elif kind in self.kubescape_non_namespaced_kinds:
+            status = self.client_CustomObjectsApi.delete_cluster_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=get_name(application),
+                    plural=self.kubescape_non_namespaced_kinds[kind])
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))
         return status
@@ -586,26 +670,6 @@ class KubectlWrapper(object):
     def scale(namespace: str, kind: str, name: str, replicas: int):
         TestUtil.run_command(f"kubectl scale --replicas={replicas} {kind} {name} -n {namespace}".split(" "), timeout=None)
 
-    def create_network_policy(self, namespace: str, policy: dict, timeout=360):
-        network_policy = {
-            'apiVersion': 'networking.k8s.io/v1', 
-            'kind': 'NetworkPolicy',
-            'metadata': {
-                'name': policy["metadata"]["name"], 
-                'namespace': namespace
-            }, 
-            'spec': {
-                'podSelector': policy["spec"]["podSelector"],
-                'policyTypes': policy["spec"]["policyTypes"],
-            }
-        }
-
-        if "ingress" in policy["spec"]:
-            network_policy['spec']["ingress"] = policy["spec"]["ingress"]
-
-        if "engress" in policy["spec"]:
-            network_policy['spec']["engress"] = policy["spec"]["engress"]
-        return utils.create_from_dict(k8s_client=self.client.ApiClient(), data=network_policy, namespace=namespace, verbose=True)
-
+    
 def get_name(obj: dict):
     return obj["metadata"]["name"]

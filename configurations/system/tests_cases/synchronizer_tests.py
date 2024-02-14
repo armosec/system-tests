@@ -50,3 +50,11 @@ class SynchronizerTests(object):
             test_obj=SynchronizerRaceCondition,
         )
 
+    @staticmethod
+    def synchronizer_kubescape_crds():
+        from tests_scripts.helm.synchronizer import SynchronizerKubescapeCRDs
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            crds=statics.DEFAULT_SYNCHRONIZER_CRDS_PATH,
+            test_obj=SynchronizerKubescapeCRDs,
+        )

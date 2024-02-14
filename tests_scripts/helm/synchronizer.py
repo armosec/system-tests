@@ -55,18 +55,6 @@ class BaseSynchronizer(BaseHelm):
             namespace=namespace, kind="deployment", name="synchronizer", replicas=1
         )
 
-    def block_all_communication(self, namespace):
-        deny_all_policy = dict(
-            metadata=dict(name="deny-all", namespace=namespace),
-            spec=dict(
-                podSelector=dict(matchLabels=dict(app="synchronizer")),
-                ingress=None,
-                egress=None,
-                policyTypes=["Ingress", "Egress"],
-            ),
-        )
-        self.kubernetes_obj.create_network_policy(namespace, deny_all_policy)
-
     def get_all_workloads_in_namespace(self, namespace):
         workloads = self.kubernetes_obj.get_all_namespaced_workloads(
             namespace=namespace
@@ -79,6 +67,30 @@ class BaseSynchronizer(BaseHelm):
             )
         )
         return wl_without_parent
+
+    def get_all_non_namespaced_kubescape_crds(self, _=None):
+        return self.kubernetes_obj.get_all_non_namespaced_kubescape_crds()
+
+    def get_all_namespaced_kubescape_crds(self, namespace):
+        r = self.kubernetes_obj.get_all_namespaced_kubescape_crds(
+            namespace=namespace
+        )
+        r_filtered = list(
+            filter(
+                lambda x: x['kind'] != 'GeneratedNetworkPolicy',
+                r,
+            )
+        )
+        return r_filtered
+
+    
+    def get_all_kubescape_crds(self, namespace):
+        """
+        Get all kubescape crds in the cluster (namespaced and non-namespaced)
+        """
+        crds = self.get_all_namespaced_kubescape_crds(namespace)
+        crds.extend(self.get_all_non_namespaced_kubescape_crds())
+        return crds
 
     def get_workload_in_namespace(self, namespace, kind, name):
         wls = self.get_all_workloads_in_namespace(namespace)
@@ -108,6 +120,14 @@ class BaseSynchronizer(BaseHelm):
                 application=dict(kind=kind, metadata=dict(name=name)),
             )
 
+    def delete_all_crds(self, namespace):
+        crds = self.get_all_kubescape_crds(namespace)
+        for resource in crds:
+            self.kubernetes_obj.delete_workload(
+                namespace=namespace,
+                application=dict(kind=resource["kind"], metadata=dict(name=resource["metadata"]["name"])),
+            )
+
     def verify_backend_resources_deleted(
         self, cluster, namespace, iterations=10, sleep_time=10
     ):
@@ -127,12 +147,12 @@ class BaseSynchronizer(BaseHelm):
                 TestUtil.sleep(sleep_time, "sleeping and retrying", "info")
 
     def verify_backend_resources(
-        self, cluster, namespace, iterations=10, sleep_time=10
+        self, cluster, namespace, list_func=None, iterations=10, sleep_time=10
     ):
         while iterations > 0:
             iterations -= 1
-            try:
-                cluster_resources = self.get_all_workloads_in_namespace(namespace)
+            try:   
+                cluster_resources = list_func(namespace) if list_func else self.get_all_workloads_in_namespace(namespace)
                 be_resources = self.backend.get_kubernetes_resources(
                     with_resource=True, cluster_name=cluster, namespace=namespace
                 )
@@ -153,18 +173,27 @@ class BaseSynchronizer(BaseHelm):
                     )
                     be_kind = full_be_object.get("kind")
                     be_name = full_be_object.get("metadata").get("name")
-                    be_namespace = full_be_object.get("metadata").get("namespace")
+                    be_namespace = full_be_object.get("metadata").get("namespace", "")
 
                     # find the be resource in the expected resources
                     cluster_resource = None
+                    cluster_resource_version = None
                     for resource in cluster_resources:
-                        cluster_kind = getattr(resource, "kind", "")
-                        cluster_name = getattr(
-                            getattr(resource, "metadata", {}), "name"
-                        )
-                        cluster_namespace = getattr(
-                            getattr(resource, "metadata", {}), "namespace"
-                        )
+                        if isinstance(resource, dict):
+                            cluster_kind = resource.get("kind", "")
+                            cluster_name = resource.get("metadata", {}).get("name")
+                            cluster_namespace = resource.get("metadata", {}).get("namespace", "")
+                            cluster_resource_version = resource.get("metadata", {}).get("resourceVersion", "")
+                        else:
+                            cluster_kind = getattr(resource, "kind", "")
+                            cluster_name = getattr(
+                                getattr(resource, "metadata", {}), "name"
+                            )
+                            cluster_namespace = getattr(
+                                getattr(resource, "metadata", {}), "namespace", ""
+                            )
+                            cluster_resource_version = getattr(getattr(cluster_resource, "metadata", {}), "resource_version", "")
+                        
                         if (
                             cluster_kind == be_kind
                             and cluster_namespace == be_namespace
@@ -177,9 +206,7 @@ class BaseSynchronizer(BaseHelm):
                     assert (
                         cluster_resource
                     ), f"kubernetes resource '{be_namespace}/{be_kind}/{be_name}' not found in expected resources '{cluster_resources}'"
-                    cluster_resource_version = getattr(
-                        getattr(cluster_resource, "metadata", {}), "resource_version"
-                    )
+                    
                     assert (
                         be_resource_version == cluster_resource_version
                     ), f"cluster resource '{be_namespace}/{be_kind}/{be_name}' is '{cluster_resource_version}' while resource version in BE is '{be_resource_version}'"
@@ -453,7 +480,7 @@ class SynchronizerRaceCondition(BaseSynchronizer):
         assert (
             self.backend != None
         ), f"the test {self.test_driver.test_name} must run with backend"
-
+    
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info(f"1. Apply workload")
@@ -478,3 +505,52 @@ class SynchronizerRaceCondition(BaseSynchronizer):
         self.verify_backend_resources(cluster, namespace) 
 
         return self.cleanup()
+
+
+class SynchronizerKubescapeCRDs(BaseSynchronizer):
+    def __init__(
+        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
+    ):
+        super(SynchronizerKubescapeCRDs, self).__init__(
+            test_driver=test_driver,
+            test_obj=test_obj,
+            backend=backend,
+            kubernetes_obj=kubernetes_obj,
+        )
+
+    def start(self):
+        """
+        Test plan:
+        1. Install Helm chart
+        2. Create CRDs
+        3. Check CRDs are reported
+        4. Delete CRDs
+        5. Check CRDs are deleted
+        """
+
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info("1. Install Helm Chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
+        Logger.logger.info(f"2. Create CRDs")
+        resources = self.apply_directory(path=self.test_obj["crds"], namespace=namespace)
+        assert len(resources) > 0, "no resources created"
+
+        TestUtil.sleep(20, "wait for synchronization")
+
+        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
+        self.verify_backend_resources(cluster, namespace, list_func=self.get_all_namespaced_kubescape_crds)
+        self.verify_backend_resources(cluster, "", list_func=self.get_all_non_namespaced_kubescape_crds)
+        
+        Logger.logger.info("4. Delete CRDs")
+        self.delete_all_crds(namespace)
+
+        Logger.logger.info("5. Check BE vs. Cluster - resources deleted in BE")
+        self.verify_backend_resources_deleted(cluster, namespace) # namespaced crds
+        self.verify_backend_resources_deleted(cluster, "")        # non-namespaced crds
+
+        return self.cleanup()
+    

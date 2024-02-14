@@ -2078,7 +2078,9 @@ class ControlPanelAPI(object):
             "innerFilters": [{"cluster": cluster_name}],
         }
 
-        if namespace:
+        if namespace == "":
+            payload["innerFilters"][0]["namespace"] = "','|missing"
+        elif namespace is not None:
             payload["innerFilters"][0]["namespace"] = namespace
 
         r = self.post(API_KUBERNETES_RESOURCES, params=params, json=payload, timeout=60)

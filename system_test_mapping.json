@@ -595,7 +595,23 @@
             "event-ingester-service",
             "synchronizer"
         ],
-        "description": "Checks synchronizer proxy and disconnection",
+        "description": "Checks synchronizer race condition (multiple updates)",
+        "skip_on_environment": ""
+    },
+    "synchronizer_kubescape_crds": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer - kubescape CRDs",
         "skip_on_environment": ""
     },
     "network_policy": {
