@@ -1282,13 +1282,13 @@ class ControlPanelAPI(object):
             result.extend(r.json()['response'])
             Logger.logger.info(
                 'container scan id : {} len(result):{}, len(expected_results):{} '.format(containers_scan_id,
-                                                                                          len(result),
+                                                                                          result,
                                                                                           total_cve))
     
         if len(result) < total_cve:
             raise Exception(
                 f'wait for aggregation to end in the backend, number of CVEs is lower than expected. ' \
-                f'received {len(result)}, expected: {total_cve}'
+                f'received {result}, expected: {total_cve}'
             )
         return result
 

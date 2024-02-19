@@ -707,6 +707,7 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
 
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        TestUtil.sleep(60, "sleep for 60 seconds before creation of workloads")
 
         # P2 apply workloads
         Logger.logger.info('apply workloads')

@@ -54,7 +54,8 @@ def get_messages_from_teams_channel(before_test):
 
 
 def get_messages_from_slack_channel(before_test):
-    client = WebClient(token=os.getenv("SLACK_TOKEN"))
+    Logger.logger.info('Attempting to read messages from slack before timestamp ' + str(before_test))
+    client = WebClient(token=os.getenv("SLACK_SYSTEM_TEST_TOKEN"))
     result = client.conversations_history(channel=f'{os.getenv("SLACK_CHANNEL_ID")}', oldest=before_test)
     return result['messages']
 

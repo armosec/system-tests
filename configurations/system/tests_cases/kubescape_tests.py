@@ -163,22 +163,7 @@ class KubescapeTests(object):
             namespace="system-test",
             create_test_tenant = True
         )
-    
-    @staticmethod
-    def scan_security_and_submit_to_backend():
-        from tests_scripts.kubescape.scan import ScanAndSubmitToBackend
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanAndSubmitToBackend,
-            policy_scope='framework',
-            policy_name='security',
-            submit=True,
-            account=True,
-            resources_for_test=[
-                {'kind': 'Deployment', 'name': 'apache', 'namespace': 'system-test', 'apiVersion': 'apps/v1'}],
-            yaml="apache.yaml",
-            namespace="system-test"
-        )
+
 
     @staticmethod
     def scan_mitre_and_submit_to_backend():

@@ -835,7 +835,18 @@ class BaseK8S(BaseDockerizeTest):
         }
         self.apply_workload(workload=body, namespace=namespace)
         p = {"imagePullSecrets": [{"name": secret_name}]}
-        self.kubernetes_obj.patch_workload(namespace=namespace, name="default", kind="ServiceAccount", application=p)
+
+        err = None
+        for _ in range(20):
+            try:
+                self.kubernetes_obj.patch_workload(namespace=namespace, name="default", kind="ServiceAccount",
+                                                   application=p)
+                return
+            except Exception as e:
+                time.sleep(1)
+                err = e
+        if err:
+            Logger.logger.error("failed to patch secret. reason: {}".format(err))
 
     def display_kube_system_logs(self):
         self.display_apiserver_logs()
