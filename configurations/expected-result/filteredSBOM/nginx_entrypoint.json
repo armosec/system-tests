@@ -1,0 +1,759 @@
+{
+    "SPDXID": "SPDXRef-DOCUMENT",
+    "annotations": null,
+    "comment": "",
+    "creationInfo": {
+        "comment": "",
+        "created": "2023-04-13T22:26:53Z",
+        "creators": [
+            "Organization: Anchore, Inc",
+            "Tool: syft-v0.76.0",
+            "Organization: Kubescape",
+            "Tool: KubescapeNodeAgent"
+        ],
+        "licenseListVersion": "3.20"
+    },
+    "dataLicense": "CC0-1.0",
+    "documentDescribes": null,
+    "documentNamespace": "https://anchore.com/syft/image/docker.io/danielgrunberger/entrypoint-img@sha256-5af3d3aab902e7968f5c645d241a7a8aa023cab2cd6434c6e5ab359cf03f1113-1b520ff0-ab15-455b-aab6-3c9ef5d4da57",
+    "externalDocumentRefs": null,
+    "files": [
+        {
+            "SPDXID": "SPDXRef-dbf7cb210c3886e8",
+            "annotations": null,
+            "artifactOfs": null,
+            "attributionTexts": null,
+            "checksums": [
+                {
+                    "algorithm": "SHA1",
+                    "checksumValue": "0000000000000000000000000000000000000000"
+                }
+            ],
+            "comment": "layerID: sha256:650abce4b096b06ac8bec2046d821d66d801af34f1f1d4c5e272ad030c7873db",
+            "copyrightText": "",
+            "fileContributors": null,
+            "fileDependencies": null,
+            "fileName": "/bin/sleep",
+            "fileTypes": null,
+            "licenseComments": "",
+            "licenseConcluded": "NOASSERTION",
+            "licenseInfoInFiles": null,
+            "noticeText": ""
+        }
+    ],
+    "hasExtractedLicensingInfos": [
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-All-permissive",
+            "name": "All-permissive",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Artistic",
+            "name": "Artistic",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Artistic-dist",
+            "name": "Artistic-dist",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Autoconf",
+            "name": "Autoconf",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-2-clause-author",
+            "name": "BSD-2-clause-author",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-2-clause-verbatim",
+            "name": "BSD-2-clause-verbatim",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3",
+            "name": "BSD-3",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-Aaron-D-Gifford",
+            "name": "BSD-3-clause-Aaron-D-Gifford",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-GENERIC",
+            "name": "BSD-3-clause-GENERIC",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-John-Birrell",
+            "name": "BSD-3-clause-John-Birrell",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-Regents",
+            "name": "BSD-3-clause-Regents",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-author",
+            "name": "BSD-3-clause-author",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-3-clause-with-weird-numbering",
+            "name": "BSD-3-clause-with-weird-numbering",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-4-clause-Christopher-G-Demetriou",
+            "name": "BSD-4-clause-Christopher-G-Demetriou",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-4-clause-Niels-Provos",
+            "name": "BSD-4-clause-Niels-Provos",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-4-clause-POWERDOG",
+            "name": "BSD-4-clause-POWERDOG",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-5-clause-Peter-Wemm",
+            "name": "BSD-5-clause-Peter-Wemm",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-BY-LC-NE",
+            "name": "BSD-BY-LC-NE",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-like-with-advertising-clause",
+            "name": "BSD-like-with-advertising-clause",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD-variant",
+            "name": "BSD-variant",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BSD3",
+            "name": "BSD3",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-BZIP",
+            "name": "BZIP",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-CC0",
+            "name": "CC0",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Chromium",
+            "name": "Chromium",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-DONT-CHANGE-THE-GPL",
+            "name": "DONT-CHANGE-THE-GPL",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Expat",
+            "name": "Expat",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-FSF-manpages",
+            "name": "FSF-manpages",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-FreeSoftware",
+            "name": "FreeSoftware",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GAP",
+            "name": "GAP",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GAP-Makefile.in",
+            "name": "GAP~Makefile.in",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GAP-configure",
+            "name": "GAP~configure",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GFDL",
+            "name": "GFDL",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GFDL-1.2-",
+            "name": "GFDL-1.2+",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GFDL-1.3--no-invariant",
+            "name": "GFDL-1.3+-no-invariant",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GFDL-3",
+            "name": "GFDL-3",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL",
+            "name": "GPL",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL-2--autoconf-exception",
+            "name": "GPL-2+-autoconf-exception",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL-2--libtool-exception",
+            "name": "GPL-2+-libtool-exception",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL-3--WITH-BISON-EXCEPTION",
+            "name": "GPL-3+-WITH-BISON-EXCEPTION",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPL-3--autoconf-exception",
+            "name": "GPL-3+-autoconf-exception",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPLv2-",
+            "name": "GPLv2+",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-GPLv3-",
+            "name": "GPLv3+",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-HSIEH-BSD",
+            "name": "HSIEH-BSD",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-HSIEH-DERIVATIVE",
+            "name": "HSIEH-DERIVATIVE",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Hylafax",
+            "name": "Hylafax",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-ISC-IBM",
+            "name": "ISC+IBM",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-ISC-Original",
+            "name": "ISC-Original",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-LGPL",
+            "name": "LGPL",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-LGPLv2.1-",
+            "name": "LGPLv2.1+",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-LGPLv3--or-GPLv2-",
+            "name": "LGPLv3+_or_GPLv2+",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-MIT-1",
+            "name": "MIT-1",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-MIT-X11",
+            "name": "MIT/X11",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-OpenGroup-BSD-like",
+            "name": "OpenGroup-BSD-like",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-PD",
+            "name": "PD",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-PD-debian",
+            "name": "PD-debian",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Permissive",
+            "name": "Permissive",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Public-Domain",
+            "name": "Public-Domain",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-REGCOMP",
+            "name": "REGCOMP",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-REGCOMP-",
+            "name": "REGCOMP,",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-RFC-Reference",
+            "name": "RFC-Reference",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-RRA-KEEP-THIS-NOTICE",
+            "name": "RRA-KEEP-THIS-NOTICE",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-SDBM-PUBLIC-DOMAIN",
+            "name": "SDBM-PUBLIC-DOMAIN",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-SIL-OFL-1.1",
+            "name": "SIL-OFL-1.1",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-TEXT-TABS",
+            "name": "TEXT-TABS",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-The",
+            "name": "The",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-TinySCHEME",
+            "name": "TinySCHEME",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-Unicode",
+            "name": "Unicode",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-WEBP",
+            "name": "WEBP",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-XFIG",
+            "name": "XFIG",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-all-permissive",
+            "name": "all-permissive",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-config-h",
+            "name": "config-h",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-configure",
+            "name": "configure",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-expat",
+            "name": "expat",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-g10-permissive",
+            "name": "g10-permissive",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-installsh",
+            "name": "installsh",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-noderivs",
+            "name": "noderivs",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-other",
+            "name": "other",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive",
+            "name": "permissive",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-autoconf-m4",
+            "name": "permissive-autoconf-m4",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-autoconf-m4-no-warranty",
+            "name": "permissive-autoconf-m4-no-warranty",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-configure",
+            "name": "permissive-configure",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-fsf",
+            "name": "permissive-fsf",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-like-automake-output",
+            "name": "permissive-like-automake-output",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-makefile-in",
+            "name": "permissive-makefile-in",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-permissive-nowarranty",
+            "name": "permissive-nowarranty",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-probably-PD",
+            "name": "probably-PD",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-public-domain",
+            "name": "public-domain",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-public-domain-md4",
+            "name": "public-domain-md4",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-public-domain-md5",
+            "name": "public-domain-md5",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-public-domain-s-s-d",
+            "name": "public-domain-s-s-d",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-public-domain-sha1",
+            "name": "public-domain-sha1",
+            "seeAlsos": null
+        },
+        {
+            "comment": "",
+            "extractedText": "NONE",
+            "licenseId": "LicenseRef-same-as-rest-of-p11kit",
+            "name": "same-as-rest-of-p11kit",
+            "seeAlsos": null
+        }
+    ],
+    "name": "docker.io/danielgrunberger/entrypoint-img@sha256:5af3d3aab902e7968f5c645d241a7a8aa023cab2cd6434c6e5ab359cf03f1113",
+    "packages": [
+        {
+            "SPDXID": "SPDXRef-Package-deb-coreutils-65bac153c492b66e",
+            "annotations": null,
+            "attributionTexts": null,
+            "builtDate": "",
+            "checksums": null,
+            "comment": "",
+            "copyrightText": "NOASSERTION",
+            "description": "",
+            "downloadLocation": "NOASSERTION",
+            "externalRefs": [
+                {
+                    "comment": "",
+                    "referenceCategory": "SECURITY",
+                    "referenceLocator": "cpe:2.3:a:coreutils:coreutils:8.32-4\\+b1:*:*:*:*:*:*:*",
+                    "referenceType": "cpe23Type"
+                },
+                {
+                    "comment": "",
+                    "referenceCategory": "PACKAGE-MANAGER",
+                    "referenceLocator": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64\u0026upstream=coreutils%408.32-4\u0026distro=debian-11",
+                    "referenceType": "purl"
+                }
+            ],
+            "files": null,
+            "filesAnalyzed": false,
+            "hasFiles": null,
+            "homepage": "",
+            "licenseComments": "",
+            "licenseConcluded": "GPL-3.0-only",
+            "licenseDeclared": "GPL-3.0-only",
+            "licenseInfoFromFiles": null,
+            "name": "coreutils",
+            "originator": "Person: Michael Stone \u003cmstone@debian.org\u003e",
+            "packageFileName": "",
+            "packageVerificationCode": null,
+            "primaryPackagePurpose": "",
+            "releaseDate": "",
+            "sourceInfo": "acquired package info from DPKG DB: /usr/share/doc/coreutils/copyright, /var/lib/dpkg/info/coreutils.md5sums, /var/lib/dpkg/status",
+            "summary": "",
+            "supplier": null,
+            "validUntilDate": "",
+            "versionInfo": "8.32-4+b1"
+        }
+    ],
+    "relationships": [
+        {
+            "comment": "ownership-by-file-overlap: indicates that the parent package claims ownership of a child package since the parent metadata indicates overlap with a location that a cataloger found the child package by",
+            "relatedSpdxElement": "SPDXRef-Package-java-archive-libintl-a29ca26c5c907c8",
+            "relationshipType": "OTHER",
+            "spdxElementId": "SPDXRef-Package-deb-gettext-base-19929d95b155bf28"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-dbf7cb210c3886e8",
+            "relationshipType": "CONTAINS",
+            "spdxElementId": "SPDXRef-Package-deb-coreutils-65bac153c492b66e"
+        },
+        {
+            "comment": "",
+            "relatedSpdxElement": "SPDXRef-DOCUMENT",
+            "relationshipType": "DESCRIBES",
+            "spdxElementId": "SPDXRef-DOCUMENT"
+        }
+    ],
+    "snippets": null,
+    "spdxVersion": "SPDX-2.3"
+}

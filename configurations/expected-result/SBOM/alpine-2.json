@@ -1,0 +1,3475 @@
+{
+    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+    "kind": "SBOMSyft",
+    "metadata": {
+        "annotations": {
+            "kubescape.io/image-id": "docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1",
+            "kubescape.io/status": "ready"
+        },
+        "creationTimestamp": "2024-02-04T15:26:27Z",
+        "labels": {
+            "kubescape.io/image-id": "docker-io-library-alpine-sha256-82d1e9d7ed48a7523bdebc18cf6290b",
+            "kubescape.io/image-name": "docker-io-library-alpine"
+        },
+        "name": "docker.io-library-alpine-sha256-82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1-ea94d1",
+        "namespace": "kubescape",
+        "resourceVersion": "1",
+        "uid": "236bdb4b-2a3b-420f-b76a-c87df9dea347"
+    },
+    "spec": {
+        "metadata": {
+            "report": {
+                "createdAt": "2024-02-04T15:26:27Z"
+            },
+            "tool": {
+                "name": "syft",
+                "version": "v0.101.1"
+            }
+        },
+        "syft": {
+            "artifactRelationships": [
+                {
+                    "child": "baca676b3df82a63",
+                    "parent": "10848772f7a65db3",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "faa840103274ca70",
+                    "parent": "10848772f7a65db3",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "10848772f7a65db3",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "e44c85cc4e5c249e",
+                    "parent": "10d30cab00c9abf0",
+                    "type": "contains"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "10d30cab00c9abf0",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fa81d4142b11def0",
+                    "parent": "10d30cab00c9abf0",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "10d30cab00c9abf0",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "10848772f7a65db3",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "10d30cab00c9abf0",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "38a6593706eca590",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "701300eef0967970",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "7b913bcb39976573",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "85e34641ddeca26c",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "99fec84f02b3ac20",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "baca676b3df82a63",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "c3e1269ff75aa1d8",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "c5d7c5a6064e9d71",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "c8e7fc9f117e52bc",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "caef79f1fe0b500a",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "e6d1b63d5a046c55",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "fa81d4142b11def0",
+                    "parent": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "type": "contains"
+                },
+                {
+                    "child": "10d30cab00c9abf0",
+                    "parent": "38a6593706eca590",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "163d1073b5f40181",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "3c10fc5555c6d992",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "53641aabfdcc175a",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "70d048615ea83820",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "7def79fe8112eae6",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "891d558e59931245",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "a658763f59ed26bc",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "b3bd8089cf3c868c",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "c37f8ed4a6ff5fc6",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "d2bd3ac7bcbb4ad2",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "38a6593706eca590",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e683f35e0cebe4bb",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "e770d799673e813c",
+                    "parent": "38a6593706eca590",
+                    "type": "contains"
+                },
+                {
+                    "child": "fa81d4142b11def0",
+                    "parent": "38a6593706eca590",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "38a6593706eca590",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "00dc101d755fb0e6",
+                    "parent": "701300eef0967970",
+                    "type": "contains"
+                },
+                {
+                    "child": "c5d7c5a6064e9d71",
+                    "parent": "701300eef0967970",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "701300eef0967970",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "0a2d75ae0e171168",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "0f1b70ecaf9c6959",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "10848772f7a65db3",
+                    "parent": "7b913bcb39976573",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "1b167b8bd8c1f88d",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "3aa091a3d6aeafff",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "b1a48711067826b8",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "dbb5fe5f477dee53",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "faa840103274ca70",
+                    "parent": "7b913bcb39976573",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "7b913bcb39976573",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "246c288e3f039849",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "27bb14faeea25093",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "35306d0c271e8151",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "47c1ef421bd17b65",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "5188d6a461dd383a",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "90e791213b38ac17",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "9d3afe049fc1fa85",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "aef929103adc276d",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "b898dd748a07dd54",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "baca676b3df82a63",
+                    "parent": "85e34641ddeca26c",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "c48ef089a7e66e81",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "cf588df57f93bca5",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "d3e9ef27c1435289",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "dd1f066aad2fd5ca",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "f7d731e402a497da",
+                    "parent": "85e34641ddeca26c",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "85e34641ddeca26c",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "10d30cab00c9abf0",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "38a6593706eca590",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "701300eef0967970",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "7b913bcb39976573",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "802e3ac751079e24",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "contains"
+                },
+                {
+                    "child": "c5d7c5a6064e9d71",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "c8e7fc9f117e52bc",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fa81d4142b11def0",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "99fec84f02b3ac20",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "0bc480ee66512b2f",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "16f071b3d4db299e",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "369a8305d5c2fd17",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "966520dc32e9f439",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "99079a9b93a84e6c",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "993275ba77fc90fc",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "a4ebda49f1a71623",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "a6f0ad5763be29cc",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "c90aee6c9db4aa37",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "da4d29261d5ce1cf",
+                    "parent": "baca676b3df82a63",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "baca676b3df82a63",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "04320b45906e8370",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "07a10576ea11fb28",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "0e3ff3669d0f9255",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "0e6f5dc995aca28b",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "102d5bd7dd174917",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "114574377a35bb80",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "1456141c7441e22b",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "339d06444fe8eeab",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "504d69f6c057b3f1",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "52ae5b8751e451e0",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "55bb3a6303350ebe",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "6e7b185e4c3811d4",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "888a74be1b342391",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "a585cc079227ee3d",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "b02d0d615cb15a1d",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "ba2b2951f82c4223",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "be2efe36c17d41e3",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "bf2fa58afe3044b9",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "ca464a40cac881db",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "cef5de170dba8b0c",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "e87f8ab6e5ebb1b3",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "f90f4a9f43c5f68e",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "c3e1269ff75aa1d8",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "2b7f9f6463a21c4e",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "contains"
+                },
+                {
+                    "child": "3e7fbbdbefbaa182",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "contains"
+                },
+                {
+                    "child": "6113bdd00462f4b1",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "contains"
+                },
+                {
+                    "child": "730a5d6b8f961b16",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "contains"
+                },
+                {
+                    "child": "a44da4321012368a",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "contains"
+                },
+                {
+                    "child": "caef79f1fe0b500a",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "c5d7c5a6064e9d71",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "c8e7fc9f117e52bc",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "e6f75601d1024920",
+                    "parent": "c8e7fc9f117e52bc",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "c8e7fc9f117e52bc",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "caef79f1fe0b500a",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "20b90c0f274d4360",
+                    "parent": "e54b9e6921a9482e",
+                    "type": "contains"
+                },
+                {
+                    "child": "7879d720adaa1501",
+                    "parent": "e54b9e6921a9482e",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "e54b9e6921a9482e",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "5ec81dccdf73a9ea",
+                    "parent": "e6d1b63d5a046c55",
+                    "type": "contains"
+                },
+                {
+                    "child": "e54b9e6921a9482e",
+                    "parent": "e6d1b63d5a046c55",
+                    "type": "dependency-of"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "e6d1b63d5a046c55",
+                    "type": "evident-by"
+                },
+                {
+                    "child": "77e6ef4c286d056b",
+                    "parent": "fa81d4142b11def0",
+                    "type": "contains"
+                },
+                {
+                    "child": "fef74c12c20ce517",
+                    "parent": "fa81d4142b11def0",
+                    "type": "evident-by"
+                }
+            ],
+            "artifacts": [
+                {
+                    "cpes": [
+                        "cpe:2.3:a:alpine-baselayout:alpine-baselayout:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout:alpine_baselayout:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine-baselayout:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine_baselayout:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine-baselayout:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine_baselayout:3.4.3-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "baca676b3df82a63",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "alpine-baselayout",
+                    "purl": "pkg:apk/alpine/alpine-baselayout@3.4.3-r1?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "3.4.3-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:alpine-baselayout-data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout-data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout_data:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout_data:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_baselayout:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine-baselayout-data:3.4.3-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine_baselayout_data:3.4.3-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "85e34641ddeca26c",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "alpine-baselayout-data",
+                    "purl": "pkg:apk/alpine/alpine-baselayout-data@3.4.3-r1?arch=x86_64\u0026upstream=alpine-baselayout\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "3.4.3-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:alpine-keys:alpine-keys:2.4-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine-keys:alpine_keys:2.4-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_keys:alpine-keys:2.4-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine_keys:alpine_keys:2.4-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine-keys:2.4-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:alpine:alpine_keys:2.4-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "c3e1269ff75aa1d8",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "alpine-keys",
+                    "purl": "pkg:apk/alpine/alpine-keys@2.4-r1?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "2.4-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:apk-tools:apk-tools:2.14.0-r2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:apk-tools:apk_tools:2.14.0-r2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:apk_tools:apk-tools:2.14.0-r2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:apk_tools:apk_tools:2.14.0-r2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:apk:apk-tools:2.14.0-r2:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:apk:apk_tools:2.14.0-r2:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "e54b9e6921a9482e",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "apk-tools",
+                    "purl": "pkg:apk/alpine/apk-tools@2.14.0-r2?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "2.14.0-r2"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:busybox:busybox:1.36.1-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "7b913bcb39976573",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "busybox",
+                    "purl": "pkg:apk/alpine/busybox@1.36.1-r0?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.36.1-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:busybox-binsh:busybox-binsh:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:busybox-binsh:busybox_binsh:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:busybox_binsh:busybox-binsh:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:busybox_binsh:busybox_binsh:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:busybox:busybox-binsh:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:busybox:busybox_binsh:1.36.1-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "10848772f7a65db3",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "busybox-binsh",
+                    "purl": "pkg:apk/alpine/busybox-binsh@1.36.1-r0?arch=x86_64\u0026upstream=busybox\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.36.1-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:ca-certificates-bundle:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca-certificates-bundle:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca_certificates_bundle:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca_certificates_bundle:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca-certificates:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca-certificates:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca_certificates:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca_certificates:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:mozilla:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:mozilla:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca:ca-certificates-bundle:20230506-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ca:ca_certificates_bundle:20230506-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "e6d1b63d5a046c55",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MPL-2.0 AND MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MPL-2.0 AND MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "ca-certificates-bundle",
+                    "purl": "pkg:apk/alpine/ca-certificates-bundle@20230506-r0?arch=x86_64\u0026upstream=ca-certificates\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "20230506-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libc-utils:libc-utils:0.7.2-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libc-utils:libc_utils:0.7.2-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libc_utils:libc-utils:0.7.2-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libc_utils:libc_utils:0.7.2-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libc:libc-utils:0.7.2-r5:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libc:libc_utils:0.7.2-r5:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "caef79f1fe0b500a",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "BSD-2-Clause AND BSD-3-Clause",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "BSD-2-Clause AND BSD-3-Clause"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libc-utils",
+                    "purl": "pkg:apk/alpine/libc-utils@0.7.2-r5?arch=x86_64\u0026upstream=libc-dev\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "0.7.2-r5"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libcrypto3:libcrypto3:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto3:libcrypto:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto:libcrypto3:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libcrypto:libcrypto:3.1.1-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "38a6593706eca590",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Apache-2.0",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Apache-2.0"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libcrypto3",
+                    "purl": "pkg:apk/alpine/libcrypto3@3.1.1-r1?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "3.1.1-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:libssl3:libssl3:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl3:libssl:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl:libssl3:3.1.1-r1:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:libssl:libssl:3.1.1-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "10d30cab00c9abf0",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Apache-2.0",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Apache-2.0"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "libssl3",
+                    "purl": "pkg:apk/alpine/libssl3@3.1.1-r1?arch=x86_64\u0026upstream=openssl\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "3.1.1-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:musl-libc:musl:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl_libc:musl:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl:musl:1.2.4-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "99fec84f02b3ac20",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "musl",
+                    "purl": "pkg:apk/alpine/musl@1.2.4-r0?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.2.4-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:musl-utils:musl-utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl-utils:musl_utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl_utils:musl-utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl_utils:musl_utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl-libc:musl-utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl-libc:musl_utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl:musl-utils:1.2.4-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:musl:musl_utils:1.2.4-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "c5d7c5a6064e9d71",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "MIT AND BSD-2-Clause AND GPL-2.0-or-later",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "MIT AND BSD-2-Clause AND GPL-2.0-or-later"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "musl-utils",
+                    "purl": "pkg:apk/alpine/musl-utils@1.2.4-r0?arch=x86_64\u0026upstream=musl\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.2.4-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:scanelf:scanelf:1.3.7-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "701300eef0967970",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "scanelf",
+                    "purl": "pkg:apk/alpine/scanelf@1.3.7-r1?arch=x86_64\u0026upstream=pax-utils\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.3.7-r1"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:ssl-client:ssl-client:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ssl-client:ssl_client:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ssl_client:ssl-client:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ssl_client:ssl_client:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ssl:ssl-client:1.36.1-r0:*:*:*:*:*:*:*",
+                        "cpe:2.3:a:ssl:ssl_client:1.36.1-r0:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "fa81d4142b11def0",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "GPL-2.0-only",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "GPL-2.0-only"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "ssl_client",
+                    "purl": "pkg:apk/alpine/ssl_client@1.36.1-r0?arch=x86_64\u0026upstream=busybox\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.36.1-r0"
+                },
+                {
+                    "cpes": [
+                        "cpe:2.3:a:zlib:zlib:1.2.13-r1:*:*:*:*:*:*:*"
+                    ],
+                    "foundBy": "apk-db-cataloger",
+                    "id": "c8e7fc9f117e52bc",
+                    "language": "",
+                    "licenses": [
+                        {
+                            "locations": [
+                                {
+                                    "accessPath": "/lib/apk/db/installed",
+                                    "annotations": {
+                                        "evidence": "primary"
+                                    },
+                                    "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                                    "path": "/lib/apk/db/installed"
+                                }
+                            ],
+                            "spdxExpression": "Zlib",
+                            "type": "declared",
+                            "urls": [],
+                            "value": "Zlib"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "accessPath": "/lib/apk/db/installed",
+                            "annotations": {
+                                "evidence": "primary"
+                            },
+                            "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "path": "/lib/apk/db/installed"
+                        }
+                    ],
+                    "name": "zlib",
+                    "purl": "pkg:apk/alpine/zlib@1.2.13-r1?arch=x86_64\u0026distro=alpine-3.18.2",
+                    "type": "apk",
+                    "version": "1.2.13-r1"
+                }
+            ],
+            "descriptor": {
+                "configuration": {
+                    "catalogers": {
+                        "requested": {
+                            "default": [
+                                "image"
+                            ]
+                        },
+                        "used": [
+                            "alpm-db-cataloger",
+                            "apk-db-cataloger",
+                            "binary-cataloger",
+                            "cargo-auditable-binary-cataloger",
+                            "conan-info-cataloger",
+                            "dotnet-portable-executable-cataloger",
+                            "dpkg-db-cataloger",
+                            "go-module-binary-cataloger",
+                            "graalvm-native-image-cataloger",
+                            "java-archive-cataloger",
+                            "javascript-package-cataloger",
+                            "nix-store-cataloger",
+                            "php-composer-installed-cataloger",
+                            "portage-cataloger",
+                            "python-installed-package-cataloger",
+                            "r-package-cataloger",
+                            "rpm-db-cataloger",
+                            "ruby-installed-gemspec-cataloger",
+                            "sbom-cataloger"
+                        ]
+                    },
+                    "data-generation": {
+                        "generate-cpes": true
+                    },
+                    "files": {
+                        "content": {
+                            "globs": null,
+                            "skip-files-above-size": 0
+                        },
+                        "hashers": [
+                            "sha-1",
+                            "sha-256"
+                        ],
+                        "selection": "owned-by-package"
+                    },
+                    "packages": {
+                        "binary": [
+                            "python-binary",
+                            "python-binary-lib",
+                            "pypy-binary-lib",
+                            "go-binary",
+                            "julia-binary",
+                            "helm",
+                            "redis-binary",
+                            "java-binary-openjdk",
+                            "java-binary-ibm",
+                            "java-binary-oracle",
+                            "nodejs-binary",
+                            "go-binary-hint",
+                            "busybox-binary",
+                            "haproxy-binary",
+                            "perl-binary",
+                            "php-cli-binary",
+                            "php-fpm-binary",
+                            "php-apache-binary",
+                            "php-composer-binary",
+                            "httpd-binary",
+                            "memcached-binary",
+                            "traefik-binary",
+                            "postgresql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "mysql-binary",
+                            "xtrabackup-binary",
+                            "mariadb-binary",
+                            "rust-standard-library-linux",
+                            "rust-standard-library-macos",
+                            "ruby-binary",
+                            "erlang-binary",
+                            "consul-binary",
+                            "nginx-binary",
+                            "bash-binary",
+                            "openssl-binary",
+                            "gcc-binary",
+                            "wordpress-cli-binary"
+                        ],
+                        "golang": {
+                            "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+                            "proxies": [
+                                "https://proxy.golang.org",
+                                "direct"
+                            ],
+                            "search-local-mod-cache-licenses": false,
+                            "search-remote-licenses": false
+                        },
+                        "java-archive": {
+                            "include-indexed-archives": true,
+                            "include-unindexed-archives": false,
+                            "maven-base-url": "https://repo1.maven.org/maven2",
+                            "max-parent-recursive-depth": 5,
+                            "use-network": false
+                        },
+                        "javascript": {
+                            "npm-base-url": "https://registry.npmjs.org",
+                            "search-remote-licenses": false
+                        },
+                        "linux-kernel": {
+                            "catalog-modules": true
+                        },
+                        "python": {
+                            "guess-unpinned-requirements": false
+                        }
+                    },
+                    "relationships": {
+                        "exclude-binary-packages-with-file-ownership-overlap": true,
+                        "package-file-ownership": true,
+                        "package-file-ownership-overlap": true
+                    },
+                    "search": {
+                        "scope": "squashed"
+                    }
+                },
+                "name": "docker.io-library-alpine-sha256-82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1-ea94d1",
+                "version": "v0.101.1"
+            },
+            "distro": {
+                "bugReportURL": "https://gitlab.alpinelinux.org/alpine/aports/-/issues",
+                "homeURL": "https://alpinelinux.org/",
+                "id": "alpine",
+                "name": "Alpine Linux",
+                "prettyName": "Alpine Linux v3.18",
+                "versionID": "3.18.2"
+            },
+            "files": [
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2e9a0bdd9f3f3e9e95bc2ba3ebcc33d1ed43db9c"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "6bf2a4358d5c26033d2d2e30ef9ce0ba9e3a9b34d81f0964f1d127123ae3e827"
+                        }
+                    ],
+                    "id": "faa840103274ca70",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/bin/busybox"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 816888,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3af08548ef78cfdedcf349880c2c6a1a48763a0e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9c102bcc376af1498d549b77bdbfa815ae86faa1d2d82f040e616b18ef2df2d4"
+                        }
+                    ],
+                    "id": "339d06444fe8eeab",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "bfb616658cc05a872568b0c8e398c482e23b60dd"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ebf31683b56410ecc4c00acd9f6e2839e237a3b62b5ae7ef686705c7ba0396a9"
+                        }
+                    ],
+                    "id": "ca464a40cac881db",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3671ae0ec7503b1e193587c1dcdf7b78bc863e42"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "12f899e55a7691225603d6fb3324940fc51cd7f133e7ead788663c2b7eecb00c"
+                        }
+                    ],
+                    "id": "bf2fa58afe3044b9",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "95995311236b7a55933642ffa10ce6014f1af7d0"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "207e4696d3c05f7cb05966aee557307151f1f00217af4143c1bcaf33b8df733f"
+                        }
+                    ],
+                    "id": "888a74be1b342391",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "58d5ba4b2f3b1e927721d7a6432f298eedf72a6b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "128d34d4aec39b0daedea8163cd8dc24dff36fd3d848630ab97eeb1d3084bbb3"
+                        }
+                    ],
+                    "id": "0e3ff3669d0f9255",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d512bba3b8a5c9dfe6a033e919f5af0ef1ced993"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "51cfbbdc27b1524bfce7aff217f7a82327ce6d441f43ce0eadfc6d30852104a5"
+                        }
+                    ],
+                    "id": "b1a48711067826b8",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/busybox-paths.d/busybox"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 3996,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "bdf9356a9516238c8b2468613517749098b17ef6"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "575d810a9fae5f2f0671c9b2c0ce973e46c7207fbe5cb8d1b0d1836a6a0470e3"
+                        }
+                    ],
+                    "id": "a4ebda49f1a71623",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/crontabs/root"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/tab-separated-values",
+                        "mode": 600,
+                        "size": 283,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d50ee135ef10a434b9df582ea8276b5c1ce803fa"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "a3efca2e8d62785c87517283092b4c800d88612b6f3f06b80a4c2f39d8e68841"
+                        }
+                    ],
+                    "id": "c48ef089a7e66e81",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/fstab"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/csv",
+                        "mode": 644,
+                        "size": 89,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "dcafa89498396b2cc7495354920819257b81fbd6"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0632d55a68081065097472fe7bc7c66f0785f3b78f39fb23f622d24a7e09be9f"
+                        }
+                    ],
+                    "id": "b898dd748a07dd54",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/group"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 697,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "ea75706155cffed0a1bd43ddba4543da27d73a67"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d906aecb61d076a967d9ffe8821c7b04b063f72df9d9e35b33ef36b1c0d98f16"
+                        }
+                    ],
+                    "id": "d3e9ef27c1435289",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/hostname"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 10,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "043eb324a653456caa1a73e2e2d49f77792bb0c5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e3998dbe02b51dada33de87ae43d18a93ab6915b9e34f5a751bf2b9b25a55492"
+                        }
+                    ],
+                    "id": "aef929103adc276d",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/hosts"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 79,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "4ecb616e15bb4335917b513f34ac133ae0f8a477"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "54a5f36970125bf70cdf7b215c9e12a287d92ad76a693bd72aec4cbc5645df87"
+                        }
+                    ],
+                    "id": "cf588df57f93bca5",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/inittab"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 570,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "4f29720883559a74be03f4de69de2f66113b064b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d608a3b7715886b5735def0cc50a6359fd364fac2e0e0a459c588c04be471031"
+                        }
+                    ],
+                    "id": "0a2d75ae0e171168",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/logrotate.d/acpid"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 140,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "5946e1e930583552bb7b863eb94bcbb3feef8aa9"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "3ebaba946f213670170c7d69949f690a3854553bd0b1560f1d980cba4c83a942"
+                        }
+                    ],
+                    "id": "0bc480ee66512b2f",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/modprobe.d/aliases.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 1545,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "e1376014791376ddee402f8d06dae7b4e9e6f67e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "5cd46031fc7dc7186e67c97fd34780597de4ebff51dbe41eba27220fe5e0d866"
+                        }
+                    ],
+                    "id": "a6f0ad5763be29cc",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/modprobe.d/blacklist.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 2136,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a676b2fe78e7ea897d702b2c2fb2a2659f1eb657"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "6c46c4cbfb8b7594f19eb94801a350fa2221ae9ac5239a8819d15555caa76ae8"
+                        }
+                    ],
+                    "id": "c90aee6c9db4aa37",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/modprobe.d/i386.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 122,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "ca76cb9f71980e9bda8db6bf95da759e26b27a88"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "50467fa732f809f3a2bb5738628765c5f895c3a237e1c1ad09f85d41fd9ca7c5"
+                        }
+                    ],
+                    "id": "993275ba77fc90fc",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/modprobe.d/kms.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 91,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "b68a208d48a91c670c8040a03c95fae12c144f53"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "2c881de75a5409c35d2433a24f180b8b02ba478ef2c1c60ea3434a35bcbc335d"
+                        }
+                    ],
+                    "id": "47c1ef421bd17b65",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/modules"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 15,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "48b912f610627546cfc30af0f974745a1bf7c30f"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ff044e9be5daa2eee2d3d10a4da72e5477e4c24c16f1792de2c91dae844c0e30"
+                        }
+                    ],
+                    "id": "da4d29261d5ce1cf",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/motd"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 284,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3917fe94f44ab9881d90105c2a87af475b7ad10e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "8ee2455448c12cd1fd0befbc84f1ace7b80ba46603aff0d67bc7bcad604ea466"
+                        }
+                    ],
+                    "id": "1b167b8bd8c1f88d",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/network/if-up.d/dad"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 775,
+                        "size": 265,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "f4306c327bf44767da8da4e3a13bf40bdd4d3aaa"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0afd94c183d30a348b45057f6bf468e121aa448a7641109addb5bb8e282f514d"
+                        }
+                    ],
+                    "id": "90e791213b38ac17",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/nsswitch.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 205,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "4dc86eb8b51fbabd22cef7d9419c6037f2c9841f"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "2e0902cf0a7f64bf4e64ef2fad66ae977b4d01975dddf5352a84aea5c4e901f0"
+                        }
+                    ],
+                    "id": "35306d0c271e8151",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/passwd"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 1172,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "844cab296bb258be8d3190a4a5c276ce146455fe"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d60bb14d0da6fa0ce9783dbfdcd440d219c9b556d0bdfd519890010c5d1df48c"
+                        }
+                    ],
+                    "id": "27bb14faeea25093",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/profile"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 950,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "96adbd950ccf992085295990f9bbe667f0cf4c4e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "284a6ef56ab97a13a777c6b01ae14f2cc3d2b7a29c19e750e622e70cc3c73186"
+                        }
+                    ],
+                    "id": "16f071b3d4db299e",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/profile.d/20locale.sh"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 97,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "df9396b02cf3be70767e6171eb691baa6d40c759"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "b73284f27fe2da9ae1902b1fe9596c3ffc61a154e2805a034184f0468f8b09b0"
+                        }
+                    ],
+                    "id": "369a8305d5c2fd17",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/profile.d/README"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 249,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d5733d99d7b5676f6d58c19a3a47a8bc3fe6e2e5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ba24425c6864a5d17fa0fdaf914c4d21419e47c4d62080c33830af059fe46617"
+                        }
+                    ],
+                    "id": "99079a9b93a84e6c",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/profile.d/color_prompt.sh.disabled"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 447,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d5f9654539089b96f1b1956848d783527da6fb47"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4959498abbadaa1e50894a266f8d0d94500101cfe5b5f09dcad82e9d5bdfab46"
+                        }
+                    ],
+                    "id": "5188d6a461dd383a",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/protocols"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 3144,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "981f791ead8d513679f7d443892b23f70e45ace5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "49382575069e4b954a36f1fb2248d1bd96ee7ba28a5b12798fa92d80a29d0fab"
+                        }
+                    ],
+                    "id": "dbb5fe5f477dee53",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/securetty"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 98,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a0d7a229bf049f7fe17e8445226236e4024535d0"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f6183055fd949f9c53d49ee620f85d0150123ea691d25ed1bba0c641b4ee2f48"
+                        }
+                    ],
+                    "id": "9d3afe049fc1fa85",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/services"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 12813,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "258ab61690a3d3c96c2447483f55c6761ed21b01"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "cdcdf002dbf6a03de7cf3c024d12162d6227cb5e2d27ca58844a716301f03151"
+                        }
+                    ],
+                    "id": "f7d731e402a497da",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/shadow"
+                    },
+                    "metadata": {
+                        "groupID": 42,
+                        "mimeType": "text/plain",
+                        "mode": 640,
+                        "size": 422,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a239b661da4227a07f6a9183699fd275bdb12640"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "24be6ceb236610df45684c83b06c918ae45635be55f69975e43676b7595bbc5f"
+                        }
+                    ],
+                    "id": "246c288e3f039849",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/shells"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 38,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "b132b312a42c8be5d632069aecc6797b629f1264"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "824cefcee69de918c76b7b92776f304c3a4b7f6281539118bc1d41a9dd8476d9"
+                        }
+                    ],
+                    "id": "5ec81dccdf73a9ea",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/certs/ca-certificates.crt"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 214509,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a2587c4e97408b64274e5e052b74e3754892c13a"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f1c1803d13d1d0b755b13b23c28bd4e20e07baf9f2b744c9337ba5866aa0ec3b"
+                        }
+                    ],
+                    "id": "b3bd8089cf3c868c",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/ct_log_list.cnf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 412,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "a2587c4e97408b64274e5e052b74e3754892c13a"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f1c1803d13d1d0b755b13b23c28bd4e20e07baf9f2b744c9337ba5866aa0ec3b"
+                        }
+                    ],
+                    "id": "3c10fc5555c6d992",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/ct_log_list.cnf.dist"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 412,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "99ca8b6ceea241ef139900a8443a3315649c8ac4"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "35a85ebe05ac4ee42a0efe544c02ad2c70bf374c4dcd8bf5aaf403b7c1b6cdd8"
+                        }
+                    ],
+                    "id": "163d1073b5f40181",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/misc/CA.pl"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/x-perl",
+                        "mode": 755,
+                        "size": 8062,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "e3c512de4f186a1719c98f86d7bb6670a1823acb"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "559f94eb47d2d6f81c361e334fd882596858c7934a8b0111177f535a910f2990"
+                        }
+                    ],
+                    "id": "7def79fe8112eae6",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/misc/tsget.pl"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/x-perl",
+                        "mode": 755,
+                        "size": 6746,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "c22e9d6430e914e1a6b72b22093b3cab5338f1cc"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f6045e326b439e8ee31d4efd020ddf660d616c67d03e0e8e7a927eb14cbb5d1f"
+                        }
+                    ],
+                    "id": "a658763f59ed26bc",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/openssl.cnf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 12324,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "c22e9d6430e914e1a6b72b22093b3cab5338f1cc"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "f6045e326b439e8ee31d4efd020ddf660d616c67d03e0e8e7a927eb14cbb5d1f"
+                        }
+                    ],
+                    "id": "d2bd3ac7bcbb4ad2",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/ssl/openssl.cnf.dist"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 12324,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "e2ea73ded7e7371664204b148569fb5e88b0f7a8"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "8bba47da45bc8715c69ac904a60410eabffaa7bbbef640f9c1368ab9c48493d0"
+                        }
+                    ],
+                    "id": "dd1f066aad2fd5ca",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/sysctl.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 53,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1202c58e3ebba2edde32aa789b7af66639d0ed05"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9249f3fd52c2500bfe3586def6765b82336ba7832b65cb8c6b8ca1999c31342e"
+                        }
+                    ],
+                    "id": "0f1b70ecaf9c6959",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/etc/udhcpd.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 5636,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "id": "fef74c12c20ce517",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/apk/db/installed"
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "5adcbfa23f38f04c7cb7ba4e74177dfd2b77bf06"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "c6b3288ba48945a21ede7ccf6f7a257d41bacf2c061236726ff9b5def383a766"
+                        }
+                    ],
+                    "id": "802e3ac751079e24",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/ld-musl-x86_64.so.1"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 617072,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "82db0af9c582fc1474ba2787c5e6785c89d5fa31"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "1bc180d44dc900c27c2ca2991814afddbb7339255650814089b524bfd53dd0f4"
+                        }
+                    ],
+                    "id": "20b90c0f274d4360",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/libapk.so.2.14.0"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 188184,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3f0ff34539bfde441e9c3f446d74dabcf9e43702"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4518b7d5f6563f81ca1b3d857bbd7008d686545d8211283240506449618b2858"
+                        }
+                    ],
+                    "id": "e683f35e0cebe4bb",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/libcrypto.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 4261264,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "8d2bf58118f8ad3e179dedf48683db83c876073c"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "c22f9f45c1266ebdcc5f89c2f3471e89ffc5b2a4cd299f672156723270994133"
+                        }
+                    ],
+                    "id": "e44c85cc4e5c249e",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/libssl.so.3"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 544848,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "db729620754c73e0fafb66ec33f7bade6e1e519b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "e0df969fd057eeaeb3064663b0f0af0f776fa42c697b56726a3eec6b13ca6986"
+                        }
+                    ],
+                    "id": "e6f75601d1024920",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/libz.so.1.2.13"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 100264,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1e9125cd6d7112098a7c446d4f2ee8a269a7aba7"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ee169bea2cb6859420b55ca7a9c23fb68b50adc1d26c951f904dec9e8f767380"
+                        }
+                    ],
+                    "id": "966520dc32e9f439",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/lib/sysctl.d/00-alpine.conf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 1278,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2660a91d0fa130974549ddbe068ea0cfec9ce5c6"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "cd6b35489580d1df540ad49a9af6fd054899b7218b14dec455f6881200c2b039"
+                        }
+                    ],
+                    "id": "7879d720adaa1501",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/sbin/apk"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 69632,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2a36b6f8f3992b112450e66ac128c2ea499a103e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "b4a2c06db38742e8c42c3c9838b285a7d8cdac6c091ff3df5ff9a15f1e41b9c7"
+                        }
+                    ],
+                    "id": "3e7fbbdbefbaa182",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/sbin/ldconfig"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 755,
+                        "size": 393,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "22d6923c1e2d23ddb98e09363e8e9006d660a358"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d314880d6288d48e8223b3da02d00605f6a993b669593c1c1a0fa5fd95339d48"
+                        }
+                    ],
+                    "id": "a44da4321012368a",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/getconf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 35008,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1e17a3622f873e8a7905cee63bfbddf8abc894bc"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "1c6aa066998ddd019b6df0142ffcf8b1f4307593dc42b92e7fc82cd601905f75"
+                        }
+                    ],
+                    "id": "6113bdd00462f4b1",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/getent"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 48544,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "16af49b4328cf786a0c824f2d221cfa54a215601"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "8c54b8962ef07047032facf57cacb2f19eecfbefe03ad001e8c6c2b332e0d334"
+                        }
+                    ],
+                    "id": "2b7f9f6463a21c4e",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/iconv"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 24256,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "c850211a08262fb11181b200eca431c93cdfde4b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9a49c2541a439be89f1ef1496604ef3b607f460d589877c60775acf74cdb5dfb"
+                        }
+                    ],
+                    "id": "730a5d6b8f961b16",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/ldd"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 755,
+                        "size": 52,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "6ca2e3fff9ad0d6816681e98f2e95206ee4c5d8e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "a8c78b1e9868c56d9cc72ca360f1f89cc4a30be1ec0f3371f290b1ceb9976802"
+                        }
+                    ],
+                    "id": "00dc101d755fb0e6",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/scanelf"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 75720,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "946753ca4928b91ed98ceb9f70bd971276a99d91"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "6fd3e22aa116f17022775dc9653c6a72fa9b99c3ff9f9d88473a2314ceed66be"
+                        }
+                    ],
+                    "id": "77e6ef4c286d056b",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/bin/ssl_client"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 14392,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "209278640550fc8992c9e09043e7caea42141916"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "2aaa6a94f0e07f556e77faa8bec55321d0fe138f27193fdcd6ef8ccef051c7ba"
+                        }
+                    ],
+                    "id": "53641aabfdcc175a",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/lib/engines-3/afalg.so"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 22704,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "d7f519c15cdd66927819ddb2ca1a42e0b4547f2e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "1b0508fa6be2efe1412f59da46b3963c7611696563b6b2b699b1aa9dba447b5a"
+                        }
+                    ],
+                    "id": "c37f8ed4a6ff5fc6",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/lib/engines-3/capi.so"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 13920,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "77c7bf52f3bcb4e1defd942ba8141d29d607e9a5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4f419a09b9f608e753045d83c255818c793913c274f724eb10d8ca8f474ae457"
+                        }
+                    ],
+                    "id": "e770d799673e813c",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/lib/engines-3/loader_attic.so"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 47736,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "aa663256735e66046d2e03aba8ae2e217bf1425e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "670f9a084f97974b12c81cc7a88fce5ec9f47dcee00da3192a17577a5298e62f"
+                        }
+                    ],
+                    "id": "70d048615ea83820",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/lib/engines-3/padlock.so"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 22480,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "2780afe7877c50b7b89036e330b1c26b34b3fc4a"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "5b677eca0c3a3ac53c1a49fbac49534ea2862c62416d14ec6053f2080d5bae50"
+                        }
+                    ],
+                    "id": "891d558e59931245",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/lib/ossl-modules/legacy.so"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "application/x-sharedlib",
+                        "mode": 755,
+                        "size": 88024,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3af08548ef78cfdedcf349880c2c6a1a48763a0e"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9c102bcc376af1498d549b77bdbfa815ae86faa1d2d82f040e616b18ef2df2d4"
+                        }
+                    ],
+                    "id": "52ae5b8751e451e0",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "bfb616658cc05a872568b0c8e398c482e23b60dd"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ebf31683b56410ecc4c00acd9f6e2839e237a3b62b5ae7ef686705c7ba0396a9"
+                        }
+                    ],
+                    "id": "6e7b185e4c3811d4",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "053a92f87fd4532850bb31f0881978efe0532ae5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "1bb2a846c0ea4ca9d0e7862f970863857fc33c32f5506098c636a62a726a847b"
+                        }
+                    ],
+                    "id": "ba2b2951f82c4223",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3671ae0ec7503b1e193587c1dcdf7b78bc863e42"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "12f899e55a7691225603d6fb3324940fc51cd7f133e7ead788663c2b7eecb00c"
+                        }
+                    ],
+                    "id": "55bb3a6303350ebe",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "39ac5d72c6ba018a0f74b8b453894edc9db07b5f"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "73867d92083f2f8ab899a26ccda7ef63dfaa0032a938620eda605558958a8041"
+                        }
+                    ],
+                    "id": "e87f8ab6e5ebb1b3",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "c8fabeb2eeb992c368c77b9707e0d1ecfd7cf905"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "9a4cd858d9710963848e6d5f555325dc199d1c952b01cf6e64da2c15deedbd97"
+                        }
+                    ],
+                    "id": "1456141c7441e22b",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "329643357d0b78b1ef48ec155325e25f1d7534dd"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "780b3ed41786772cbc7b68136546fa3f897f28a23b30c72dde6225319c44cfff"
+                        }
+                    ],
+                    "id": "114574377a35bb80",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "825090fde25bbc0e71a9cb3076316b5afe459e4d"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "59c01c57b446633249f67c04b115dd6787f4378f183dff2bbf65406df93f176d"
+                        }
+                    ],
+                    "id": "504d69f6c057b3f1",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "5d4743128353b6396fad2fa2ba793ace21602295"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "db0b49163f07ffba64a5ca198bcf1688610b0bd1f0d8d5afeaf78559d73f2278"
+                        }
+                    ],
+                    "id": "f90f4a9f43c5f68e",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 451,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "95995311236b7a55933642ffa10ce6014f1af7d0"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "207e4696d3c05f7cb05966aee557307151f1f00217af4143c1bcaf33b8df733f"
+                        }
+                    ],
+                    "id": "04320b45906e8370",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "58d5ba4b2f3b1e927721d7a6432f298eedf72a6b"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "128d34d4aec39b0daedea8163cd8dc24dff36fd3d848630ab97eeb1d3084bbb3"
+                        }
+                    ],
+                    "id": "b02d0d615cb15a1d",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "23d0f2ea1af269c2f66165e0f8a944e96bf011de"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "10877cce0a935e46ad88cb79e174a2491680508eccda08e92bf04fb9bf37fbc1"
+                        }
+                    ],
+                    "id": "cef5de170dba8b0c",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "3529ec82670c6d4e20ee3e4968db34b551e91d50"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "4a095a9daca86da496a3cd9adcd95ee2197fdbeb84638656d469f05a4d740751"
+                        }
+                    ],
+                    "id": "0e6f5dc995aca28b",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "55a301064e11c6fe9ba0f2ca17e234f3943ccb61"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "0caf5662fde45616d88cfd7021b7bda269a2fcaf311e51c48945a967a609ec0b"
+                        }
+                    ],
+                    "id": "102d5bd7dd174917",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "de1241307014aae3dba798e900f163408d98d6f4"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "ebe717d228555aa58133c202314a451f81e71f174781fd7ff8d8970d6cfa60da"
+                        }
+                    ],
+                    "id": "a585cc079227ee3d",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "57f6b93fda4a4496fab62844ddef0eeb168f80b5"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "d11f6b21c61b4274e182eb888883a8ba8acdbf820dcc7a6d82a7d9fc2fd2836d"
+                        }
+                    ],
+                    "id": "be2efe36c17d41e3",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "df02c9adc2906a3aa5e5ad69f50e3953e65710d0"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "40a216cbd163f22e5f16a9e0929de7cde221b9cbae8e36aa368b1e128afe0a31"
+                        }
+                    ],
+                    "id": "07a10576ea11fb28",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 644,
+                        "size": 800,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                },
+                {
+                    "digests": [
+                        {
+                            "algorithm": "sha1",
+                            "value": "1d6a46dde403f14a22e2692cd84dd24af3805216"
+                        },
+                        {
+                            "algorithm": "sha256",
+                            "value": "c4e5a7c4783a7a73dec48dee009ee687015d2de7ff86b269679b95bef2c60e13"
+                        }
+                    ],
+                    "id": "3aa091a3d6aeafff",
+                    "location": {
+                        "layerID": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                        "path": "/usr/share/udhcpc/default.script"
+                    },
+                    "metadata": {
+                        "groupID": 0,
+                        "mimeType": "text/plain",
+                        "mode": 755,
+                        "size": 3688,
+                        "type": "RegularFile",
+                        "userID": 0
+                    }
+                }
+            ],
+            "schema": {
+                "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-13.0.0.json",
+                "version": "13.0.0"
+            },
+            "source": {
+                "id": "25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                "metadata": {
+                    "architecture": "amd64",
+                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giXSwiSW1hZ2UiOiJzaGEyNTY6NWI4NjU4NzAxYzk2YWNlZmUxY2QzYTIxYjJhODAyMjBiYWRmOTEyNDg5MWFkNDQwZDk1YTdmYTUwMGQ0ODc2NSIsIlZvbHVtZXMiOm51bGwsIldvcmtpbmdEaXIiOiIiLCJFbnRyeXBvaW50IjpudWxsLCJPbkJ1aWxkIjpudWxsLCJMYWJlbHMiOm51bGx9LCJjb250YWluZXIiOiJiZmM4MDc4YzE2OTYzN2Q3MGU0MGNlNTkxYjVjMmZlOGQyNjMyOTkxOGRhZmNiOTZlYmM5MzA0ZGRmZjE2MmVhIiwiY29udGFpbmVyX2NvbmZpZyI6eyJIb3N0bmFtZSI6ImJmYzgwNzhjMTY5NiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbIi9iaW4vc2giLCItYyIsIiMobm9wKSAiLCJDTUQgW1wiL2Jpbi9zaFwiXSJdLCJJbWFnZSI6InNoYTI1Njo1Yjg2NTg3MDFjOTZhY2VmZTFjZDNhMjFiMmE4MDIyMGJhZGY5MTI0ODkxYWQ0NDBkOTVhN2ZhNTAwZDQ4NzY1IiwiVm9sdW1lcyI6bnVsbCwiV29ya2luZ0RpciI6IiIsIkVudHJ5cG9pbnQiOm51bGwsIk9uQnVpbGQiOm51bGwsIkxhYmVscyI6e319LCJjcmVhdGVkIjoiMjAyMy0wNi0xNFQyMDo0MTo1OS4wNzk3OTUxMjVaIiwiZG9ja2VyX3ZlcnNpb24iOiIyMC4xMC4yMyIsImhpc3RvcnkiOlt7ImNyZWF0ZWQiOiIyMDIzLTA2LTE0VDIwOjQxOjU4Ljk1MDE3ODIwNFoiLCJjcmVhdGVkX2J5IjoiL2Jpbi9zaCAtYyAjKG5vcCkgQUREIGZpbGU6MWRhNzU2ZDEyNTUxYTBlM2U3OTNlMDJlZjg3NDMyZDY5ZDQ5Njg5MzdiZDExYmVkMGFmMjE1ZGIxOWRkOTRjZCBpbiAvICJ9LHsiY3JlYXRlZCI6IjIwMjMtMDYtMTRUMjA6NDE6NTkuMDc5Nzk1MTI1WiIsImNyZWF0ZWRfYnkiOiIvYmluL3NoIC1jICMobm9wKSAgQ01EIFtcIi9iaW4vc2hcIl0iLCJlbXB0eV9sYXllciI6dHJ1ZX1dLCJvcyI6ImxpbnV4Iiwicm9vdGZzIjp7InR5cGUiOiJsYXllcnMiLCJkaWZmX2lkcyI6WyJzaGEyNTY6NzhhODIyZmUyYTJkMmM4NGYzZGU0YTQwMzE4OGM0NWY2MjMwMTdkNmE0NTIxZDIzMDQ3YzlmYmIwODAxNzk0YyJdfX0=",
+                    "imageID": "sha256:c1aabb73d2339c5ebaa3681de2e9d9c18d57485045a4e311d9f8004bec208d67",
+                    "imageSize": 7326745,
+                    "layers": [
+                        {
+                            "digest": "sha256:78a822fe2a2d2c84f3de4a403188c45f623017d6a4521d23047c9fbb0801794c",
+                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+                            "size": 7326745
+                        }
+                    ],
+                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMTQ3MiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YzFhYWJiNzNkMjMzOWM1ZWJhYTM2ODFkZTJlOWQ5YzE4ZDU3NDg1MDQ1YTRlMzExZDlmODAwNGJlYzIwOGQ2NyIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDMzOTc4NzksCiAgICAgICAgICJkaWdlc3QiOiAic2hhMjU2OjMxZTM1Mjc0MGY1MzRmOWFkMTcwZjc1Mzc4YTg0ZmU0NTNkNjE1NmU0MDcwMGI4ODJkNzM3YThmNGE2OTg4YTMiCiAgICAgIH0KICAgXQp9",
+                    "manifestDigest": "sha256:25fad2a32ad1f6f510e528448ae1ec69a28ef81916a004d3629874104f8a7f70",
+                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                    "os": "linux",
+                    "repoDigests": [
+                        "index.docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1"
+                    ],
+                    "tags": [],
+                    "userInput": "docker.io/library/alpine@sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1"
+                },
+                "name": "docker.io/library/alpine",
+                "type": "image",
+                "version": "sha256:82d1e9d7ed48a7523bdebc18cf6290bdb97b82302a8a9c27d4fe885949ea94d1"
+            }
+        }
+    },
+    "status": {}
+}

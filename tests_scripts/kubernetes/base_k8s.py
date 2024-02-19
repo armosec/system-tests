@@ -481,12 +481,19 @@ class BaseK8S(BaseDockerizeTest):
 
     @staticmethod
     def get_image_ids(pod):
-        return [(container_status.name, container_status.image_id) for container_status in
+        c = [(container_status.name, container_status.image_id) for container_status in
                 pod.status.container_statuses]
+        if pod.status.init_container_statuses:
+            c.extend([(container_status.name, container_status.image_id) for container_status in
+                    pod.status.init_container_statuses])
+        return c
 
     @staticmethod
     def get_image_tags(pod):
-        return [(container_spec.name, container_spec.image) for container_spec in pod.spec.containers]
+        c = [(container_spec.name, container_spec.image) for container_spec in pod.spec.containers]
+        if pod.spec.init_containers:
+            c.extend([(container_spec.name, container_spec.image) for container_spec in pod.spec.init_containers])
+        return c
 
     def get_pod_data(self, get_data_of_pod_call_back, namespace: str = "", subname: str = "", wlid: str = ""):
         """
