@@ -213,9 +213,14 @@ STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"
 RELEVANCY_KIND_LABEL = "kubescape.io/workload-kind"
 RELEVANCY_NAME_LABEL = "kubescape.io/workload-name"
 RELEVANCY_NAMESPACE_LABEL = "kubescape.io/workload-namespace"
+RELEVANCY_TEMPLATE_HASH_LABEL = "kubescape.io/instance-template-hash"
+RELEVANCY_RESOURCE_VERSION_LABEL = "kubescape.io/workload-resource-version"
 RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
 RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
+
+RELEVANCY_CONTAINER_ANNOTATIONS = "kubescape.io/workload-container-name"
+RELEVANCY_IMAGE_ANNOTATIONS = "kubescape.io/image-id"
 
 
 # relevancy feature

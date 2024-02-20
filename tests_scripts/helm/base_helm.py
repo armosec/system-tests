@@ -21,7 +21,7 @@ class BaseHelm(BaseK8S):
         self.helm_branch = self.test_driver.kwargs.get("helm_branch", DEFAULT_BRANCH)
         self.local_helm_chart = self.test_driver.kwargs.get("local_helm_chart", None)
         self.print_kubescape_chart_logs: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
-                                                                             "print_kubescape_chart_logs", True)
+                                                                           "print_kubescape_chart_logs", True)
         self.port_forward_proc = None
         self.proxy_config = test_obj[("proxy_config", None)]
         self.enable_security = self.test_obj[("enable_security", True)]
@@ -81,7 +81,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-    def install_armo_helm_chart(self, helm_kwargs: dict = None):
+    def install_armo_helm_chart(self, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME, helm_kwargs: dict = None):
         if helm_kwargs is None:
             helm_kwargs = {}
 
@@ -118,11 +118,18 @@ class BaseHelm(BaseK8S):
         if "nodeAgent.config.updatePeriod" not in helm_kwargs:
             helm_kwargs.update({"nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
 
+        create_namespace = True
+        if self.docker_default_secret:
+            self.create_namespace(unique_name=False, name=namespace)
+            create_namespace = False
+
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
                                             access_key=self.backend.get_access_key() if self.backend != None else "",
                                             server=self.test_driver.backend_obj.get_api_url(),
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                            repo=self.helm_armo_repo, helm_kwargs=helm_kwargs)
+                                            namespace=namespace,
+                                            repo=self.helm_armo_repo, create_namespace=create_namespace,
+                                            helm_kwargs=helm_kwargs)
 
     def get_in_cluster_tags(self):
         component_tag = {}
