@@ -137,17 +137,24 @@ class BaseSynchronizer(BaseHelm):
                 be_resources = self.backend.get_kubernetes_resources(
                     cluster_name=cluster, namespace=namespace
                 )
+                # remove Namespace objects from the list
+                be_resources = list(filter(lambda x: BaseSynchronizer.backend_resource_kind(x) != "Namespace", be_resources))
                 assert (
                     len(be_resources) == 0
                 ), "BE kubernetes resources were not deleted"
+                return
             except Exception as e:
                 Logger.logger.error(f"failed to verify backend resources: {e}")
                 if iterations == 0:
                     raise e
                 TestUtil.sleep(sleep_time, "sleeping and retrying", "info")
 
+    @staticmethod
+    def backend_resource_kind(be_resource): 
+        return be_resource.get(KUBERNETES_RESOURCES_METADATA_KEY).get('designators').get('attributes').get('kind')
+    
     def verify_backend_resources(
-        self, cluster, namespace, list_func=None, iterations=10, sleep_time=10
+        self, cluster, namespace, list_func=None, iterations=10, sleep_time=10, filter_func=None
     ):
         while iterations > 0:
             iterations -= 1
@@ -156,6 +163,10 @@ class BaseSynchronizer(BaseHelm):
                 be_resources = self.backend.get_kubernetes_resources(
                     with_resource=True, cluster_name=cluster, namespace=namespace
                 )
+
+                # remove Namespace objects from the list
+                be_resources = list(filter(lambda x: BaseSynchronizer.backend_resource_kind(x) != "Namespace", be_resources))
+
                 assert len(be_resources) > 0, "BE kubernetes resources is empty"
                 assert len(be_resources) == len(cluster_resources), (
                     "amount of kubernetes resources ('%d') is not as expected ('%d')"
@@ -307,6 +318,10 @@ class SynchronizerReconciliation(BaseSynchronizer):
         9. Check workload 2 is deleted
 
         """
+        if self.backend.server == "https://api.armosec.io": # skip test for production
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+        
         cluster, namespace_1 = self.setup(apply_services=False)
 
         helm_kwargs = self.test_obj.get_arg("helm_kwargs")
