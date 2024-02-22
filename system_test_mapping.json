@@ -534,6 +534,86 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "synchronizer": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer flow",
+        "skip_on_environment": ""
+    },
+    "synchronizer_reconciliation": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer reconciliation flow",
+        "skip_on_environment": ""
+    },
+    "synchronizer_proxy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer proxy and disconnection",
+        "skip_on_environment": ""
+    },
+    "synchronizer_race_condition": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer race condition (multiple updates)",
+        "skip_on_environment": ""
+    },
+    "synchronizer_kubescape_crds": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer - kubescape CRDs",
+        "skip_on_environment": ""
+    },
     "network_policy": {
         "target": [
             "In cluster",

@@ -83,6 +83,11 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `stripe_webhook`                                               | payment |                                                                           | stripe, backend             |
 | `user_email_settings`                                          | users-notification |                                                                | notifications, backend             |
 | `user_alert_channels`                                          | users-notification |                                                                | notifications, backend             |
+| `synchronizer`                      | helm-chart |  synchronizer happy flow    | in-cluster synchronizer, backend |
+| `synchronizer_reconciliation`       | helm-chart |  synchronizer reconciliation flow | in-cluster synchronizer, backend |
+| `synchronizer_proxy`                | helm-chart |  synchronizer network disconnection and proxy | in-cluster synchronizer, backend |
+| `synchronizer_race_condition`       | helm-chart |  synchronizer multiple frequent modifications | in-cluster synchronizer, backend |
+| `synchronizer_kubescape_crds`       | helm-chart |  synchronizer Kubescape CRDs | in-cluster synchronizer, backend |
 
 ### Install:
 * download/clone repository

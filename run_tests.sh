@@ -12,7 +12,7 @@ fi
 
 if [ ! -d "python_virtual_env" ]; then
 
-    python3.6 -m venv python_virtual_env
+    python3 -m venv python_virtual_env
 
 fi
 
@@ -23,7 +23,7 @@ echo "Installing TestRunner requirments..."
 pip3 install -r requirements.txt
 
 # Run the tests
-python3.6 cli.py "$@" 
+python3 cli.py "$@"
 echo "Exiting python virtual environment"
 deactivate
 
