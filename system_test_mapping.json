@@ -623,8 +623,8 @@
             "helm-chart",
             "node-agent",
             "storage",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
         "skip_on_environment": ""
@@ -639,8 +639,8 @@
             "node-agent",
             "storage",
             "operator",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
         "skip_on_environment": ""
@@ -655,8 +655,8 @@
             "node-agent",
             "storage",
             "operator",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after pod restarted",
         "skip_on_environment": ""
@@ -677,12 +677,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart-dummy",
-            "node-agent-dummy",
-            "storage-dummy",
-            "operator-dummy",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
         "skip_on_environment": ""
@@ -693,12 +693,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart_dummy",
-            "node-agent_dummy",
-            "storage_dummy",
-            "operator_dummy",
-            "cadashboardbe_dummy",
-            "event-ingester-service_dummy"
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
 
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
@@ -988,6 +988,20 @@
             "config-service-dummy"
         ],
         "description": "testing slack alert channels with compliance and vulnerabilities notifications",
+        "skip_on_environment": ""
+    },
+    "sr_ac_5_fix_control_no_relevancy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe-dummy",
+            "event-receiver-dummy",
+            "event-ingester-service-dummy",
+            "gateway-dummy"
+        ],
+        "description": "",
         "skip_on_environment": ""
     }
 }
