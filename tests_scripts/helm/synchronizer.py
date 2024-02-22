@@ -27,7 +27,7 @@ class BaseSynchronizer(BaseHelm):
             "capabilities.nodeScan": "disable",
             "capabilities.vulnerabilityScan": "disable",
             "capabilities.runtimeObservability": "enable",
-            "synchronizer.image.tag": "v0.0.57",
+            "synchronizer.image.tag": "v0.0.59",
             "grypeOfflineDB.enabled": "false",
         }
 
@@ -192,7 +192,7 @@ class BaseSynchronizer(BaseHelm):
                             cluster_namespace = getattr(
                                 getattr(resource, "metadata", {}), "namespace", ""
                             )
-                            cluster_resource_version = getattr(getattr(cluster_resource, "metadata", {}), "resource_version", "")
+                            cluster_resource_version = getattr(getattr(resource, "metadata", {}), "resource_version", "")
                         
                         if (
                             cluster_kind == be_kind
