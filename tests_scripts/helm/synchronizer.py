@@ -27,7 +27,6 @@ class BaseSynchronizer(BaseHelm):
             "capabilities.nodeScan": "disable",
             "capabilities.vulnerabilityScan": "disable",
             "capabilities.runtimeObservability": "enable",
-            "synchronizer.image.tag": "v0.0.59",
             "grypeOfflineDB.enabled": "false",
         }
 
