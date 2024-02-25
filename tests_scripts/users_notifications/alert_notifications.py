@@ -70,9 +70,10 @@ def get_messages_from_teams_channel(before_test):
 
 
 def get_messages_from_slack_channel(before_test):
-    Logger.logger.info('Attempting to read messages from slack before timestamp ' + str(before_test))
+    formatted_time = format(before_test, ".6f")
+    Logger.logger.info('Attempting to read messages from slack before timestamp ' + formatted_time)
     client = WebClient(token=get_env("SLACK_SYSTEM_TEST_TOKEN"))
-    result = client.conversations_history(channel=f'{get_env("SLACK_CHANNEL_ID")}', oldest=before_test)
+    result = client.conversations_history(channel=f'{get_env("SLACK_CHANNEL_ID")}', oldest=formatted_time)
     if result is not None and isinstance(result.data, dict) and 'messages' in result.data:
         return result.data['messages']
     else:
