@@ -18,11 +18,11 @@ TEST_NAMESPACE = "alerts"
 
 
 def enrich_teams_alert_channel(data):
-    data["channel"]["context"]["webhook"]["id"] = os.getenv("CHANNEL_WEBHOOK")
+    data["channel"]["context"]["webhook"]["id"] = get_env("CHANNEL_WEBHOOK")
 
 
 def enrich_slack_alert_channel(data):
-    data["channel"]["context"]["channel"]["id"] = os.getenv("SLACK_CHANNEL_ID")
+    data["channel"]["context"]["channel"]["id"] = get_env("SLACK_CHANNEL_ID")
 
 
 def get_access_token():
@@ -32,17 +32,33 @@ def get_access_token():
     }
     body = {
         'grant_type': 'client_credentials',
-        'client_id': os.getenv("MS_TEAMS_CLIENT_ID"),
-        'client_secret': os.getenv("MS_TEAMS_CLIENT_SECRET"),
+        'client_id': get_env("MS_TEAMS_CLIENT_ID"),
+        'client_secret': get_env("MS_TEAMS_CLIENT_SECRET"),
         'scope': 'https://graph.microsoft.com/.default'
     }
     response = requests.post(url, headers=headers, data=body)
     return response.json().get('access_token')
 
 
+def mask_value(value):
+    if len(value) <= 3:
+        return "***"
+    return value[:3] + '*' * (len(value) - 6) + value[-3:]
+
+
+def get_env(env_var_name):
+    value = os.getenv(env_var_name)
+    if value is not None:
+        masked_value = mask_value(value)
+        Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value}")
+    else:
+        Logger.logger.info(f"Environment variable '{env_var_name}' not found.")
+    return value
+
+
 def get_messages_from_teams_channel(before_test):
     before_test_utc = datetime.utcfromtimestamp(before_test).isoformat() + "Z"
-    endpoint = f'https://graph.microsoft.com/v1.0/teams/{os.getenv("TEAMS_ID")}/channels/{os.getenv("CHANNEL_ID")}' \
+    endpoint = f'https://graph.microsoft.com/v1.0/teams/{get_env("TEAMS_ID")}/channels/{get_env("CHANNEL_ID")}' \
                f'/messages/delta?$filter=lastModifiedDateTime gt {before_test_utc}'
     headers = {
         'Authorization': 'Bearer ' + get_access_token(),
@@ -55,9 +71,13 @@ def get_messages_from_teams_channel(before_test):
 
 def get_messages_from_slack_channel(before_test):
     Logger.logger.info('Attempting to read messages from slack before timestamp ' + str(before_test))
-    client = WebClient(token=os.getenv("SLACK_SYSTEM_TEST_TOKEN"))
-    result = client.conversations_history(channel=f'{os.getenv("SLACK_CHANNEL_ID")}', oldest=before_test)
-    return result['messages']
+    client = WebClient(token=get_env("SLACK_SYSTEM_TEST_TOKEN"))
+    result = client.conversations_history(channel=f'{get_env("SLACK_CHANNEL_ID")}', oldest=before_test)
+    if result is not None and isinstance(result.data, dict) and 'messages' in result.data:
+        return result.data['messages']
+    else:
+        Logger.logger.info("No 'messages' key found in the result.")
+        return []
 
 
 def assert_vulnerability_message_sent(messages, cluster):
@@ -75,7 +95,7 @@ def assert_new_admin_message_sent(messages, cluster):
         message_string = str(message)
         if "New cluster admin was added" in message_string and cluster in message_string:
             found += 1
-    assert found == 1, "expected to have exactly one new cluster admin message"
+    assert found == 1, f"expected to have exactly one new cluster admin message, found {found}"
 
 
 def assert_misconfiguration_message_sent(messages, cluster):
@@ -84,7 +104,7 @@ def assert_misconfiguration_message_sent(messages, cluster):
         message_string = str(message)
         if "Your complaince score has decreased" in message_string and cluster in message_string:
             found += 1
-    assert found == 1, "expected to have exactly one new misconfiguration message"
+    assert found == 1, f"expected to have exactly one new misconfiguration message, found {found}"
 
 
 class AlertNotifications(BaseHelm):
@@ -195,7 +215,8 @@ class AlertNotifications(BaseHelm):
         for i in range(5):
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
-                assert str(messages).count(cluster) > 2, "expected to have at least 3 messages"
+                found = str(messages).count(cluster)
+                assert found > 2, f"expected to have at least 3 messages, found {found}"
                 assert_vulnerability_message_sent(messages, cluster)
                 assert_new_admin_message_sent(messages, cluster)
                 assert_misconfiguration_message_sent(messages, cluster)
