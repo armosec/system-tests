@@ -1,0 +1,7 @@
+kind: WorkloadConfigurationScan
+apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+spec:
+  controls: {}
+  relatedObjects: []
+metadata:
+  name: wcs

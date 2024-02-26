@@ -103,6 +103,16 @@
         "description": "checks public registry scan capabilities",
         "skip_on_environment": ""
     },
+    "relevancy_multiple_containers": {
+        "target": [
+            "In cluster"
+        ],
+        "target_repositories": [
+            "helm-chart"
+        ],
+        "description": "checks public registry scan capabilities",
+        "skip_on_environment": ""
+    },
     "scan_local_file": {
         "target": [
             "CLI"
@@ -156,7 +166,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "config-service"
         ],
         "description": "",
@@ -169,7 +179,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "config-service"
         ],
         "description": "",
@@ -206,7 +216,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver"
+            "careportsreceiver"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -218,7 +228,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "config-service"
         ],
@@ -232,7 +242,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver"
+            "careportsreceiver"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -264,7 +274,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver"
+            "careportsreceiver"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -274,7 +284,7 @@
             "In cluster"
         ],
         "target_repositories": [
-            "event-receiver"
+            "careportsreceiver"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -332,7 +342,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -346,7 +356,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -360,7 +370,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -374,7 +384,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service"
         ],
         "description": "",
@@ -387,7 +397,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -401,7 +411,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver-dummy",
+            "careportsreceiver-dummy",
             "event-ingester-service-dummy",
             "gateway-dummy"
         ],
@@ -415,7 +425,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -429,7 +439,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -443,7 +453,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -457,7 +467,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver-dummy",
+            "careportsreceiver-dummy",
             "event-ingester-service-dummy",
             "gateway-dummy"
         ],
@@ -471,7 +481,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -485,7 +495,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver-dummy",
+            "careportsreceiver-dummy",
             "event-ingester-service-dummy",
             "gateway-dummy"
         ],
@@ -499,7 +509,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -513,7 +523,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "gateway"
         ],
@@ -529,9 +539,89 @@
             "operator",
             "helm-chart",
             "cadashboardbe",
-            "event-receiver"
+            "careportsreceiver"
         ],
         "description": "",
+        "skip_on_environment": ""
+    },
+    "synchronizer": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer flow",
+        "skip_on_environment": ""
+    },
+    "synchronizer_reconciliation": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer reconciliation flow",
+        "skip_on_environment": ""
+    },
+    "synchronizer_proxy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer proxy and disconnection",
+        "skip_on_environment": ""
+    },
+    "synchronizer_race_condition": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer race condition (multiple updates)",
+        "skip_on_environment": ""
+    },
+    "synchronizer_kubescape_crds": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "cadashboardbe",
+            "event-ingester-service",
+            "synchronizer"
+        ],
+        "description": "Checks synchronizer - kubescape CRDs",
         "skip_on_environment": ""
     },
     "network_policy": {
@@ -543,8 +633,8 @@
             "helm-chart",
             "node-agent",
             "storage",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
         "skip_on_environment": ""
@@ -559,8 +649,8 @@
             "node-agent",
             "storage",
             "operator",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
         "skip_on_environment": ""
@@ -575,8 +665,8 @@
             "node-agent",
             "storage",
             "operator",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after pod restarted",
         "skip_on_environment": ""
@@ -597,12 +687,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart-dummy",
-            "node-agent-dummy",
-            "storage-dummy",
-            "operator-dummy",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy"
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
         "skip_on_environment": ""
@@ -613,12 +703,12 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart_dummy",
-            "node-agent_dummy",
-            "storage_dummy",
-            "operator_dummy",
-            "cadashboardbe_dummy",
-            "event-ingester-service_dummy"
+            "helm-chart",
+            "node-agent",
+            "storage",
+            "operator",
+            "cadashboardbe",
+            "event-ingester-service"
 
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
@@ -633,7 +723,7 @@
             "helm-chart",
             "operator",
             "cadashboardbe-dummy",
-            "event-receiver",
+            "careportsreceiver",
             "gateway"
         ],
         "description": "",
@@ -646,7 +736,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "gateway"
         ],
         "description": "",
@@ -659,7 +749,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "gateway"
         ],
         "description": "",
@@ -672,7 +762,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "gateway"
         ],
         "description": "",
@@ -685,7 +775,7 @@
         ],
         "target_repositories": [
             "cadashboardbe",
-            "event-receiver",
+            "careportsreceiver",
             "gateway"
         ],
         "description": "",
@@ -777,7 +867,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "users-notification-service"
         ],
@@ -836,7 +926,7 @@
         ],
         "target_repositories": [
             "cadashboardbe-dummy",
-            "event-receiver",
+            "careportsreceiver",
             "event-ingester-service",
             "users-notification-service"
         ],
@@ -908,6 +998,20 @@
             "config-service-dummy"
         ],
         "description": "testing slack alert channels with compliance and vulnerabilities notifications",
+        "skip_on_environment": ""
+    },
+    "sr_ac_5_fix_control_no_relevancy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe-dummy",
+            "careportsreceiver-dummy",
+            "event-ingester-service-dummy",
+            "gateway-dummy"
+        ],
+        "description": "",
         "skip_on_environment": ""
     }
 }

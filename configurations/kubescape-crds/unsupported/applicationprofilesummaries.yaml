@@ -1,0 +1,14 @@
+kind: ApplicationProfileSummary
+apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+metadata:
+  name: default-replicaset-nginx-748c667d99-cf81-0278
+  labels:
+    kubescape.io/workload-api-group: apps
+    kubescape.io/workload-api-version: v1
+    kubescape.io/workload-kind: Deployment
+    kubescape.io/workload-name: nginx
+    kubescape.io/workload-namespace: default
+    kubescape.io/workload-resource-version: '584084'
+  annotations:
+    kubescape.io/status: ''
+    kubescape.io/wlid: wlid://cluster-kind-kind/namespace-default/deployment-nginx

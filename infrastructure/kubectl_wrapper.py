@@ -5,7 +5,7 @@ import time
 from crypt import methods
 
 from kubernetes.client import api_client
-from kubernetes import client, config, dynamic
+from kubernetes import client, config, dynamic, utils
 from kubernetes.client.exceptions import ApiException
 import requests
 from systest_utils import Logger, TestUtil, statics
@@ -13,6 +13,30 @@ import subprocess
 
 class KubectlWrapper(object):
     """ CaKube provides kubernetes wrapper and helper functions"""
+
+    kubescape_namespaced_kinds = {
+        'ApplicationActivity': 'applicationactivities',
+        'ApplicationProfile': 'applicationprofiles',
+        'ApplicationProfileSummary': 'applicationprofilesummaries',
+        'GeneratedNetworkPolicy': 'generatednetworkpolicies',
+        'NetworkNeighbors': 'networkneighborses',
+        'OpenVulnerabilityExchangeContainer': 'openvulnerabilityexchangecontainers',
+        'SBOMSPDXv2p3Filtered': 'sbomspdxv2p3filtereds',
+        'SBOMSPDXv2p3': 'sbomspdxv2p3s',
+        'SBOMSummary': 'sbomsummaries',
+        'SBOMSyftFiltered': 'sbomsyftfiltereds',
+        'SBOMSyft': 'sbomsyfts',
+        'VulnerabilityManifest': 'vulnerabilitymanifests',
+        'VulnerabilityManifestSummary': 'vulnerabilitymanifestsummaries',
+        'WorkloadConfigurationScan': 'workloadconfigurationscans',
+        'WorkloadConfigurationScanSummary': 'workloadconfigurationscansummaries'
+    }
+
+    kubescape_non_namespaced_kinds = {
+        'ConfigurationScanSummary': 'configurationscansummaries',
+        'KnownServer': 'knownservers',
+        'VulnerabilitySummary': 'vulnerabilitysummaries',
+    }
 
     all_kinds = ["ComponentStatus", "ConfigMap", "ControllerRevision", "CronJob",
                  "CustomResourceDefinition", "DaemonSet", "Deployment", "Endpoints", "Event", "HorizontalPodAutoscaler",
@@ -179,6 +203,59 @@ class KubectlWrapper(object):
 
         return pod_events
 
+    def get_all_namespaced_workloads(self, namespace='Default'):
+        kinds = ["Deployment", "ReplicationController", "ReplicaSet", "StatefulSet", "DaemonSet"]
+        items = list()
+
+        for kind in kinds:
+            if kind == 'Deployment':
+                method = self.client_AppsV1Api.list_namespaced_deployment
+            elif "ReplicationController" in kind:
+                method = self.client_CoreV1Api.list_namespaced_replication_controller
+            elif 'ReplicaSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_replica_set
+            elif 'StatefulSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_stateful_set
+            elif 'DaemonSet' in kind:
+                method = self.client_AppsV1Api.list_namespaced_daemon_set
+            status = self.run(method=method, namespace=namespace)
+            for item in status.items:
+                item.kind = kind
+                items.append(item)
+
+        return items
+    
+    def get_all_namespaced_kubescape_crds(self, namespace='Default'):
+        items = list()
+
+        for kind, plural in self.kubescape_namespaced_kinds.items():
+            status = self.client_CustomObjectsApi.list_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                namespace=namespace,
+                plural=plural
+            )
+            for item in status['items']:
+                item['kind'] = kind
+                items.append(item)
+
+        return items
+
+    def get_all_non_namespaced_kubescape_crds(self):
+        items = list()
+
+        for kind, plural in self.kubescape_non_namespaced_kinds.items():
+            status = self.client_CustomObjectsApi.list_cluster_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                plural=plural
+            )
+            for item in status['items']:
+                item['kind'] = kind
+                items.append(item)
+
+        return items
+    
     def get_namespaced_workloads(self, kind='Deployment', namespace='Default'):
         if 'Deployment' in kind:
             method = self.client_AppsV1Api.list_namespaced_deployment
@@ -256,6 +333,21 @@ class KubectlWrapper(object):
             return status
         elif 'Namespace' == kind:
             return self.run(method=self.client_CoreV1Api.create_namespace, body=application, _request_timeout=timeout)
+        elif kind in self.kubescape_namespaced_kinds:
+            return self.client_CustomObjectsApi.create_namespaced_custom_object(
+                     group=statics.STORAGE_AGGREGATED_API_GROUP,
+                     version=statics.STORAGE_AGGREGATED_API_VERSION,
+                     body=application,
+                     plural=self.kubescape_namespaced_kinds[kind],
+                     namespace=namespace
+                )
+        elif kind in self.kubescape_non_namespaced_kinds:
+            return self.client_CustomObjectsApi.create_cluster_custom_object(
+                     group=statics.STORAGE_AGGREGATED_API_GROUP,
+                     version=statics.STORAGE_AGGREGATED_API_VERSION,
+                     body=application,
+                     plural=self.kubescape_non_namespaced_kinds[kind],
+                )
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))
         status = self.run(method=method, namespace=namespace, body=application, _request_timeout=timeout)
@@ -366,6 +458,20 @@ class KubectlWrapper(object):
         elif 'ConfigMap' == kind:
             status = self.client_CoreV1Api.delete_namespaced_config_map(namespace=namespace,
                                                                         _request_timeout=None)
+        elif kind in self.kubescape_namespaced_kinds:
+            status = self.client_CustomObjectsApi.delete_namespaced_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=get_name(application),
+                    plural=self.kubescape_namespaced_kinds[kind],
+                    namespace=namespace
+            )
+        elif kind in self.kubescape_non_namespaced_kinds:
+            status = self.client_CustomObjectsApi.delete_cluster_custom_object(
+                    group=statics.STORAGE_AGGREGATED_API_GROUP,
+                    version=statics.STORAGE_AGGREGATED_API_VERSION,
+                    name=get_name(application),
+                    plural=self.kubescape_non_namespaced_kinds[kind])
         else:
             raise Exception('Unsupported Kind ,{0}, deploy application failed'.format(kind))
         return status
@@ -541,8 +647,29 @@ class KubectlWrapper(object):
 
     @staticmethod
     def add_new_namespace(namespace: str):
-        TestUtil.run_command("kubectl create namespace alerts".split(" "), timeout=None)
+        TestUtil.run_command(f"kubectl create namespace {namespace}".split(" "), timeout=None)
 
+    @staticmethod
+    def restart_workloads_in_namespace(namespace: str, kind: str, name: str):
+        if kind == "Deployment":
+            TestUtil.run_command(f"kubectl rollout restart deployment {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "ReplicationController":
+            TestUtil.run_command(f"kubectl rollout restart replicationcontroller {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "StatefulSet":
+            TestUtil.run_command(f"kubectl rollout restart statefulset {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "DaemonSet":
+            TestUtil.run_command(f"kubectl rollout restart daemonset {name} -n {namespace}".split(" "), timeout=None)
+        elif kind == "ReplicaSet":
+            # for replica set we scale down to 0 and then scale up to 1
+            TestUtil.run_command(f"kubectl scale --replicas=0 replicaset {name} -n {namespace}".split(" "), timeout=None)
+            TestUtil.run_command(f"kubectl scale --replicas=1 replicaset {name} -n {namespace}".split(" "), timeout=None)
+        else:
+            raise Exception(f"kind {kind} is not supported")
 
+    @staticmethod
+    def scale(namespace: str, kind: str, name: str, replicas: int):
+        TestUtil.run_command(f"kubectl scale --replicas={replicas} {kind} {name} -n {namespace}".split(" "), timeout=None)
+
+    
 def get_name(obj: dict):
     return obj["metadata"]["name"]
