@@ -782,7 +782,10 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         expected = new_report_guid
         actual = repository_info['attributes']['lastPostureReportGUID']
         assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
-        
+        assert repository_info['provider'] == designators_attributes['provider'], f"Expected provider to be {designators_attributes['provider']} but got {repository_info['provider']}"
+        assert repository_info['owner'] == designators_attributes['repoOwner'], f"Expected owner to be {designators_attributes['repoOwner']} but got {repository_info['owner']}"
+        assert repository_info['repoName'] == designators_attributes['repoName'], f"Expected repoName to be {designators_attributes['repoName']} but got {repository_info['repoName']}"
+        assert repository_info['branchName'] == designators_attributes['branch'], f"Expected branchName to be {designators_attributes['branch']} but got {repository_info['branchName']}"
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
         try:
             self.backend.delete_repository(repository_hash=repoHash)
