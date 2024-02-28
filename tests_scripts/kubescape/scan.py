@@ -783,10 +783,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         assert repository_info['repoName'] == designators_attributes['repoName'], f"Expected repoName to be {designators_attributes['repoName']} but got {repository_info['repoName']}"
         assert repository_info['branchName'] == designators_attributes['branch'], f"Expected branchName to be {designators_attributes['branch']} but got {repository_info['branchName']}"
         Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
-        try:
-            self.backend.delete_repository(repository_hash=repoHash)
-        except Exception as e:
-            Logger.logger.warning(f"failed to delete repository - {e}")
+        self.backend.delete_repository(repository_hash=repoHash)
         return statics.SUCCESS, ""
 
 class TestScanningScope(BaseKubescape):
