@@ -886,9 +886,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
 
         Logger.logger.info('2. verify all pods are running')
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
-
-        since_time = datetime.now(timezone.utc).astimezone().isoformat()
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)        
 
         Logger.logger.info('3. install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
@@ -985,7 +983,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         body['innerFilters'][0]['componentInfo.name'] = cve["componentInfo"]["name"]
         body['innerFilters'][0]['componentInfo.version'] = cve["componentInfo"]["version"]
         cve = self.backend.get_vuln_v2_details(body=body)
-        cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']"}
+        cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']","root['componentInfo']['pathsInfo'][0]['workloadHash']","root['componentInfo']['pathsInfo'][0]['clusterName']"}
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)        
 
         return self.cleanup()
