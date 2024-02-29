@@ -289,6 +289,18 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "vuln_v2_views": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "vuln_scan_trigger_scan_on_new_image": {
         "target": [
             "In cluster"

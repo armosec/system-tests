@@ -862,3 +862,131 @@ class VulnerabilityScanningTestRegistryConnectivity(VulnerabilityScanningRegistr
         }
         self.check_connectivity_for_single_registry(registry=registry, expected_statuses=expected_statuses,
                                                     auth_method=auth_method)
+class VulnerabilityV2Views(BaseVulnerabilityScanning):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(VulnerabilityV2Views, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj)
+
+    def start(self):
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
+
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info('1. apply cluster resources')
+
+        Logger.logger.info('1.1 apply services')
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+
+        Logger.logger.info('1.2 apply config-maps')
+        self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+
+        Logger.logger.info('1.3 apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+
+        Logger.logger.info('2. verify all pods are running')
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
+
+        since_time = datetime.now(timezone.utc).astimezone().isoformat()
+
+        Logger.logger.info('3. install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart()
+
+        Logger.logger.info('3.1 verify helm installation')
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        Logger.logger.info('4. verify httpd-proxy scan arrived to backend')
+        body = {"innerFilters": [
+            {
+                "cluster": cluster,
+                "namespace": "default",
+                "name": "httpd-proxy"
+            }]}
+        self.wait_for_report(timeout=400, report_type=self.backend.get_vuln_v2_workloads,
+                                              body=body,expected_results=1)  
+
+        Logger.logger.info('4.1 get httpd-proxy workload with filteres and compare with expected')
+        body =  {"innerFilters": [{            
+            "exploitable":"Known Exploited,High Likelihood",
+            "riskFactors":"Secret access",
+            "isRelevant":"Yes",
+            "cvssInfo.baseScore":"5|greater",
+            "severity":"Medium",
+            "cveName":"CVE-2007-0450",
+            "labels":"app:httpd-proxy"
+            }]}
+        wl_summary = self.backend.get_vuln_v2_workloads(body)        
+        if len(wl_summary) == 0:
+            raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
+        
+        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']"}
+        wl_summary = wl_summary[0]        
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
+
+        Logger.logger.info('5. get workload details and compare with expected')
+        body =  {"innerFilters": [{
+            "cluster":wl_summary["cluster"],
+            "namespace":wl_summary["namespace"],
+            "kind": wl_summary["kind"],
+            "name": wl_summary["name"]
+            }]}
+        wl_summary = self.backend.get_vuln_v2_workload_details(body=body)
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_details.json", wl_summary, wl_excluded_paths)
+
+        Logger.logger.info('6. get workloads components')
+        body =  {"innerFilters": [{
+            "cluster":wl_summary["cluster"],
+            "namespace":wl_summary["namespace"],
+            "kind": wl_summary["kind"],
+            "workload": wl_summary["name"]
+            }]}
+        components = self.backend.get_vuln_v2_components(body=body)
+        assert len(components) == 9, 'expect 9 components found for httpd-proxy'
+      
+        Logger.logger.info('7. get workloads images and compare with expected')
+        image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
+        image = image[0]
+        image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']","root['cisaKevInfo']"}
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
+      
+        Logger.logger.info('7. get workloads CVEs and match with workload summary')
+        body['innerFilters'][0]['severity'] = "Critical"
+        cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["criticalCount"])
+        for cve in cves:
+            if cve["name"] not in wl_summary["severityStats"]["Critical"]:
+                raise Exception(f'cve {cve["name"]} not found in critical cves')
+        
+        body['innerFilters'][0]['severity'] = "High"
+        cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["highCount"])
+        for cve in cves:
+            if cve["name"] not in wl_summary["severityStats"]["High"]:
+                raise Exception(f'cve {cve["name"]} not found in high cves')
+        
+        body['innerFilters'][0]['severity'] = "Medium"
+        cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["mediumCount"])
+        for cve in cves:
+            if cve["name"] not in wl_summary["severityStats"]["Medium"]:
+                raise Exception(f'cve {cve["name"]} not found in medium cves')
+            
+        body['innerFilters'][0]['severity'] = "Low"
+        cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["lowCount"])
+        for cve in cves:
+            if cve["name"] not in wl_summary["severityStats"]["Low"]:
+                raise Exception(f'cve {cve["name"]} not found in low cves')
+            
+        Logger.logger.info('7. get exploitable CVE details and compare with expected')        
+        body['innerFilters'][0]['severity'] = ""
+        body['innerFilters'][0]['exploitable'] = "Known Exploited,High Likelihood"
+        cve = self.backend.get_vulns_v2(body=body, expected_results=1)
+        cve = cve[0]
+        body['innerFilters'][0]['name'] = cve["name"]
+        body['innerFilters'][0]['componentInfo.name'] = cve["componentInfo"]["name"]
+        body['innerFilters'][0]['componentInfo.version'] = cve["componentInfo"]["version"]
+        cve = self.backend.get_vuln_v2_details(body=body)
+        cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']"}
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)        
+
+        return self.cleanup()
+    

@@ -52,6 +52,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `host_scanner_with_hostsensorrule`                             | kubescape  | scan with host scanner using rules with `hostSensorRule: true`         | kubescape                     |
 | `vuln_scan`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_scan_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
+| `vuln_v2_views`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_scan_trigger_scan_on_new_image`             | helm-chart |                                                                        | kubevuln, backend             |
 | `ks_microservice_ns_creation`                                  | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
