@@ -782,6 +782,7 @@ class ControlPanelAPI(object):
             API_REPOSITORYPOSTURE_FILES,
             params={"customerGUID": self.selected_tenant_id},
             json=params,
+            timeout=60
         )
         if not 200 <= r.status_code < 300:
             raise Exception(
