@@ -32,12 +32,7 @@ class VulnerabilityScanningTests(object):
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityV2Views,
-            services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
-            secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "viewsv2"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),   
-            database=supported_systemsAPI.WikiJS,       
+            test_obj=VulnerabilityV2Views, 
             proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
      
@@ -52,8 +47,7 @@ class VulnerabilityScanningTests(object):
             services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
             secret="wikijs.yaml",
             config_maps=join(DEFAULT_CONFIGMAP_PATH, "viewsv2"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),           
-            proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2")
         )
     
     
