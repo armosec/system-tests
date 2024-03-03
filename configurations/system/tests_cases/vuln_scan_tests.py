@@ -33,7 +33,7 @@ class VulnerabilityScanningTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityV2Views, 
-            proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
+            #proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
      
     @staticmethod
