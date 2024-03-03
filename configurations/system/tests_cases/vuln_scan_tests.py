@@ -33,12 +33,26 @@ class VulnerabilityScanningTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityV2Views,
-            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
+            services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
             secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
-            database=supported_systemsAPI.WikiJS,
-            expected_results="wikijs.json",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "viewsv2"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),   
+            database=supported_systemsAPI.WikiJS,       
+            proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
+        )
+     
+    @staticmethod
+    def vuln_v2_views_kev():
+        from tests_scripts.helm.vuln_scan import VulnerabilityV2ViewsKEV
+        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=VulnerabilityV2ViewsKEV,
+            services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
+            secret="wikijs.yaml",
+            config_maps=join(DEFAULT_CONFIGMAP_PATH, "viewsv2"),
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),           
             proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
     

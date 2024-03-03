@@ -946,7 +946,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         Logger.logger.info('7. get workloads images and compare with expected')
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
         image = image[0]
-        image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']","root['cisaKevInfo']"}
+        image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']"}
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
       
         Logger.logger.info('7. get workloads CVEs and match with workload summary')
@@ -983,8 +983,81 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         body['innerFilters'][0]['componentInfo.name'] = cve["componentInfo"]["name"]
         body['innerFilters'][0]['componentInfo.version'] = cve["componentInfo"]["version"]
         cve = self.backend.get_vuln_v2_details(body=body)
-        cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']","root['componentInfo']['pathsInfo'][0]['workloadHash']","root['componentInfo']['pathsInfo'][0]['clusterName']"}
+        cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']",
+                              "root['componentInfo']['pathsInfo'][0]['workloadHash']",
+                              "root['componentInfo']['pathsInfo'][0]['clusterName']",
+                              "root['cvssInfo']['baseScore']"}
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)        
 
         return self.cleanup()
     
+
+
+class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(VulnerabilityV2ViewsKEV, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj)
+
+    def start(self):
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
+
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info('1. apply cluster resources')
+
+        Logger.logger.info('1.1 apply services')
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+
+        Logger.logger.info('1.2 apply config-maps')
+        self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
+
+        Logger.logger.info('1.3 apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+
+        Logger.logger.info('2. verify all pods are running')
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)        
+
+        Logger.logger.info('3. install armo helm-chart')
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(use_offline_db=False)
+
+        Logger.logger.info('3.1 verify helm installation')
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        Logger.logger.info('4. verify mariadb scan arrived to backend')
+        body = {"innerFilters": [
+            {
+                "cluster": cluster,
+                "namespace": namespace,
+                "kind" : "deployment",
+                "name": "mariadb"
+            }]}
+        self.wait_for_report(timeout=500, report_type=self.backend.get_vuln_v2_workloads,
+                                              body=body,expected_results=1)  
+       
+        Logger.logger.info('4.1 get mariadb knwon exploited cve 2023-44487')
+        body =  {"innerFilters": [{
+            "name":"CVE-2023-44487",
+            "cluster": cluster,
+            "namespace":namespace,
+            "kind":"deployment",
+            "workload":"mariadb",
+            "componentInfo.name":"stdlib",
+            "componentInfo.version":"go1.16.7"}]}
+        kev_vulan = self.backend.get_vuln_v2_details(body)        
+      
+        Logger.logger.info('4.1 get mariadb knwon exploited cve 2023-44487 using exploitable filter')
+        body['innerFilters'][0]['exploitable'] = "Known Exploited"
+        kev_vulan = self.backend.get_vuln_v2_details(body) 
+        if len(kev_vulan["cisaKevInfo"]) == 0:   
+            raise Exception('vuilnerability CVE-2023-44487 does not include kev info')
+     
+        Logger.logger.info('check cve kev info')           
+        kev_excluded_paths = {"root['knownRansomwareCampaignUse']"}
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/kev_vulan.json", kev_vulan["cisaKevInfo"],kev_excluded_paths)       
+      
+        return self.cleanup()
+    
+

@@ -81,7 +81,7 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-    def install_armo_helm_chart(self, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME, helm_kwargs: dict = None):
+    def install_armo_helm_chart(self, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME, helm_kwargs: dict = None, use_offline_db: bool = True):
         if helm_kwargs is None:
             helm_kwargs = {}
 
@@ -129,7 +129,7 @@ class BaseHelm(BaseK8S):
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             namespace=namespace,
                                             repo=self.helm_armo_repo, create_namespace=create_namespace,
-                                            helm_kwargs=helm_kwargs)
+                                            helm_kwargs=helm_kwargs, use_offline_db=use_offline_db)
 
     def get_in_cluster_tags(self):
         component_tag = {}

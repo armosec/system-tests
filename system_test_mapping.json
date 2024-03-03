@@ -295,8 +295,18 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
-            "careportsreceiver"
+            "cadashboardbe"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "vuln_v2_views_kev": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe"
         ],
         "description": "",
         "skip_on_environment": ""

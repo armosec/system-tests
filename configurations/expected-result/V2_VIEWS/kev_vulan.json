@@ -1,0 +1,6 @@
+{
+    "dateAdded": "2023-10-10",
+    "dueDate": "2023-10-31",
+    "knownRansomwareCampaignUse": "Unknown",
+    "notes": "https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/"
+}
