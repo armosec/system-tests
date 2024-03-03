@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-proxy
+  labels:
+    app: httpd-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd-proxy
+  template:
+    metadata:
+      labels:
+        app: httpd-proxy
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:latest
+        ports:
+        - containerPort: 80

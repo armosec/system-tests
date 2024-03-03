@@ -869,24 +869,38 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
 
     def start(self):
         assert self.backend != None;
+        #use this flag to update expected results (test will fail if flag is not set to prevent accidental overwrite of expected results)
+        updateExpected = False
         f'the test {self.test_driver.test_name} must run with backend'
 
         cluster, namespace = self.setup(apply_services=False)
 
-        Logger.logger.info('1. install armo helm-chart')
+        Logger.logger.info('1. apply cluster resources')
+
+        Logger.logger.info('1.1 apply services')
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+
+        Logger.logger.info('1.2 apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+
+        Logger.logger.info('1.3 verify all pods are running')
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)        
+
+        Logger.logger.info('1.4 install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart()
 
-        Logger.logger.info('1.1 verify helm installation')
+        Logger.logger.info('1.6 verify helm installation')
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
         Logger.logger.info('2. verify httpd-proxy scan arrived to backend')
         body = {"innerFilters": [
             {
                 "cluster": cluster,
-                "namespace": "default",
+                "namespace": namespace,
                 "name": "httpd-proxy",
-                "riskFactors":"Secret access",
+                "riskFactors":"External facing",
             }]}
         wl_list, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
                                               body=body,expected_results=1)  
@@ -896,14 +910,14 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         Logger.logger.info('2.1 get httpd-proxy workload with filteres and compare with expected')
         body =  {"innerFilters": [{   
             "exploitable":"Known Exploited,High Likelihood",
-            "riskFactors":"Secret access",
+            "riskFactors":"External facing",
             "isRelevant":"Yes",
             "cvssInfo.baseScore":"5|greater",
             "severity":"Medium",
             "cveName":"CVE-2007-0450",
             "labels":"app:httpd-proxy",
             "cluster": cluster,
-            "namespace": "default",
+            "namespace": namespace,
             "name": "httpd-proxy"                     
             }]}
         wl_summary = self.backend.get_vuln_v2_workloads(body)        
@@ -911,7 +925,9 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
         
         wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']"}
-        wl_summary = wl_summary[0]        
+        wl_summary = wl_summary[0] 
+        if updateExpected:
+            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
 
         Logger.logger.info('3. get workload details and compare with expected')
@@ -922,6 +938,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             "name": wl_summary["name"]
             }]}
         wl_summary = self.backend.get_vuln_v2_workload_details(body=body)
+        if updateExpected:
+            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_details.json", wl_summary, wl_excluded_paths)
 
         Logger.logger.info('4. get workloads components')
@@ -938,6 +956,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
         image = image[0]
         image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']","root['digest']","root['repository']","root['registry']"}
+        if updateExpected:
+            TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
       
         Logger.logger.info('6. get workloads CVEs and match with workload summary')
@@ -979,7 +999,13 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                               "root['componentInfo']['pathsInfo'][0]['clusterName']",
                                "root['componentInfo']['pathsInfo'][0]['imageHash']",
                               "root['cvssInfo']['baseScore']"}
-        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)        
+        if updateExpected:
+            TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details.json")
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)
+
+        if updateExpected:
+            raise Exception('update expected is set to True')
+
 
         return self.cleanup()
     
@@ -999,12 +1025,9 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
         Logger.logger.info('1. apply cluster resources')
 
         Logger.logger.info('1.1 apply services')
-        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)       
 
-        Logger.logger.info('1.2 apply config-maps')
-        self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
-
-        Logger.logger.info('1.3 apply workloads')
+        Logger.logger.info('1.2 apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
 
