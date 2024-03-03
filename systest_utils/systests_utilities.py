@@ -12,6 +12,7 @@ import time
 import traceback
 from builtins import staticmethod
 from datetime import datetime
+from deepdiff import DeepDiff
 
 import requests
 import yaml
@@ -374,6 +375,30 @@ class TestUtil(object):
     @staticmethod
     def get_class_methods(class_name):
         return [func for func in dir(class_name) if callable(getattr(class_name, func)) and not func.startswith("_")]
+
+    @staticmethod
+    def save_expceted_json(expected_json, path):
+        with open(path, 'w') as f:
+            json.dump(expected_json, f)
+
+    @staticmethod
+    def get_expected_json(path):
+        with open(path, 'r') as f:
+            return json.load(f)
+        
+    @staticmethod        
+    def compare_jsons(expected_json, actual_json, exclude_paths):
+        diff = DeepDiff(expected_json, actual_json, exclude_paths=exclude_paths, ignore_order=True)
+        if diff:
+           raise Exception(
+           'Actual different from expected: {}'.format(diff))
+    
+    @staticmethod
+    def compare_with_expected_file(expected_file, actual_json, exclude_paths):
+        expected_json = TestUtil.get_expected_json(expected_file)
+        TestUtil.compare_jsons(expected_json, actual_json, exclude_paths)
+
+
 
 
 class OutputCapturer(io.StringIO):

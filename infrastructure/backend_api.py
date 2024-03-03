@@ -57,6 +57,14 @@ API_VULNERABILITY_SCAN_V2 = "/api/v1/vulnerability/scan/v2/"
 API_VULNERABILITY_SCANRESULTSDETAILS = "/api/v1/vulnerability/scanResultsDetails"
 API_VULNERABILITY_UNIQUE_VALUES_SUMMARY =   "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
 
+API_VULNERABILITY_V2_WORKLOAD = "/api/v1/vulnerability_v2/workload"   
+API_VULNERABILITY_V2 = "/api/v1/vulnerability_v2/vulnerability"
+API_VULNERABILITY_V2_IMAGE = "/api/v1/vulnerability_v2/image"
+API_VULNERABILITY_V2_COMPONENT = "/api/v1/vulnerability_v2/component"
+
+
+
+
 
 API_REPOSITORYPOSTURE = "/api/v1/repositoryPosture"
 API_REPOSITORYPOSTURE_REPOSITORIES =  "/api/v1/repositoryPosture/repositories"
@@ -2097,6 +2105,55 @@ class ControlPanelAPI(object):
         assert be_resources is not None, "kubernetes resources response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
 
         return be_resources
+    
+
+    def post_details_request(self,url, body: dict):            
+        r = self.post(url + '/details', params={"customerGUID": self.customer_guid},
+                      json=body)        
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: results of vuln workload details "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        j = r.json()
+        if not j:
+            raise Exception('Request: results of vuln workload details is empty body: %s' % body)
+        return j   
+    
+    def post_list_request(self, url, body: dict, expected_results: int = 0):
+        r = self.post(url + "/list", params={"customerGUID": self.customer_guid},
+                      json=body)        
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
+                    url, self.customer, r.status_code, r.text))
+        j = r.json()
+        if expected_results == 0:
+            return j['response']
+        if 'response' not in j or len(j['response']) == 0:
+            raise Exception('Request: results is empty')
+        if  len(j['response']) < expected_results:
+             raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
+        return j['response']     
+    
+    def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0):   
+        return self.post_list_request(API_VULNERABILITY_V2_WORKLOAD, body, expected_results)
+    
+    def get_vuln_v2_workload_details(self, body: dict):   
+        return self.post_details_request(API_VULNERABILITY_V2_WORKLOAD, body)    
+    
+    def get_vulns_v2(self, body: dict, expected_results: int = 0):            
+        return self.post_list_request(API_VULNERABILITY_V2, body, expected_results)
+    
+    def get_vuln_v2_details(self, body: dict):
+        return self.post_details_request(API_VULNERABILITY_V2, body)
+    
+    def get_vuln_v2_images(self, body: dict, expected_results: int = 0):            
+        return self.post_list_request(API_VULNERABILITY_V2_IMAGE, body, expected_results)
+    
+    def get_vuln_v2_components(self, body: dict, expected_results: int = 0):            
+        return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results)
+        
+  
     
 class Solution(object):
     """docstring for Solution"""

@@ -1,0 +1,28 @@
+{
+    "wlid": "wlid://wlv2test4/namespace-default/deployment-httpd-proxy",
+    "name": "httpd-proxy",
+    "namespace": "default",
+    "kind": "deployment",
+    "cluster": "wlv2test4",
+    "clusterShortName": "wlv2test4",
+    "lastScanTime": "2024-02-29T08:10:59Z",
+    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+    "imagesCount": 1,
+    "criticalCount": 0,
+    "highCount": 0,
+    "mediumCount": 1,
+    "lowCount": 0,
+    "severityStats": {
+        "Medium": [
+            "CVE-2007-0450"
+        ]
+    },
+    "riskFactorsCount": 1,
+    "riskFactors": [
+        "Secret access"
+    ],
+    "labels": [
+        "app:httpd-proxy"
+    ],
+    "hasRelevancyData": false
+}

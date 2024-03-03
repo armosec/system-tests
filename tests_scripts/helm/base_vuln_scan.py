@@ -1294,3 +1294,4 @@ class BaseVulnerabilityScanning(BaseHelm):
         print(resp)
         if resp.status_code < 200 or resp.status_code >= 300:
             raise Exception(f'bad response: {resp.text}')
+        
