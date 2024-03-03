@@ -997,7 +997,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         cve_excluded_paths = {"root['links']", "root['epssInfo']","root['cisaKevInfo']",
                               "root['componentInfo']['pathsInfo'][0]['workloadHash']",
                               "root['componentInfo']['pathsInfo'][0]['clusterName']",
-                               "root['componentInfo']['pathsInfo'][0]['imageHash']",
+                              "root['componentInfo']['pathsInfo'][0]['namespace']",
+                              "root['componentInfo']['pathsInfo'][0]['imageHash']",
                               "root['cvssInfo']['baseScore']"}
         if updateExpected:
             TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details.json")
