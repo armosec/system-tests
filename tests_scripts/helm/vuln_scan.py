@@ -895,9 +895,9 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         body =  {"innerFilters": [{   
             "exploitable":"Known Exploited,High Likelihood",
             "riskFactors":"Secret access",
-            "isRelevant":"Yes",
-            "cvssInfo.baseScore":"5|greater",
-            "severity":"Medium",
+            #"isRelevant":"Yes",
+            #"cvssInfo.baseScore":"5|greater",
+            #"severity":"Medium",
             "cveName":"CVE-2007-0450",
             "labels":"app:httpd-proxy",
             "cluster": cluster,
