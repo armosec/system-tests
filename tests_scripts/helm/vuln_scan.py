@@ -891,14 +891,17 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                                               body=body,expected_results=1)  
 
         Logger.logger.info('2.1 get httpd-proxy workload with filteres and compare with expected')
-        body =  {"innerFilters": [{            
+        body =  {"innerFilters": [{   
             "exploitable":"Known Exploited,High Likelihood",
             "riskFactors":"Secret access",
             "isRelevant":"Yes",
             "cvssInfo.baseScore":"5|greater",
             "severity":"Medium",
             "cveName":"CVE-2007-0450",
-            "labels":"app:httpd-proxy"
+            "labels":"app:httpd-proxy",
+            "cluster": cluster,
+            "namespace": "default",
+            "name": "httpd-proxy"                     
             }]}
         wl_summary = self.backend.get_vuln_v2_workloads(body)        
         if len(wl_summary) == 0:
