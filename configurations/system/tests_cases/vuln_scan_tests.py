@@ -46,7 +46,8 @@ class VulnerabilityScanningTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityV2ViewsKEV,
             services=join(DEFAULT_SERVICE_PATH, "viewsv2kev"),           
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2kev")
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2kev"),
+            secret="wikijs.yaml"
         )
     
     
