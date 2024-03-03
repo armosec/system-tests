@@ -885,19 +885,21 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             {
                 "cluster": cluster,
                 "namespace": "default",
-                "name": "httpd-proxy"
+                "name": "httpd-proxy",
+                "riskFactors":"Secret access",
             }]}
         wl_list, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
                                               body=body,expected_results=1)  
+        
         Logger.logger.info("received httpd-proxy scan {}".format(wl_list))
 
         Logger.logger.info('2.1 get httpd-proxy workload with filteres and compare with expected')
         body =  {"innerFilters": [{   
             "exploitable":"Known Exploited,High Likelihood",
             "riskFactors":"Secret access",
-            #"isRelevant":"Yes",
-            #"cvssInfo.baseScore":"5|greater",
-            #"severity":"Medium",
+            "isRelevant":"Yes",
+            "cvssInfo.baseScore":"5|greater",
+            "severity":"Medium",
             "cveName":"CVE-2007-0450",
             "labels":"app:httpd-proxy",
             "cluster": cluster,
