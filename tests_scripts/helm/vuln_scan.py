@@ -891,7 +891,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart()
 
-        Logger.logger.info('1.6 verify helm installation')
+        Logger.logger.info('1.5 verify helm installation')
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
 
         Logger.logger.info('2. verify httpd-proxy scan arrived to backend')
