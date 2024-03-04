@@ -34,7 +34,7 @@ class VulnerabilityScanningTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityV2Views, 
             services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2")
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),
             database=supported_systemsAPI.WikiJS,
             helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
