@@ -19,13 +19,6 @@
             "name": "github-workflows",
             "originalIP": "142.250.1.104",
             "server": "github.com"
-        },
-        {
-            "dns": "www.google.com.",
-            "ipBlock": "209.85.146.106/32",
-            "name": "",
-            "originalIP": "209.85.146.106",
-            "server": ""
         }
     ],
     "spec": {
@@ -58,11 +51,6 @@
                         {
                             "ipBlock": {
                                 "cidr": "142.250.1.104/24"
-                            }
-                        },
-                        {
-                            "ipBlock": {
-                                "cidr": "209.85.146.106/32"
                             }
                         }
                     ]

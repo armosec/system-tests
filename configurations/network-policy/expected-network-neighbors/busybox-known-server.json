@@ -43,21 +43,6 @@
                 "type": "internal"
             },
             {
-                "dns": "www.google.com.",
-                "identifier": "a63c2f7904d77cfedc655bf8c629d0bcb638a949bd7ef94ae5825a7a397b1b60",
-                "ipAddress": "64.233.183.104",
-                "namespaceSelector": null,
-                "podSelector": null,
-                "ports": [
-                    {
-                        "name": "TCP-80",
-                        "port": 80,
-                        "protocol": "TCP"
-                    }
-                ],
-                "type": "external"
-            },
-            {
                 "dns": "",
                 "identifier": "9a1817356173a94001deda15a1a8c56bb9969454691f48661cbda6ce7f662bd4",
                 "ipAddress": "142.250.1.104",
