@@ -286,9 +286,8 @@ class BaseVulnerabilityScanning(BaseHelm):
 
         # for older helm charts, installationData is not available
         if cluster_info is not None:
-            assert cluster_info['installationData']['imageVulnerabilitiesScanningEnabled'] == True
-            assert cluster_info['installationData'][
-                       'relevantImageVulnerabilitiesEnabled'] == self.is_relevancy_enabled()
+            assert cluster_info['installationData']['imageVulnerabilitiesScanningEnabled']
+            assert cluster_info['installationData']['relevantImageVulnerabilitiesEnabled'] == self.is_relevancy_enabled(), f"installationData.relevantImageVulnerabilitiesEnabled expected: {self.is_relevancy_enabled()}, actual: {cluster_info['installationData']['relevantImageVulnerabilitiesEnabled']}"
 
     def get_workload_data_from_yaml(self, yaml_file: str, path: str = statics.DEFAULT_DEPLOYMENT_PATH):
         workload = self.load_yaml(yaml_file=yaml_file, path=path)
