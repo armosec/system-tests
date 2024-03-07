@@ -5,7 +5,7 @@
         "annotations": {
             "kubescape.io/status": "ready"
         },
-        "creationTimestamp": "2023-12-11T11:02:21Z",
+        "creationTimestamp": "2024-03-07T12:59:31Z",
         "labels": {
             "kubescape.io/workload-api-group": "apps",
             "kubescape.io/workload-api-version": "v1",
@@ -13,12 +13,42 @@
             "kubescape.io/workload-name": "busybox-deployment"
         },
         "name": "deployment-busybox-deployment",
-        "namespace": "systest-ns-d3qk",
+        "namespace": "systest-ns-sjcr",
         "resourceVersion": "1",
-        "uid": "ac1da60e-d171-4c72-a070-882744d16a9c"
+        "uid": "47a6dcd2-55ee-4fa7-8322-ca2bbe59e68d"
     },
     "spec": {
         "egress": [
+            {
+                "dns": "www.google.com.",
+                "identifier": "8ad885c9fb5e79d3c06756c5e42a369222f1eaa16f538198641ad090876b90f3",
+                "ipAddress": "64.233.181.104",
+                "namespaceSelector": null,
+                "podSelector": null,
+                "ports": [
+                    {
+                        "name": "TCP-80",
+                        "port": 80,
+                        "protocol": "TCP"
+                    }
+                ],
+                "type": "external"
+            },
+            {
+                "dns": "",
+                "identifier": "9a1817356173a94001deda15a1a8c56bb9969454691f48661cbda6ce7f662bd4",
+                "ipAddress": "142.250.1.104",
+                "namespaceSelector": null,
+                "podSelector": null,
+                "ports": [
+                    {
+                        "name": "TCP-80",
+                        "port": 80,
+                        "protocol": "TCP"
+                    }
+                ],
+                "type": "external"
+            },
             {
                 "dns": "",
                 "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
@@ -41,21 +71,6 @@
                     }
                 ],
                 "type": "internal"
-            },
-            {
-                "dns": "",
-                "identifier": "9a1817356173a94001deda15a1a8c56bb9969454691f48661cbda6ce7f662bd4",
-                "ipAddress": "142.250.1.104",
-                "namespaceSelector": null,
-                "podSelector": null,
-                "ports": [
-                    {
-                        "name": "TCP-80",
-                        "port": 80,
-                        "protocol": "TCP"
-                    }
-                ],
-                "type": "external"
             }
         ],
         "ingress": [],
