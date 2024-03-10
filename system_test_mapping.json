@@ -201,7 +201,6 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
             "config-service"
         ],
         "description": "",
@@ -295,7 +294,6 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe"
         ],
         "description": "",
         "skip_on_environment": ""
