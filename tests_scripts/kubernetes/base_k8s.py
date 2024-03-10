@@ -1057,14 +1057,16 @@ class BaseK8S(BaseDockerizeTest):
                 time.sleep(1)
         Logger.logger.info("exiting websocket thread")
 
-    def run_exec_cmd(self, pod_name: str, namespace: str, cmd: str):
+    def run_exec_cmd(self, pod_name: str, namespace: str, cmd: str, repeat: int = 1):
         """ 
         Run a command inside a pod
         :param pod_name: pod name
         :param namespace: namespace
         :param cmd: command to run
         """
-        self.kubernetes_obj.exec_pod(namespace=namespace, name=pod_name, command=cmd)
+        for i in range(repeat):
+            self.kubernetes_obj.exec_pod(namespace=namespace, name=pod_name, command=cmd)
+            time.sleep(0.5)  # sleep between repeat's
 
     def get_generated_network_policy(self, namespace: str, name: str):
         generated_network_policy = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(

@@ -48,8 +48,8 @@ class NetworkPolicy(BaseNetworkPolicy):
         pod_name = pod[0].metadata.name
 
         Logger.logger.info(f"3. pod {pod_name} is ready. Triggering exec commands to generate traffic")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://google.com")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org")
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://google.com", repeat=10)
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org", repeat=10)
 
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
         TestUtil.sleep(5 * int(update_period_in_seconds), "wait for node-agent update period", "info")
@@ -147,8 +147,8 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         pod_name = pod[0].metadata.name
 
         Logger.logger.info(f"4. pod {pod_name} is ready. Triggering exec commands to generate traffic")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://google.com")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org")
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://google.com", repeat=10)
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org", repeat=10)
 
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
         TestUtil.sleep(5 * int(update_period_in_seconds), "wait for node-agent update period", "info")
@@ -288,8 +288,8 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         TestUtil.sleep(int(duration_in_seconds) + 5, "wait for node-agent learning period", "info")
 
         Logger.logger.info(f"3. pod {pod_name} is ready. Triggering exec command to generate traffic")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://google.com")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://www.google.com")
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://google.com", repeat=10)
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://www.google.com", repeat=10)
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
@@ -352,8 +352,8 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         pod_name = pods[0].metadata.name
 
         Logger.logger.info(f"3. pod {pod_name} is ready. Triggering exec command to send request from within Pod")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget 185.199.108.153")
-        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://www.google.com")
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget 185.199.108.153", repeat=10)
+        self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="wget http://www.google.com", repeat=10)
 
         Logger.logger.info('4. Apply Known Servers')
         known_servers_file = self.test_obj.get_arg("knownservers")
