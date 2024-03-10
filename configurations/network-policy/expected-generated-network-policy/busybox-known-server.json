@@ -22,9 +22,9 @@
     },
     {
         "dns": "",
-        "ipBlock": "142.250.1.104/24",
+        "ipBlock": "185.199.108.153/24",
         "name": "github-workflows",
-        "originalIP": "142.250.1.104",
+        "originalIP": "185.199.108.153",
         "server": "github.com"
     }
 ],
@@ -57,7 +57,7 @@
                 "to": [
                     {
                         "ipBlock": {
-                            "cidr": "142.250.1.104/24"
+                            "cidr": "185.199.108.153/24"
                         }
                     },
                     {

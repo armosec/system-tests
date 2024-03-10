@@ -37,7 +37,7 @@
             {
                 "dns": "",
                 "identifier": "9a1817356173a94001deda15a1a8c56bb9969454691f48661cbda6ce7f662bd4",
-                "ipAddress": "142.250.1.104",
+                "ipAddress": "185.199.108.153",
                 "namespaceSelector": null,
                 "podSelector": null,
                 "ports": [

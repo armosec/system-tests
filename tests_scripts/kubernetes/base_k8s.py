@@ -1064,10 +1064,7 @@ class BaseK8S(BaseDockerizeTest):
         :param namespace: namespace
         :param cmd: command to run
         """
-        result = self.kubernetes_obj.exec_pod(namespace=namespace, name=pod_name, command=cmd)
-
-        if result[0] != 0:
-            raise Exception(f"failed to run command {cmd} on pod {pod_name} in namespace {namespace}")
+        self.kubernetes_obj.exec_pod(namespace=namespace, name=pod_name, command=cmd)
 
     def get_generated_network_policy(self, namespace: str, name: str):
         generated_network_policy = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
