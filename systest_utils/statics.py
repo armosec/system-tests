@@ -43,6 +43,9 @@ DEFAULT_SECRETE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'secrets')
 DEFAULT_NAMESPACE_PATH = os.path.join(DEFAULT_K8S_PATHS, 'namespaces')
 DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 
+# smart remediation tests
+DEFAULT_SMART_REMEDIATION_PATH = os.path.join(DEFAULT_K8S_PATHS, 'smart-remediation')
+
 # synchronizer tests
 DEFAULT_SYNCHRONIZER_PATH = os.path.join(DEFAULT_K8S_PATHS, 'synchronizer')
 DEFAULT_SYNCHRONIZER_CRDS_PATH = os.path.abspath(os.path.join('configurations', 'kubescape-crds', 'supported'))
