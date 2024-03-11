@@ -83,7 +83,7 @@
             "In cluster"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy",
+            "cadashboardbe",
             "event-ingester-service",
             "gateway"
         ],
@@ -153,7 +153,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy"
+            "cadashboardbe"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -201,8 +201,8 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
-            "config-service"
+            "config-service",
+            "cadashboardbe"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -415,7 +415,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy",
+            "cadashboardbe",
             "careportsreceiver",
             "event-ingester-service"
         ],
@@ -754,7 +754,7 @@
         "target_repositories": [
             "helm-chart",
             "operator",
-            "cadashboardbe-dummy",
+            "cadashboardbe",
             "careportsreceiver",
             "gateway"
         ],
@@ -898,7 +898,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy",
+            "cadashboardbe",
             "careportsreceiver",
             "event-ingester-service",
             "users-notification-service"
@@ -957,7 +957,7 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy",
+            "cadashboardbe",
             "careportsreceiver",
             "event-ingester-service",
             "users-notification-service"
