@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+            privileged: true
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache/nginx
+            - name: run
+              mountPath: /var/run
+            - name: docker-socket
+              mountPath: /host-docker.sock
+            - name: host-volume
+              mountPath: /host-etc
+      volumes:
+        - name: cache
+          emptyDir: {}
+        - name: run
+          emptyDir: {}
+        - name: docker-socket
+          hostPath:
+            path: /run/containerd/containerd.sock
+            type: Socket
+        - name: host-volume
+          hostPath:
+            path: /etc
+            type: Directory

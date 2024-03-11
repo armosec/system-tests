@@ -43,7 +43,7 @@ API_STRIPE_PLANS = "/api/v1/tenants/stripe/plans"
 API_TENANT_DETAILS = "/api/v1/tenants/tenantDetails"
 API_TENANT_CREATE= "/api/v1/tenants/createTenant"
 API_CLUSTER = "/api/v1/cluster"
-API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan" 
+API_IMAGE_SCAN_STATS = "/api/v1/customerState/reports/imageScan"
 API_POSTURE_CLUSTERSOVERTIME = "/api/v1/posture/clustersOvertime"
 API_POSTURE_FRAMEWORKS =  "/api/v1/posture/frameworks"
 API_POSTURE_CONTROLS = "/api/v1/posture/controls"
@@ -57,7 +57,7 @@ API_VULNERABILITY_SCAN_V2 = "/api/v1/vulnerability/scan/v2/"
 API_VULNERABILITY_SCANRESULTSDETAILS = "/api/v1/vulnerability/scanResultsDetails"
 API_VULNERABILITY_UNIQUE_VALUES_SUMMARY =   "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
 
-API_VULNERABILITY_V2_WORKLOAD = "/api/v1/vulnerability_v2/workload"   
+API_VULNERABILITY_V2_WORKLOAD = "/api/v1/vulnerability_v2/workload"
 API_VULNERABILITY_V2 = "/api/v1/vulnerability_v2/vulnerability"
 API_VULNERABILITY_V2_IMAGE = "/api/v1/vulnerability_v2/image"
 API_VULNERABILITY_V2_COMPONENT = "/api/v1/vulnerability_v2/component"
@@ -111,7 +111,7 @@ def deco_cookie(func):
         ControlPanelAPIObj = args[0]
         if type(ControlPanelAPIObj) != ControlPanelAPI:
             raise Exception("In 'apply_cookie': First argument must be ControlPanelAPI object")
-        
+
         if "params" not in kwargs:
             kwargs["params"] = {}
 
@@ -160,7 +160,7 @@ class ControlPanelAPI(object):
     secret_key : str
         the secret_key to use for login_method "frontegg"
     login_customer_cookie : str
-        the cookie used for login the API. 
+        the cookie used for login the API.
     login_customer_guid : str
         the customer_guid used for login the API. In order to access the admin APIS, this customer must be configured in AllowedAnyCustomer.
     selected_tenant_cookie : str
@@ -176,7 +176,7 @@ class ControlPanelAPI(object):
     api_login : APILogin
         the api_login object constructed from the login_method.
 
-    
+
     """
 
     def __init__(self, user_name, password, customer, client_id, secret_key, url, auth_url=None, login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None):
@@ -190,7 +190,7 @@ class ControlPanelAPI(object):
         self.customer = customer
 
         # Required for login_method == LOGIN_METHOD_FRONTEGG
-        self.client_id = client_id 
+        self.client_id = client_id
         self.secret_key = secret_key
         self.auth_url = auth_url
 
@@ -209,9 +209,9 @@ class ControlPanelAPI(object):
         self.api_login = APILogin()
 
         self.verify = True
-        
+
         self.login(self.login_method)
- 
+
 
     def login(self, login_method):
         if login_method == LOGIN_METHOD_KEYCLOAK:
@@ -222,8 +222,8 @@ class ControlPanelAPI(object):
             self.api_login = FrontEggUsernameAPILogin(server=self.server, username=self.username, password=self.password, customer=self.customer, customer_guid=self.customer_guid)
         else:
             raise Exception(f"Login method '{login_method}' not supported")
-        
-        self.login_customer_guid, self.login_customer_cookie, auth = self.api_login.login()  
+
+        self.login_customer_guid, self.login_customer_cookie, auth = self.api_login.login()
         Logger.logger.info(f"Customer guid  {self.login_customer_guid} authenticated successfully")
         if login_method == LOGIN_METHOD_FRONTEGG_USERNAME:
             self.auth = {"Cookie" : "auth=" + auth}
@@ -232,7 +232,7 @@ class ControlPanelAPI(object):
 
         self.selected_tenant_id = self.login_customer_guid
         self.selected_tenant_cookie = self.login_customer_cookie
-        
+
         # set access keys
         access_keys_response = self.get_access_keys()
         access_keys = access_keys_response.json()
@@ -255,26 +255,26 @@ class ControlPanelAPI(object):
         """
         return self.selected_tenant_id
 
-    
+
     def get_tenant_cookie(self, tenant_id: str) -> requests.Response:
         """
         Get the cookie of the given tenant.
         """
         if tenant_id == self.selected_tenant_id:
             return self.selected_tenant_cookie
-        
+
         return self.api_login.getCookie(self.server, self.api_login.frontEgg_auth, tenant_id)
 
     def select_tenant(self, tenant_id: str):
-        """ 
-        Configure tenant_id as the current selected tenant. 
+        """
+        Configure tenant_id as the current selected tenant.
         Once selected, all APIs will be executed on this tenant except for the admin APIs.
         """
         if self.get_selected_tenant() != tenant_id:
             self.selected_tenant_cookie = self.get_tenant_cookie(tenant_id)
             self.selected_tenant_id = tenant_id
             Logger.logger.info(f"Selected tenant: {tenant_id}")
-    
+
     def get_tenant_details(self, tenant_id=None) -> requests.Response:
         """
         Get tenant details for tenant_id. If None, get details of the selected tenant.
@@ -289,7 +289,7 @@ class ControlPanelAPI(object):
             raise Exception(f"Requested {tenant_id} details, got {res.text['guid']}. Make sure to first select the customer using select_tenant()")
 
         return res
-    
+
     def create_tenant(self, tenantName: str):
         """
         Creates a new tenant with name tenantName.
@@ -302,7 +302,7 @@ class ControlPanelAPI(object):
 
         if self.login_method != LOGIN_METHOD_FRONTEGG_SECRET:
             raise Exception(f"create_tenant() is only supported for {LOGIN_METHOD_FRONTEGG_SECRET} login_method")
-  
+
 
         res = self.post(API_TENANT_CREATE, json={"customerName": tenantName, "userId": self.api_login.get_frontEgg_user_id()}, cookies=None, headers={"Authorization": f"Bearer {self.api_login.get_frontEgg_auth_user_id()}"})
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
@@ -310,7 +310,7 @@ class ControlPanelAPI(object):
         assert json_response.get("tenantId", {}) != {}, f"tenantId is empty: {res.text}"
         assert json_response.get("agentAccessKey", {}).get("value", {}) != {}, f"agentAccessKey['value'] is empty: {res.text}"
         return json_response["tenantId"], json_response["agentAccessKey"]["value"]
-    
+
     def delete_tenant(self, tenant_id) -> requests.Response:
         """
         Deletes a tenant. .
@@ -318,7 +318,7 @@ class ControlPanelAPI(object):
         params:
             tenant_id: The id of the tenant to delete.
 
-        returns: 
+        returns:
             The response of the request.
 
         Exceptions:
@@ -333,7 +333,7 @@ class ControlPanelAPI(object):
         assert res.status_code == client.OK, f"delete tenant failed {tenant_id}: {res.status_code} {res.text}"
         return res
 
-    
+
     def get_access_keys(self) -> requests.Response:
         """
             Returns the access keys of the selected tenant.
@@ -341,14 +341,14 @@ class ControlPanelAPI(object):
         res = self.get(API_ACCESS_KEYS)
         assert res.status_code == client.OK, f"failed to get access keys for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
-    
+
     ## ************** Stripe Backend APIs ************** ##
 
     def stripe_billing_portal(self) -> requests.Response:
         """
             Creates a stripe billing portal url for the selected tenant.
         """
-        res = self.get(API_STRIPE_BILLING_PORTAL) 
+        res = self.get(API_STRIPE_BILLING_PORTAL)
         assert res.status_code == client.CREATED, f"stripe billing portal failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
 
@@ -359,7 +359,7 @@ class ControlPanelAPI(object):
         res = self.post(API_STRIPE_CHECKOUT, json={"priceID": priceID, "quantity": qauntity},)
         assert res.status_code == client.CREATED, f"stripe checkout failed to create url for tenant_id {self.selected_tenant_id}. Response: {res.text}"
         return res
-    
+
     def get_stripe_plans(self) -> requests.Response:
         """
             Get all stripe plans.
@@ -368,7 +368,7 @@ class ControlPanelAPI(object):
         assert res.status_code == client.OK, f"get_stripe_plans Failed. expected status code 200, found {res.status_code}. response: {res.text} Make sure you have a valid stripe secret key and priceIdsMap is well configured"
         return res
 
-    
+
     def create_subscription(self, priceID: str, stripeCustomerID: str, quantity: int, tenantID: str)-> requests.Response:
         """
             Creates a subscription for a tenant.
@@ -391,7 +391,7 @@ class ControlPanelAPI(object):
         )
         assert res.status_code == client.OK, f"stripe create subscription failed with priceID: {priceID}, response.text: {res.text}"
         return res
-    
+
     def cancel_subscription(self, tenantID: str)-> dict:
         """
             Cancels a subscription for a tenant.
@@ -407,7 +407,7 @@ class ControlPanelAPI(object):
         )
         assert res.status_code == client.OK, f"cancel subscription failed for tenantID: {tenantID}"
         return res
-    
+
     def renew_subscription(self, tenantID: str)-> dict:
         """
             Renews a subscription for a tenant.
@@ -420,10 +420,10 @@ class ControlPanelAPI(object):
             json={
                 "tenantID": tenantID
             },
-        )        
+        )
         assert res.status_code == client.OK, f"renew subscription failed for tenantID: {tenantID}"
         return res
-    
+
     def get_customer_guid(self):
         return self.selected_tenant_id
 
@@ -435,7 +435,7 @@ class ControlPanelAPI(object):
 
     def get_access_key(self):
         return self.access_key
-    
+
     def cleanup(self, namespace=str(), ca_cluster=str()):
         Logger.logger.info("ControlPanelAPI Clean Up")
 
@@ -815,7 +815,7 @@ class ControlPanelAPI(object):
                 % (self.customer, r.status_code, r.text)
             )
         result_length = r.json()['total']['value']
-        
+
         result = []
         for i in range(1, math.ceil(result_length / page_size)+1):
             params['pageNum'] = i
@@ -826,13 +826,13 @@ class ControlPanelAPI(object):
                     % (self.customer, r.status_code, r.text)
                 )
             result.extend(r.json()['response'])
-            
+
         return result
 
     def get_posture_frameworks(self, report_guid: str, framework_name: str = ""):
         params = {"pageNum": 1, "pageSize": 1000, "orderBy": "timestamp:desc", "innerFilters": [{
             "reportGUID": report_guid, "name": framework_name}]}
-        
+
         if framework_name in statics.SECURITY_FRAMEWORKS:
             params["innerFilters"][0]["typeTags"] = statics.SECURITY_FRAMEWORK_TYPETAG
 
@@ -872,7 +872,7 @@ class ControlPanelAPI(object):
         return r.json()['response']
 
     def get_top_controls_results(self, cluster_name):
-        # TODO: change to "topControls" when it will be deprecated 
+        # TODO: change to "topControls" when it will be deprecated
         r = self.post(API_POSTURE_TOPFAILEDCONTROLS, params={"customerGUID": self.selected_tenant_id, "cluster": cluster_name},
                       json={"pageNum": 1, "pageSize": 5, "innerFilters": [{
                           }]})
@@ -887,12 +887,12 @@ class ControlPanelAPI(object):
 
 
     def get_posture_resources(self, framework_name: str, report_guid: str, resource_name: str = "", related_exceptions: str = "false", namespace=None, order_by=None):
-        
+
         if order_by is None:
             order_by = "timestamp:desc"
-        
-        body={"pageNum": 1, 
-              "pageSize": 150, 
+
+        body={"pageNum": 1,
+              "pageSize": 150,
              "orderBy": order_by,
               "innerFilters": [{
                           "frameworkName": framework_name, "reportGUID": report_guid,
@@ -901,7 +901,7 @@ class ControlPanelAPI(object):
             body["innerFilters"][0]["designators.attributes.namespace"] = namespace
         r = self.post(API_POSTURE_RESOURCES, params={"customerGUID": self.customer_guid, "relatedExceptions": related_exceptions, "ignoreRulesSummary": related_exceptions},
                       json=body)
-        
+
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of posture resources "%s" (code: %d, message: %s)' % (
@@ -929,7 +929,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: results of posture resources by control is empty')
         return r.json()['response']
 
-    
+
     def get_image_scan_stats(self):
         r = self.get(API_IMAGE_SCAN_STATS, params={"customerGUID": self.selected_tenant_id, "includeLastReport": False})
         if not 200 <= r.status_code < 300:
@@ -1233,11 +1233,11 @@ class ControlPanelAPI(object):
                 raise Exception(
                     'Error accessing layers summery. Request: get scan layer summery "%s" (code: %d, message: %s). Url: "%s" ContainersScanID "%s" ' % (
                         self.customer, r.status_code, r.text, self.server + API_REGISTRY_SCANRESULTSLAYERSUMMARY, container_scan_id))
-        
+
         Logger.logger.info(
             'layers of container scan id : {} response {}'.format(container_scan_id, r.json()))
         return r.json()
-    
+
     def get_unique_values_for_field_scan_summary(self, since_time, field, customer_guid):
         params = {"customerGUID": customer_guid}
         body = {
@@ -1253,9 +1253,9 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        
+
         return r
-        
+
     def get_summary_with_inner_filters(self, since_time, filter, customer_guid):
         params = {"customerGUID": customer_guid}
         body = {
@@ -1273,9 +1273,9 @@ class ControlPanelAPI(object):
     def get_scan_results_details(self, since_time: str, containers_scan_id: str, expected_results, total_cve):
         params = {"customerGUID": self.selected_tenant_id, "ignoreRulesSummary": "true", "relatedExceptions": "true"}
         page_size = 100
-        body = {"pageNum": 1, 
+        body = {"pageNum": 1,
                 "orderBy": "timestamp:desc,name:desc",
-                "pageSize": page_size, 
+                "pageSize": page_size,
                 "since": since_time,
                 "innerFilters": [{"containersScanID": containers_scan_id}]}
         result_length = self.get_length_of_post_response(url=API_VULNERABILITY_SCANRESULTSDETAILS, params=params, body=body)
@@ -1297,7 +1297,7 @@ class ControlPanelAPI(object):
                 'container scan id : {} len(result):{}, len(expected_results):{} '.format(containers_scan_id,
                                                                                           result,
                                                                                           total_cve))
-    
+
         if len(result) < total_cve:
             raise Exception(
                 f'wait for aggregation to end in the backend, number of CVEs is lower than expected. ' \
@@ -1338,9 +1338,9 @@ class ControlPanelAPI(object):
 
         message = {"innerFilters": [{'cluster': cluster_name, 'namespace': namespace}]}
         if severity is not None:
-            message['innerFilters'][0]['severitiesStats.severity'] = severity  
+            message['innerFilters'][0]['severitiesStats.severity'] = severity
         if fixable:
-            message['innerFilters'][0]['severitiesStats.fixedTotal'] = "1|greater"     
+            message['innerFilters'][0]['severitiesStats.fixedTotal'] = "1|greater"
         self.ws_send(ws, json.dumps(message))
         result = self.ws_extract_receive(ws)
 
@@ -1427,7 +1427,7 @@ class ControlPanelAPI(object):
     def create_registry_scan_job_request_deprecated(self, cluster_name, registry_name: str, schedule_string: str = ''):
         params = {"customerGUID": self.selected_tenant_id}
         body = []
-       
+
         body.append({"clusterName": cluster_name, "registryName": registry_name,
                              "cronTabSchedule": schedule_string})
 
@@ -1439,7 +1439,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def create_registry_scan_job_request(self, cluster_name, registry_name: str,    auth_method: dict, schedule_string: str, registry_type: str, 
+    def create_registry_scan_job_request(self, cluster_name, registry_name: str,    auth_method: dict, schedule_string: str, registry_type: str,
     excluded_repositories: list = []):
         return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,registry_name= registry_name, excluded_repositories= excluded_repositories, registry_type=registry_type, auth_method=auth_method, schedule_string=schedule_string)
 
@@ -1475,7 +1475,7 @@ class ControlPanelAPI(object):
                    command, self.customer, r.status_code, r.text))
         return r
 
-            
+
 
 
     def get_vuln_scan_cronjob_list(self, cluster_name: str, expected_cjs):
@@ -1514,7 +1514,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjob_list = r.json()
         registry_scan_cronjob_list = [cj for cj in cronjob_list if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
-        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs, cluster_name=cluster_name)    
+        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs, cluster_name=cluster_name)
         return registry_scan_cronjob_list
 
 
@@ -1527,7 +1527,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjob_list = r.json()
         registry_scan_cronjob_list = [cj for cj in cronjob_list if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
-        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs, cluster_name=cluster_name)    
+        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs, cluster_name=cluster_name)
         return registry_scan_cronjob_list
 
 
@@ -1544,8 +1544,8 @@ class ControlPanelAPI(object):
                     assert expected.spec.schedule == actual[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED], f'cronjob schedule is not as expected'
                     assert actual[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-registry-scan"), f'cronjob name is not as expected'
                     assert actual[statics.CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_FIELD] == expected.spec.job_template.spec.template.metadata.annotations[statics.CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_ANNOTATION_FIELD], f'registry name is not as expected'
-                
-        
+
+
 
     def get_vuln_scan_cronjob(self, cj_name: str, expect_to_results: bool = True):
         params = {"customerGUID": self.selected_tenant_id}
@@ -1621,7 +1621,7 @@ class ControlPanelAPI(object):
                     statics.UPDATE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
         return r
 
-        
+
 
     def update_registry_scan_cronjob_deprecated(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
@@ -1642,7 +1642,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete vuln scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def delete_registry_scan_cronjob(self, cj):
         params = {"customerGUID": self.selected_tenant_id}
         body = [
@@ -1694,7 +1694,7 @@ class ControlPanelAPI(object):
             if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name and "ks-scheduled-scan-{}".format(framework_name.lower()) in cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED]:
                 return True
         return False
-    
+
     def is__backend_returning_only_ks_cronjob(self, cluster_name: str):
         params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_POSTURE_SCAN, params=params)
@@ -1742,13 +1742,13 @@ class ControlPanelAPI(object):
     def get_component(self, component):
         return Component(self, component.guid, component.solution_guid)
 
-    
+
     @deco_cookie
     def post(self, url, **args):
         if not url.startswith("http://") and not url.startswith("https://"):
             url = self.server + url
         return requests.post(url, **args)
-    
+
     @deco_cookie
     def get(self, url, **args):
         if not url.startswith("http://") and not url.startswith("https://"):
@@ -1799,7 +1799,7 @@ class ControlPanelAPI(object):
             r = ws.recv()
             if r:
                 r = json.loads(r)
-                Logger.logger.debug("request chunk: {}".format(r))                
+                Logger.logger.debug("request chunk: {}".format(r))
                 result.extend(r['response'])
                 nbmsg += 1
         assert nbmsg == totalChunks, 'Excepted %d chunks, receive %d' % (totalChunks, nbmsg)
@@ -1826,11 +1826,11 @@ class ControlPanelAPI(object):
                 if 200 <= r.status_code < 300:
                     return r.json()
                 time.sleep(5)
-                
+
         raise Exception(
             'Error accessing dashboard. Request: get job report status "%s" (code: %d, message: %s, jobID: "%s")' % (
                             self.customer, r.status_code, r.text, job_id))
-    
+
     def get_repositories_list(self,  job_id):
         params = {"customerGUID": self.selected_tenant_id, "jobID": job_id}
 
@@ -1854,11 +1854,11 @@ class ControlPanelAPI(object):
             {
             "registryProvider": provider,
             "action": "testRegistryConnectivity",
-            "clusterName": cluster_name, 
-            "registryName": registry_name, 
+            "clusterName": cluster_name,
+            "registryName": registry_name,
             "cronTabSchedule": "",
             "registryType": "public",
-            "depth": 3, 
+            "depth": 3,
             "include":[],
             "exclude": excluded_repositories,
             "kind":"",
@@ -1893,23 +1893,23 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-    
-    def get_notifications_unsubscribed(self) -> requests.Response:       
+
+    def get_notifications_unsubscribed(self) -> requests.Response:
         res = self.get(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie)
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
-   
-    def add_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:       
+
+    def add_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:
         res = self.post(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie, json=notifications_identifiers)
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get scan notifications unsubscribe "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
-    def remove_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:       
+    def remove_notifications_unsubscribed(self, notifications_identifiers) -> requests.Response:
         res = self.delete(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie, json=notifications_identifiers)
         if not 200 <= res.status_code < 300:
             raise Exception(
@@ -2008,7 +2008,7 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        
+
         response = json.loads(r.text)
         workloads_list = response.get("response", None)
 
@@ -2033,12 +2033,12 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: get network policies generate "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        
+
         response = json.loads(r.text)
 
         # verify there is a response
         assert len(response) > 0, "network policies generate response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
-        
+
         np = response[0].get("networkPolicies", None).get("kubernetes", None).get("new", None)
         # verify there is a 'new' network policy
         assert np is not None, "no 'new' NetworkPolicy '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
@@ -2077,12 +2077,12 @@ class ControlPanelAPI(object):
         assert response['total']['value'] == 0, f"attack-chains not fixed yet"
 
         return True
-    
+
     def get_kubernetes_resources(self, cluster_name: str, namespace:str=None, with_resource: bool=False):
         params = {"customerGUID": self.selected_tenant_id}
         if with_resource:
             params["enrichObjects"] = "true"
-         
+
         payload = {
             "innerFilters": [{"cluster": cluster_name}],
         }
@@ -2099,17 +2099,17 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: POST kubernetes resources generate "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        
+
         response = json.loads(r.text)
         be_resources = response.get("response", None)
         assert be_resources is not None, "kubernetes resources response is empty '%s' (code: %d, message: %s)" % (self.customer, r.status_code, r.text)
 
         return be_resources
-    
 
-    def post_details_request(self,url, body: dict):            
+
+    def post_details_request(self,url, body: dict):
         r = self.post(url + '/details', params={"customerGUID": self.customer_guid},
-                      json=body)        
+                      json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: results of vuln workload details "%s" (code: %d, message: %s)' % (
@@ -2117,11 +2117,11 @@ class ControlPanelAPI(object):
         j = r.json()
         if not j:
             raise Exception('Request: results of vuln workload details is empty body: %s' % body)
-        return j   
-    
+        return j
+
     def post_list_request(self, url, body: dict, expected_results: int = 0):
         r = self.post(url + "/list", params={"customerGUID": self.customer_guid},
-                      json=body)        
+                      json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
@@ -2133,28 +2133,39 @@ class ControlPanelAPI(object):
             raise Exception('Request: results is empty')
         if  len(j['response']) < expected_results:
              raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
-        return j['response']     
-    
-    def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0):   
+        return j['response']
+
+    def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0):
         return self.post_list_request(API_VULNERABILITY_V2_WORKLOAD, body, expected_results)
-    
-    def get_vuln_v2_workload_details(self, body: dict):   
-        return self.post_details_request(API_VULNERABILITY_V2_WORKLOAD, body)    
-    
-    def get_vulns_v2(self, body: dict, expected_results: int = 0):            
+
+    def get_vuln_v2_workload_details(self, body: dict):
+        return self.post_details_request(API_VULNERABILITY_V2_WORKLOAD, body)
+
+    def get_vulns_v2(self, body: dict, expected_results: int = 0):
         return self.post_list_request(API_VULNERABILITY_V2, body, expected_results)
-    
+
     def get_vuln_v2_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2, body)
-    
-    def get_vuln_v2_images(self, body: dict, expected_results: int = 0):            
+
+    def get_vuln_v2_images(self, body: dict, expected_results: int = 0):
         return self.post_list_request(API_VULNERABILITY_V2_IMAGE, body, expected_results)
-    
-    def get_vuln_v2_components(self, body: dict, expected_results: int = 0):            
+
+    def get_vuln_v2_components(self, body: dict, expected_results: int = 0):
         return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results)
-        
-  
-    
+
+    def get_posture_resources_highlights(self, body: dict):
+        r = self.post(API_POSTURE_RESOURCES + '/highlights',
+                      params={"smEnabled": "true", "customerGUID": self.selected_tenant_id},
+                      json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing smart remediation. Request: results of posture resources highlights "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        j = r.json()
+        if not j:
+            raise Exception('Request: results of posture resources highlights is empty body: %s' % body)
+        return j
+
 class Solution(object):
     """docstring for Solution"""
 
