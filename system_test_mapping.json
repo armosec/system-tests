@@ -1026,6 +1026,8 @@
             "Backend"
         ],
         "target_repositories": [
+            "cadashboardbe",
+            "event-ingester-service",
             "users-notification-service",
             "config-service"
         ],

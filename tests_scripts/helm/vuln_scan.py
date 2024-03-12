@@ -955,13 +955,15 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         Logger.logger.info('5. get workloads images and compare with expected')
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
         image = image[0]
-        image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']","root['digest']","root['repository']","root['registry']"}
+        image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']", "root['digest']",
+                                "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']"}
         if updateExpected:
             TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
       
         Logger.logger.info('6. get workloads CVEs and match with workload summary')
         body['innerFilters'][0]['severity'] = "Critical"
+        body['innerFilters'][0]['riskFactors'] = "External facing"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["criticalCount"])
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Critical"]:
