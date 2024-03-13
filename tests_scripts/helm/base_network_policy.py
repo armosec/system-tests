@@ -75,68 +75,53 @@ class BaseNetworkPolicy(BaseHelm):
         param actual_entries: actual network neighbor entries        
         """
 
-        assert len(expected_entries) == len(actual_entries), f"expected_entries length is not equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
-
-        verified_entries = []
+        # we might have multiple actual entries, but we should have at least the same amount of expected entries
+        assert len(expected_entries) <= len(actual_entries), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
 
         # we can't use the identifier for the entry, since IP addresses may change. Instead, we check for all fields that are not IP addresses, and verify that they are equal. If they are all equal, we count this entry as verified.
         for expected_entry in expected_entries:
-            for  actual_entry in actual_entries:
-                    if expected_entry["dns"] != actual_entry["dns"]:
-                        continue
-                    
-                    if expected_entry["ipAddress"] != "":
-                        if actual_entry["ipAddress"] == "":
-                            continue
-                    
-                    if expected_entry["type"] != actual_entry["type"]:
-                        continue
+            # if expected entry contains dns, that means we explicitly expect a DNS entry,
+            # we don't care about the IP address
+            if expected_entry["dns"] != "": 
+                actual_entry = next((actual_entry for actual_entry in actual_entries if expected_entry["dns"] == actual_entry["dns"]), None)
+                assert actual_entry, f"expected a network neighbor entry with DNS: {expected_entry['dns']} not found in actual entries {actual_entries}"
+                assert expected_entry["type"] == actual_entry["type"], f"expected type: {expected_entry['type']} not found in actual type {actual_entry['type']}"
 
-                    is_labels = True
-                    if expected_entry["namespaceSelector"] is not None:
-                        if actual_entry["namespaceSelector"] is not None:
-                            for key, label  in expected_entry["namespaceSelector"]["matchLabels"].items():
-                                if actual_entry["namespaceSelector"]["matchLabels"][key] != label:
-                                    is_labels = False
-                                    break
-                        else:
-                            is_labels = False
-                    
-                    if not is_labels:
-                        continue
-                    
-                    is_labels = True
-                    if expected_entry["podSelector"] is not None:
-                        for key, label  in expected_entry["podSelector"]["matchLabels"].items():
-                            if key not in actual_entry["podSelector"]["matchLabels"]:
-                                is_labels = False
-                                break
-                            if actual_entry["podSelector"]["matchLabels"][key] != label:
-                                is_labels = False
-                                break
-                    
-                    if not is_labels:
-                        continue
+                # check ports & protocols
+                expected_ports = set((port['port'], port['protocol']) for port in expected_entry["ports"])
+                actual_ports = set((port['port'], port['protocol']) for port in actual_entry["ports"])
+                assert expected_ports == actual_ports, f"expected ports: {expected_ports} not found in actual ports {actual_ports}"
+                
+            # expected entry does not contain dns, but contains IP address, that means we expect an IP address entry explicitly
+            elif expected_entry["ipAddress"] != "":
+                actual_entry = next((actual_entry for actual_entry in actual_entries if expected_entry["ipAddress"] == actual_entry["ipAddress"]), None)
+                assert actual_entry, f"expected a network neighbor entry with IP Address: {expected_entry['ipAddress']} not found in actual entries {actual_entries}"
 
-                    verified_ports = 0
-                    for expected_port in expected_entry["ports"]:
-                        for actual_port in actual_entry["ports"]:
-                            if expected_port["name"] != actual_port["name"]:
-                                continue
-                            if expected_port["protocol"] != actual_port["protocol"]:
-                                continue
-                            if expected_port["port"] != actual_port["port"]:
-                                continue
-                            verified_ports += 1
-                            break
+                assert expected_entry["type"] == actual_entry["type"], f"expected type: {expected_entry['type']} not found in actual type {actual_entry['type']}"
 
-                    if verified_ports != len(expected_entry["ports"]):
-                        continue
+                # check ports & protocols
+                expected_ports = set((port['port'], port['protocol']) for port in expected_entry["ports"])
+                actual_ports = set((port['port'], port['protocol']) for port in actual_entry["ports"])
+                assert expected_ports == actual_ports, f"expected ports: {expected_ports} not found in actual ports {actual_ports}"
 
-                    verified_entries.append(expected_entry)
-                    break
-    
-        assert len(verified_entries) == len(expected_entries), f"in validate_network_neighbor_entry: verified_entries length is not equal to expected_entries length, actual length: {len(verified_entries)}, expected length: {len(expected_entries)}, actual results: {verified_entries}, expected results: {expected_entries}"
+            # third case, expected entry does not contain dns nor IP address, that means we expect a network neighbor entry with matchLabels
+            elif expected_entry["namespaceSelector"] is not None or expected_entry["podSelector"] is not None:
+                expected_namespace_match_labels = expected_entry.get("namespaceSelector", {}).get("matchLabels", {})
+                expected_pod_selector_match_labels = expected_entry.get("podSelector", {}).get("matchLabels", {})
+
+                # we try to find the actual entry that matches the expected entry match labels
+                actual_entry = next((entry for entry in actual_entries 
+                                     if entry.get("namespaceSelector", {}).get("matchLabels", {}) == expected_namespace_match_labels and 
+                                     entry.get("podSelector", {}).get("matchLabels", {}) == expected_pod_selector_match_labels), None)
+                
+                assert actual_entry, f"expected a network neighbor entry with namespaceSelector: {expected_namespace_match_labels} and podSelector: {expected_pod_selector_match_labels} not found in actual entries {actual_entries}"
+                assert expected_entry["type"] == actual_entry["type"], f"expected type: {expected_entry['type']} not found in actual type {actual_entry['type']}"
+
+                expected_ports = set((port['port'], port['protocol']) for port in expected_entry["ports"])
+                actual_ports = set((port['port'], port['protocol']) for port in actual_entry["ports"])
+                assert expected_ports == actual_ports, f"expected ports: {expected_ports} not found in actual ports {actual_ports}"
+            else:
+                raise ValueError("expected entry is not valid, it should contain either dns, ipAddress or namespaceSelector/podSelector")
 
     def validate_expected_network_neighbors_and_generated_network_policies_lists(self, namespace, expected_network_neighbors_list, expected_generated_network_policy_list):
         """
