@@ -106,8 +106,11 @@ class BaseNetworkPolicy(BaseHelm):
 
             # third case, expected entry does not contain dns nor IP address, that means we expect a network neighbor entry with matchLabels
             elif expected_entry["namespaceSelector"] is not None or expected_entry["podSelector"] is not None:
-                expected_namespace_match_labels = expected_entry.get("namespaceSelector", {}).get("matchLabels", {})
-                expected_pod_selector_match_labels = expected_entry.get("podSelector", {}).get("matchLabels", {})
+                expected_namespace_selector = expected_entry.get("namespaceSelector", {})
+                expected_namespace_match_labels = expected_namespace_selector.get("matchLabels", {}) if expected_namespace_selector else {}
+
+                expected_pod_selector = expected_entry.get("podSelector", {})
+                expected_pod_selector_match_labels = expected_pod_selector.get("matchLabels", {}) if expected_pod_selector else {}
 
                 # we try to find the actual entry that matches the expected entry match labels
                 actual_entry = None
