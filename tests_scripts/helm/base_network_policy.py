@@ -114,8 +114,12 @@ class BaseNetworkPolicy(BaseHelm):
                 for entry in actual_entries:
                     if entry is None:
                         continue
-                    actual_namespace_match_labels = entry.get("namespaceSelector", {}).get("matchLabels", {})
-                    actual_pod_selector_match_labels = entry.get("podSelector", {}).get("matchLabels", {})
+                    actual_namespace_selector = entry.get("namespaceSelector", {})
+                    actual_pod_selector = entry.get("podSelector", {})
+    
+                    actual_namespace_match_labels = actual_namespace_selector.get("matchLabels", {}) if actual_namespace_selector else {}
+                    actual_pod_selector_match_labels = actual_pod_selector.get("matchLabels", {}) if actual_pod_selector else {}
+
                     if expected_namespace_match_labels == actual_namespace_match_labels and expected_pod_selector_match_labels == actual_pod_selector_match_labels:
                         actual_entry = entry
                         break
