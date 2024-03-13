@@ -112,6 +112,8 @@ class BaseNetworkPolicy(BaseHelm):
                 # we try to find the actual entry that matches the expected entry match labels
                 actual_entry = None
                 for entry in actual_entries:
+                    if entry is None:
+                        continue
                     actual_namespace_match_labels = entry.get("namespaceSelector", {}).get("matchLabels", {})
                     actual_pod_selector_match_labels = entry.get("podSelector", {}).get("matchLabels", {})
                     if expected_namespace_match_labels == actual_namespace_match_labels and expected_pod_selector_match_labels == actual_pod_selector_match_labels:
