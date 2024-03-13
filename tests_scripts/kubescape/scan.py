@@ -219,7 +219,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
-        return statics.SUCCESS, ""
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
         # 1. Apply namespace "system-test" and Deployment "apache" to cluster
