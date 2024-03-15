@@ -276,10 +276,10 @@ class ScanWithExceptionToBackend(BaseKubescape):
                                         framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
         Logger.logger.info("Stage 2.3: Verify download of controls and resources")
-        # self.get_posture_controls_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
-        #                               report_guid=first_report_guid)
-        # self.get_posture_resources_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
-        #                                report_guid=first_report_guid)
+        self.get_posture_controls_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
+                                      report_guid=first_report_guid)
+        self.get_posture_resources_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
+                                       report_guid=first_report_guid)
 
         Logger.logger.info("Stage 3: Add exception to backend and test with backend")
         Logger.logger.info("Stage 3.1: Add exception to backend")
