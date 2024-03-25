@@ -319,7 +319,7 @@ class BaseK8S(BaseDockerizeTest):
 
     def apply_yaml_file(self, yaml_file, namespace: str, path: str = statics.DEFAULT_DEPLOYMENT_PATH,
                         unique_name: bool = False, name: str = None, wlid: str = None, auto_attach: bool = False,
-                        auto_protect: bool = False, **kwargs):
+                        auto_protect: bool = False, patch: bool = False, **kwargs):
         """
         currently supports yaml with *one* workload
         for applying more than one workload the yaml_file should be a list of files
@@ -349,7 +349,10 @@ class BaseK8S(BaseDockerizeTest):
                                                                                 statics.AUTO_ATTACH_SECRET_VALUE})
 
         self.update_workload_metadata_env(workload=workload, env=self.env)
-        self.apply_workload(workload=workload, namespace=namespace, **kwargs)
+        if patch:
+            self.kubernetes_obj.patch_workload(application=workload, namespace=namespace, kind=workload["kind"], name=workload["metadata"]["name"])
+        else:
+            self.apply_workload(workload=workload, namespace=namespace, **kwargs)
         return workload
 
     def apply_workload(self, workload, namespace: str, wait: int = 0):

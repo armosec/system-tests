@@ -2152,9 +2152,20 @@ class ControlPanelAPI(object):
     
     def get_vuln_v2_components(self, body: dict, expected_results: int = 0):            
         return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results)
-        
-  
-    
+
+    def get_posture_resources_highlights(self, body: dict):
+        r = self.post(API_POSTURE_RESOURCES + '/highlights',
+                      params={"smEnabled": "true", "customerGUID": self.customer_guid},
+                      json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing smart remediation. Request: results of posture resources highlights "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        j = r.json()
+        if not j:
+            raise Exception('Request: results of posture resources highlights is empty body: %s' % body)
+        return j
+
 class Solution(object):
     """docstring for Solution"""
 
