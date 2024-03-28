@@ -215,7 +215,7 @@ class ControlPanelAPI(object):
 
     def login(self, login_method):
         if login_method == LOGIN_METHOD_KEYCLOAK:
-            self.api_login = KeycloakAPILogin(username=self.username, password=self.password, customer=self.customer, server=self.server, verify=self.verify)
+            self.api_login = KeycloakAPILogin(username=self.username, password=self.password, customer=self.customer, server=self.server, referer=self.auth_url, verify=self.verify)
         elif login_method == LOGIN_METHOD_FRONTEGG_SECRET:
             self.api_login = FrontEggSecretAPILogin(auth_url=self.auth_url, base_url=self.server, client_id=self.client_id, secret_key=self.secret_key)
         elif login_method == LOGIN_METHOD_FRONTEGG_USERNAME:

@@ -95,10 +95,11 @@ class FrontEggSecretAPILogin(APILogin):
 
 class KeycloakAPILogin(APILogin):
 
-    def __init__(self, server, customer, username, password, verify=True):
+    def __init__(self, server, referer, customer, username, password, verify=True):
         super().__init__()
         self.customer = customer
         self.server = server
+        self.referer = referer
         self.username = username
         self.password = password
         self.verify = verify
@@ -114,7 +115,7 @@ class KeycloakAPILogin(APILogin):
         """
         # Start session with portal
         url = '{}{}'.format(self.server, '/open_id_url')
-        response_from_portal = requests.get(url, headers={'Referer': self.server.replace('dashbe', 'dash') + '/login'},
+        response_from_portal = requests.get(url, headers={'Referer': self.referer.replace('dashbe', 'dash') + '/login'},
                                             allow_redirects=False)
         assert response_from_portal.status_code == 200, 'Received status code {}\nfrom url: {}\nmessage: {}'.format(
             response_from_portal.status_code, url, response_from_portal.text)
@@ -122,34 +123,38 @@ class KeycloakAPILogin(APILogin):
         url = response_from_portal.json()['openIDURL']
 
         # Get url to the keycloak
-        openid_login_url = requests.get(url, headers={'Referer': self.server.replace('dashbe', 'dash') + '/login'},
-                                        allow_redirects=False)
+        openid_login_url = requests.get(url, headers={'Referer': self.referer.replace('dashbe', 'dash') + '/login'},
+                                        allow_redirects=True)
         assert openid_login_url.status_code == 200, 'Received status code {}\nfrom url: {}\nmessage: {}'.format(
             openid_login_url.status_code, url, openid_login_url.text)
 
         # We received a html page so extract keycloak url out of it
         # parsed_html = BeautifulSoup(openid_login_url.text, features="html5lib")
         # url = parsed_html.body.find('form', attrs={'id': "kc-form-login"})['action']
-        url = findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ])+', openid_login_url.text)[-1].replace('amp;',
-                                                                                                                '')
+        url = openid_login_url.url
 
         # login to keycloak. we use the cookies we received from portal
         keycloak_session = requests.post(url, cookies=openid_login_url.cookies,
-                                         data={'username': self.username, 'password': self.password}, verify=self.verify,
+                                         data={'login': self.username, 'password': self.password}, verify=self.verify,
                                          timeout=10, allow_redirects=False)
 
         if keycloak_session.status_code == 200 and keycloak_session.text.count('Invalid username or password'):
             raise Exception('Invalid username or password')
 
-        assert keycloak_session.status_code == 302, 'Received status code {}\nfrom url: {}\nmessage: {}'.format(
+        assert keycloak_session.status_code == 303, 'Received status code {}\nfrom url: {}\nmessage: {}'.format(
             keycloak_session.status_code, url, keycloak_session.text)
+
+        url = keycloak_session.headers['Location']
+
+        r = requests.get(
+            url, headers={'Referer': self.referer.replace('dashbe', 'dash') + '/login'})
+        assert r.status_code == 200, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
 
         url = '{}/{}?{}'.format(self.server, 'open_id_callback',
                                 keycloak_session.headers['Location'].split('?')[1])
 
         r = requests.get(
-            url, headers={'Referer': self.server.replace('dashbe', 'dash') + '/login'})
-        assert r.status_code == 200, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+            url, headers={'Referer': self.referer.replace('dashbe', 'dash') + '/login'})
 
         auth = r.text
 

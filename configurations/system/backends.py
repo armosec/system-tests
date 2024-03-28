@@ -113,6 +113,15 @@ def set_backends():
                             login_method=LOGIN_METHOD_FRONTEGG_USERNAME,
                             customer_guid='SOME_CUSTOMER_GUID'))
 
+    # on-prem
+    backends.append(Backend(name='onprem',
+                            dashboard='https://orange-api.cademo.cyberarmorsoft.com',
+                            api_url='orange-api.cademo.cyberarmorsoft.com',
+                            auth_url='https://orange.cademo.cyberarmorsoft.com',
+                            login_method=LOGIN_METHOD_KEYCLOAK,
+                            tls_verify=False))
+
+
     return {backend.get_name(): backend for backend in backends}
 
 
