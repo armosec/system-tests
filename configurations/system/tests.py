@@ -1,4 +1,5 @@
 from configurations.system.tests_cases.network_policy_tests import NetworkPolicyTests
+from configurations.system.tests_cases.smart_remediation_tests import SmartRemediationTests
 from configurations.system.tests_cases.synchronizer_tests import SynchronizerTests
 from systest_utils import TestUtil
 
@@ -22,6 +23,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(RelevantVulnerabilityScanningTests))
     tests.extend(TestUtil.get_class_methods(NetworkPolicyTests))
     tests.extend(TestUtil.get_class_methods(NotificationSTests))
+    tests.extend(TestUtil.get_class_methods(SmartRemediationTests))
     tests.extend(TestUtil.get_class_methods(SynchronizerTests))
     return tests
 
@@ -44,6 +46,8 @@ def get_test(test_name):
         return NetworkPolicyTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(NotificationSTests):
         return NotificationSTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(SmartRemediationTests):
+        return SmartRemediationTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(SynchronizerTests):
         return SynchronizerTests().__getattribute__(test_name)()
 

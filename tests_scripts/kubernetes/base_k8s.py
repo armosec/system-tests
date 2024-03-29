@@ -319,7 +319,7 @@ class BaseK8S(BaseDockerizeTest):
 
     def apply_yaml_file(self, yaml_file, namespace: str, path: str = statics.DEFAULT_DEPLOYMENT_PATH,
                         unique_name: bool = False, name: str = None, wlid: str = None, auto_attach: bool = False,
-                        auto_protect: bool = False, **kwargs):
+                        auto_protect: bool = False, replace: bool = False, **kwargs):
         """
         currently supports yaml with *one* workload
         for applying more than one workload the yaml_file should be a list of files
@@ -349,6 +349,9 @@ class BaseK8S(BaseDockerizeTest):
                                                                                 statics.AUTO_ATTACH_SECRET_VALUE})
 
         self.update_workload_metadata_env(workload=workload, env=self.env)
+        if replace:
+            # cannot use patch because of https://github.com/kubernetes-client/python/issues/1359
+            self.kubernetes_obj.delete_workload(application=workload, namespace=namespace)
         self.apply_workload(workload=workload, namespace=namespace, **kwargs)
         return workload
 
@@ -1058,7 +1061,7 @@ class BaseK8S(BaseDockerizeTest):
         Logger.logger.info("exiting websocket thread")
 
     def run_exec_cmd(self, pod_name: str, namespace: str, cmd: str, repeat: int = 1):
-        """ 
+        """
         Run a command inside a pod
         :param pod_name: pod name
         :param namespace: namespace
