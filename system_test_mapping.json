@@ -649,8 +649,8 @@
             "helm-chart",
             "node-agent",
             "storage",
-            "cadashboardbe",
-            "event-ingester-service",
+            "cadashboardbe_dummy",
+            "event-ingester-service_dummy",
             "synchronizer"
         ],
         "description": "Checks smart remediation C0046",
