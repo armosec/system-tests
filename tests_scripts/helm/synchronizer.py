@@ -136,8 +136,8 @@ class BaseSynchronizer(BaseHelm):
                 be_resources = self.backend.get_kubernetes_resources(
                     cluster_name=cluster, namespace=namespace
                 )
-                # remove Namespace, Node objects from the list
-                kinds_to_ignore = ["Namespace", "Node"]
+                # remove non-workload objects from the list
+                kinds_to_ignore = ["Namespace", "Node", "ConfigMap"]
                 be_resources = list(filter(lambda x: BaseSynchronizer.backend_resource_kind(x) not in kinds_to_ignore, be_resources))
                 assert (
                     len(be_resources) == 0
@@ -164,8 +164,8 @@ class BaseSynchronizer(BaseHelm):
                     with_resource=True, cluster_name=cluster, namespace=namespace
                 )
 
-                # remove Namespace, Node objects from the list
-                kinds_to_ignore = ["Namespace", "Node"]
+                # remove non-workload objects from the list
+                kinds_to_ignore = ["Namespace", "Node", "ConfigMap"]
                 be_resources = list(filter(lambda x: BaseSynchronizer.backend_resource_kind(x) not in kinds_to_ignore, be_resources))
 
                 assert len(be_resources) > 0, "BE kubernetes resources is empty"
