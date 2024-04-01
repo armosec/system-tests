@@ -403,16 +403,10 @@ class BaseKubescape(BaseK8S):
 
         ks_path = os.path.join(self.test_driver.temp_dir, "kubescape")
 
-        # build kubescape (make file) for non-windows machines
-        if platform.system() != "Windows" and os.path.exists(os.path.join(ks_path, "Makefile")):
-            return_code, return_obj = TestUtil.run_command(command_args=["make"], cwd=ks_path, timeout=1000)
-            assert not return_code, f"Failed to build kubescape (make) from branch {branch} : {return_obj.stderr}"
-            shutil.move(os.path.join(ks_path, "kubescape"), kubescape_exec)
-        else:
-            # build kubescape using go build
-            return_code, return_obj = TestUtil.run_command(command_args=["go", "build", "-o", kubescape_exec],
-                                                           cwd=ks_path, timeout=360)
-            assert not return_code, f"Failed to build kubescape (go build) from branch {branch} : {return_obj.stderr}"
+        # build kubescape using go build
+        return_code, return_obj = TestUtil.run_command(command_args=["go", "build", "-o", kubescape_exec],
+                                                        cwd=ks_path, timeout=360)
+        assert not return_code, f"Failed to build kubescape (go build) from branch {branch} : {return_obj.stderr}"
 
         self.kubescape_exec = kubescape_exec
 
