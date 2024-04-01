@@ -240,7 +240,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
 
         Logger.logger.info("Installing kubescape")
         # Logger.logger.info(self.install())
-        self.install()
+        self.install(branch="v3.0.7")
 
         Logger.logger.info("Delete all exception from backend")
         self.backend.delete_all_posture_exceptions(cluster_name=self.kubernetes_obj.get_cluster_name())
