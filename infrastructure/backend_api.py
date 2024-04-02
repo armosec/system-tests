@@ -131,7 +131,10 @@ def deco_cookie(func):
                     kwargs["params"]["customerGUID"] = ControlPanelAPIObj.selected_tenant_id
 
         kwargs['headers'] = kwargs.get("headers", ControlPanelAPIObj.auth)
-        kwargs["timeout"] = kwargs.get("timeout", 21)
+
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = kwargs.get("timeout", 21)
+            
         kwargs["verify"] = kwargs.get("verify", ControlPanelAPIObj.verify)
 
         result = func(*args, **kwargs)
