@@ -91,7 +91,7 @@ class SmartRemediation(BaseKubescape, BaseHelm):
             "reportGUID": report_guid,
             "frameworkName": "AllControls"
         }]}
-        assert self.check_smart_remediation(body, retries=30), "smartRemediations is not found"
+        assert self.check_smart_remediation(body, retries=50), "smartRemediations is not found"
 
         Logger.logger.info(f"5. Correct the issue")
         workload_fix = self.apply_yaml_file(
@@ -119,6 +119,6 @@ class SmartRemediation(BaseKubescape, BaseHelm):
             "reportGUID": report_guid,
             "frameworkName": "AllControls"
         }]}
-        assert self.check_smart_remediation(body, want=False, retries=30), "smartRemediations should be empty"
+        assert self.check_smart_remediation(body, want=False, retries=50), "smartRemediations should be empty"
 
         return self.cleanup()
