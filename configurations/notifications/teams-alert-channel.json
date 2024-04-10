@@ -39,7 +39,7 @@
   "scope": [
     {
       "cluster": "cluster",
-      "namespaces": []
+      "namespaces": ["alerts"]
     }
   ]
 }
