@@ -16,7 +16,7 @@ spec:
         app: http
     spec:
       containers:
-        - image: httpd:2
+        - image: httpd:alpine3.16
           name: http
           env:
             - name: app
