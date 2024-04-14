@@ -55,10 +55,10 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("4. Apply attack chain fix")
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
-        Logger.logger.Info("5. trigger scan after fix")
+        Logger.logger.info("5. trigger scan after fix")
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
-        Logger.logger.Info("6. verify fix")
+        Logger.logger.info("6. verify fix")
         scenarios_manager.verify_fix(verify_atack_chains=True)
         
         Logger.logger.info('attack-chain fixed properly')
