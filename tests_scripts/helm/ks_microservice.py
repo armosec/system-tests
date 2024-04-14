@@ -49,7 +49,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         time.sleep(10)
 
         Logger.logger.info("3. Verify scenario on backend")
-        scenarios_manager.verify_scenario(validate_attack_chains=True)
+        scenarios_manager.verify_scenario(verify_attack_chains=True)
         Logger.logger.info("attack chains detected, applying fix command")
 
         Logger.logger.info("4. Apply attack chain fix")
