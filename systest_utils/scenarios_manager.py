@@ -79,7 +79,7 @@ class ScenarioManager(base_test.BaseTest):
        
 
 
-class AttackChainsScenarioManager(ScenarioManager):
+class AttackChainsScenarioManager(ScenarioManager, base_test.BaseTest):
     """
     AttackChainsScenarioManager is a class that manage
     """
@@ -169,7 +169,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         return True
 
 
-class SecurityRisksScenarioManager(ScenarioManager):
+class SecurityRisksScenarioManager(ScenarioManager, base_test.BaseTest):
 
     def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster):
         super().__init__(test_scenario, backend, cluster, ATTACK_CHAINS_SCENARIOS_PATH)
