@@ -34,9 +34,16 @@ class Incidents(BaseHelm):
     
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
-        cluster, namespace = self.setup()
 
-        Logger.logger.info("1. Install armo helm-chart")
+        cluster, namespace = self.setup()        
+        Logger.logger.info('apply workloads')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
+        Logger.logger.info('workloads are running', wlids)
+
+        Logger.logger.info(". Install armo helm-chart")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.verify_running_pods(
