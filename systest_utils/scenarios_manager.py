@@ -98,7 +98,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=300,
+            timeout=600,
             current_datetime=current_datetime,
             cluster_name=self.cluster
             )
@@ -121,7 +121,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         # cat take more than 15m to get the updated result
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
-            timeout=1000, 
+            timeout=600, 
             cluster_name=self.cluster
             )
 
