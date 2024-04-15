@@ -14,7 +14,7 @@ ATTACK_CHAINS_EXPECTED_VALUES = "./configurations/attack_chains_expected_values"
 SECURITY_RISKS_EXPECTED_VALUES = "./configurations/security_risks_expected_values"
       
 
-class ScenarioManager():
+class ScenarioManager(base_test.BaseTest):
     """
     ScenarioManager is a class that manage the in cluster scenarios deployment and validation.
     class have the following methods:
@@ -30,6 +30,9 @@ class ScenarioManager():
         self.backend = backend
         self.cluster = cluster
         self.scenario_path = scenario_path
+
+    def __del__(self):
+        pass
 
 
     def apply_scenario(self):
