@@ -65,7 +65,7 @@ class ScenarioManager(base_test.BaseTest):
                 cluster_name=self.cluster,
                 trigger_by=trigger_by,
                 framework_list=["security"],
-                with_host_sensor="true"
+                with_host_sensor="false"
             )
         else:
             self.backend.trigger_posture_scan(
