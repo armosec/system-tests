@@ -1,0 +1,16 @@
+{
+    "total": {
+        "value": 3,
+        "relation": "eq"
+    },
+    "response": {
+        "severityResourceCounter": {
+            "Critical": 0,
+            "High": 3,
+            "Low": 2,
+            "Medium": 8
+        },
+        "totalResources": 13
+    },
+    "cursor": ""
+}
