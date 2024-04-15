@@ -2181,7 +2181,7 @@ class ControlPanelAPI(object):
         filters = {}
 
         if cluster_name is not None:
-            filters["clusterName"] = cluster_name
+            filters["cluster"] = cluster_name
         
         if namespace is not None:
             filters["namespace"] = namespace
@@ -2211,7 +2211,7 @@ class ControlPanelAPI(object):
         filters = {}
 
         if cluster_name is not None:
-            filters["clusterName"] = cluster_name
+            filters["cluster"] = cluster_name
         
         if namespace is not None:
             filters["namespace"] = namespace
@@ -2240,7 +2240,7 @@ class ControlPanelAPI(object):
         filters = {}
 
         if cluster_name is not None:
-            filters["clusterName"] = cluster_name
+            filters["cluster"] = cluster_name
         
         if namespace is not None:
             filters["namespace"] = namespace
