@@ -2178,16 +2178,21 @@ class ControlPanelAPI(object):
     # security risks functions
     def get_security_risks_list(self, cluster_name=None, namespace=None):
         params = {"customerGUID": self.selected_tenant_id}
+        filters = {}
 
-        filters = []
         if cluster_name is not None:
-            filters.append({"clusterName": cluster_name})
+            filters["clusterName"] = cluster_name
         
         if namespace is not None:
-            filters.append({"namespace": namespace})
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
 
         payload = {
-            "innerFilters": filters,
+            "innerFilters": innerFilters,
             "orderBy": "securityRiskID:asc",
         }
         r = self.post(API_SECURITY_RISKS_LIST, params=params, json=payload, timeout=60)
@@ -2203,15 +2208,20 @@ class ControlPanelAPI(object):
     def get_security_risks_severities(self, cluster_name=None, namespace=None):
         params = {"customerGUID": self.selected_tenant_id}
 
-        filters = []
+        filters = {}
+
         if cluster_name is not None:
-            filters.append({"clusterName": cluster_name})
+            filters["clusterName"] = cluster_name
         
         if namespace is not None:
-            filters.append({"namespace": namespace})
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
 
         payload = {
-            "innerFilters": filters,
+            "innerFilters": innerFilters,
         }
         r = self.post(API_SECURITY_RISKS_SEVERITIES, params=params, json=payload, timeout=60)
         Logger.logger.info(r.text)
@@ -2226,15 +2236,21 @@ class ControlPanelAPI(object):
     def get_security_risks_categories(self, cluster_name=None, namespace=None):
         params = {"customerGUID": self.selected_tenant_id}
 
-        filters = []
+                
+        filters = {}
+
         if cluster_name is not None:
-            filters.append({"clusterName": cluster_name})
+            filters["clusterName"] = cluster_name
         
         if namespace is not None:
-            filters.append({"namespace": namespace})
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
 
         payload = {
-            "innerFilters": filters,
+            "innerFilters": innerFilters,
         }
         r = self.post(API_SECURITY_RISKS_CATEGORIES, params=params, json=payload, timeout=60)
         Logger.logger.info(r.text)
