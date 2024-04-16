@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+    tier: frontend
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30008
+  selector:
+    app: wordpress
+    tier: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+        - image: wordpress:6.0.1-php7.4
+          name: wordpress
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: wordpress-mysql
+            - name: WORDPRESS_DB_NAME
+              value: wordpress
+            - name: WORDPRESS_DB_USER
+              value: root
+            - name: WORDPRESS_DB_PASSWORD
+              value: P4ssw0rd0110
+            - name: WORDPRESS_DEBUG
+              value: "1"
+          ports:
+            - containerPort: 80
+              name: wordpress
+          resources:
+            requests:
+              cpu: 700m
+              memory: "1Gi"
+            limits:
+              cpu: 700m
+              memory: "1Gi"
+          volumeMounts:
+            - name: hostpath-volume
+              mountPath: /tmp
+      volumes:
+      - name: hostpath-volume
+        hostPath:
+          path: /var
+          type: Directory

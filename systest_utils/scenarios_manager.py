@@ -9,7 +9,7 @@ import json
 from tests_scripts import base_test
 
 
-SCENARIOS_TEST_PATH = "./configurations/scenarios_test_env"
+SCENARIOS_TEST_PATH = "./configurations/scenarios-test-env"
 SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
       
 

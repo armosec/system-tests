@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+kubectl patch deployment wordpress -n default --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"wordpress:6.3.1-php8.2"}]'
+kubectl rollout status deployment wordpress -n default --timeout=90s

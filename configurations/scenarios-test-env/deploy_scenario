@@ -1,0 +1,107 @@
+#!/bin/bash
+#
+# Kubernetes Manifest Deployment Script
+#
+# This script deploys Kubernetes manifests sequentially from a specified directory.
+# The manifest files should be named in the format: [xx]-<name-of-the-manifest>.yaml,
+# where [xx] is a number expressed as 00, 01, 02, etc.
+#
+# The script assumes kubectl is installed and properly configured to interact with
+# the Kubernetes cluster.
+#
+# Usage:
+#   ./deploy_scenario /path/to/manifests [--kubeconfig /path/to/kubeconfig]
+#
+# Author: ARMO
+# Date: 2023-07-27
+
+check_kubectl_installed() {
+  if ! command -v kubectl &>/dev/null; then
+    echo "Error: kubectl is not installed. Please install kubectl before running this script."
+    exit 1
+  fi
+}
+
+apply_manifests() {
+  local path=$1
+  local kubeconfig=$2
+
+  if [ ! -d "$path" ]; then
+    echo "Error: Path '$path' does not exist or is not a directory."
+    return 1
+  fi
+
+  for filename in $(ls "$path"/*.yaml | sort); do
+    if grep -q "^[0-9]\{2\}-" <<< "$(basename "$filename")"; then
+      kubectl apply -f "$filename" --kubeconfig "$kubeconfig"
+      if [ $? -eq 0 ]; then
+        echo "Applied manifest: $(basename "$filename")"
+        wait_for_running "$filename" "$kubeconfig"
+      else
+        echo "Error applying manifest: $(basename "$filename")"
+      fi
+    else
+      echo "Ignoring file: $(basename "$filename") (Invalid filename format)"
+    fi
+  done
+}
+
+wait_for_running() {
+  local filename=$1
+  local kubeconfig=$2
+
+  local deployments=$(kubectl get -f "$filename" --kubeconfig "$kubeconfig" -o jsonpath='{.items[?(@.kind=="Deployment")].metadata.name}')
+  local namespaces=$(kubectl get -f "$filename" --kubeconfig "$kubeconfig" -o jsonpath='{.items[?(@.kind=="Deployment")].metadata.namespace}')
+
+  if [ -n "$deployments" ]; then
+    echo "Waiting for Pods to be Running..."
+    i=0
+    for deployment in $deployments; do
+      namespace=$(echo "$namespaces" | cut -d ' ' -f $((i+1)))
+      sleep 5
+      #kubectl wait pod -l app="$deployment" -n "$namespace" --for=condition=Ready --timeout=120s --kubeconfig "$kubeconfig" >/dev/null 2>&1
+      #kubectl wait deployment/"$deployment" -n "$namespace" --for=condition=Available --timeout=120s --kubeconfig "$kubeconfig" >/dev/null 2>&1
+      kubectl rollout status deployment "$deployment" -n "$namespace" --timeout=90s --kubeconfig "$kubeconfig" >/dev/null 2>&1
+      if [ $? -eq 0 ]; then
+        echo "Deployment '$deployment' in Namespace '$namespace' is Available."
+      else
+        echo "Timeout: Deployment '$deployment' in Namespace '$namespace' not Running within the specified time."
+      fi
+      ((i++))
+    done
+  else
+    echo "No Deployments found in $filename. Skipping wait."
+  fi
+}
+
+main() {
+  if [ $# -lt 1 ]; then
+    echo "Usage: $0 /path/to/manifests [--kubeconfig /path/to/kubeconfig]"
+    return 1
+  fi
+
+  local path=$1
+  local kubeconfig=${KUBECONFIG:-$HOME/.kube/config}
+
+  check_kubectl_installed
+
+  shift
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --kubeconfig)
+        shift
+        kubeconfig=$1
+        ;;
+      *)
+        echo "Unknown option: $1"
+        return 1
+        ;;
+    esac
+    shift
+  done
+
+  apply_manifests "$path" "$kubeconfig"
+}
+
+main "$@"
+
