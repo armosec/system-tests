@@ -1,0 +1,267 @@
+{
+    "total": {
+        "value": 7,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "securityRiskID": "R_0002",
+            "securityRiskName": "Application credentials in configuration files",
+            "category": "Secret management",
+            "severity": "High",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": false,
+            "smartRemediation": false
+        },
+        {
+            "securityRiskID": "R_0004",
+            "securityRiskName": "Non-root container",
+            "category": "Workload configuration",
+            "severity": "Medium",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": false,
+            "smartRemediation": false
+        },
+        {
+            "securityRiskID": "R_0005",
+            "securityRiskName": "Allow privilege escalation",
+            "category": "Workload configuration",
+            "severity": "Medium",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": true,
+            "smartRemediation": true
+        },
+        {
+            "securityRiskID": "R_0006",
+            "securityRiskName": "Immutable container filesystem",
+            "category": "Workload configuration",
+            "severity": "Low",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": true,
+            "smartRemediation": true
+        },
+        {
+            "securityRiskID": "R_0007",
+            "securityRiskName": "Workload without network policy",
+            "category": "Network configuration",
+            "severity": "Medium",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": false,
+            "smartRemediation": false
+        },
+        {
+            "securityRiskID": "R_0008",
+            "securityRiskName": "Automatic mapping of service account",
+            "category": "RBAC configuration",
+            "severity": "Medium",
+            "lastUpdated": "2024-04-14T11:26:56Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 2,
+            "resourcesDetectedLastUpdateCount": 2,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 2,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                },
+                {
+                    "k8sResourceHash": "14384108763640485526",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress-mysql"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 2,
+            "supportsSmartRemediation": true,
+            "smartRemediation": true
+        },
+        {
+            "securityRiskID": "R_0035",
+            "securityRiskName": "External facing workload with critical vulnerabilities and impacts",
+            "category": "Attack path",
+            "severity": "High",
+            "lastUpdated": "2024-04-14T11:28:48Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 1,
+            "resourcesDetectedLastUpdateCount": 1,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 1,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "17205342161461348985",
+                    "cluster": "systemtesteran",
+                    "clusterShortName": "systemtesteran",
+                    "namespace": "default",
+                    "kind": "Deployment",
+                    "name": "wordpress"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 1,
+            "supportsSmartRemediation": false,
+            "smartRemediation": false
+        }
+    ],
+    "cursor": ""
+}

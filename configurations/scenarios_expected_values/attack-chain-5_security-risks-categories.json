@@ -1,0 +1,17 @@
+{
+    "total": {
+        "value": 5,
+        "relation": "eq"
+    },
+    "response": {
+        "categoryResourceCounter": {
+            "Attack path": 1,
+            "Network configuration": 2,
+            "RBAC configuration": 2,
+            "Secret management": 2,
+            "Workload configuration": 6
+        },
+        "totalResources": 13
+    },
+    "cursor": ""
+}
