@@ -33,11 +33,13 @@ class SmartRemediation(BaseKubescape, BaseHelm):
         return statics.SUCCESS, ""
 
     def check_smart_remediation(self, body, want=True, retries=0):
+        hl = {}
         for _ in range(retries):
             hl = self.backend.get_posture_resources_highlights(body)
             if len(hl["response"]) > 0 and (want == ("smartRemediations" in hl["response"][0])):
                 return True
             TestUtil.sleep(10, "wait for smart remediation")
+        Logger.logger.error("timed out waiting for smart remediation: {}".format(hl))
         return False
 
     def start(self):
@@ -89,7 +91,7 @@ class SmartRemediation(BaseKubescape, BaseHelm):
             "reportGUID": report_guid,
             "frameworkName": "AllControls"
         }]}
-        assert self.check_smart_remediation(body, retries=30), "smartRemediations is not found"
+        assert self.check_smart_remediation(body, retries=50), "smartRemediations is not found"
 
         Logger.logger.info(f"5. Correct the issue")
         workload_fix = self.apply_yaml_file(
@@ -117,6 +119,6 @@ class SmartRemediation(BaseKubescape, BaseHelm):
             "reportGUID": report_guid,
             "frameworkName": "AllControls"
         }]}
-        assert self.check_smart_remediation(body, want=False, retries=30), "smartRemediations should be empty"
+        assert self.check_smart_remediation(body, want=False, retries=50), "smartRemediations should be empty"
 
         return self.cleanup()

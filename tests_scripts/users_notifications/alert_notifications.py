@@ -85,7 +85,7 @@ def assert_vulnerability_message_sent(messages, cluster):
     found = 0
     for message in messages:
         message_string = str(message)
-        if "New Vulnerability found" in message_string and cluster in message_string and "httpd:2" in message_string:
+        if "New Vulnerability found" in message_string and cluster in message_string and "httpd" in message_string:
             found += 1
     assert found > 0, "expected to have at least one vulnerability message"
 

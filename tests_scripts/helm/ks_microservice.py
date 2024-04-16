@@ -1,17 +1,73 @@
-from datetime import datetime,timezone
-import os
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 from systest_utils import Logger, TestUtil, statics
-#from struct_diff import Comparator,JSONFormatter
-import json
+from systest_utils.scenarios_manager import SecurityRisksScenarioManager, AttackChainsScenarioManager
 
 DEFAULT_BRANCH = "release"
 
+
+class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
+    """
+    ScanAttackChainsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanSecurityRisksWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        """
+        Agenda:
+        1. Install attack-chains scenario manifests in the cluster
+        2. Install kubescape with helm-chart
+        3. Verify scenario on backend
+        4. Apply attack chain fix
+        5. trigger scan after fix
+        6. verify fix
+
+        """
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+
+        self.ignore_agent = True
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
+        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
+                                                            backend= self.backend, cluster=cluster)       
+        Logger.logger.info("1.2 apply attack chains scenario manifests")
+        scenarios_manager.apply_scenario()
+
+        Logger.logger.info("2. Install kubescape with helm-chart")
+        Logger.logger.info("2.1 Installing kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        Logger.logger.info("2.2 verify installation")
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(10)
+
+        Logger.logger.info("3. Verify scenario on backend")
+        scenarios_manager.verify_scenario()
+        Logger.logger.info("security risks, applying fix command")
+
+        Logger.logger.info("4. Apply attack chain fix")
+        scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
+
+        Logger.logger.info("5. trigger scan after fix")
+
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+
+        Logger.logger.info("6. verify fix")
+        scenarios_manager.verify_fix()
+        
+        Logger.logger.info('attack-chain fixed properly')
+        return self.cleanup()
+
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
-    ScanWithKubescapeHelmChartWithoutManifests install the kubescape operator and run the scan to check attack-chains.
+    ScanAttackChainsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
     """
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -19,141 +75,53 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        """
+        Agenda:
+        1. Install attack-chains scenario manifests in the cluster
+        2. Install kubescape with helm-chart
+        3. Verify scenario on backend
+        4. Apply attack chain fix
+        5. trigger scan after fix
+        6. verify fix
 
-        attack_chain_scenarios_path = "./configurations/attack-chains-test-env"
-        attack_chain_expected_values = "./configurations/attack_chains_expected_values"
+        """
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
-        Logger.logger.info("Installing attack-chain-scenario")
+        Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
+        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = AttackChainsScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
+                                                            backend= self.backend, cluster=cluster)
 
-        Logger.logger.info("Applying scenario manifests")
-        test_scenario = self.test_obj[("test_scenario", None)]
-        deploy_cmd = os.path.join(attack_chain_scenarios_path, 'deploy_scenario') + ' ' + os.path.join(attack_chain_scenarios_path , test_scenario)
-        TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
-        time.sleep(5)
+        Logger.logger.info("1.2 apply attack chains scenario manifests")
+        scenarios_manager.apply_scenario()
 
-        Logger.logger.info("Installing kubescape with helm-chart")
-        # 2.1 add and update armo in repo
+        Logger.logger.info("2. Install kubescape with helm-chart")
+        Logger.logger.info("2.1 Installing kubescape with helm-chart")
         self.add_and_upgrade_armo_to_repo()
-        # 2.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
-        current_datetime = datetime.now(timezone.utc)
 
-        # 2.3 verify installation
+        Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         time.sleep(10)
 
-        Logger.logger.info("wait for response from BE")
-        r, t = self.wait_for_report(
-            self.backend.get_active_attack_chains, 
-            timeout=600,
-            current_datetime=current_datetime,
-            cluster_name=cluster
-            )
-
-        Logger.logger.info('loading attack chain scenario to validate it')
-        f = open(os.path.join(attack_chain_expected_values, test_scenario+'.json'))
-        expected = json.load(f) 
-        response = json.loads(r.text)
-
-        Logger.logger.info('comparing attack-chains result with expected ones')
-        #cmp = Comparator()
-        #d = cmp.diff(expected, response)
-        #difference = JSONFormatter(d, {'max_elisions': 1})
-        #Logger.logger.info('diff: %s', difference)
-        assert self.check_attack_chains_results(response, expected), f"Attack chain response differs from the expected one. Response: {response}, Expected: {expected}"
-
-
-        # Fixing phase
+        Logger.logger.info("3. Verify scenario on backend")
+        scenarios_manager.verify_scenario()
         Logger.logger.info("attack chains detected, applying fix command")
-        self.fix_attack_chain(attack_chain_scenarios_path, test_scenario)
-        time.sleep(20)
-        current_datetime = datetime.now(timezone.utc)
-        Logger.logger.info("triggering a new scan")
-        trigger = self.test_obj["test_job"][0]["trigger_by"]
-        self.trigger_scan(cluster, trigger)
 
-        Logger.logger.info("wait for response from BE")
-        # we set the timeout to 1000s because image scan 
-        # cat take more than 15m to get the updated result
-        active_attack_chains, t = self.wait_for_report(
-            self.backend.has_active_attack_chains, 
-            timeout=1000, 
-            cluster_name=cluster
-            )
+        Logger.logger.info("4. Apply attack chain fix")
+        scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
+        Logger.logger.info("5. trigger scan after fix")
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+
+        Logger.logger.info("6. verify fix")
+        scenarios_manager.verify_fix()
+        
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
-
-    def fix_attack_chain(self, attack_chain_scenarios_path, test_scenario):
-        fix_type = self.test_obj[("fix_object", "control")]
-        fix_command= os.path.join(attack_chain_scenarios_path, test_scenario, 'fix_' + fix_type)
-        TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
-        time.sleep(5)
-
-    def trigger_scan(self, cluster_name, trigger_by) -> None:
-        """trigger_scan create a new scan action from the backend
-
-        :param cluster_name: name of the cluster you want to scan
-        :param trigger_by: the kind of event that trigger the scan ("cronjob", "scan_on_start")
-        """
-        if trigger_by == "cronjob":
-            self.backend.create_kubescape_job_request(
-                cluster_name=cluster_name,
-                trigger_by=trigger_by,
-                framework_list=["security"],
-                with_host_sensor="true"
-            )
-        else:
-            self.backend.trigger_posture_scan(
-                cluster_name=cluster_name,
-                framework_list=["security"],
-                with_host_sensor="true"
-                )
-
-    def compare_nodes(self, obj1, obj2) -> bool:
-        """Walk 2 dictionary object to compare their values.
-
-        :param obj1: dictionary one to be compared.
-        :param obj2: dictionary two to be compared.
-        :return: True if all checks passed, False otherwise.
-        """
-        # check at first if we are managin dictionaries
-        if isinstance(obj1, dict) and isinstance(obj2, dict):
-            # check if key 'nextNodes' is present in the dictionaries
-            if 'nextNodes' in obj1 and 'nextNodes' in obj2:
-                # check if length of the items is the same
-                if len(obj1['nextNodes']) != len(obj2['nextNodes']):
-                    return False
-                # loop over the new nextNodes
-                for node1, node2 in zip(obj1['nextNodes'], obj2['nextNodes']):
-                    if not self.compare_nodes(node1, node2):
-                        return False
-                return True
-            else:
-                if 'name' in obj1 and 'name' in obj2:
-                    return obj1['name'] == obj2['name']
-                return all(self.compare_nodes(obj1[key], obj2[key]) for key in obj1.keys())
-        return False
-
-    def check_attack_chains_results(self, result, expected) -> bool:
-        """Validate the input content with the expected one.
-        
-        :param result: content retrieved from backend.
-        :return: True if all the controls passed, False otherwise.
-        """
-        # Some example of assertion needed to recognize attack chain scenarios
-        for acid, ac in enumerate(result['response']['attackChains']):
-            ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
-            ac_node_expected = expected['response']['attackChains'][acid]['attackChainNodes']
-            if ac_node_result['name'] != ac_node_expected['name']:
-                return False
-            if not self.compare_nodes(ac_node_result, ac_node_expected):
-                return False
-        return True
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):

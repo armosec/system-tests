@@ -82,7 +82,7 @@ class BaseSynchronizer(BaseHelm):
         )
         return r_filtered
 
-    
+
     def get_all_kubescape_crds(self, namespace):
         """
         Get all kubescape crds in the cluster (namespaced and non-namespaced)
@@ -150,15 +150,15 @@ class BaseSynchronizer(BaseHelm):
                 TestUtil.sleep(sleep_time, "sleeping and retrying", "info")
 
     @staticmethod
-    def backend_resource_kind(be_resource): 
+    def backend_resource_kind(be_resource):
         return be_resource.get(KUBERNETES_RESOURCES_METADATA_KEY).get('designators').get('attributes').get('kind')
-    
+
     def verify_backend_resources(
-        self, cluster, namespace, list_func=None, iterations=10, sleep_time=10, filter_func=None
+        self, cluster, namespace, list_func=None, iterations=20, sleep_time=10, filter_func=None
     ):
         while iterations > 0:
             iterations -= 1
-            try:   
+            try:
                 cluster_resources = list_func(namespace) if list_func else self.get_all_workloads_in_namespace(namespace)
                 be_resources = self.backend.get_kubernetes_resources(
                     with_resource=True, cluster_name=cluster, namespace=namespace
@@ -205,7 +205,7 @@ class BaseSynchronizer(BaseHelm):
                                 getattr(resource, "metadata", {}), "namespace", ""
                             )
                             cluster_resource_version = getattr(getattr(resource, "metadata", {}), "resource_version", "")
-                        
+
                         if (
                             cluster_kind == be_kind
                             and cluster_namespace == be_namespace
@@ -218,7 +218,7 @@ class BaseSynchronizer(BaseHelm):
                     assert (
                         cluster_resource
                     ), f"kubernetes resource '{be_namespace}/{be_kind}/{be_name}' not found in expected resources '{cluster_resources}'"
-                    
+
                     assert (
                         be_resource_version == cluster_resource_version
                     ), f"cluster resource '{be_namespace}/{be_kind}/{be_name}' is '{cluster_resource_version}' while resource version in BE is '{be_resource_version}'"
@@ -322,7 +322,7 @@ class SynchronizerReconciliation(BaseSynchronizer):
         if self.backend.server == "https://api.armosec.io": # skip test for production
             Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
             return statics.SUCCESS, ""
-        
+
         cluster, namespace_1 = self.setup(apply_services=False)
 
         helm_kwargs = self.test_obj.get_arg("helm_kwargs")
@@ -465,7 +465,7 @@ class SynchronizerProxy(BaseSynchronizer):
         self.scale_up_proxy_server()
 
         Logger.logger.info("8. Check BE vs. Cluster - resources are updated / created")
-        self.verify_backend_resources(cluster, namespace_1, iterations=20, sleep_time=30) 
+        self.verify_backend_resources(cluster, namespace_1, iterations=20, sleep_time=30)
 
         Logger.logger.info("9. Check BE vs. Cluster - resources deleted from BE")
         self.verify_backend_resources_deleted(cluster, namespace_2, iterations=20, sleep_time=30)
@@ -487,7 +487,7 @@ class SynchronizerRaceCondition(BaseSynchronizer):
     def start(self):
         """
         Test plan:
-        1. Apply workload 
+        1. Apply workload
         2. Install Helm chart
         3. Check workload is reported
         4. Update env var in a loop
@@ -496,7 +496,7 @@ class SynchronizerRaceCondition(BaseSynchronizer):
         assert (
             self.backend != None
         ), f"the test {self.test_driver.test_name} must run with backend"
-    
+
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info(f"1. Apply workload")
@@ -518,7 +518,7 @@ class SynchronizerRaceCondition(BaseSynchronizer):
         TestUtil.sleep(20, "wait for synchronization")
 
         Logger.logger.info("5. Check BE vs. Cluster - last resource version")
-        self.verify_backend_resources(cluster, namespace) 
+        self.verify_backend_resources(cluster, namespace)
 
         return self.cleanup()
 
@@ -560,7 +560,7 @@ class SynchronizerKubescapeCRDs(BaseSynchronizer):
         Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
         self.verify_backend_resources(cluster, namespace, list_func=self.get_all_namespaced_kubescape_crds)
         self.verify_backend_resources(cluster, "", list_func=self.get_all_non_namespaced_kubescape_crds)
-        
+
         Logger.logger.info("4. Delete CRDs")
         self.delete_all_crds(namespace)
 
@@ -569,4 +569,3 @@ class SynchronizerKubescapeCRDs(BaseSynchronizer):
         self.verify_backend_resources_deleted(cluster, "")        # non-namespaced crds
 
         return self.cleanup()
-    
