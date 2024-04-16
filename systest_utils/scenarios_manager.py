@@ -9,9 +9,8 @@ import json
 from tests_scripts import base_test
 
 
-ATTACK_CHAINS_SCENARIOS_PATH = "./configurations/attack-chains-test-env"
-ATTACK_CHAINS_EXPECTED_VALUES = "./configurations/attack_chains_expected_values"
-SECURITY_RISKS_EXPECTED_VALUES = "./configurations/security_risks_expected_values"
+SCENARIOS_TEST_PATH = "./configurations/scenarios_test_env"
+SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
       
 
 class ScenarioManager(base_test.BaseTest):
@@ -25,7 +24,7 @@ class ScenarioManager(base_test.BaseTest):
     - verify_fix: validate the fix results on the backend - needs to be implemented in the child class
     """
 
-    def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster, scenario_path=ATTACK_CHAINS_SCENARIOS_PATH):
+    def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster, scenario_path=SCENARIOS_TEST_PATH):
         self.test_scenario = test_scenario
         self.backend = backend
         self.cluster = cluster
@@ -88,7 +87,7 @@ class AttackChainsScenarioManager(ScenarioManager):
     """
 
     def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster):
-        super().__init__(test_scenario, backend, cluster, ATTACK_CHAINS_SCENARIOS_PATH)
+        super().__init__(test_scenario, backend, cluster, SCENARIOS_TEST_PATH)
 
     def verify_scenario(self):
         """
@@ -104,7 +103,7 @@ class AttackChainsScenarioManager(ScenarioManager):
             )
 
         Logger.logger.info('loading attack chain scenario to validate it')
-        f = open(os.path.join(ATTACK_CHAINS_EXPECTED_VALUES, self.test_scenario+'.json'))
+        f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
@@ -175,7 +174,7 @@ class AttackChainsScenarioManager(ScenarioManager):
 class SecurityRisksScenarioManager(ScenarioManager):
 
     def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster):
-        super().__init__(test_scenario, backend, cluster, ATTACK_CHAINS_SCENARIOS_PATH)
+        super().__init__(test_scenario, backend, cluster, SCENARIOS_TEST_PATH)
 
     def verify_scenario(self):
         """
@@ -190,8 +189,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         Logger.logger.info("validating security risks list")
         r = self.wait_for_report(
-        self.verify_security_risks, 
-        expected_values_path=SECURITY_RISKS_EXPECTED_VALUES,
+        self.verify_security_risks_list, 
+        expected_values_path=SCENARIOS_EXPECTED_VALUES,
         timeout=180,
         sleep_interval=10
         )
@@ -199,7 +198,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("validating security risks categories")
         r = self.wait_for_report(
         self.verify_security_risks_categories, 
-        expected_values_path=SECURITY_RISKS_EXPECTED_VALUES,
+        expected_values_path=SCENARIOS_EXPECTED_VALUES,
         timeout=180,
         sleep_interval=10
         )
@@ -207,7 +206,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("validating security risks severities")
         r = self.wait_for_report(
         self.verify_security_risks_severities,
-        expected_values_path=SECURITY_RISKS_EXPECTED_VALUES,
+        expected_values_path=SCENARIOS_EXPECTED_VALUES,
         timeout=180,
         sleep_interval=10
         )
@@ -327,7 +326,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.backend.get_security_risks_severities(self.cluster, "default")
 
         Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(expected_values_path, self.test_scenario+'-severities.json'))
+        f = open(os.path.join(expected_values_path, self.test_scenario+'_security-risks-severities.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
@@ -348,7 +347,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.backend.get_security_risks_categories(self.cluster, "default")
 
         Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(expected_values_path, self.test_scenario+'-categories.json'))
+        f = open(os.path.join(expected_values_path, self.test_scenario+'_security-risks-categories.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
@@ -360,16 +359,16 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert equal, f"security risks categories response differs from the expected one. Response: {response}, Expected: {expected}"
 
 
-    def verify_security_risks(self, expected_values_path):
+    def verify_security_risks_list(self, expected_values_path):
         """
-        verify_security_risks validate the security risks results on the backend
+        verify_security_risks_list validate the security risks results on the backend
         """
         # current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
         r = self.backend.get_security_risks_list(self.cluster, "default")
 
         Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(expected_values_path, self.test_scenario+'.json'))
+        f = open(os.path.join(expected_values_path, self.test_scenario+'_security-risks-list.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
