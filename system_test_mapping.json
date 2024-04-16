@@ -1175,5 +1175,17 @@
         ],
         "description": "",
         "skip_on_environment": ""
+    },
+    "jira_integration": {
+        "target": [
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe-disabled",
+            "event-ingester-service-disabled",            
+            "config-service-disabled"
+        ],
+        "description": "testing jira integration",
+        "skip_on_environment": ""
     }
 }
