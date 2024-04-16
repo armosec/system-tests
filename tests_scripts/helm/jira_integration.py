@@ -261,7 +261,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert len(workloads) == 1, "Expected one workload"
         assert len(workloads[0]['tickets']) > 0, "Image is missing Jira issue"
 
-        Logger.logger.info(f"unlink Jira issuez")
+        Logger.logger.info(f"unlink Jira issues")
         self.backend.unlink_issue(globalCVEicket['guid'])
         self.backend.unlink_issue(workloadCVEicket['guid'])
         self.backend.unlink_issue(globalImageTicket['guid'])
