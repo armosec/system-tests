@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+kubectl delete -n default deployment wordpress-mysql
+kubectl wait deployment/wordpress-mysql --for=delete --timeout=-1s -n default
+
+kubectl delete -n default deployment wordpress
+kubectl wait deployment/wordpress --for=delete --timeout=-1s -n default

@@ -105,6 +105,12 @@ KUBERNETES_RESOURCES_METADATA_KEY = 'kubernetesResourcesMetadata'
 KUBERNETES_RESOURCES_OBJECT_KEY = 'kubernetesResourceObject'
 
 
+API_SECURITY_RISKS_LIST = "/api/v1/securityrisks/list"
+API_SECURITY_RISKS_SEVERITIES = "/api/v1/securityrisks/severities"
+API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
+API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
+
+
 def deco_cookie(func):
 
     def apply_cookie(*args, **kwargs):
@@ -2174,6 +2180,92 @@ class ControlPanelAPI(object):
         if not j:
             raise Exception('Request: results of posture resources highlights is empty body: %s' % body)
         return j
+
+    # security risks functions
+    def get_security_risks_list(self, cluster_name=None, namespace=None):
+        params = {"customerGUID": self.selected_tenant_id}
+        filters = {}
+
+        if cluster_name is not None:
+            filters["cluster"] = cluster_name
+        
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+
+        payload = {
+            "innerFilters": innerFilters,
+            "orderBy": "securityRiskID:asc",
+        }
+        r = self.post(API_SECURITY_RISKS_LIST, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+
+    def get_security_risks_severities(self, cluster_name=None, namespace=None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = {}
+
+        if cluster_name is not None:
+            filters["cluster"] = cluster_name
+        
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_SEVERITIES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+
+    def get_security_risks_categories(self, cluster_name=None, namespace=None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+                
+        filters = {}
+
+        if cluster_name is not None:
+            filters["cluster"] = cluster_name
+        
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_CATEGORIES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
 
 class Solution(object):
     """docstring for Solution"""
