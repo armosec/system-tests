@@ -14,5 +14,5 @@ class RuntimeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=Incidents,
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
-            create_test_tenant=True,
+            # create_test_tenant=True,
         )

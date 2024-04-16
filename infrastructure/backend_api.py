@@ -512,12 +512,13 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
-    def get_incidents(self, **kwargs):
+    def get_incidents(self, filters, **kwargs):
         url = "/api/v1/runtime/incidents"
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
-        r = self.post(url, params=params,json={"pageNumber": 1, "pageSize": 100, "sort": "createdTimestamp:desc"})
+        r = self.post(url, params=params,json={"pageNumber": 1, "pageSize": 100,
+                                                "orderBy": "createdTimestamp:desc", "innerFilters": [filters]})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
