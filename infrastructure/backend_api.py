@@ -63,9 +63,7 @@ API_VULNERABILITY_V2 = "/api/v1/vulnerability_v2/vulnerability"
 API_VULNERABILITY_V2_IMAGE = "/api/v1/vulnerability_v2/image"
 API_VULNERABILITY_V2_COMPONENT = "/api/v1/vulnerability_v2/component"
 
-
 API_INTEGRATIONS = "/api/v1/integrations"
-
 
 API_REPOSITORYPOSTURE = "/api/v1/repositoryPosture"
 API_REPOSITORYPOSTURE_REPOSITORIES =  "/api/v1/repositoryPosture/repositories"
