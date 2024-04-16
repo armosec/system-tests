@@ -1,0 +1,25 @@
+{
+    "fields": {
+        "namespace": [
+            "default",
+            "kube-system",
+            "local-path-storage"
+        ]
+    },
+    "fieldsCount": {
+        "namespace": [
+            {
+                "key": "default",
+                "count": 1
+            },
+            {
+                "key": "kube-system",
+                "count": 2
+            },
+            {
+                "key": "local-path-storage",
+                "count": 1
+            }
+        ]
+    }
+}

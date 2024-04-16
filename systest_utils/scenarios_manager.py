@@ -12,6 +12,13 @@ from tests_scripts import base_test
 SCENARIOS_TEST_PATH = "./configurations/scenarios-test-env"
 SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
       
+SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
+    "clusterShortName": "_security-risks-uv-clustershortname.json",
+    "namespace": "_security-risks-uv-namespace.json",
+    "severity": "_security-risks-uv-severity.json",
+    "category": "_security-risks-uv-category.json",
+    "securityRiskName": "_security-risks-uv-securityriskname.json",
+}
 
 class ScenarioManager(base_test.BaseTest):
     """
@@ -199,7 +206,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.wait_for_report(
         self.verify_security_risks_categories, 
         expected_values_path=SCENARIOS_EXPECTED_VALUES,
-        timeout=180,
+        timeout=30,
         sleep_interval=10
         )
         
@@ -207,9 +214,13 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.wait_for_report(
         self.verify_security_risks_severities,
         expected_values_path=SCENARIOS_EXPECTED_VALUES,
-        timeout=180,
+        timeout=30,
         sleep_interval=10
         )
+
+        # verify unique values - no need to wait.
+        uniqueValuesAllFilters = {"clusterShortName":self.cluster,"namespace":"default","severity":"Medium","category":"Workload configuration","smartRemediation":"1"}
+        self.verify_security_risks_list_uniquevalues(SCENARIOS_EXPECTED_VALUES, uniqueValuesAllFilters)
 
     def verify_fix(self):
         """
@@ -316,6 +327,27 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert response['total']['value'] == 0, "Security risks found, expecting no security risks"
         return True
     
+    def verify_security_risks_list_uniquevalues(self, expected_values_path, baseFilters):
+        """
+        verify_security_risks_list_uniquevalues validate the security risks unique values results on the backend
+        """
+
+        for fieldName, expectedSuffix in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
+            newFilters = baseFilters.copy()
+            newFilters[fieldName] = ""
+            Logger.logger.info(f"wait for response from BE with filter: {newFilters}")
+            r = self.backend.get_security_risks_list_uniquevalues(newFilters, fieldName)
+
+
+            Logger.logger.info('loading security risks scenario to validate it')
+            f = open(os.path.join(expected_values_path, self.test_scenario+expectedSuffix))
+            expected = json.load(f) 
+            response = json.loads(r.text)
+
+            equal = response == expected
+       
+            assert equal, f"security risks unique values for '{fieldName}' response differs from the expected one. Response: {response}, Expected: {expected}"
+
 
     def verify_security_risks_severities(self, expected_values_path):
         """
@@ -397,8 +429,12 @@ def compare_dicts(d1, d2, ignore_keys=None):
     """
     Compare two dictionaries deeply, ignoring specific keys.
     """
-    d1_keys = set(d1.keys()) - ignore_keys
-    d2_keys = set(d2.keys()) - ignore_keys
+    if ignore_keys is not None:
+        d1_keys = set(d1.keys()) - ignore_keys
+        d2_keys = set(d2.keys()) - ignore_keys
+    else:
+        d1_keys = set(d1.keys())
+        d2_keys = set(d2.keys())
 
     if d1_keys != d2_keys:
         print("Keys mismatch:", d1_keys, d2_keys)

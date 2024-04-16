@@ -1,0 +1,20 @@
+{
+    "fields": {
+        "category": [
+            "RBAC configuration",
+            "Workload configuration"
+        ]
+    },
+    "fieldsCount": {
+        "category": [
+            {
+                "key": "RBAC configuration",
+                "count": 1
+            },
+            {
+                "key": "Workload configuration",
+                "count": 1
+            }
+        ]
+    }
+}

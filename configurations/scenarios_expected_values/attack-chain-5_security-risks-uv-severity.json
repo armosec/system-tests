@@ -1,0 +1,20 @@
+{
+    "fields": {
+        "severity": [
+            "Low",
+            "Medium"
+        ]
+    },
+    "fieldsCount": {
+        "severity": [
+            {
+                "key": "Low",
+                "count": 1
+            },
+            {
+                "key": "Medium",
+                "count": 1
+            }
+        ]
+    }
+}

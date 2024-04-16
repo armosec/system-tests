@@ -109,6 +109,7 @@ API_SECURITY_RISKS_LIST = "/api/v1/securityrisks/list"
 API_SECURITY_RISKS_SEVERITIES = "/api/v1/securityrisks/severities"
 API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
+API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
 
 
 def deco_cookie(func):
@@ -2200,7 +2201,7 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_list "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
@@ -2228,7 +2229,7 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_severities "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
@@ -2257,9 +2258,33 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_categories "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def get_security_risks_list_uniquevalues(self, filters: dict, field):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+
+        payload = {
+            "fields": {field: ""},
+            "innerFilters": innerFilters,
+            "pageNum": 1,
+            "pageSize": 100,
+        }
+        r = self.post(API_SECURITY_RISKS_LIST_UNIQUEVALUES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get get_security_risks_list_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
 
 class Solution(object):
     """docstring for Solution"""

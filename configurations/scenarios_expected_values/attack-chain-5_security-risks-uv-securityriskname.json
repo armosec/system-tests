@@ -1,0 +1,15 @@
+{
+    "fields": {
+        "securityRiskName": [
+            "Allow privilege escalation"
+        ]
+    },
+    "fieldsCount": {
+        "securityRiskName": [
+            {
+                "key": "Allow privilege escalation",
+                "count": 1
+            }
+        ]
+    }
+}
