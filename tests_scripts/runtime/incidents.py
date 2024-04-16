@@ -26,7 +26,6 @@ class Incidents(BaseHelm):
             "capabilities.runtimeObservability": "enable",
             "capabilities.malwareDetection": "enable",
             "capabilities.runtimeDetection": "enable",
-            # "installDefaultAlertRuleBinding": True,
             "alertCRD.installDefault" : True,
             "alertCRD.scopeClustered" : True,
             # short learning period
@@ -63,13 +62,11 @@ class Incidents(BaseHelm):
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
         
         Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, sleep_interval=5, cluster=cluster, namespace=namespace, incident_name="Unexpected process launched")
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5, cluster=cluster, namespace=namespace, incident_name="Unexpected process launched")
         
         inc, _ = self.wait_for_report(self.verify_incident_completed,timeout=5*60, sleep_interval=5, incident_id=incs[0]['guid'])        
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-
-        assert len(inc['relatedAlerts']) > len(expected_related_alerts), f"Expected at least {len(expected_related_alerts)} related alerts {json.dumps(inc)}"
-        
+        assert len(inc['relatedAlerts']) > 1, f"Expected at least 2 related alerts {json.dumps(inc)}"        
         
         return self.cleanup()
 
