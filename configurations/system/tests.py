@@ -3,7 +3,7 @@ from configurations.system.tests_cases.smart_remediation_tests import SmartRemed
 from configurations.system.tests_cases.synchronizer_tests import SynchronizerTests
 from systest_utils import TestUtil
 
-from .tests_cases import KubescapeTests, KSMicroserviceTests
+from .tests_cases import KubescapeTests, KSMicroserviceTests, RuntimeTests
 from .tests_cases.vuln_scan_tests import VulnerabilityScanningTests
 from .tests_cases.ks_vuln_scan_tests import KsVulnerabilityScanningTests
 from .tests_cases.payments_tests import PaymentTests
@@ -26,6 +26,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(NotificationSTests))
     tests.extend(TestUtil.get_class_methods(SmartRemediationTests))
     tests.extend(TestUtil.get_class_methods(SynchronizerTests))
+    tests.extend(TestUtil.get_class_methods(RuntimeTests))
     tests.extend(TestUtil.get_class_methods(SecurityRisksTests))
 
     return tests
@@ -53,6 +54,8 @@ def get_test(test_name):
         return SmartRemediationTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(SynchronizerTests):
         return SynchronizerTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(RuntimeTests):
+        return RuntimeTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(SecurityRisksTests):
         return SecurityRisksTests().__getattribute__(test_name)()
 

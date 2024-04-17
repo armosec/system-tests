@@ -265,6 +265,7 @@ class TestUtil(object):
                 "Command - {0} - Has Failed, time: {1}".format(" ".join(command_args), TestUtil.get_time(start, end)))
             Logger.logger.error("Has Failed with Error {0}".format(return_obj.returncode))
             Logger.logger.error("StdOut: {0}".format(return_obj.stdout))
+            Logger.logger.error("StdErr: {0}".format(return_obj.stderr))
         elif display_stdout:
             Logger.logger.info("{0}".format(" ".join(command_args)))
             Logger.logger.info(

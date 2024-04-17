@@ -520,13 +520,19 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
-    def get_incidents(self, **kwargs):
-        # TODO update to v2
-        url = "/v1/incidents"
+    def get_incidents(self, filters, **kwargs):
+        url = "/api/v1/runtime/incidents"
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
-        r = self.get(url, params=params)
+        r = self.post(url, params=params,json={"pageNumber": 1, "pageSize": 100,
+                                                "orderBy": "createdTimestamp:desc", "innerFilters": [filters]})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def get_incident(self, incident_id: str):
+        url = "/api/v1/runtime/incidents/" + incident_id
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
