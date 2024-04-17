@@ -13,7 +13,6 @@ SCENARIOS_TEST_PATH = "./configurations/scenarios-test-env"
 SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
       
 SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
-    "clusterShortName": "_security-risks-uv-clustershortname.json",
     "namespace": "_security-risks-uv-namespace.json",
     "severity": "_security-risks-uv-severity.json",
     "category": "_security-risks-uv-category.json",
