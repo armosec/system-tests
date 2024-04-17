@@ -110,6 +110,7 @@ API_SECURITY_RISKS_SEVERITIES = "/api/v1/securityrisks/severities"
 API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
+API_SECURITY_RISKS_RESOURCES = "/api/v1/securityrisks/resources"
 
 
 def deco_cookie(func):
@@ -2282,6 +2283,37 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get get_security_risks_list_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = {}
+
+        if cluster_name is not None:
+            filters["cluster"] = cluster_name
+        
+        if namespace is not None:
+            filters["namespace"] = namespace
+        
+        if security_risk_id is not None:
+            filters["securityRiskID"] = security_risk_id
+            
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_RESOURCES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_security_risks_resources "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
