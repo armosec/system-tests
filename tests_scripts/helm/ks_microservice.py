@@ -35,7 +35,8 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
         Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
         scenarios_manager = SecurityRisksScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
-                                                            backend= self.backend, cluster=cluster)       
+                                                            backend= self.backend, cluster=cluster)
+               
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
 

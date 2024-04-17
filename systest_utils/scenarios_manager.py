@@ -11,7 +11,21 @@ from tests_scripts import base_test
 
 SCENARIOS_TEST_PATH = "./configurations/scenarios-test-env"
 SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
-      
+
+
+# maps field name and the expected values file suffix
+SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
+    "namespace": "_security-risks-uv-namespace.json",
+    "severity": "_security-risks-uv-severity.json",
+    "category": "_security-risks-uv-category.json",
+    "securityRiskName": "_security-risks-uv-securityriskname.json",
+}
+
+# maps security risk id and the expected values file prefix
+SECURITY_RISKS_RESOURCES_PREFIX = {
+    "R_0002": "_security-risks-resources_sidebar_R0002", # control security risk type
+    "R_0035": "_security-risks-resources_sidebar_R0035", # attack path security risk type
+}
 
 class ScenarioManager(base_test.BaseTest):
     """
@@ -183,6 +197,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         - security risks list
         - security risks categories
         - security risks severities
+        - security risks unique values
+        - security risks resources
 
         TODO: validate security risks trends
 
@@ -196,20 +212,19 @@ class SecurityRisksScenarioManager(ScenarioManager):
         )
         
         Logger.logger.info("validating security risks categories")
-        r = self.wait_for_report(
-        self.verify_security_risks_categories, 
-        expected_values_path=SCENARIOS_EXPECTED_VALUES,
-        timeout=180,
-        sleep_interval=10
-        )
+        self.verify_security_risks_categories(SCENARIOS_EXPECTED_VALUES)
         
         Logger.logger.info("validating security risks severities")
-        r = self.wait_for_report(
-        self.verify_security_risks_severities,
-        expected_values_path=SCENARIOS_EXPECTED_VALUES,
-        timeout=180,
-        sleep_interval=10
-        )
+        self.verify_security_risks_severities(SCENARIOS_EXPECTED_VALUES)
+
+        # verify unique values - no need to wait.
+        Logger.logger.info("validating security risks unique values")
+        uniqueValuesAllFilters = {"clusterShortName":self.cluster,"namespace":"default","severity":"Medium","category":"Workload configuration","smartRemediation":"1"}
+        self.verify_security_risks_list_uniquevalues(SCENARIOS_EXPECTED_VALUES, uniqueValuesAllFilters)
+
+        # verify resources side panel - no need to wait.
+        Logger.logger.info("validating security risks resources")
+        self.verify_security_risks_resources(SCENARIOS_EXPECTED_VALUES)
 
     def verify_fix(self):
         """
@@ -235,6 +250,30 @@ class SecurityRisksScenarioManager(ScenarioManager):
         super().apply_fix(fix_type)
 
 
+    def check_security_risks_resources_results(self, result, expected) -> bool:
+        """
+        check_security_risks_resources_results - Validate the input content with the expected one of security risks resources
+        
+        :param result: content retrieved from backend.
+        :return: True if all the controls passed, False otherwise.
+        """
+        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 
+                   'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
+                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID'}
+    
+        if 'total' in result and 'total' in expected:
+            if result['total']['value'] != expected['total']['value']:
+                raise Exception(f"'Total' value mismatch: result: {result['total']['value']} != expected: {expected['total']['value']}")
+
+        if 'response' in result and 'response' in expected:
+            if len(result['response']) != len(expected['response']):
+                raise Exception(f"Length mismatch: result: {len(result['response'])} != expected: {len(expected['response'])}")
+            
+            if not compare_lists(result['response'], expected['response'], ignore_keys):
+                return False
+        
+        return True
+
     def check_security_risks_results(self, result, expected) -> bool:
         """
         check_security_risks_results - Validate the input content with the expected one of security risks list
@@ -251,6 +290,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
                 raise Exception(f"'Total' value mismatch: result: {result['total']['value']} != expected: {expected['total']['value']}, missing security risks: {missingSecurityRiskIDs}")
 
         if 'response' in result and 'response' in expected:
+            if result['response'] == None:
+                raise Exception(f"response is None")
             if len(result['response']) != len(expected['response']):
                 missingSecurityRiskIDs =self.find_missing_security_risks(result, expected)
                 raise Exception(f"Length mismatch: result: {len(result['response'])} != expected: {len(expected['response'])}, missing security risks: {missingSecurityRiskIDs}")
@@ -316,6 +357,28 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert response['total']['value'] == 0, "Security risks found, expecting no security risks"
         return True
     
+    def verify_security_risks_list_uniquevalues(self, expected_values_path, baseFilters):
+        """
+        verify_security_risks_list_uniquevalues validate the security risks unique values results on the backend
+        """
+
+        for fieldName, expectedSuffix in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
+            newFilters = baseFilters.copy()
+            if fieldName != "namespace":
+                newFilters[fieldName] = ""
+            Logger.logger.info(f"wait for response from BE with filter: {newFilters}")
+            r = self.backend.get_security_risks_list_uniquevalues(newFilters, fieldName)
+
+
+            Logger.logger.info('loading security risks scenario to validate it')
+            f = open(os.path.join(expected_values_path, self.test_scenario+expectedSuffix))
+            expected = json.load(f) 
+            response = json.loads(r.text)
+
+            equal = response == expected
+       
+            assert equal, f"verify_security_risks_list_uniquevalues - security risks unique values for '{fieldName}' response differs from the expected one. Response: {response}, Expected: {expected}"
+
 
     def verify_security_risks_severities(self, expected_values_path):
         """
@@ -334,8 +397,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         try:
             equal = self.check_security_risks_severities(response, expected)
         except Exception as e:
-            raise Exception(f"Security risks severities response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
-        assert equal, f"security risks severities response differs from the expected one. Response: {response}, Expected: {expected}"
+            raise Exception(f"verify_security_risks_severities - Security risks severities response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
+        assert equal, f"verify_security_risks_severities - security risks severities response differs from the expected one. Response: {response}, Expected: {expected}"
 
     
     def verify_security_risks_categories(self, expected_values_path):
@@ -355,8 +418,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         try:
             equal = self.check_security_risks_categories(response, expected)
         except Exception as e:
-            raise Exception(f"Security risks categories response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
-        assert equal, f"security risks categories response differs from the expected one. Response: {response}, Expected: {expected}"
+            raise Exception(f"verify_security_risks_categories - Security risks categories response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
+        assert equal, f"verify_security_risks_categories - security risks categories response differs from the expected one. Response: {response}, Expected: {expected}"
 
 
     def verify_security_risks_list(self, expected_values_path):
@@ -376,8 +439,31 @@ class SecurityRisksScenarioManager(ScenarioManager):
         try:
             equal = self.check_security_risks_results(response, expected)
         except Exception as e:
-            raise Exception(f"Security risks response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
-        assert equal, f"security risks response differs from the expected one. Response: {response}, Expected: {expected}"
+            raise Exception(f"verify_security_risks_list - Security risks response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
+        assert equal, f"verify_security_risks_list - security risks response differs from the expected one. Response: {response}, Expected: {expected}"
+
+
+    def verify_security_risks_resources(self, expected_values_path):
+        """
+        verify_security_risks_resources_sidebar validate the security risks resources on the backend
+        """
+
+        for security_risk_id, expectedPrefix in SECURITY_RISKS_RESOURCES_PREFIX.items():
+            Logger.logger.info(f"wait for response from BE with filter: {security_risk_id}")
+            r = self.backend.get_security_risks_resources(self.cluster, "default", security_risk_id)
+
+            Logger.logger.info('loading security risks scenario to validate it')
+            f = open(os.path.join(expected_values_path, self.test_scenario+expectedPrefix+'.json'))
+            expected = json.load(f) 
+            response = json.loads(r.text)
+
+            Logger.logger.info('comparing security risks result with expected ones')
+            try:
+                equal = self.check_security_risks_resources_results(response, expected)
+            except Exception as e:
+                raise Exception(f"verify_security_risks_resources - Security risks response differs from the expected one. Error: {e},  Response: {response}, Expected: {expected}")
+            assert equal, f"verify_security_risks_resources - security risks response differs from the expected one. Response: {response}, Expected: {expected}"
+
 
     def find_missing_security_risks(self, result, expected):
         """
@@ -397,12 +483,15 @@ def compare_dicts(d1, d2, ignore_keys=None):
     """
     Compare two dictionaries deeply, ignoring specific keys.
     """
-    d1_keys = set(d1.keys()) - ignore_keys
-    d2_keys = set(d2.keys()) - ignore_keys
+    if ignore_keys is not None:
+        d1_keys = set(d1.keys()) - ignore_keys
+        d2_keys = set(d2.keys()) - ignore_keys
+    else:
+        d1_keys = set(d1.keys())
+        d2_keys = set(d2.keys())
 
     if d1_keys != d2_keys:
-        print("Keys mismatch:", d1_keys, d2_keys)
-        return False
+        raise Exception(f"Keys mismatch: {d1_keys} != {d2_keys}")
 
     for key in d1_keys:
         if isinstance(d1[key], dict) and isinstance(d2[key], dict):
@@ -412,8 +501,7 @@ def compare_dicts(d1, d2, ignore_keys=None):
             if not compare_lists(d1[key], d2[key], ignore_keys):
                 return False
         elif d1[key] != d2[key]:
-            print(f"Difference found at key '{key}': {d1[key]} != {d2[key]}")
-            return False
+            raise Exception(f"Difference found at key '{key}': {d1[key]} != {d2[key]}")
     return True
 
 def compare_lists(l1, l2, ignore_keys=None):
@@ -421,8 +509,7 @@ def compare_lists(l1, l2, ignore_keys=None):
     Compare two lists of dictionaries deeply, ignoring specific keys.
     """
     if len(l1) != len(l2):
-        print("List lengths differ:", len(l1), len(l2))
-        return False
+        raise Exception(f"List lengths differ: {len(l1)} != {len(l2)}")
     for item1, item2 in zip(l1, l2):
         if not compare_dicts(item1, item2, ignore_keys):
             return False
