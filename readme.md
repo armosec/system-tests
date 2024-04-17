@@ -39,7 +39,6 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `scan_local_file`                                              | kubescape  | scan local file                                                        | kubescape                     |
 | `scan_local_glob_files`                                        | kubescape  | scan local glob files                                                  | kubescape                     |
 | `scan_local_list_of_files`                                     | kubescape  | scan local list of files                                               | kubescape      
-| `scan_security_and_submit_to_backend`                               | kubescape, security  | scan framework NSA and test results against the backend,                | kubescape, backend                 |
 | `scan_nsa_and_submit_to_backend`                               | kubescape  | scan framework NSA and test results against the backend                | kubescape, backend            | 
 | `scan_mitre_and_submit_to_backend`                             | kubescape  | scan framework MITRE and test results against the backend              | kubescape, backend            | 
 | `scan_local_repository_and_submit_to_backend`                  | kubescape  | scan local repository and test results against the backend             | kubescape, backend            | 
@@ -90,6 +89,8 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `synchronizer_proxy`                | helm-chart |  synchronizer network disconnection and proxy | in-cluster synchronizer, backend |
 | `synchronizer_race_condition`       | helm-chart |  synchronizer multiple frequent modifications | in-cluster synchronizer, backend |
 | `synchronizer_kubescape_crds`       | helm-chart |  synchronizer Kubescape CRDs | in-cluster synchronizer, backend |
+| `sr_detect_and_resolve`             | helm-chart |                                    | in-cluster kubescape, backend |
+
 
 ### Install:
 * download/clone repository
