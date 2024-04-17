@@ -258,7 +258,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         :return: True if all the controls passed, False otherwise.
         """
         ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 
-                   'cursor', 'k8sResourceHash', 'cluster', 
+                   'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
                    'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID'}
     
         if 'total' in result and 'total' in expected:
