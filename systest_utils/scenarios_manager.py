@@ -364,7 +364,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
         for fieldName, expectedSuffix in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
             newFilters = baseFilters.copy()
-            newFilters[fieldName] = ""
+            if fieldName != "namespace":
+                newFilters[fieldName] = ""
             Logger.logger.info(f"wait for response from BE with filter: {newFilters}")
             r = self.backend.get_security_risks_list_uniquevalues(newFilters, fieldName)
 
