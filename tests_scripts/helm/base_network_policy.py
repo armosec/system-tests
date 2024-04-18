@@ -31,15 +31,34 @@ class BaseNetworkPolicy(BaseHelm):
         for key, label in expected_obj['metadata']['labels'].items():
             assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}, actual object: {actual_obj}, expected object: {expected_obj}"
         
-    
+    def store_netwrok_for_first_time_results(self, result_data, store_path):
+        for file_path in store_path:
+            with open(file_path) as f:
+                expected_data = json.load(f)
+            if expected_data['metadata']['name'] == result_data['metadata']['name']:
+                try:
+                    # del result_data['metadata']['annotations']["kubescape.io/completion"]
+                    # del result_data['metadata']['annotations']["kubescape.io/status"]
+                    del result_data['metadata']['annotations'][statics.RELEVANCY_WLID_ANNOTATION]
+                    del result_data['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL]
+                    del result_data['metadata']['labels'][statics.RELEVANCY_RESOURCE_VERSION_LABEL]
+                    del result_data['metadata']['labels'][statics.RELEVANCY_TEMPLATE_HASH_LABEL]
+                except:
+                    pass
+                with open(file_path, 'w') as f:
+                    json.dump(result_data, f)
+
     def validate_expected_network_neighbors_list(self, namespace, expected_network_neighbors_list):
         """
         Validate expected network neighbors list. It pulls the actual network neighbors and validates each one of them
         param namespace: namespace of the object
         param expected_network_neighbors_list: list of expected network neighbors
         """
-        for expected_network_neighbors in expected_network_neighbors_list:
+        for expected_network_neighbors in  expected_network_neighbors_list:
             actual_network_neighbors = self.get_network_neighbors(name=expected_network_neighbors['metadata']['name'] ,namespace=namespace)
+            if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
+                self.store_netwrok_for_first_time_results(result_data=actual_network_neighbors, store_path=self.test_obj["expected_network_neighbors"])
+                continue
             self.validate_expected_network_neighbors(actual_network_neighbors=actual_network_neighbors, expected_network_neighbors=expected_network_neighbors, namespace=namespace)
     
     
@@ -285,6 +304,9 @@ class BaseNetworkPolicy(BaseHelm):
         """
         for expected_generated_network_policy in expected_generated_network_policy_list:
             actual_generated_network_policy = self.get_generated_network_policy(namespace=namespace, name=expected_generated_network_policy['metadata']['name'])
+            if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
+                self.store_netwrok_for_first_time_results(result_data=expected_generated_network_policy, store_path=self.test_obj["expected_generated_network_policies"])
+                continue
             self.validate_expected_generated_network_policy(actual_network_policy=actual_generated_network_policy,expected_network_policy=expected_generated_network_policy, namespace=namespace)
 
 
