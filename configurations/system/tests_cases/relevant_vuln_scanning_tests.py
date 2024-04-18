@@ -68,7 +68,7 @@ class RelevantVulnerabilityScanningTests(object):
                                     ("wordpress", "configurations/expected-result/filteredCVEs/wordpress.json")],
             helm_kwargs={statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
-                         "nodeAgent.config.learningPeriod": "2m",
+                         "nodeAgent.config.learningPeriod": "1m",
                          "nodeAgent.config.updatePeriod": "0.5m"
                          }
         )

@@ -56,15 +56,16 @@ class KubectlWrapper(object):
         self.context = None
         self.client_CoreV1Api = None
         self.client_AppsV1Api = None
-        self.client_AppsV1beta1Api = None
         self.client_RbacAuthorizationV1Api = None
         self.client_NetworkingV1Api = None
         self.client_ApiextensionsV1Api = None
+        self.client_BatchV1Api = None
         self.client = None
 
         self.kubernetes_login()
 
     def run(self, method, retry=0, _request_timeout=360, **kwargs):
+
         try:
             status = method(**kwargs)
             return status
@@ -112,12 +113,9 @@ class KubectlWrapper(object):
                 api_client=config.new_client_from_config(context=active_context['name']))
             self.client_NetworkingV1Api = client.NetworkingV1Api(api_client=config.new_client_from_config(
                 context=active_context['name']))
-            self.client_AppsV1beta1Api = \
-                client.AppsV1beta1Api(api_client=config.new_client_from_config(
-                    context=active_context['name']))
             self.client_ApiextensionsV1Api = client.ApiextensionsV1Api(api_client=config.new_client_from_config(
                 context=active_context['name']))
-            self.client_BatchV1beta1Api = client.BatchV1beta1Api(api_client=config.new_client_from_config(
+            self.client_BatchV1Api = client.BatchV1Api(api_client=config.new_client_from_config(
                 context=active_context['name']))
             self.client_CustomObjectsApi = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
 
@@ -503,28 +501,28 @@ class KubectlWrapper(object):
         return c
     
     def get_ks_cronjob_schedule(self, namespace):
-        cronjobs = self.run(method=self.client_BatchV1beta1Api.list_namespaced_cron_job, namespace=namespace)
+        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan" in cj.metadata.name:
                 return cj.spec._schedule
 
     def get_ks_cronjob_name(self, namespace):
         cronjobs_name=[]
-        cronjobs = self.run(method=self.client_BatchV1beta1Api.list_namespaced_cron_job, namespace=namespace)
+        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan" in cj.metadata.name:
                 cronjobs_name.append(cj.metadata.name)
         return cronjobs_name
 
     def is_ks_cronjob_created(self, framework_name, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
-        cronjobs = self.run(method=self.client_BatchV1beta1Api.list_namespaced_cron_job, namespace=namespace)
+        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan-{}".format(framework_name.lower()) in cj.metadata.name:
                 return True 
         return False
 
     def get_vuln_scan_cronjob(self, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
-        cronjobs = self.run(method=self.client_BatchV1beta1Api.list_namespaced_cron_job, namespace=namespace)
+        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         result = []
         for cj in cronjobs.items:
             if statics.CA_VULN_SCAN_CRONJOB_ARMO_TIER_LABEL_FIELD in cj.metadata.labels.keys() and \
@@ -534,7 +532,7 @@ class KubectlWrapper(object):
         return result
 
     def get_registry_scan_cronjob(self, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
-        cronjobs = self.run(method=self.client_BatchV1beta1Api.list_namespaced_cron_job, namespace=namespace)
+        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         result = []
         for cj in cronjobs.items:
             if statics.CA_VULN_SCAN_CRONJOB_ARMO_TIER_LABEL_FIELD in cj.metadata.labels.keys() and \
