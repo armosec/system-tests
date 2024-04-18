@@ -16,7 +16,7 @@
             "riskType": "AttackPath",
             "securityRiskID": "R_0035",
             "status": "Detected",
-            "isNew": false,
+            "isNew": true,
             "lastTimeDetected": "2024-04-17T12:03:57Z",
             "exceptionApplied": false,
             "attackChainID": "1496039999",
