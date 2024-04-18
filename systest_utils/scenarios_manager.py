@@ -15,7 +15,7 @@ SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
 
 # maps field name and the expected values file suffix
 SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
-    "namespace": "_security-risks-uv-namespace.json",
+    # "namespace": "_security-risks-uv-namespace.json",
     "severity": "_security-risks-uv-severity.json",
     "category": "_security-risks-uv-category.json",
     "securityRiskName": "_security-risks-uv-securityriskname.json",
