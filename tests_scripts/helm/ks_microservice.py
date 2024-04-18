@@ -22,9 +22,14 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         1. Install attack-chains scenario manifests in the cluster
         2. Install kubescape with helm-chart
         3. Verify scenario on backend
-        4. Apply attack chain fix
-        5. trigger scan after fix
-        6. verify fix
+        4. Verify security risks categories
+        5. Verify security risks severities
+        6. Verify security risks unique values
+        7. Verify security risks resources
+        8. Apply attack chain fix
+        9. trigger scan after fix
+        10. verify fix
+        TODO: validate security risks trends
 
         """
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
@@ -51,16 +56,29 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario()
-        Logger.logger.info("security risks, applying fix command")
+                
+        Logger.logger.info("4. validating security risks categories")
+        scenarios_manager.verify_security_risks_categories()
+        
+        Logger.logger.info("5. validating security risks severities")
+        scenarios_manager.verify_security_risks_severities()
 
-        Logger.logger.info("4. Apply attack chain fix")
+        # verify unique values - no need to wait.
+        Logger.logger.info("6. validating security risks unique values")
+        uniqueValuesAllFilters = {"clusterShortName":self.cluster,"namespace":"default","severity":"Medium","category":"Workload configuration","smartRemediation":"1"}
+        scenarios_manager.verify_security_risks_list_uniquevalues(uniqueValuesAllFilters)
+
+        # verify resources side panel - no need to wait.
+        Logger.logger.info("7. validating security risks resources")
+        scenarios_manager.verify_security_risks_resources()
+
+        Logger.logger.info("8. Apply attack chain fix")
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
-        Logger.logger.info("5. trigger scan after fix")
-
+        Logger.logger.info("9. trigger scan after fix")
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
-        Logger.logger.info("6. verify fix")
+        Logger.logger.info("10. verify fix")
         scenarios_manager.verify_fix()
         
         Logger.logger.info('attack-chain fixed properly')
