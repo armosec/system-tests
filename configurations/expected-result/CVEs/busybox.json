@@ -1,167 +1,168 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "VulnerabilityManifest",
+  "kind": "VulnerabilityManifest",
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "metadata": {
+    "name": "docker.io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231-60c231",
+    "namespace": "kubescape",
+    "uid": "8df87dea-f468-41f5-af50-1de5a2d033fc",
+    "resourceVersion": "1",
+    "creationTimestamp": "2024-04-18T11:49:55Z",
+    "labels": {
+      "kubescape.io/context": "non-filtered",
+      "kubescape.io/image-id": "docker-io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2",
+      "kubescape.io/image-name": "docker-io-library-busybox"
+    },
+    "annotations": {
+      "kubescape.io/image-id": "docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231",
+      "kubescape.io/image-tag": "docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231",
+      "kubescape.io/status": "ready"
+    }
+  },
+  "spec": {
     "metadata": {
-        "annotations": {
-            "kubescape.io/image-id": "docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231",
-            "kubescape.io/status": "ready"
-        },
-        "creationTimestamp": "2024-02-04T15:27:03Z",
-        "labels": {
-            "kubescape.io/context": "non-filtered",
-            "kubescape.io/image-id": "docker-io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2",
-            "kubescape.io/image-name": "docker-io-library-busybox"
-        },
-        "name": "docker.io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231-60c231",
-        "namespace": "kubescape",
-        "resourceVersion": "1",
-        "uid": "a12c267b-a496-4088-a883-cd8b05c1449c"
+      "withRelevancy": false,
+      "tool": {
+        "name": "",
+        "version": "v0.74.2-hotfix",
+        "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
+      },
+      "report": {
+        "createdAt": null
+      }
     },
-    "spec": {
-        "metadata": {
-            "report": {
-                "createdAt": null
-            },
-            "tool": {
-                "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
-                "name": "",
-                "version": "v0.74.2"
-            },
-            "withRelevancy": false
-        },
-        "payload": {
-            "descriptor": {
-                "configuration": null,
-                "db": {
-                    "built": "2023-05-29T01:31:19Z",
-                    "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
-                    "error": null,
-                    "location": "/home/nonroot/.cache/grype/db/5",
-                    "schemaVersion": 5
-                },
-                "name": "",
-                "version": ""
-            },
-            "distro": {
-                "idLike": [
-                    "busybox"
-                ],
-                "name": "busybox",
-                "version": "1.34.0"
-            },
-            "matches": [
-                {
-                    "artifact": {
-                        "cpes": [
-                            "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*",
-                            "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*"
-                        ],
-                        "language": "",
-                        "licenses": [],
-                        "locations": [
-                            {
-                                "layerID": "sha256:f6cb480bb44e83be776ab6da2494ef58204ffe5dceb1bd0aecf3766840ccb008",
-                                "path": "/bin/["
-                            }
-                        ],
-                        "metadata": null,
-                        "name": "busybox",
-                        "purl": "pkg:generic/busybox@1.34.0",
-                        "type": "binary",
-                        "upstreams": null,
-                        "version": "1.34.0"
-                    },
-                    "matchDetails": [
-                        {
-                            "found": {
-                                "cpes": [
-                                    "cpe:2.3:a:busybox:busybox:*:*:*:*:*:*:*:*"
-                                ],
-                                "versionConstraint": "\u003c= 1.35.0 (unknown)",
-                                "vulnerabilityID": "CVE-2022-28391"
-                            },
-                            "matcher": "stock-matcher",
-                            "searchedBy": {
-                                "Package": {
-                                    "name": "busybox",
-                                    "version": "1.34.0"
-                                },
-                                "cpes": [
-                                    "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*"
-                                ],
-                                "namespace": "nvd:cpe"
-                            },
-                            "type": "cpe-match"
-                        }
-                    ],
-                    "relatedVulnerabilities": null,
-                    "vulnerability": {
-                        "advisories": null,
-                        "cvss": [
-                            {
-                                "metrics": {
-                                    "baseScore": 6.8,
-                                    "exploitabilityScore": 8.6,
-                                    "impactScore": 6.4
-                                },
-                                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
-                                "vendorMetadata": {},
-                                "version": "2.0"
-                            },
-                            {
-                                "metrics": {
-                                    "baseScore": 8.8,
-                                    "exploitabilityScore": 2.8,
-                                    "impactScore": 5.9
-                                },
-                                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
-                                "vendorMetadata": {},
-                                "version": "3.1"
-                            }
-                        ],
-                        "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-28391",
-                        "description": "BusyBox through 1.35.0 allows remote attackers to execute arbitrary code if netstat is used to print a DNS PTR record's value to a VT compatible terminal. Alternatively, the attacker could choose to change the terminal's colors.",
-                        "fix": {
-                            "state": "unknown",
-                            "versions": []
-                        },
-                        "id": "CVE-2022-28391",
-                        "namespace": "nvd:cpe",
-                        "severity": "High",
-                        "urls": [
-                            "https://git.alpinelinux.org/aports/plain/main/busybox/0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch",
-                            "https://git.alpinelinux.org/aports/plain/main/busybox/0002-nslookup-sanitize-all-printed-strings-with-printable.patch",
-                            "https://gitlab.alpinelinux.org/alpine/aports/-/issues/13661"
-                        ]
-                    }
-                }
+    "payload": {
+      "matches": [
+        {
+          "vulnerability": {
+            "id": "CVE-2022-28391",
+            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-28391",
+            "namespace": "nvd:cpe",
+            "severity": "High",
+            "urls": [
+              "https://git.alpinelinux.org/aports/plain/main/busybox/0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch",
+              "https://git.alpinelinux.org/aports/plain/main/busybox/0002-nslookup-sanitize-all-printed-strings-with-printable.patch",
+              "https://gitlab.alpinelinux.org/alpine/aports/-/issues/13661"
             ],
-            "source": {
-                "target": {
-                    "architecture": "amd64",
-                    "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbInNoIl0sIkltYWdlIjoic2hhMjU2Ojk0OGRkOGU1NmFiZjg3ODYyMmM4YmM2NTNmN2QzMDkxMjkwZjI5NDAyZDZmMmM2ZDY3MTg3ODc3N2NhNDQ2YTgiLCJWb2x1bWVzIjpudWxsLCJXb3JraW5nRGlyIjoiIiwiRW50cnlwb2ludCI6bnVsbCwiT25CdWlsZCI6bnVsbCwiTGFiZWxzIjpudWxsfSwiY29udGFpbmVyIjoiYWQ3NWQ4Nzc5ZTc4NGQ3MjZjMmIxZTRjZGY1OTk0YjVjMDM4MjY2NDQ3ZTEwNDIwMjI1NGIwNTlhYmNhYjJiNCIsImNvbnRhaW5lcl9jb25maWciOnsiSG9zdG5hbWUiOiJhZDc1ZDg3NzllNzgiLCJEb21haW5uYW1lIjoiIiwiVXNlciI6IiIsIkF0dGFjaFN0ZGluIjpmYWxzZSwiQXR0YWNoU3Rkb3V0IjpmYWxzZSwiQXR0YWNoU3RkZXJyIjpmYWxzZSwiVHR5IjpmYWxzZSwiT3BlblN0ZGluIjpmYWxzZSwiU3RkaW5PbmNlIjpmYWxzZSwiRW52IjpbIlBBVEg9L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluIl0sIkNtZCI6WyIvYmluL3NoIiwiLWMiLCIjKG5vcCkgIiwiQ01EIFtcInNoXCJdIl0sIkltYWdlIjoic2hhMjU2Ojk0OGRkOGU1NmFiZjg3ODYyMmM4YmM2NTNmN2QzMDkxMjkwZjI5NDAyZDZmMmM2ZDY3MTg3ODc3N2NhNDQ2YTgiLCJWb2x1bWVzIjpudWxsLCJXb3JraW5nRGlyIjoiIiwiRW50cnlwb2ludCI6bnVsbCwiT25CdWlsZCI6bnVsbCwiTGFiZWxzIjp7fX0sImNyZWF0ZWQiOiIyMDIxLTA5LTE0VDAxOjIwOjM0LjkyNjI5MTIyMVoiLCJkb2NrZXJfdmVyc2lvbiI6IjIwLjEwLjciLCJoaXN0b3J5IjpbeyJjcmVhdGVkIjoiMjAyMS0wOS0xNFQwMToyMDozNC43NzUxNzYwNTNaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApIEFERCBmaWxlOjYyN2VkNTJjYTkwNjg0NmY2YWRiZGUyMjkwMTI3MGFkZDkxNTU3M2NlMWNhYTViMDk4MTU1OWRlYWZhMDMyMTMgaW4gLyAifSx7ImNyZWF0ZWQiOiIyMDIxLTA5LTE0VDAxOjIwOjM0LjkyNjI5MTIyMVoiLCJjcmVhdGVkX2J5IjoiL2Jpbi9zaCAtYyAjKG5vcCkgIENNRCBbXCJzaFwiXSIsImVtcHR5X2xheWVyIjp0cnVlfV0sIm9zIjoibGludXgiLCJyb290ZnMiOnsidHlwZSI6ImxheWVycyIsImRpZmZfaWRzIjpbInNoYTI1NjpmNmNiNDgwYmI0NGU4M2JlNzc2YWI2ZGEyNDk0ZWY1ODIwNGZmZTVkY2ViMWJkMGFlY2YzNzY2ODQwY2NiMDA4Il19fQ==",
-                    "imageID": "sha256:8336f9f1d0946781f428a155536995f0d8a31209d65997e2a379a23e7a441b78",
-                    "imageSize": 1243916,
-                    "layers": [
-                        {
-                            "digest": "sha256:f6cb480bb44e83be776ab6da2494ef58204ffe5dceb1bd0aecf3766840ccb008",
-                            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
-                            "size": 1243916
-                        }
-                    ],
-                    "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMTQ1NiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ODMzNmY5ZjFkMDk0Njc4MWY0MjhhMTU1NTM2OTk1ZjBkOGEzMTIwOWQ2NTk5N2UyYTM3OWEyM2U3YTQ0MWI3OCIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDc3Mjg4NywKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MzVkYWNhZmNkYWQ1YjYzZTBkZTk1MjRjNGJlNmJmN2FmNzhhNDkzMzE4YjQ4OTg0MDk2NWI5NTVlZTRkN2U2MCIKICAgICAgfQogICBdCn0=",
-                    "manifestDigest": "sha256:15f840677a5e245d9ea199eb9b026b1539208a5183621dced7b469f6aa678115",
-                    "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-                    "os": "linux",
-                    "repoDigests": [
-                        "index.docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231"
-                    ],
-                    "tags": [],
-                    "userInput": "docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231"
+            "description": "BusyBox through 1.35.0 allows remote attackers to execute arbitrary code if netstat is used to print a DNS PTR record's value to a VT compatible terminal. Alternatively, the attacker could choose to change the terminal's colors.",
+            "cvss": [
+              {
+                "version": "2.0",
+                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:P",
+                "metrics": {
+                  "baseScore": 6.8,
+                  "exploitabilityScore": 8.6,
+                  "impactScore": 6.4
                 },
-                "type": "image"
+                "vendorMetadata": {}
+              },
+              {
+                "version": "3.1",
+                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H",
+                "metrics": {
+                  "baseScore": 8.8,
+                  "exploitabilityScore": 2.8,
+                  "impactScore": 5.9
+                },
+                "vendorMetadata": {}
+              }
+            ],
+            "fix": {
+              "versions": [],
+              "state": "unknown"
+            },
+            "advisories": null
+          },
+          "relatedVulnerabilities": null,
+          "matchDetails": [
+            {
+              "type": "cpe-match",
+              "matcher": "stock-matcher",
+              "searchedBy": {
+                "namespace": "nvd:cpe",
+                "cpes": [
+                  "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*"
+                ],
+                "Package": {
+                  "name": "busybox",
+                  "version": "1.34.0"
+                }
+              },
+              "found": {
+                "vulnerabilityID": "CVE-2022-28391",
+                "versionConstraint": "<= 1.35.0 (unknown)",
+                "cpes": [
+                  "cpe:2.3:a:busybox:busybox:*:*:*:*:*:*:*:*"
+                ]
+              }
             }
+          ],
+          "artifact": {
+            "name": "busybox",
+            "version": "1.34.0",
+            "type": "binary",
+            "locations": [
+              {
+                "path": "/bin/[",
+                "layerID": "sha256:f6cb480bb44e83be776ab6da2494ef58204ffe5dceb1bd0aecf3766840ccb008"
+              }
+            ],
+            "language": "",
+            "licenses": [],
+            "cpes": [
+              "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*",
+              "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*"
+            ],
+            "purl": "pkg:generic/busybox@1.34.0",
+            "upstreams": null,
+            "metadata": null
+          }
         }
-    },
-    "status": {}
+      ],
+      "source": {
+        "type": "image",
+        "target": {
+          "userInput": "docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231",
+          "imageID": "sha256:8336f9f1d0946781f428a155536995f0d8a31209d65997e2a379a23e7a441b78",
+          "manifestDigest": "sha256:15f840677a5e245d9ea199eb9b026b1539208a5183621dced7b469f6aa678115",
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "tags": [],
+          "imageSize": 1243916,
+          "layers": [
+            {
+              "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+              "digest": "sha256:f6cb480bb44e83be776ab6da2494ef58204ffe5dceb1bd0aecf3766840ccb008",
+              "size": 1243916
+            }
+          ],
+          "manifest": "ewogICAic2NoZW1hVmVyc2lvbiI6IDIsCiAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5kaXN0cmlidXRpb24ubWFuaWZlc3QudjIranNvbiIsCiAgICJjb25maWciOiB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmRvY2tlci5jb250YWluZXIuaW1hZ2UudjEranNvbiIsCiAgICAgICJzaXplIjogMTQ1NiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6ODMzNmY5ZjFkMDk0Njc4MWY0MjhhMTU1NTM2OTk1ZjBkOGEzMTIwOWQ2NTk5N2UyYTM3OWEyM2U3YTQ0MWI3OCIKICAgfSwKICAgImxheWVycyI6IFsKICAgICAgewogICAgICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5kb2NrZXIuaW1hZ2Uucm9vdGZzLmRpZmYudGFyLmd6aXAiLAogICAgICAgICAic2l6ZSI6IDc3Mjg4NywKICAgICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MzVkYWNhZmNkYWQ1YjYzZTBkZTk1MjRjNGJlNmJmN2FmNzhhNDkzMzE4YjQ4OTg0MDk2NWI5NTVlZTRkN2U2MCIKICAgICAgfQogICBdCn0=",
+          "config": "eyJhcmNoaXRlY3R1cmUiOiJhbWQ2NCIsImNvbmZpZyI6eyJIb3N0bmFtZSI6IiIsIkRvbWFpbm5hbWUiOiIiLCJVc2VyIjoiIiwiQXR0YWNoU3RkaW4iOmZhbHNlLCJBdHRhY2hTdGRvdXQiOmZhbHNlLCJBdHRhY2hTdGRlcnIiOmZhbHNlLCJUdHkiOmZhbHNlLCJPcGVuU3RkaW4iOmZhbHNlLCJTdGRpbk9uY2UiOmZhbHNlLCJFbnYiOlsiUEFUSD0vdXNyL2xvY2FsL3NiaW46L3Vzci9sb2NhbC9iaW46L3Vzci9zYmluOi91c3IvYmluOi9zYmluOi9iaW4iXSwiQ21kIjpbInNoIl0sIkltYWdlIjoic2hhMjU2Ojk0OGRkOGU1NmFiZjg3ODYyMmM4YmM2NTNmN2QzMDkxMjkwZjI5NDAyZDZmMmM2ZDY3MTg3ODc3N2NhNDQ2YTgiLCJWb2x1bWVzIjpudWxsLCJXb3JraW5nRGlyIjoiIiwiRW50cnlwb2ludCI6bnVsbCwiT25CdWlsZCI6bnVsbCwiTGFiZWxzIjpudWxsfSwiY29udGFpbmVyIjoiYWQ3NWQ4Nzc5ZTc4NGQ3MjZjMmIxZTRjZGY1OTk0YjVjMDM4MjY2NDQ3ZTEwNDIwMjI1NGIwNTlhYmNhYjJiNCIsImNvbnRhaW5lcl9jb25maWciOnsiSG9zdG5hbWUiOiJhZDc1ZDg3NzllNzgiLCJEb21haW5uYW1lIjoiIiwiVXNlciI6IiIsIkF0dGFjaFN0ZGluIjpmYWxzZSwiQXR0YWNoU3Rkb3V0IjpmYWxzZSwiQXR0YWNoU3RkZXJyIjpmYWxzZSwiVHR5IjpmYWxzZSwiT3BlblN0ZGluIjpmYWxzZSwiU3RkaW5PbmNlIjpmYWxzZSwiRW52IjpbIlBBVEg9L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluIl0sIkNtZCI6WyIvYmluL3NoIiwiLWMiLCIjKG5vcCkgIiwiQ01EIFtcInNoXCJdIl0sIkltYWdlIjoic2hhMjU2Ojk0OGRkOGU1NmFiZjg3ODYyMmM4YmM2NTNmN2QzMDkxMjkwZjI5NDAyZDZmMmM2ZDY3MTg3ODc3N2NhNDQ2YTgiLCJWb2x1bWVzIjpudWxsLCJXb3JraW5nRGlyIjoiIiwiRW50cnlwb2ludCI6bnVsbCwiT25CdWlsZCI6bnVsbCwiTGFiZWxzIjp7fX0sImNyZWF0ZWQiOiIyMDIxLTA5LTE0VDAxOjIwOjM0LjkyNjI5MTIyMVoiLCJkb2NrZXJfdmVyc2lvbiI6IjIwLjEwLjciLCJoaXN0b3J5IjpbeyJjcmVhdGVkIjoiMjAyMS0wOS0xNFQwMToyMDozNC43NzUxNzYwNTNaIiwiY3JlYXRlZF9ieSI6Ii9iaW4vc2ggLWMgIyhub3ApIEFERCBmaWxlOjYyN2VkNTJjYTkwNjg0NmY2YWRiZGUyMjkwMTI3MGFkZDkxNTU3M2NlMWNhYTViMDk4MTU1OWRlYWZhMDMyMTMgaW4gLyAifSx7ImNyZWF0ZWQiOiIyMDIxLTA5LTE0VDAxOjIwOjM0LjkyNjI5MTIyMVoiLCJjcmVhdGVkX2J5IjoiL2Jpbi9zaCAtYyAjKG5vcCkgIENNRCBbXCJzaFwiXSIsImVtcHR5X2xheWVyIjp0cnVlfV0sIm9zIjoibGludXgiLCJyb290ZnMiOnsidHlwZSI6ImxheWVycyIsImRpZmZfaWRzIjpbInNoYTI1NjpmNmNiNDgwYmI0NGU4M2JlNzc2YWI2ZGEyNDk0ZWY1ODIwNGZmZTVkY2ViMWJkMGFlY2YzNzY2ODQwY2NiMDA4Il19fQ==",
+          "repoDigests": [
+            "index.docker.io/library/busybox@sha256:e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231"
+          ],
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      "distro": {
+        "name": "busybox",
+        "version": "1.34.0",
+        "idLike": [
+          "busybox"
+        ]
+      },
+      "descriptor": {
+        "name": "",
+        "version": "",
+        "configuration": null,
+        "db": {
+          "built": "2023-05-29T01:31:19Z",
+          "schemaVersion": 5,
+          "location": "/home/nonroot/.cache/grype/db/5",
+          "checksum": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3",
+          "error": null
+        }
+      }
+    }
+  },
+  "status": {}
 }

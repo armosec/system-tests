@@ -4,9 +4,9 @@
   "metadata": {
     "name": "docker.io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-9722c2",
     "namespace": "kubescape",
-    "uid": "ea2efbe6-5512-4a40-ad77-c02cac405837",
+    "uid": "664c329f-27b0-40a9-987d-8ab8f22a2f38",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T10:37:56Z",
+    "creationTimestamp": "2024-04-18T11:50:02Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
