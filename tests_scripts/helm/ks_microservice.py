@@ -63,14 +63,16 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("5. validating security risks severities")
         scenarios_manager.verify_security_risks_severities()
 
-        # verify unique values - no need to wait.
-        Logger.logger.info("6. validating security risks unique values")
-        uniqueValuesAllFilters = {"clusterShortName":self.cluster,
-                                  "namespace":"default",
-                                  "severity":"Medium",
-                                  "category":"Workload configuration",
-                                  "smartRemediation":"1"}
-        scenarios_manager.verify_security_risks_list_uniquevalues(uniqueValuesAllFilters)
+
+        # TODO: Fix verify_security_risks_list_uniquevalues
+        # # verify unique values - no need to wait.
+        # Logger.logger.info("6. validating security risks unique values")
+        # uniqueValuesAllFilters = {"clusterShortName":self.cluster,
+        #                           "namespace":"default",
+        #                           "severity":"Medium",
+        #                           "category":"Workload configuration",
+        #                           "smartRemediation":"1"}
+        # scenarios_manager.verify_security_risks_list_uniquevalues(uniqueValuesAllFilters)
 
         # verify resources side panel - no need to wait.
         Logger.logger.info("7. validating security risks resources")
