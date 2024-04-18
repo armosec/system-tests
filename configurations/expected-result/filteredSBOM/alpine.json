@@ -2,11 +2,11 @@
   "kind": "SBOMSyftFiltered",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
-    "name": "replicaset-collection-785d56d6d5-wordpress-0afd-e19b",
+    "name": "replicaset-collection-785d56d6d5-wordpress-6b82-e33b",
     "namespace": "kubescape",
-    "uid": "53b6fe66-699b-4a26-865a-e36640591a59",
+    "uid": "968aba44-0ec7-48bf-b91e-ba6248bd1e6b",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T12:03:35Z",
+    "creationTimestamp": "2024-04-18T12:27:17Z",
     "labels": {
       "kubescape.io/workload-api-group": "apps",
       "kubescape.io/workload-api-version": "v1",

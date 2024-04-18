@@ -3,9 +3,9 @@
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
     "name": "deployment-nginx",
-    "uid": "6976bce4-da26-4cff-9d60-957c7ec74a91",
+    "uid": "ef88c2a8-288d-4bff-9292-151257806c52",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T11:35:27Z",
+    "creationTimestamp": "2024-04-18T12:20:14Z",
     "labels": {
       "kubescape.io/workload-api-group": "apps",
       "kubescape.io/workload-api-version": "v1",
@@ -27,6 +27,7 @@
         "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
         "type": "internal",
         "dns": "",
+        "dnsNames": null,
         "ports": [
           {
             "name": "UDP-53",
