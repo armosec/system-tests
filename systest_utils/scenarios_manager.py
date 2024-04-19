@@ -260,17 +260,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
             compare_lists(result['response'], expected['response'], ignore_keys)
 
 
-    # def check_security_risks_trends(self, result, expected_number_of_events):
-    #     """
-    #     check_security_risks_trends - Validate the input content with the expected one of security risks trends
-        
-    #     :param result: content retrieved from backend.
-    #     """
-    #     ignore_keys = {'date'}
-
-    #     compare_dicts(result, expected, ignore_keys)
-        
-
     def check_security_risks_results(self, result, expected):
         """
         check_security_risks_results - Validate the input content with the expected one of security risks list
@@ -349,9 +338,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r = self.backend.get_security_risks_trends(self.cluster,self.namespace, self.test_security_risk_ids)
 
-        Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-trends.json'))
-        expected = json.load(f) 
         response = json.loads(r.text)
 
         Logger.logger.info('comparing security risks trends result with expected ones')
