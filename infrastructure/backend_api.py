@@ -111,6 +111,7 @@ API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
 API_SECURITY_RISKS_RESOURCES = "/api/v1/securityrisks/resources"
+API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 
 
 def deco_cookie(func):
@@ -2184,7 +2185,7 @@ class ControlPanelAPI(object):
         return j
 
     # security risks functions
-    def get_security_risks_list(self, cluster_name=None, namespace=None):
+    def get_security_risks_list(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
         filters = {}
 
@@ -2193,6 +2194,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+        
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2213,7 +2217,7 @@ class ControlPanelAPI(object):
         return r
     
 
-    def get_security_risks_severities(self, cluster_name=None, namespace=None):
+    def get_security_risks_severities(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
 
         filters = {}
@@ -2223,6 +2227,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2241,7 +2248,7 @@ class ControlPanelAPI(object):
         return r
     
 
-    def get_security_risks_categories(self, cluster_name=None, namespace=None):
+    def get_security_risks_categories(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
 
                 
@@ -2252,6 +2259,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+        
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2320,6 +2330,36 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get_security_risks_resources "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_security_risks_trends(self, cluster_name=None, namespace=None, security_risk_ids=[]):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = {}
+
+        if cluster_name is not None:
+            filters["clusterShortName"] = cluster_name
+        
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)        
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_TRENDS, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_security_risks_trends "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
