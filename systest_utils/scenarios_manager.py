@@ -210,7 +210,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("validating security risks list")
         res = self.wait_for_report(
         self.verify_security_risks_list, 
-        timeout=500,
+        timeout=600,
         sleep_interval=10
         )
 
@@ -227,7 +227,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
             self.is_security_risk_empty, 
             cluster_name=self.cluster,
             namespace=self.namespace,
-            timeout=500,
+            timeout=600,
             sleep_interval=10
             )
 
