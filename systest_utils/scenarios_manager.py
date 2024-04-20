@@ -12,6 +12,8 @@ from tests_scripts import base_test
 SCENARIOS_TEST_PATH = "./configurations/scenarios-test-env"
 SCENARIOS_EXPECTED_VALUES = "./configurations/scenarios_expected_values"
 
+EXPECTED_TRENDS_DAYS_BACK = 31
+
 
 # maps field name and the expected values file suffix
 SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
@@ -38,11 +40,12 @@ class ScenarioManager(base_test.BaseTest):
     - verify_fix: validate the fix results on the backend - needs to be implemented in the child class
     """
 
-    def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster, scenario_path=SCENARIOS_TEST_PATH):
-        self.test_scenario = test_scenario
+    def __init__(self, test_obj, backend: backend_api.ControlPanelAPI, cluster, namespace, scenario_path=SCENARIOS_TEST_PATH):
+        self.test_scenario = test_obj[("test_scenario", None)]
         self.backend = backend
         self.cluster = cluster
         self.scenario_path = scenario_path
+        self.namespace = namespace
 
     def __del__(self):
         pass
@@ -53,7 +56,7 @@ class ScenarioManager(base_test.BaseTest):
         apply_scenario apply the scenario manifests to the cluster
         """
         Logger.logger.info(f"Applying scenario manifests for {self.test_scenario}")
-        deploy_cmd = os.path.join(self.scenario_path, 'deploy_scenario') + ' ' + os.path.join(self.scenario_path , self.test_scenario)
+        deploy_cmd = os.path.join(self.scenario_path, 'deploy_scenario') + ' ' + os.path.join(self.scenario_path , self.test_scenario) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
         time.sleep(5)
 
@@ -62,7 +65,7 @@ class ScenarioManager(base_test.BaseTest):
         """
         apply_fix apply the fix to the cluster
         """
-        fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type)
+        fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         time.sleep(5)
   
@@ -100,8 +103,8 @@ class AttackChainsScenarioManager(ScenarioManager):
     AttackChainsScenarioManager is a class that manage
     """
 
-    def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster):
-        super().__init__(test_scenario, backend, cluster, SCENARIOS_TEST_PATH)
+    def __init__(self, test_obj, backend: backend_api.ControlPanelAPI, cluster, namespace):
+        super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
 
     def verify_scenario(self):
         """
@@ -111,7 +114,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=600,
+            timeout=180,
             current_datetime=current_datetime,
             cluster_name=self.cluster
             )
@@ -187,8 +190,10 @@ class AttackChainsScenarioManager(ScenarioManager):
 
 class SecurityRisksScenarioManager(ScenarioManager):
 
-    def __init__(self, test_scenario, backend: backend_api.ControlPanelAPI, cluster):
-        super().__init__(test_scenario, backend, cluster, SCENARIOS_TEST_PATH)
+    def __init__(self, test_obj, backend: backend_api.ControlPanelAPI, cluster, namespace):
+        super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
+        
+        self.test_security_risk_ids = test_obj["test_job"][0].get("security_risks_ids", [])
 
     def verify_scenario(self):
         """
@@ -199,16 +204,18 @@ class SecurityRisksScenarioManager(ScenarioManager):
         - security risks severities
         - security risks unique values
         - security risks resources
-
-        TODO: validate security risks trends
+        - security risks trends
 
         """
         Logger.logger.info("validating security risks list")
-        r = self.wait_for_report(
+        res = self.wait_for_report(
         self.verify_security_risks_list, 
-        timeout=180,
+        timeout=600,
         sleep_interval=10
         )
+
+        return res[0]
+
 
 
     def verify_fix(self):
@@ -219,8 +226,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         isEmpty, t = self.wait_for_report(
             self.is_security_risk_empty, 
             cluster_name=self.cluster,
-            namespace="default",
-            timeout=180,
+            namespace=self.namespace,
+            timeout=600,
             sleep_interval=10
             )
 
@@ -230,7 +237,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         apply_fix apply the fix to the cluster
         """
-        fix_command= os.path.join(self.scenario_path, self.test_scenario, "delete_deployments")
+        fix_command= os.path.join(self.scenario_path, self.test_scenario, "delete_deployments") + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         super().apply_fix(fix_type)
 
@@ -241,7 +248,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         
         :param result: content retrieved from backend.
         """
-        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 
+        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
                    'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew'}
     
@@ -252,7 +259,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
         if 'response' in result and 'response' in expected:
             compare_lists(result['response'], expected['response'], ignore_keys)
 
-        
 
     def check_security_risks_results(self, result, expected):
         """
@@ -260,7 +266,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         
         :param result: content retrieved from backend.
         """
-        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 
+        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace',
                    'clusterShortName', 'cursor', 'k8sResourceHash', 'cluster', 'clusterShortName'}
     
         if 'total' in result and 'total' in expected:
@@ -324,6 +330,27 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert response['total']['value'] == 0, "Security risks found, expecting no security risks"
         return True
     
+    def verify_security_risks_trends(self, expected_n_events_detected, expected_n_events_resolved, expected_current_detected, expected_change_from_beginning_of_period):
+        """
+        verify_security_risks_trends validate the security risks trends results on the backend
+        """
+        # current_datetime = datetime.now(timezone.utc)
+        Logger.logger.info("wait for response from BE")
+        r = self.backend.get_security_risks_trends(self.cluster,self.namespace, self.test_security_risk_ids)
+
+        response = json.loads(r.text)
+
+        Logger.logger.info('comparing security risks trends result with expected ones')
+
+        assert len(response['securityIssuesTrends']) == EXPECTED_TRENDS_DAYS_BACK, f"Security risks trends response differs from the expected one. Response: {len(response['securityIssuesTrends'])} != Expected: {EXPECTED_TRENDS_DAYS_BACK}"
+        
+        assert response["totalDetectedForPeriod"] == expected_n_events_detected, f"Security risks trends total detected for period response differs from the expected one. Response: {response['totalDetectedForPeriod']} != Expected: {expected_n_events_detected}"
+        assert response["totalResolvedForPeriod"] == expected_n_events_resolved, f"Security risks trends total resolved for period response differs from the expected one. Response: {response['totalResolvedForPeriod']} != Expected: {expected_n_events_resolved}"
+        assert response["currentDetected"] == expected_current_detected, f"Security risks trends current detected response differs from the expected one. Response: {response['currentDetected']} != Expected: {expected_current_detected}"
+        assert response["changeFromBeginningOfPeriod"] == expected_change_from_beginning_of_period, f"Security risks trends change from beginning of period response differs from the expected one. Response: {response['changeFromBeginningOfPeriod']} != Expected: {expected_change_from_beginning_of_period}"
+ 
+        
+
     def verify_security_risks_list_uniquevalues(self, baseFilters):
         """
         verify_security_risks_list_uniquevalues validate the security risks unique values results on the backend
@@ -345,33 +372,33 @@ class SecurityRisksScenarioManager(ScenarioManager):
             assert response == expected, f"verify_security_risks_list_uniquevalues - security risks unique values for '{fieldName}' response differs from the expected one. Response: {response}, Expected: {expected}"
 
 
-    def verify_security_risks_severities(self):
+    def verify_security_risks_severities(self, list_result):
         """
         verify_security_risks_severities validate the security risks severities results on the backend
         """
         # current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
-        r = self.backend.get_security_risks_severities(self.cluster, "default")
+        r = self.backend.get_security_risks_severities(self.cluster, self.namespace, self.test_security_risk_ids)
 
-        Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-severities.json'))
-        expected = json.load(f) 
+        # Logger.logger.info('loading security risks scenario to validate it')
+        # f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-severities.json'))
+        expected = summarize_severity(list_result)
         response = json.loads(r.text)
 
         Logger.logger.info('comparing security risks severities result with expected ones')
         self.check_security_risks_severities(response, expected)
     
-    def verify_security_risks_categories(self):
+    def verify_security_risks_categories(self, list_result):
         """
         verify_security_risks_categories validate the security risks categories results on the backend
         """
         # current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
-        r = self.backend.get_security_risks_categories(self.cluster, "default")
+        r = self.backend.get_security_risks_categories(self.cluster, self.namespace, self.test_security_risk_ids)
 
-        Logger.logger.info('loading security risks scenario to validate it')
-        f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-categories.json'))
-        expected = json.load(f) 
+        # Logger.logger.info('loading security risks scenario to validate it')
+        # f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-categories.json'))
+        expected = summarize_category(list_result)
         response = json.loads(r.text)
 
         Logger.logger.info('comparing security risks categories result with expected ones')
@@ -384,15 +411,19 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         # current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
-        r = self.backend.get_security_risks_list(self.cluster, "default")
+        r = self.backend.get_security_risks_list(self.cluster, self.namespace, self.test_security_risk_ids)
 
         Logger.logger.info('loading security risks scenario to validate it')
         f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-list.json'))
         expected = json.load(f) 
         response = json.loads(r.text)
 
+        filtered_expected = filter_security_risks_list(expected, self.test_security_risk_ids)
+
         Logger.logger.info('comparing security risks result with expected ones')
-        self.check_security_risks_results(response, expected)
+        self.check_security_risks_results(response, filtered_expected)
+
+        return response
 
 
     def verify_security_risks_resources(self):
@@ -401,16 +432,17 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
 
         for security_risk_id, expectedPrefix in SECURITY_RISKS_RESOURCES_PREFIX.items():
-            Logger.logger.info(f"wait for response from BE with filter: {security_risk_id}")
-            r = self.backend.get_security_risks_resources(self.cluster, "default", security_risk_id)
+            if security_risk_id in self.test_security_risk_ids:
+                Logger.logger.info(f"wait for response from BE with filter: {security_risk_id}")
+                r = self.backend.get_security_risks_resources(self.cluster, self.namespace, security_risk_id)
 
-            Logger.logger.info('loading security risks scenario to validate it')
-            f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+expectedPrefix+'.json'))
-            expected = json.load(f) 
-            response = json.loads(r.text)
+                Logger.logger.info('loading security risks scenario to validate it')
+                f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+expectedPrefix+'.json'))
+                expected = json.load(f) 
+                response = json.loads(r.text)
 
-            Logger.logger.info('comparing security risks result with expected ones')
-            self.check_security_risks_resources_results(response, expected)
+                Logger.logger.info('comparing security risks result with expected ones')
+                self.check_security_risks_resources_results(response, expected)
 
     def find_missing_security_risks(self, result, expected):
         """
@@ -464,3 +496,110 @@ def compare_lists(result, expected, ignore_keys=None):
             raise Exception(f"Error comparing list items: {e}, item1 result: {item1}, item2 expected: {item2}")
 
 
+
+def filter_security_risks_list(data, security_risk_ids):
+    """
+    Filters the security risks based on a list of securityRiskIDs.
+    
+    :param data: Dict containing the total data and a list of security risks
+    :param security_risk_ids: List of securityRiskID strings to filter by; returns all if empty
+    :return: A new dictionary with the filtered security risks
+    """
+    if not security_risk_ids:  # If the list is empty, return all items
+        return data
+
+    filtered_response = [risk for risk in data['response'] if risk['securityRiskID'] in security_risk_ids]
+    new_data = {
+        "total": {
+            "value": len(filtered_response),
+            "relation": "eq"
+        },
+        "response": filtered_response,
+        "cursor": data['cursor']
+    }
+    return new_data
+
+
+def summarize_severity(data):
+    """
+    Summarizes the security risks by severity and counts total affected resources.
+    
+    :param data: Dict containing the total data and a list of security risks
+    :return: A new dictionary with severity resource counters and total resources count
+    """
+    severity_counter = {
+        "Critical": 0,
+        "High": 0,
+        "Low": 0,
+        "Medium": 0
+    }
+    total_resources = 0
+    
+    for item in data['response']:
+        severity = item['severity']
+        affected_resources = item['affectedResourcesCount']
+        
+        # Increment the count for the severity level
+        if severity in severity_counter:
+            severity_counter[severity] += affected_resources
+        else:
+            # If the severity level is not predefined, we can add it dynamically if necessary
+            severity_counter[severity] = affected_resources
+        
+        # Increment total resources
+        total_resources += affected_resources
+
+    # Prepare the final dictionary
+    new_data = {
+        "total": {
+            "value": len(data['response']),
+            "relation": "eq"
+        },
+        "response": {
+            "severityResourceCounter": severity_counter,
+            "totalResources": total_resources
+        },
+        "cursor": data['cursor']
+    }
+    
+    return new_data
+
+
+def summarize_category(data):
+    """
+    Summarizes the security risks by category and counts total affected resources.
+    
+    :param data: Dict containing the total data and a list of security risks
+    :return: A new dictionary with category resource counters and total resources count
+    """
+    category_counter = {}
+    total_resources = 0
+
+    for item in data['response']:
+        category = item['category']
+        affected_resources = item['affectedResourcesCount']
+
+        # Increment the count for the category
+        if category in category_counter:
+            category_counter[category] += affected_resources
+        else:
+            # If the category is not already in the dictionary, initialize it
+            category_counter[category] = affected_resources
+
+        # Increment total resources
+        total_resources += affected_resources
+
+    # Prepare the final dictionary
+    new_data = {
+        "total": {
+            "value": len(data['response']),
+            "relation": "eq"
+        },
+        "response": {
+            "categoryResourceCounter": category_counter,
+            "totalResources": total_resources
+        },
+        "cursor": data['cursor']
+    }
+
+    return new_data

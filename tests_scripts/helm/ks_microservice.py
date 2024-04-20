@@ -15,6 +15,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanSecurityRisksWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+        self.wait_for_agg_to_end = False
 
     def start(self):
         """
@@ -29,6 +30,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         8. Apply attack chain fix
         9. trigger scan after fix
         10. verify fix
+        11. validate security risks trends
         TODO: validate security risks trends
 
         """
@@ -39,8 +41,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
         Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = SecurityRisksScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
-                                                            backend= self.backend, cluster=cluster)
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj,  backend= self.backend, cluster=cluster, namespace=namespace)
                
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
@@ -52,16 +53,18 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        time.sleep(10)
 
         Logger.logger.info("3. Verify scenario on backend")
-        scenarios_manager.verify_scenario()
+        result = scenarios_manager.verify_scenario()
+
+        total_events_detected = sum(res['affectedResourcesCount'] for res in result['response'])
+
                 
         Logger.logger.info("4. validating security risks categories")
-        scenarios_manager.verify_security_risks_categories()
+        scenarios_manager.verify_security_risks_categories(result)
         
         Logger.logger.info("5. validating security risks severities")
-        scenarios_manager.verify_security_risks_severities()
+        scenarios_manager.verify_security_risks_severities(result)
 
 
         # TODO: Fix verify_security_risks_list_uniquevalues
@@ -86,6 +89,13 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("10. verify fix")
         scenarios_manager.verify_fix()
+
+        # after fix is verified, we expect total detected to be equal to total resolved
+        total_events_resolved = total_events_detected
+
+        Logger.logger.info('11. validate security risks trends')
+        # after resolve we expect total detected and total resolved to be the same and total new and total remaining to be 0
+        scenarios_manager.verify_security_risks_trends(total_events_detected, total_events_resolved, 0, 0)
         
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
@@ -117,8 +127,10 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
         Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = AttackChainsScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
-                                                            backend= self.backend, cluster=cluster)
+
+        # TODO: change namespace to use the one generated for the test, need to update all scanerios to support it (as in the security risk test)
+        scenarios_manager = AttackChainsScenarioManager(test_obj=self.test_obj,
+                                                            backend= self.backend, cluster=cluster, namespace="default")
 
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()

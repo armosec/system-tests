@@ -120,7 +120,9 @@ class BaseKubescape(BaseK8S):
     def cleanup(self, **kwargs):
         self.delete_kubescape_config_file(**kwargs)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
-            TestUtil.sleep(50, "Waiting for aggregation to end")
+
+            if not hasattr(self, "wait_for_agg_to_end") or self.wait_for_agg_to_end:
+                TestUtil.sleep(50, "Waiting for aggregation to end")
 
             self.cluster_deleted = self.delete_cluster_from_backend()
         super().cleanup(**kwargs)
