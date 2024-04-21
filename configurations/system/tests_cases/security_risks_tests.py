@@ -29,3 +29,20 @@ class SecurityRisksTests(object):
                          }
         )
     
+    @staticmethod
+    def sr_ac_scan_status():
+        from tests_scripts.helm.ks_microservice import ScanStatusWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanStatusWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-5",
+            fix_object="control",
+            relevancy_enabled=False,
+            helm_kwargs={
+                        statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED,
+                        statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
+                        statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                        statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
+                        }
+        )

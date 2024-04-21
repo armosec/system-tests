@@ -7,6 +7,87 @@ from systest_utils.scenarios_manager import SecurityRisksScenarioManager, Attack
 DEFAULT_BRANCH = "release"
 
 
+class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
+    """
+    ScanStatusWithKubescapeHelmChart install the kubescape operator and run the scan to check status.
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanStatusWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+
+    def start(self):
+        """
+        Agenda:
+        1. Install kubescape with helm-chart
+        2. Install attack-chains scenario manifests in the cluster
+        3. Verify scenario on backend
+        4. trigger posture scan
+        5. verify scan status
+        6. Apply attack chain fix
+        7. trigger scan after fix
+        8. verify scan status (without verifying fix)
+
+
+        """
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+
+        self.ignore_agent = True
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
+        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_scenario=self.test_obj[("test_scenario", None)], 
+                                                            backend= self.backend, cluster=cluster)
+               
+        Logger.logger.info("1.2 apply attack chains scenario manifests")
+        scenarios_manager.apply_scenario()
+
+        Logger.logger.info("2. Install kubescape with helm-chart")
+        Logger.logger.info("2.1 Installing kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        Logger.logger.info("2.2 verify installation")
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(10)
+
+        Logger.logger.info("3. Verify scenario on backend")
+        scenarios_manager.verify_scenario()
+        
+        Logger.logger.info("4. trigger posture scan")
+        time_before_scan = time.time()
+        self.backend.trigger_posture_scan(
+                cluster_name=self.cluster,
+                framework_list=["security"],
+                with_host_sensor="false",
+                additional_params={"triggeredFrom":"securityRiskPage"}
+                )
+        # scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+
+        Logger.logger.info("5. verify scan status")
+        scenarios_manager.verify_scan_status(time_before_scan)
+
+        Logger.logger.info("6. Apply attack chain fix")
+        scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
+
+        Logger.logger.info("7. trigger scan after fix")
+        time_before_scan = time.time()
+        self.backend.trigger_posture_scan(
+                cluster_name=self.cluster,
+                framework_list=["security"],
+                with_host_sensor="false",
+                additional_params={"triggeredFrom":"securityRiskPage"}
+                )
+        # scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+        
+        Logger.logger.info("8. verify scan status (without verifying fix)")
+        scenarios_manager.verify_scan_status(time_before_scan)
+
+        Logger.logger.info('attack-chain fixed properly')
+        return self.cleanup()
+    
+
 class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
     ScanAttackChainsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
