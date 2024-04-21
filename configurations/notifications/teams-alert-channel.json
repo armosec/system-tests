@@ -11,6 +11,13 @@
   },
   "notifications": [
     {
+      "notificationType": "securityRiskPush:newSecurityRisk",
+      "disabled": false,
+      "parameters": {
+          "minSeverity": 300
+      }
+    },
+    {
       "notificationType": "push:newClusterAdmin",
       "disabled": false
     },
