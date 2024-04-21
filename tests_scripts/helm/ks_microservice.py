@@ -68,20 +68,15 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
 
         # TODO: Fix verify_security_risks_list_uniquevalues
-        # # verify unique values - no need to wait.
-        # Logger.logger.info("6. validating security risks unique values")
-        # uniqueValuesAllFilters = {"clusterShortName":self.cluster,
-        #                           "namespace":"default",
-        #                           "severity":"Medium",
-        #                           "category":"Workload configuration",
-        #                           "smartRemediation":"1"}
-        # scenarios_manager.verify_security_risks_list_uniquevalues(uniqueValuesAllFilters)
+        # verify unique values - no need to wait.
+        Logger.logger.info("6. validating security risks unique values")
+        scenarios_manager.verify_security_risks_list_uniquevalues(result["response"])
 
         # verify resources side panel - no need to wait.
         Logger.logger.info("7. validating security risks resources")
         scenarios_manager.verify_security_risks_resources()
 
-        Logger.logger.info("8. Apply attack chain fix")
+        Logger.logger.info("8. Apply scenario fix")
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
         Logger.logger.info("9. trigger scan after fix")

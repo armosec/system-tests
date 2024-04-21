@@ -17,7 +17,7 @@ EXPECTED_TRENDS_DAYS_BACK = 31
 
 # maps field name and the expected values file suffix
 SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
-    "namespace": "_security-risks-uv-namespace.json",
+    # "namespace": "_security-risks-uv-namespace.json",
     "severity": "_security-risks-uv-severity.json",
     "category": "_security-risks-uv-category.json",
     "securityRiskName": "_security-risks-uv-securityriskname.json",
@@ -27,6 +27,8 @@ SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
 SECURITY_RISKS_RESOURCES_PREFIX = {
     "R_0002": "_security-risks-resources_sidebar_R0002", # control security risk type
     "R_0035": "_security-risks-resources_sidebar_R0035", # attack path security risk type
+    "R_0005": "_security-risks-resources_sidebar_R0005", # control security risk type
+
 }
 
 class ScenarioManager(base_test.BaseTest):
@@ -323,7 +325,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         r = self.backend.get_security_risks_list(
             cluster_name=cluster_name,
-            namespace=namespace
+            namespace=namespace,
+            security_risk_ids=self.test_security_risk_ids
             )
         
         response = json.loads(r.text)
@@ -349,24 +352,26 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert response["currentDetected"] == expected_current_detected, f"Security risks trends current detected response differs from the expected one. Response: {response['currentDetected']} != Expected: {expected_current_detected}"
         assert response["changeFromBeginningOfPeriod"] == expected_change_from_beginning_of_period, f"Security risks trends change from beginning of period response differs from the expected one. Response: {response['changeFromBeginningOfPeriod']} != Expected: {expected_change_from_beginning_of_period}"
  
-        
-
-    def verify_security_risks_list_uniquevalues(self, baseFilters):
+    def verify_security_risks_list_uniquevalues(self, list_result):
         """
         verify_security_risks_list_uniquevalues validate the security risks unique values results on the backend
         """
 
-        for fieldName, expectedSuffix in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
-            newFilters = baseFilters.copy()
-            if fieldName != "namespace":
-                newFilters[fieldName] = ""
-            Logger.logger.info(f"wait for response from BE with filter: {newFilters}")
-            r = self.backend.get_security_risks_list_uniquevalues(newFilters, fieldName)
+        baseFilters = {"clusterShortName":self.cluster,
+                        "namespace":self.namespace,
+                        "severity":"",
+                        "category":"",
+                        "smartRemediation":"",
+                        "exceptionApplied":"|empty"}
 
+        if self.test_security_risk_ids:
+            baseFilters["securityRiskID"] = ','.join(self.test_security_risk_ids)
 
-            Logger.logger.info('loading security risks scenario to validate it')
-            f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+expectedSuffix))
-            expected = json.load(f) 
+        for fieldName, _ in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
+            Logger.logger.info(f"wait for response from BE with filter: {baseFilters} for field: {fieldName}")
+            r = self.backend.get_security_risks_list_uniquevalues(baseFilters, fieldName)
+
+            expected = summarize_uniquevalues(list_result, fieldName)
             response = json.loads(r.text)
        
             assert response == expected, f"verify_security_risks_list_uniquevalues - security risks unique values for '{fieldName}' response differs from the expected one. Response: {response}, Expected: {expected}"
@@ -603,3 +608,40 @@ def summarize_category(data):
     }
 
     return new_data
+
+
+def summarize_uniquevalues(response, field_name):
+    """
+    Transforms a list of dictionaries into a structured output based on the specified field.
+    
+    :param response: List of dictionaries containing the data.
+    :param field_name: The name of the field to base the transformation on (e.g., "category").
+    :return: A dictionary structured with unique field values and counts.
+    """
+    # Initializing a dictionary to count occurrences
+    field_counts = {}
+
+    # Count occurrences of each field value
+    for item in response:
+        if field_name in item:
+            value = item[field_name]
+            if value in field_counts:
+                field_counts[value] += 1
+            else:
+                field_counts[value] = 1
+
+    # Creating lists of fields and field counts
+    fields_list = sorted(field_counts.keys())  # Sorting keys to maintain order
+    fields_count_list = [{'key': key, 'count': field_counts[key]} for key in fields_list]
+
+    # Creating the structured output
+    structured_response = {
+        "fields": {
+            field_name: fields_list
+        },
+        "fieldsCount": {
+            field_name: fields_count_list
+        }
+    }
+
+    return structured_response
