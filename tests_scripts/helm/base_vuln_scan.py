@@ -673,7 +673,7 @@ class BaseVulnerabilityScanning(BaseHelm):
         TestUtil.sleep(30, "wait till delete cronjob will arrive to backend")
 
         # check that the cronjob was deleted from cluster
-        cj = self.kubernetes_obj.run(self.kubernetes_obj.client_BatchV1beta1Api.read_namespaced_cron_job,
+        cj = self.kubernetes_obj.run(self.kubernetes_obj.client_BatchV1Api.read_namespaced_cron_job,
                                      namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job['name'])
         assert len(cj) == 0 \
             , "Cronjob {}  was not deleted in cluster".format(cron_job['name'])
@@ -968,8 +968,10 @@ class BaseVulnerabilityScanning(BaseHelm):
         verified_SBOMs = 0
         for expected_SBOM in expected_SBOM_paths:
             for SBOM in SBOMs:
-                # if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
-                #     self.store_filter_data_for_first_time_results(result=SBOM, store_path=expected_SBOM[1], namespace="kubescape")
+                if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
+                    self.store_unfilter_data_for_first_time_results(result=SBOM, store_path=expected_SBOM[1] )
+                    verified_SBOMs = len(SBOMs)
+                    continue
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
@@ -1014,6 +1016,15 @@ class BaseVulnerabilityScanning(BaseHelm):
             with open(store_path, 'w') as f:
                 json.dump(result_data, f)
 
+    def store_unfilter_data_for_first_time_results(self, result, store_path ):
+        with open(store_path, 'r') as content_file:
+            content = content_file.read()
+        expected_data = json.loads(content)
+        result_data = result[1]
+        if expected_data['metadata']['name'] == result_data['metadata']['name']:
+            with open(store_path, 'w') as f:
+                json.dump(result_data, f)
+
     def validate_expected_filtered_SBOMs(self, SBOMs, expected_SBOM_paths, namespace):
         verified_SBOMs = 0
         for expected_SBOM in expected_SBOM_paths:
@@ -1021,6 +1032,8 @@ class BaseVulnerabilityScanning(BaseHelm):
                 if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
                     self.store_filter_data_for_first_time_results(result=SBOM, store_path=expected_SBOM[1],
                                                                   namespace=namespace)
+                    verified_SBOMs = len(SBOMs)
+                    continue
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)
@@ -1062,6 +1075,8 @@ class BaseVulnerabilityScanning(BaseHelm):
                 if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
                     self.store_filter_data_for_first_time_results(result=CVE, store_path=expected_CVE[1],
                                                                   namespace=namespace)
+                    verified_CVEs = len(CVEs)
+                    continue
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)
@@ -1082,6 +1097,10 @@ class BaseVulnerabilityScanning(BaseHelm):
         verified_CVEs = 0
         for expected_CVE in expected_CVEs_path:
             for CVE in CVEs:
+                if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
+                    self.store_unfilter_data_for_first_time_results(result=CVE, store_path=expected_CVE[1])
+                    verified_CVEs = len(CVEs)
+                    continue
                 with open(expected_CVE[1], 'r') as content_file:
                     content = content_file.read()
                 expected_CVE_data = json.loads(content)

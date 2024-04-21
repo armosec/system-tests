@@ -36,6 +36,7 @@ class BaseTest(object):
         
         self.test_started_at = datetime.now(timezone.utc).astimezone().isoformat()
         self.cluster_deleted = False
+        self.wait_for_agg_to_end = True
 
         # objects
         self.test_driver = test_driver

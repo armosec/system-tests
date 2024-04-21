@@ -1,7 +1,20 @@
 #!/usr/bin/bash
 
-kubectl delete -n default deployment wordpress-mysql
-kubectl wait deployment/wordpress-mysql --for=delete --timeout=-1s -n default
+# Default namespace
+namespace="default"
 
-kubectl delete -n default deployment wordpress
-kubectl wait deployment/wordpress --for=delete --timeout=-1s -n default
+# Parse command line arguments for namespace
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+# Commands to delete deployments and wait for their deletion
+kubectl delete deployment wordpress-mysql -n "$namespace"
+kubectl wait deployment/wordpress-mysql --for=delete --timeout=90s -n "$namespace"
+
+kubectl delete deployment wordpress -n "$namespace"
+kubectl wait deployment/wordpress --for=delete --timeout=90s -n "$namespace"
