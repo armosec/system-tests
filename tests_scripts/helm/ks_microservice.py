@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import time
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -56,14 +57,14 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         scenarios_manager.verify_scenario()
         
         Logger.logger.info("4. trigger posture scan")
-        time_before_scan = time.time()
-        self.backend.trigger_posture_scan(
-                cluster_name=self.cluster,
-                framework_list=["security"],
-                with_host_sensor="false",
-                additional_params={"triggeredFrom":"securityRiskPage"}
-                )
-        # scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+        time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        # self.backend.trigger_posture_scan(
+        #         cluster_name=self.cluster,
+        #         framework_list=["security"],
+        #         with_host_sensor="false",
+        #         additional_params={"triggeredFrom":"securityRiskPage"}
+        #         )
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
 
         Logger.logger.info("5. verify scan status")
         scenarios_manager.verify_scan_status(time_before_scan)
@@ -72,14 +73,15 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
         Logger.logger.info("7. trigger scan after fix")
-        time_before_scan = time.time()
-        self.backend.trigger_posture_scan(
-                cluster_name=self.cluster,
-                framework_list=["security"],
-                with_host_sensor="false",
-                additional_params={"triggeredFrom":"securityRiskPage"}
-                )
-        # scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+        time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        # self.backend.trigger_posture_scan(
+        #         cluster_name=self.cluster,
+        #         framework_list=["security"],
+        #         with_host_sensor="false",
+        #         additional_params={"triggeredFrom":"securityRiskPage"}
+        #         )
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
+
         
         Logger.logger.info("8. verify scan status (without verifying fix)")
         scenarios_manager.verify_scan_status(time_before_scan)
