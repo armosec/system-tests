@@ -9,9 +9,6 @@ from os.path import join
 class SecurityRisksTests(object):
 
     @staticmethod
-
-
-    
     # test security risks detection and resolve with kubescape helm chart
     # based on attack chain 5 scenarios.
     def sr_detect_and_resolve_attack_chain():
@@ -31,7 +28,7 @@ class SecurityRisksTests(object):
                          }
         )
     
-        
+    @staticmethod
     # test security risks detection and resolve with kubescape helm chart
     # based on attack chain 5 scenarios.
     def sr_detect_and_resolve_control():
