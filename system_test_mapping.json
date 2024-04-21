@@ -1203,5 +1203,19 @@
         ],
         "description": "testing basic incident presented",
         "skip_on_environment": "production"
+    },
+    "sr_ac_scan_status":{
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe-dummy",
+            "careportsreceiver-dummy",
+            "event-ingester-service-dummy",
+            "gateway-dummy"
+        ],
+        "description": "",
+        "skip_on_environment": ""
     }
 }

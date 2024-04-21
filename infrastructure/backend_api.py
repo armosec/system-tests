@@ -111,6 +111,7 @@ API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
 API_SECURITY_RISKS_RESOURCES = "/api/v1/securityrisks/resources"
+API_SCAN_STATUS = "/api/v1/scanStatus"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 
 
@@ -1409,8 +1410,10 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true"):
+    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true", additional_params={}):
         params = {"customerGUID": self.selected_tenant_id}
+        if additional_params:
+            params.update(additional_params)
         body = []
         for framework in framework_list:
             body.append(
@@ -2278,6 +2281,16 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_security_risks_categories "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+    
+    def get_scan_status(self):
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(API_SCAN_STATUS, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan status "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
 
     def get_security_risks_list_uniquevalues(self, filters: dict, field):
         params = {"customerGUID": self.selected_tenant_id}

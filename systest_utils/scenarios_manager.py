@@ -72,7 +72,7 @@ class ScenarioManager(base_test.BaseTest):
         time.sleep(5)
   
 
-    def trigger_scan(self, trigger_by) -> None:
+    def trigger_scan(self, trigger_by,  additional_params={}) -> None:
         """trigger_scan create a new scan action from the backend
 
         :param trigger_by: the kind of event that trigger the scan ("cronjob", "scan_on_start")
@@ -89,7 +89,8 @@ class ScenarioManager(base_test.BaseTest):
             self.backend.trigger_posture_scan(
                 cluster_name=self.cluster,
                 framework_list=["security"],
-                with_host_sensor="false"
+                with_host_sensor="false",
+                additional_params=additional_params
                 )
             
     def verify_scenario(self):
@@ -458,8 +459,60 @@ class SecurityRisksScenarioManager(ScenarioManager):
             if securityRisk['securityRiskID'] not in [sr['securityRiskID'] for sr in result['response']]:
                 missingSecurityRiskIDs.append(securityRisk['securityRiskID'])
         return missingSecurityRiskIDs
+    
+    
+    def verify_scan_status(self, trigger_time):
+        """
+        verify_scenario validate the scan status results on the backend
+        """
+
+        Logger.logger.info("validating lastPostureScanTriggered for this cluster was updated")
+
+        self.verify_cluster_lastPostureScanTriggered_time(cluster_name=self.cluster, trigger_time=trigger_time)
+
+        Logger.logger.info("validating scan status of attack chains is processing")
+        r, t = self.wait_for_report(
+            self.verify_global_field_in_scan_status, 
+            timeout=60,
+            expected_field='attackChainsProcessingStatus',
+            expectedStatus='processing'
+            )
+        Logger.logger.info("validating scan status of security risks is processing")
+        r, t = self.wait_for_report(
+            self.verify_global_field_in_scan_status, 
+            timeout=1,
+            expected_field='securityRisksProcessingStatus',
+            expectedStatus='processing'
+            )
+        Logger.logger.info("validating scan status of attack chains is done")
+        r, t = self.wait_for_report(
+            self.verify_global_field_in_scan_status, 
+            timeout=600,
+            expected_field='attackChainsProcessingStatus',
+            expectedStatus='done'
+            )
+        Logger.logger.info("validating scan status of security risks is done")
+        r, t = self.wait_for_report(
+            self.verify_global_field_in_scan_status, 
+            timeout=600,
+            expected_field='securityRisksProcessingStatus',
+            expectedStatus='done'
+            )
         
         
+    def verify_global_field_in_scan_status(self, expected_field, expectedStatus)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}"
+        return True
+        
+    def verify_cluster_lastPostureScanTriggered_time(self, cluster_name, trigger_time)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        for cluster_response in response['clusterScansStatus']:
+            if cluster_response['clusterName'] == cluster_name:
+                assert cluster_response['lastPostureScanTriggered'] >= trigger_time, f"Expected {'lastPostureScanTriggered'} to be >= than {trigger_time}, got {cluster_response['lastPostureScanTriggered']}"
+        return True    
         
 
 
