@@ -58,12 +58,6 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         
         Logger.logger.info("4. trigger posture scan")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        # self.backend.trigger_posture_scan(
-        #         cluster_name=self.cluster,
-        #         framework_list=["security"],
-        #         with_host_sensor="false",
-        #         additional_params={"triggeredFrom":"securityRiskPage"}
-        #         )
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
 
         Logger.logger.info("5. verify scan status")
@@ -74,12 +68,6 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("7. trigger scan after fix")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        # self.backend.trigger_posture_scan(
-        #         cluster_name=self.cluster,
-        #         framework_list=["security"],
-        #         with_host_sensor="false",
-        #         additional_params={"triggeredFrom":"securityRiskPage"}
-        #         )
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
 
         
