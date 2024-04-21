@@ -28,7 +28,7 @@ class SecurityRisksTests(object):
                         statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
-                         },
+                         }
         )
     
         
@@ -48,7 +48,7 @@ class SecurityRisksTests(object):
                         statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
-                         },
+                         }
         )
     
     
