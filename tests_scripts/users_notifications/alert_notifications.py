@@ -88,7 +88,7 @@ def assert_security_risks_message_sent(messages, cluster):
         message_string = str(message)
         if "Risk:" in message_string and cluster in message_string and "http" in message_string and "Deployment" in message_string:
             found += 1
-    assert found > 0, "expected to have at least one vulnerability message"
+    assert found > 0, "expected to have at least one security risk message"
 
 
 def assert_vulnerability_message_sent(messages, cluster):
