@@ -21,10 +21,10 @@ check_kubectl_installed() {
     exit 1
   fi
 }
-
 apply_manifests() {
   local path=$1
   local kubeconfig=$2
+  local namespace=$3
 
   if [ ! -d "$path" ]; then
     echo "Error: Path '$path' does not exist or is not a directory."
@@ -33,7 +33,14 @@ apply_manifests() {
 
   for filename in $(ls "$path"/*.yaml | sort); do
     if grep -q "^[0-9]\{2\}-" <<< "$(basename "$filename")"; then
-      kubectl apply -f "$filename" --kubeconfig "$kubeconfig"
+      if [ -z "$namespace" ]; then
+        # No namespace specified, apply using default or context from kubeconfig
+        kubectl apply -f "$filename" --kubeconfig "$kubeconfig"
+      else
+        # Apply using the specified namespace
+        kubectl apply -f "$filename" --kubeconfig "$kubeconfig" -n "$namespace"
+      fi
+
       if [ $? -eq 0 ]; then
         echo "Applied manifest: $(basename "$filename")"
         wait_for_running "$filename" "$kubeconfig"
@@ -73,14 +80,14 @@ wait_for_running() {
     echo "No Deployments found in $filename. Skipping wait."
   fi
 }
-
 main() {
   if [ $# -lt 1 ]; then
-    echo "Usage: $0 /path/to/manifests [--kubeconfig /path/to/kubeconfig]"
+    echo "Usage: $0 /path/to/manifests [--kubeconfig /path/to/kubeconfig] [--namespace namespace]"
     return 1
   fi
 
   local path=$1
+  local namespace=""
   local kubeconfig=${KUBECONFIG:-$HOME/.kube/config}
 
   check_kubectl_installed
@@ -92,6 +99,10 @@ main() {
         shift
         kubeconfig=$1
         ;;
+      --namespace)
+        shift
+        namespace=$1
+        ;;
       *)
         echo "Unknown option: $1"
         return 1
@@ -100,8 +111,7 @@ main() {
     shift
   done
 
-  apply_manifests "$path" "$kubeconfig"
+  apply_manifests "$path" "$kubeconfig" "$namespace"
 }
 
 main "$@"
-

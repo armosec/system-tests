@@ -17,7 +17,7 @@ class SecurityRisksTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanSecurityRisksWithKubescapeHelmChart,
-            test_job=[{"trigger_by": "scan_on_start"}],
+            test_job=[{"trigger_by": "scan_on_start", "security_risks_ids": ["R_0002", "R_0035"]}],
             test_scenario="attack-chain-5",
             fix_object="control",
             relevancy_enabled=False,

@@ -22,3 +22,4 @@ portable_apps
 *.xml
 *.iml
 .git-old
+creds_file.json

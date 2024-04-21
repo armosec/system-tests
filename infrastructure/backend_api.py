@@ -108,6 +108,9 @@ API_SECURITY_RISKS_LIST = "/api/v1/securityrisks/list"
 API_SECURITY_RISKS_SEVERITIES = "/api/v1/securityrisks/severities"
 API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
+API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
+API_SECURITY_RISKS_RESOURCES = "/api/v1/securityrisks/resources"
+API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 
 
 def deco_cookie(func):
@@ -517,13 +520,19 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
-    def get_incidents(self, **kwargs):
-        # TODO update to v2
-        url = "/v1/incidents"
+    def get_incidents(self, filters, **kwargs):
+        url = "/api/v1/runtime/incidents"
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
-        r = self.get(url, params=params)
+        r = self.post(url, params=params,json={"pageNumber": 1, "pageSize": 100,
+                                                "orderBy": "createdTimestamp:desc", "innerFilters": [filters]})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+
+    def get_incident(self, incident_id: str):
+        url = "/api/v1/runtime/incidents/" + incident_id
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
@@ -935,7 +944,7 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: results of posture resources by control is empty')
         return r.json()['response']
-    
+
     def get_posture_clusters(self, body):
         r = self.post(API_POSTURE_CLUSTERS, params={"customerGUID": self.selected_tenant_id},
                       json=body)
@@ -946,7 +955,7 @@ class ControlPanelAPI(object):
         if len(r.json()['response']) == 0:
             raise Exception('Error accessing dashboard. Request: results of posture controls is empty')
         return r.json()['response']
-       
+
 
 
     def get_image_scan_stats(self):
@@ -2200,9 +2209,9 @@ class ControlPanelAPI(object):
         if not j:
             raise Exception('Request: results of posture resources highlights is empty body: %s' % body)
         return j
-    
+
     # security risks functions
-    def get_security_risks_list(self, cluster_name=None, namespace=None):
+    def get_security_risks_list(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
         filters = {}
 
@@ -2211,6 +2220,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2226,12 +2238,12 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_list "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
 
-    def get_security_risks_severities(self, cluster_name=None, namespace=None):
+    def get_security_risks_severities(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
 
         filters = {}
@@ -2241,6 +2253,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2254,12 +2269,12 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_severities "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
     
 
-    def get_security_risks_categories(self, cluster_name=None, namespace=None):
+    def get_security_risks_categories(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
 
                 
@@ -2270,6 +2285,9 @@ class ControlPanelAPI(object):
         
         if namespace is not None:
             filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
         if filters:
@@ -2283,22 +2301,107 @@ class ControlPanelAPI(object):
 
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: get_security_risks_categories "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
 
-    def get_integration_status(self, provider: str):   
-        url = API_INTEGRATIONS + "/connection/status"    
+    def get_security_risks_list_uniquevalues(self, filters: dict, field):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+
+        payload = {
+            "fields": {field: ""},
+            "innerFilters": innerFilters,
+            "pageNum": 1,
+            "pageSize": 100,
+        }
+        r = self.post(API_SECURITY_RISKS_LIST_UNIQUEVALUES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get get_security_risks_list_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = {}
+
+        if cluster_name is not None:
+            filters["cluster"] = cluster_name
+
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        if security_risk_id is not None:
+            filters["securityRiskID"] = security_risk_id
+
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_RESOURCES, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_security_risks_resources "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_security_risks_trends(self, cluster_name=None, namespace=None, security_risk_ids=[]):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        filters = {}
+
+        if cluster_name is not None:
+            filters["clusterShortName"] = cluster_name
+
+        if namespace is not None:
+            filters["namespace"] = namespace
+
+        if security_risk_ids:
+            filters["securityRiskID"] = ','.join(security_risk_ids)
+
+        innerFilters = []
+        if filters:
+            innerFilters.append(filters)
+
+        payload = {
+            "innerFilters": innerFilters,
+        }
+        r = self.post(API_SECURITY_RISKS_TRENDS, params=params, json=payload, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_security_risks_trends "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+
+    def get_integration_status(self, provider: str):
+        url = API_INTEGRATIONS + "/connection/status"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id, "provider": provider})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
-    
-    def get_jira_config(self):       
+
+    def get_jira_config(self):
         url = API_INTEGRATIONS + "/jira/config"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
-    
+
     def update_jira_config(self, body: dict):
         url = API_INTEGRATIONS + "/jira/config"
         r = self.post(url,
@@ -2307,8 +2410,8 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing smart remediation. Request: results of posture resources highlights "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))        
-    
+                    self.customer, r.status_code, r.text))
+
     def search_jira_projects(self, body: dict):
         url = API_INTEGRATIONS + "/jira/projects/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
@@ -2318,7 +2421,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def search_jira_issue_types(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issueTypes/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
@@ -2328,7 +2431,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def search_jira_schema(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issueTypes/schema/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
@@ -2338,7 +2441,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def search_jira_issue_field(self, body: dict):
         url = API_INTEGRATIONS + "jira/issueTypes/fields/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
@@ -2348,7 +2451,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def create_jira_issue(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issue"
         r = self.post(url, params={"customerGUID": self.customer_guid},
@@ -2358,7 +2461,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def unlink_issue(self, guid: str):
         url = API_INTEGRATIONS + "/link/" + guid
         r = self.delete(url, params={"customerGUID": self.customer_guid})
@@ -2366,12 +2469,12 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     url, self.customer, r.status_code, r.text))
-        
 
-    
-   
-   
-   
+
+
+
+
+
     #/jira/issue
 class Solution(object):
     """docstring for Solution"""

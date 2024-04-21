@@ -1,0 +1,47 @@
+{
+    "total": {
+        "value": 2,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "cluster": "kind-sr-tests-eran",
+            "clusterShortName": "kind-sr-tests-eran",
+            "namespace": "default",
+            "resourceName": "wordpress",
+            "kind": "Deployment",
+            "resourceID": "apps/v1/default/Deployment/wordpress",
+            "k8sResourceHash": "6025895423758369643",
+            "riskID": "C-0012",
+            "riskType": "Control",
+            "securityRiskID": "R_0002",
+            "status": "Detected",
+            "isNew": true,
+            "lastTimeDetected": "2024-04-17T10:23:22Z",
+            "exceptionApplied": false,
+            "controlID": "C-0012",
+            "reportGUID": "8be391e9-a889-4eeb-b46d-592a9cf98772",
+            "frameworkName": "security"
+        },
+        {
+            "cluster": "kind-sr-tests-eran",
+            "clusterShortName": "kind-sr-tests-eran",
+            "namespace": "default",
+            "resourceName": "wordpress-mysql",
+            "kind": "Deployment",
+            "resourceID": "apps/v1/default/Deployment/wordpress-mysql",
+            "k8sResourceHash": "9407321070799184244",
+            "riskID": "C-0012",
+            "riskType": "Control",
+            "securityRiskID": "R_0002",
+            "status": "Detected",
+            "isNew": true,
+            "lastTimeDetected": "2024-04-17T10:23:22Z",
+            "exceptionApplied": false,
+            "controlID": "C-0012",
+            "reportGUID": "8be391e9-a889-4eeb-b46d-592a9cf98772",
+            "frameworkName": "security"
+        }
+    ],
+    "cursor": ""
+}
