@@ -1,0 +1,39 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "guid": "a6acc5d4-ffd7-11ee-bf9e-12732c328de3",
+            "policyType": "securityRiskExceptionPolicy",
+            "creationTime": "2024-04-21T12:06:57Z",
+            "reason": "accept the risk test",
+            "createdBy": "eranm@armosec.io",
+            "resources": [
+                {
+                    "designatorType": "Attributes",
+                    "attributes": {
+                        "cluster": "testsync",
+                        "clusterShortName": "testsync",
+                        "k8sResourceHash": "11611317426560423144",
+                        "kind": "Deployment",
+                        "name": "wordpress",
+                        "namespace": "systest-ns-zhye"
+                    }
+                }
+            ],
+            "name": "Allow privilege escalation",
+            "category": "Workload configuration",
+            "severity": "Medium",
+            "securityRiskID": "R_0005",
+            "risks": [
+                {
+                    "ID": "C-0016",
+                    "type": "Control"
+                }
+            ]
+        }
+    ],
+    "cursor": ""
+}

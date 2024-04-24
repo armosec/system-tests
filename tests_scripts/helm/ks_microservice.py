@@ -164,6 +164,97 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
+    
+
+class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
+    """
+    ScanAttackChainsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanSecurityRisksExceptionsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
+                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+        self.wait_for_agg_to_end = False
+
+    def start(self):
+        """
+        Agenda:
+        1. Install attack-chains scenario manifests in the cluster
+        2. Install kubescape with helm-chart
+        3. Verify scenario on backend
+        4. Add new exception.
+        5. Verify resources under exceptions are filtered out from security risks list.
+        6. Verify resources under exceptions are filtered out from security risks resources.
+        7. edit exception.
+        8. delete exception.
+        9. Verify resources are back to security risks list.
+        10. verify resources are back to security risks resources.
+
+        """
+        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+
+        self.ignore_agent = True
+        cluster, namespace = self.setup(apply_services=False)
+
+        Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
+        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj,  backend= self.backend, cluster=cluster, namespace=namespace)
+               
+        Logger.logger.info("1.2 apply attack chains scenario manifests")
+        scenarios_manager.apply_scenario()
+
+        Logger.logger.info("2. Install kubescape with helm-chart")
+        Logger.logger.info("2.1 Installing kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
+
+        Logger.logger.info("2.2 verify installation")
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        Logger.logger.info("3. Verify scenario on backend")
+        result = scenarios_manager.verify_scenario()
+
+        test_security_risk_id = scenarios_manager.test_security_risk_ids[0]
+        resources_list_before_exception = scenarios_manager.get_security_risks_resources(test_security_risk_id)
+        security_risks_list_before_exception = scenarios_manager.get_security_risks_list([test_security_risk_id])
+
+        k8s_resources_hash = []
+        for resource in resources_list_before_exception["response"]:
+            k8s_resources_hash.append(resource["k8sResourceHash"])
+
+        Logger.logger.info("4. Add new exception.")
+        Logger.logger.info("4.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id, k8s_resources_hash))
+        new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "new exception")
+
+        Logger.logger.info("5. Verify resources under exceptions are filtered out from security risks list.")
+        resources_list_after_exception = scenarios_manager.get_security_risks_resources(test_security_risk_id)
+        assert len(resources_list_after_exception["response"]) == 0, "resources under exception are not filtered out from security risks list"
+
+        Logger.logger.info("6. Verify resources under exceptions are filtered out from security risks resources.")
+        security_risks_list_after_exception = scenarios_manager.get_security_risks_list([test_security_risk_id])
+        assert len(security_risks_list_after_exception["response"]) == 0, "resources under exception are not filtered out from security risks resources"
+
+        Logger.logger.info("7. edit exception.")
+        edit_exception = scenarios_manager.edit_exception(new_exception["guid"], test_security_risk_id, k8s_resources_hash, "edit exception")
+        resources_list_after_exception_edit = scenarios_manager.get_security_risks_resources(test_security_risk_id)
+        security_risks_list_after_exception_edit = scenarios_manager.get_security_risks_list([test_security_risk_id])
+
+        assert len(resources_list_after_exception_edit["response"]) == 0, "resources under exception are not filtered out from security risks list"
+        assert len(security_risks_list_after_exception_edit["response"]) == 0, "resources under exception are not filtered out from security risks resources"
+
+        Logger.logger.info("8. delete exception.")
+        scenarios_manager.delete_exception(edit_exception["guid"])
+
+        Logger.logger.info("9. Verify resources are back to security risks list.")
+        resources_list_after_exception_delete = scenarios_manager.get_security_risks_resources(test_security_risk_id)
+        assert len(resources_list_after_exception_delete["response"]) == len(resources_list_before_exception["response"]), "resources are not back to security risks resources as before exception"
+
+        Logger.logger.info("10. verify resources are back to security risks resources.")
+        security_risks_list_after_exception_delete = scenarios_manager.get_security_risks_list([test_security_risk_id])
+        assert len(security_risks_list_after_exception_delete["response"]) == len(security_risks_list_before_exception["response"]), "resources are not back to security risks list as before exception"
+        assert security_risks_list_after_exception_delete["response"][0]["affectedResourcesCount"] == security_risks_list_before_exception["response"][0]["affectedResourcesCount"], "resources are not back to security risks list as before exception"
+
+        return self.cleanup()
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
