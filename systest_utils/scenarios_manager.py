@@ -289,9 +289,10 @@ class SecurityRisksScenarioManager(ScenarioManager):
         exceptions = exceptions_res["response"]
 
         found = False
-        for exception in exceptions:
-            if exception["guid"] == exception_guid:
-                found = True
+        if exceptions != None:
+            for exception in exceptions:
+                if exception["guid"] == exception_guid:
+                    found = True
 
         assert not found, f"Failed to delete exception: {response}"
         return response
