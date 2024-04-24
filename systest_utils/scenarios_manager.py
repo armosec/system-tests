@@ -220,7 +220,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
         return res[0]
 
 
-
     def verify_fix(self):
         """
         verify_fix validate the security risks fix results on the backend
@@ -228,8 +227,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         isEmpty, t = self.wait_for_report(
             self.is_security_risk_empty, 
-            cluster_name=self.cluster,
-            namespace=self.namespace,
+            security_risk_ids=self.test_security_risk_ids,
             timeout=600,
             sleep_interval=10
             )
@@ -244,6 +242,93 @@ class SecurityRisksScenarioManager(ScenarioManager):
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         super().apply_fix(fix_type)
 
+    def get_exceptions_list(self):
+        """
+        get_exceptions_list get the list of exceptions from the security risk
+        """
+        r = self.backend.get_security_risks_exceptions_list(self.cluster)
+        response = json.loads(r.text)
+        return response
+
+    def add_new_exception(self, security_risk_id, k8s_resource_ids=[], reason=""):
+        """
+        add_new_exception add a new exception to the security risk
+        """
+
+        r = self.backend.add_security_risks_exception(security_risk_id, k8s_resource_ids, reason)
+        new_exception = json.loads(r.text)
+        new_exception_guid = new_exception["guid"]
+
+        exceptions_res = self.get_exceptions_list()
+        exceptions = exceptions_res["response"]
+
+        found = False
+        for exception in exceptions:
+            if exception["guid"] == new_exception_guid:
+                found = True
+                assert exception["reason"] == reason, f"Failed to add exception, expected reason: {reason}, got: {exception['reason']}"
+                assert exception["securityRiskID"] == security_risk_id, f"Failed to add exception, expected securityRiskID: {security_risk_id}, got: {exception['securityRiskID']}"
+                assert len(exception["resources"]) == len(k8s_resource_ids), f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
+
+                for resource in exception["resources"]:
+                    assert resource["attributes"]["k8sResourceHash"] in k8s_resource_ids, f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
+        assert found, f"Failed to add new exception to the security risk, expected security risk: {security_risk_id}, got: {exceptions}"
+        return new_exception
+    
+    def delete_exception(self, exception_guid):
+        """
+        delete_exception delete an exception from the security risk
+        """
+
+        r = self.backend.delete_security_risks_exception(exception_guid)
+        response = json.loads(r.text)
+
+        assert response == ["deleted"], f"Failed to delete exception: {response}"
+
+        exceptions_res = self.get_exceptions_list()
+        exceptions = exceptions_res["response"]
+
+        found = False
+        if exceptions != None:
+            for exception in exceptions:
+                if exception["guid"] == exception_guid:
+                    found = True
+
+        assert not found, f"Failed to delete exception: {response}"
+        return response
+    
+    def edit_exception(self, exception_guid, security_risk_id, k8s_resource_ids, reason=""):
+        """
+        edit_exception edit an exception from the security risk
+        """
+
+        r = self.backend.put_security_risks_exception(exception_guid, security_risk_id, k8s_resource_ids, reason)
+        response = json.loads(r.text)
+
+        assert response["guid"] == exception_guid, f"Failed to edit exception, expected guid: {exception_guid}, got: {response['guid']}"
+        assert response["reason"] == reason, f"Failed to edit exception, expected reason: {reason}, got: {response['reason']}"
+        assert response["securityRiskID"] == security_risk_id, f"Failed to edit exception, expected securityRiskID: {security_risk_id}, got: {response['securityRiskID']}"
+        assert len(response["resources"]) == len(k8s_resource_ids), f"Failed to edit exception, expected resources: {k8s_resource_ids}, got: {response['resources']}"
+        return response
+    
+    def get_security_risks_resources(self, security_risk_id):
+        """
+        get_security_risks_resources get the security risks resources from the backend
+        """
+        r = self.backend.get_security_risks_resources(self.cluster, self.namespace, security_risk_id)
+        response = json.loads(r.text)
+        if response["response"] ==  None:
+            response["response"] = []
+        return response
+    
+    def get_security_risks_list(self, security_risk_ids=[]):
+        """
+        get_security_risks_list get the security risks list from the backend
+        """
+        r = self.backend.get_security_risks_list(self.cluster, self.namespace, security_risk_ids)
+        response = json.loads(r.text)
+        return response
+    
 
     def check_security_risks_resources_results(self, result, expected):
         """
@@ -320,18 +405,32 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
     
 
-    def is_security_risk_empty(self, cluster_name, namespace, **kwargs):
+    def is_security_risk_empty(self, security_risk_ids):
         """
         is_security_risk_empty check if the security risks list are empty
         """
         r = self.backend.get_security_risks_list(
-            cluster_name=cluster_name,
-            namespace=namespace,
-            security_risk_ids=self.test_security_risk_ids
+            cluster_name=self.cluster,
+            namespace=self.namespace,
+            security_risk_ids=security_risk_ids
             )
         
         response = json.loads(r.text)
         assert response['total']['value'] == 0, "Security risks found, expecting no security risks"
+        return True
+    
+    def is_security_risk_resources_empty(self, security_risk_ids):
+        """
+        is_security_risk_resources_empty check if the security risks resources list are empty
+        """
+        r = self.backend.get_security_risks_resources(
+            cluster_name=self.cluster,
+            namespace=self.namespace,
+            security_risk_id=security_risk_ids
+            )
+        
+        response = json.loads(r.text)
+        assert response['total']['value'] == 0, "Security risks resources found, expecting no security risks resources"
         return True
     
     def verify_security_risks_trends(self, expected_n_events_detected, expected_n_events_resolved, expected_current_detected, expected_change_from_beginning_of_period):
@@ -449,6 +548,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
                 Logger.logger.info('comparing security risks result with expected ones')
                 self.check_security_risks_resources_results(response, expected)
+        
 
     def find_missing_security_risks(self, result, expected):
         """

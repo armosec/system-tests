@@ -91,7 +91,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `synchronizer_kubescape_crds`       | helm-chart |  synchronizer Kubescape CRDs | in-cluster synchronizer, backend |
 | `sr_detect_and_resolve_attack_chain`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `sr_detect_and_resolve_control`             | helm-chart |                                    | in-cluster kubescape, backend |
-
+| `sr_with_exceptions`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `basic_incident_presented`         | helm-chart |  basic incident from in cluster presented in BE API | in-cluster , backend |
 
 ### Install:
