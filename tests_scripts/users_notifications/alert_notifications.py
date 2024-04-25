@@ -10,7 +10,7 @@ from infrastructure import KubectlWrapper
 from systest_utils import Logger, statics, TestUtil
 from ..helm.base_helm import BaseHelm
 
-NOTIFICATIONS_SVC_DELAY = 4 * 60
+NOTIFICATIONS_SVC_DELAY = 7 * 60
 
 TEST_MESSAGE_DELAY = 10
 
