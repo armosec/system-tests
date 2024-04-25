@@ -338,7 +338,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
-                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew'}
+                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'k8sResourceHash'}
     
         if 'total' in result and 'total' in expected:
             assert result['total']['value'] == expected['total']['value'], f"'Total' value mismatch: result: {result['total']['value']} != expected: {expected['total']['value']}"
