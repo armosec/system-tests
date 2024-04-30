@@ -392,7 +392,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config"},
+            cli_args={"scan": True, "trigger": "configurations"},
         )
 
     @staticmethod
@@ -401,7 +401,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config", "exclude-namespaces": ["kubescape"]},
+            cli_args={"scan": True, "trigger": "configurations", "exclude-namespaces": ["kubescape"]},
         )
 
     @staticmethod
@@ -410,7 +410,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config", "include-namespaces": ["kubescape"]},
+            cli_args={"scan": True, "trigger": "configurations", "include-namespaces": ["kubescape"]},
         )
 
     @staticmethod
@@ -419,7 +419,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config", "host-scanner-enabled": True},
+            cli_args={"scan": True, "trigger": "configurations", "host-scanner-enabled": True},
         )
 
     @staticmethod
@@ -428,7 +428,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config", "submit": True},
+            cli_args={"scan": True, "trigger": "configurations", "submit": True},
         )
 
     @staticmethod
@@ -437,7 +437,7 @@ class KSMicroserviceTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ControlClusterFromCLI,
-            cli_args={"scan": True, "trigger": "config", "frameworks": ["MITRE"]},
+            cli_args={"scan": True, "trigger": "configurations", "frameworks": ["MITRE"]},
         )
 
     @staticmethod
