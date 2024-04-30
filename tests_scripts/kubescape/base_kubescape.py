@@ -1235,11 +1235,11 @@ class BaseKubescape(BaseK8S):
         cli_args.append("scan")
 
         assert "trigger" in kwargs[
-            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"configurations\" or \"vulnerabilities\")'
 
         trigger = kwargs['args']['trigger']
-        if trigger == "config":
-            cli_args.append("config")
+        if trigger == "configurations":
+            cli_args.append("configurations")
             if "include-namespaces" in kwargs['args']:
                 cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(
                     data=kwargs['args']["include-namespaces"])])
@@ -1259,7 +1259,7 @@ class BaseKubescape(BaseK8S):
                 cli_args.extend(["--include-namespaces", BaseKubescape.parse_cli_args_in_list_to_string(
                     data=kwargs['args']["include-namespaces"])])
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
+            raise Exception("cli args must contain neither \"configurations\" or \"vulnerabilities\"")
 
         return cli_args
 
@@ -1284,12 +1284,12 @@ class BaseKubescape(BaseK8S):
             'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
         trigger = kwargs['args']['trigger']
 
-        if trigger == "config":
+        if trigger == "configurations":
             self.validate_scan_trigger(cluster_name=cluster_name, deployment_name="kubescape", kwargs=kwargs)
         elif trigger == "vulnerabilities":
             self.validate_scan_trigger(cluster_name=cluster_name, deployment_name="operator", kwargs=kwargs)
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
+            raise Exception("cli args must contain neither \"configurations\" or \"vulnerabilities\"")
 
     @staticmethod
     def parse_string_to_found_in_list_argument(prefix: str, argument: list, postfix: str):
@@ -1305,10 +1305,10 @@ class BaseKubescape(BaseK8S):
 
         assert "scan" in kwargs['args'], 'cli args must contain \"scan\"'
         assert "trigger" in kwargs[
-            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"config\" or \"vulnerabilities\")'
+            'args'], 'cli args must contain \"trigger\", to understand which operation do you want to trigger.(\"configurations\" or \"vulnerabilities\")'
 
         trigger = kwargs['args']['trigger']
-        if trigger == "config":
+        if trigger == "configurations":
             if "include-namespaces" in kwargs['args']:
                 string_to_be_found.append(
                     BaseKubescape.parse_string_to_found_in_list_argument("\\\"includeNamespaces\\\":[",
@@ -1340,7 +1340,7 @@ class BaseKubescape(BaseK8S):
                 string_to_be_found.append(
                     "{\\\"commandName\\\":\\\"scan\\\",\\\"wildWlid\\\":\\\"wlid://cluster-" + cluster_name)
         else:
-            raise Exception("cli args must contain neither \"config\" or \"vulnerabilities\"")
+            raise Exception("cli args must contain neither \"configurations\" or \"vulnerabilities\"")
 
         return string_to_be_found
 
