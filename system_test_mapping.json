@@ -65,6 +65,70 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "control_cluster_from_CLI_config_scan_default": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_exclude_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_include_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_host_scanner_enabled": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_submit": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_MITRE_framework": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_vulnerabilities_scan_default": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_vulnerabilities_scan_include_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "ac_alpine_fix_image_no_relevancy_with_cronjob": {
         "target": [
             "CLI",
