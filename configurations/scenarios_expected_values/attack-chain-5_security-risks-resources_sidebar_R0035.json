@@ -1,0 +1,27 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "cluster": "srtest1000",
+            "clusterShortName": "srtest1000",
+            "namespace": "default",
+            "resourceName": "wordpress",
+            "kind": "Deployment",
+            "resourceID": "",
+            "k8sResourceHash": "309973501118010814",
+            "riskID": "workload-external-track",
+            "riskType": "AttackPath",
+            "securityRiskID": "R_0035",
+            "status": "Detected",
+            "isNew": true,
+            "lastTimeDetected": "2024-04-17T12:03:57Z",
+            "exceptionApplied": false,
+            "attackChainID": "1496039999",
+            "firstSeen": "2024-04-17T11:37:55.549216Z"
+        }
+    ],
+    "cursor": ""
+}

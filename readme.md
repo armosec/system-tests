@@ -39,7 +39,6 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `scan_local_file`                                              | kubescape  | scan local file                                                        | kubescape                     |
 | `scan_local_glob_files`                                        | kubescape  | scan local glob files                                                  | kubescape                     |
 | `scan_local_list_of_files`                                     | kubescape  | scan local list of files                                               | kubescape      
-| `scan_security_and_submit_to_backend`                               | kubescape, security  | scan framework NSA and test results against the backend,                | kubescape, backend                 |
 | `scan_nsa_and_submit_to_backend`                               | kubescape  | scan framework NSA and test results against the backend                | kubescape, backend            | 
 | `scan_mitre_and_submit_to_backend`                             | kubescape  | scan framework MITRE and test results against the backend              | kubescape, backend            | 
 | `scan_local_repository_and_submit_to_backend`                  | kubescape  | scan local repository and test results against the backend             | kubescape, backend            | 
@@ -90,6 +89,10 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `synchronizer_proxy`                | helm-chart |  synchronizer network disconnection and proxy | in-cluster synchronizer, backend |
 | `synchronizer_race_condition`       | helm-chart |  synchronizer multiple frequent modifications | in-cluster synchronizer, backend |
 | `synchronizer_kubescape_crds`       | helm-chart |  synchronizer Kubescape CRDs | in-cluster synchronizer, backend |
+| `sr_r_0035_attack_chain`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `sr_r_0005_control`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `sr_r_0007_control_networkpolicy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `sr_with_exceptions`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `basic_incident_presented`         | helm-chart |  basic incident from in cluster presented in BE API | in-cluster , backend |
 
 ### Install:

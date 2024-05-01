@@ -1,0 +1,15 @@
+{
+    "fields": {
+        "namespace": [
+            "default"
+        ]
+    },
+    "fieldsCount": {
+        "namespace": [
+            {
+                "key": "default",
+                "count": 1
+            }
+        ]
+    }
+}
