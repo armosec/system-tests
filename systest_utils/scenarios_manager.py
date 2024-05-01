@@ -28,6 +28,7 @@ SECURITY_RISKS_RESOURCES_PREFIX = {
     "R_0002": "_security-risks-resources_sidebar_R0002", # control security risk type
     "R_0035": "_security-risks-resources_sidebar_R0035", # attack path security risk type
     "R_0005": "_security-risks-resources_sidebar_R0005", # control security risk type
+    "R_0007": "_security-risks-resources_sidebar_R0007", # control security risk type with network policy
 
 }
 
@@ -197,6 +198,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
         
         self.test_security_risk_ids = test_obj["test_job"][0].get("security_risks_ids", [])
+        self.with_network_policy = test_obj["test_job"][0].get("with_network_policy", False)
 
     def verify_scenario(self):
         """
@@ -463,6 +465,11 @@ class SecurityRisksScenarioManager(ScenarioManager):
                         "category":"",
                         "smartRemediation":"",
                         "exceptionApplied":"|empty"}
+
+        if self.with_network_policy:
+            baseFilters["label"] = ""
+            baseFilters["networkPolicyStatus"] = ""
+            
 
         if self.test_security_risk_ids:
             baseFilters["securityRiskID"] = ','.join(self.test_security_risk_ids)
