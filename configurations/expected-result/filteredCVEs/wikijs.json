@@ -2,11 +2,11 @@
   "kind": "VulnerabilityManifest",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
-    "name": "replicaset-wikijs-59d8c5c9b9-wikijs-af1f-f315",
+    "name": "replicaset-wikijs-59d8c5c9b9-wikijs-d60a-147f",
     "namespace": "kubescape",
-    "uid": "2c6c51f7-c8e3-4923-8c5c-62f4e9d033bf",
+    "uid": "6c7ee8af-34d5-4c59-843c-ef11888d734d",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:39:21Z",
+    "creationTimestamp": "2024-05-01T07:16:38Z",
     "labels": {
       "kubescape.io/context": "filtered",
       "kubescape.io/workload-api-group": "apps",
@@ -27,7 +27,7 @@
       "withRelevancy": true,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
@@ -311,14 +311,7 @@
               "BSD-2-Clause"
             ],
             "cpes": [
-              "cpe:2.3:a:css-what:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css-what:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css_what:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css_what:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:fb55:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:fb55:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css:css_what:4.0.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:css-what_project:css-what:4.0.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/css-what@4.0.0",
             "upstreams": null,
@@ -412,8 +405,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
@@ -507,8 +499,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
@@ -603,8 +594,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
