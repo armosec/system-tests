@@ -4,9 +4,9 @@
   "metadata": {
     "name": "mariadb-sha256-821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66-0b6c66",
     "namespace": "kubescape",
-    "uid": "09a085fc-2ab6-40f8-8d21-e4be4a8de6e4",
+    "uid": "cfbbd231-0042-43bd-8996-1cee2762c7d3",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:33:48Z",
+    "creationTimestamp": "2024-05-01T07:03:07Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-mariadb-sha256-821d0411208eaa88f9e1f0daccd1d5",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {

@@ -2,11 +2,11 @@
   "kind": "VulnerabilityManifest",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
-    "name": "replicaset-mariadb-86d99cf856-mariadb-8384-37e7",
+    "name": "replicaset-mariadb-86d99cf856-mariadb-6769-2a49",
     "namespace": "kubescape",
-    "uid": "a7239e1b-97c3-4cc6-8b95-97bc86b34f52",
+    "uid": "204616dc-8816-4130-b9e4-d89a92a2acf8",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:39:19Z",
+    "creationTimestamp": "2024-05-01T07:16:40Z",
     "labels": {
       "kubescape.io/context": "filtered",
       "kubescape.io/workload-api-group": "apps",
@@ -27,7 +27,7 @@
       "withRelevancy": true,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {

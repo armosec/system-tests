@@ -4,9 +4,9 @@
   "metadata": {
     "name": "nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3fb73ed23f2a75a65ce1d4b4f55a5c2ef2-5c2ef2",
     "namespace": "kubescape",
-    "uid": "e6437175-cf6d-439f-830e-131f1cee809b",
+    "uid": "a0347db4-6976-48db-9ee4-e3e8fd0015ce",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:33:15Z",
+    "creationTimestamp": "2024-05-01T07:02:49Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-nginx-sha256-aa0afebbb3cfa473099a62c4b32e9b3f",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
@@ -204,7 +204,7 @@
             "cpes": [
               "cpe:2.3:a:bash:bash:5.1-2+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/bash@5.1-2+deb11u1?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/bash@5.1-2%2Bdeb11u1?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -301,7 +301,7 @@
             "cpes": [
               "cpe:2.3:a:bsdutils:bsdutils:1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/bsdutils@1:2.36.1-8+deb11u1?arch=amd64&upstream=util-linux%402.36.1-8+deb11u1&distro=debian-11",
+            "purl": "pkg:deb/debian/bsdutils@1:2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux%402.36.1-8%2Bdeb11u1&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux",
@@ -408,7 +408,7 @@
             "cpes": [
               "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
+            "purl": "pkg:deb/debian/coreutils@8.32-4%2Bb1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
             "upstreams": [
               {
                 "name": "coreutils",
@@ -513,7 +513,7 @@
             "cpes": [
               "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
+            "purl": "pkg:deb/debian/coreutils@8.32-4%2Bb1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
             "upstreams": [
               {
                 "name": "coreutils",
@@ -607,7 +607,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -694,7 +694,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -783,7 +783,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -871,7 +871,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -960,7 +960,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1048,7 +1048,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1144,7 +1144,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1232,7 +1232,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1319,7 +1319,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1404,7 +1404,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1495,7 +1495,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1590,7 +1590,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1675,7 +1675,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1760,7 +1760,7 @@
             "cpes": [
               "cpe:2.3:a:curl:curl:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/curl@7.74.0-1.3+deb11u7?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/curl@7.74.0-1.3%2Bdeb11u7?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -1943,7 +1943,7 @@
             "cpes": [
               "cpe:2.3:a:gpgv:gpgv:2.2.27-2+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/gpgv@2.2.27-2+deb11u2?arch=amd64&upstream=gnupg2&distro=debian-11",
+            "purl": "pkg:deb/debian/gpgv@2.2.27-2%2Bdeb11u2?arch=amd64&upstream=gnupg2&distro=debian-11",
             "upstreams": [
               {
                 "name": "gnupg2"
@@ -2141,7 +2141,7 @@
             "cpes": [
               "cpe:2.3:a:libblkid1:libblkid1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libblkid1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libblkid1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -2237,7 +2237,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2336,7 +2336,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2436,7 +2436,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2535,7 +2535,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2633,7 +2633,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2732,7 +2732,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2831,7 +2831,7 @@
               "cpe:2.3:a:libc:libc-bin:2.31-13+deb11u5:*:*:*:*:*:*:*",
               "cpe:2.3:a:libc:libc_bin:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc-bin@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc-bin@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -2922,7 +2922,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3016,7 +3016,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3111,7 +3111,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3205,7 +3205,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3298,7 +3298,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3392,7 +3392,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3486,7 +3486,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u5?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u5?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -3667,7 +3667,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -3758,7 +3758,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -3851,7 +3851,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -3943,7 +3943,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4036,7 +4036,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4128,7 +4128,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4228,7 +4228,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4320,7 +4320,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4411,7 +4411,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4500,7 +4500,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4595,7 +4595,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4694,7 +4694,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4783,7 +4783,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -4872,7 +4872,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u7:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u7?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u7?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -5076,7 +5076,7 @@
             "cpes": [
               "cpe:2.3:a:libexpat1:libexpat1:2.2.10-2+deb11u5:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libexpat1@2.2.10-2+deb11u5?arch=amd64&upstream=expat&distro=debian-11",
+            "purl": "pkg:deb/debian/libexpat1@2.2.10-2%2Bdeb11u5?arch=amd64&upstream=expat&distro=debian-11",
             "upstreams": [
               {
                 "name": "expat"
@@ -5262,7 +5262,7 @@
             "cpes": [
               "cpe:2.3:a:libfreetype6:libfreetype6:2.10.4+dfsg-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1+deb11u1?arch=amd64&upstream=freetype&distro=debian-11",
+            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1%2Bdeb11u1?arch=amd64&upstream=freetype&distro=debian-11",
             "upstreams": [
               {
                 "name": "freetype"
@@ -5359,7 +5359,7 @@
             "cpes": [
               "cpe:2.3:a:libfreetype6:libfreetype6:2.10.4+dfsg-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1+deb11u1?arch=amd64&upstream=freetype&distro=debian-11",
+            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1%2Bdeb11u1?arch=amd64&upstream=freetype&distro=debian-11",
             "upstreams": [
               {
                 "name": "freetype"
@@ -5999,7 +5999,7 @@
             "cpes": [
               "cpe:2.3:a:libgnutls30:libgnutls30:3.7.1-5+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5+deb11u3?arch=amd64&upstream=gnutls28&distro=debian-11",
+            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5%2Bdeb11u3?arch=amd64&upstream=gnutls28&distro=debian-11",
             "upstreams": [
               {
                 "name": "gnutls28"
@@ -6094,7 +6094,7 @@
               "cpe:2.3:a:libgssapi:libgssapi-krb5-2:1.18.3-6+deb11u3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libgssapi:libgssapi_krb5_2:1.18.3-6+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6+deb11u3?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6%2Bdeb11u3?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -6182,7 +6182,7 @@
             "cpes": [
               "cpe:2.3:a:libjbig0:libjbig0:2.1-3.1+b2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libjbig0@2.1-3.1+b2?arch=amd64&upstream=jbigkit%402.1-3.1&distro=debian-11",
+            "purl": "pkg:deb/debian/libjbig0@2.1-3.1%2Bb2?arch=amd64&upstream=jbigkit%402.1-3.1&distro=debian-11",
             "upstreams": [
               {
                 "name": "jbigkit",
@@ -6364,7 +6364,7 @@
             "cpes": [
               "cpe:2.3:a:libk5crypto3:libk5crypto3:1.18.3-6+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6+deb11u3?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6%2Bdeb11u3?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -6455,7 +6455,7 @@
               "cpe:2.3:a:libkrb5:libkrb5-3:1.18.3-6+deb11u3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libkrb5:libkrb5_3:1.18.3-6+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6+deb11u3?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6%2Bdeb11u3?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -6541,7 +6541,7 @@
             "cpes": [
               "cpe:2.3:a:libkrb5support0:libkrb5support0:1.18.3-6+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6+deb11u3?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6%2Bdeb11u3?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -6639,7 +6639,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -6735,7 +6735,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -6828,7 +6828,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -6923,7 +6923,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -7024,7 +7024,7 @@
             "cpes": [
               "cpe:2.3:a:libmount1:libmount1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmount1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libmount1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -8117,7 +8117,7 @@
             "cpes": [
               "cpe:2.3:a:libsmartcols1:libsmartcols1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libsmartcols1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libsmartcols1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -8286,7 +8286,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u4?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -8373,7 +8373,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u4?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -8460,7 +8460,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u4?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -8547,7 +8547,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u4?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -8637,7 +8637,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u4?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u4?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -8731,7 +8731,7 @@
             "cpes": [
               "cpe:2.3:a:libsystemd0:libsystemd0:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libsystemd0@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libsystemd0@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -8829,7 +8829,7 @@
             "cpes": [
               "cpe:2.3:a:libsystemd0:libsystemd0:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libsystemd0@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libsystemd0@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -8926,7 +8926,7 @@
             "cpes": [
               "cpe:2.3:a:libsystemd0:libsystemd0:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libsystemd0@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libsystemd0@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -9019,7 +9019,7 @@
             "cpes": [
               "cpe:2.3:a:libsystemd0:libsystemd0:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libsystemd0@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libsystemd0@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -9106,7 +9106,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9193,7 +9193,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9281,7 +9281,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9368,7 +9368,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9455,7 +9455,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9544,7 +9544,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9633,7 +9633,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9719,7 +9719,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9806,7 +9806,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9894,7 +9894,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -9982,7 +9982,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -10076,7 +10076,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -10174,7 +10174,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u4?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u4?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -10266,7 +10266,7 @@
             "cpes": [
               "cpe:2.3:a:libtinfo6:libtinfo6:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtinfo6@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/libtinfo6@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -10359,7 +10359,7 @@
             "cpes": [
               "cpe:2.3:a:libtinfo6:libtinfo6:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtinfo6@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/libtinfo6@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -10453,7 +10453,7 @@
             "cpes": [
               "cpe:2.3:a:libudev1:libudev1:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libudev1@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libudev1@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -10551,7 +10551,7 @@
             "cpes": [
               "cpe:2.3:a:libudev1:libudev1:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libudev1@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libudev1@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -10648,7 +10648,7 @@
             "cpes": [
               "cpe:2.3:a:libudev1:libudev1:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libudev1@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libudev1@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -10741,7 +10741,7 @@
             "cpes": [
               "cpe:2.3:a:libudev1:libudev1:247.3-7+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libudev1@247.3-7+deb11u1?arch=amd64&upstream=systemd&distro=debian-11",
+            "purl": "pkg:deb/debian/libudev1@247.3-7%2Bdeb11u1?arch=amd64&upstream=systemd&distro=debian-11",
             "upstreams": [
               {
                 "name": "systemd"
@@ -10842,7 +10842,7 @@
             "cpes": [
               "cpe:2.3:a:libuuid1:libuuid1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libuuid1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libuuid1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -11109,7 +11109,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -11200,7 +11200,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -11282,7 +11282,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -11626,7 +11626,7 @@
             "cpes": [
               "cpe:2.3:a:libxslt1.1:libxslt1.1:1.1.34-4+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxslt1.1@1.1.34-4+deb11u1?arch=amd64&upstream=libxslt&distro=debian-11",
+            "purl": "pkg:deb/debian/libxslt1.1@1.1.34-4%2Bdeb11u1?arch=amd64&upstream=libxslt&distro=debian-11",
             "upstreams": [
               {
                 "name": "libxslt"
@@ -12273,7 +12273,7 @@
             "cpes": [
               "cpe:2.3:a:mount:mount:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/mount@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/mount@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -12374,7 +12374,7 @@
               "cpe:2.3:a:ncurses:ncurses-base:6.2+20201114-2:*:*:*:*:*:*:*",
               "cpe:2.3:a:ncurses:ncurses_base:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/ncurses-base@6.2+20201114-2?arch=all&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/ncurses-base@6.2%2B20201114-2?arch=all&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -12476,7 +12476,7 @@
               "cpe:2.3:a:ncurses:ncurses-base:6.2+20201114-2:*:*:*:*:*:*:*",
               "cpe:2.3:a:ncurses:ncurses_base:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/ncurses-base@6.2+20201114-2?arch=all&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/ncurses-base@6.2%2B20201114-2?arch=all&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -12573,7 +12573,7 @@
               "cpe:2.3:a:ncurses:ncurses-bin:6.2+20201114-2:*:*:*:*:*:*:*",
               "cpe:2.3:a:ncurses:ncurses_bin:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/ncurses-bin@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/ncurses-bin@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -12671,7 +12671,7 @@
               "cpe:2.3:a:ncurses:ncurses-bin:6.2+20201114-2:*:*:*:*:*:*:*",
               "cpe:2.3:a:ncurses:ncurses_bin:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/ncurses-bin@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/ncurses-bin@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -13018,7 +13018,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u4?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -13105,7 +13105,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u4?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -13192,7 +13192,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u4?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -13279,7 +13279,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u4?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -13369,7 +13369,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u4:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u4?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u4?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -13858,7 +13858,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -13976,7 +13976,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -14098,7 +14098,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -14216,7 +14216,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -14494,7 +14494,7 @@
               "cpe:2.3:a:util:util-linux:2.36.1-8+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:util:util_linux:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/util-linux@2.36.1-8+deb11u1?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/util-linux@2.36.1-8%2Bdeb11u1?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }

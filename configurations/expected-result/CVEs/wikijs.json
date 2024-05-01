@@ -4,9 +4,9 @@
   "metadata": {
     "name": "requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d-87439d",
     "namespace": "kubescape",
-    "uid": "95511b1a-b703-4b70-a889-fe732d9a86aa",
+    "uid": "6e683292-b573-401d-ac38-c54bc0659ac4",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:33:35Z",
+    "creationTimestamp": "2024-05-01T07:03:30Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-requarks-wiki-sha256-dd83fff15e77843ff934b25c28c865ac",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
@@ -1354,7 +1354,7 @@
             "type": "npm",
             "locations": [
               {
-                "path": "/wiki/node_modules/@graphql-tools/url-loader/node_modules/cross-fetch/package.json",
+                "path": "/wiki/node_modules/fbjs/node_modules/cross-fetch/package.json",
                 "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
               }
             ],
@@ -1458,7 +1458,7 @@
             "type": "npm",
             "locations": [
               {
-                "path": "/wiki/node_modules/fbjs/node_modules/cross-fetch/package.json",
+                "path": "/wiki/node_modules/@graphql-tools/url-loader/node_modules/cross-fetch/package.json",
                 "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
               }
             ],
@@ -1562,14 +1562,7 @@
               "BSD-2-Clause"
             ],
             "cpes": [
-              "cpe:2.3:a:css-what:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css-what:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css_what:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css_what:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:fb55:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:fb55:css_what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css:css-what:4.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:css:css_what:4.0.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:css-what_project:css-what:4.0.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/css-what@4.0.0",
             "upstreams": null,
@@ -4441,6 +4434,84 @@
               }
             ],
             "fix": {
+              "versions": [],
+              "state": "unknown"
+            },
+            "advisories": null
+          },
+          "relatedVulnerabilities": null,
+          "matchDetails": [
+            {
+              "type": "cpe-match",
+              "matcher": "javascript-matcher",
+              "searchedBy": {
+                "namespace": "nvd:cpe",
+                "cpes": [
+                  "cpe:2.3:a:decode-uri-component_project:decode-uri-component:0.2.0:*:*:*:*:node.js:*:*"
+                ],
+                "Package": {
+                  "name": "decode-uri-component",
+                  "version": "0.2.0"
+                }
+              },
+              "found": {
+                "vulnerabilityID": "CVE-2022-38900",
+                "versionConstraint": "= 0.2.0 (unknown)",
+                "cpes": [
+                  "cpe:2.3:a:decode-uri-component_project:decode-uri-component:0.2.0:*:*:*:*:*:*:*"
+                ]
+              }
+            }
+          ],
+          "artifact": {
+            "name": "decode-uri-component",
+            "version": "0.2.0",
+            "type": "npm",
+            "locations": [
+              {
+                "path": "/wiki/node_modules/decode-uri-component/package.json",
+                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
+              }
+            ],
+            "language": "javascript",
+            "licenses": [
+              "MIT"
+            ],
+            "cpes": [
+              "cpe:2.3:a:decode-uri-component_project:decode-uri-component:0.2.0:*:*:*:*:node.js:*:*"
+            ],
+            "purl": "pkg:npm/decode-uri-component@0.2.0",
+            "upstreams": null,
+            "metadata": null
+          }
+        },
+        {
+          "vulnerability": {
+            "id": "CVE-2022-38900",
+            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-38900",
+            "namespace": "nvd:cpe",
+            "severity": "High",
+            "urls": [
+              "https://github.com/SamVerschueren/decode-uri-component/issues/5",
+              "https://github.com/sindresorhus/query-string/issues/345",
+              "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/ERN6YE3DS7NBW7UH44SCJBMNC2NWQ7SM/",
+              "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/KAC5KQ2SEWAMQ6UZAUBZ5KXKEOESH375/",
+              "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VNV2GNZXOTEDAJRFH3ZYWRUBGIVL7BSU/"
+            ],
+            "description": "decode-uri-component 0.2.0 is vulnerable to Improper Input Validation resulting in DoS.",
+            "cvss": [
+              {
+                "version": "3.1",
+                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+                "metrics": {
+                  "baseScore": 7.5,
+                  "exploitabilityScore": 3.9,
+                  "impactScore": 3.6
+                },
+                "vendorMetadata": {}
+              }
+            ],
+            "fix": {
               "versions": [
                 "0.2.1"
               ],
@@ -4494,16 +4565,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:decode-uri-component:decode-uri-component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode-uri-component:decode_uri_component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode_uri_component:decode-uri-component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode_uri_component:decode_uri_component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode-uri:decode-uri-component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode-uri:decode_uri_component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode_uri:decode-uri-component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode_uri:decode_uri_component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode:decode-uri-component:0.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:decode:decode_uri_component:0.2.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:decode-uri-component_project:decode-uri-component:0.2.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/decode-uri-component@0.2.0",
             "upstreams": null,
@@ -4608,8 +4670,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:mscdex:dicer:0.2.5:*:*:*:*:*:*:*",
-              "cpe:2.3:a:dicer:dicer:0.2.5:*:*:*:*:*:*:*"
+              "cpe:2.3:a:dicer_project:dicer:0.2.5:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/dicer@0.2.5",
             "upstreams": null,
@@ -4714,8 +4775,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:mscdex:dicer:0.3.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:dicer:dicer:0.3.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:dicer_project:dicer:0.3.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/dicer@0.3.0",
             "upstreams": null,
@@ -7028,12 +7088,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:file-type:file-type:15.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:file-type:file_type:15.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:file_type:file-type:15.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:file_type:file_type:15.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:file:file-type:15.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:file:file_type:15.0.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:file-type_project:file-type:15.0.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/file-type@15.0.1",
             "upstreams": null,
@@ -7137,12 +7192,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:follow-redirects:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow-redirects:follow_redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow_redirects:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow_redirects:follow_redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow:follow_redirects:1.14.6:*:*:*:*:*:*:*"
+              "cpe:2.3:a:follow-redirects:follow_redirects:1.14.6:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/follow-redirects@1.14.6",
             "upstreams": null,
@@ -7247,12 +7297,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:follow-redirects:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow-redirects:follow_redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow_redirects:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow_redirects:follow_redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow:follow-redirects:1.14.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:follow:follow_redirects:1.14.6:*:*:*:*:*:*:*"
+              "cpe:2.3:a:follow-redirects:follow_redirects:1.14.6:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/follow-redirects@1.14.6",
             "upstreams": null,
@@ -18431,7 +18476,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:json5:json5:2.0.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:json5:json5:2.0.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/json5@2.0.0",
             "upstreams": null,
@@ -18528,7 +18573,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:json5:json5:2.2.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:json5:json5:2.2.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/json5@2.2.0",
             "upstreams": null,
@@ -18622,8 +18667,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
@@ -18717,8 +18761,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
@@ -18813,8 +18856,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jsonwebtoken:jsonwebtoken:8.5.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:auth0:jsonwebtoken:8.5.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/jsonwebtoken@8.5.1",
             "upstreams": null,
@@ -25466,12 +25508,102 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:markdown-it:markdown-it:11.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:markdown-it:markdown_it:11.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:markdown_it:markdown-it:11.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:markdown_it:markdown_it:11.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:markdown:markdown-it:11.0.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:markdown:markdown_it:11.0.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:markdown-it_project:markdown-it:11.0.1:*:*:*:*:*:*:*"
+            ],
+            "purl": "pkg:npm/markdown-it@11.0.1",
+            "upstreams": null,
+            "metadata": null
+          }
+        },
+        {
+          "vulnerability": {
+            "id": "CVE-2022-21670",
+            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-21670",
+            "namespace": "nvd:cpe",
+            "severity": "Medium",
+            "urls": [
+              "https://github.com/markdown-it/markdown-it/commit/ffc49ab46b5b751cd2be0aabb146f2ef84986101",
+              "https://github.com/markdown-it/markdown-it/security/advisories/GHSA-6vfc-qv3f-vr6c"
+            ],
+            "description": "markdown-it is a Markdown parser. Prior to version 1.3.2, special patterns with length greater than 50 thousand characterss could slow down the parser significantly. Users should upgrade to version 12.3.2 to receive a patch. There are no known workarounds aside from upgrading.",
+            "cvss": [
+              {
+                "version": "2.0",
+                "vector": "AV:N/AC:L/Au:N/C:N/I:N/A:P",
+                "metrics": {
+                  "baseScore": 5,
+                  "exploitabilityScore": 10,
+                  "impactScore": 2.9
+                },
+                "vendorMetadata": {}
+              },
+              {
+                "version": "3.1",
+                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                "metrics": {
+                  "baseScore": 5.3,
+                  "exploitabilityScore": 3.9,
+                  "impactScore": 1.4
+                },
+                "vendorMetadata": {}
+              },
+              {
+                "version": "3.1",
+                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+                "metrics": {
+                  "baseScore": 5.3,
+                  "exploitabilityScore": 3.9,
+                  "impactScore": 1.4
+                },
+                "vendorMetadata": {}
+              }
+            ],
+            "fix": {
+              "versions": [],
+              "state": "unknown"
+            },
+            "advisories": null
+          },
+          "relatedVulnerabilities": null,
+          "matchDetails": [
+            {
+              "type": "cpe-match",
+              "matcher": "javascript-matcher",
+              "searchedBy": {
+                "namespace": "nvd:cpe",
+                "cpes": [
+                  "cpe:2.3:a:markdown-it_project:markdown-it:11.0.1:*:*:*:*:*:*:*"
+                ],
+                "Package": {
+                  "name": "markdown-it",
+                  "version": "11.0.1"
+                }
+              },
+              "found": {
+                "vulnerabilityID": "CVE-2022-21670",
+                "versionConstraint": "<= 12.3.1 (unknown)",
+                "cpes": [
+                  "cpe:2.3:a:markdown-it_project:markdown-it:*:*:*:*:*:*:*:*"
+                ]
+              }
+            }
+          ],
+          "artifact": {
+            "name": "markdown-it",
+            "version": "11.0.1",
+            "type": "npm",
+            "locations": [
+              {
+                "path": "/wiki/node_modules/markdown-it/package.json",
+                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
+              }
+            ],
+            "language": "javascript",
+            "licenses": [
+              "MIT"
+            ],
+            "cpes": [
+              "cpe:2.3:a:markdown-it_project:markdown-it:11.0.1:*:*:*:*:*:*:*"
             ],
             "purl": "pkg:npm/markdown-it@11.0.1",
             "upstreams": null,
@@ -25558,8 +25690,7 @@
               "ISC"
             ],
             "cpes": [
-              "cpe:2.3:a:minimatch:minimatch:3.0.4:*:*:*:*:*:*:*",
-              "cpe:2.3:a:isaacs:minimatch:3.0.4:*:*:*:*:*:*:*"
+              "cpe:2.3:a:minimatch_project:minimatch:3.0.4:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/minimatch@3.0.4",
             "upstreams": null,
@@ -25646,8 +25777,7 @@
               "ISC"
             ],
             "cpes": [
-              "cpe:2.3:a:minimatch:minimatch:3.0.4:*:*:*:*:*:*:*",
-              "cpe:2.3:a:isaacs:minimatch:3.0.4:*:*:*:*:*:*:*"
+              "cpe:2.3:a:minimatch_project:minimatch:3.0.4:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/minimatch@3.0.4",
             "upstreams": null,
@@ -29794,14 +29924,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:1.7.3:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-fetch_project:node-fetch:1.7.3:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-fetch@1.7.3",
             "upstreams": null,
@@ -29905,129 +30028,9 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:1.7.3:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:1.7.3:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-fetch_project:node-fetch:1.7.3:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-fetch@1.7.3",
-            "upstreams": null,
-            "metadata": null
-          }
-        },
-        {
-          "vulnerability": {
-            "id": "CVE-2022-0235",
-            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-0235",
-            "namespace": "nvd:cpe",
-            "severity": "Medium",
-            "urls": [
-              "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
-              "https://github.com/node-fetch/node-fetch/commit/36e47e8a6406185921e4985dcbeff140d73eaa10",
-              "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7",
-              "https://lists.debian.org/debian-lts-announce/2022/12/msg00007.html"
-            ],
-            "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
-            "cvss": [
-              {
-                "version": "2.0",
-                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:N",
-                "metrics": {
-                  "baseScore": 5.8,
-                  "exploitabilityScore": 8.6,
-                  "impactScore": 4.9
-                },
-                "vendorMetadata": {}
-              },
-              {
-                "version": "3.0",
-                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
-                "metrics": {
-                  "baseScore": 8.8,
-                  "exploitabilityScore": 2.8,
-                  "impactScore": 5.9
-                },
-                "vendorMetadata": {}
-              },
-              {
-                "version": "3.1",
-                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
-                "metrics": {
-                  "baseScore": 6.1,
-                  "exploitabilityScore": 2.8,
-                  "impactScore": 2.7
-                },
-                "vendorMetadata": {}
-              }
-            ],
-            "fix": {
-              "versions": [
-                "2.6.7"
-              ],
-              "state": "fixed"
-            },
-            "advisories": null
-          },
-          "relatedVulnerabilities": [
-            {
-              "id": "GHSA-r683-j2x4-v87g",
-              "dataSource": "https://github.com/advisories/GHSA-r683-j2x4-v87g",
-              "namespace": "github:language:javascript",
-              "severity": "High",
-              "urls": [
-                "https://github.com/advisories/GHSA-r683-j2x4-v87g"
-              ],
-              "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
-              "cvss": null
-            }
-          ],
-          "matchDetails": [
-            {
-              "type": "exact-direct-match",
-              "matcher": "javascript-matcher",
-              "searchedBy": {
-                "language": "javascript",
-                "namespace": "github:language:javascript",
-                "package": {
-                  "name": "node-fetch",
-                  "version": "2.6.1"
-                }
-              },
-              "found": {
-                "versionConstraint": "<2.6.7 (unknown)",
-                "vulnerabilityID": "GHSA-r683-j2x4-v87g"
-              }
-            }
-          ],
-          "artifact": {
-            "name": "node-fetch",
-            "version": "2.6.1",
-            "type": "npm",
-            "locations": [
-              {
-                "path": "/wiki/node_modules/fbjs/node_modules/node-fetch/package.json",
-                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
-              }
-            ],
-            "language": "javascript",
-            "licenses": [
-              "MIT"
-            ],
-            "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:2.6.1:*:*:*:*:*:*:*"
-            ],
-            "purl": "pkg:npm/node-fetch@2.6.1",
             "upstreams": null,
             "metadata": null
           }
@@ -30131,14 +30134,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:2.6.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-fetch_project:node-fetch:2.6.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-fetch@2.6.1",
             "upstreams": null,
@@ -30244,14 +30240,113 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:2.6.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:2.6.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-fetch_project:node-fetch:2.6.1:*:*:*:*:node.js:*:*"
+            ],
+            "purl": "pkg:npm/node-fetch@2.6.1",
+            "upstreams": null,
+            "metadata": null
+          }
+        },
+        {
+          "vulnerability": {
+            "id": "CVE-2022-0235",
+            "dataSource": "https://nvd.nist.gov/vuln/detail/CVE-2022-0235",
+            "namespace": "nvd:cpe",
+            "severity": "Medium",
+            "urls": [
+              "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf",
+              "https://github.com/node-fetch/node-fetch/commit/36e47e8a6406185921e4985dcbeff140d73eaa10",
+              "https://huntr.dev/bounties/d26ab655-38d6-48b3-be15-f9ad6b6ae6f7",
+              "https://lists.debian.org/debian-lts-announce/2022/12/msg00007.html"
+            ],
+            "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
+            "cvss": [
+              {
+                "version": "2.0",
+                "vector": "AV:N/AC:M/Au:N/C:P/I:P/A:N",
+                "metrics": {
+                  "baseScore": 5.8,
+                  "exploitabilityScore": 8.6,
+                  "impactScore": 4.9
+                },
+                "vendorMetadata": {}
+              },
+              {
+                "version": "3.0",
+                "vector": "CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+                "metrics": {
+                  "baseScore": 8.8,
+                  "exploitabilityScore": 2.8,
+                  "impactScore": 5.9
+                },
+                "vendorMetadata": {}
+              },
+              {
+                "version": "3.1",
+                "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                "metrics": {
+                  "baseScore": 6.1,
+                  "exploitabilityScore": 2.8,
+                  "impactScore": 2.7
+                },
+                "vendorMetadata": {}
+              }
+            ],
+            "fix": {
+              "versions": [
+                "2.6.7"
+              ],
+              "state": "fixed"
+            },
+            "advisories": null
+          },
+          "relatedVulnerabilities": [
+            {
+              "id": "GHSA-r683-j2x4-v87g",
+              "dataSource": "https://github.com/advisories/GHSA-r683-j2x4-v87g",
+              "namespace": "github:language:javascript",
+              "severity": "High",
+              "urls": [
+                "https://github.com/advisories/GHSA-r683-j2x4-v87g"
+              ],
+              "description": "node-fetch is vulnerable to Exposure of Sensitive Information to an Unauthorized Actor",
+              "cvss": null
+            }
+          ],
+          "matchDetails": [
+            {
+              "type": "exact-direct-match",
+              "matcher": "javascript-matcher",
+              "searchedBy": {
+                "language": "javascript",
+                "namespace": "github:language:javascript",
+                "package": {
+                  "name": "node-fetch",
+                  "version": "2.6.1"
+                }
+              },
+              "found": {
+                "versionConstraint": "<2.6.7 (unknown)",
+                "vulnerabilityID": "GHSA-r683-j2x4-v87g"
+              }
+            }
+          ],
+          "artifact": {
+            "name": "node-fetch",
+            "version": "2.6.1",
+            "type": "npm",
+            "locations": [
+              {
+                "path": "/wiki/node_modules/fbjs/node_modules/node-fetch/package.json",
+                "layerID": "sha256:3168fdb8242773be4862e6e68b31c616680bc5e8b4093da2ca8ad71797b6c21e"
+              }
+            ],
+            "language": "javascript",
+            "licenses": [
+              "MIT"
+            ],
+            "cpes": [
+              "cpe:2.3:a:node-fetch_project:node-fetch:2.6.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-fetch@2.6.1",
             "upstreams": null,
@@ -30357,14 +30452,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:node-fetch:node-fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-fetch:node_fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node-fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_fetch:node_fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node-fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:bitinn:node_fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-fetch:2.6.6:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_fetch:2.6.6:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-fetch_project:node-fetch:2.6.6:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-fetch@2.6.6",
             "upstreams": null,
@@ -30469,14 +30557,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -30580,14 +30661,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -30692,14 +30766,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -30803,14 +30870,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -30870,14 +30930,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -30937,14 +30990,7 @@
               "(BSD-3-Clause OR GPL-2.0)"
             ],
             "cpes": [
-              "cpe:2.3:a:digitalbazaar:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:digitalbazaar:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_forge:node_forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-forge:0.10.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_forge:0.10.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:digitalbazaar:forge:0.10.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-forge@0.10.0",
             "upstreams": null,
@@ -31038,14 +31084,7 @@
               "Apache-2.0"
             ],
             "cpes": [
-              "cpe:2.3:a:node-jose:node-jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-jose:node_jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_jose:node-jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_jose:node_jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:cisco:node-jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:cisco:node_jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-jose:2.0.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_jose:2.0.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:cisco:node-jose:2.0.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-jose@2.0.0",
             "upstreams": null,
@@ -31139,14 +31178,7 @@
             "language": "javascript",
             "licenses": [],
             "cpes": [
-              "cpe:2.3:a:node-uuid:node-uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node-uuid:node_uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_uuid:node-uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node_uuid:node_uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:broofa:node-uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:broofa:node_uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node-uuid:1.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:node:node_uuid:1.4.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:node-uuid_project:node-uuid:1.4.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/node-uuid@1.4.1",
             "upstreams": null,
@@ -31353,8 +31385,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:jaredhanson:passport:0.4.1:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport:passport:0.4.1:*:*:*:*:*:*:*"
+              "cpe:2.3:a:passport_project:passport:0.4.1:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/passport@0.4.1",
             "upstreams": null,
@@ -31449,14 +31480,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:passport-oauth2:passport-oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport-oauth2:passport_oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport_oauth2:passport-oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport_oauth2:passport_oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:jaredhanson:passport-oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:jaredhanson:passport_oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport:passport-oauth2:1.2.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:passport:passport_oauth2:1.2.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:passportjs:passport-oauth2:1.2.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/passport-oauth2@1.2.0",
             "upstreams": null,
@@ -32514,7 +32538,7 @@
               "Apache-2.0"
             ],
             "cpes": [
-              "cpe:2.3:a:request:request:2.88.2:*:*:*:*:*:*:*"
+              "cpe:2.3:a:request_project:request:2.88.2:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/request@2.88.2",
             "upstreams": null,
@@ -32611,14 +32635,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:simple-git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple-git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple_git:2.21.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:simple-git_project:simple-git:2.21.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/simple-git@2.21.0",
             "upstreams": null,
@@ -32713,14 +32730,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:simple-git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple-git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple_git:2.21.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:simple-git_project:simple-git:2.21.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/simple-git@2.21.0",
             "upstreams": null,
@@ -32826,14 +32836,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:simple-git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple-git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple_git:2.21.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:simple-git_project:simple-git:2.21.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/simple-git@2.21.0",
             "upstreams": null,
@@ -32939,14 +32942,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:simple-git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple-git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple_git:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:steveukx:simple_git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple-git:2.21.0:*:*:*:*:*:*:*",
-              "cpe:2.3:a:simple:simple_git:2.21.0:*:*:*:*:*:*:*"
+              "cpe:2.3:a:simple-git_project:simple-git:2.21.0:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/simple-git@2.21.0",
             "upstreams": null,
@@ -33240,8 +33236,7 @@
               "BSD-3-Clause"
             ],
             "cpes": [
-              "cpe:2.3:a:sqlite3:sqlite3:5.0.2:*:*:*:*:*:*:*",
-              "cpe:2.3:a:mapbox:sqlite3:5.0.2:*:*:*:*:*:*:*"
+              "cpe:2.3:a:ghost:sqlite3:5.0.2:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/sqlite3@5.0.2",
             "upstreams": null,
@@ -33346,8 +33341,7 @@
               "BSD-3-Clause"
             ],
             "cpes": [
-              "cpe:2.3:a:sqlite3:sqlite3:5.0.2:*:*:*:*:*:*:*",
-              "cpe:2.3:a:mapbox:sqlite3:5.0.2:*:*:*:*:*:*:*"
+              "cpe:2.3:a:ghost:sqlite3:5.0.2:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/sqlite3@5.0.2",
             "upstreams": null,
@@ -34417,8 +34411,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:websockets:ws:7.4.5:*:*:*:*:*:*:*",
-              "cpe:2.3:a:ws:ws:7.4.5:*:*:*:*:*:*:*"
+              "cpe:2.3:a:ws_project:ws:7.4.5:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/ws@7.4.5",
             "upstreams": null,
@@ -34524,8 +34517,7 @@
               "MIT"
             ],
             "cpes": [
-              "cpe:2.3:a:websockets:ws:7.4.5:*:*:*:*:*:*:*",
-              "cpe:2.3:a:ws:ws:7.4.5:*:*:*:*:*:*:*"
+              "cpe:2.3:a:ws_project:ws:7.4.5:*:*:*:*:node.js:*:*"
             ],
             "purl": "pkg:npm/ws@7.4.5",
             "upstreams": null,
