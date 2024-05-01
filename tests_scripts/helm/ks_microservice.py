@@ -193,6 +193,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         8. delete exception.
         9. Verify resources are back to security risks list.
         10. verify resources are back to security risks resources.
+        11. verify expections deletion after resource deletion.
 
         """
         assert self.backend != None;
@@ -271,6 +272,26 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         assert security_risks_list_after_exception_delete["response"][0]["affectedResourcesCount"] == \
                security_risks_list_before_exception["response"][0][
                    "affectedResourcesCount"], "resources are not back to security risks list as before exception"
+        
+        Logger.logger.info("11. verify expections deletion after resource deletion.")
+        Logger.logger.info(
+            "11.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id,
+                                                                                         k8s_resources_hash))
+        new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "another exception")
+
+        Logger.logger.info("11.2 verify exception was created.")
+        exceptions_list_before_fix = scenarios_manager.get_exceptions_list()
+        assert exceptions_list_before_fix["total"]["value"] > 0, "no exceptions found"
+
+        Logger.logger.info("11.3 delete resource (apply fix)")
+        scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
+        Logger.logger.info("11.4 verify fix")
+        scenarios_manager.verify_fix()
+
+        Logger.logger.info("11.5 verify expections deletion after resource deletion.")
+        exceptions_list_after_fix = scenarios_manager.get_exceptions_list()
+        assert exceptions_list_after_fix["total"]["value"] == 0, "exceptions found after fix (resource deleted)"
+        
 
         return self.cleanup()
 
