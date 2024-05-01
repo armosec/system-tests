@@ -15,7 +15,7 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanStatusWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
-                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+                                                               kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
         """
@@ -31,15 +31,18 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
 
         """
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
-        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj,  backend= self.backend, cluster=cluster, namespace=namespace)
-               
+        Logger.logger.info(
+            f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
+                                                         namespace=namespace)
+
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
 
@@ -54,10 +57,11 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario()
-        
+
         Logger.logger.info("4. trigger posture scan")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"],
+                                       additional_params={"triggeredFrom": "securityRiskPage"})
 
         Logger.logger.info("5. verify scan status")
         scenarios_manager.verify_scan_status(time_before_scan)
@@ -67,15 +71,15 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("7. trigger scan after fix")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"], additional_params={"triggeredFrom":"securityRiskPage"})
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"],
+                                       additional_params={"triggeredFrom": "securityRiskPage"})
 
-        
         Logger.logger.info("8. verify scan status (without verifying fix)")
         scenarios_manager.verify_scan_status(time_before_scan)
 
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
-    
+
 
 class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
@@ -84,7 +88,8 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanSecurityRisksWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
-                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+                                                                      kubernetes_obj=kubernetes_obj,
+                                                                      test_driver=test_driver)
         self.wait_for_agg_to_end = False
 
     def start(self):
@@ -103,15 +108,18 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         11. validate security risks trends
 
         """
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
-        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj,  backend= self.backend, cluster=cluster, namespace=namespace)
-               
+        Logger.logger.info(
+            f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
+                                                         namespace=namespace)
+
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
 
@@ -128,13 +136,11 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         total_events_detected = sum(res['affectedResourcesCount'] for res in result['response'])
 
-                
         Logger.logger.info("4. validating security risks categories")
         scenarios_manager.verify_security_risks_categories(result)
-        
+
         Logger.logger.info("5. validating security risks severities")
         scenarios_manager.verify_security_risks_severities(result)
-
         # verify unique values - no need to wait.
         Logger.logger.info("6. validating security risks unique values")
         scenarios_manager.verify_security_risks_list_uniquevalues(result["response"])
@@ -158,10 +164,10 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info('11. validate security risks trends')
         # after resolve we expect total detected and total resolved to be the same and total new and total remaining to be 0
         scenarios_manager.verify_security_risks_trends(total_events_detected, total_events_resolved, 0, 0)
-        
+
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
-    
+
 
 class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
@@ -170,7 +176,8 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanSecurityRisksExceptionsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
-                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+                                                                                kubernetes_obj=kubernetes_obj,
+                                                                                test_driver=test_driver)
         self.wait_for_agg_to_end = False
 
     def start(self):
@@ -188,15 +195,18 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         10. verify resources are back to security risks resources.
 
         """
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
-        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj,  backend= self.backend, cluster=cluster, namespace=namespace)
-               
+        Logger.logger.info(
+            f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
+                                                         namespace=namespace)
+
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
 
@@ -220,38 +230,50 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
             k8s_resources_hash.append(resource["k8sResourceHash"])
 
         Logger.logger.info("4. Add new exception.")
-        Logger.logger.info("4.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id, k8s_resources_hash))
+        Logger.logger.info(
+            "4.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id,
+                                                                                         k8s_resources_hash))
         new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "new exception")
 
         Logger.logger.info("5. Verify resources under exceptions are filtered out from security risks list.")
         resources_list_after_exception = scenarios_manager.get_security_risks_resources(test_security_risk_id)
-        assert len(resources_list_after_exception["response"]) == 0, "resources under exception are not filtered out from security risks list"
+        assert len(resources_list_after_exception[
+                       "response"]) == 0, "resources under exception are not filtered out from security risks list"
 
         Logger.logger.info("6. Verify resources under exceptions are filtered out from security risks resources.")
         security_risks_list_after_exception = scenarios_manager.get_security_risks_list([test_security_risk_id])
-        assert len(security_risks_list_after_exception["response"]) == 0, "resources under exception are not filtered out from security risks resources"
+        assert len(security_risks_list_after_exception[
+                       "response"]) == 0, "resources under exception are not filtered out from security risks resources"
 
         Logger.logger.info("7. edit exception.")
-        edit_exception = scenarios_manager.edit_exception(new_exception["guid"], test_security_risk_id, k8s_resources_hash, "edit exception")
+        edit_exception = scenarios_manager.edit_exception(new_exception["guid"], test_security_risk_id,
+                                                          k8s_resources_hash, "edit exception")
         resources_list_after_exception_edit = scenarios_manager.get_security_risks_resources(test_security_risk_id)
         security_risks_list_after_exception_edit = scenarios_manager.get_security_risks_list([test_security_risk_id])
 
-        assert len(resources_list_after_exception_edit["response"]) == 0, "resources under exception are not filtered out from security risks list"
-        assert len(security_risks_list_after_exception_edit["response"]) == 0, "resources under exception are not filtered out from security risks resources"
+        assert len(resources_list_after_exception_edit[
+                       "response"]) == 0, "resources under exception are not filtered out from security risks list"
+        assert len(security_risks_list_after_exception_edit[
+                       "response"]) == 0, "resources under exception are not filtered out from security risks resources"
 
         Logger.logger.info("8. delete exception.")
         scenarios_manager.delete_exception(edit_exception["guid"])
 
         Logger.logger.info("9. Verify resources are back to security risks list.")
         resources_list_after_exception_delete = scenarios_manager.get_security_risks_resources(test_security_risk_id)
-        assert len(resources_list_after_exception_delete["response"]) == len(resources_list_before_exception["response"]), "resources are not back to security risks resources as before exception"
+        assert len(resources_list_after_exception_delete["response"]) == len(resources_list_before_exception[
+                                                                                 "response"]), "resources are not back to security risks resources as before exception"
 
         Logger.logger.info("10. verify resources are back to security risks resources.")
         security_risks_list_after_exception_delete = scenarios_manager.get_security_risks_list([test_security_risk_id])
-        assert len(security_risks_list_after_exception_delete["response"]) == len(security_risks_list_before_exception["response"]), "resources are not back to security risks list as before exception"
-        assert security_risks_list_after_exception_delete["response"][0]["affectedResourcesCount"] == security_risks_list_before_exception["response"][0]["affectedResourcesCount"], "resources are not back to security risks list as before exception"
+        assert len(security_risks_list_after_exception_delete["response"]) == len(security_risks_list_before_exception[
+                                                                                      "response"]), "resources are not back to security risks list as before exception"
+        assert security_risks_list_after_exception_delete["response"][0]["affectedResourcesCount"] == \
+               security_risks_list_before_exception["response"][0][
+                   "affectedResourcesCount"], "resources are not back to security risks list as before exception"
 
         return self.cleanup()
+
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
@@ -260,7 +282,8 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ScanAttackChainsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
-                                                         kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+                                                                     kubernetes_obj=kubernetes_obj,
+                                                                     test_driver=test_driver)
 
     def start(self):
         """
@@ -273,17 +296,19 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         6. verify fix
 
         """
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
-        Logger.logger.info(f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        Logger.logger.info(
+            f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
 
         # TODO: change namespace to use the one generated for the test, need to update all scanerios to support it (as in the security risk test)
         scenarios_manager = AttackChainsScenarioManager(test_obj=self.test_obj,
-                                                            backend= self.backend, cluster=cluster, namespace="default")
+                                                        backend=self.backend, cluster=cluster, namespace="default")
 
         Logger.logger.info("1.2 apply attack chains scenario manifests")
         scenarios_manager.apply_scenario()
@@ -309,7 +334,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("6. verify fix")
         scenarios_manager.verify_fix()
-        
+
         Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
 
@@ -320,7 +345,8 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
                                                          kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         # P1 Install Wikijs
@@ -368,7 +394,8 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                                                              kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
-        assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
 
         self.ignore_agent = True
@@ -477,11 +504,12 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
 
             Logger.logger.info("check if kubescape cronjob created in backend")
             assert self.backend.is_ks_cronjob_created_in_backend(cluster_name,
-                framework_list[0]), "kubescape cronjob failed to create in backend"
+                                                                 framework_list[
+                                                                     0]), "kubescape cronjob failed to create in backend"
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")
-            self.backend.is__backend_returning_only_ks_cronjob(cluster_name), "kubescape cronjob failed to create in backend"
-
+            self.backend.is__backend_returning_only_ks_cronjob(
+                cluster_name), "kubescape cronjob failed to create in backend"
 
             sleep_time += 30
             TestUtil.sleep(sleep_time, "wait till data will arrive to backend")
@@ -530,10 +558,11 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             Logger.logger.info("check if kubescape cronjob deleted")
             assert not self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to deleted"
 
+
 class ControlClusterFromCLI(BaseHelm, BaseKubescape):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(ControlClusterFromCLI, self).__init__(test_obj=test_obj, backend=backend,
-                                                             kubernetes_obj=kubernetes_obj, test_driver=test_driver)
+                                                    kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
         # test check in cluster workloads and kubescape CLI 
@@ -544,7 +573,7 @@ class ControlClusterFromCLI(BaseHelm, BaseKubescape):
         # 1.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
         # 1.2 install armo helm-chart
-        # self.install_armo_helm_chart()
+        self.install_armo_helm_chart()
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
