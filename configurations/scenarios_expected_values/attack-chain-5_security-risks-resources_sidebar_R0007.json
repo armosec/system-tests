@@ -1,0 +1,53 @@
+{
+    "total": {
+        "value": 2,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "cluster": "systestcontrolnp",
+            "clusterShortName": "systestcontrolnp",
+            "namespace": "systest-ns-kywj",
+            "resourceName": "wordpress",
+            "kind": "Deployment",
+            "resourceID": "apps/v1/systest-ns-kywj/Deployment/wordpress",
+            "k8sResourceHash": "5478696838889374112",
+            "riskID": "C-0260",
+            "riskType": "Control",
+            "securityRiskID": "R_0007",
+            "status": "Detected",
+            "isNew": true,
+            "lastTimeDetected": "2024-05-01T06:23:40Z",
+            "exceptionApplied": false,
+            "exceptionPolicyGUID": "",
+            "controlID": "C-0260",
+            "reportGUID": "fdfa10a9-4b3d-4331-ba44-fad76ea1fac8",
+            "frameworkName": "security",
+            "networkPolicyStatus": 1,
+            "missingRuntimeInfoReason": 1
+        },
+        {
+            "cluster": "systestcontrolnp",
+            "clusterShortName": "systestcontrolnp",
+            "namespace": "systest-ns-kywj",
+            "resourceName": "wordpress-mysql",
+            "kind": "Deployment",
+            "resourceID": "apps/v1/systest-ns-kywj/Deployment/wordpress-mysql",
+            "k8sResourceHash": "15403887904473520079",
+            "riskID": "C-0260",
+            "riskType": "Control",
+            "securityRiskID": "R_0007",
+            "status": "Detected",
+            "isNew": true,
+            "lastTimeDetected": "2024-05-01T06:23:40Z",
+            "exceptionApplied": false,
+            "exceptionPolicyGUID": "",
+            "controlID": "C-0260",
+            "reportGUID": "fdfa10a9-4b3d-4331-ba44-fad76ea1fac8",
+            "frameworkName": "security",
+            "networkPolicyStatus": 1,
+            "missingRuntimeInfoReason": 1
+        }
+    ],
+    "cursor": ""
+}

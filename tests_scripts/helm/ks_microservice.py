@@ -106,7 +106,6 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         9. trigger scan after fix
         10. verify fix
         11. validate security risks trends
-        TODO: validate security risks trends
 
         """
         assert self.backend != None;
@@ -142,8 +141,6 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("5. validating security risks severities")
         scenarios_manager.verify_security_risks_severities(result)
-
-        # TODO: Fix verify_security_risks_list_uniquevalues
         # verify unique values - no need to wait.
         Logger.logger.info("6. validating security risks unique values")
         scenarios_manager.verify_security_risks_list_uniquevalues(result["response"])
