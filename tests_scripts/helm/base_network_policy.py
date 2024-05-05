@@ -101,7 +101,16 @@ class BaseNetworkPolicy(BaseHelm):
         for expected_entry in expected_entries:
             # if expected entry contains dns, that means we explicitly expect a DNS entry,
             # we don't care about the IP address
-            if expected_entry["dns"] != "": 
+            if expected_entry["dns"] != "":
+
+                # add '.' to the DNS (this is for backwards compatibility)
+                if not expected_entry["dns"].endswith('.'):
+                    expected_entry["dns"] += "."
+                for actual_entry in actual_entries:
+                    if not actual_entry["dns"].endswith('.'):
+                        actual_entry["dns"] += "."
+
+                # compare DNS
                 actual_entry = next((actual_entry for actual_entry in actual_entries if expected_entry["dns"] == actual_entry["dns"]), None)
                 assert actual_entry, f"expected a network neighbor entry with DNS: {expected_entry['dns']} not found in actual entries {actual_entries}"
                 assert expected_entry["type"] == actual_entry["type"], f"expected type: {expected_entry['type']} not found in actual type {actual_entry['type']}"
