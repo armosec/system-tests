@@ -610,7 +610,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
     def verify_global_field_in_scan_status(self, expected_field, expectedStatus)-> bool:
         r = self.backend.get_scan_status()
         response = json.loads(r.text)
-        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}"
+        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}. Response: {response}"
         return True
         
     def verify_cluster_lastPostureScanTriggered_time(self, cluster_name, trigger_time)-> bool:
