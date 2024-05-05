@@ -1,6 +1,6 @@
 import json
 
-from systest_utils import Logger
+from systest_utils import Logger, TestUtil
 from .base_notifications import BaseNotifications
 
 CLUSTER_NAME = "cluster"
@@ -23,6 +23,7 @@ class AlertChannels(BaseNotifications):
         Logger.logger.info("Stage 2: Create new alert channel")
         with open(self.test_obj["alert_channel_file"], 'r') as file:
             data = json.load(file)
+        data["channel"]["name"] = "user_alert_channels_" + TestUtil.random_string()
         created_alert_channel_response = self.backend.create_alert_channel(data)
         assert created_alert_channel_response, "Expected alert channel"
         guid = created_alert_channel_response.json()["channel"]["guid"]
