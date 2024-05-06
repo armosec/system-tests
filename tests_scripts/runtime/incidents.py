@@ -7,6 +7,8 @@ from systest_utils import statics, Logger, TestUtil
 import json
 import time
 
+__RELATED_ALERTS_KEY__ = "relatedAlerts"
+
 class Incidents(BaseHelm):
     '''
         check incidents page.
@@ -66,7 +68,8 @@ class Incidents(BaseHelm):
         
         inc, _ = self.wait_for_report(self.verify_incident_completed,timeout=5*60, sleep_interval=5, incident_id=incs[0]['guid'])        
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        assert len(inc['relatedAlerts']) > 1, f"Expected at least 2 related alerts {json.dumps(inc)}"        
+        assert inc[__RELATED_ALERTS_KEY__] is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        # TODO: add alerts API test
         
         return self.cleanup()
 

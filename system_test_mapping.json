@@ -1291,7 +1291,8 @@
             "cadashboardbe",
             "event-ingester-service",
             "node-agent",
-            "synchronizer"
+            "synchronizer",
+            "config-service"
         ],
         "description": "testing basic incident presented",
         "skip_on_environment": "production"
