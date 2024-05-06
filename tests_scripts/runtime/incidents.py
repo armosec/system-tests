@@ -96,7 +96,7 @@ class Incidents(BaseHelm):
         k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1", "ApplicationProfile").get(namespace=namespace).items
         assert k8s_data != None, "Failed to get application profiles"
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
-        Logger.logger.info("Application profiles are presented", len(k8s_data))
+        Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
         ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
         for i in wlids:
             assert i in ap_wlids, f"Failed to get application profile for {i}"
