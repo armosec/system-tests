@@ -13,7 +13,7 @@ class Incidents(BaseHelm):
     '''
         check incidents page.
     '''
-    
+
     def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
         super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
         self.helm_kwargs = {
@@ -40,7 +40,7 @@ class Incidents(BaseHelm):
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
-    
+
     def start(self):
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
 
@@ -58,26 +58,26 @@ class Incidents(BaseHelm):
             wlids = [wlids]
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
 
-        Logger.logger.info('workloads are running, waiting 1 minute before exec into pod', wlids)        
+        Logger.logger.info(f'workloads are running, waiting 1 minute before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(6)
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
-        
+
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5, cluster=cluster, namespace=namespace, incident_name="Unexpected process launched")
-        
-        inc, _ = self.wait_for_report(self.verify_incident_completed,timeout=5*60, sleep_interval=5, incident_id=incs[0]['guid'])        
+
+        inc, _ = self.wait_for_report(self.verify_incident_completed,timeout=5*60, sleep_interval=5, incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc[__RELATED_ALERTS_KEY__] is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         # TODO: add alerts API test
-        
+
         return self.cleanup()
 
     def verify_incident_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
-        assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"        
+        assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
         return response
-    
+
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
         Logger.logger.info("Get incidents list")
         filters_dict = {
@@ -90,7 +90,7 @@ class Incidents(BaseHelm):
         incs = response['response']
         assert len(incs) > 0, f"Failed to get incidents list {json.dumps(incs)}"
         return incs
-    
+
     def verify_application_profiles(self, wlids:list, namespace):
         Logger.logger.info("Get application profiles")
         k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1", "ApplicationProfile").get(namespace=namespace).items
@@ -101,8 +101,8 @@ class Incidents(BaseHelm):
         for i in wlids:
             assert i in ap_wlids, f"Failed to get application profile for {i}"
         # kubescape.io/status: completed, kubescape.io/completion: complete
-        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' or i.metadata.annotations['kubescape.io/status'] != 'completed']
+        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' and i.metadata.annotations['kubescape.io/status'] != 'completed']
         assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {len(not_complete_application_profiles)}"
-    
+
     def cleanup(self, **kwargs):
         return super().cleanup(**kwargs)
