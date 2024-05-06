@@ -579,29 +579,33 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
         Logger.logger.info("validating scan status of attack chains is processing")
         r, t = self.wait_for_report(
-            self.verify_global_field_in_scan_status, 
+            self.verify_cluster_field_in_scan_status, 
             timeout=60,
+            cluster_name=self.cluster,
             expected_field='attackChainsProcessingStatus',
             expectedStatus='processing'
             )
         Logger.logger.info("validating scan status of security risks is processing")
         r, t = self.wait_for_report(
-            self.verify_global_field_in_scan_status, 
+            self.verify_cluster_field_in_scan_status, 
             timeout=1,
+            cluster_name=self.cluster,
             expected_field='securityRisksProcessingStatus',
             expectedStatus='processing'
             )
         Logger.logger.info("validating scan status of attack chains is done")
         r, t = self.wait_for_report(
-            self.verify_global_field_in_scan_status, 
+            self.verify_cluster_field_in_scan_status, 
             timeout=600,
+            cluster_name=self.cluster,
             expected_field='attackChainsProcessingStatus',
             expectedStatus='done'
             )
         Logger.logger.info("validating scan status of security risks is done")
         r, t = self.wait_for_report(
-            self.verify_global_field_in_scan_status, 
+            self.verify_cluster_field_in_scan_status, 
             timeout=600,
+            cluster_name=self.cluster,
             expected_field='securityRisksProcessingStatus',
             expectedStatus='done'
             )
@@ -610,7 +614,15 @@ class SecurityRisksScenarioManager(ScenarioManager):
     def verify_global_field_in_scan_status(self, expected_field, expectedStatus)-> bool:
         r = self.backend.get_scan_status()
         response = json.loads(r.text)
-        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}"
+        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}. Response: {response}"
+        return True
+    
+    def verify_cluster_field_in_scan_status(self, cluster_name, expected_field, expectedStatus)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        for cluster_response in response['clusterScansStatus']:
+            if cluster_response['clusterName'] == cluster_name:
+                assert cluster_response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {cluster_response[expected_field]}. Response: {response}"
         return True
         
     def verify_cluster_lastPostureScanTriggered_time(self, cluster_name, trigger_time)-> bool:
