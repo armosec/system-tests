@@ -118,7 +118,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=180,
+            timeout=600,
             current_datetime=current_datetime,
             cluster_name=self.cluster
             )
