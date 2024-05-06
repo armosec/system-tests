@@ -120,9 +120,9 @@ class KubectlWrapper(object):
             self.client_CustomObjectsApi = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
 
             self.client_dynamic = dynamic.DynamicClient(api_client.ApiClient(configuration=config.load_kube_config())
-    )    
+    )
             # self.client_ = client.CustomObjectsApi(api_client=config.new_client_from_config(context=active_context['name']))
-            
+
 
         else:
             for context in contexts:
@@ -222,7 +222,7 @@ class KubectlWrapper(object):
                 items.append(item)
 
         return items
-    
+
     def get_all_namespaced_kubescape_crds(self, namespace='Default'):
         items = list()
 
@@ -253,7 +253,7 @@ class KubectlWrapper(object):
                 items.append(item)
 
         return items
-    
+
     def get_namespaced_workloads(self, kind='Deployment', namespace='Default'):
         if 'Deployment' in kind:
             method = self.client_AppsV1Api.list_namespaced_deployment
@@ -499,7 +499,7 @@ class KubectlWrapper(object):
         Logger.logger.info(f'k8s portforward cmd: {cmd}')
         c = subprocess.Popen(cmd, shell=True)
         return c
-    
+
     def get_ks_cronjob_schedule(self, namespace):
         cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
@@ -518,7 +518,7 @@ class KubectlWrapper(object):
         cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan-{}".format(framework_name.lower()) in cj.metadata.name:
-                return True 
+                return True
         return False
 
     def get_vuln_scan_cronjob(self, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
@@ -551,8 +551,8 @@ class KubectlWrapper(object):
         return self.run(method=self.client_CoreV1Api.list_namespaced_service, namespace=namespace)
 
     def get_pod_logs(self, pod_name='', container='', namespace='default', previous=False):
-        api_response = self.client_CoreV1Api.read_namespaced_pod_log(name=pod_name,
-                                                                     namespace=namespace, previous=previous)
+        api_response = self.client_CoreV1Api.read_namespaced_pod_log(name=pod_name, namespace=namespace,
+                                                                     container=container, previous=previous)
         return api_response
 
     def is_hostsensor_triggered(self):
@@ -668,6 +668,6 @@ class KubectlWrapper(object):
     def scale(namespace: str, kind: str, name: str, replicas: int):
         TestUtil.run_command(f"kubectl scale --replicas={replicas} {kind} {name} -n {namespace}".split(" "), timeout=None)
 
-    
+
 def get_name(obj: dict):
     return obj["metadata"]["name"]
