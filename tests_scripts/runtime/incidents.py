@@ -58,7 +58,7 @@ class Incidents(BaseHelm):
             wlids = [wlids]
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
 
-        Logger.logger.info(f'workloads are running, waiting 1 minute before exec into pod {wlids}')
+        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(6)
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
@@ -101,7 +101,7 @@ class Incidents(BaseHelm):
         for i in wlids:
             assert i in ap_wlids, f"Failed to get application profile for {i}"
         # kubescape.io/status: completed, kubescape.io/completion: complete
-        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' and i.metadata.annotations['kubescape.io/status'] != 'completed']
+        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' or i.metadata.annotations['kubescape.io/status'] != 'completed']
         assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {len(not_complete_application_profiles)}"
 
     def cleanup(self, **kwargs):
