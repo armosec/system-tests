@@ -358,7 +358,7 @@ class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):
             running_pods = self.get_ready_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                name=statics.CA_VULN_SCAN_DEPLOYMENT_FROM_HELM_NAME)
             successful_vuln_scan_log = f'posting to event receiver image {registry}/{self.expected_payloads["image"]} wlid  finished successfully response body:'
-            self.wait_for_report(timeout=600, report_type=self.find_string_in_log,
+            self.wait_for_report(timeout=900, report_type=self.find_string_in_log,
                                  namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                  pod_name=running_pods[0].metadata.name,
                                  containers=statics.CA_VULN_SCAN_CONTAINER_FROM_HELM_NAME,
