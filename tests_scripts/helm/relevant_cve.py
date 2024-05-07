@@ -607,6 +607,9 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # 1.2 install armo helm-chart
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+
         # P2 apply workloads
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
