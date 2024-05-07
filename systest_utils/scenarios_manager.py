@@ -17,7 +17,7 @@ EXPECTED_TRENDS_DAYS_BACK = 31
 
 # maps field name and the expected values file suffix
 SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
-    "namespace": "_security-risks-uv-namespace.json",
+    # "namespace": "_security-risks-uv-namespace.json",
     "severity": "_security-risks-uv-severity.json",
     "category": "_security-risks-uv-category.json",
     "securityRiskName": "_security-risks-uv-securityriskname.json",
@@ -27,6 +27,9 @@ SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX = {
 SECURITY_RISKS_RESOURCES_PREFIX = {
     "R_0002": "_security-risks-resources_sidebar_R0002", # control security risk type
     "R_0035": "_security-risks-resources_sidebar_R0035", # attack path security risk type
+    "R_0005": "_security-risks-resources_sidebar_R0005", # control security risk type
+    "R_0007": "_security-risks-resources_sidebar_R0007", # control security risk type with network policy
+
 }
 
 class ScenarioManager(base_test.BaseTest):
@@ -70,7 +73,7 @@ class ScenarioManager(base_test.BaseTest):
         time.sleep(5)
   
 
-    def trigger_scan(self, trigger_by) -> None:
+    def trigger_scan(self, trigger_by,  additional_params={}) -> None:
         """trigger_scan create a new scan action from the backend
 
         :param trigger_by: the kind of event that trigger the scan ("cronjob", "scan_on_start")
@@ -87,7 +90,8 @@ class ScenarioManager(base_test.BaseTest):
             self.backend.trigger_posture_scan(
                 cluster_name=self.cluster,
                 framework_list=["security"],
-                with_host_sensor="false"
+                with_host_sensor="false",
+                additional_params=additional_params
                 )
             
     def verify_scenario(self):
@@ -114,7 +118,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=180,
+            timeout=600,
             current_datetime=current_datetime,
             cluster_name=self.cluster
             )
@@ -194,6 +198,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
         
         self.test_security_risk_ids = test_obj["test_job"][0].get("security_risks_ids", [])
+        self.with_network_policy = test_obj["test_job"][0].get("with_network_policy", False)
 
     def verify_scenario(self):
         """
@@ -217,7 +222,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
         return res[0]
 
 
-
     def verify_fix(self):
         """
         verify_fix validate the security risks fix results on the backend
@@ -225,8 +229,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         isEmpty, t = self.wait_for_report(
             self.is_security_risk_empty, 
-            cluster_name=self.cluster,
-            namespace=self.namespace,
+            security_risk_ids=self.test_security_risk_ids,
             timeout=600,
             sleep_interval=10
             )
@@ -241,6 +244,93 @@ class SecurityRisksScenarioManager(ScenarioManager):
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
         super().apply_fix(fix_type)
 
+    def get_exceptions_list(self):
+        """
+        get_exceptions_list get the list of exceptions from the security risk
+        """
+        r = self.backend.get_security_risks_exceptions_list(self.cluster)
+        response = json.loads(r.text)
+        return response
+
+    def add_new_exception(self, security_risk_id, k8s_resource_ids=[], reason=""):
+        """
+        add_new_exception add a new exception to the security risk
+        """
+
+        r = self.backend.add_security_risks_exception(security_risk_id, k8s_resource_ids, reason)
+        new_exception = json.loads(r.text)
+        new_exception_guid = new_exception["guid"]
+
+        exceptions_res = self.get_exceptions_list()
+        exceptions = exceptions_res["response"]
+
+        found = False
+        for exception in exceptions:
+            if exception["guid"] == new_exception_guid:
+                found = True
+                assert exception["reason"] == reason, f"Failed to add exception, expected reason: {reason}, got: {exception['reason']}"
+                assert exception["securityRiskID"] == security_risk_id, f"Failed to add exception, expected securityRiskID: {security_risk_id}, got: {exception['securityRiskID']}"
+                assert len(exception["resources"]) == len(k8s_resource_ids), f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
+
+                for resource in exception["resources"]:
+                    assert resource["attributes"]["k8sResourceHash"] in k8s_resource_ids, f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
+        assert found, f"Failed to add new exception to the security risk, expected security risk: {security_risk_id}, got: {exceptions}"
+        return new_exception
+    
+    def delete_exception(self, exception_guid):
+        """
+        delete_exception delete an exception from the security risk
+        """
+
+        r = self.backend.delete_security_risks_exception(exception_guid)
+        response = json.loads(r.text)
+
+        assert response == ["deleted"], f"Failed to delete exception: {response}"
+
+        exceptions_res = self.get_exceptions_list()
+        exceptions = exceptions_res["response"]
+
+        found = False
+        if exceptions != None:
+            for exception in exceptions:
+                if exception["guid"] == exception_guid:
+                    found = True
+
+        assert not found, f"Failed to delete exception: {response}"
+        return response
+    
+    def edit_exception(self, exception_guid, security_risk_id, k8s_resource_ids, reason=""):
+        """
+        edit_exception edit an exception from the security risk
+        """
+
+        r = self.backend.put_security_risks_exception(exception_guid, security_risk_id, k8s_resource_ids, reason)
+        response = json.loads(r.text)
+
+        assert response["guid"] == exception_guid, f"Failed to edit exception, expected guid: {exception_guid}, got: {response['guid']}"
+        assert response["reason"] == reason, f"Failed to edit exception, expected reason: {reason}, got: {response['reason']}"
+        assert response["securityRiskID"] == security_risk_id, f"Failed to edit exception, expected securityRiskID: {security_risk_id}, got: {response['securityRiskID']}"
+        assert len(response["resources"]) == len(k8s_resource_ids), f"Failed to edit exception, expected resources: {k8s_resource_ids}, got: {response['resources']}"
+        return response
+    
+    def get_security_risks_resources(self, security_risk_id):
+        """
+        get_security_risks_resources get the security risks resources from the backend
+        """
+        r = self.backend.get_security_risks_resources(self.cluster, self.namespace, security_risk_id)
+        response = json.loads(r.text)
+        if response["response"] ==  None:
+            response["response"] = []
+        return response
+    
+    def get_security_risks_list(self, security_risk_ids=[]):
+        """
+        get_security_risks_list get the security risks list from the backend
+        """
+        r = self.backend.get_security_risks_list(self.cluster, self.namespace, security_risk_ids)
+        response = json.loads(r.text)
+        return response
+    
 
     def check_security_risks_resources_results(self, result, expected):
         """
@@ -250,7 +340,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
-                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew'}
+                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'exceptionPolicyGUID'}
     
         if 'total' in result and 'total' in expected:
             assert result['total']['value'] == expected['total']['value'], f"'Total' value mismatch: result: {result['total']['value']} != expected: {expected['total']['value']}"
@@ -317,17 +407,32 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
     
 
-    def is_security_risk_empty(self, cluster_name, namespace, **kwargs):
+    def is_security_risk_empty(self, security_risk_ids):
         """
         is_security_risk_empty check if the security risks list are empty
         """
         r = self.backend.get_security_risks_list(
-            cluster_name=cluster_name,
-            namespace=namespace
+            cluster_name=self.cluster,
+            namespace=self.namespace,
+            security_risk_ids=security_risk_ids
             )
         
         response = json.loads(r.text)
         assert response['total']['value'] == 0, "Security risks found, expecting no security risks"
+        return True
+    
+    def is_security_risk_resources_empty(self, security_risk_ids):
+        """
+        is_security_risk_resources_empty check if the security risks resources list are empty
+        """
+        r = self.backend.get_security_risks_resources(
+            cluster_name=self.cluster,
+            namespace=self.namespace,
+            security_risk_id=security_risk_ids
+            )
+        
+        response = json.loads(r.text)
+        assert response['total']['value'] == 0, "Security risks resources found, expecting no security risks resources"
         return True
     
     def verify_security_risks_trends(self, expected_n_events_detected, expected_n_events_resolved, expected_current_detected, expected_change_from_beginning_of_period):
@@ -349,24 +454,31 @@ class SecurityRisksScenarioManager(ScenarioManager):
         assert response["currentDetected"] == expected_current_detected, f"Security risks trends current detected response differs from the expected one. Response: {response['currentDetected']} != Expected: {expected_current_detected}"
         assert response["changeFromBeginningOfPeriod"] == expected_change_from_beginning_of_period, f"Security risks trends change from beginning of period response differs from the expected one. Response: {response['changeFromBeginningOfPeriod']} != Expected: {expected_change_from_beginning_of_period}"
  
-        
-
-    def verify_security_risks_list_uniquevalues(self, baseFilters):
+    def verify_security_risks_list_uniquevalues(self, list_result):
         """
         verify_security_risks_list_uniquevalues validate the security risks unique values results on the backend
         """
 
-        for fieldName, expectedSuffix in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
-            newFilters = baseFilters.copy()
-            if fieldName != "namespace":
-                newFilters[fieldName] = ""
-            Logger.logger.info(f"wait for response from BE with filter: {newFilters}")
-            r = self.backend.get_security_risks_list_uniquevalues(newFilters, fieldName)
+        baseFilters = {"clusterShortName":self.cluster,
+                        "namespace":self.namespace,
+                        "severity":"",
+                        "category":"",
+                        "smartRemediation":"",
+                        "exceptionApplied":"|empty"}
 
+        if self.with_network_policy:
+            baseFilters["label"] = ""
+            baseFilters["networkPolicyStatus"] = ""
+            
 
-            Logger.logger.info('loading security risks scenario to validate it')
-            f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+expectedSuffix))
-            expected = json.load(f) 
+        if self.test_security_risk_ids:
+            baseFilters["securityRiskID"] = ','.join(self.test_security_risk_ids)
+
+        for fieldName, _ in SECURITY_RISKS_EXPECTED_UNIQUE_VALUES_SUFFIX.items():
+            Logger.logger.info(f"wait for response from BE with filter: {baseFilters} for field: {fieldName}")
+            r = self.backend.get_security_risks_list_uniquevalues(baseFilters, fieldName)
+
+            expected = summarize_uniquevalues(list_result, fieldName)
             response = json.loads(r.text)
        
             assert response == expected, f"verify_security_risks_list_uniquevalues - security risks unique values for '{fieldName}' response differs from the expected one. Response: {response}, Expected: {expected}"
@@ -443,6 +555,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
                 Logger.logger.info('comparing security risks result with expected ones')
                 self.check_security_risks_resources_results(response, expected)
+        
 
     def find_missing_security_risks(self, result, expected):
         """
@@ -453,8 +566,72 @@ class SecurityRisksScenarioManager(ScenarioManager):
             if securityRisk['securityRiskID'] not in [sr['securityRiskID'] for sr in result['response']]:
                 missingSecurityRiskIDs.append(securityRisk['securityRiskID'])
         return missingSecurityRiskIDs
+    
+    
+    def verify_scan_status(self, trigger_time):
+        """
+        verify_scenario validate the scan status results on the backend
+        """
+
+        Logger.logger.info("validating lastPostureScanTriggered for this cluster was updated")
+
+        self.verify_cluster_lastPostureScanTriggered_time(cluster_name=self.cluster, trigger_time=trigger_time)
+
+        Logger.logger.info("validating scan status of attack chains is processing")
+        r, t = self.wait_for_report(
+            self.verify_cluster_field_in_scan_status, 
+            timeout=60,
+            cluster_name=self.cluster,
+            expected_field='attackChainsProcessingStatus',
+            expectedStatus='processing'
+            )
+        Logger.logger.info("validating scan status of security risks is processing")
+        r, t = self.wait_for_report(
+            self.verify_cluster_field_in_scan_status, 
+            timeout=1,
+            cluster_name=self.cluster,
+            expected_field='securityRisksProcessingStatus',
+            expectedStatus='processing'
+            )
+        Logger.logger.info("validating scan status of attack chains is done")
+        r, t = self.wait_for_report(
+            self.verify_cluster_field_in_scan_status, 
+            timeout=600,
+            cluster_name=self.cluster,
+            expected_field='attackChainsProcessingStatus',
+            expectedStatus='done'
+            )
+        Logger.logger.info("validating scan status of security risks is done")
+        r, t = self.wait_for_report(
+            self.verify_cluster_field_in_scan_status, 
+            timeout=600,
+            cluster_name=self.cluster,
+            expected_field='securityRisksProcessingStatus',
+            expectedStatus='done'
+            )
         
         
+    def verify_global_field_in_scan_status(self, expected_field, expectedStatus)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        assert response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {response[expected_field]}. Response: {response}"
+        return True
+    
+    def verify_cluster_field_in_scan_status(self, cluster_name, expected_field, expectedStatus)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        for cluster_response in response['clusterScansStatus']:
+            if cluster_response['clusterName'] == cluster_name:
+                assert cluster_response[expected_field] == expectedStatus, f"Expected {expected_field} to be {expectedStatus}, got {cluster_response[expected_field]}. Response: {response}"
+        return True
+        
+    def verify_cluster_lastPostureScanTriggered_time(self, cluster_name, trigger_time)-> bool:
+        r = self.backend.get_scan_status()
+        response = json.loads(r.text)
+        for cluster_response in response['clusterScansStatus']:
+            if cluster_response['clusterName'] == cluster_name:
+                assert cluster_response['lastPostureScanTriggered'] >= trigger_time, f"Expected {'lastPostureScanTriggered'} to be >= than {trigger_time}, got {cluster_response['lastPostureScanTriggered']}"
+        return True    
         
 
 
@@ -603,3 +780,40 @@ def summarize_category(data):
     }
 
     return new_data
+
+
+def summarize_uniquevalues(response, field_name):
+    """
+    Transforms a list of dictionaries into a structured output based on the specified field.
+    
+    :param response: List of dictionaries containing the data.
+    :param field_name: The name of the field to base the transformation on (e.g., "category").
+    :return: A dictionary structured with unique field values and counts.
+    """
+    # Initializing a dictionary to count occurrences
+    field_counts = {}
+
+    # Count occurrences of each field value
+    for item in response:
+        if field_name in item:
+            value = item[field_name]
+            if value in field_counts:
+                field_counts[value] += 1
+            else:
+                field_counts[value] = 1
+
+    # Creating lists of fields and field counts
+    fields_list = sorted(field_counts.keys())  # Sorting keys to maintain order
+    fields_count_list = [{'key': key, 'count': field_counts[key]} for key in fields_list]
+
+    # Creating the structured output
+    structured_response = {
+        "fields": {
+            field_name: fields_list
+        },
+        "fieldsCount": {
+            field_name: fields_count_list
+        }
+    }
+
+    return structured_response

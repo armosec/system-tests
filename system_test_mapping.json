@@ -65,6 +65,70 @@
         "description": "",
         "skip_on_environment": ""
     },
+    "control_cluster_from_CLI_config_scan_default": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_exclude_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_include_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_host_scanner_enabled": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_submit": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_config_scan_MITRE_framework": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_vulnerabilities_scan_default": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "control_cluster_from_CLI_vulnerabilities_scan_include_namespaces": {
+        "target": [
+            "CLI"
+        ],
+        "target_repositories": [],
+        "description": "",
+        "skip_on_environment": ""
+    },
     "ac_alpine_fix_image_no_relevancy_with_cronjob": {
         "target": [
             "CLI",
@@ -428,10 +492,10 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
-            "careportsreceiver",
-            "event-ingester-service",
-            "gateway"
+            "cadashboardbe-dummy",
+            "careportsreceiver-dummy",
+            "event-ingester-service-dummy",
+            "gateway-dummy"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -442,10 +506,10 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe-dummy",
-            "careportsreceiver-dummy",
-            "event-ingester-service-dummy",
-            "gateway-dummy"
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -484,10 +548,10 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
-            "careportsreceiver",
-            "event-ingester-service",
-            "gateway"
+            "cadashboardbe-dummy",
+            "careportsreceiver-dummy",
+            "event-ingester-service-dummy",
+            "gateway-dummy"
         ],
         "description": "",
         "skip_on_environment": ""
@@ -1146,7 +1210,7 @@
             "config-service"
         ],
         "description": "testing teams alert channels with compliance and vulnerabilities notifications",
-        "skip_on_environment": ""
+        "skip_on_environment": "production"
     },
     "slack_alerts": {
         "target": [
@@ -1159,9 +1223,51 @@
             "config-service"
         ],
         "description": "testing slack alert channels with compliance and vulnerabilities notifications",
+        "skip_on_environment": "production"
+    },
+    "sr_r_0035_attack_chain": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "",
         "skip_on_environment": ""
     },
-    "sr_detect_and_resolve": {
+    "sr_r_0005_control": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "sr_r_0007_control_networkpolicy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "",
+        "skip_on_environment": ""
+    },
+    "sr_with_exceptions": {
         "target": [
             "In cluster",
             "Backend"
@@ -1181,14 +1287,29 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart-dummy",
-            "cadashboardbe-dummy",
-            "event-ingester-service-dummy",
-            "node-agent-dummy",
-            "synchronizer-dummy"
+            "helm-chart",
+            "cadashboardbe",
+            "event-ingester-service",
+            "node-agent",
+            "synchronizer",
+            "config-service"
         ],
         "description": "testing basic incident presented",
         "skip_on_environment": "production"
+    },
+    "sr_ac_scan_status":{
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "",
+        "skip_on_environment": ""
     },
     "jira_integration": {
         "target": [

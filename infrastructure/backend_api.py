@@ -110,7 +110,12 @@ API_SECURITY_RISKS_CATEGORIES = "/api/v1/securityrisks/categories"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
 API_SECURITY_RISKS_LIST_UNIQUEVALUES = "/api/v1/uniqueValues/securityrisks/list"
 API_SECURITY_RISKS_RESOURCES = "/api/v1/securityrisks/resources"
+API_SCAN_STATUS = "/api/v1/scanStatus"
 API_SECURITY_RISKS_TRENDS = "/api/v1/securityrisks/trends"
+
+API_SECURITY_RISKS_EXCEPTIONS_NEW = "/api/v1/securityrisks/exceptions/new"
+API_SECURITY_RISKS_EXCEPTIONS_LIST = "/api/v1/securityrisks/exceptions/list"
+API_SECURITY_RISKS_EXCEPTIONS = "/api/v1/securityrisks/exceptions"
 
 
 def deco_cookie(func):
@@ -1419,8 +1424,10 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true"):
+    def trigger_posture_scan(self, cluster_name, framework_list=[""], with_host_sensor="true", additional_params={}):
         params = {"customerGUID": self.selected_tenant_id}
+        if additional_params:
+            params.update(additional_params)
         body = []
         for framework in framework_list:
             body.append(
@@ -2304,6 +2311,16 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_security_risks_categories "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+    
+    def get_scan_status(self):
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(API_SCAN_STATUS, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get scan status "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
 
     def get_security_risks_list_uniquevalues(self, filters: dict, field):
         params = {"customerGUID": self.selected_tenant_id}
@@ -2327,8 +2344,8 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get get_security_risks_list_uniquevalues "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-
-    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None):
+    
+    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None, exception_applied=True):
         params = {"customerGUID": self.selected_tenant_id}
 
         filters = {}
@@ -2341,7 +2358,9 @@ class ControlPanelAPI(object):
 
         if security_risk_id is not None:
             filters["securityRiskID"] = security_risk_id
-
+        
+        if exception_applied:
+            filters["exceptionApplied"] = "|empty"
 
         innerFilters = []
         if filters:
@@ -2388,7 +2407,104 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_security_risks_trends "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+    
+    def add_security_risks_exception(self, security_risk_id, k8s_resource_hash_list, reason):
+        params = {"customerGUID": self.selected_tenant_id}
 
+        resources_list = []
+
+        for k8s_resource_hash in k8s_resource_hash_list:
+            resources_list.append(
+                {
+                    "designatorType":"Attribute",
+                    "attributes":
+                        {
+                            "k8sResourceHash":k8s_resource_hash
+                        }
+                }
+            )
+        payload = {
+                    "policyIDs":[security_risk_id],
+                    "resources":resources_list,
+                    "reason":reason
+                }
+
+        r = self.post(API_SECURITY_RISKS_EXCEPTIONS_NEW, params=params, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: add_security_risks_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+    def get_security_risks_exceptions_list(self, cluster_name):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+                    "pageSize":50,
+                    "pageNum":1,
+                    "innerFilters":[
+                        {
+                            "clusterShortName":cluster_name
+                        }]
+                }
+        
+        r = self.post(API_SECURITY_RISKS_EXCEPTIONS_LIST, params=params, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_security_risks_exceptions_list "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+    # edit security risks exception
+    def put_security_risks_exception(self, exception_id, security_risk_id, k8s_resource_hash_list, reason):
+        params = {"customerGUID": self.selected_tenant_id}
+        resources_list = []
+
+        for k8s_resource_hash in k8s_resource_hash_list:
+            resources_list.append(
+                {
+                    "designatorType":"Attribute",
+                    "attributes":
+                        {
+                            "k8sResourceHash":k8s_resource_hash
+                        }
+                }
+            )
+
+
+        payload = {
+                    "guid":exception_id,
+                    "policyIDs":[security_risk_id],
+                    "resources":resources_list,
+                    "reason":reason
+                }
+
+        r = self.put(API_SECURITY_RISKS_EXCEPTIONS, params=params, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: put_security_risks_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        return r
+
+    def delete_security_risks_exception(self, exception_id):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        del_url = API_SECURITY_RISKS_EXCEPTIONS + "/" + exception_id
+
+        r = self.delete(del_url, params=params)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: delete_security_risks_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        
+        return r
+
+    
 
     def get_integration_status(self, provider: str):
         url = API_INTEGRATIONS + "/connection/status"

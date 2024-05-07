@@ -2,11 +2,11 @@
   "kind": "VulnerabilityManifest",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
-    "name": "replicaset-java-simple-server-587989759-java-bac4-6dd9",
+    "name": "replicaset-java-simple-server-587989759-java-1d23-7edf",
     "namespace": "kubescape",
-    "uid": "76fd942b-5ac0-486e-bd8e-985c18314a0d",
+    "uid": "18516c3c-9c88-4b1c-a8d9-fdbfdf627291",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:47:19Z",
+    "creationTimestamp": "2024-05-01T07:08:46Z",
     "labels": {
       "kubescape.io/context": "filtered",
       "kubescape.io/workload-api-group": "apps",
@@ -27,7 +27,7 @@
       "withRelevancy": true,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
@@ -158,7 +158,7 @@
                   "cpe:2.3:a:oracle:openjdk:1.8.0_372-b07:*:*:*:*:*:*:*"
                 ],
                 "Package": {
-                  "name": "java",
+                  "name": "java/jre",
                   "version": "1.8.0_372-b07"
                 }
               },
@@ -172,7 +172,7 @@
             }
           ],
           "artifact": {
-            "name": "java",
+            "name": "java/jre",
             "version": "1.8.0_372-b07",
             "type": "binary",
             "locations": [
@@ -185,9 +185,9 @@
             "licenses": [],
             "cpes": [
               "cpe:2.3:a:oracle:openjdk:1.8.0_372-b07:*:*:*:*:*:*:*",
-              "cpe:2.3:a:java:java:1.8.0_372-b07:*:*:*:*:*:*:*"
+              "cpe:2.3:a:java/jre:java/jre:1.8.0_372-b07:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:generic/java@1.8.0_372-b07",
+            "purl": "pkg:generic/java/jre@1.8.0_372-b07",
             "upstreams": null,
             "metadata": null
           }

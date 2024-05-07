@@ -81,6 +81,16 @@ def get_messages_from_slack_channel(before_test):
         return []
 
 
+
+def assert_security_risks_message_sent(messages, cluster):
+    found = 0
+    for message in messages:
+        message_string = str(message)
+        if "Risk:" in message_string and cluster in message_string and "http" in message_string and "Deployment" in message_string:
+            found += 1
+    assert found > 0, "expected to have at least one security risk message"
+
+
 def assert_vulnerability_message_sent(messages, cluster):
     found = 0
     for message in messages:
@@ -221,6 +231,7 @@ class AlertNotifications(BaseHelm):
                 assert_vulnerability_message_sent(messages, cluster)
                 assert_new_admin_message_sent(messages, cluster)
                 assert_misconfiguration_message_sent(messages, cluster)
+                assert_security_risks_message_sent(messages, cluster)
             except AssertionError:
                 if i == 4:
                     raise

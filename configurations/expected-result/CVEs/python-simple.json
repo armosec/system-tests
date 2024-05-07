@@ -4,9 +4,9 @@
   "metadata": {
     "name": "python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07-087a07",
     "namespace": "kubescape",
-    "uid": "964a740f-eab8-4e6d-aef3-1e4ba812a458",
+    "uid": "d2d0f887-87a0-4c6e-8d64-c5141dcc79fb",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T08:45:20Z",
+    "creationTimestamp": "2024-05-01T07:06:46Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-python-sha256-4e8e9a59bf1b3ca8e030244bc5f801f",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
