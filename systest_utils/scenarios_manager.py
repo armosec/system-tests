@@ -664,7 +664,7 @@ def compare_lists(result, expected, ignore_keys=None):
     Compare two lists of dictionaries deeply, ignoring specific keys.
     """
 
-    assert len(result) == len(expected), f"List lengths differ: result: {len(result)} != expected: {len(result)}"
+    assert len(result) == len(expected), f"List lengths differ: result: {len(result)} != expected: {len(expected)}"
 
     for item1, item2 in zip(result, expected):
         try:
