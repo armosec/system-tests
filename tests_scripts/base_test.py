@@ -242,7 +242,7 @@ class BaseTest(object):
         """
         start = time.time()
         err = ""
-        while time.time() - start < timeout:
+        while True:
             try:
                 report_info = report_type(**kwargs)
                 return report_info, TestUtil.get_time(start, time.time())
@@ -251,7 +251,10 @@ class BaseTest(object):
                     raise e
                 err = e
                 Logger.logger.warning(f"{report_type.__func__.__name__}, error: '{e}', kwargs: '{kwargs}'")
-            time.sleep(sleep_interval)
+            if time.time() - start < timeout:
+                time.sleep(sleep_interval)
+            else:
+                break
         raise Exception(
             f"{report_type.__func__.__name__}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
 

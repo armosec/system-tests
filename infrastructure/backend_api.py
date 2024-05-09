@@ -4,7 +4,7 @@ import subprocess
 import sys
 import time
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import inspect
 from typing import Dict, List
 import dateutil.parser
@@ -541,6 +541,43 @@ class ControlPanelAPI(object):
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
+    
+    def get_alerts_of_incident(self, incident_id: str):
+        url = "/api/v1/runtime/incidents/" + incident_id + "/alerts/list"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, 
+                      json={"pageNumber": 1, "pageSize": 100,"orderBy":"timestamp:asc"})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        #TODO: get them all
+        return r.json()        
+    
+    def get_incident_unique_values(self, request: Dict):
+        url = "/api/v1/runtime/incidentsUniqueValues"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=request)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()    
+    
+    def get_alerts_unique_values(self, incident_id: str, request: Dict):
+        url = f"/api/v1/runtime/incidents/{incident_id}/alerts/uniqueValues"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=request)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def get_incidents_per_severity(self):
+        url = "/api/v1/runtime/incidentsPerSeverity"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json={})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+        
+    def get_incidents_overtime(self):
+        url = "/api/v1/runtime/incidentsOvertime"
+        now_time = datetime.now(timezone.utc)
+        last_30_days = now_time - timedelta(days=30)
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id},
+                     json={})
+        # "since": last_30_days.isoformat("T")+"Z", "until": now_time.isoformat("T")+"Z"
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+
 
     @staticmethod
     def sort_table_response_by_time(table, time_field: str, date_format: str = '%Y-%m-%dT%H:%M:%SZ'):
