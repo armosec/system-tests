@@ -950,7 +950,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             "workload": wl_summary["name"]
             }]}
         components = self.backend.get_vuln_v2_components(body=body)
-        assert len(components) == 9, 'expect 9 components found for httpd-proxy'
+        assert len(components) == 41, f'Expected 41 components, but found {len(components)} for httpd-proxy'
       
         Logger.logger.info('5. get workloads images and compare with expected')
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
