@@ -71,6 +71,8 @@ class SmartRemediation(BaseKubescape, BaseHelm):
             namespace=namespace, workload=workload, timeout=300
         )
 
+        TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
+       
         Logger.logger.info(f"3. Trigger a scan")
         self.backend.trigger_posture_scan(
             cluster_name=cluster,
