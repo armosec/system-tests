@@ -65,13 +65,71 @@ class Incidents(BaseHelm):
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5, cluster=cluster, namespace=namespace, incident_name="Unexpected process launched")
-
+        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
         inc, _ = self.wait_for_report(self.verify_incident_completed,timeout=5*60, sleep_interval=5, incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        assert inc[__RELATED_ALERTS_KEY__] is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
-        # TODO: add alerts API test
+        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        
+        # self.check_incident_unique_values(inc)
+        # self.check_incidents_per_severity()
+        # self.check_incidents_overtime()
+        # self.check_alerts_of_incident(inc)
+
+        # TODO: add resolve incident API test (suspicious+false positive)
 
         return self.cleanup()
+    
+    def check_alerts_of_incident(self, incident):
+        Logger.logger.info("Get alerts of incident")
+        resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
+        alerts = resp["response"]
+        assert alerts != None, f"Failed to get alerts of incident {json.dumps(incident)}"
+        assert len(alerts) > 0, f"Failed to get alerts of incident {json.dumps(incident)}"
+        # TODO: compare expected values with alerts
+        Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
+        self.check_alerts_unique_values(incident)
+
+    def check_alerts_unique_values(self, incident):
+        Logger.logger.info("Check unique values of alerts")
+        unique_values_req = {
+            "fields":{"ruleID":""},
+            "innerFilters":[],
+            "pageSize":100,
+            "pageNum":1
+            }
+        unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
+        assert unique_values != None, f"Failed to get unique values of alerts {json.dumps(incident)}"
+        assert len(unique_values["fields"]) > 0, f"Failed to get unique values of alerts {json.dumps(incident)}"
+        expected_values={"fields": {"ruleID": ["R0001", "R0003", "R0004"]}, "fieldsCount": {"ruleID": [{"key": "R0001", "count": 1}, {"key": "R0003", "count": 22}, {"key": "R0004", "count": 42}]}}
+    
+    def check_incidents_per_severity(self):
+        Logger.logger.info("Get incidents per severity")
+        resp = self.backend.get_incidents_per_severity()
+        assert resp["response"] != None, f"Failed to get incidents per severity {json.dumps(resp)}"
+        assert len(resp["response"]) > 0, f"Failed to get incidents per severity {json.dumps(resp)}"
+
+    def check_incidents_overtime(self):
+        Logger.logger.info("Get incidents over time")
+        resp = self.backend.get_incidents_overtime()
+        assert resp["response"] != None, f"Failed to get incidents over time {json.dumps(resp)}"
+        assert len(resp["response"]) > 0, f"Failed to get incidents over time {json.dumps(resp)}"
+
+    def check_incident_unique_values(self, incident):
+        Logger.logger.info("Check unique values of incident")
+        unique_values_req = {
+            "fields":{"clusterName":"","containerName":"","name":"",
+                      "workloadNamespace":"","podName":"","workloadKind|workloadName":"",
+                      "incidentSeverity":"","mitreTactic":"","isDismissed":"","incidentCategory":""},
+            "innerFilters":[{"guid":incident['guid']}],
+            "pageSize":100,
+            "pageNum":1
+            }
+        unique_values = self.backend.get_incident_unique_values(unique_values_req)
+        assert unique_values != None, f"Failed to get unique values of incident {json.dumps(incident)}"
+        assert len(unique_values["fields"]) > 0, f"Failed to get unique values of incident {json.dumps(incident)}"
+        expected_values={"fields": {"clusterName": ["gke_elated-pottery-310110_us-central1-c_bez-longrun-3"], "containerName": ["redis"], "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"], "isDismissed": ["false"], "mitreTactic": ["TA0002"], "name": ["Unexpected process launched"], "podName": ["redis-sleep-59d7cdf95d-ltcr8"], "workloadKind|workloadName": ["Deployment|redis-sleep"], "workloadNamespace": ["systest-ns-zcb4"]}, "fieldsCount": {"clusterName": [{"key": "gke_elated-pottery-310110_us-central1-c_bez-longrun-3", "count": 1}], "containerName": [{"key": "redis", "count": 1}], "incidentCategory": [{"key": "Anomaly", "count": 1}], "incidentSeverity": [{"key": "Medium", "count": 1}], "isDismissed": [{"key": "false", "count": 1}], "mitreTactic": [{"key": "TA0002", "count": 1}], "name": [{"key": "Unexpected process launched", "count": 1}], "podName": [{"key": "redis-sleep-59d7cdf95d-ltcr8", "count": 1}], "workloadKind|workloadName": [{"key": "Deployment|redis-sleep", "count": 1}], "workloadNamespace": [{"key": "systest-ns-zcb4", "count": 1}]}}
+        # TODO: compare expected values with unique_values
+        Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
     def verify_incident_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
