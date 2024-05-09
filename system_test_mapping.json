@@ -1028,7 +1028,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "dwertent@armosec.io"
     },
     "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
         "target": [
