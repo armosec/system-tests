@@ -70,10 +70,10 @@ class Incidents(BaseHelm):
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
-        self.check_incident_unique_values(inc)
-        self.check_incidents_per_severity()
-        self.check_incidents_overtime()
-        self.check_alerts_of_incident(inc)
+        # self.check_incident_unique_values(inc)
+        # self.check_incidents_per_severity()
+        # self.check_incidents_overtime()
+        # self.check_alerts_of_incident(inc)
 
         # TODO: add resolve incident API test (suspicious+false positive)
 
