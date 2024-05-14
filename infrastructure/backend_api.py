@@ -542,6 +542,12 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
+    def resolve_incident(self, incident_id: str, resolution:str):
+        url = "/api/v1/runtime/incidents/" + incident_id + "/resolve"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json={"Reason": resolution})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
     def get_alerts_of_incident(self, incident_id: str):
         url = "/api/v1/runtime/incidents/" + incident_id + "/alerts/list"
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, 
@@ -569,12 +575,29 @@ class ControlPanelAPI(object):
         return r.json()
         
     def get_incidents_overtime(self):
-        url = "/api/v1/runtime/incidentsOvertime"
+        url = "/api/v1/runtime/rawalerts/overtime"
         now_time = datetime.now(timezone.utc)
         last_30_days = now_time - timedelta(days=30)
         r = self.post(url, params={"customerGUID": self.selected_tenant_id},
-                     json={})
-        # "since": last_30_days.isoformat("T")+"Z", "until": now_time.isoformat("T")+"Z"
+                     json={"since": last_30_days.isoformat("T")+"Z", "until": now_time.isoformat("T")+"Z"})        
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def get_raw_alerts_list(self,cursor=None):
+        url = "/api/v1/runtime/rawalerts/list"
+        payload = {"pageNumber": 1, "pageSize": 20}
+        if cursor:
+            payload["cursorV1"] = {"id": cursor}
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=payload)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+
+    def get_raw_alerts_overtime(self):
+        url = "/api/v1/runtime/alertsOvertime"
+        now_time = datetime.now(timezone.utc)
+        last_30_days = now_time - timedelta(days=30)
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id},
+                    json={"since": last_30_days.isoformat("T")+"Z", "until": now_time.isoformat("T")+"Z"})        
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 

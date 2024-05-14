@@ -1,6 +1,3 @@
-# test incidents list API
-# test single incident API
-# Bonus: test alerts overtime + raw alerts
 from tests_scripts.helm.base_helm import BaseHelm
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger, TestUtil
@@ -8,6 +5,7 @@ import json
 import time
 
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
+__RESPONSE_FIELD__ = "response"
 
 class Incidents(BaseHelm):
     '''
@@ -74,15 +72,86 @@ class Incidents(BaseHelm):
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
         self.check_alerts_of_incident(inc)
+        self.check_raw_alerts_overtime()
+        self.check_raw_alerts_list()
 
-        # TODO: add resolve incident API test (suspicious+false positive)
+        self.resolve_incident(inc)
+        self.check_incident_resolved(inc)
+        self.check_overtime_resolved_incident(inc)
+
+        self.reslove_incident_false_positive(inc)
+        self.check_incident_resolved_false_positive(inc)
 
         return self.cleanup()
+    
+    def check_raw_alerts_list(self):
+        Logger.logger.info("Get raw alerts list")
+        resp = self.backend.get_raw_alerts_list()
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get raw alerts list {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get raw alerts list {len(resp['response'])}"
+        Logger.logger.info(f"Got raw alerts list. Trying with cursor next page {json.dumps(resp)}")
+        assert resp.get("cursor", None) != None, f"Failed to get raw alerts list cursor {json.dumps(resp)}"
+        resp = self.backend.get_raw_alerts_list(cursor=resp["cursor"])
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get raw alerts list {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get raw alerts list {len(resp['response'])}"
+        Logger.logger.info(f"Got raw alerts list {json.dumps(resp)}")
+        
+    
+    def check_raw_alerts_overtime(self):
+        Logger.logger.info("Get raw alerts over time")
+        resp = self.backend.get_raw_alerts_overtime()
+        assert resp['alertsPerDay'] != None, f"Failed to get raw alerts over time {json.dumps(resp)}"
+        assert len(resp['alertsPerDay']) > 0, f"Failed to get raw alerts over time {len(resp['alertsPerDay'])}"
+        today = time.strftime("%Y-%m-%d")
+        assert resp['alertsPerDay'][-1].get("date", "") == today, f"Failed to get raw alerts over time date {json.dumps(resp)}"
+        assert resp['alertsPerDay'][-1].get("count", 0) > 0, f"Failed to get raw alerts over time count {json.dumps(resp)}"
+        Logger.logger.info(f"Got raw alerts over time {json.dumps(resp)}")
+    
+    def resolve_incident(self, incident):
+        Logger.logger.info("Resolve incident")
+        resp = self.backend.resolve_incident(incident_id=incident['guid'], resolution="Suspicious")
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to resolve incident {json.dumps(incident)}"
+        Logger.logger.info(f"Resolved incident {json.dumps(incident)}")
+
+    def reslove_incident_false_positive(self, incident):
+        Logger.logger.info("Resolve incident false positive")
+        resp = self.backend.resolve_incident(incident_id=incident['guid'], resolution="FalsePositive")
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to resolve incident false positive {json.dumps(incident)}"
+        Logger.logger.info(f"Resolved incident false positive {json.dumps(incident)}")
+
+    def check_incident_resolved(self, incident):
+        Logger.logger.info("Check resolved incident")
+        Logger.logger.info("Get incidents list")
+        filters_dict = {
+            "guid": incident['guid']
+        }
+        response = self.backend.get_incidents(filters=filters_dict)
+        incs = response['response']
+        assert len(incs) == 1, f"Failed to get incident list for guid '{incident['guid']}' {json.dumps(incs)}"        
+        assert incs[0]["isDismissed"], f"Failed to get resolved incident {json.dumps(incs)}"
+        assert incs[0].get("markedAsFalsePositive", False) == False, f"markedAsFalsePositive==true {json.dumps(incs)}"        
+        assert incs[0].get("resolvedBy", "") != "", f"resolvedBy==None {json.dumps(incs)}"
+        assert incs[0].get("resolvedAt", "") != "", f"resolvedAt==None {json.dumps(incs)}"
+
+        Logger.logger.info(f"Got resolved incident {json.dumps(incs)}")
+
+    def check_incident_resolved_false_positive(self, incident):
+        Logger.logger.info("Check resolved incident false positive")
+        Logger.logger.info("Get incidents list")
+        filters_dict = {
+            "guid": incident['guid']
+        }
+        response = self.backend.get_incidents(filters=filters_dict)
+        incs = response['response']
+        assert len(incs) == 1, f"Failed to get incident list for guid '{incident['guid']}' {json.dumps(incs)}"        
+        assert incs[0]["isDismissed"], f"Failed to get resolved incident false positive {json.dumps(incs)}"
+        assert incs[0].get("markedAsFalsePositive", False), f"markedAsFalsePositive==false {json.dumps(incs)}"
+        Logger.logger.info(f"Got resolved incident false positive {json.dumps(incs)}")
     
     def check_alerts_of_incident(self, incident):
         Logger.logger.info("Get alerts of incident")
         resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
-        alerts = resp["response"]
+        alerts = resp[__RESPONSE_FIELD__]
         assert alerts != None, f"Failed to get alerts of incident {json.dumps(incident)}"
         assert len(alerts) > 1, f"Failed to get alerts of incident {incident['guid']}, got {resp}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
@@ -92,27 +161,44 @@ class Incidents(BaseHelm):
         Logger.logger.info("Check unique values of alerts")
         unique_values_req = {
             "fields":{"ruleID":""},
-            "innerFilters":[{"ruleID":"R0001,R0003,R0004"}],
+            # "innerFilters":[{"ruleID":"R0001,R0003,R0004"}],
             "pageSize":100,
             "pageNum":1
             }
         unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
         assert unique_values != None, f"Failed to get unique values of alerts {json.dumps(incident)}"
-        expected_values = {"fields": {"ruleID": ["R0001", "R0003", "R0004"]}, "fieldsCount": {"ruleID": [{"key": "R0001", "count": 1}, {"key": "R0003", "count": 22}, {"key": "R0004", "count": 42}]}}
+        expected_values = {"ruleID": ["R0001", "R0003", "R0004"]}
         # don't check the count, it's dynamic
-        assert unique_values["fields"] == expected_values["fields"], f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
+        assert unique_values["fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
     
     def check_incidents_per_severity(self):
         Logger.logger.info("Get incidents per severity")
         resp = self.backend.get_incidents_per_severity()
-        assert resp["response"] != None, f"Failed to get incidents per severity {json.dumps(resp)}"
-        assert len(resp["response"]) > 0, f"Failed to get incidents per severity {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get incidents per severity {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get incidents per severity {json.dumps(resp)}"
 
     def check_incidents_overtime(self):
         Logger.logger.info("Get incidents over time")
         resp = self.backend.get_incidents_overtime()
-        assert resp["response"] != None, f"Failed to get incidents over time {json.dumps(resp)}"
-        assert len(resp["response"]) > 0, f"Failed to get incidents over time {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get incidents over time {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get incidents over time {len(resp[__RESPONSE_FIELD__])}"
+        today = time.strftime("%Y-%m-%d")
+        assert resp[__RESPONSE_FIELD__][-1].get("date", "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("count", 0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("newCount", 0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
+        Logger.logger.info(f"Got incidents over time {json.dumps(resp)}")
+
+    def check_overtime_resolved_incident(self):
+        Logger.logger.info("Get resolved incidents over time")
+        resp = self.backend.get_incidents_overtime()
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get incidents over time {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get incidents over time {len(resp[__RESPONSE_FIELD__])}"
+        today = time.strftime("%Y-%m-%d")
+        assert resp[__RESPONSE_FIELD__][-1].get("date", "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("count", 0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("newCount", 0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("dismissedCount", 0) > 0, f"Failed to get incidents over time dismissedCount {json.dumps(resp)}"
+        Logger.logger.info(f"Got resolved incidents over time {json.dumps(resp)}")
 
     def check_incident_unique_values(self, incident):
         Logger.logger.info("Check unique values of incident")
