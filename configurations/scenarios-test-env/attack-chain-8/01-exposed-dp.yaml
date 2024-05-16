@@ -5,7 +5,7 @@ metadata:
   name: my-service
 spec:
   selector:
-    app: nginx
+    app: alpine
   ports:
     - protocol: TCP
       port: 80
@@ -20,24 +20,23 @@ status:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: alpine-deployment
   labels:
-    app: nginx
+    app: alpine
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx
+      app: alpine
   template:
     metadata:
       labels:
-        app: nginx
+        app: alpine
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
+      - name: alpine
+        image: alpine:latest
+        command: ["sh", "-c", "echo Hello Kubernetes! && sleep 3600"]
         resources:
           requests:
             cpu: 700m

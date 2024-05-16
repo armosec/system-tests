@@ -12,7 +12,7 @@ Create the cluster with **kind** using the provided configuration file:
 kind create cluster --config kind-config --name attack-chains
 ```
 
-Install **mysql** and **nginx** with their manifests:
+Install **mysql** and **alpine** with their manifests:
 
 ```shell
 kubectl apply -f 01-exposed-dp.yaml
@@ -24,5 +24,5 @@ kubectl apply -f 02-rbac-permissions.yaml
 After creating the cluster and installing the manifests you should be able to see attack chain composed like so:
 
 * **Initial Access**: through a `LoadBalancer` service.
-* **Cluster Access**: with **nginx** `Deployment` cluster takeover roles.
+* **Cluster Access**: with **alpine** `Deployment` cluster takeover roles.
 
