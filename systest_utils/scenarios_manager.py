@@ -159,8 +159,9 @@ class AttackChainsScenarioManager(ScenarioManager):
         """
         # check at first if we are managin dictionaries
         if isinstance(obj1, dict) and isinstance(obj2, dict):
-            if 'relatedResources' in obj1 and 'relatedResources' in obj2:
-                if obj1['relatedResources'] != obj2['relatedResources']:
+            if 'relatedResources' in obj1 and 'relatedResources' in obj2 and obj1['relatedResources'] != None and obj2['relatedResources'] != None and obj1['relatedResources'] != "None" and obj2['relatedResources'] != "None":
+                if len(obj1['relatedResources']) != len(obj2['relatedResources']):
+                    Logger.logger.error(f"Length mismatch: result: {len(obj1['relatedResources'])} != expected: {len(obj2['relatedResources'])}")
                     return False
             # check if key 'nextNodes' is present in the dictionaries
             if 'nextNodes' in obj1 and 'nextNodes' in obj2:
