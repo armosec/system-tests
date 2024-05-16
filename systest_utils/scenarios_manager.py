@@ -159,6 +159,9 @@ class AttackChainsScenarioManager(ScenarioManager):
         """
         # check at first if we are managin dictionaries
         if isinstance(obj1, dict) and isinstance(obj2, dict):
+            if 'relatedResources' in obj1 and 'relatedResources' in obj2:
+                if obj1['relatedResources'] != obj2['relatedResources']:
+                    return False
             # check if key 'nextNodes' is present in the dictionaries
             if 'nextNodes' in obj1 and 'nextNodes' in obj2:
                 # check if length of the items is the same
