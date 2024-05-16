@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+kubectl delete ClusterRoleBinding read-secrets-global
+kubectl wait ClusterRoleBinding/read-secrets-global --for=delete --timeout=-1s
+
+kubectl delete -n default RoleBinding read-pods
+kubectl wait RoleBinding/read-pods --for=delete --timeout=-1s

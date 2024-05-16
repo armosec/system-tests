@@ -4,9 +4,9 @@
   "metadata": {
     "name": "docker.io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231-60c231",
     "namespace": "kubescape",
-    "uid": "8df87dea-f468-41f5-af50-1de5a2d033fc",
+    "uid": "966a4fd8-b87d-45e5-a32a-0bbb5d568932",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T11:49:55Z",
+    "creationTimestamp": "2024-05-07T13:43:24Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {

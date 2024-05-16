@@ -4,9 +4,9 @@
   "metadata": {
     "name": "docker.io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231-60c231",
     "namespace": "kubescape",
-    "uid": "23db3895-d945-478e-b991-18e9fac69d1d",
+    "uid": "3a410884-da4a-4fcf-8c75-4fd88df3a328",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T11:49:55Z",
+    "creationTimestamp": "2024-05-07T13:43:24Z",
     "labels": {
       "kubescape.io/image-id": "docker-io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2",
       "kubescape.io/image-name": "docker-io-library-busybox"
@@ -21,10 +21,10 @@
     "metadata": {
       "tool": {
         "name": "syft",
-        "version": "v0.101.1-hotfix"
+        "version": "v1.3.0"
       },
       "report": {
-        "createdAt": "2024-04-18T11:49:55Z"
+        "createdAt": "2024-05-07T13:43:24Z"
       }
     },
     "syft": {
@@ -34,7 +34,7 @@
           "name": "busybox",
           "version": "1.34.0",
           "type": "binary",
-          "foundBy": "binary-cataloger",
+          "foundBy": "binary-classifier-cataloger",
           "locations": [
             {
               "path": "/bin/[",
@@ -48,8 +48,14 @@
           "licenses": [],
           "language": "",
           "cpes": [
-            "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*",
-            "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*"
+            {
+              "cpe": "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*",
+              "source": "syft-generated"
+            },
+            {
+              "cpe": "cpe:2.3:a:busybox:busybox:1.34.0:*:*:*:*:*:*:*",
+              "source": "syft-generated"
+            }
           ],
           "purl": "pkg:generic/busybox@1.34.0",
           "metadataType": "binary-signature",
@@ -88,6 +94,19 @@
           "location": {
             "path": "/bin/[",
             "layerID": "sha256:f6cb480bb44e83be776ab6da2494ef58204ffe5dceb1bd0aecf3766840ccb008"
+          },
+          "executable": {
+            "format": "elf",
+            "hasExports": false,
+            "hasEntrypoint": true,
+            "importedLibraries": [],
+            "elfSecurityFeatures": {
+              "symbolTableStripped": true,
+              "nx": true,
+              "relRO": "partial",
+              "pie": false,
+              "dso": false
+            }
           }
         }
       ],
@@ -131,7 +150,7 @@
       },
       "descriptor": {
         "name": "docker.io-library-busybox-sha256-e8e5cca392e3cf056fcdb3093e7ac2bf83fcf28b3bcf5818fe8ae71cf360c231-60c231",
-        "version": "v0.101.1-hotfix",
+        "version": "v1.3.0",
         "configuration": {
           "catalogers": {
             "requested": {
@@ -142,23 +161,26 @@
             "used": [
               "alpm-db-cataloger",
               "apk-db-cataloger",
-              "binary-cataloger",
+              "binary-classifier-cataloger",
               "cargo-auditable-binary-cataloger",
               "conan-info-cataloger",
               "dotnet-portable-executable-cataloger",
               "dpkg-db-cataloger",
+              "elf-binary-package-cataloger",
               "go-module-binary-cataloger",
               "graalvm-native-image-cataloger",
               "java-archive-cataloger",
               "javascript-package-cataloger",
+              "linux-kernel-cataloger",
               "nix-store-cataloger",
               "php-composer-installed-cataloger",
+              "php-pecl-serialized-cataloger",
               "portage-cataloger",
               "python-installed-package-cataloger",
               "r-package-cataloger",
               "rpm-db-cataloger",
               "ruby-installed-gemspec-cataloger",
-              "sbom-cataloger"
+              "wordpress-plugins-cataloger"
             ]
           },
           "data-generation": {
@@ -170,7 +192,6 @@
               "skip-files-above-size": 0
             },
             "hashers": [
-              "sha-1",
               "sha-256"
             ],
             "selection": "owned-by-package"
@@ -187,6 +208,8 @@
               "java-binary-openjdk",
               "java-binary-ibm",
               "java-binary-oracle",
+              "java-binary-graalvm",
+              "java-binary-jdk",
               "nodejs-binary",
               "go-binary-hint",
               "busybox-binary",
@@ -218,6 +241,11 @@
             ],
             "golang": {
               "local-mod-cache-dir": "/home/nonroot/go/pkg/mod",
+              "main-module-version": {
+                "from-build-settings": true,
+                "from-contents": true,
+                "from-ld-flags": true
+              },
               "proxies": [
                 "https://proxy.golang.org",
                 "direct"
@@ -233,7 +261,7 @@
               "use-network": false
             },
             "javascript": {
-              "npm-base-url": "https://registry.npmjs.org",
+              "npm-base-url": "",
               "search-remote-licenses": false
             },
             "linux-kernel": {
@@ -254,8 +282,8 @@
         }
       },
       "schema": {
-        "version": "13.0.0",
-        "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-13.0.0.json"
+        "version": "16.0.7",
+        "url": "https://raw.githubusercontent.com/anchore/syft/main/schema/json/schema-16.0.7.json"
       }
     }
   },
