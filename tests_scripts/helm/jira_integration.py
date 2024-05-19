@@ -120,14 +120,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.verify_running_pods(
             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
         )       
-
-        # Logger.logger.info(f"Trigger a scan")
-        # self.backend.trigger_posture_scan(
-        #     cluster_name=cluster,
-        #     framework_list=["AllControls"],
-        #     with_host_sensor="false",
-        # )
-
+        
         Logger.logger.info(f"Get report guid")
         report_guid = self.get_report_guid(
             cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
