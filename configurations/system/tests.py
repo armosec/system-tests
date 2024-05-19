@@ -10,7 +10,7 @@ from .tests_cases.payments_tests import PaymentTests
 from .tests_cases.relevant_vuln_scanning_tests import RelevantVulnerabilityScanningTests
 from .tests_cases.notifications_tests import NotificationSTests
 from .tests_cases.security_risks_tests import SecurityRisksTests
-
+from configurations.system.tests_cases.integrations_tests import IntegrationsTests
 
 
 def all_tests_names():
@@ -28,7 +28,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(SynchronizerTests))
     tests.extend(TestUtil.get_class_methods(RuntimeTests))
     tests.extend(TestUtil.get_class_methods(SecurityRisksTests))
-
+    tests.extend(TestUtil.get_class_methods(IntegrationsTests))
     return tests
 
 
@@ -58,6 +58,8 @@ def get_test(test_name):
         return RuntimeTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(SecurityRisksTests):
         return SecurityRisksTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(IntegrationsTests):
+        return IntegrationsTests().__getattribute__(test_name)()
 
 
 ALL_TESTS = all_tests_names()

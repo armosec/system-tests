@@ -1433,5 +1433,17 @@
         "description": "",
         "skip_on_environment": "",
         "owner": "eranm@armosec.io"
+    },
+    "jira_integration": {
+        "target": [
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": "testing jira integration",
+        "skip_on_environment": "",
+        "owner": "avrahams@armosec.io"
     }
 }

@@ -1,0 +1,32 @@
+{
+    "issueType": "clusterControl",
+    "fields": {
+        "summary": "armo system test",
+        "labels": [
+            "jira-sys-test"
+        ],
+        "description": "system test jira integration",
+        "customfield_10120": "my text",
+        "customfield_10121": "paragraph",
+        "customfield_10122": "2021-12-31",
+        "customfield_10123": "2021-12-31T23:59:59.999Z",
+        "customfield_10124": "http://www.example.com",
+        "customfield_10125": 3.4,
+        "customfield_10126": [
+            {
+                "id": "accounts"
+            },
+            {
+                "id": "agent"
+            }
+        ],
+        "customfield_10127": [
+            {
+                "id": "10179"
+            }
+        ],
+        "customfield_10128": {
+            "id": "10182"
+        }
+    }
+}
