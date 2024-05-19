@@ -992,7 +992,7 @@ class ControlPanelAPI(object):
                       json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
-                'Error accessing dashboard. Request: results of posture controls "%s" (code: %d, message: %s)' % (
+                'Error accessing dashboard. Request: results of posture clusters "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         if len(r.json()['response']) == 0:
             raise Exception('Error accessing dashboard. Request: results of posture controls is empty')
