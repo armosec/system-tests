@@ -30,7 +30,7 @@ class BaseNetworkPolicy(BaseHelm):
 
         for key, label in expected_obj['metadata']['labels'].items():
             assert actual_obj['metadata']['labels'][key] == label, f"label {key} is not equal, actual: {actual_obj['metadata']['labels'][key]}, expected: {label}, actual object: {actual_obj}, expected object: {expected_obj}"
-        
+
     def store_netwrok_for_first_time_results(self, result_data, store_path):
         for file_path in store_path:
             with open(file_path) as f:
@@ -60,8 +60,8 @@ class BaseNetworkPolicy(BaseHelm):
                 self.store_netwrok_for_first_time_results(result_data=actual_network_neighbors, store_path=self.test_obj["expected_network_neighbors"])
                 continue
             self.validate_expected_network_neighbors(actual_network_neighbors=actual_network_neighbors, expected_network_neighbors=expected_network_neighbors, namespace=namespace)
-    
-    
+
+
     def validate_expected_network_neighbors(self, actual_network_neighbors, expected_network_neighbors, namespace: str):
         """
         Validate expected network neighbors. It validates the basic metadata and then validates the network neighbors entries and the match labels
@@ -71,7 +71,7 @@ class BaseNetworkPolicy(BaseHelm):
         """
 
         self.validate_basic_metadata(actual_obj=actual_network_neighbors, expected_obj=expected_network_neighbors, namespace=namespace)
-        
+
         for key, label in expected_network_neighbors['spec']['matchLabels'].items():
             assert actual_network_neighbors['spec']['matchLabels'][key] == label, f"label {key} is not equal, actual: {actual_network_neighbors['spec']['matchLabels'][key]}, expected: {label}"
 
@@ -89,13 +89,13 @@ class BaseNetworkPolicy(BaseHelm):
 
     def validate_network_neighbor_entry(self, expected_entries, actual_entries):
         """
-        Validate a single network neighbor entry. 
+        Validate a single network neighbor entry.
         param expected_entries: expected network neighbor entries
-        param actual_entries: actual network neighbor entries        
+        param actual_entries: actual network neighbor entries
         """
 
         # we might have multiple actual entries, but we should have at least the same amount of expected entries
-        assert len(expected_entries) <= len(actual_entries), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
+        assert len(expected_entries) <= len(actual_entries or ''), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
 
         # we can't use the identifier for the entry, since IP addresses may change. Instead, we check for all fields that are not IP addresses, and verify that they are equal. If they are all equal, we count this entry as verified.
         for expected_entry in expected_entries:
@@ -119,7 +119,7 @@ class BaseNetworkPolicy(BaseHelm):
                 expected_ports = set((port['port'], port['protocol']) for port in expected_entry["ports"])
                 actual_ports = set((port['port'], port['protocol']) for port in actual_entry["ports"])
                 assert expected_ports == actual_ports, f"expected ports: {expected_ports} not found in actual ports {actual_ports}"
-                
+
             # expected entry does not contain dns, but contains IP address, that means we expect an IP address entry explicitly
             elif expected_entry["ipAddress"] != "":
                 actual_entry = next((actual_entry for actual_entry in actual_entries if expected_entry["ipAddress"] == actual_entry["ipAddress"]), None)
@@ -147,14 +147,14 @@ class BaseNetworkPolicy(BaseHelm):
                         continue
                     actual_namespace_selector = entry.get("namespaceSelector", {})
                     actual_pod_selector = entry.get("podSelector", {})
-    
+
                     actual_namespace_match_labels = actual_namespace_selector.get("matchLabels", {}) if actual_namespace_selector else {}
                     actual_pod_selector_match_labels = actual_pod_selector.get("matchLabels", {}) if actual_pod_selector else {}
 
                     if expected_namespace_match_labels == actual_namespace_match_labels and expected_pod_selector_match_labels == actual_pod_selector_match_labels:
                         actual_entry = entry
                         break
-                
+
                 assert actual_entry, f"expected a network neighbor entry with namespaceSelector: {expected_namespace_match_labels} and podSelector: {expected_pod_selector_match_labels} not found in actual entries {actual_entries}"
                 assert expected_entry["type"] == actual_entry["type"], f"expected type: {expected_entry['type']} not found in actual type {actual_entry['type']}"
 
@@ -209,7 +209,7 @@ class BaseNetworkPolicy(BaseHelm):
         except Exception as e:
             return True
         return False
-    
+
 
 
     def validate_workload_deleted_from_backend(self, cluster, workload_name, namespace):
@@ -220,11 +220,11 @@ class BaseNetworkPolicy(BaseHelm):
         param namespace: namespace of the object
         """
 
-        deleted, t = self.wait_for_report(timeout=100, 
+        deleted, t = self.wait_for_report(timeout=100,
                                         sleep_interval=5,
-                                        report_type=self.is_workload_deleted_from_backend, 
-                                        cluster=cluster, 
-                                        workload_name=workload_name, 
+                                        report_type=self.is_workload_deleted_from_backend,
+                                        cluster=cluster,
+                                        workload_name=workload_name,
                                         namespace=namespace)
 
 
@@ -256,11 +256,11 @@ class BaseNetworkPolicy(BaseHelm):
         for i in range(0, len(expected_network_policy_list)):
             workload_name = expected_network_policy_list[i]['metadata']['labels']['kubescape.io/workload-name']
             res = self.backend.get_network_policies_generate(cluster_name=cluster, workload_name=workload_name, namespace=namespace)
-  
-            
+
+
             backend_generated_network_policy = res[1]
             graph = res[2]
-            
+
             self.validate_expected_backend_network_policy(expected_network_policy_list[i],backend_generated_network_policy, namespace)
 
             self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=graph, expected_network_neighbors=expected_network_neighbors_list[i])
@@ -337,7 +337,7 @@ class BaseNetworkPolicy(BaseHelm):
         expected_policy = expected_network_policy['spec']
         self.validate_network_policy(actual_network_policy=actual_policy, expected_network_policy=expected_policy, namespace=namespace)
 
-    
+
     def validate_network_policy(self, actual_network_policy, expected_network_policy, namespace: str):
         """
         Validate network policy. It validates the basic metadata and then validates the network policy entries
@@ -363,14 +363,14 @@ class BaseNetworkPolicy(BaseHelm):
         if 'Ingress' in expected_network_policy_spec['policyTypes']:
             expected_network_policy_entries = expected_network_policy_spec['ingress']
             actual_network_policy_entries = actual_network_policy_spec['ingress']
-            self.validate_network_policy_entry(expected_network_policy_entries=expected_network_policy_entries, actual_network_policy_entries=actual_network_policy_entries) 
+            self.validate_network_policy_entry(expected_network_policy_entries=expected_network_policy_entries, actual_network_policy_entries=actual_network_policy_entries)
 
         if 'Egress' in expected_network_policy_spec['policyTypes']:
             expected_network_policy_entries = expected_network_policy_spec['egress']
             actual_network_policy_entries = actual_network_policy_spec['egress']
             self.validate_network_policy_entry(expected_network_policy_entries=expected_network_policy_entries,actual_network_policy_entries=actual_network_policy_entries)
 
-    
+
     def validate_network_policy_entry(self, expected_network_policy_entries, actual_network_policy_entries):
         """
         Validate network policy entry. It validates the ports and then validates the to and from entries
@@ -387,7 +387,7 @@ class BaseNetworkPolicy(BaseHelm):
                     for actual_ports in actual_network_policy_entry['ports']:
                         if expected_ports['port'] == actual_ports['port']:
                             if expected_ports['protocol'] == actual_ports['protocol']:
-                                 verified_ports += 1 
+                                 verified_ports += 1
                 if verified_ports != len(expected_network_policy_entry['ports']):
                     continue
 
@@ -420,7 +420,7 @@ class BaseNetworkPolicy(BaseHelm):
                     if 'ipBlock' in actual_to_from:
                         verified_entries += 1
                         break
-                        
+
                 is_labels = True
                 if "namespaceSelector" in expected_to_from:
                     is_labels = False
@@ -430,7 +430,7 @@ class BaseNetworkPolicy(BaseHelm):
                                 is_labels = True
                                 break
                 if not is_labels:
-                    continue        
+                    continue
 
                 is_labels = True
                 if "podSelector" in expected_to_from:
@@ -441,7 +441,7 @@ class BaseNetworkPolicy(BaseHelm):
                                 is_labels = True
                                 break
                 if not is_labels:
-                    continue   
+                    continue
                 verified_entries += 1
         return verified_entries == len(expected_entries)
 
@@ -464,7 +464,7 @@ class BaseNetworkPolicy(BaseHelm):
                     break
 
         assert verified_refs == len(expected_policy_refs), f"in validate_policy_refs: verified_refs is not equal, actual: {verified_refs}, expected: {len(expected_policy_refs)}"
-    
+
 
     def cleanup(self, **kwargs):
         super().cleanup(**kwargs)

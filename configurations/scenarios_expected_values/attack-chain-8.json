@@ -1,6 +1,6 @@
 {
     "total": {
-        "value": 2,
+        "value": 1,
         "relation": "eq"
     },
     "response": {
@@ -17,172 +17,12 @@
                             "designatorType": "Attributes",
                             "attributes": {
                                 "apiVersion": "v1",
-                                "cluster": "kind-attack-chain-8",
+                                "cluster": "kind-test-ac8",
                                 "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                 "kind": "Service",
                                 "name": "my-service",
                                 "namespace": "default",
                                 "resourceID": "/v1/default/Service/my-service"
-                            }
-                        }
-                    ],
-                    "nextNodes": [
-                        {
-                            "name": "Execution (Vulnerable Image)",
-                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
-                            "vulnerabilities": [
-                                {
-                                    "containerName": "nginx",
-                                    "imageScanID": "334082900111689015",
-                                    "names": [
-                                        "CVE-2017-12424",
-                                        "CVE-2017-12652",
-                                        "CVE-2017-8872",
-                                        "CVE-2018-25009",
-                                        "CVE-2018-25010",
-                                        "CVE-2018-25011",
-                                        "CVE-2018-25012",
-                                        "CVE-2018-25013",
-                                        "CVE-2018-25014",
-                                        "CVE-2018-6485",
-                                        "CVE-2018-6551",
-                                        "CVE-2019-11068",
-                                        "CVE-2019-12900",
-                                        "CVE-2019-20367",
-                                        "CVE-2019-8457",
-                                        "CVE-2019-9169",
-                                        "CVE-2020-36328",
-                                        "CVE-2020-36329",
-                                        "CVE-2020-36330",
-                                        "CVE-2020-36331",
-                                        "CVE-2021-31535",
-                                        "CVE-2021-33574",
-                                        "CVE-2021-3520",
-                                        "CVE-2021-35942",
-                                        "CVE-2022-1292",
-                                        "CVE-2022-1664",
-                                        "CVE-2022-2068",
-                                        "CVE-2022-2274",
-                                        "CVE-2022-22822",
-                                        "CVE-2022-22823",
-                                        "CVE-2022-22824",
-                                        "CVE-2022-23218",
-                                        "CVE-2022-23219",
-                                        "CVE-2022-23852",
-                                        "CVE-2022-23990",
-                                        "CVE-2022-25235",
-                                        "CVE-2022-25236",
-                                        "CVE-2022-25315",
-                                        "CVE-2022-27404"
-                                    ]
-                                }
-                            ],
-                            "relatedResources": null,
-                            "nextNodes": [
-                                {
-                                    "name": "Credential access",
-                                    "description": "An attacker can steal account names and passwords.",
-                                    "controlIDs": [
-                                        "C-0261"
-                                    ],
-                                    "relatedResources": [
-                                        {
-                                            "designatorType": "Attributes",
-                                            "attributes": {
-                                                "apiVersion": "v1",
-                                                "cluster": "kind-attack-chain-8",
-                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
-                                                "kind": "ServiceAccount",
-                                                "name": "default",
-                                                "namespace": "default",
-                                                "resourceID": "/v1/default/ServiceAccount/default"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "Privilege Escalation (Node)",
-                                    "description": "An attacker can gain permissions and access node resources.",
-                                    "controlIDs": [
-                                        "C-0211"
-                                    ],
-                                    "relatedResources": null
-                                },
-                                {
-                                    "name": "Persistence",
-                                    "description": "An attacker can create a foothold.",
-                                    "controlIDs": [
-                                        "C-0017"
-                                    ],
-                                    "relatedResources": null
-                                },
-                                {
-                                    "name": "Lateral Movement (Network)",
-                                    "description": "An attacker can move through the network.",
-                                    "controlIDs": [
-                                        "C-0260"
-                                    ],
-                                    "relatedResources": null
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "guid": "5d817063-096f-4d91-b39b-8665240080af",
-                "name": "workload-external-track",
-                "attributes": {
-                    "apiVersion": "apps/v1",
-                    "cluster": "kind-attack-chain-8",
-                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
-                    "kind": "Deployment",
-                    "name": "nginx-deployment",
-                    "namespace": "default",
-                    "resourceID": "apps/v1/default/Deployment/nginx-deployment"
-                },
-                "resource": {
-                    "designatorType": "attributes",
-                    "attributes": {
-                        "apiVersion": "apps/v1",
-                        "cluster": "kind-attack-chain-8",
-                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
-                        "k8sResourceHash": "11952088903998685987",
-                        "kind": "Deployment",
-                        "name": "nginx-deployment",
-                        "namespace": "default",
-                        "resourceID": "apps/v1/default/Deployment/nginx-deployment"
-                    }
-                },
-                "description": "Exposed nginx-deployment with critical vulnerabilities and 4 severe impacts",
-                "creationTime": "2024-05-15 18:51:40.316503 +0000 UTC",
-                "attackChainID": "1051033178",
-                "clusterName": "kind-attack-chain-8",
-                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
-                "latestReportGUID": "de1acef1-b62e-4e62-9007-cc3f5f343712",
-                "uiStatus": {
-                    "firstSeen": "2024-05-15T18:51:40Z",
-                    "viewedMainScreen": "2024-05-15T21:51:45Z",
-                    "processingStatus": "done"
-                },
-                "status": "active"
-            },
-            {
-                "attackChainNodes": {
-                    "name": "Initial Access",
-                    "description": "An attacker can access the Kubernetes environment.",
-                    "controlIDs": [
-                        "C-0256"
-                    ],
-                    "relatedResources": [
-                        {
-                            "designatorType": "Attributes",
-                            "attributes": {
-                                "apiVersion": "v1",
-                                "cluster": "kind-attack-chain-7",
-                                "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
-                                "kind": "Service",
-                                "name": "my-service",
-                                "namespace": "my-ns",
-                                "resourceID": "/v1/my-ns/Service/my-service"
                             }
                         }
                     ],
@@ -198,25 +38,25 @@
                                     "designatorType": "attributes",
                                     "attributes": {
                                         "apiVersion": "apps/v1",
-                                        "cluster": "kind-attack-chain-7",
-                                        "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
-                                        "k8sResourceHash": "11027902468199612166",
+                                        "cluster": "kind-test-ac8",
+                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                        "k8sResourceHash": "14175683509256536882",
                                         "kind": "Deployment",
-                                        "name": "nginx-deployment",
-                                        "namespace": "my-ns",
-                                        "resourceID": "apps/v1/my-ns/Deployment/nginx-deployment"
+                                        "name": "alpine-deployment",
+                                        "namespace": "default",
+                                        "resourceID": "apps/v1/default/Deployment/alpine-deployment"
                                     }
                                 },
                                 {
                                     "designatorType": "Attributes",
                                     "attributes": {
                                         "apiVersion": "v1",
-                                        "cluster": "kind-attack-chain-7",
-                                        "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                                        "cluster": "kind-test-ac8",
+                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                         "kind": "ServiceAccount",
                                         "name": "default",
-                                        "namespace": "my-ns",
-                                        "resourceID": "/v1/my-ns/ServiceAccount/default"
+                                        "namespace": "default",
+                                        "resourceID": "/v1/default/ServiceAccount/default"
                                     },
                                     "clickable": true,
                                     "relatedResources": [
@@ -224,20 +64,20 @@
                                             "designatorType": "Attributes",
                                             "attributes": {
                                                 "apiVersion": "rbac.authorization.k8s.io/v1",
-                                                "cluster": "kind-attack-chain-7",
-                                                "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                                                "cluster": "kind-test-ac8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                                 "kind": "ClusterRoleBinding",
                                                 "name": "read-secrets-global",
                                                 "namespace": "",
-                                                "resourceID": "rbac.authorization.k8s.io/v1//ClusterRoleBinding/read-secrets-global"
+                                                "resourceID": "rbac.authorization.k8s.io/v1 //ClusterRoleBinding/read-secrets-global"
                                             },
                                             "relatedResources": [
                                                 {
                                                     "designatorType": "Attributes",
                                                     "attributes": {
                                                         "apiVersion": "rbac.authorization.k8s.io/v1",
-                                                        "cluster": "kind-attack-chain-7",
-                                                        "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                                                        "cluster": "kind-test-ac8",
+                                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                                         "kind": "ClusterRole",
                                                         "name": "secret-reader",
                                                         "namespace": "",
@@ -263,24 +103,24 @@
                                             "designatorType": "Attributes",
                                             "attributes": {
                                                 "apiVersion": "rbac.authorization.k8s.io/v1",
-                                                "cluster": "kind-attack-chain-7",
-                                                "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                                                "cluster": "kind-test-ac8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                                 "kind": "RoleBinding",
                                                 "name": "read-pods",
-                                                "namespace": "my-ns",
-                                                "resourceID": "rbac.authorization.k8s.io/v1/my-ns/RoleBinding/read-pods"
+                                                "namespace": "default",
+                                                "resourceID": "rbac.authorization.k8s.io/v1/default/RoleBinding/read-pods"
                                             },
                                             "relatedResources": [
                                                 {
                                                     "designatorType": "Attributes",
                                                     "attributes": {
                                                         "apiVersion": "rbac.authorization.k8s.io/v1",
-                                                        "cluster": "kind-attack-chain-7",
-                                                        "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                                                        "cluster": "kind-test-ac8",
+                                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                                                         "kind": "Role",
                                                         "name": "pod-admin",
-                                                        "namespace": "my-ns",
-                                                        "resourceID": "rbac.authorization.k8s.io/v1/my-ns/Role/pod-admin"
+                                                        "namespace": "default",
+                                                        "resourceID": "rbac.authorization.k8s.io/v1/default/Role/pod-admin"
                                                     },
                                                     "relatedResources": [
                                                         {
@@ -303,45 +143,44 @@
                         }
                     ]
                 },
-                "guid": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                "guid": "5d817063-096f-4d91-b39b-8665240080af",
                 "name": "external-workload-with-cluster-takeover-roles",
                 "attributes": {
                     "apiVersion": "apps/v1",
-                    "cluster": "kind-attack-chain-7",
-                    "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
+                    "cluster": "kind-test-ac8",
+                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
                     "kind": "Deployment",
-                    "name": "nginx-deployment",
-                    "namespace": "my-ns",
-                    "resourceID": "apps/v1/my-ns/Deployment/nginx-deployment"
+                    "name": "alpine-deployment",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/alpine-deployment"
                 },
                 "resource": {
                     "designatorType": "attributes",
                     "attributes": {
                         "apiVersion": "apps/v1",
-                        "cluster": "kind-attack-chain-7",
-                        "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
-                        "k8sResourceHash": "11027902468199612166",
+                        "cluster": "kind-test-ac8",
+                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                        "k8sResourceHash": "14175683509256536882",
                         "kind": "Deployment",
-                        "name": "nginx-deployment",
-                        "namespace": "my-ns",
-                        "resourceID": "apps/v1/my-ns/Deployment/nginx-deployment"
+                        "name": "alpine-deployment",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/alpine-deployment"
                     }
                 },
                 "description": "External workload with cluster takeover roles",
-                "creationTime": "2024-05-12 08:35:50.027614 +0000 +0000",
-                "attackChainID": "110514303",
-                "clusterName": "kind-attack-chain-7",
-                "customerGUID": "3aebcfee-7a1a-4831-9357-b160a20551b7",
-                "latestReportGUID": "ffca4dd8-17da-4513-ab56-798cf376f504",
+                "creationTime": "2024-05-19 08:45:05.906971 +0000 UTC",
+                "attackChainID": "3401471947",
+                "clusterName": "kind-test-ac8",
+                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                "latestReportGUID": "f12430b9-42f1-4b65-8fb9-052a08800b04",
                 "uiStatus": {
-                    "firstSeen": "2024-05-12T08:35:50Z",
-                    "viewedMainScreen": "2024-05-12T11:35:51Z",
+                    "firstSeen": "2024-05-19T08:45:05Z",
                     "processingStatus": "done"
                 },
                 "status": "active"
             }
         ],
-        "attackChainsLastScan": "2024-05-15T18:56:31Z",
+        "attackChainsLastScan": "2024-05-19T08:45:31Z",
         "frameworkName": "security"
     },
     "cursor": ""

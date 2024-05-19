@@ -30,30 +30,7 @@
       "namespace": "systest-ns-uzhe"
     },
     "spec": {
-      "egress": [
-        {
-          "ports": [
-            {
-              "port": 53,
-              "protocol": "UDP"
-            }
-          ],
-          "to": [
-            {
-              "namespaceSelector": {
-                "matchLabels": {
-                  "kubernetes.io/metadata.name": "kube-system"
-                }
-              },
-              "podSelector": {
-                "matchLabels": {
-                  "k8s-app": "kube-dns"
-                }
-              }
-            }
-          ]
-        }
-      ],
+            "egress": [],
       "podSelector": {
         "matchLabels": {
           "app": "nginx"
