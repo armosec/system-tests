@@ -298,7 +298,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "avrahams@armosec.io"
     },
     "scan_with_custom_framework": {
         "target": [
