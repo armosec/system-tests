@@ -6,7 +6,7 @@
         "target_repositories": [],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "scan_nsa": {
         "target": [
@@ -15,7 +15,7 @@
         "target_repositories": [],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "dwertent@armosec.io"
     },
     "scan_custom_framework_scanning_file_scope_testing": {
         "target": [
@@ -156,7 +156,7 @@
         ],
         "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "vuln_scan_test_public_registry_connectivity_by_backend": {
         "target": [
@@ -546,7 +546,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_5_fix_control_with_relevancy": {
         "target": [
@@ -561,7 +561,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_alpine_fix_image_with_relevancy": {
         "target": [
@@ -576,7 +576,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_alpine_fix_control_with_relevancy": {
         "target": [
@@ -606,7 +606,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_3_fix_control_no_relevancy": {
         "target": [
@@ -621,7 +621,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_3_fix_control_with_relevancy": {
         "target": [
@@ -636,7 +636,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_8_fix_control_with_relevancy": {
         "target": [
@@ -665,7 +665,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_6_fix_control_with_relevancy": {
         "target": [
@@ -680,7 +680,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "ac_1_1_fix_control_no_relevancy": {
         "target": [
@@ -695,7 +695,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "registry_scanning_triggering_with_cron_job": {
         "target": [
@@ -727,7 +727,7 @@
         ],
         "description": "Checks smart remediation C0016",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0017": {
         "target": [
@@ -744,7 +744,7 @@
         ],
         "description": "Checks smart remediation C0017",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0034": {
         "target": [
@@ -761,7 +761,7 @@
         ],
         "description": "Checks smart remediation C0034",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0045": {
         "target": [
@@ -778,7 +778,7 @@
         ],
         "description": "Checks smart remediation C0045",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0046": {
         "target": [
@@ -795,7 +795,7 @@
         ],
         "description": "Checks smart remediation C0046",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0048": {
         "target": [
@@ -812,7 +812,7 @@
         ],
         "description": "Checks smart remediation C0048",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0057": {
         "target": [
@@ -829,7 +829,7 @@
         ],
         "description": "Checks smart remediation C0057",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0074": {
         "target": [
@@ -846,7 +846,7 @@
         ],
         "description": "Checks smart remediation C0074",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "synchronizer": {
         "target": [
@@ -1042,7 +1042,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "dwertent@armosec.io"
     },
     "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
         "target": [
@@ -1110,7 +1110,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "stripe_billing_portal": {
         "target": [
@@ -1122,7 +1122,7 @@
         ],
         "description": "",
         "skip_on_environment": "production",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "stripe_plans": {
         "target": [
@@ -1134,7 +1134,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "stripe_webhook": {
         "target": [
@@ -1146,7 +1146,7 @@
         ],
         "description": "",
         "skip_on_environment": "production",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "user_email_settings": {
         "target": [
@@ -1355,7 +1355,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "sr_r_0005_control": {
         "target": [
@@ -1385,7 +1385,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "sr_with_exceptions": {
         "target": [
@@ -1400,7 +1400,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "basic_incident_presented": {
         "target": [
@@ -1432,6 +1432,6 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     }
 }
