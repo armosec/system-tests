@@ -106,13 +106,6 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         cluster, namespace = self.setup(apply_services=False)
         print("Debug: cluster: ", cluster)
 
-        Logger.logger.info(f"Install Helm Chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(
-            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
-        )
-
         Logger.logger.info(f"Apply workload")
         workload = self.apply_yaml_file(
             yaml_file=self.test_obj["workload"], namespace=namespace
@@ -121,13 +114,13 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             namespace=namespace, workload=workload, timeout=300
         )
 
-        Logger.logger.info(f"Trigger a scan")
-        self.backend.trigger_posture_scan(
-            cluster_name=cluster,
-            framework_list=["AllControls"],
-            with_host_sensor="false",
-        )
-
+        Logger.logger.info(f"Install Helm Chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(
+            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
+        )       
+        
         Logger.logger.info(f"Get report guid")
         report_guid = self.get_report_guid(
             cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
