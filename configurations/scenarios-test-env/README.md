@@ -10,6 +10,7 @@ This is a collection of vulnerable scenarios for the **attack chains** feature.
 * [attack-chain-5](./attack-chain-5/)
 * [attack-chain-6](./attack-chain-6/)
 * [attack-chain-7](./attack-chain-7/)
+* [attack-chain-8](./attack-chain-8/)
 
 ## Requirements
 

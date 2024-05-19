@@ -244,6 +244,25 @@ class KSMicroserviceTests(object):
             helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED},
             relevancy_enabled=False
         )
+    
+    @staticmethod
+    def ac_8_fix_control_with_relevancy():
+        """
+        install scenario #8 on the cluster, install the kubescape operator and run the scan.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new control scan.
+
+        'fix_object' parameter is used to determine which type of fix you want to apply, to test the attack-chain fix functionality.
+        fix_object = ["control", "image"]
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChart,
+            test_job=[{"trigger_by": "scan_on_start"}],
+            test_scenario="attack-chain-8",
+            fix_object="control",
+        )
 
     @staticmethod
     def ks_microservice_ns_creation():
