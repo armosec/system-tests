@@ -39,8 +39,8 @@ spec:
         command: ["sh", "-c", "echo Hello Kubernetes! && sleep 3600"]
         resources:
           requests:
-            cpu: 700m
-            memory: "1Gi"
+            cpu: 50m
+            memory: "50Mi"
           limits:
-            cpu: 700m
-            memory: "1Gi"
+            cpu: 50m
+            memory: "50Mi"
