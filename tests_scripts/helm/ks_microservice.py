@@ -62,6 +62,8 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario()
 
+        # wait for status to be updated to done before triggering another scan
+        time.sleep(5)
         Logger.logger.info("4. trigger posture scan")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"],
