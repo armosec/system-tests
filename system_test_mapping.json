@@ -644,9 +644,9 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe_dummy",
-            "careportsreceiver_dummy",
-            "event-ingester-service_dummy",
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
             "gateway"
         ],
         "description": "",
