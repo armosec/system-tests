@@ -1,0 +1,152 @@
+{
+    "total": {
+        "value": 14,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "required": false,
+            "name": "Assignee",
+            "fieldId": "assignee",
+            "type": "user",
+            "topValues": null,
+            "searchable": true
+        },
+        {
+            "required": true,
+            "name": "Text",
+            "fieldId": "customfield_10120",
+            "type": "string",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Paragraph",
+            "fieldId": "customfield_10121",
+            "type": "string",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Date",
+            "fieldId": "customfield_10122",
+            "type": "date",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Timestamp",
+            "fieldId": "customfield_10123",
+            "type": "datetime",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "URL",
+            "fieldId": "customfield_10124",
+            "type": "url",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Number",
+            "fieldId": "customfield_10125",
+            "type": "number",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Labels",
+            "fieldId": "customfield_10126",
+            "type": "array",
+            "items": "string",
+            "topValues": null,
+            "searchable": true
+        },
+        {
+            "required": true,
+            "name": "CheckBox",
+            "fieldId": "customfield_10127",
+            "type": "array",
+            "items": "option",
+            "allowedValues": [
+                {
+                    "id": "10179",
+                    "name": "Op1"
+                },
+                {
+                    "id": "10180",
+                    "name": "Op2"
+                },
+                {
+                    "id": "10181",
+                    "name": "Op3"
+                }
+            ],
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Dropdown",
+            "fieldId": "customfield_10128",
+            "type": "option",
+            "allowedValues": [
+                {
+                    "id": "10182",
+                    "name": "op1"
+                },
+                {
+                    "id": "10183",
+                    "name": "op2"
+                },
+                {
+                    "id": "10184",
+                    "name": "op3"
+                }
+            ],
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": false,
+            "name": "Description",
+            "fieldId": "description",
+            "type": "string",
+            "searchable": false,
+            "topValues": null
+        },
+        {
+            "required": true,
+            "name": "Labels",
+            "fieldId": "labels",
+            "type": "array",
+            "items": "string",
+            "topValues": null,
+            "searchable": true
+        },
+        {
+            "required": false,
+            "name": "Reporter",
+            "fieldId": "reporter",
+            "type": "user",
+            "topValues": null,
+            "searchable": true
+        },
+        {
+            "required": true,
+            "name": "Summary",
+            "fieldId": "summary",
+            "type": "string",
+            "searchable": false,
+            "topValues": null
+        }
+    ],
+    "cursor": ""
+}

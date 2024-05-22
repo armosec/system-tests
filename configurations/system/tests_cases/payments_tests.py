@@ -5,7 +5,7 @@ from .structures import PaymentConfiguration
 # plan names and their price per unit in cents.
 # the name is an internal identifier which is assigned to a stripe priceId object. 
 # The price is the price in cents as defined in Stripe price object.
-EXPECTED_PRICES = [{"name":"MonthlyPriceID","price":2900},{"name":"YearlyPriceID","price":27600}]
+EXPECTED_PRICES = [{"name":"MonthlyPriceID","price":3900},{"name":"YearlyPriceID","price":36000}]
 TEST_STRIPE_CUSTOMER_ID = "cus_NT8XoDsp5Alqwc"
 
 
