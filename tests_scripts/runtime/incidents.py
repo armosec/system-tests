@@ -3,9 +3,16 @@ from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger, TestUtil
 import json
 import time
+from kubernetes.dynamic import ResourceField
 
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
+
+class ResourceFieldEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ResourceField):
+            return obj.__dict__
+        return json.JSONEncoder.default(self, obj)
 
 class Incidents(BaseHelm):
     '''
@@ -91,10 +98,10 @@ class Incidents(BaseHelm):
         assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get raw alerts list {len(resp['response'])}"
         Logger.logger.info(f"Got raw alerts list. Trying with cursor next page {json.dumps(resp)}")
         assert resp.get("cursor", None) != None, f"Failed to get raw alerts list cursor {json.dumps(resp)}"
-        # resp = self.backend.get_raw_alerts_list(cursor=resp["cursor"])
-        # assert resp[__RESPONSE_FIELD__] != None, f"Failed to get raw alerts list {json.dumps(resp)}"
-        # assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get raw alerts list {len(resp['response'])}"
-        # Logger.logger.info(f"Got raw alerts list {json.dumps(resp)}")
+        resp = self.backend.get_raw_alerts_list(cursor=resp["cursor"])
+        assert resp[__RESPONSE_FIELD__] != None, f"Failed to get raw alerts list {json.dumps(resp)}"
+        assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get raw alerts list {len(resp['response'])}"
+        Logger.logger.info(f"Got raw alerts list {json.dumps(resp)}")
         
     
     def check_raw_alerts_overtime(self):
@@ -242,8 +249,9 @@ class Incidents(BaseHelm):
         for i in wlids:
             assert i in ap_wlids, f"Failed to get application profile for {i}"
         # kubescape.io/status: completed, kubescape.io/completion: complete
-        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' or i.metadata.annotations['kubescape.io/status'] != 'completed']        
-        assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles])}"
+        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' or i.metadata.annotations['kubescape.io/status'] != 'completed']
+
+        assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 
     def cleanup(self, **kwargs):
         return super().cleanup(**kwargs)
