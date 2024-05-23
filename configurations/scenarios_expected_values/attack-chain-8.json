@@ -1,0 +1,187 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "kind-test-ac8",
+                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                "kind": "Service",
+                                "name": "my-service",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/my-service"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Cluster Access",
+                            "description": "An attacker has access to sensitive information and can leverage them by creating pods in the cluster.",
+                            "controlIDs": [
+                                "C-0267"
+                            ],
+                            "relatedResources": [
+                                {
+                                    "designatorType": "attributes",
+                                    "attributes": {
+                                        "apiVersion": "apps/v1",
+                                        "cluster": "kind-test-ac8",
+                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                        "k8sResourceHash": "14175683509256536882",
+                                        "kind": "Deployment",
+                                        "name": "alpine-deployment",
+                                        "namespace": "default",
+                                        "resourceID": "apps/v1/default/Deployment/alpine-deployment"
+                                    }
+                                },
+                                {
+                                    "designatorType": "Attributes",
+                                    "attributes": {
+                                        "apiVersion": "v1",
+                                        "cluster": "kind-test-ac8",
+                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                        "kind": "ServiceAccount",
+                                        "name": "default",
+                                        "namespace": "default",
+                                        "resourceID": "/v1/default/ServiceAccount/default"
+                                    },
+                                    "clickable": true,
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "rbac.authorization.k8s.io/v1",
+                                                "cluster": "kind-test-ac8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                "kind": "ClusterRoleBinding",
+                                                "name": "read-secrets-global",
+                                                "namespace": "",
+                                                "resourceID": "rbac.authorization.k8s.io/v1 //ClusterRoleBinding/read-secrets-global"
+                                            },
+                                            "relatedResources": [
+                                                {
+                                                    "designatorType": "Attributes",
+                                                    "attributes": {
+                                                        "apiVersion": "rbac.authorization.k8s.io/v1",
+                                                        "cluster": "kind-test-ac8",
+                                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                        "kind": "ClusterRole",
+                                                        "name": "secret-reader",
+                                                        "namespace": "",
+                                                        "resourceID": "rbac.authorization.k8s.io/v1//ClusterRole/secret-reader"
+                                                    },
+                                                    "relatedResources": [
+                                                        {
+                                                            "designatorType": "Attributes",
+                                                            "attributes": {
+                                                                "kind": "Secret"
+                                                            },
+                                                            "edgeText": [
+                                                                "get",
+                                                                "watch",
+                                                                "list"
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "rbac.authorization.k8s.io/v1",
+                                                "cluster": "kind-test-ac8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                "kind": "RoleBinding",
+                                                "name": "read-pods",
+                                                "namespace": "default",
+                                                "resourceID": "rbac.authorization.k8s.io/v1/default/RoleBinding/read-pods"
+                                            },
+                                            "relatedResources": [
+                                                {
+                                                    "designatorType": "Attributes",
+                                                    "attributes": {
+                                                        "apiVersion": "rbac.authorization.k8s.io/v1",
+                                                        "cluster": "kind-test-ac8",
+                                                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                        "kind": "Role",
+                                                        "name": "pod-admin",
+                                                        "namespace": "default",
+                                                        "resourceID": "rbac.authorization.k8s.io/v1/default/Role/pod-admin"
+                                                    },
+                                                    "relatedResources": [
+                                                        {
+                                                            "designatorType": "Attributes",
+                                                            "attributes": {
+                                                                "kind": "Pod"
+                                                            },
+                                                            "edgeText": [
+                                                                "*"
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "flattenRelatedResourcesDisplay": true
+                        }
+                    ]
+                },
+                "guid": "5d817063-096f-4d91-b39b-8665240080af",
+                "name": "external-workload-with-cluster-takeover-roles",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "kind-test-ac8",
+                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                    "kind": "Deployment",
+                    "name": "alpine-deployment",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/alpine-deployment"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "kind-test-ac8",
+                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                        "k8sResourceHash": "14175683509256536882",
+                        "kind": "Deployment",
+                        "name": "alpine-deployment",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/alpine-deployment"
+                    }
+                },
+                "description": "External workload with cluster takeover roles",
+                "creationTime": "2024-05-19 08:45:05.906971 +0000 UTC",
+                "attackChainID": "3401471947",
+                "clusterName": "kind-test-ac8",
+                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                "latestReportGUID": "f12430b9-42f1-4b65-8fb9-052a08800b04",
+                "uiStatus": {
+                    "firstSeen": "2024-05-19T08:45:05Z",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2024-05-19T08:45:31Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}

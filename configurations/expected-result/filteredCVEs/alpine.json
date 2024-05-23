@@ -2,11 +2,11 @@
   "kind": "VulnerabilityManifest",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
-    "name": "replicaset-collection-785d56d6d5-wordpress-6b82-e33b",
+    "name": "replicaset-collection-785d56d6d5-wordpress-e7c7-ee53",
     "namespace": "kubescape",
-    "uid": "f28d1653-ea27-4cc7-a803-5be34d0e00da",
+    "uid": "4f31f90e-f80a-4c80-893f-5fab7e461381",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T12:27:18Z",
+    "creationTimestamp": "2024-05-07T13:43:37Z",
     "labels": {
       "kubescape.io/context": "filtered",
       "kubescape.io/workload-api-group": "apps",
@@ -27,7 +27,7 @@
       "withRelevancy": true,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
@@ -5767,7 +5767,7 @@
             "cpes": [
               "cpe:2.3:a:bash:bash:5.1-2+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/bash@5.1-2+deb11u1?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/bash@5.1-2%2Bdeb11u1?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -5869,7 +5869,7 @@
             "cpes": [
               "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
+            "purl": "pkg:deb/debian/coreutils@8.32-4%2Bb1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
             "upstreams": [
               {
                 "name": "coreutils",
@@ -5974,7 +5974,7 @@
             "cpes": [
               "cpe:2.3:a:coreutils:coreutils:8.32-4+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/coreutils@8.32-4+b1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
+            "purl": "pkg:deb/debian/coreutils@8.32-4%2Bb1?arch=amd64&upstream=coreutils%408.32-4&distro=debian-11",
             "upstreams": [
               {
                 "name": "coreutils",
@@ -6100,7 +6100,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6225,7 +6225,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6350,7 +6350,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6476,7 +6476,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6598,7 +6598,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6722,7 +6722,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6846,7 +6846,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -6970,7 +6970,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7097,7 +7097,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7221,7 +7221,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7356,7 +7356,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7490,7 +7490,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7615,7 +7615,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7741,7 +7741,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7863,7 +7863,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -7987,7 +7987,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8112,7 +8112,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8237,7 +8237,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8362,7 +8362,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8487,7 +8487,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8612,7 +8612,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8740,7 +8740,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8862,7 +8862,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -8986,7 +8986,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9110,7 +9110,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9232,7 +9232,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9354,7 +9354,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9480,7 +9480,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9609,7 +9609,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9732,7 +9732,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9841,7 +9841,7 @@
               "cpe:2.3:a:imagemagick:imagemagick-6-common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:imagemagick:imagemagick_6_common:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60+dfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/imagemagick-6-common@8:6.9.11.60%2Bdfsg-1.3?arch=all&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -9933,7 +9933,7 @@
             "cpes": [
               "cpe:2.3:a:libapr1:libapr1:1.7.0-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libapr1@1.7.0-6+deb11u1?arch=amd64&upstream=apr&distro=debian-11",
+            "purl": "pkg:deb/debian/libapr1@1.7.0-6%2Bdeb11u1?arch=amd64&upstream=apr&distro=debian-11",
             "upstreams": [
               {
                 "name": "apr"
@@ -10324,7 +10324,7 @@
             "cpes": [
               "cpe:2.3:a:libblkid1:libblkid1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libblkid1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libblkid1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -10423,7 +10423,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10514,7 +10514,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10608,7 +10608,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10703,7 +10703,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10797,7 +10797,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10890,7 +10890,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -10984,7 +10984,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -11078,7 +11078,7 @@
             "cpes": [
               "cpe:2.3:a:libc6:libc6:2.31-13+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libc6@2.31-13+deb11u3?arch=amd64&upstream=glibc&distro=debian-11",
+            "purl": "pkg:deb/debian/libc6@2.31-13%2Bdeb11u3?arch=amd64&upstream=glibc&distro=debian-11",
             "upstreams": [
               {
                 "name": "glibc"
@@ -11259,7 +11259,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11350,7 +11350,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11457,7 +11457,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11550,7 +11550,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11642,7 +11642,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11735,7 +11735,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11827,7 +11827,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -11927,7 +11927,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12019,7 +12019,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12120,7 +12120,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12211,7 +12211,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12311,7 +12311,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12410,7 +12410,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12499,7 +12499,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12594,7 +12594,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12693,7 +12693,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12782,7 +12782,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12871,7 +12871,7 @@
             "cpes": [
               "cpe:2.3:a:libcurl4:libcurl4:7.74.0-1.3+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3+deb11u2?arch=amd64&upstream=curl&distro=debian-11",
+            "purl": "pkg:deb/debian/libcurl4@7.74.0-1.3%2Bdeb11u2?arch=amd64&upstream=curl&distro=debian-11",
             "upstreams": [
               {
                 "name": "curl"
@@ -12968,7 +12968,7 @@
             "cpes": [
               "cpe:2.3:a:libdb5.3:libdb5.3:5.3.28+dfsg1-0.8:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libdb5.3@5.3.28+dfsg1-0.8?arch=amd64&upstream=db5.3&distro=debian-11",
+            "purl": "pkg:deb/debian/libdb5.3@5.3.28%2Bdfsg1-0.8?arch=amd64&upstream=db5.3&distro=debian-11",
             "upstreams": [
               {
                 "name": "db5.3"
@@ -13072,7 +13072,7 @@
             "cpes": [
               "cpe:2.3:a:libexpat1:libexpat1:2.2.10-2+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libexpat1@2.2.10-2+deb11u3?arch=amd64&upstream=expat&distro=debian-11",
+            "purl": "pkg:deb/debian/libexpat1@2.2.10-2%2Bdeb11u3?arch=amd64&upstream=expat&distro=debian-11",
             "upstreams": [
               {
                 "name": "expat"
@@ -13175,7 +13175,7 @@
             "cpes": [
               "cpe:2.3:a:libexpat1:libexpat1:2.2.10-2+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libexpat1@2.2.10-2+deb11u3?arch=amd64&upstream=expat&distro=debian-11",
+            "purl": "pkg:deb/debian/libexpat1@2.2.10-2%2Bdeb11u3?arch=amd64&upstream=expat&distro=debian-11",
             "upstreams": [
               {
                 "name": "expat"
@@ -13282,7 +13282,7 @@
             "cpes": [
               "cpe:2.3:a:libexpat1:libexpat1:2.2.10-2+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libexpat1@2.2.10-2+deb11u3?arch=amd64&upstream=expat&distro=debian-11",
+            "purl": "pkg:deb/debian/libexpat1@2.2.10-2%2Bdeb11u3?arch=amd64&upstream=expat&distro=debian-11",
             "upstreams": [
               {
                 "name": "expat"
@@ -13382,7 +13382,7 @@
             "cpes": [
               "cpe:2.3:a:libfreetype6:libfreetype6:2.10.4+dfsg-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1+deb11u1?arch=amd64&upstream=freetype&distro=debian-11",
+            "purl": "pkg:deb/debian/libfreetype6@2.10.4%2Bdfsg-1%2Bdeb11u1?arch=amd64&upstream=freetype&distro=debian-11",
             "upstreams": [
               {
                 "name": "freetype"
@@ -13479,7 +13479,7 @@
             "cpes": [
               "cpe:2.3:a:libfreetype6:libfreetype6:2.10.4+dfsg-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libfreetype6@2.10.4+dfsg-1+deb11u1?arch=amd64&upstream=freetype&distro=debian-11",
+            "purl": "pkg:deb/debian/libfreetype6@2.10.4%2Bdfsg-1%2Bdeb11u1?arch=amd64&upstream=freetype&distro=debian-11",
             "upstreams": [
               {
                 "name": "freetype"
@@ -13863,7 +13863,7 @@
             "cpes": [
               "cpe:2.3:a:libgnutls30:libgnutls30:3.7.1-5+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5+deb11u2?arch=amd64&upstream=gnutls28&distro=debian-11",
+            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5%2Bdeb11u2?arch=amd64&upstream=gnutls28&distro=debian-11",
             "upstreams": [
               {
                 "name": "gnutls28"
@@ -14039,7 +14039,7 @@
             "cpes": [
               "cpe:2.3:a:libgnutls30:libgnutls30:3.7.1-5+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5+deb11u2?arch=amd64&upstream=gnutls28&distro=debian-11",
+            "purl": "pkg:deb/debian/libgnutls30@3.7.1-5%2Bdeb11u2?arch=amd64&upstream=gnutls28&distro=debian-11",
             "upstreams": [
               {
                 "name": "gnutls28"
@@ -14148,7 +14148,7 @@
               "cpe:2.3:a:libgssapi:libgssapi-krb5-2:1.18.3-6+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libgssapi:libgssapi_krb5_2:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -14243,7 +14243,7 @@
               "cpe:2.3:a:libgssapi:libgssapi-krb5-2:1.18.3-6+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libgssapi:libgssapi_krb5_2:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libgssapi-krb5-2@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -14603,7 +14603,7 @@
             "cpes": [
               "cpe:2.3:a:libjbig0:libjbig0:2.1-3.1+b2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libjbig0@2.1-3.1+b2?arch=amd64&upstream=jbigkit%402.1-3.1&distro=debian-11",
+            "purl": "pkg:deb/debian/libjbig0@2.1-3.1%2Bb2?arch=amd64&upstream=jbigkit%402.1-3.1&distro=debian-11",
             "upstreams": [
               {
                 "name": "jbigkit",
@@ -14799,7 +14799,7 @@
             "cpes": [
               "cpe:2.3:a:libk5crypto3:libk5crypto3:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -14885,7 +14885,7 @@
             "cpes": [
               "cpe:2.3:a:libk5crypto3:libk5crypto3:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libk5crypto3@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -14990,7 +14990,7 @@
               "cpe:2.3:a:libkrb5:libkrb5-3:1.18.3-6+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libkrb5:libkrb5_3:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -15081,7 +15081,7 @@
               "cpe:2.3:a:libkrb5:libkrb5-3:1.18.3-6+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libkrb5:libkrb5_3:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5-3@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -15181,7 +15181,7 @@
             "cpes": [
               "cpe:2.3:a:libkrb5support0:libkrb5support0:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -15267,7 +15267,7 @@
             "cpes": [
               "cpe:2.3:a:libkrb5support0:libkrb5support0:1.18.3-6+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6+deb11u1?arch=amd64&upstream=krb5&distro=debian-11",
+            "purl": "pkg:deb/debian/libkrb5support0@1.18.3-6%2Bdeb11u1?arch=amd64&upstream=krb5&distro=debian-11",
             "upstreams": [
               {
                 "name": "krb5"
@@ -15365,7 +15365,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57%2Bdfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -15461,7 +15461,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57%2Bdfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -15554,7 +15554,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57%2Bdfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -15649,7 +15649,7 @@
               "cpe:2.3:a:libldap:libldap-2.4-2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*",
               "cpe:2.3:a:libldap:libldap_2.4_2:2.4.57+dfsg-3+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57+dfsg-3+deb11u1?arch=amd64&upstream=openldap&distro=debian-11",
+            "purl": "pkg:deb/debian/libldap-2.4-2@2.4.57%2Bdfsg-3%2Bdeb11u1?arch=amd64&upstream=openldap&distro=debian-11",
             "upstreams": [
               {
                 "name": "openldap"
@@ -15743,7 +15743,7 @@
               "cpe:2.3:a:liblua5.3:liblua5.3-0:5.3.3-1.1+b1:*:*:*:*:*:*:*",
               "cpe:2.3:a:liblua5.3:liblua5.3_0:5.3.3-1.1+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1+b1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
+            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1%2Bb1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
             "upstreams": [
               {
                 "name": "lua5.3",
@@ -15837,7 +15837,7 @@
               "cpe:2.3:a:liblua5.3:liblua5.3-0:5.3.3-1.1+b1:*:*:*:*:*:*:*",
               "cpe:2.3:a:liblua5.3:liblua5.3_0:5.3.3-1.1+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1+b1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
+            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1%2Bb1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
             "upstreams": [
               {
                 "name": "lua5.3",
@@ -15932,7 +15932,7 @@
               "cpe:2.3:a:liblua5.3:liblua5.3-0:5.3.3-1.1+b1:*:*:*:*:*:*:*",
               "cpe:2.3:a:liblua5.3:liblua5.3_0:5.3.3-1.1+b1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1+b1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
+            "purl": "pkg:deb/debian/liblua5.3-0@5.3.3-1.1%2Bb1?arch=amd64&upstream=lua5.3%405.3.3-1.1&distro=debian-11",
             "upstreams": [
               {
                 "name": "lua5.3",
@@ -16054,7 +16054,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16175,7 +16175,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16296,7 +16296,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16418,7 +16418,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16536,7 +16536,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16656,7 +16656,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16776,7 +16776,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -16896,7 +16896,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17019,7 +17019,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17139,7 +17139,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17270,7 +17270,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17400,7 +17400,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17521,7 +17521,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17643,7 +17643,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17761,7 +17761,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -17881,7 +17881,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18002,7 +18002,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18123,7 +18123,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18244,7 +18244,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18365,7 +18365,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18486,7 +18486,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18610,7 +18610,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18728,7 +18728,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18848,7 +18848,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -18968,7 +18968,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19086,7 +19086,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19204,7 +19204,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19326,7 +19326,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19451,7 +19451,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19570,7 +19570,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19675,7 +19675,7 @@
               "cpe:2.3:a:libmagickcore:libmagickcore-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickcore:libmagickcore_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickcore-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19796,7 +19796,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -19917,7 +19917,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20038,7 +20038,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20160,7 +20160,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20278,7 +20278,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20398,7 +20398,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20518,7 +20518,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20638,7 +20638,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20761,7 +20761,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -20881,7 +20881,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21012,7 +21012,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21142,7 +21142,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21263,7 +21263,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21385,7 +21385,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21503,7 +21503,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21623,7 +21623,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21744,7 +21744,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21865,7 +21865,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -21986,7 +21986,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22107,7 +22107,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22228,7 +22228,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22352,7 +22352,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22470,7 +22470,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22590,7 +22590,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22710,7 +22710,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22828,7 +22828,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -22946,7 +22946,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -23068,7 +23068,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -23193,7 +23193,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -23312,7 +23312,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -23417,7 +23417,7 @@
               "cpe:2.3:a:libmagickwand:libmagickwand-6.q16-6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*",
               "cpe:2.3:a:libmagickwand:libmagickwand_6.q16_6:8:6.9.11.60+dfsg-1.3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60+dfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
+            "purl": "pkg:deb/debian/libmagickwand-6.q16-6@8:6.9.11.60%2Bdfsg-1.3?arch=amd64&upstream=imagemagick&distro=debian-11",
             "upstreams": [
               {
                 "name": "imagemagick"
@@ -23518,7 +23518,7 @@
             "cpes": [
               "cpe:2.3:a:libmount1:libmount1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libmount1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libmount1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -27110,7 +27110,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27205,7 +27205,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27300,7 +27300,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27392,7 +27392,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27479,7 +27479,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27566,7 +27566,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27656,7 +27656,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27757,7 +27757,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27844,7 +27844,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -27934,7 +27934,7 @@
             "cpes": [
               "cpe:2.3:a:libssl1.1:libssl1.1:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0+deb11u3?arch=amd64&upstream=openssl&distro=debian-11",
+            "purl": "pkg:deb/debian/libssl1.1@1.1.1n-0%2Bdeb11u3?arch=amd64&upstream=openssl&distro=debian-11",
             "upstreams": [
               {
                 "name": "openssl"
@@ -28130,7 +28130,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28217,7 +28217,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28304,7 +28304,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28392,7 +28392,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28489,7 +28489,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28586,7 +28586,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28683,7 +28683,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28780,7 +28780,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28877,7 +28877,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -28974,7 +28974,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29071,7 +29071,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29167,7 +29167,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29264,7 +29264,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29361,7 +29361,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29457,7 +29457,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29555,7 +29555,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29652,7 +29652,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29748,7 +29748,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29845,7 +29845,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -29941,7 +29941,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30038,7 +30038,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30136,7 +30136,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30233,7 +30233,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30329,7 +30329,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30423,7 +30423,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30517,7 +30517,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30611,7 +30611,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30705,7 +30705,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30799,7 +30799,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30893,7 +30893,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -30992,7 +30992,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31091,7 +31091,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31190,7 +31190,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31289,7 +31289,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31393,7 +31393,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31492,7 +31492,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31591,7 +31591,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31678,7 +31678,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31765,7 +31765,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31854,7 +31854,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -31943,7 +31943,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32029,7 +32029,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32116,7 +32116,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32204,7 +32204,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32292,7 +32292,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32386,7 +32386,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32484,7 +32484,7 @@
             "cpes": [
               "cpe:2.3:a:libtiff5:libtiff5:4.2.0-1+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtiff5@4.2.0-1+deb11u1?arch=amd64&upstream=tiff&distro=debian-11",
+            "purl": "pkg:deb/debian/libtiff5@4.2.0-1%2Bdeb11u1?arch=amd64&upstream=tiff&distro=debian-11",
             "upstreams": [
               {
                 "name": "tiff"
@@ -32576,7 +32576,7 @@
             "cpes": [
               "cpe:2.3:a:libtinfo6:libtinfo6:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtinfo6@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/libtinfo6@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -32669,7 +32669,7 @@
             "cpes": [
               "cpe:2.3:a:libtinfo6:libtinfo6:6.2+20201114-2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libtinfo6@6.2+20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
+            "purl": "pkg:deb/debian/libtinfo6@6.2%2B20201114-2?arch=amd64&upstream=ncurses&distro=debian-11",
             "upstreams": [
               {
                 "name": "ncurses"
@@ -32770,7 +32770,7 @@
             "cpes": [
               "cpe:2.3:a:libuuid1:libuuid1:2.36.1-8+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libuuid1@2.36.1-8+deb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
+            "purl": "pkg:deb/debian/libuuid1@2.36.1-8%2Bdeb11u1?arch=amd64&upstream=util-linux&distro=debian-11",
             "upstreams": [
               {
                 "name": "util-linux"
@@ -33391,7 +33391,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u2?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10%2Bdfsg-6.7%2Bdeb11u2?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33491,7 +33491,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u2?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10%2Bdfsg-6.7%2Bdeb11u2?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33582,7 +33582,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u2?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10%2Bdfsg-6.7%2Bdeb11u2?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33673,7 +33673,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u2?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10%2Bdfsg-6.7%2Bdeb11u2?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33755,7 +33755,7 @@
             "cpes": [
               "cpe:2.3:a:libxml2:libxml2:2.9.10+dfsg-6.7+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/libxml2@2.9.10+dfsg-6.7+deb11u2?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/libxml2@2.9.10%2Bdfsg-6.7%2Bdeb11u2?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33841,7 +33841,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -33936,7 +33936,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34031,7 +34031,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34123,7 +34123,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34210,7 +34210,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34297,7 +34297,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34387,7 +34387,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34488,7 +34488,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34575,7 +34575,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34665,7 +34665,7 @@
             "cpes": [
               "cpe:2.3:a:openssl:openssl:1.1.1n-0+deb11u3:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/openssl@1.1.1n-0+deb11u3?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/openssl@1.1.1n-0%2Bdeb11u3?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -34782,7 +34782,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -34900,7 +34900,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -35022,7 +35022,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -35140,7 +35140,7 @@
               "cpe:2.3:a:perl:perl-base:5.32.1-4+deb11u2:*:*:*:*:*:*:*",
               "cpe:2.3:a:perl:perl_base:5.32.1-4+deb11u2:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/perl-base@5.32.1-4+deb11u2?arch=amd64&upstream=perl&distro=debian-11",
+            "purl": "pkg:deb/debian/perl-base@5.32.1-4%2Bdeb11u2?arch=amd64&upstream=perl&distro=debian-11",
             "upstreams": [
               {
                 "name": "perl"
@@ -35229,7 +35229,7 @@
             "cpes": [
               "cpe:2.3:a:tar:tar:1.34+dfsg-1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/tar@1.34+dfsg-1?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/tar@1.34%2Bdfsg-1?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -35312,7 +35312,7 @@
             "cpes": [
               "cpe:2.3:a:tar:tar:1.34+dfsg-1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/tar@1.34+dfsg-1?arch=amd64&distro=debian-11",
+            "purl": "pkg:deb/debian/tar@1.34%2Bdfsg-1?arch=amd64&distro=debian-11",
             "upstreams": null,
             "metadata": null
           }
@@ -35425,7 +35425,7 @@
             "cpes": [
               "cpe:2.3:a:zlib1g:zlib1g:1:1.2.11.dfsg-2+deb11u1:*:*:*:*:*:*:*"
             ],
-            "purl": "pkg:deb/debian/zlib1g@1:1.2.11.dfsg-2+deb11u1?arch=amd64&upstream=zlib&distro=debian-11",
+            "purl": "pkg:deb/debian/zlib1g@1:1.2.11.dfsg-2%2Bdeb11u1?arch=amd64&upstream=zlib&distro=debian-11",
             "upstreams": [
               {
                 "name": "zlib"

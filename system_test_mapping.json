@@ -5,7 +5,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "scan_nsa": {
         "target": [
@@ -13,7 +14,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "dwertent@armosec.io"
     },
     "scan_custom_framework_scanning_file_scope_testing": {
         "target": [
@@ -21,7 +23,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_custom_framework_scanning_cluster_scope_testing": {
         "target": [
@@ -29,7 +32,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
         "target": [
@@ -37,7 +41,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_mitre": {
         "target": [
@@ -45,7 +50,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_with_exceptions": {
         "target": [
@@ -55,7 +61,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_repository": {
         "target": [
@@ -63,7 +70,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_default": {
         "target": [
@@ -71,7 +79,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_exclude_namespaces": {
         "target": [
@@ -79,7 +88,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_include_namespaces": {
         "target": [
@@ -87,7 +97,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_host_scanner_enabled": {
         "target": [
@@ -95,7 +106,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_submit": {
         "target": [
@@ -103,7 +115,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_config_scan_MITRE_framework": {
         "target": [
@@ -111,7 +124,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_vulnerabilities_scan_default": {
         "target": [
@@ -119,7 +133,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "control_cluster_from_CLI_vulnerabilities_scan_include_namespaces": {
         "target": [
@@ -127,7 +142,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ac_alpine_fix_image_no_relevancy_with_cronjob": {
         "target": [
@@ -139,7 +155,8 @@
             "event-ingester-service"
         ],
         "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "vuln_scan_test_public_registry_connectivity_by_backend": {
         "target": [
@@ -152,7 +169,8 @@
             "gateway"
         ],
         "description": "checks public registry scan capabilities",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_test_public_registry_connectivity_excluded_by_backend": {
         "target": [
@@ -165,7 +183,8 @@
             "gateway"
         ],
         "description": "checks public registry scan capabilities",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_multiple_containers": {
         "target": [
@@ -175,7 +194,8 @@
             "helm-chart"
         ],
         "description": "checks public registry scan capabilities",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_cve_exceptions": {
         "target": [
@@ -185,7 +205,8 @@
             "helm-chart"
         ],
         "description": "checks public registry scan capabilities",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_local_file": {
         "target": [
@@ -193,7 +214,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_local_glob_files": {
         "target": [
@@ -201,7 +223,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_local_list_of_files": {
         "target": [
@@ -209,7 +232,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_nsa_and_submit_to_backend": {
         "target": [
@@ -220,7 +244,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_mitre_and_submit_to_backend": {
         "target": [
@@ -231,7 +256,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_local_repository_and_submit_to_backend": {
         "target": [
@@ -244,7 +270,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_repository_from_url_and_submit_to_backend": {
         "target": [
@@ -257,7 +284,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_with_exception_to_backend": {
         "target": [
@@ -269,7 +297,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "avrahams@armosec.io"
     },
     "scan_with_custom_framework": {
         "target": [
@@ -281,7 +310,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_compliance_score": {
         "target": [
@@ -293,7 +323,8 @@
             "careportsreceiver"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "scan_customer_configuration": {
         "target": [
@@ -307,7 +338,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "custom",
+        "owner": ""
     },
     "host_scanner": {
         "target": [
@@ -319,7 +351,8 @@
             "careportsreceiver"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "host_scanner_with_hostsensorrule": {
         "target": [
@@ -330,7 +363,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan": {
         "target": [
@@ -339,7 +373,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_proxy": {
         "target": [
@@ -351,7 +386,8 @@
             "careportsreceiver"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_v2_views": {
         "target": [
@@ -362,7 +398,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "custom",
+        "owner": "refaelm@armosec.io"
     },
     "vuln_v2_views_kev": {
         "target": [
@@ -373,7 +410,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "custom",
+        "owner": "refaelm@armosec.io"
     },
     "vuln_scan_trigger_scan_on_new_image": {
         "target": [
@@ -383,7 +421,8 @@
             "careportsreceiver"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_ns_creation": {
         "target": [
@@ -393,7 +432,8 @@
             "cadashboardbe"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_on_demand": {
         "target": [
@@ -405,7 +445,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_mitre_framework_on_demand": {
         "target": [
@@ -417,7 +458,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_nsa_and_mitre_framework_demand": {
         "target": [
@@ -429,7 +471,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_triggering_with_cron_job": {
         "target": [
@@ -443,7 +486,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_update_cronjob_schedule": {
         "target": [
@@ -457,7 +501,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_delete_cronjob": {
         "target": [
@@ -471,7 +516,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ks_microservice_create_2_cronjob_mitre_and_nsa": {
         "target": [
@@ -484,7 +530,8 @@
             "event-ingester-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ac_5_fix_control_no_relevancy": {
         "target": [
@@ -498,7 +545,8 @@
             "gateway-dummy"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_5_fix_control_with_relevancy": {
         "target": [
@@ -512,7 +560,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_alpine_fix_image_with_relevancy": {
         "target": [
@@ -526,7 +575,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_alpine_fix_control_with_relevancy": {
         "target": [
@@ -540,7 +590,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "ac_alpine_fix_image_no_relevancy": {
         "target": [
@@ -554,7 +605,8 @@
             "gateway-dummy"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_3_fix_control_no_relevancy": {
         "target": [
@@ -568,9 +620,25 @@
             "gateway-dummy"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_3_fix_control_with_relevancy": {
+        "target": [
+            "In cluster",
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "careportsreceiver",
+            "event-ingester-service",
+            "gateway"
+        ],
+        "description": "",
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
+    },
+    "ac_8_fix_control_with_relevancy": {
         "target": [
             "In cluster",
             "Backend"
@@ -596,7 +664,8 @@
             "gateway-dummy"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_6_fix_control_with_relevancy": {
         "target": [
@@ -610,7 +679,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "ac_1_1_fix_control_no_relevancy": {
         "target": [
@@ -624,7 +694,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "registry_scanning_triggering_with_cron_job": {
         "target": [
@@ -638,7 +709,8 @@
             "careportsreceiver"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "smart_remediation_c0016": {
         "target": [
@@ -654,7 +726,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0016",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0017": {
         "target": [
@@ -670,7 +743,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0017",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0034": {
         "target": [
@@ -686,7 +760,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0034",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0045": {
         "target": [
@@ -702,7 +777,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0045",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0046": {
         "target": [
@@ -718,7 +794,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0046",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0048": {
         "target": [
@@ -734,7 +811,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0048",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0057": {
         "target": [
@@ -750,7 +828,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0057",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "smart_remediation_c0074": {
         "target": [
@@ -766,7 +845,8 @@
             "synchronizer"
         ],
         "description": "Checks smart remediation C0074",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "synchronizer": {
         "target": [
@@ -782,7 +862,8 @@
             "synchronizer"
         ],
         "description": "Checks synchronizer flow",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "synchronizer_reconciliation": {
         "target": [
@@ -798,7 +879,8 @@
             "synchronizer"
         ],
         "description": "Checks synchronizer reconciliation flow",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "synchronizer_proxy": {
         "target": [
@@ -814,7 +896,8 @@
             "synchronizer"
         ],
         "description": "Checks synchronizer proxy and disconnection",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "synchronizer_race_condition": {
         "target": [
@@ -830,7 +913,8 @@
             "synchronizer"
         ],
         "description": "Checks synchronizer race condition (multiple updates)",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "synchronizer_kubescape_crds": {
         "target": [
@@ -846,7 +930,8 @@
             "synchronizer-dummy"
         ],
         "description": "Checks synchronizer - kubescape CRDs",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy": {
         "target": [
@@ -861,7 +946,8 @@
             "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy_data_appended": {
         "target": [
@@ -877,7 +963,8 @@
             "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy_pod_restarted": {
         "target": [
@@ -893,7 +980,8 @@
             "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after pod restarted",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy_known_servers_cache": {
         "target": [
@@ -903,7 +991,8 @@
             "cadashboardbe"
         ],
         "description": "Checks knownserverscache backend api endpoint returns 200",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy_multiple_replicas": {
         "target": [
@@ -919,7 +1008,8 @@
             "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "network_policy_known_servers": {
         "target": [
@@ -935,7 +1025,8 @@
             "event-ingester-service"
         ],
         "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_trigger_scan_private_quay_registry": {
         "target": [
@@ -950,7 +1041,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "dwertent@armosec.io"
     },
     "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
         "target": [
@@ -963,7 +1055,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_trigger_scan_public_registry": {
         "target": [
@@ -976,7 +1069,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_trigger_scan_public_registry_excluded": {
         "target": [
@@ -989,7 +1083,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "vuln_scan_triggering_with_cron_job": {
         "target": [
@@ -1002,7 +1097,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "stripe_checkout": {
         "target": [
@@ -1013,7 +1109,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "stripe_billing_portal": {
         "target": [
@@ -1024,7 +1121,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production,custom",
+        "owner": "eranm@armosec.io"
     },
     "stripe_plans": {
         "target": [
@@ -1035,7 +1133,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "stripe_webhook": {
         "target": [
@@ -1046,7 +1145,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production,custom",
+        "owner": "eranm@armosec.io"
     },
     "user_email_settings": {
         "target": [
@@ -1059,7 +1159,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "user_alert_channels": {
         "target": [
@@ -1072,7 +1173,8 @@
             "config-service"
         ],
         "description": "",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production",
+        "owner": ""
     },
     "relevant_data_is_appended": {
         "target": [
@@ -1081,7 +1183,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevantCVEs": {
         "target": [
@@ -1095,7 +1198,8 @@
             "users-notification-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_disabled_installation": {
         "target": [
@@ -1104,7 +1208,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_storage_disabled": {
         "target": [
@@ -1113,7 +1218,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_enabled_stop_sniffing": {
         "target": [
@@ -1122,7 +1228,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_large_image": {
         "target": [
@@ -1131,7 +1238,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_extra_large_image": {
         "target": [
@@ -1140,7 +1248,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_fix_vuln": {
         "target": [
@@ -1154,7 +1263,8 @@
             "users-notification-service"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_python": {
         "target": [
@@ -1163,7 +1273,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_golang": {
         "target": [
@@ -1172,7 +1283,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_java": {
         "target": [
@@ -1181,7 +1293,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_java_and_python": {
         "target": [
@@ -1190,7 +1303,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "relevancy_golang_dynamic": {
         "target": [
@@ -1199,7 +1313,8 @@
         ],
         "target_repositories": [],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "teams_alerts": {
         "target": [
@@ -1210,7 +1325,8 @@
             "config-service"
         ],
         "description": "testing teams alert channels with compliance and vulnerabilities notifications",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production",
+        "owner": ""
     },
     "slack_alerts": {
         "target": [
@@ -1223,7 +1339,8 @@
             "config-service"
         ],
         "description": "testing slack alert channels with compliance and vulnerabilities notifications",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production,custom",
+        "owner": "refaelm@armosec.io"
     },
     "sr_r_0035_attack_chain": {
         "target": [
@@ -1237,7 +1354,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "sr_r_0005_control": {
         "target": [
@@ -1251,7 +1369,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": ""
     },
     "sr_r_0007_control_networkpolicy": {
         "target": [
@@ -1265,7 +1384,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "sr_with_exceptions": {
         "target": [
@@ -1279,7 +1399,8 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "",
+        "owner": "eranm@armosec.io"
     },
     "basic_incident_presented": {
         "target": [
@@ -1295,7 +1416,8 @@
             "config-service"
         ],
         "description": "testing basic incident presented",
-        "skip_on_environment": "production"
+        "skip_on_environment": "production",
+        "owner": ""
     },
     "sr_ac_scan_status":{
         "target": [
@@ -1309,6 +1431,19 @@
             "gateway"
         ],
         "description": "",
-        "skip_on_environment": ""
+        "skip_on_environment": "production,custom",
+        "owner": "eranm@armosec.io"
+    },
+    "jira_integration": {
+        "target": [
+            "Backend"
+        ],
+        "target_repositories": [
+            "cadashboardbe",
+            "config-service"
+        ],
+        "description": "testing jira integration",
+        "skip_on_environment": "custom",
+        "owner": "avrahams@armosec.io"
     }
 }

@@ -53,11 +53,17 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        time.sleep(10)
+
+        # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
+        # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
+        time.sleep(20)
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario()
 
+        # wait for status to be updated to done before triggering another scan
+        time.sleep(5)
         Logger.logger.info("4. trigger posture scan")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"],
@@ -130,6 +136,11 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
+        # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
+        time.sleep(20)
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("3. Verify scenario on backend")
         result = scenarios_manager.verify_scenario()
@@ -218,6 +229,11 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
+        # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
+        time.sleep(20)
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("3. Verify scenario on backend")
         result = scenarios_manager.verify_scenario()

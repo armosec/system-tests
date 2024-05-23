@@ -4,9 +4,9 @@
   "metadata": {
     "name": "docker.io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2-9722c2",
     "namespace": "kubescape",
-    "uid": "664c329f-27b0-40a9-987d-8ab8f22a2f38",
+    "uid": "9096f532-e111-4032-af6e-7bc7cf0e64a3",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T11:50:02Z",
+    "creationTimestamp": "2024-05-07T13:43:03Z",
     "labels": {
       "kubescape.io/context": "non-filtered",
       "kubescape.io/image-id": "docker-io-library-redis-sha256-92f3e116c1e719acf78004dd62992c3a",
@@ -23,7 +23,7 @@
       "withRelevancy": false,
       "tool": {
         "name": "",
-        "version": "v0.74.2-hotfix",
+        "version": "v0.77.1",
         "databaseVersion": "sha256:5a5f72d5828b204f21cd1e15f95f6fa8ec214da0ad0d970bd91f5dee43100cb3"
       },
       "report": {
