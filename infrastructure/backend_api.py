@@ -526,6 +526,16 @@ class ControlPanelAPI(object):
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
+    
+    # /api/v1/runtime/kdrMonitoredCounters
+    def get_kdr_monitored_counters(self,cluster: str):
+        url = "/api/v1/runtime/kdrMonitoredCounters"
+        params={"customerGUID": self.selected_tenant_id}
+        if cluster:
+            params["clusterName"] = cluster
+        r = self.get(url, params=params)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
 
     def get_incidents(self, filters, **kwargs):
         url = "/api/v1/runtime/incidents"
@@ -561,7 +571,7 @@ class ControlPanelAPI(object):
         url = "/api/v1/runtime/incidents/" + incident_id + "/process"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()   
+        return r.json()
     
     def get_incident_unique_values(self, request: Dict):
         url = "/api/v1/runtime/incidentsUniqueValues"

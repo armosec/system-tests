@@ -33,6 +33,7 @@ class Incidents(BaseHelm):
             "capabilities.runtimeObservability": "enable",
             "capabilities.malwareDetection": "enable",
             "capabilities.runtimeDetection": "enable",
+            "capabilities.nodeProfileService": "enable",
             "alertCRD.installDefault" : True,
             "alertCRD.scopeClustered" : True,
             # short learning period
@@ -89,8 +90,20 @@ class Incidents(BaseHelm):
         self.reslove_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
         self.check_process_graph(inc)
+        self.verify_kdr_monitored_counters(cluster=cluster)
 
         return self.cleanup()
+    
+    def verify_kdr_monitored_counters(self, cluster:str):
+        Logger.logger.info("Get monitored assets")
+        resp = self.backend.get_kdr_monitored_counters(cluster=cluster)        
+        assert resp != None, f"Failed to get monitored assets {json.dumps(resp)}"
+        assert resp.get("clustersCount", 0) > 0, f"Failed to get monitored assets {json.dumps(resp)}"
+        assert resp.get("nodesCount", 0) > 0, f"Failed to get monitored assets {json.dumps(resp)}"
+        assert resp.get("namespacesCount", 0) > 0, f"Failed to get monitored assets {json.dumps(resp)}"
+        assert resp.get("podsCount", 0) > 0, f"Failed to get monitored assets {json.dumps(resp)}"
+        assert resp.get("containersCount", 0) > 0, f"Failed to get monitored assets {json.dumps(resp)}"
+        Logger.logger.info(f"Got monitored assets {json.dumps(resp)}")
     
     def check_process_graph(self, incident):
         Logger.logger.info("Get process graph")
@@ -239,7 +252,7 @@ class Incidents(BaseHelm):
         assert response['processTree']['processTree'] != None, f"Failed to get process tree {json.dumps(response)}"
         expected_process_tree =    {'cmdline': 'ls -l /tmp',      'comm': 'ls', 'path': '/bin/busybox',     'uid': 0, 'gid': 0, 'cwd': '/data'}
         expected_process_tree_v2 = {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data"}
-        expected_process_tree_v3 =   {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data', 'path': '/bin/busybox'}
+        expected_process_tree_v3 = {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data', 'path': '/bin/busybox'}
         actual_process_tree = response['processTree']['processTree']
         del actual_process_tree['pid']
         del actual_process_tree['ppid']
@@ -262,7 +275,7 @@ class Incidents(BaseHelm):
 
     def verify_application_profiles(self, wlids:list, namespace):
         Logger.logger.info("Get application profiles")
-        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1", "ApplicationProfile").get(namespace=namespace, _preload_content=False).items
+        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1", "ApplicationProfile").get(namespace=namespace).items
         assert k8s_data != None, "Failed to get application profiles"
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
         Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
