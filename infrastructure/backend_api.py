@@ -2255,9 +2255,12 @@ class ControlPanelAPI(object):
         return j
 
     # security risks functions
-    def get_security_risks_list(self, cluster_name=None, namespace=None, security_risk_ids=[]):
+    def get_security_risks_list(self, cluster_name=None, namespace=None, security_risk_ids=[], other_filters={}):
         params = {"customerGUID": self.selected_tenant_id}
         filters = {}
+
+        if other_filters:
+            filters = other_filters
 
         if cluster_name is not None:
             filters["cluster"] = cluster_name
@@ -2265,12 +2268,16 @@ class ControlPanelAPI(object):
         if namespace is not None:
             filters["namespace"] = namespace
 
-        if security_risk_ids:
+        if len(security_risk_ids):
             filters["securityRiskID"] = ','.join(security_risk_ids)
+
+
 
         innerFilters = []
         if filters:
             innerFilters.append(filters)
+        
+
 
 
         payload = {
@@ -2298,7 +2305,7 @@ class ControlPanelAPI(object):
         if namespace is not None:
             filters["namespace"] = namespace
 
-        if security_risk_ids:
+        if len(security_risk_ids):
             filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
@@ -2330,7 +2337,7 @@ class ControlPanelAPI(object):
         if namespace is not None:
             filters["namespace"] = namespace
 
-        if security_risk_ids:
+        if len(security_risk_ids):
             filters["securityRiskID"] = ','.join(security_risk_ids)
 
         innerFilters = []
@@ -2382,10 +2389,13 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
     
-    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None, exception_applied=True):
+    def get_security_risks_resources(self, cluster_name=None, namespace=None, security_risk_id=None, exception_applied=True, resource_name=None, other_filters={}):
         params = {"customerGUID": self.selected_tenant_id}
 
         filters = {}
+
+        if other_filters:
+            filters = other_filters
 
         if cluster_name is not None:
             filters["cluster"] = cluster_name
@@ -2398,6 +2408,9 @@ class ControlPanelAPI(object):
         
         if exception_applied:
             filters["exceptionApplied"] = "|empty"
+        
+        if resource_name is not None:
+            filters["resourceName"] = resource_name
 
         innerFilters = []
         if filters:
