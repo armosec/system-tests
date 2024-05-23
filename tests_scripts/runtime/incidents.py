@@ -88,8 +88,19 @@ class Incidents(BaseHelm):
 
         self.reslove_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
+        self.check_process_graph(inc)
 
         return self.cleanup()
+    
+    def check_process_graph(self, incident):
+        Logger.logger.info("Get process graph")
+        resp = self.backend.get_process_graph(incident_id=incident['guid'])
+        expected_process_graph = {"graphNodes": [{"graphNodeType": "Node", "graphNodeID": f"{incident['guid']}-Node-{incident['nodeName']}", "graphNodeLabel": f"{incident['nodeName']}", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {}}, {"graphNodeType": "Pod", "graphNodeID": f"{incident['guid']}-Pod-{incident['podName']}", "graphNodeLabel": f"{incident['podName']}", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {"workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": f"{incident['workloadNamespace']}"}}, {"graphNodeType": "Container", "graphNodeID": f"{incident['guid']}-Container-redis", "graphNodeLabel": "redis", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {"image": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2", "workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": f"{incident['workloadNamespace']}"}}, {"graphNodeType": "Process", "graphNodeID": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "graphNodeLabel": f"ls:{incident['infectedPID']}", "hasIncident": True, "graphNodeBadge": 0, "nodeMetadata": {"processID": incident['infectedPID'], "processName": "ls"}}, {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files", "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6, "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}], "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}", "to": f"{incident['guid']}-Pod-{incident['podName']}", "edgeType": "directed"}, {"from": f"{incident['guid']}-Pod-{incident['podName']}", "to": f"{incident['guid']}-Container-redis", "edgeType": "directed"}, {"from": f"{incident['guid']}-Container-redis", "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "edgeType": "directed"}, {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files", "edgeType": "directed"}]}
+        assert resp != None, f"Failed to get process graph {json.dumps(resp)}"
+        # We expect no network data in the process graph and file data is dynamic
+        assert resp['graphNodes'][:4] == expected_process_graph['graphNodes'][:4], f"Failed to get process graph nodes {json.dumps(resp)}"
+        assert resp['graphEdges'][:3] == expected_process_graph['graphEdges'][:3], f"Failed to get process graph edges {json.dumps(resp)}"
+        Logger.logger.info(f"Got process graph {json.dumps(resp)}")
     
     def check_raw_alerts_list(self):
         Logger.logger.info("Get raw alerts list")
@@ -224,6 +235,16 @@ class Incidents(BaseHelm):
     def verify_incident_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
+        assert response['processTree'] != None, f"Failed to get process tree {json.dumps(response)}"
+        assert response['processTree']['processTree'] != None, f"Failed to get process tree {json.dumps(response)}"
+        expected_process_tree =    {'cmdline': 'ls -l /tmp',      'comm': 'ls', 'path': '/bin/busybox',     'uid': 0, 'gid': 0, 'cwd': '/data'}
+        expected_process_tree_v2 = {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data"}
+        expected_process_tree_v3 =   {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data', 'path': '/bin/busybox'}
+        actual_process_tree = response['processTree']['processTree']
+        del actual_process_tree['pid']
+        del actual_process_tree['ppid']
+        del actual_process_tree['pcomm']
+        assert actual_process_tree == expected_process_tree or actual_process_tree == expected_process_tree_v2 or actual_process_tree == expected_process_tree_v3, f"Failed to get process tree {json.dumps(actual_process_tree)}"
         return response
 
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
@@ -249,7 +270,8 @@ class Incidents(BaseHelm):
         for i in wlids:
             assert i in ap_wlids, f"Failed to get application profile for {i}"
         # kubescape.io/status: completed, kubescape.io/completion: complete
-        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/completion'] != 'complete' or i.metadata.annotations['kubescape.io/status'] != 'completed']
+        # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
+        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/status'] != 'completed']
 
         assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 

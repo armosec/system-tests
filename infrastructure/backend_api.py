@@ -555,7 +555,13 @@ class ControlPanelAPI(object):
                       json={"pageNumber": 1, "pageSize": 100,"orderBy":"timestamp:asc"})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         #TODO: get them all
-        return r.json()        
+        return r.json()
+
+    def get_process_graph(self, incident_id: str):
+        url = "/api/v1/runtime/incidents/" + incident_id + "/process"
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()   
     
     def get_incident_unique_values(self, request: Dict):
         url = "/api/v1/runtime/incidentsUniqueValues"
