@@ -1,6 +1,7 @@
 from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
+import json
 
 
 class JiraIntegration(BaseKubescape, BaseHelm):
@@ -27,6 +28,8 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
+        
+        self.wait_for_agg_to_end = False
 
     def cleanup(self, **kwargs):
         super().cleanup(**kwargs)
@@ -39,8 +42,10 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.setup_jira_config()
         Logger.logger.info(f"Setup cluster and run posture scan")
         self.setup_cluster_and_run_posture_scan()
-        Logger.logger.info(f"Create Jira issue")
-        self.create_jira_issue_for_posture()       
+        Logger.logger.info(f"Create Jira issue for posture")
+        self.create_jira_issue_for_posture()      
+        Logger.logger.info(f"Create Jira issue for security risks")
+        self.create_jira_issue_for_security_risks() 
         Logger.logger.info(f"Wait for vulnerabilities results")
         self.wait_for_vuln_results()
         Logger.logger.info(f"Create image ticket")
@@ -171,6 +176,70 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         resourcesRes = self.backend.get_posture_resources(framework_name="AllControls", report_guid=self.report_guid,namespace=self.namespace,resource_name="nginx")
         assert len(resourcesRes) == 1, "Expected one resource"
         return resourcesRes[0]
+    
+
+    def create_jira_issue_for_security_risks(self):
+        security_risk_id = "R_0011"
+        resource = self.get_security_risks_resource(security_risk_id)
+        resourceHash = resource['k8sResourceHash']
+
+        Logger.logger.info(f"Create Jira issue for resource {resourceHash} and security_risk_id {security_risk_id}")
+        issue = self.test_obj["issueTemplate"].copy()
+        issue['issueType'] = "securityIssue"
+        issue['siteId'] = self.site['id']
+        issue['projectId'] = self.project['id']
+        issue['issueTypeId'] = self.issueType['id']
+        issue['owner'] = {"resourceHash": resourceHash}
+        issue['subjects'] = [{"securityRiskID": security_risk_id}]
+        issue['fields']['summary'] = f"Jira System Test security risks Issue cluster:{self.cluster} namespace:{self.namespace} resource:{resourceHash}"
+        ticket = self.backend.create_jira_issue(issue)
+        assert ticket, "Jira ticket is empty"
+        self.securityTicket = ticket
+        assert ticket['owner']['resourceHash'] == resourceHash, "Resource hash is not matching"
+        assert ticket['subjects'][0]['securityRiskID'] == security_risk_id, "security risk id is not matching"
+
+        Logger.logger.info(f"Verify Jira issue in security risks resource")
+        resource = self.get_security_risks_resource(security_risk_id, other_filters={"resourceName":"nginx"})
+        assert len(resource['tickets']) > 0, "Resource is missing Jira issue" 
+
+        Logger.logger.info(f"Verify Jira issue in security risk list")
+        security_risk = self.get_security_risks_list(security_risk_id)
+        assert len(security_risk['tickets']) > 0, f"Security risk {security_risk_id} is missing Jira issue"
+
+        Logger.logger.info(f"Verify Jira issue |exists filter in security risks resource")
+        self.verify_security_risks_resource_exists(security_risk_id)
+        assert len(security_risk['tickets']) > 0, f"Security risk is missing Jira issue"
+
+        Logger.logger.info(f"Verify Jira issue |missing filter in security risks resource")
+        self.verify_security_risks_resource_missing(security_risk_id)
+
+        Logger.logger.info(f"unlink Jira issue")
+        self.backend.unlink_issue(ticket['guid'])
+
+
+    def get_security_risks_list(self, security_risk_id, other_filters={}):
+        security_risk_ids = [security_risk_id] if security_risk_id else []
+        r = self.backend.get_security_risks_list(self.cluster, self.namespace, security_risk_ids, other_filters=other_filters)
+        response = json.loads(r.text)
+        assert len(response["response"]) == 1 , "Expected one security risk"
+        return response["response"][0]
+
+    def verify_security_risks_resource_exists(self, security_risk_id):
+        r = self.backend.get_security_risks_resources(cluster_name=self.cluster, namespace=self.namespace, security_risk_id=security_risk_id, other_filters={"tickets":"|exists"})
+        response = json.loads(r.text)
+        assert len(response["response"]) == 1 , "Expected one resource for security risks"
+
+    def verify_security_risks_resource_missing(self, security_risk_id):
+        r = self.backend.get_security_risks_resources(cluster_name=self.cluster, namespace=self.namespace, security_risk_id=security_risk_id, other_filters={"tickets":"|missing"})
+        response = json.loads(r.text)
+        assert response["response"] is None , "Expected no resource for security risks"
+
+
+    def get_security_risks_resource(self, security_risk_id, other_filters={}):
+        r = self.backend.get_security_risks_resources(cluster_name=self.cluster, namespace=self.namespace, security_risk_id=security_risk_id, other_filters=other_filters)
+        response = json.loads(r.text)
+        assert len(response["response"]) == 1 , "Expected one resource for security risks"
+        return response["response"][0]
     
     def wait_for_vuln_results(self):
         Logger.logger.info('get nginx workload vulnerabilities')
