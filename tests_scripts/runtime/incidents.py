@@ -59,7 +59,8 @@ class Incidents(BaseHelm):
         Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
+                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -68,17 +69,22 @@ class Incidents(BaseHelm):
             wlids = [wlids]
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
 
-        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
+        Logger.logger.info(
+            f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(6)
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
 
         Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5, cluster=cluster, namespace=namespace, incident_name="Unexpected process launched")
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
+                                       cluster=cluster, namespace=namespace,
+                                       incident_name="Unexpected process launched")
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
-        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5, incident_id=incs[0]['guid'])
+        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
+                                      incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
+            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
 
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
@@ -112,11 +118,40 @@ class Incidents(BaseHelm):
     def check_process_graph(self, incident):
         Logger.logger.info("Get process graph")
         resp = self.backend.get_process_graph(incident_id=incident['guid'])
-        expected_process_graph = {"graphNodes": [{"graphNodeType": "Node", "graphNodeID": f"{incident['guid']}-Node-{incident['nodeName']}", "graphNodeLabel": f"{incident['nodeName']}", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {}}, {"graphNodeType": "Pod", "graphNodeID": f"{incident['guid']}-Pod-{incident['podName']}", "graphNodeLabel": f"{incident['podName']}", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {"workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": f"{incident['workloadNamespace']}"}}, {"graphNodeType": "Container", "graphNodeID": f"{incident['guid']}-Container-redis", "graphNodeLabel": "redis", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {"image": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2", "workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": f"{incident['workloadNamespace']}"}}, {"graphNodeType": "Process", "graphNodeID": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "graphNodeLabel": f"ls:{incident['infectedPID']}", "hasIncident": True, "graphNodeBadge": 0, "nodeMetadata": {"processID": incident['infectedPID'], "processName": "ls"}}, {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files", "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6, "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}], "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}", "to": f"{incident['guid']}-Pod-{incident['podName']}", "edgeType": "directed"}, {"from": f"{incident['guid']}-Pod-{incident['podName']}", "to": f"{incident['guid']}-Container-redis", "edgeType": "directed"}, {"from": f"{incident['guid']}-Container-redis", "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "edgeType": "directed"}, {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}", "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files", "edgeType": "directed"}]}
+        expected_process_graph = {"graphNodes": [
+            {"graphNodeType": "Node", "graphNodeID": f"{incident['guid']}-Node-{incident['nodeName']}",
+             "graphNodeLabel": f"{incident['nodeName']}", "hasIncident": False, "graphNodeBadge": 0,
+             "nodeMetadata": {}},
+            {"graphNodeType": "Pod", "graphNodeID": f"{incident['guid']}-Pod-{incident['podName']}",
+             "graphNodeLabel": f"{incident['podName']}", "hasIncident": False, "graphNodeBadge": 0,
+             "nodeMetadata": {"workloadKind": "Deployment", "workloadName": "redis-sleep"}},
+            {"graphNodeType": "Container", "graphNodeID": f"{incident['guid']}-Container-redis",
+             "graphNodeLabel": "redis", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {
+                "image": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
+                "workloadKind": "Deployment", "workloadName": "redis-sleep"}},
+            {"graphNodeType": "Process", "graphNodeID": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+             "graphNodeLabel": f"ls:{incident['infectedPID']}", "hasIncident": True, "graphNodeBadge": 0,
+             "nodeMetadata": {"processID": incident['infectedPID'], "processName": "ls"}},
+            {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
+             "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6,
+             "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}],
+                                  "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}",
+                                                  "to": f"{incident['guid']}-Pod-{incident['podName']}",
+                                                  "edgeType": "directed"},
+                                                 {"from": f"{incident['guid']}-Pod-{incident['podName']}",
+                                                  "to": f"{incident['guid']}-Container-redis", "edgeType": "directed"},
+                                                 {"from": f"{incident['guid']}-Container-redis",
+                                                  "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+                                                  "edgeType": "directed"},
+                                                 {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+                                                  "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
+                                                  "edgeType": "directed"}]}
         assert resp is not None, f"Failed to get process graph {json.dumps(resp)}"
         # We expect no network data in the process graph and file data is dynamic
-        assert resp['graphNodes'][:4] == expected_process_graph['graphNodes'][:4], f"Failed to get process graph nodes {json.dumps(resp)}"
-        assert resp['graphEdges'][:3] == expected_process_graph['graphEdges'][:3], f"Failed to get process graph edges {json.dumps(resp)}"
+        assert resp['graphNodes'][:4] == expected_process_graph['graphNodes'][
+                                         :4], f"Failed to get process graph nodes {json.dumps(resp)}"
+        assert resp['graphEdges'][:3] == expected_process_graph['graphEdges'][
+                                         :3], f"Failed to get process graph edges {json.dumps(resp)}"
         Logger.logger.info(f"Got process graph {json.dumps(resp)}")
 
     def check_raw_alerts_list(self):
@@ -137,8 +172,10 @@ class Incidents(BaseHelm):
         assert resp['alertsPerDay'] is not None, f"Failed to get raw alerts over time {json.dumps(resp)}"
         assert len(resp['alertsPerDay']) > 0, f"Failed to get raw alerts over time {len(resp['alertsPerDay'])}"
         today = time.strftime("%Y-%m-%d")
-        assert resp['alertsPerDay'][-1].get("date", "") == today, f"Failed to get raw alerts over time date {json.dumps(resp)}"
-        assert resp['alertsPerDay'][-1].get("count", 0) > 0, f"Failed to get raw alerts over time count {json.dumps(resp)}"
+        assert resp['alertsPerDay'][-1].get("date",
+                                            "") == today, f"Failed to get raw alerts over time date {json.dumps(resp)}"
+        assert resp['alertsPerDay'][-1].get("count",
+                                            0) > 0, f"Failed to get raw alerts over time count {json.dumps(resp)}"
         Logger.logger.info(f"Got raw alerts over time {json.dumps(resp)}")
 
     def resolve_incident(self, incident):
@@ -199,7 +236,8 @@ class Incidents(BaseHelm):
         assert unique_values is not None, f"Failed to get unique values of alerts {json.dumps(incident)}"
         expected_values = {"ruleID": ["R0001", "R0003", "R0004"]}
         # don't check the count, it's dynamic
-        assert unique_values["fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
+        assert unique_values[
+                   "fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
 
     def check_incidents_per_severity(self):
         Logger.logger.info("Get incidents per severity")
@@ -213,9 +251,12 @@ class Incidents(BaseHelm):
         assert resp[__RESPONSE_FIELD__] is not None, f"Failed to get incidents over time {json.dumps(resp)}"
         assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get incidents over time {len(resp[__RESPONSE_FIELD__])}"
         today = time.strftime("%Y-%m-%d")
-        assert resp[__RESPONSE_FIELD__][-1].get("date", "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
-        assert resp[__RESPONSE_FIELD__][-1].get("count", 0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
-        assert resp[__RESPONSE_FIELD__][-1].get("newCount", 0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("date",
+                                                "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("count",
+                                                0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("newCount",
+                                                0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
         Logger.logger.info(f"Got incidents over time {json.dumps(resp)}")
 
     def check_overtime_resolved_incident(self):
@@ -224,17 +265,21 @@ class Incidents(BaseHelm):
         assert resp[__RESPONSE_FIELD__] is not None, f"Failed to get incidents over time {json.dumps(resp)}"
         assert len(resp[__RESPONSE_FIELD__]) > 0, f"Failed to get incidents over time {len(resp[__RESPONSE_FIELD__])}"
         today = time.strftime("%Y-%m-%d")
-        assert resp[__RESPONSE_FIELD__][-1].get("date", "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
-        assert resp[__RESPONSE_FIELD__][-1].get("count", 0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
-        assert resp[__RESPONSE_FIELD__][-1].get("newCount", 0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
-        assert resp[__RESPONSE_FIELD__][-1].get("dismissedCount", 0) > 0, f"Failed to get incidents over time dismissedCount {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("date",
+                                                "") == today, f"Failed to get incidents over time date {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("count",
+                                                0) > 0, f"Failed to get incidents over time count {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("newCount",
+                                                0) > 0, f"Failed to get incidents over time newCount {json.dumps(resp)}"
+        assert resp[__RESPONSE_FIELD__][-1].get("dismissedCount",
+                                                0) > 0, f"Failed to get incidents over time dismissedCount {json.dumps(resp)}"
         Logger.logger.info(f"Got resolved incidents over time {json.dumps(resp)}")
 
     def check_incident_unique_values(self, incident):
         Logger.logger.info("Check unique values of incident")
         unique_values_req = {
             "fields": {"clusterName": "", "containerName": "", "name": "",
-                       "workloadNamespace": "", "podName": "", "workloadKind|workloadName": "",
+                       "podName": "", "workloadKind|workloadName": "",
                        "incidentSeverity": "", "mitreTactic": "", "isDismissed": "", "incidentCategory": "",
                        "nodeName": ""},
             "innerFilters": [{"guid": incident['guid']}],
@@ -244,7 +289,23 @@ class Incidents(BaseHelm):
         unique_values = self.backend.get_incident_unique_values(unique_values_req)
 
         assert unique_values is not None, f"Failed to get unique values of incident {json.dumps(incident)}"
-        expected_values = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"], "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"], "isDismissed": ["false"], "mitreTactic": ["TA0002"], "name": ["Unexpected process launched"],"nodeName":[incident["nodeName"]], "podName": [incident["podName"]], "workloadKind|workloadName": ["Deployment|redis-sleep"], "workloadNamespace": [incident["workloadNamespace"]]}, "fieldsCount": {"clusterName": [{"key": incident["clusterName"], "count": 1}], "containerName": [{"key": "redis", "count": 1}], "incidentCategory": [{"key": "Anomaly", "count": 1}], "incidentSeverity": [{"key": "Medium", "count": 1}], "isDismissed": [{"key": "false", "count": 1}], "mitreTactic": [{"key": "TA0002", "count": 1}], "name": [{"key": "Unexpected process launched", "count": 1}],"nodeName":[{"key": incident["nodeName"], "count": 1}], "podName": [{"key": incident["podName"], "count": 1}], "workloadKind|workloadName": [{"key": "Deployment|redis-sleep", "count": 1}], "workloadNamespace": [{"key": incident["workloadNamespace"], "count": 1}]}}
+        expected_values = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
+                                      "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"],
+                                      "isDismissed": ["false"], "mitreTactic": ["TA0002"],
+                                      "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
+                                      "podName": [incident["podName"]],
+                                      "workloadKind|workloadName": ["Deployment|redis-sleep"]},
+                           "fieldsCount": {"clusterName": [{"key": incident["clusterName"], "count": 1}],
+                                           "containerName": [{"key": "redis", "count": 1}],
+                                           "incidentCategory": [{"key": "Anomaly", "count": 1}],
+                                           "incidentSeverity": [{"key": "Medium", "count": 1}],
+                                           "isDismissed": [{"key": "false", "count": 1}],
+                                           "mitreTactic": [{"key": "TA0002", "count": 1}],
+                                           "name": [{"key": "Unexpected process launched", "count": 1}],
+                                           "nodeName": [{"key": incident["nodeName"], "count": 1}],
+                                           "podName": [{"key": incident["podName"], "count": 1}],
+                                           "workloadKind|workloadName": [
+                                               {"key": "Deployment|redis-sleep", "count": 1}]}}
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
@@ -252,16 +313,20 @@ class Incidents(BaseHelm):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
         assert response['processTree'] is not None, f"Failed to get processTree {json.dumps(response)}"
-        assert response['processTree']['processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
+        assert response['processTree'][
+                   'processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
         actual_process_tree = response['processTree']['processTree']
         del actual_process_tree['pid']
         del actual_process_tree['ppid']
         del actual_process_tree['pcomm']
         expected_process_trees = [
             {'cmdline': 'ls -l /tmp', 'comm': 'ls', 'path': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data'},
-            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data"},
-            {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data', 'path': '/bin/busybox'},
-            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data", "path": "/bin/ls"},
+            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0,
+             "cwd": "/data"},
+            {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data',
+             'path': '/bin/busybox'},
+            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data",
+             "path": "/bin/ls"},
         ]
         assert actual_process_tree in expected_process_trees, f"Unexpected process tree {json.dumps(actual_process_tree)}"
         return response
@@ -281,7 +346,8 @@ class Incidents(BaseHelm):
 
     def verify_application_profiles(self, wlids: list, namespace):
         Logger.logger.info("Get application profiles")
-        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1", "ApplicationProfile").get(namespace=namespace).items
+        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
+                                                          "ApplicationProfile").get(namespace=namespace).items
         assert k8s_data is not None, "Failed to get application profiles"
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
         Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
@@ -290,9 +356,11 @@ class Incidents(BaseHelm):
             assert i in ap_wlids, f"Failed to get application profile for {i}"
         # kubescape.io/status: completed, kubescape.io/completion: complete
         # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
-        not_complete_application_profiles = [i for i in k8s_data if i.metadata.annotations['kubescape.io/status'] != 'completed']
+        not_complete_application_profiles = [i for i in k8s_data if
+                                             i.metadata.annotations['kubescape.io/status'] != 'completed']
 
-        assert len(not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
+        assert len(
+            not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 
     def cleanup(self, **kwargs):
         return super().cleanup(**kwargs)
