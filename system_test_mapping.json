@@ -1034,11 +1034,11 @@
             "Backend"
         ],
         "target_repositories": [
-            "helm-chart",
-            "operator",
-            "cadashboardbe",
-            "careportsreceiver",
-            "gateway"
+            "helm-chart-tbd",
+            "operator-tbd",
+            "cadashboardbe-tbd",
+            "careportsreceiver-tbd",
+            "gateway-tbd"
         ],
         "description": "",
         "skip_on_environment": "custom",
@@ -1064,9 +1064,9 @@
             "Backend"
         ],
         "target_repositories": [
-            "cadashboardbe",
-            "careportsreceiver",
-            "gateway"
+            "cadashboardbe-tbd",
+            "careportsreceiver-tbd",
+            "gateway-tbd"
         ],
         "description": "",
         "skip_on_environment": "",
