@@ -135,17 +135,17 @@ class Incidents(BaseHelm):
             {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
              "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6,
              "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}],
-                                  "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}",
-                                                  "to": f"{incident['guid']}-Pod-{incident['podName']}",
-                                                  "edgeType": "directed"},
-                                                 {"from": f"{incident['guid']}-Pod-{incident['podName']}",
-                                                  "to": f"{incident['guid']}-Container-redis", "edgeType": "directed"},
-                                                 {"from": f"{incident['guid']}-Container-redis",
-                                                  "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
-                                                  "edgeType": "directed"},
-                                                 {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
-                                                  "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
-                                                  "edgeType": "directed"}]}
+            "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}",
+                            "to": f"{incident['guid']}-Pod-{incident['podName']}",
+                            "edgeType": "directed"},
+                           {"from": f"{incident['guid']}-Pod-{incident['podName']}",
+                            "to": f"{incident['guid']}-Container-redis", "edgeType": "directed"},
+                           {"from": f"{incident['guid']}-Container-redis",
+                            "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+                            "edgeType": "directed"},
+                           {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+                            "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
+                            "edgeType": "directed"}]}
         assert resp is not None, f"Failed to get process graph {json.dumps(resp)}"
         # We expect no network data in the process graph and file data is dynamic
         assert resp['graphNodes'][:4] == expected_process_graph['graphNodes'][
@@ -279,7 +279,7 @@ class Incidents(BaseHelm):
         Logger.logger.info("Check unique values of incident")
         unique_values_req = {
             "fields": {"clusterName": "", "containerName": "", "name": "",
-                       "podName": "", "workloadKind|workloadName": "",
+                       "podName": "", "workloadKind": "", "workloadName": "",
                        "incidentSeverity": "", "mitreTactic": "", "isDismissed": "", "incidentCategory": "",
                        "nodeName": ""},
             "innerFilters": [{"guid": incident['guid']}],
@@ -294,7 +294,8 @@ class Incidents(BaseHelm):
                                       "isDismissed": ["false"], "mitreTactic": ["TA0002"],
                                       "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
                                       "podName": [incident["podName"]],
-                                      "workloadKind|workloadName": ["Deployment|redis-sleep"]},
+                                      "workloadKind": ["Deployment"],
+                                      "workloadName": ["redis-sleep"]},
                            "fieldsCount": {"clusterName": [{"key": incident["clusterName"], "count": 1}],
                                            "containerName": [{"key": "redis", "count": 1}],
                                            "incidentCategory": [{"key": "Anomaly", "count": 1}],
@@ -304,8 +305,8 @@ class Incidents(BaseHelm):
                                            "name": [{"key": "Unexpected process launched", "count": 1}],
                                            "nodeName": [{"key": incident["nodeName"], "count": 1}],
                                            "podName": [{"key": incident["podName"], "count": 1}],
-                                           "workloadKind|workloadName": [
-                                               {"key": "Deployment|redis-sleep", "count": 1}]}}
+                                           "workloadKind": [{"key": "Deployment", "count": 1}],
+                                           "workloadName": [{"key": "redis-sleep", "count": 1}]}}
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
