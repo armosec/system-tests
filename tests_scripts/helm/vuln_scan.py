@@ -924,7 +924,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         if len(wl_summary) == 0:
             raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
         
-        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']"}
+        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
         wl_summary = wl_summary[0] 
         if updateExpected:
             TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
