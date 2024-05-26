@@ -245,7 +245,7 @@
         ],
         "description": "",
         "skip_on_environment": "",
-        "owner": ""
+        "owner": "eranm@armosec.io"
     },
     "scan_mitre_and_submit_to_backend": {
         "target": [
