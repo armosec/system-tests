@@ -117,6 +117,12 @@ API_SECURITY_RISKS_EXCEPTIONS_NEW = "/api/v1/securityrisks/exceptions/new"
 API_SECURITY_RISKS_EXCEPTIONS_LIST = "/api/v1/securityrisks/exceptions/list"
 API_SECURITY_RISKS_EXCEPTIONS = "/api/v1/securityrisks/exceptions"
 
+API_INCIDENTS_UNIQUEVALUES = "/api/v1/uniqueValues/incidents"
+API_RUNTIME_INCIDENTS = "/api/v1/runtime/incidents"
+
+API_RUNTIME_INCIDENTSPERSEVERITY = "/api/v1/runtime/incidentsPerSeverity"
+API_RUNTIME_INCIDENTSOVERTIME = "/api/v1/runtime/incidentsOvertime"
+
 
 def deco_cookie(func):
 
@@ -526,7 +532,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_incidents(self, filters, **kwargs):
-        url = "/api/v1/runtime/incidents"
+        url = API_RUNTIME_INCIDENTS
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
@@ -536,13 +542,13 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_incident(self, incident_id: str):
-        url = "/api/v1/runtime/incidents/" + incident_id
+        url = API_RUNTIME_INCIDENTS + "/" + incident_id
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
     def get_alerts_of_incident(self, incident_id: str):
-        url = "/api/v1/runtime/incidents/" + incident_id + "/alerts/list"
+        url = API_RUNTIME_INCIDENTS + "/" + incident_id + "/alerts/list"
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, 
                       json={"pageNumber": 1, "pageSize": 100,"orderBy":"timestamp:asc"})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
@@ -550,25 +556,25 @@ class ControlPanelAPI(object):
         return r.json()        
     
     def get_incident_unique_values(self, request: Dict):
-        url = "/api/v1/runtime/incidentsUniqueValues"
+        url = API_INCIDENTS_UNIQUEVALUES
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=request)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()    
     
     def get_alerts_unique_values(self, incident_id: str, request: Dict):
-        url = f"/api/v1/runtime/incidents/{incident_id}/alerts/uniqueValues"
+        url = f"{API_RUNTIME_INCIDENTS}/{incident_id}/alerts/uniqueValues"
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=request)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
     def get_incidents_per_severity(self):
-        url = "/api/v1/runtime/incidentsPerSeverity"
+        url = API_RUNTIME_INCIDENTSPERSEVERITY
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json={})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
         
     def get_incidents_overtime(self):
-        url = "/api/v1/runtime/incidentsOvertime"
+        url = API_RUNTIME_INCIDENTSOVERTIME
         now_time = datetime.now(timezone.utc)
         last_30_days = now_time - timedelta(days=30)
         r = self.post(url, params={"customerGUID": self.selected_tenant_id},
