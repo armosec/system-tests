@@ -133,6 +133,6 @@ class HelmWrapper(object):
         obj = {"global.httpsProxy": helm_proxy_url}
 
         r = return_obj.stdout.decode("utf-8")
-        if len(r) != '\n':
+        if r != '\n':
             obj["global.proxySecretFile"] = r
         return obj
