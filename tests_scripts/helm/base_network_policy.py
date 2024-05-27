@@ -59,6 +59,10 @@ class BaseNetworkPolicy(BaseHelm):
             if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
                 self.store_netwrok_for_first_time_results(result_data=actual_network_neighbors, store_path=self.test_obj["expected_network_neighbors"])
                 continue
+
+            if actual_network_neighbors:
+                nn_json = json.dumps(actual_network_neighbors)
+                Logger.logger.info(f"Actual Network Neighbor (name: {expected_network_neighbors['metadata']['name']}): {nn_json}")
             self.validate_expected_network_neighbors(actual_network_neighbors=actual_network_neighbors, expected_network_neighbors=expected_network_neighbors, namespace=namespace)
 
 
