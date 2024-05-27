@@ -796,18 +796,6 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
         Logger.logger.info("Test delete registry-scan cronjob ")
         self.test_delete_registry_scan_cronjob(cron_job=cj, credentials=new_auth)
 
-        Logger.logger.info("Test create registry-scan cronjob - deprecated API")
-        cj = self.test_create_registry_scan_cronjob_deprecated(registry_name=registry,
-                                                               schedule_string=self.test_obj.get_arg("schedule_time"))
-
-        Logger.logger.info("Test update registry-scan cronjob - deprecated API")
-        cj = self.test_update_registry_scan_cronjob_deprecated(cron_job=cj,
-                                                               schedule_string=self.test_obj.get_arg(
-                                                                   "updating_schedule_time"))
-
-        Logger.logger.info("Test delete registry-scan cronjob - deprecated API")
-        self.test_delete_registry_scan_cronjob_deprecated(cron_job=cj)
-
         return self.cleanup()
 
 
