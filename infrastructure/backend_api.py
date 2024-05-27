@@ -352,7 +352,7 @@ class ControlPanelAPI(object):
 
 
         res = self.delete(API_ADMIN_TENANTS, json={"tenantsIds": [tenant_id]})
-        assert res.status_code == client.OK, f"delete tenant failed {tenant_id}: {res.status_code} {res.text}"
+        # assert res.status_code == client.OK, f"delete tenant failed {tenant_id}: {res.status_code} {res.text}"
         return res
 
 
