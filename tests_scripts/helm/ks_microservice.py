@@ -453,6 +453,8 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         self.add_and_upgrade_armo_to_repo()
         # 2.2 install armo helm-chart
         self.install_armo_helm_chart()
+        # 1.3 verify installation
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
         self.test_scan_jobs(port=statics.KS_PORT_FORWARD)
 

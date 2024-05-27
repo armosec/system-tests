@@ -696,13 +696,6 @@ class BaseVulnerabilityScanning(BaseHelm):
                                      expect_to_results=False)
         assert not cj, f"Failed to verify from backend the cronjob was deleted, cronjob: {cj}"
 
-    def test_delete_registry_scan_cronjob_deprecated(self, cron_job: dict):
-        self.backend.delete_registry_scan_cronjob_deprecated(cj=cron_job)
-        TestUtil.sleep(30, "wait till delete cronjob will arrive to backend")
-        cj, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob, cj_name=cron_job['name'],
-                                     expect_to_results=False)
-        assert not cj, f"Failed to verify from backend the cronjob was deleted, cronjob: {cj}"
-
     def test_update_vuln_scan_cronjob(self, cron_job: dict, schedule_string: str):
         cron_job[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED] = schedule_string
         self.backend.update_vuln_scan_cronjob(cj=cron_job)
@@ -760,19 +753,6 @@ class BaseVulnerabilityScanning(BaseHelm):
 
         return new_cj
 
-    def test_update_registry_scan_cronjob_deprecated(self, cron_job: dict, schedule_string: str):
-        cron_job[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED] = schedule_string
-        self.backend.update_registry_scan_cronjob_deprecated(cj=cron_job)
-        TestUtil.sleep(30, "wait till update cronjob will arrive to backend")
-
-        new_cj, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob, cj_name=cron_job['name'])
-        assert new_cj[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED] == schedule_string, \
-            f'Failed to verify that cronjob {cron_job["name"]} with schedule {schedule_string} was updated. ' \
-            f'cronjob: {new_cj}'
-        assert (new_cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-registry-scan")), \
-            f'cronjob {cron_job["name"]} has wrong name for {statics.CA_VULN_SCAN_CRONJOB_NAME_FILED}. '
-        return new_cj
-
     def test_create_vuln_scan_cronjob(self, namespaces_list: list, schedule_string: str):
         old_expected_cjs = self.kubernetes_obj.get_vuln_scan_cronjob()
         old_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_vuln_scan_cronjob_list,
@@ -784,28 +764,6 @@ class BaseVulnerabilityScanning(BaseHelm):
         TestUtil.sleep(30, "wait till cronjob will arrive to backend")
         new_expected_cjs = self.kubernetes_obj.get_vuln_scan_cronjob()
         new_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_vuln_scan_cronjob_list,
-                                                 expected_cjs=new_expected_cjs,
-                                                 cluster_name=self.kubernetes_obj.get_cluster_name())
-
-        new_cj = self.get_new_cronjob(old_cronjob_list=old_actual_cjs, new_cronjob_list=new_actual_cjs)
-        assert new_cj, f"Failed to find the new cronjob, old_cronjob_list: {old_actual_cjs}. " \
-                       f"new_cronjob_list: {new_actual_cjs}"
-
-        return new_cj
-
-    def test_create_registry_scan_cronjob_deprecated(self, registry_name: str, schedule_string: str):
-        old_expected_cjs = self.kubernetes_obj.get_registry_scan_cronjob()
-        old_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob_list,
-                                                 expected_cjs=old_expected_cjs,
-                                                 cluster_name=self.kubernetes_obj.get_cluster_name())
-
-        resp = self.backend.create_registry_scan_job_request_deprecated(
-            cluster_name=self.kubernetes_obj.get_cluster_name(),
-            schedule_string=schedule_string, registry_name=registry_name)
-
-        TestUtil.sleep(30, "wait till cronjob will arrive to backend")
-        new_expected_cjs = self.kubernetes_obj.get_registry_scan_cronjob()
-        new_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob_list,
                                                  expected_cjs=new_expected_cjs,
                                                  cluster_name=self.kubernetes_obj.get_cluster_name())
 
