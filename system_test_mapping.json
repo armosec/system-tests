@@ -413,17 +413,6 @@
         "skip_on_environment": "custom",
         "owner": "refaelm@armosec.io"
     },
-    "vuln_scan_trigger_scan_on_new_image": {
-        "target": [
-            "In cluster"
-        ],
-        "target_repositories": [
-            "careportsreceiver"
-        ],
-        "description": "",
-        "skip_on_environment": "",
-        "owner": ""
-    },
     "ks_microservice_ns_creation": {
         "target": [
             "In cluster"
