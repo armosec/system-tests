@@ -16,7 +16,6 @@ def tests = [
             //"ks_microservice_create_2_cronjob_mitre_and_nsa_proxy":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"vuln_scan_proxy":                                              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"vuln_scan":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-            //"vuln_scan_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"ks_microservice_ns_creation":                                               ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"ks_microservice_on_demand":                                                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
             //"ks_microservice_mitre_framework_on_demand":                                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
