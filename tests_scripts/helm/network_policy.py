@@ -42,7 +42,7 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(5 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(7 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         pod = self.wait_for_report(report_type=self.get_pod_if_ready, namespace=namespace, name="wikijs", timeout=180)
         pod_name = pod[0].metadata.name
@@ -130,7 +130,7 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(5 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_network_neighbors"])
@@ -228,7 +228,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         Logger.logger.info(f"restarted pods successfully")
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(7 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(8 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_network_neighbors"])
