@@ -52,7 +52,7 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org", repeat=10)
 
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
-        TestUtil.sleep(5 * int(update_period_in_seconds), "wait for node-agent update period", "info")
+        TestUtil.sleep(6 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_network_neighbors"])
@@ -228,7 +228,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         Logger.logger.info(f"restarted pods successfully")
 
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(5 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
         expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_network_neighbors"])
