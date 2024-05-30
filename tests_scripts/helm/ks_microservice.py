@@ -139,7 +139,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
         # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
-        time.sleep(20)
+        time.sleep(60)
         scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("3. Verify scenario on backend")
