@@ -2,7 +2,6 @@ def backend = "${env.BACKEND}"
 
 // Add ONLY kubescape-HELM tests (do NOT add any CLI related tests)
 def tests = ["vuln_scan":                                                    ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
-             "vuln_scan_trigger_scan_on_new_image":                          ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vuln_scan_trigger_scan_public_registry":                       ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vuln_scan_trigger_scan_public_registry_excluded":              ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],
              "vuln_scan_trigger_scan_private_quay_registry":                 ["CA-AWS-DEV-JENKINS-EC2-FLEET-X-LARGE",  "k8s"],

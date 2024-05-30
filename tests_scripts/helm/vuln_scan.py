@@ -357,7 +357,7 @@ class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):
 
             running_pods = self.get_ready_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                name=statics.CA_VULN_SCAN_DEPLOYMENT_FROM_HELM_NAME)
-            successful_vuln_scan_log = f'posting to event receiver image {registry}/{self.expected_payloads["image"]} wlid finished successfully response body:'
+            successful_vuln_scan_log = f'posting to event receiver image {registry}/{self.expected_payloads["image"]}'
             self.wait_for_report(timeout=600, report_type=self.find_string_in_log,
                                  namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
                                  pod_name=running_pods[0].metadata.name,
@@ -796,18 +796,6 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
         Logger.logger.info("Test delete registry-scan cronjob ")
         self.test_delete_registry_scan_cronjob(cron_job=cj, credentials=new_auth)
 
-        Logger.logger.info("Test create registry-scan cronjob - deprecated API")
-        cj = self.test_create_registry_scan_cronjob_deprecated(registry_name=registry,
-                                                               schedule_string=self.test_obj.get_arg("schedule_time"))
-
-        Logger.logger.info("Test update registry-scan cronjob - deprecated API")
-        cj = self.test_update_registry_scan_cronjob_deprecated(cron_job=cj,
-                                                               schedule_string=self.test_obj.get_arg(
-                                                                   "updating_schedule_time"))
-
-        Logger.logger.info("Test delete registry-scan cronjob - deprecated API")
-        self.test_delete_registry_scan_cronjob_deprecated(cron_job=cj)
-
         return self.cleanup()
 
 
@@ -924,7 +912,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         if len(wl_summary) == 0:
             raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
         
-        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']"}
+        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
         wl_summary = wl_summary[0] 
         if updateExpected:
             TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     

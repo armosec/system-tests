@@ -130,5 +130,9 @@ class HelmWrapper(object):
 
         Logger.logger.info(f"Helm proxy with url: '{helm_proxy_url}' configured successfully.")
 
-        return {"global.httpsProxy": helm_proxy_url,
-                "global.proxySecretFile": return_obj.stdout.decode("utf-8")}
+        obj = {"global.httpsProxy": helm_proxy_url}
+
+        r = return_obj.stdout.decode("utf-8")
+        if r != '\n':
+            obj["global.proxySecretFile"] = r
+        return obj

@@ -2,5 +2,5 @@
     "dateAdded": "2023-10-10",
     "dueDate": "2023-10-31",
     "knownRansomwareCampaignUse": "Unknown",
-    "notes": "https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/"
+    "notes": "This vulnerability affects a common open-source component, third-party library, or a protocol used by different products. Please check with specific vendors for information on patching status.   For more information, please see: https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/"
 }

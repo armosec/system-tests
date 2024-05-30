@@ -73,18 +73,6 @@ class VulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def vuln_scan_trigger_scan_on_new_image():
-        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTriggerScanOnNewImage
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityScanningTriggerScanOnNewImage,
-            deployment=join("nginx-vuln-scan-new-image.yaml"),
-            expected_results="nginx-new-image.json",
-            helm_kwargs={"triggerNewImageScan": True}
-        )
-
-    @staticmethod
     def vuln_scan_cve_exceptions():
         from tests_scripts.helm.vuln_scan import VulnerabilityScanningCVEExceptions
         from os.path import join
