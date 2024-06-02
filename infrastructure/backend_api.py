@@ -599,7 +599,7 @@ class ControlPanelAPI(object):
         
     def get_incidents_overtime(self):
         url = API_RUNTIME_INCIDENTSOVERTIME
-        now_time = datetime.now(timezone.utc)
+        now_time = datetime.now(timezone.utc) + timedelta(days=1)
         last_30_days = now_time - timedelta(days=30)
         r = self.post(url, params={"customerGUID": self.selected_tenant_id},
                      json={"since": last_30_days.isoformat("T")[:__TIME_LEN__]+"Z", "until": now_time.isoformat("T")[:__TIME_LEN__]+"Z"})        

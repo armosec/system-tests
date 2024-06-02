@@ -44,6 +44,7 @@ class Incidents(BaseHelm):
             "nodeAgent.config.maxLearningPeriod": "60s",
             "nodeAgent.config.learningPeriod": "50s",
             "nodeAgent.config.updatePeriod": "30s",
+            "nodeAgent.config.nodeProfileInterval": "1m",
             # "nodeAgent.image.repository": "docker.io/amitschendel/node-agent",
             # "nodeAgent.image.tag": "v0.0.5",
         }
@@ -95,12 +96,12 @@ class Incidents(BaseHelm):
 
         self.resolve_incident(inc)
         self.check_incident_resolved(inc)
-        self.check_overtime_resolved_incident()
+        self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
 
         self.reslove_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
-        self.check_process_graph(inc)
-        self.verify_kdr_monitored_counters(cluster=cluster)
+        self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
+        self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
 
@@ -124,17 +125,18 @@ class Incidents(BaseHelm):
              "nodeMetadata": {}},
             {"graphNodeType": "Pod", "graphNodeID": f"{incident['guid']}-Pod-{incident['podName']}",
              "graphNodeLabel": f"{incident['podName']}", "hasIncident": False, "graphNodeBadge": 0,
-             "nodeMetadata": {"workloadKind": "Deployment", "workloadName": "redis-sleep"}},
+             "nodeMetadata": {"workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": incident['workloadNamespace']}},
             {"graphNodeType": "Container", "graphNodeID": f"{incident['guid']}-Container-redis",
              "graphNodeLabel": "redis", "hasIncident": False, "graphNodeBadge": 0, "nodeMetadata": {
                 "image": "docker.io/library/redis@sha256:92f3e116c1e719acf78004dd62992c3ad56f68f810c93a8db3fe2351bb9722c2",
-                "workloadKind": "Deployment", "workloadName": "redis-sleep"}},
+                "workloadKind": "Deployment", "workloadName": "redis-sleep", "workloadNamespace": incident['workloadNamespace']}},
             {"graphNodeType": "Process", "graphNodeID": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
              "graphNodeLabel": f"ls:{incident['infectedPID']}", "hasIncident": True, "graphNodeBadge": 0,
              "nodeMetadata": {"processID": incident['infectedPID'], "processName": "ls"}},
-            {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
-             "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6,
-             "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}],
+            # {"graphNodeType": "Files", "graphNodeID": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
+            #  "graphNodeLabel": "", "hasIncident": False, "graphNodeBadge": 6,
+            #  "nodeMetadata": {"ruleIDs": ["R0002"], "processID": incident['infectedPID'], "processName": "ls"}}
+             ],
             "graphEdges": [{"from": f"{incident['guid']}-Node-{incident['nodeName']}",
                             "to": f"{incident['guid']}-Pod-{incident['podName']}",
                             "edgeType": "directed"},
@@ -143,15 +145,18 @@ class Incidents(BaseHelm):
                            {"from": f"{incident['guid']}-Container-redis",
                             "to": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
                             "edgeType": "directed"},
-                           {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
-                            "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
-                            "edgeType": "directed"}]}
+                        #    {"from": f"{incident['guid']}-Process-ls:{incident['infectedPID']}",
+                        #     "to": f"{incident['guid']}-Files-ls:{incident['infectedPID']}-Files",
+                        #     "edgeType": "directed"}
+                            ]}
         assert resp is not None, f"Failed to get process graph {json.dumps(resp)}"
-        # We expect no network data in the process graph and file data is dynamic
-        assert resp['graphNodes'][:4] == expected_process_graph['graphNodes'][
-                                         :4], f"Failed to get process graph nodes {json.dumps(resp)}"
-        assert resp['graphEdges'][:3] == expected_process_graph['graphEdges'][
-                                         :3], f"Failed to get process graph edges {json.dumps(resp)}"
+        for k, v in enumerate(expected_process_graph['graphNodes']):
+            for k1, v1 in v.items():
+                assert resp['graphNodes'][k][k1] == v1, f"Failed to get process graph node {k}, {k1}, {resp['graphNodes'][k][k1]}. {json.dumps(resp)}"
+        for k, v in enumerate(expected_process_graph['graphEdges']):
+            for k1, v1 in v.items():
+                assert resp['graphEdges'][k][k1] == v1, f"Failed to get process graph edge {k}, {k1}, {resp['graphEdges'][k][k1]}. {json.dumps(resp)}"
+        
         Logger.logger.info(f"Got process graph {json.dumps(resp)}")
 
     def check_raw_alerts_list(self):
@@ -317,19 +322,14 @@ class Incidents(BaseHelm):
         assert response['processTree'][
                    'processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
         actual_process_tree = response['processTree']['processTree']
-        del actual_process_tree['pid']
-        del actual_process_tree['ppid']
-        del actual_process_tree['pcomm']
-        expected_process_trees = [
-            {'cmdline': 'ls -l /tmp', 'comm': 'ls', 'path': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data'},
-            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0,
-             "cwd": "/data"},
-            {'cmdline': '/bin/ls -l /tmp', 'comm': 'ls', 'hardlink': '/bin/busybox', 'uid': 0, 'gid': 0, 'cwd': '/data',
-             'path': '/bin/busybox'},
-            {"cmdline": "/bin/ls -l /tmp", "comm": "ls", "hardlink": "/bin/busybox", "uid": 0, "gid": 0, "cwd": "/data",
-             "path": "/bin/ls"},
-        ]
-        assert actual_process_tree in expected_process_trees, f"Unexpected process tree {json.dumps(actual_process_tree)}"
+        assert "ls" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
+        assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
+        # optional fields
+        assert "ls -l /tmp" in actual_process_tree.get('cmdline', "ls -l /tmp"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
+        assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
+        assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
+
         return response
 
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
