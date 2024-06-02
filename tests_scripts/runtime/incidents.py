@@ -322,6 +322,8 @@ class Incidents(BaseHelm):
         assert response['processTree'][
                    'processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
         actual_process_tree = response['processTree']['processTree']
+        if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
+            actual_process_tree = actual_process_tree["children"][0]
         assert "ls" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields
