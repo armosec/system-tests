@@ -115,9 +115,9 @@ def set_backends():
 
     # on-prem
     backends.append(Backend(name='onprem',
-                            dashboard='https://orange-api.cademo.cyberarmorsoft.com',
-                            api_url='orange-api.cademo.cyberarmorsoft.com',
-                            auth_url='https://orange.cademo.cyberarmorsoft.com',
+                            dashboard='https://armo-platform-api.cademo.cyberarmorsoft.com',
+                            api_url='armo-platform-api.cademo.cyberarmorsoft.com',
+                            auth_url='armo-platform.cademo.cyberarmorsoft.com',
                             login_method=LOGIN_METHOD_KEYCLOAK,
                             tls_verify=False))
 
