@@ -217,7 +217,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
         
-        TestUtil.sleep(30, "wait for 30 seconds before restarting pods", "info")
+        TestUtil.sleep(40, "wait for 40 seconds before restarting pods", "info")
 
         pods_list = list(map(lambda obj: obj['metadata']['name'], workload_objs))
         Logger.logger.info(f"3. Restarting pods: {pods_list}")
@@ -241,7 +241,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
         Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
-        self.wait_for_report(timeout=120,
+        self.wait_for_report(timeout=240,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
