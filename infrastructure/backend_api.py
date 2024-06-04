@@ -25,6 +25,8 @@ class NotExistingCustomer(Exception):
     pass
 
 
+__TIME_LEN__ = len('2024-05-15T07:10:23.513630')
+
 INTEGRITY_STATUS_CLEAR = 0
 INTEGRITY_STATUS_PROTECTED = 2
 INTEGRITY_STATUS_BLOCKED = -1
@@ -530,6 +532,16 @@ class ControlPanelAPI(object):
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
+    
+    # /api/v1/runtime/kdrMonitoredCounters
+    def get_kdr_monitored_counters(self,cluster: str):
+        url = "/api/v1/runtime/kdrMonitoredCounters"
+        params={"customerGUID": self.selected_tenant_id}
+        if cluster:
+            params["clusterName"] = cluster
+        r = self.get(url, params=params)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
 
     def get_incidents(self, filters, **kwargs):
         url = API_RUNTIME_INCIDENTS
@@ -547,13 +559,25 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
+    def resolve_incident(self, incident_id: str, resolution:str):
+        url = "/api/v1/runtime/incidents/" + incident_id + "/resolve"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json={"Reason": resolution})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
     def get_alerts_of_incident(self, incident_id: str):
         url = API_RUNTIME_INCIDENTS + "/" + incident_id + "/alerts/list"
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, 
                       json={"pageNumber": 1, "pageSize": 100,"orderBy":"timestamp:asc"})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         #TODO: get them all
-        return r.json()        
+        return r.json()
+
+    def get_process_graph(self, incident_id: str):
+        url = "/api/v1/runtime/incidents/" + incident_id + "/process"
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
     
     def get_incident_unique_values(self, request: Dict):
         url = API_INCIDENTS_UNIQUEVALUES
@@ -575,11 +599,30 @@ class ControlPanelAPI(object):
         
     def get_incidents_overtime(self):
         url = API_RUNTIME_INCIDENTSOVERTIME
+        now_time = datetime.now(timezone.utc) + timedelta(days=1)
+        last_30_days = now_time - timedelta(days=30)
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id},
+                     json={"since": last_30_days.isoformat("T")[:__TIME_LEN__]+"Z", "until": now_time.isoformat("T")[:__TIME_LEN__]+"Z"})        
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def get_raw_alerts_list(self,cursor=None):
+        url = "/api/v1/runtime/rawalerts/list"
+        last_30_days = datetime.now(timezone.utc) - timedelta(days=30)
+        # since is mandatory
+        payload = {"pageNumber": 1, "pageSize": 20, "since": last_30_days.isoformat("T")[:__TIME_LEN__]+"Z"}
+        if cursor:
+            payload["cursorV1"] = {"id": cursor}        
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=payload)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+
+    def get_raw_alerts_overtime(self):
+        url = "/api/v1/runtime/rawalerts/overtime"
         now_time = datetime.now(timezone.utc)
         last_30_days = now_time - timedelta(days=30)
         r = self.post(url, params={"customerGUID": self.selected_tenant_id},
-                     json={})
-        # "since": last_30_days.isoformat("T")+"Z", "until": now_time.isoformat("T")+"Z"
+                    json={"since": last_30_days.isoformat("T")[:__TIME_LEN__]+"Z", "until": now_time.isoformat("T")[:__TIME_LEN__]+"Z"})        
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
