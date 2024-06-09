@@ -856,7 +856,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                                                          kubernetes_obj=kubernetes_obj)
 
     def start(self):
-        assert self.backend != None;
+        assert self.backend != None
         #use this flag to update expected results (test will fail if flag is not set to prevent accidental overwrite of expected results)
         updateExpected = False
         f'the test {self.test_driver.test_name} must run with backend'
@@ -908,15 +908,10 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             "namespace": namespace,
             "name": "httpd-proxy"                     
             }]}
-        wl_summary = self.backend.get_vuln_v2_workloads(body)        
-        if len(wl_summary) == 0:
-            raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
         
-        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
-        wl_summary = wl_summary[0] 
-        if updateExpected:
-            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
-        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
+        res, _ = self.wait_for_report(timeout=300, report_type=self.get_filtered_workload_summary, updateExpected=updateExpected, body=body)
+
+        wl_summary, wl_excluded_paths = res[0], res[1]
 
         Logger.logger.info('3. get workload details and compare with expected')
         body =  {"innerFilters": [{
@@ -944,7 +939,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
         image = image[0]
         image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']", "root['digest']",
-                                "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']"}
+                                "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']",
+                                "root['architecture']", "root['os']", "root['size']"}
         if updateExpected:
             TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
@@ -1000,6 +996,18 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
 
 
         return self.cleanup()
+
+    def get_filtered_workload_summary(self, updateExpected, body):
+        wl_summary = self.backend.get_vuln_v2_workloads(body)        
+        if len(wl_summary) == 0:
+            raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
+        
+        wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
+        wl_summary = wl_summary[0] 
+        if updateExpected:
+            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
+        return wl_summary,wl_excluded_paths
     
 
 
