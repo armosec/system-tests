@@ -26,6 +26,7 @@ class KubectlWrapper(object):
         'SBOMSummary': 'sbomsummaries',
         'SBOMSyftFiltered': 'sbomsyftfiltereds',
         'SBOMSyft': 'sbomsyfts',
+        'SeccompProfile': 'seccompprofiles',
         'VulnerabilityManifest': 'vulnerabilitymanifests',
         'VulnerabilityManifestSummary': 'vulnerabilitymanifestsummaries',
         'WorkloadConfigurationScan': 'workloadconfigurationscans',

@@ -46,6 +46,9 @@ DEFAULT_CONFIGMAP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'config-map')
 # smart remediation tests
 DEFAULT_SMART_REMEDIATION_PATH = os.path.join(DEFAULT_K8S_PATHS, 'smart-remediation')
 
+# seccomp tests
+DEFAULT_SECCOMP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'seccomp')
+
 # synchronizer tests
 DEFAULT_SYNCHRONIZER_PATH = os.path.join(DEFAULT_K8S_PATHS, 'synchronizer')
 DEFAULT_SYNCHRONIZER_CRDS_PATH = os.path.abspath(os.path.join('configurations', 'kubescape-crds', 'supported'))
@@ -214,6 +217,7 @@ STORAGE_AGGREGATED_API_NAMESPACE = "kubescape"
 KNOWN_SERVERS_PLURAL = "knownservers"
 GENERATED_NETWORK_POLICY_PLURAL = "generatednetworkpolicies"
 
+APPLICATION_PROFILE_PLURAL = "applicationprofiles"
 NETWORK_NEIGHBOR_PLURAL = "networkneighborses"
 
 STORAGE_CVE_LABEL = "kubescape.io/context"

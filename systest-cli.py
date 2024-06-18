@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import argparse
-import base64
+import json
 import os
+import socket
 import sys
 from datetime import datetime
 from logging import DEBUG, ERROR
 from random import seed
-import json
+
 import requests
-import socket
 
 from configurations import BACKENDS, CREDENTIALS, ALL_TESTS
 from systest_utils import Logger, TestUtil
@@ -26,8 +26,10 @@ def validate_test(test_name, json_file_path):
         Logger.logger.info(f"Test '{test_name}' is defined in ['{json_file_path}'] JSON.")
         return True
     else:
-        Logger.logger.error(f"Test '{test_name}' is not defined in ['{json_file_path}'] JSON. Please add the test and try again.")
+        Logger.logger.error(
+            f"Test '{test_name}' is not defined in ['{json_file_path}'] JSON. Please add the test and try again.")
         return False
+
 
 def input_parser():
     # get arguments
@@ -44,7 +46,8 @@ def input_parser():
     parser.add_argument("--logger", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="logger level", default="DEBUG",
                         dest="logger_level")
 
-    parser.add_argument("--delete_test_tenant", choices=["ALWAYS", "TEST_PASSED", "NEVER"], help="when to delete test tenant", default="ALWAYS",
+    parser.add_argument("--delete_test_tenant", choices=["ALWAYS", "TEST_PASSED", "NEVER"],
+                        help="when to delete test tenant", default="ALWAYS",
                         dest="delete_test_tenant")
 
     parser.add_argument("-f", "--fresh", action="store_true", dest="fresh", default=False,
@@ -79,7 +82,6 @@ def input_parser():
                         help="will create first time results", required=False, dest="create_first_time_results")
     parser.add_argument("--kwargs", action="store", required=False, nargs='*', dest='kwargs',
                         help="adding additional values. example: --kwargs k0=v0 k1=v1;v11")
-
 
     return parser.parse_args()
 
@@ -126,8 +128,14 @@ def main():
     if not validate_test(args.test_name, json_file_path='system_test_mapping.json'):
         exit(1)
 
-    if args.test_name not in ALL_TESTS or args.customer != CREDENTIALS.customer:
+    if args.test_name not in ALL_TESTS:
+        Logger.logger.error(
+            f"Test '{args.test_name}' is not defined in the system tests. Please add the test and try again.")
         print_configurations()
+        exit(1)
+
+    if args.customer != CREDENTIALS.customer:
+        Logger.logger.error(f"Customer '{args.customer}' is different from '{CREDENTIALS.customer}'.")
         exit(1)
 
     # ignore https requests warnings
@@ -139,7 +147,6 @@ def main():
     res = t.main()
     Logger.logger.debug('Logger file location: {}'.format(Logger.get_file_location()))
     exit(res)
-
 
 
 if __name__ == "__main__":

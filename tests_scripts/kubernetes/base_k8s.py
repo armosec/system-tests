@@ -1196,3 +1196,27 @@ class BaseK8S(BaseDockerizeTest):
                 )
                 filteredCVEs.append((key, cve_data))
         return filteredCVEs
+
+    def get_application_profiles_from_storage(self, namespace, label_selector):
+        applicationProfiles = []
+        metadata_list = self.kubernetes_obj.client_CustomObjectsApi.list_namespaced_custom_object(
+            group=statics.STORAGE_AGGREGATED_API_GROUP,
+            version=statics.STORAGE_AGGREGATED_API_VERSION,
+            namespace=namespace,
+            plural=statics.APPLICATION_PROFILE_PLURAL,
+            label_selector=label_selector,
+        )
+        for metadata in metadata_list['items']:
+            if metadata['metadata']['annotations']['kubescape.io/status'] == 'initializing':
+                continue
+            item = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=metadata['metadata']['name'],
+                namespace=metadata['metadata']['namespace'],
+                plural=statics.APPLICATION_PROFILE_PLURAL,
+            )
+            applicationProfiles.append(item)
+        if len(applicationProfiles) < 1:
+            raise Exception(f"no application profiles found in namespace {namespace} with label selector {label_selector}")
+        return applicationProfiles
