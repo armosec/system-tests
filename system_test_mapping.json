@@ -1475,12 +1475,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks seccomp workload list on backend",
     "skip_on_environment": "",
