@@ -51,3 +51,18 @@ class SeccompProfileTests(object):
                                                                  statics.SECCOMP_STATUS_OVERLY_PERMISSIVE]},
             },
             test_obj=SeccompProfileList)
+
+    # seccomp profile - backend generate
+    @staticmethod
+    def seccomp_profile_generate():
+        from tests_scripts.helm.seccomp import SeccompProfileGenerate
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            seccomp_overly_permissive=join(statics.DEFAULT_SECCOMP_PATH, "seccomp-alpine-overly-permissive.yaml"),
+            workload_missing=join(statics.DEFAULT_SECCOMP_PATH, "alpine-seccomp-pod-missing.yaml"),
+            workload_overly_permissive=join(statics.DEFAULT_SECCOMP_PATH, "alpine-seccomp-pod-overly-permissive.yaml"),
+            expected={
+                "alpine-syscall-overly-permissive": {"profileStatuses": [statics.SECCOMP_STATUS_OVERLY_PERMISSIVE]},
+            },
+            test_obj=SeccompProfileGenerate)

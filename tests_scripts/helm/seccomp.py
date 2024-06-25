@@ -5,8 +5,6 @@ import json
 import time
 
 
-
-
 class SeccompProfile(BaseKubescape, BaseHelm):
     def __init__(
             self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
@@ -25,7 +23,7 @@ class SeccompProfile(BaseKubescape, BaseHelm):
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
-        
+
         self.wait_for_agg_to_end = False
 
     def cleanup(self, **kwargs):
@@ -121,7 +119,6 @@ class SeccompProfileList(SeccompProfile):
             yaml_file=self.test_obj["seccomp_overly_permissive"], namespace=namespace
         )
 
-
         Logger.logger.info(f"2.2 Apply optimized seccomp profile")
         self.apply_yaml_file(
             yaml_file=self.test_obj["seccomp_optimized"], namespace=namespace
@@ -145,8 +142,7 @@ class SeccompProfileList(SeccompProfile):
             namespace=namespace, workload=workload, timeout=300
         )
 
-
-        # TODO: add an explicit test for optimized seccomp profile. Currently, it is expected to be also overly permissive because blocked syscalls 
+        # TODO: add an explicit test for optimized seccomp profile. Currently, it is expected to be also overly permissive because blocked syscalls
         # are being recorded as well.
         # no need to verify the pods are running, as it might fail due to the seccomp profile
         Logger.logger.info(f"3.3 Apply workload optimized")
@@ -160,12 +156,12 @@ class SeccompProfileList(SeccompProfile):
 
         try:
             res = self.wait_for_report(
-            self.verify_seccomp_workloads_list, 
-            timeout=180,
-            sleep_interval=10,
-            cluster=cluster,
-            namespace=namespace,
-            expected=excepted
+                self.verify_seccomp_workloads_list,
+                timeout=180,
+                sleep_interval=10,
+                cluster=cluster,
+                namespace=namespace,
+                expected=excepted
             )
         except Exception as e:
             Logger.logger.info(f"latest seccomp workloads list: {res}")
@@ -174,7 +170,6 @@ class SeccompProfileList(SeccompProfile):
 
         return self.cleanup()
 
-    
     def verify_seccomp_workloads_list(self, cluster, namespace, expected: dict):
         """
         verify_seccomp_workloads_list verifies the seccomp workloads list
@@ -195,22 +190,22 @@ class SeccompProfileList(SeccompProfile):
 
         assert "total" in response, "total key not found in response"
         assert "response" in response, "response key not found in response"
-        assert response["total"]["value"] == len(expected), f"expected total value: {len(expected)}, got: {response['total']['value']}"
-        assert len(response["response"]) == len(expected), f"expected response items: {len(expected)}, got: {len(response['response'])}"
+        assert response["total"]["value"] == len(
+            expected), f"expected total value: {len(expected)}, got: {response['total']['value']}"
+        assert len(response["response"]) == len(
+            expected), f"expected response items: {len(expected)}, got: {len(response['response'])}"
 
         for item in expected:
             found = False
             for res_item in response["response"]:
                 if res_item["name"] == item:
-                    assert res_item["profileStatus"] in expected[item]["profileStatuses"], f"expected for item: {item} profileStatus: {expected[item]['profileStatuses']}, got: {res_item['profileStatus']}"
+                    assert res_item["profileStatus"] in expected[item][
+                        "profileStatuses"], f"expected for item: {item} profileStatus: {expected[item]['profileStatuses']}, got: {res_item['profileStatus']}"
                     found = True
-                  
-            assert found, f"expected workload: {item} not found in response"
-        
-        return response
-        
 
-    
+            assert found, f"expected workload: {item} not found in response"
+
+        return response
 
     def log_on_failure(self, cluster, namespace, expected: dict):
         """
@@ -222,14 +217,107 @@ class SeccompProfileList(SeccompProfile):
             Logger.logger.info(f"get and log application profiles for item: {item}")
             try:
                 applicationProfiles, _ = self.wait_for_report(timeout=180,
-                                                            report_type=self.get_application_profiles_from_storage,
-                                                            namespace=namespace,
-                                                            label_selector=f"app={item}")
+                                                              report_type=self.get_application_profiles_from_storage,
+                                                              namespace=namespace,
+                                                              label_selector=f"app={item}")
                 Logger.logger.info(f"label_selector:app={item}, applicationProfiles: {applicationProfiles}")
             except Exception as e:
                 Logger.logger.error(f"failed to get application profiles for item: {item}, error: {e}")
                 continue
 
 
-       
-        
+class SeccompProfileGenerate(SeccompProfileList):
+    def start(self):
+        """
+        Generate seccomp profile test plan:
+        1. Install Helm chart
+        2. Apply seccomp profiles - overly_permissive
+        3. Apply workload - overly_permissive
+        4. Validate backend seccomp workloads list
+        5. Generate seccomp profile and validate response
+        6. Apply seccomp profile and verify workload is running
+        """
+        # Call the original start method from SeccompProfileList and get the response
+        cluster, namespace = self.setup(apply_services=False)
+        print("Debug: cluster: ", cluster)
+
+        Logger.logger.info(f"1. Install Helm Chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(
+            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
+        )
+
+        Logger.logger.info(f"2 Apply overly_permissive seccomp profile")
+        self.apply_yaml_file(
+            yaml_file=self.test_obj["seccomp-alpine-overly-permissive.yaml"], namespace=namespace
+        )
+
+        Logger.logger.info(f"3 Apply workload overly_permissive")
+        workload = self.apply_yaml_file(
+            yaml_file=self.test_obj["workload_overly_permissive"], namespace=namespace
+        )
+        self.verify_all_pods_are_running(
+            namespace=namespace, workload=workload, timeout=300
+        )
+
+        Logger.logger.info("4. Validate backend seccomp workloads list")
+        expected = self.test_obj["expected"]
+        try:
+            response = self.wait_for_report(
+                self.verify_seccomp_workloads_list,
+                timeout=180,
+                sleep_interval=10,
+                cluster=cluster,
+                namespace=namespace,
+                expected=expected
+            )
+        except Exception as e:
+            Logger.logger.info(f"latest seccomp workloads list: {response}")
+            self.log_on_failure(cluster, namespace, expected)
+            raise e
+
+        Logger.logger.info("5. Generate seccomp profile")
+
+        # Generate seccomp profile and validate response
+        response = self.generate_seccomp(response)
+
+        Logger.logger.info(f"6 Apply optimized seccomp profile, verify that workload runs and all good")
+        self.apply_yaml_file(
+            yaml_file=response["suggestedWorkload"]["new"], namespace=namespace
+        )
+        self.verify_all_pods_are_running(
+            namespace=namespace, workload=workload, timeout=300
+        )
+        return self.cleanup()
+
+    def generate_seccomp(self, response):
+        """
+        Generate seccomp profile with BE API and verify response
+        """
+        Logger.logger.info("Generating seccomp profile")
+
+        res_item = response["response"][0]
+        generate_seccomp_body = {
+            "innerFilters": [
+                {
+                    "k8sResourceHash": res_item["k8sResourceHash"]
+                }
+            ]
+        }
+
+        res = self.backend.generate_seccomp_profile(generate_seccomp_body)
+        response = json.loads(res.text)
+
+        assert response["name"] == res_item["name"], f"expected name: {res_item['name']}, got: {response['name']}"
+        assert response["kind"] == res_item["kind"], f"expected kind: {res_item['kind']}, got: {response['kind']}"
+        assert response["namespace"] == res_item[
+            "namespace"], f"expected namespace: {res_item['namespace']}, got: {response['namespace']}"
+        assert response["k8sResourceHash"] == res_item[
+            "k8sResourceHash"], f"expected k8sResourceHash: {res_item['k8sResourceHash']}, got: {response['k8sResourceHash']}"
+        assert response["suggestedWorkload"]["old"] == self.test_obj[
+            "workload_overly_permissive"], f"expected suggestedWorkload.old: {self.test_obj['workload_overly_permissive']}, got {response['suggestedWorkload']['old']}"
+        assert response["suggestedWorkload"]["new"] == self.test_obj[
+            "workload_overly_permissive-after-optimize"], f"expected suggestedWorkload.new: {self.test_obj['seccomp-alpine-optimized.yaml']}, got {response['suggestedWorkload']['new']}"
+
+        return response
