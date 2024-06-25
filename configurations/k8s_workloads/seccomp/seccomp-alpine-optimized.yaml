@@ -1,0 +1,77 @@
+kind: SeccompProfile
+apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+metadata:
+  name: replicaset-alpine-77b4fdf86c-alpine-optimized
+spec:
+  containers:
+    - name: alpine-optimized
+      path: default/replicaset-alpine-77b4fdf86c-alpine-optimized.json
+      spec:
+        defaultAction: SCMP_ACT_ERRNO
+        architectures:
+          - SCMP_ARCH_X86_64
+          - SCMP_ARCH_X86
+          - SCMP_ARCH_X32
+        syscalls:
+          - names:
+              - readlinkat
+              - chdir
+              - brk
+              - openat
+              - newfstatat
+              - fchdir
+              - capget
+              - epoll_ctl
+              - rt_sigprocmask
+              - sethostname
+              - read
+              - mprotect
+              - pipe2
+              - gettid
+              - exit_group
+              - setuid
+              - mmap
+              - prctl
+              - getpid
+              - mount
+              - setgid
+              - execve
+              - futex
+              - rt_sigaction
+              - fchownat
+              - epoll_create1
+              - nanosleep
+              - sched_getaffinity
+              - umask
+              - epoll_pwait
+              - sched_yield
+              - getppid
+              - fstat
+              - pivot_root
+              - keyctl
+              - mkdirat
+              - setsid
+              - sigaltstack
+              - set_robust_list
+              - getdents64
+              - setgroups
+              - dup3
+              - mknodat
+              - umount2
+              - close
+              - capset
+              - faccessat2
+              - tgkill
+              - unlinkat
+              - fstatfs
+              - fcntl
+              - write
+              - pread64
+              - fchmodat
+              - clone
+              - symlinkat
+              - rt_sigreturn
+              - munmap
+              - unshare
+              - statfs
+            action: SCMP_ACT_ALLOW

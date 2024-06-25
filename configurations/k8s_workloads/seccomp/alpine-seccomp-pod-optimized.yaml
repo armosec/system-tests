@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-syscall-optimized
+spec:
+  selector:
+    matchLabels:
+      app: alpine-syscall-optimized
+  template:
+    metadata:
+      labels:
+        app: alpine-syscall-optimized
+    spec:
+      containers:
+        - name: alpine-optimized
+          image: alpine
+          command: ["/bin/sh"]
+          args: ["-c", "sleep 600"] 
+          securityContext:
+            seccompProfile:
+              type: Localhost
+              localhostProfile: default/replicaset-alpine-77b4fdf86c-alpine-optimized.json
+

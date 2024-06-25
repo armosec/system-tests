@@ -1,0 +1,90 @@
+kind: SeccompProfile
+apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+metadata:
+  name: replicaset-alpine-77b4fdf86c-alpine-overly-permissive
+spec:
+  containers:
+    - name: alpine-overly-permissive
+      path: default/replicaset-alpine-77b4fdf86c-alpine-overly-permissive.json
+      spec:
+        defaultAction: SCMP_ACT_ERRNO
+        architectures:
+          - SCMP_ARCH_X86_64
+          - SCMP_ARCH_X86
+          - SCMP_ARCH_X32
+        syscalls:
+          - names:
+              - dup3
+              - symlinkat
+              - tgkill
+              - stat
+              - unlink
+              - clone
+              - open
+              - setgroups
+              - read
+              - umask
+              - access
+              - nanosleep
+              - fcntl
+              - setsid
+              - getdents64
+              - prctl
+              - fchdir
+              - getpid
+              - fstat
+              - capset
+              - sigaltstack
+              - mmap
+              - write
+              - newfstatat
+              - set_tid_address
+              - rt_sigprocmask
+              - pread64
+              - set_robust_list
+              - statfs
+              - gettid
+              - unshare
+              - faccessat2
+              - setgid
+              - rt_sigaction
+              - unlinkat
+              - exit_group
+              - getcwd
+              - munmap
+              - readlinkat
+              - umount2
+              - brk
+              - getuid
+              - mprotect
+              - fstatfs
+              - keyctl
+              - mkdirat
+              - mount
+              - pipe2
+              - futex
+              - sched_yield
+              - sendfile
+              - chdir
+              - pivot_root
+              - capget
+              - rt_sigreturn
+              - sethostname
+              - getppid
+              - openat
+              - fork
+              - fchownat
+              - lstat
+              - epoll_pwait
+              - epoll_create1
+              - mknodat
+              - utimensat
+              - sched_getaffinity
+              - epoll_ctl
+              - arch_prctl
+              - wait4
+              - fchmodat
+              - execve
+              - setuid
+              - close
+            action: SCMP_ACT_ALLOW
