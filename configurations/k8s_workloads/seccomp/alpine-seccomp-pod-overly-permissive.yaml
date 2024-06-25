@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-syscall-overly-permissive
+spec:
+  selector:
+    matchLabels:
+      app: alpine-syscall-overly-permissive
+  template:
+    metadata:
+      labels:
+        app: alpine-syscall-overly-permissive
+    spec:
+      containers:
+        - name: alpine-overly-permissive
+          image: alpine
+          command: ["/bin/sh"]
+          args: ["-c", "sleep 600"]
+          securityContext:
+            seccompProfile:
+              type: Localhost
+              localhostProfile: default/replicaset-alpine-77b4fdf86c-alpine-overly-permissive.json

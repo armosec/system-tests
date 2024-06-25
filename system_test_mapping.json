@@ -1450,7 +1450,7 @@
     ],
     "description": "Checks seccomp profiles flow",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "matthiasb@armosec.io"
   },
   "seccomp_profile_container": {
     "target": [
@@ -1466,6 +1466,23 @@
       "synchronizer"
     ],
     "description": "Checks seccomp profiles flow",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "seccomp_profile_workloads_list": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart",
+      "node-agent",
+      "storage",
+      "cadashboardbe",
+      "event-ingester-service",
+      "synchronizer"
+    ],
+    "description": "Checks seccomp workload list on backend",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   }

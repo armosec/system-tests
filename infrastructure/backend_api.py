@@ -125,6 +125,8 @@ API_RUNTIME_INCIDENTS = "/api/v1/runtime/incidents"
 API_RUNTIME_INCIDENTSPERSEVERITY = "/api/v1/runtime/incidentsPerSeverity"
 API_RUNTIME_INCIDENTSOVERTIME = "/api/v1/runtime/incidentsOvertime"
 
+API_SECCOMP_LIST = "/api/v1/seccomp/list"
+
 
 def deco_cookie(func):
 
@@ -2686,7 +2688,18 @@ class ControlPanelAPI(object):
                     url, self.customer, r.status_code, r.text))
 
 
+    def get_seccomp_workloads_list(self, body: dict): 
+        params = {"customerGUID": self.selected_tenant_id}
 
+        r = self.post(API_SECCOMP_LIST, params=params, json=body, timeout=60)
+        Logger.logger.info("get_seccomp_workloads_list response text: %s" % r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get seccomp workloads list "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
 
 
 

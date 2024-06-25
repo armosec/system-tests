@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-syscall-missing
+spec:
+  selector:
+    matchLabels:
+      app: alpine-syscall-missing
+  template:
+    metadata:
+      labels:
+        app: alpine-syscall-missing
+    spec:
+      containers:
+        - name: alpine
+          image: alpine
+          command: ["/bin/sh"]
+          args: ["-c", "sleep 600"]
