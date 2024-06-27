@@ -940,7 +940,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         image = image[0]
         image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']", "root['digest']",
                                 "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']",
-                                "root['architecture']", "root['os']", "root['size'], root['baseImage']",}
+                                "root['architecture']", "root['os']", "root['size'], root['baseImage']"
+                                "root['clustersCount']", "root['namespacesCount']", "root['workloadsCount']"}
         if updateExpected:
             TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
 
