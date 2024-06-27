@@ -296,8 +296,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "another exception")
 
         Logger.logger.info("11.2 verify exception was created.")
-        exceptions_list_before_fix = scenarios_manager.get_exceptions_list()
-        assert exceptions_list_before_fix["total"]["value"] > 0, "no exceptions found"
+        _ = scenarios_manager.verify_exception_exists()
 
         Logger.logger.info("11.3 delete resource (apply fix)")
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
@@ -305,9 +304,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         scenarios_manager.verify_fix()
 
         Logger.logger.info("11.5 verify expections deletion after resource deletion.")
-        exceptions_list_after_fix = scenarios_manager.get_exceptions_list()
-        assert exceptions_list_after_fix["total"]["value"] == 0, "exceptions found after fix (resource deleted)"
-        
+        _ = scenarios_manager.verify_exception_not_exists()
 
         return self.cleanup()
 
