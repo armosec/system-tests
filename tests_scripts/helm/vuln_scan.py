@@ -940,33 +940,43 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         image = image[0]
         image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']", "root['digest']",
                                 "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']",
-                                "root['architecture']", "root['os']", "root['size']"}
+                                "root['architecture']", "root['os']", "root['size'], root['baseImage']",}
         if updateExpected:
             TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
+
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details_temp.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
       
         Logger.logger.info('6. get workloads CVEs and match with workload summary')
         body['innerFilters'][0]['severity'] = "Critical"
         body['innerFilters'][0]['riskFactors'] = "External facing"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["criticalCount"])
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_temp.json")
+
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Critical"]:
                 raise Exception(f'cve {cve["name"]} not found in critical cves')
         
         body['innerFilters'][0]['severity'] = "High"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["highCount"])
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_high_temp.json")
+
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["High"]:
                 raise Exception(f'cve {cve["name"]} not found in high cves')
         
         body['innerFilters'][0]['severity'] = "Medium"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["mediumCount"])
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_medium_temp.json")
+
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Medium"]:
                 raise Exception(f'cve {cve["name"]} not found in medium cves')
             
         body['innerFilters'][0]['severity'] = "Low"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["lowCount"])
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_low_temp.json")
+
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Low"]:
                 raise Exception(f'cve {cve["name"]} not found in low cves')
@@ -975,6 +985,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         body['innerFilters'][0]['severity'] = ""
         body['innerFilters'][0]['exploitable'] = "Known Exploited,High Likelihood"
         cve = self.backend.get_vulns_v2(body=body, expected_results=1)
+        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_exploit_temp.json")
+
         cve = cve[0]
         body['innerFilters'][0]['name'] = cve["name"]
         body['innerFilters'][0]['componentInfo.name'] = cve["componentInfo"]["name"]
@@ -989,6 +1001,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                               "root['cvssInfo']['baseScore']"}
         if updateExpected:
             TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details.json")
+
+        TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)
 
         if updateExpected:

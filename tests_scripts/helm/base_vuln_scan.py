@@ -12,6 +12,8 @@ class BaseVulnerabilityScanning(BaseHelm):
         super(BaseVulnerabilityScanning, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                         kubernetes_obj=kubernetes_obj)
         self.ignore_agent = True
+        self.wait_for_agg_to_end = False
+
 
     def cleanup(self, **kwargs):
         super().cleanup(**kwargs)
