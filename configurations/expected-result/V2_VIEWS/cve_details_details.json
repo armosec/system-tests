@@ -64,7 +64,7 @@
     ],
     "description": "Directory traversal vulnerability in Apache HTTP Server and Tomcat 5.x before 5.5.22 and 6.x before 6.0.10, when using certain proxy modules (mod_proxy, mod_rewrite, mod_jk), allows remote attackers to read arbitrary files via a .. (dot dot) sequence with combinations of (1) \"/\" (slash), (2) \"\\\" (backslash), and (3) URL-encoded backslash (%5C) characters in the URL, which are valid separators in Tomcat but not in Apache.",
     "exploitable": "High Likelihood",
-    "isRelevant": "Yes",
+    "isRelevant": "No",
     "componentInfo": {
         "customerGUID": "",
         "name": "httpd",
@@ -74,16 +74,16 @@
         "fixVersions": null,
         "pathsInfo": [
             {
-                "namespace": "systest-ns-hzfm",
+                "namespace": "systest-ns-f5v7",
                 "workloadName": "httpd-proxy",
                 "containerName": "httpd",
                 "workloadKind": "deployment",
-                "workloadHash": "9481037807453735784",
+                "workloadHash": "8969964172352867146",
                 "wlid": "",
-                "clusterName": "gke_elated-pottery-310110_us-central1-c_bez-longrun-3",
+                "clusterName": "testvuln",
                 "clusterShortName": "",
                 "imageTag": "docker.io/library/httpd:2.4.58",
-                "imageHash": "docker.io/library/httpd@sha256:374766f5bc5977c9b72fdb8ae3ed05b7fc89060e7edc88fcbf142d6988e58eeb",
+                "imageHash": "httpd@sha256:374766f5bc5977c9b72fdb8ae3ed05b7fc89060e7edc88fcbf142d6988e58eeb",
                 "isRelevant": "Yes",
                 "paths": [
                     "/usr/local/apache2/bin/httpd"
@@ -117,9 +117,9 @@
         ]
     },
     "epssInfo": {
-        "epss": 0.97307,
-        "percentile": 0.99871,
-        "date": "2024-06-08"
+        "epss": 0.97345,
+        "percentile": 0.99897,
+        "date": "2024-06-26"
     },
     "cisaKevInfo": {
         "dateAdded": "",
@@ -127,7 +127,7 @@
         "knownRansomwareCampaignUse": "",
         "notes": ""
     },
-    "workloadsCount": 1,
+    "workloadsCount": 5,
     "imagesCount": 1,
     "ignoreRulesSummary": {}
 }
