@@ -255,6 +255,44 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.backend.get_security_risks_exceptions_list(self.cluster)
         response = json.loads(r.text)
         return response
+    
+    def verify_exception_exists(self):
+        """
+        verify_exception_exists validate the exceptions exists on the backend
+        """
+        exists, t = self.wait_for_report(
+            self.exception_exists, 
+            timeout=60,
+            sleep_interval=10
+            )
+        return exists
+    
+    def verify_exception_not_exists(self):
+        """
+        verify_exception_not_exists validate the exceptions not exists on the backend
+        """
+        not_exists, t = self.wait_for_report(
+            self.exception_not_exists, 
+            timeout=60,
+            sleep_interval=10
+            )
+        return not_exists
+    
+    def exception_exists(self):
+        """
+        exception_exists validate the exceptions exists on the backend
+        """
+        exceptions_res = self.get_exceptions_list()
+        assert exceptions_res["total"]["value"] > 0, "No exceptions found, expecting exceptions"
+        return True
+    
+    def exception_not_exists(self):
+        """
+        exception_not_exists validate the exceptions not exists on the backend
+        """
+        exceptions_res = self.get_exceptions_list()
+        assert exceptions_res["total"]["value"] == 0, "Exceptions found, expecting no exceptions"
+        return True
 
     def add_new_exception(self, security_risk_id, k8s_resource_ids=[], reason=""):
         """
