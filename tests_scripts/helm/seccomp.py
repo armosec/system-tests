@@ -286,12 +286,18 @@ class SeccompProfileGenerate(SeccompProfileList):
         response = self.generate_seccomp(response)
 
         Logger.logger.info(f"6 Apply optimized seccomp profile, verify that workload runs and all good")
-        #self.apply_yaml_file(
-        #    yaml_file=response["suggestedWorkload"]["new"], namespace=namespace
-        #)
-        #self.verify_all_pods_are_running(
-      #      namespace=namespace, workload=workload, timeout=300
-        #)
+
+        # Remove the resourceVersion field from the new suggested workload so apply will work
+        suggested_workload = response["suggestedWorkload"]["new"]
+        if "metadata" in suggested_workload and "resourceVersion" in suggested_workload["metadata"]:
+            del suggested_workload["metadata"]["resourceVersion"]
+
+        self.apply_yaml_file(
+            yaml_file=suggested_workload, namespace=namespace
+        )
+        self.verify_all_pods_are_running(
+            namespace=namespace, workload=workload, timeout=300
+        )
         return self.cleanup()
 
     def generate_seccomp(self, response):
@@ -340,27 +346,37 @@ class SeccompProfileGenerate(SeccompProfileList):
             except (yaml.YAMLError, json.JSONDecodeError) as e:
                 raise ValueError(f"Error parsing YAML/JSON from file {workload_overly_permissive_path}: {e}")
 
-        expected_security_context = expected_json_content["spec"]["template"]["spec"]["containers"][0]["securityContext"]
+        expected_security_context = expected_json_content["spec"]["template"]["spec"]["containers"][0][
+            "securityContext"]
         container_name = expected_json_content["spec"]["template"]["spec"]["containers"][0]["name"]
         namespace = response["namespace"]
         workload_name = response["name"]
         workload_kind = response["kind"]
         # Compare security contexts
         assert old_security_context == expected_security_context, f"expected securityContext: {expected_security_context}, got: {old_security_context}"
-        assert new_security_context["seccompProfile"]["type"] == "Localhost", f"expected securityContext type: Localhost, got:{new_security_context['seccompProfile']['type']}"
+        assert new_security_context["seccompProfile"][
+                   "type"] == "Localhost", f"expected securityContext type: Localhost, got:{new_security_context['seccompProfile']['type']}"
         expected_localhost_profile_path = f"{namespace}/{workload_kind}-{workload_name}-{container_name}.json"
-        assert new_security_context["seccompProfile"]["localhostProfile"] == expected_localhost_profile_path, f"expected securityContext localhostProfile : {expected_localhost_profile_path}, got: {new_security_context['seccompProfile']['localhostProfile']}"
+        assert new_security_context["seccompProfile"][
+                   "localhostProfile"] == expected_localhost_profile_path, f"expected securityContext localhostProfile : {expected_localhost_profile_path}, got: {new_security_context['seccompProfile']['localhostProfile']}"
 
         # check seccompCRD
         seccomp_crd = response["seccompCRD"]
-        assert seccomp_crd["metadata"]["name"] == workload_name, f"expected seccompCRD metadata name: {res_item['name']}, got: {seccomp_crd['metadata']['name']}"
-        assert seccomp_crd["metadata"]["namespace"] == res_item["namespace"], f"expected seccompCRD metadata namespace: {namespace}, got: {seccomp_crd['metadata']['namespace']}"
+        assert seccomp_crd["metadata"][
+                   "name"] == workload_name, f"expected seccompCRD metadata name: {res_item['name']}, got: {seccomp_crd['metadata']['name']}"
+        assert seccomp_crd["metadata"]["namespace"] == res_item[
+            "namespace"], f"expected seccompCRD metadata namespace: {namespace}, got: {seccomp_crd['metadata']['namespace']}"
         seccomp_crd_container = seccomp_crd["spec"]["containers"][0]
         seccomp_crd_container_spec = seccomp_crd_container["spec"]
         expected_path = f"{namespace}/{workload_kind}-{workload_name}-{container_name}.json"
-        assert seccomp_crd_container["path"] == expected_path, f"expected seccompCRD container path: {expected_path}, got: {seccomp_crd_container['path']}"
-        assert seccomp_crd_container["name"] == container_name, f"expected seccompCRD container name: {container_name}, got: {seccomp_crd_container['name']}"
-        assert seccomp_crd_container_spec["defaultAction"] == "SCMP_ACT_ERRNO", f"expected defaultAction: SCMP_ACT_ERRNO, got: {seccomp_crd_container_spec['defaultAction']}"
-        assert seccomp_crd_container_spec["architectures"] == ["SCMP_ARCH_X86_64", "SCMP_ARCH_X86", "SCMP_ARCH_X32"], f"expected architectures: ['SCMP_ARCH_X86_64', 'SCMP_ARCH_X86', 'SCMP_ARCH_X32'], got: {seccomp_crd_container_spec['architectures']}"
-        assert seccomp_crd_container_spec["syscalls"][0]["action"] == "SCMP_ACT_ALLOW", f"expected syscalls action :SCMP_ACT_ALLOW, got: {seccomp_crd_container_spec['syscalls'][0]['action']}"
+        assert seccomp_crd_container[
+                   "path"] == expected_path, f"expected seccompCRD container path: {expected_path}, got: {seccomp_crd_container['path']}"
+        assert seccomp_crd_container[
+                   "name"] == container_name, f"expected seccompCRD container name: {container_name}, got: {seccomp_crd_container['name']}"
+        assert seccomp_crd_container_spec[
+                   "defaultAction"] == "SCMP_ACT_ERRNO", f"expected defaultAction: SCMP_ACT_ERRNO, got: {seccomp_crd_container_spec['defaultAction']}"
+        assert seccomp_crd_container_spec["architectures"] == ["SCMP_ARCH_X86_64", "SCMP_ARCH_X86",
+                                                               "SCMP_ARCH_X32"], f"expected architectures: ['SCMP_ARCH_X86_64', 'SCMP_ARCH_X86', 'SCMP_ARCH_X32'], got: {seccomp_crd_container_spec['architectures']}"
+        assert seccomp_crd_container_spec["syscalls"][0][
+                   "action"] == "SCMP_ACT_ALLOW", f"expected syscalls action :SCMP_ACT_ALLOW, got: {seccomp_crd_container_spec['syscalls'][0]['action']}"
         return response
