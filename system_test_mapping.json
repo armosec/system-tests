@@ -1485,5 +1485,22 @@
     "description": "Checks seccomp workload list on backend",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
+  },
+  "seccomp_profile_generate": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
+    ],
+    "description": "Checks seccomp profile generate on backend",
+    "skip_on_environment": "",
+    "owner": "rinao@armosec.io"
   }
 }

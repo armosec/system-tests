@@ -2711,9 +2711,8 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     API_SECCOMP_GENERATE, self.customer, r.status_code, r.text))
-        return r.json()
+        return r
 
-    # /jira/issue
 
 
 class Solution(object):
