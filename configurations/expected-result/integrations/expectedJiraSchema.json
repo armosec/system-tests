@@ -1,6 +1,6 @@
 {
     "total": {
-        "value": 14,
+        "value": 13,
         "relation": "eq"
     },
     "response": [
@@ -128,14 +128,6 @@
             "fieldId": "labels",
             "type": "array",
             "items": "string",
-            "topValues": null,
-            "searchable": true
-        },
-        {
-            "required": false,
-            "name": "Reporter",
-            "fieldId": "reporter",
-            "type": "user",
             "topValues": null,
             "searchable": true
         },

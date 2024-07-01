@@ -361,7 +361,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         r = self.backend.get_security_risks_resources(self.cluster, self.namespace, security_risk_id)
         response = json.loads(r.text)
-        if response["response"] ==  None:
+        if "response" not in response or response["response"] ==  None:
             response["response"] = []
         return response
     
