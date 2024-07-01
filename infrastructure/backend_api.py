@@ -2244,9 +2244,9 @@ class ControlPanelAPI(object):
 
     def post_list_request(self, url, body: dict, expected_results: int = 0, params: dict = None):
         if params is None:
-            params = {"customerGUID": self.customer_guid}
+            params = {"customerGUID": self.selected_tenant_id}
         else:
-            params["customerGUID"] = self.customer_guid
+            params["customerGUID"] = self.selected_tenant_id
         r = self.post(url + "/list", params=params,
                       json=body)
         if not 200 <= r.status_code < 300:

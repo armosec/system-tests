@@ -62,7 +62,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert jiraStatus, "Jira is missing form connection status"
         assert jiraStatus['status'] == "connected", "Jira is not connected"
 
-        Logger.logger.info('get cyberarmor-io site')       
+        Logger.logger.info('get cyberarmor-io site')   
         projectsResp = self.backend.search_jira_projects({})
         assert projectsResp, "Jira projects response is empty"
         site = next((site for site in projectsResp['availableSites'] if site['name'] == 'cyberarmor-io'), None)
@@ -100,7 +100,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             field['topValues'] = None
                 
         #uncomment to update expected 
-        #TestUtil.save_expceted_json(schema, "configurations/expected-result/integrations/expectedJiraSchema.json")     
+        # TestUtil.save_expceted_json(schema, "configurations/expected-result/integrations/expectedJiraSchema_1.json")     
         TestUtil.compare_with_expected_file("configurations/expected-result/integrations/expectedJiraSchema.json", schema, {})
         #set site, project and issueType for the test
         self.site = site
