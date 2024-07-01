@@ -241,21 +241,20 @@ class SeccompProfileGenerate(SeccompProfileList):
         """
         # Call the original start method from SeccompProfileList and get the response
         cluster, namespace = self.setup(apply_services=False)
-        print("Debug: cluster: ", cluster)
 
-        Logger.logger.info(f"1. Install Helm Chart")
+        Logger.logger.info("1. Install Helm Chart")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.verify_running_pods(
             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
         )
 
-        Logger.logger.info(f"2 Apply overly_permissive seccomp profile")
+        Logger.logger.info("2 Apply overly_permissive seccomp profile")
         self.apply_yaml_file(
             yaml_file=self.test_obj["seccomp_overly_permissive"], namespace=namespace
         )
 
-        Logger.logger.info(f"3 Apply workload overly_permissive")
+        Logger.logger.info("3 Apply workload overly_permissive yaml")
         workload = self.apply_yaml_file(
             yaml_file=self.test_obj["workload_overly_permissive"], namespace=namespace
         )
@@ -263,7 +262,7 @@ class SeccompProfileGenerate(SeccompProfileList):
             namespace=namespace, workload=workload, timeout=300
         )
 
-        Logger.logger.info("4. Validate backend seccomp workloads list")
+        Logger.logger.info("4. Validate backend seccomp profile workloads list")
         expected = self.test_obj["expected"]
         try:
             response = self.wait_for_report(
@@ -285,7 +284,7 @@ class SeccompProfileGenerate(SeccompProfileList):
         # Generate seccomp profile and validate response
         response = self.generate_seccomp(response)
 
-        Logger.logger.info(f"6 Apply optimized seccomp profile, verify that workload runs and all good")
+        Logger.logger.info("6 Apply optimized seccomp profile, verify that workload runs and all good")
 
         # Remove the resourceVersion field from the new suggested workload so apply will work
         suggested_workload = response["suggestedWorkload"]["new"]
@@ -319,19 +318,16 @@ class SeccompProfileGenerate(SeccompProfileList):
 
         res = self.backend.generate_seccomp_profile(generate_seccomp_body)
         response = json.loads(res.text)
+        namespace = response["namespace"]
+        workload_name = response["name"]
+        workload_kind = response["kind"]
 
-        assert response["name"] == res_item["name"], f"expected name: {res_item['name']}, got: {response['name']}"
-        assert response["kind"] == res_item["kind"], f"expected kind: {res_item['kind']}, got: {response['kind']}"
-        assert response["namespace"] == res_item[
+        assert workload_name == res_item["name"], f"expected name: {res_item['name']}, got: {response['name']}"
+        assert workload_kind == res_item["kind"], f"expected kind: {res_item['kind']}, got: {response['kind']}"
+        assert namespace == res_item[
             "namespace"], f"expected namespace: {res_item['namespace']}, got: {response['namespace']}"
         assert response["k8sResourceHash"] == res_item[
             "k8sResourceHash"], f"expected k8sResourceHash: {res_item['k8sResourceHash']}, got: {response['k8sResourceHash']}"
-
-        # Extract the securityContext from both old and new suggestedWorkload
-        old_security_context = response["suggestedWorkload"]["old"]["spec"]["template"]["spec"]["containers"][0][
-            "securityContext"]
-        new_security_context = response["suggestedWorkload"]["new"]["spec"]["template"]["spec"]["containers"][0][
-            "securityContext"]
 
         # Load the expected YAML content and convert to JSON
         workload_overly_permissive_path = self.test_obj["workload_overly_permissive"]
@@ -348,10 +344,13 @@ class SeccompProfileGenerate(SeccompProfileList):
 
         expected_security_context = expected_json_content["spec"]["template"]["spec"]["containers"][0][
             "securityContext"]
+
+        # Extract the securityContext from both old and new suggestedWorkload
         container_name = expected_json_content["spec"]["template"]["spec"]["containers"][0]["name"]
-        namespace = response["namespace"]
-        workload_name = response["name"]
-        workload_kind = response["kind"]
+        old_security_context = response["suggestedWorkload"]["old"]["spec"]["template"]["spec"]["containers"][0][
+            "securityContext"]
+        new_security_context = response["suggestedWorkload"]["new"]["spec"]["template"]["spec"]["containers"][0][
+            "securityContext"]
         # Compare security contexts
         assert old_security_context == expected_security_context, f"expected securityContext: {expected_security_context}, got: {old_security_context}"
         assert new_security_context["seccompProfile"][
