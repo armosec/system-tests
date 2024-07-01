@@ -282,9 +282,9 @@ class SeccompProfileGenerate(SeccompProfileList):
         Logger.logger.info("5. Generate seccomp profile")
 
         # Generate seccomp profile and validate response
-        response = self.generate_seccomp(response)
+        response = self.verify_seccomp_generate(response)
 
-        Logger.logger.info("6 Apply optimized seccomp profile, verify that workload runs and all good")
+        Logger.logger.info("6. Apply optimized seccomp profile, verify that workload is up and running")
 
         # Remove the resourceVersion field from the new suggested workload so apply will work
         suggested_workload = response["suggestedWorkload"]["new"]
@@ -299,15 +299,15 @@ class SeccompProfileGenerate(SeccompProfileList):
         )
         return self.cleanup()
 
-    def generate_seccomp(self, response):
+    def verify_seccomp_generate(self, response):
         """
         Generate seccomp profile with BE API and verify response
         """
-        Logger.logger.info("Generating seccomp profile")
 
         res_item = response[0]["response"][0]
         assert len(res_item) > 0, f"expected non empty response items, got: {len(response['response'])}"
 
+        Logger.logger.info(f"Generating seccomp profile for resource {res_item['k8sResourceHash']}")
         generate_seccomp_body = {
             "innerFilters": [
                 {
@@ -331,11 +331,9 @@ class SeccompProfileGenerate(SeccompProfileList):
 
         # Load the expected YAML content and convert to JSON
         workload_overly_permissive_path = self.test_obj["workload_overly_permissive"]
-        assert os.path.isfile(workload_overly_permissive_path), f"File not found: {workload_overly_permissive_path}"
 
         with open(workload_overly_permissive_path, 'r') as f:
             file_content = f.read().strip()
-            assert file_content, f"File is empty: {workload_overly_permissive_path}"
             try:
                 expected_yaml_content = yaml.safe_load(file_content)
                 expected_json_content = json.loads(json.dumps(expected_yaml_content))
@@ -362,7 +360,7 @@ class SeccompProfileGenerate(SeccompProfileList):
         # check seccompCRD
         seccomp_crd = response["seccompCRD"]
         assert seccomp_crd["metadata"][
-                   "name"] == workload_name, f"expected seccompCRD metadata name: {res_item['name']}, got: {seccomp_crd['metadata']['name']}"
+                   "name"] == workload_name, f"expected seccompCRD metadata name: {workload_name}, got: {seccomp_crd['metadata']['name']}"
         assert seccomp_crd["metadata"]["namespace"] == res_item[
             "namespace"], f"expected seccompCRD metadata namespace: {namespace}, got: {seccomp_crd['metadata']['namespace']}"
         seccomp_crd_container = seccomp_crd["spec"]["containers"][0]
