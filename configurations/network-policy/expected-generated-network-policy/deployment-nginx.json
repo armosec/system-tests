@@ -1,45 +1,45 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "GeneratedNetworkPolicy",
-    "metadata": {
-        "creationTimestamp": "2023-12-14T09:25:02Z",
-        "labels": {
-            "kubescape.io/workload-api-group": "apps",
-            "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "nginx"
-        },
-        "name": "deployment-nginx",
-        "namespace": "systest-ns-pjqm"
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "kind": "GeneratedNetworkPolicy",
+  "metadata": {
+    "creationTimestamp": "2023-12-14T09:25:02Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "nginx"
     },
-    "policyRef": [],
+    "name": "deployment-nginx",
+    "namespace": "systest-ns-pjqm"
+  },
+  "policyRef": [],
+  "spec": {
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "NetworkPolicy",
+    "metadata": {
+      "annotations": {
+        "generated-by": "kubescape"
+      },
+      "creationTimestamp": null,
+      "labels": {
+        "kubescape.io/workload-api-group": "apps",
+        "kubescape.io/workload-api-version": "v1",
+        "kubescape.io/workload-kind": "Deployment",
+        "kubescape.io/workload-name": "nginx"
+      },
+      "name": "deployment-nginx",
+      "namespace": "systest-ns-pjqm"
+    },
     "spec": {
-        "apiVersion": "networking.k8s.io/v1",
-        "kind": "NetworkPolicy",
-        "metadata": {
-            "annotations": {
-                "generated-by": "kubescape"
-            },
-            "creationTimestamp": null,
-            "labels": {
-                "kubescape.io/workload-api-group": "apps",
-                "kubescape.io/workload-api-version": "v1",
-                "kubescape.io/workload-kind": "Deployment",
-                "kubescape.io/workload-name": "nginx"
-            },
-            "name": "deployment-nginx",
-            "namespace": "systest-ns-pjqm"
-        },
-        "spec": {
-            "egress": [],
-            "podSelector": {
-                "matchLabels": {
-                    "app": "nginx"
-                }
-            },
-            "policyTypes": [
-                "Egress"
-            ]
+      "egress": [],
+      "podSelector": {
+        "matchLabels": {
+          "app": "nginx"
         }
+      },
+      "policyTypes": [
+        "Egress"
+      ]
     }
+  }
 }

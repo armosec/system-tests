@@ -3,9 +3,10 @@
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
     "name": "deployment-mariadb",
-    "uid": "3e127fdc-e94b-4ddf-994d-e42315caa5a0",
+    "namespace": "systest-ns-hvt7",
+    "uid": "45a5f0df-855b-423d-b5d1-bea710fd2cbf",
     "resourceVersion": "1",
-    "creationTimestamp": "2024-04-18T12:20:15Z",
+    "creationTimestamp": "2024-07-03T15:42:50Z",
     "labels": {
       "kubescape.io/workload-api-group": "apps",
       "kubescape.io/workload-api-version": "v1",
@@ -43,6 +44,6 @@
         "ipAddress": ""
       }
     ],
-    "egress": []
+    "egress": null
   }
 }

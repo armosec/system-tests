@@ -2,14 +2,15 @@
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "kind": "GeneratedNetworkPolicy",
   "metadata": {
-    "creationTimestamp": "2023-12-03T09:08:50Z",
+    "creationTimestamp": "2023-12-14T09:25:02Z",
     "labels": {
       "kubescape.io/workload-api-group": "apps",
       "kubescape.io/workload-api-version": "v1",
       "kubescape.io/workload-kind": "Deployment",
       "kubescape.io/workload-name": "nginx"
     },
-    "name": "deployment-nginx"
+    "name": "deployment-nginx",
+    "namespace": "systest-ns-pjqm"
   },
   "policyRef": [],
   "spec": {
@@ -27,10 +28,10 @@
         "kubescape.io/workload-name": "nginx"
       },
       "name": "deployment-nginx",
-      "namespace": "systest-ns-uzhe"
+      "namespace": "systest-ns-pjqm"
     },
     "spec": {
-            "egress": [],
+      "egress": [],
       "podSelector": {
         "matchLabels": {
           "app": "nginx"

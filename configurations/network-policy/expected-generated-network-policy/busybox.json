@@ -1,105 +1,105 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "GeneratedNetworkPolicy",
-    "metadata": {
-        "creationTimestamp": "2024-03-07T12:50:12Z",
-        "labels": {
-            "kubescape.io/workload-api-group": "apps",
-            "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "busybox-deployment"
-        },
-        "name": "deployment-busybox-deployment",
-        "namespace": "systest-ns-h8yd"
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "kind": "GeneratedNetworkPolicy",
+  "metadata": {
+    "creationTimestamp": "2024-03-07T12:50:12Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "busybox-deployment"
     },
-    "policyRef": [
-        {
-            "dns": "google.com.",
-            "ipBlock": "64.233.182.138/32",
-            "name": "",
-            "originalIP": "64.233.182.138",
-            "server": ""
-        },
-        {
-            "dns": "www.google.com.",
-            "ipBlock": "209.85.145.147/32",
-            "name": "",
-            "originalIP": "209.85.145.147",
-            "server": ""
-        }
-    ],
-    "spec": {
-        "apiVersion": "networking.k8s.io/v1",
-        "kind": "NetworkPolicy",
-        "metadata": {
-            "annotations": {
-                "generated-by": "kubescape"
-            },
-            "creationTimestamp": null,
-            "labels": {
-                "kubescape.io/workload-api-group": "apps",
-                "kubescape.io/workload-api-version": "v1",
-                "kubescape.io/workload-kind": "Deployment",
-                "kubescape.io/workload-name": "busybox-deployment"
-            },
-            "name": "deployment-busybox-deployment",
-            "namespace": "systest-ns-h8yd"
-        },
-        "spec": {
-            "egress": [
-                {
-                    "ports": [
-                        {
-                            "port": 80,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "ipBlock": {
-                                "cidr": "209.85.145.147/32"
-                            }
-                        },
-                        {
-                            "ipBlock": {
-                                "cidr": "64.233.182.138/32"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 53,
-                            "protocol": "UDP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "namespaceSelector": {
-                                "matchLabels": {
-                                    "kubernetes.io/metadata.name": "kube-system"
-                                }
-                            },
-                            "podSelector": {
-                                "matchLabels": {
-                                    "k8s-app": "kube-dns"
-                                }
-                            }
-                        }
-                    ]
-                }
-            ],
-            "ingress": [],
-            "podSelector": {
-                "matchLabels": {
-                    "app": "busybox"
-                }
-            },
-            "policyTypes": [
-                "Ingress",
-                "Egress"
-            ]
-        }
+    "name": "deployment-busybox-deployment",
+    "namespace": "systest-ns-h8yd"
+  },
+  "policyRef": [
+    {
+      "dns": "google.com.",
+      "ipBlock": "64.233.182.138/32",
+      "name": "",
+      "originalIP": "64.233.182.138",
+      "server": ""
+    },
+    {
+      "dns": "www.google.com.",
+      "ipBlock": "209.85.145.147/32",
+      "name": "",
+      "originalIP": "209.85.145.147",
+      "server": ""
     }
+  ],
+  "spec": {
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "NetworkPolicy",
+    "metadata": {
+      "annotations": {
+        "generated-by": "kubescape"
+      },
+      "creationTimestamp": null,
+      "labels": {
+        "kubescape.io/workload-api-group": "apps",
+        "kubescape.io/workload-api-version": "v1",
+        "kubescape.io/workload-kind": "Deployment",
+        "kubescape.io/workload-name": "busybox-deployment"
+      },
+      "name": "deployment-busybox-deployment",
+      "namespace": "systest-ns-h8yd"
+    },
+    "spec": {
+      "egress": [
+        {
+          "ports": [
+            {
+              "port": 80,
+              "protocol": "TCP"
+            }
+          ],
+          "to": [
+            {
+              "ipBlock": {
+                "cidr": "209.85.145.147/32"
+              }
+            },
+            {
+              "ipBlock": {
+                "cidr": "64.233.182.138/32"
+              }
+            }
+          ]
+        },
+        {
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP"
+            }
+          ],
+          "to": [
+            {
+              "namespaceSelector": {
+                "matchLabels": {
+                  "kubernetes.io/metadata.name": "kube-system"
+                }
+              },
+              "podSelector": {
+                "matchLabels": {
+                  "k8s-app": "kube-dns"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "ingress": [],
+      "podSelector": {
+        "matchLabels": {
+          "app": "busybox"
+        }
+      },
+      "policyTypes": [
+        "Ingress",
+        "Egress"
+      ]
+    }
+  }
 }
