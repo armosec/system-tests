@@ -310,7 +310,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Verify Jira issue in vulnerability")
         vulns = self.backend.get_vulns_v2(body={"innerFilters": [{"id": self.vuln['id'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload')
-        assert len(vulns) == 1, "Expected one vulnerability"
+        assert len(vulns) == 2, "Expected two vulnerabilities"
         assert len(vulns[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in component")
