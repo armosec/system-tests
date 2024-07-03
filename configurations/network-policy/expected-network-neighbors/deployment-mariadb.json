@@ -1,47 +1,49 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "NetworkNeighbors",
-    "metadata": {
-        "annotations": {
-            "kubescape.io/status": "ready"
-        },
-        "creationTimestamp": "2023-11-29T13:10:57Z",
-        "labels": {
-            "kubescape.io/workload-api-group": "apps",
-            "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "mariadb"
-        },
-        "name": "deployment-mariadb",
-        "namespace": "systest-ns-xn23",
-        "resourceVersion": "1",
-        "uid": "def106b9-b22a-4b56-9946-6511df424a6b"
+  "kind": "NetworkNeighbors",
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "metadata": {
+    "name": "deployment-mariadb",
+    "namespace": "systest-ns-j1m4",
+    "uid": "14375c2f-c5c9-49e7-b5e2-d7f76728b0e4",
+    "resourceVersion": "1",
+    "creationTimestamp": "2024-07-03T15:50:06Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "mariadb"
     },
-    "spec": {
-        "egress": [],
-        "ingress": [
-            {
-                "dns": "",
-                "identifier": "ee5c5b2f07834fa64174c3d2ad0505366e4b26777174906b91e83dcd163f8ec2",
-                "ipAddress": "",
-                "namespaceSelector": null,
-                "podSelector": {
-                    "matchLabels": {
-                        "app": "wikijs"
-                    }
-                },
-                "ports": [
-                    {
-                        "name": "TCP-3306",
-                        "port": 3306,
-                        "protocol": "TCP"
-                    }
-                ],
-                "type": "internal"
-            }
-        ],
-        "matchLabels": {
-            "app": "mariadb"
-        }
+    "annotations": {
+      "kubescape.io/completion": "complete",
+      "kubescape.io/status": "ready"
     }
+  },
+  "spec": {
+    "matchLabels": {
+      "app": "mariadb"
+    },
+    "ingress": [
+      {
+        "identifier": "ee5c5b2f07834fa64174c3d2ad0505366e4b26777174906b91e83dcd163f8ec2",
+        "type": "internal",
+        "dns": "",
+        "dnsNames": null,
+        "ports": [
+          {
+            "name": "TCP-3306",
+            "protocol": "TCP",
+            "port": 3306
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app": "wikijs"
+          }
+        },
+        "namespaceSelector": null,
+        "ipAddress": ""
+      }
+    ],
+    "egress": null
+  }
 }
