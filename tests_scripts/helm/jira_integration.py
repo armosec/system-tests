@@ -305,22 +305,22 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         Logger.logger.info(f"Verify Jira issue in image")
         body={"innerFilters": [{"digest": self.vulnImage['digest'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}
         image = self.backend.get_vuln_v2_images(body=body, scope='workload')
-        assert len(image) == 1, "Expected one image"
+        assert len(image) == 1, f"Expected one image, got: {image}"
         assert len(image[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in vulnerability")
         vulns = self.backend.get_vulns_v2(body={"innerFilters": [{"id": self.vuln['id'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload')
-        assert len(vulns) == 1, "Expected one vulnerability"
+        assert len(vulns) == 1, f"Expected one vulnerability, got: {vulns}"
         assert len(vulns[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in component")
         components = self.backend.get_vuln_v2_components(body={"innerFilters": [{"name": self.vuln['componentInfo']['name'],"version": self.vuln['componentInfo']['version'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload')
-        assert len(components) == 1, "Expected one component"
+        assert len(components) == 1, f"Expected one component, got: {components}"
         assert len(components[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in workload")
         workloads = self.backend.get_vuln_v2_workloads(body={"innerFilters": [{"resourceHash": self.vulnWL['resourceHash']}]})
-        assert len(workloads) == 1, "Expected one workload"
+        assert len(workloads) == 1, f"Expected one workload, got: {workloads}"
         assert len(workloads[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"unlink Jira issues")
