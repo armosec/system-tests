@@ -1367,10 +1367,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
