@@ -928,11 +928,11 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks network policies and network neighbors in-cluster and backend match to expected",
     "skip_on_environment": "",
@@ -944,12 +944,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "operator",
-      "cadashboardbe",
-      "event-ingester-service"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "operator-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks network policies and network neighbors in-cluster and backend match to expected before and after data appended",
     "skip_on_environment": "",
@@ -961,10 +961,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "operator",
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "operator-dummy",
       "cadashboardb_dummy",
       "event-ingester-service_dummy"
     ],
@@ -977,7 +977,7 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe"
+      "cadashboardbe-dummy"
     ],
     "description": "Checks knownserverscache backend api endpoint returns 200",
     "skip_on_environment": "",
@@ -989,12 +989,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "operator",
-      "cadashboardbe",
-      "event-ingester-service"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "operator-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks network policies and network neighbors in-cluster and backend match to expected with multiple replicas",
     "skip_on_environment": "",
@@ -1006,12 +1006,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "operator",
-      "cadashboardbe",
-      "event-ingester-service"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "operator-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks network policies and network neighbors in-cluster and backend match to expected with known servers",
     "skip_on_environment": "",
