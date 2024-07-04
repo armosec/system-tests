@@ -24,7 +24,6 @@
         "identifier": "238053dc2e1cbe8820de562678e8cde84593e95d41e6f1a58bb987741f9e30a3",
         "type": "external",
         "dns": "",
-        "dnsNames": null,
         "ports": [
           {
             "name": "TCP-80",
@@ -40,7 +39,6 @@
         "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
         "type": "internal",
         "dns": "",
-        "dnsNames": null,
         "ports": [
           {
             "name": "UDP-53",
