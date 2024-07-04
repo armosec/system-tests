@@ -44,6 +44,6 @@
         "ipAddress": ""
       }
     ],
-    "egress": null
+    "egress": []
   }
 }
