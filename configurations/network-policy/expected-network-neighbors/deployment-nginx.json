@@ -19,10 +19,10 @@
     }
   },
   "spec": {
+    "egress": [],
+    "ingress": [],
     "matchLabels": {
       "app": "nginx"
-    },
-    "ingress": null,
-    "egress": null
+    }
   }
 }

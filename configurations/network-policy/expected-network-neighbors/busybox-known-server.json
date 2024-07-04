@@ -19,10 +19,6 @@
     }
   },
   "spec": {
-    "matchLabels": {
-      "app": "busybox"
-    },
-    "ingress": null,
     "egress": [
       {
         "identifier": "238053dc2e1cbe8820de562678e8cde84593e95d41e6f1a58bb987741f9e30a3",
@@ -82,6 +78,10 @@
         "namespaceSelector": null,
         "ipAddress": "142.250.179.68"
       }
-    ]
+    ],
+    "ingress": [],
+    "matchLabels": {
+      "app": "busybox"
+    }
   }
 }

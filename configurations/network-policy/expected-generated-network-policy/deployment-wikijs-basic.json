@@ -12,22 +12,7 @@
     "name": "deployment-wikijs",
     "namespace": "systest-ns-pjqm"
   },
-  "policyRef": [
-    {
-      "dns": "google.com.",
-      "ipBlock": "108.177.120.100/32",
-      "name": "",
-      "originalIP": "108.177.120.100",
-      "server": ""
-    },
-    {
-      "dns": "wikipedia.org.",
-      "ipBlock": "208.80.154.224/32",
-      "name": "",
-      "originalIP": "208.80.154.224",
-      "server": ""
-    }
-  ],
+  "policyRef": [],
   "spec": {
     "apiVersion": "networking.k8s.io/v1",
     "kind": "NetworkPolicy",
@@ -47,26 +32,6 @@
     },
     "spec": {
       "egress": [
-        {
-          "ports": [
-            {
-              "port": 443,
-              "protocol": "TCP"
-            }
-          ],
-          "to": [
-            {
-              "ipBlock": {
-                "cidr": "108.177.120.100/32"
-              }
-            },
-            {
-              "ipBlock": {
-                "cidr": "208.80.154.224/32"
-              }
-            }
-          ]
-        },
         {
           "ports": [
             {

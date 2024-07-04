@@ -19,10 +19,6 @@
     }
   },
   "spec": {
-    "matchLabels": {
-      "app": "wikijs"
-    },
-    "ingress": null,
     "egress": [
       {
         "identifier": "5ad9341e6dde8c3207c811b3304d1e18601c56151f02dfeb6ec20f4f7b6dfb47",
@@ -104,6 +100,10 @@
         "namespaceSelector": null,
         "ipAddress": ""
       }
-    ]
+    ],
+    "ingress": [],
+    "matchLabels": {
+      "app": "wikijs"
+    }
   }
 }
