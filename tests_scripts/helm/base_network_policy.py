@@ -99,7 +99,7 @@ class BaseNetworkPolicy(BaseHelm):
         """
 
         # we might have multiple actual entries, but we should have at least the same amount of expected entries
-        assert len(expected_entries or '') <= len(actual_entries or ''), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
+        assert len(expected_entries or '') <= len(actual_entries or ''), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries or '')}, expected: {len(expected_entries or '')}"
 
         # we can't use the identifier for the entry, since IP addresses may change. Instead, we check for all fields that are not IP addresses, and verify that they are equal. If they are all equal, we count this entry as verified.
         for expected_entry in expected_entries or []:
