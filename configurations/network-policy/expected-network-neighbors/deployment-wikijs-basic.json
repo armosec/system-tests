@@ -25,42 +25,6 @@
     "ingress": null,
     "egress": [
       {
-        "identifier": "5ad9341e6dde8c3207c811b3304d1e18601c56151f02dfeb6ec20f4f7b6dfb47",
-        "type": "external",
-        "dns": "wikipedia.org.",
-        "dnsNames": [
-          "wikipedia.org."
-        ],
-        "ports": [
-          {
-            "name": "TCP-443",
-            "protocol": "TCP",
-            "port": 443
-          }
-        ],
-        "podSelector": null,
-        "namespaceSelector": null,
-        "ipAddress": "185.15.58.224"
-      },
-      {
-        "identifier": "66c89b9fd8bd51e9c16c2eb568c64285e1bf89a98e5eb878c7cfb123246857a6",
-        "type": "external",
-        "dns": "google.com.",
-        "dnsNames": [
-          "google.com."
-        ],
-        "ports": [
-          {
-            "name": "TCP-443",
-            "protocol": "TCP",
-            "port": 443
-          }
-        ],
-        "podSelector": null,
-        "namespaceSelector": null,
-        "ipAddress": "142.250.179.78"
-      },
-      {
         "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
         "type": "internal",
         "dns": "",
