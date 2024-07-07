@@ -9,7 +9,7 @@
             "Network configuration": 2,
             "RBAC configuration": 2,
             "Secret management": 2,
-            "Workload configuration": 6
+            "Workloads": 6
         },
         "totalResources": 13
     },
