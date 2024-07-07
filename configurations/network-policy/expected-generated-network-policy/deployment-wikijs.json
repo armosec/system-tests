@@ -1,120 +1,120 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "GeneratedNetworkPolicy",
-    "metadata": {
-        "creationTimestamp": "2023-12-14T09:22:59Z",
-        "labels": {
-            "kubescape.io/workload-api-group": "apps",
-            "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "wikijs"
-        },
-        "name": "deployment-wikijs",
-        "namespace": "systest-ns-pjqm"
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "kind": "GeneratedNetworkPolicy",
+  "metadata": {
+    "creationTimestamp": "2023-12-14T09:22:59Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "wikijs"
     },
-    "policyRef": [
-        {
-            "dns": "google.com.",
-            "ipBlock": "108.177.120.100/32",
-            "name": "",
-            "originalIP": "108.177.120.100",
-            "server": ""
-        },
-        {
-            "dns": "wikipedia.org.",
-            "ipBlock": "208.80.154.224/32",
-            "name": "",
-            "originalIP": "208.80.154.224",
-            "server": ""
-        }
-    ],
-    "spec": {
-        "apiVersion": "networking.k8s.io/v1",
-        "kind": "NetworkPolicy",
-        "metadata": {
-            "annotations": {
-                "generated-by": "kubescape"
-            },
-            "creationTimestamp": null,
-            "labels": {
-                "kubescape.io/workload-api-group": "apps",
-                "kubescape.io/workload-api-version": "v1",
-                "kubescape.io/workload-kind": "Deployment",
-                "kubescape.io/workload-name": "wikijs"
-            },
-            "name": "deployment-wikijs",
-            "namespace": "systest-ns-pjqm"
-        },
-        "spec": {
-            "egress": [
-                {
-                    "ports": [
-                        {
-                            "port": 443,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "ipBlock": {
-                                "cidr": "108.177.120.100/32"
-                            }
-                        },
-                        {
-                            "ipBlock": {
-                                "cidr": "208.80.154.224/32"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 53,
-                            "protocol": "UDP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "namespaceSelector": {
-                                "matchLabels": {
-                                    "kubernetes.io/metadata.name": "kube-system"
-                                }
-                            },
-                            "podSelector": {
-                                "matchLabels": {
-                                    "k8s-app": "kube-dns"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "ports": [
-                        {
-                            "port": 3306,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "to": [
-                        {
-                            "podSelector": {
-                                "matchLabels": {
-                                    "app": "mariadb"
-                                }
-                            }
-                        }
-                    ]
-                }
-            ],
-            "podSelector": {
-                "matchLabels": {
-                    "app": "wikijs"
-                }
-            },
-            "policyTypes": [
-                "Egress"
-            ]
-        }
+    "name": "deployment-wikijs",
+    "namespace": "systest-ns-pjqm"
+  },
+  "policyRef": [
+    {
+      "dns": "google.com.",
+      "ipBlock": "108.177.120.100/32",
+      "name": "",
+      "originalIP": "108.177.120.100",
+      "server": ""
+    },
+    {
+      "dns": "wikipedia.org.",
+      "ipBlock": "208.80.154.224/32",
+      "name": "",
+      "originalIP": "208.80.154.224",
+      "server": ""
     }
+  ],
+  "spec": {
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "NetworkPolicy",
+    "metadata": {
+      "annotations": {
+        "generated-by": "kubescape"
+      },
+      "creationTimestamp": null,
+      "labels": {
+        "kubescape.io/workload-api-group": "apps",
+        "kubescape.io/workload-api-version": "v1",
+        "kubescape.io/workload-kind": "Deployment",
+        "kubescape.io/workload-name": "wikijs"
+      },
+      "name": "deployment-wikijs",
+      "namespace": "systest-ns-pjqm"
+    },
+    "spec": {
+      "egress": [
+        {
+          "ports": [
+            {
+              "port": 443,
+              "protocol": "TCP"
+            }
+          ],
+          "to": [
+            {
+              "ipBlock": {
+                "cidr": "108.177.120.100/32"
+              }
+            },
+            {
+              "ipBlock": {
+                "cidr": "208.80.154.224/32"
+              }
+            }
+          ]
+        },
+        {
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP"
+            }
+          ],
+          "to": [
+            {
+              "namespaceSelector": {
+                "matchLabels": {
+                  "kubernetes.io/metadata.name": "kube-system"
+                }
+              },
+              "podSelector": {
+                "matchLabels": {
+                  "k8s-app": "kube-dns"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ports": [
+            {
+              "port": 3306,
+              "protocol": "TCP"
+            }
+          ],
+          "to": [
+            {
+              "podSelector": {
+                "matchLabels": {
+                  "app": "mariadb"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "podSelector": {
+        "matchLabels": {
+          "app": "wikijs"
+        }
+      },
+      "policyTypes": [
+        "Egress"
+      ]
+    }
+  }
 }

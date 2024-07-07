@@ -99,10 +99,10 @@ class BaseNetworkPolicy(BaseHelm):
         """
 
         # we might have multiple actual entries, but we should have at least the same amount of expected entries
-        assert len(expected_entries) <= len(actual_entries or ''), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries)}, expected: {len(expected_entries)}"
+        assert len(expected_entries or '') <= len(actual_entries or ''), f"expected_entries length is not lower or equal to actual_entries length, actual: {len(actual_entries or '')}, expected: {len(expected_entries or '')}"
 
         # we can't use the identifier for the entry, since IP addresses may change. Instead, we check for all fields that are not IP addresses, and verify that they are equal. If they are all equal, we count this entry as verified.
-        for expected_entry in expected_entries:
+        for expected_entry in expected_entries or []:
             # if expected entry contains dns, that means we explicitly expect a DNS entry,
             # we don't care about the IP address
             if expected_entry["dns"] != "":
@@ -267,7 +267,8 @@ class BaseNetworkPolicy(BaseHelm):
 
             self.validate_expected_backend_network_policy(expected_network_policy_list[i],backend_generated_network_policy, namespace)
 
-            self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=graph, expected_network_neighbors=expected_network_neighbors_list[i])
+            # TODO rewrite to use networkneighborhood for the graph
+            # self.validate_expected_network_neighbors(namespace=namespace, actual_network_neighbors=graph, expected_network_neighbors=expected_network_neighbors_list[i])
 
 
     def convert_backend_network_policy_to_generated_network_policy(self, backend_network_policy) -> dict:

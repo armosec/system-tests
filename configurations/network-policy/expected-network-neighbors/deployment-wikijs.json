@@ -1,100 +1,107 @@
-    {
-        "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-        "kind": "NetworkNeighbors",
-        "metadata": {
-            "annotations": {
-                "kubescape.io/status": "ready"
-            },
-            "creationTimestamp": "2023-11-29T13:10:58Z",
-            "labels": {
-                "kubescape.io/workload-api-group": "apps",
-                "kubescape.io/workload-api-version": "v1",
-                "kubescape.io/workload-kind": "Deployment",
-                "kubescape.io/workload-name": "wikijs"
-            },
-            "name": "deployment-wikijs",
-            "namespace": "systest-ns-xn23",
-            "resourceVersion": "1",
-            "uid": "2536fe68-fa9d-495c-915e-2c33c6a02c97"
-        },
-        "spec": {
-            "egress": [
-                {
-                    "dns": "",
-                    "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
-                    "ipAddress": "",
-                    "namespaceSelector": {
-                        "matchLabels": {
-                            "kubernetes.io/metadata.name": "kube-system"
-                        }
-                    },
-                    "podSelector": {
-                        "matchLabels": {
-                            "k8s-app": "kube-dns"
-                        }
-                    },
-                    "ports": [
-                        {
-                            "name": "UDP-53",
-                            "port": 53,
-                            "protocol": "UDP"
-                        }
-                    ],
-                    "type": "internal"
-                },
-                {
-                    "dns": "",
-                    "identifier": "9230d773194d84ea09e198e98b8aaa1dd71fd6f406314796f234240bb5111425",
-                    "ipAddress": "",
-                    "namespaceSelector": null,
-                    "podSelector": {
-                        "matchLabels": {
-                            "app": "mariadb"
-                        }
-                    },
-                    "ports": [
-                        {
-                            "name": "TCP-3306",
-                            "port": 3306,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "type": "internal"
-                },
-                {
-                    "dns": "google.com.",
-                    "identifier": "4b9e04df98fcd52293e6fc9f055e98eaae731a100fa455f9aaae05efaad36a59",
-                    "ipAddress": "209.85.145.139",
-                    "namespaceSelector": null,
-                    "podSelector": null,
-                    "ports": [
-                        {
-                            "name": "TCP-443",
-                            "port": 443,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "type": "external"
-                },
-                {
-                    "dns": "wikipedia.org.",
-                    "identifier": "379087859840bc8e8b758ec29415606771afca4af17ff3c8552ff72adc07e86c",
-                    "ipAddress": "208.80.154.224",
-                    "namespaceSelector": null,
-                    "podSelector": null,
-                    "ports": [
-                        {
-                            "name": "TCP-443",
-                            "port": 443,
-                            "protocol": "TCP"
-                        }
-                    ],
-                    "type": "external"
-                }
-            ],
-            "ingress": [],
-            "matchLabels": {
-                "app": "wikijs"
-            }
-        }
+{
+  "kind": "NetworkNeighbors",
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "metadata": {
+    "name": "deployment-wikijs",
+    "namespace": "systest-ns-j1m4",
+    "uid": "571e146a-600f-4893-9b7a-ea48c8f5c953",
+    "resourceVersion": "1",
+    "creationTimestamp": "2024-07-03T15:50:07Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "wikijs"
+    },
+    "annotations": {
+      "kubescape.io/completion": "complete",
+      "kubescape.io/status": "ready"
     }
+  },
+  "spec": {
+    "egress": [
+      {
+        "identifier": "5ad9341e6dde8c3207c811b3304d1e18601c56151f02dfeb6ec20f4f7b6dfb47",
+        "type": "external",
+        "dns": "wikipedia.org.",
+        "dnsNames": [
+          "wikipedia.org."
+        ],
+        "ports": [
+          {
+            "name": "TCP-443",
+            "protocol": "TCP",
+            "port": 443
+          }
+        ],
+        "podSelector": null,
+        "namespaceSelector": null,
+        "ipAddress": "185.15.58.224"
+      },
+      {
+        "identifier": "66c89b9fd8bd51e9c16c2eb568c64285e1bf89a98e5eb878c7cfb123246857a6",
+        "type": "external",
+        "dns": "google.com.",
+        "dnsNames": [
+          "google.com."
+        ],
+        "ports": [
+          {
+            "name": "TCP-443",
+            "protocol": "TCP",
+            "port": 443
+          }
+        ],
+        "podSelector": null,
+        "namespaceSelector": null,
+        "ipAddress": "142.250.179.78"
+      },
+      {
+        "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
+        "type": "internal",
+        "dns": "",
+        "ports": [
+          {
+            "name": "UDP-53",
+            "protocol": "UDP",
+            "port": 53
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "k8s-app": "kube-dns"
+          }
+        },
+        "namespaceSelector": {
+          "matchLabels": {
+            "kubernetes.io/metadata.name": "kube-system"
+          }
+        },
+        "ipAddress": ""
+      },
+      {
+        "identifier": "9230d773194d84ea09e198e98b8aaa1dd71fd6f406314796f234240bb5111425",
+        "type": "internal",
+        "dns": "",
+        "ports": [
+          {
+            "name": "TCP-3306",
+            "protocol": "TCP",
+            "port": 3306
+          }
+        ],
+        "podSelector": {
+          "matchLabels": {
+            "app": "mariadb"
+          }
+        },
+        "namespaceSelector": null,
+        "ipAddress": ""
+      }
+    ],
+    "ingress": [],
+    "matchLabels": {
+      "app": "wikijs"
+    }
+  }
+}

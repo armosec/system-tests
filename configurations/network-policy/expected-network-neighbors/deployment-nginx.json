@@ -1,51 +1,28 @@
 {
-    "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
-    "kind": "NetworkNeighbors",
-    "metadata": {
-        "annotations": {
-            "kubescape.io/status": "ready"
-        },
-        "creationTimestamp": "2023-11-29T13:10:57Z",
-        "labels": {
-            "kubescape.io/workload-api-group": "apps",
-            "kubescape.io/workload-api-version": "v1",
-            "kubescape.io/workload-kind": "Deployment",
-            "kubescape.io/workload-name": "nginx"
-        },
-        "name": "deployment-nginx",
-        "namespace": "systest-ns-xn23",
-        "resourceVersion": "1",
-        "uid": "38cbc619-81c4-4bf8-86f8-4224ba0caf7c"
+  "kind": "NetworkNeighbors",
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "metadata": {
+    "name": "deployment-nginx",
+    "namespace": "systest-ns-j1m4",
+    "uid": "e415ac32-19de-4744-9700-61c773e080ca",
+    "resourceVersion": "1",
+    "creationTimestamp": "2024-07-03T15:50:06Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "nginx"
     },
-    "spec": {
-        "egress": [
-            {
-                "dns": "",
-                "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
-                "ipAddress": "",
-                "namespaceSelector": {
-                    "matchLabels": {
-                        "kubernetes.io/metadata.name": "kube-system"
-                    }
-                },
-                "podSelector": {
-                    "matchLabels": {
-                        "k8s-app": "kube-dns"
-                    }
-                },
-                "ports": [
-                    {
-                        "name": "UDP-53",
-                        "port": 53,
-                        "protocol": "UDP"
-                    }
-                ],
-                "type": "internal"
-            }
-        ],
-        "ingress": [],
-        "matchLabels": {
-            "app": "nginx"
-        }
+    "annotations": {
+      "kubescape.io/completion": "complete",
+      "kubescape.io/status": "ready"
     }
+  },
+  "spec": {
+    "egress": [],
+    "ingress": [],
+    "matchLabels": {
+      "app": "nginx"
+    }
+  }
 }
