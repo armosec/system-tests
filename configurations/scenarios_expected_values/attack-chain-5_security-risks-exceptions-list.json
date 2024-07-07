@@ -24,7 +24,7 @@
                 }
             ],
             "name": "Allow privilege escalation",
-            "category": "Workload configuration",
+            "category": "Workloads",
             "severity": "Medium",
             "securityRiskID": "R_0005",
             "risks": [
