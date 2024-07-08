@@ -23,6 +23,7 @@
             "controlID": "C-0260",
             "reportGUID": "fdfa10a9-4b3d-4331-ba44-fad76ea1fac8",
             "frameworkName": "security",
+            "appliedNetworkPolicyType": "unknown",
             "networkPolicyStatus": 1,
             "missingRuntimeInfoReason": 1
         },
@@ -45,6 +46,7 @@
             "controlID": "C-0260",
             "reportGUID": "fdfa10a9-4b3d-4331-ba44-fad76ea1fac8",
             "frameworkName": "security",
+            "appliedNetworkPolicyType": "unknown",
             "networkPolicyStatus": 1,
             "missingRuntimeInfoReason": 1
         }
