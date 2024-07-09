@@ -1,0 +1,24 @@
+{
+    "policyType": "postureExceptionPolicy",
+    "name": "exclude-control-with-regex",
+    "actions": [
+      "alertOnly"
+    ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "cluster": "minikube1",
+                "namespace": "*/*",
+                "kind": "*/*",
+                "name": "*/*"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "controlName": "Allow privilege escalation",
+            "frameworkName": "NSA"
+        }
+    ]
+}

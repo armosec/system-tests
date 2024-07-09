@@ -197,6 +197,20 @@ class KubescapeTests(object):
         )
 
     @staticmethod
+    def scan_with_global_exception_to_backend():
+        from tests_scripts.kubescape.scan import ScanWithExceptionToBackend
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanWithExceptionToBackend,
+            policy_scope='framework',
+            policy_name='NSA',
+            submit=True,
+            account=True,
+            exceptions="exclude-control-with-regex.json,exclude-control-sa-resourceID-regex.json",
+            yaml="apache.yaml"
+        )
+
+    @staticmethod
     def scan_with_custom_framework():
         from tests_scripts.kubescape.scan import ScanWithCustomFramework
         return KubescapeConfiguration(

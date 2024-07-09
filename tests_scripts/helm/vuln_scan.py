@@ -217,7 +217,7 @@ class VulnerabilityScanningTriggerScanOnNewImage(BaseVulnerabilityScanning):
 
 
 class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
-    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None, exceptions_parameters=None):
         super(VulnerabilityScanningCVEExceptions, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                  backend=backend,
                                                                  kubernetes_obj=kubernetes_obj)
@@ -268,13 +268,7 @@ class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
         # 4.2 Check logs for error- if there is 1 error- test fail
 
         # 5.0 set several cves exceptions
-        cves_list = self.get_some_cve_exceptions_list(Wlid.get_name(wlids))
-        cve_exception_guid, cve_exception_guid_time = self.wait_for_report(timeout=360,
-                                                                           report_type=self.backend.set_cves_exceptions,
-                                                                           cves_list=cves_list,
-                                                                           cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                                           namespace=namespace,
-                                                                           conatiner_name=Wlid.get_name(wlids))
+        self.set_multiple_cves_exceptions()
 
         # 5.1 rescan
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
@@ -292,6 +286,45 @@ class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
         # 4.3 Check armo components health
 
         return self.cleanup()
+
+    def set_multiple_cves_exceptions(self, namespace, wlids):
+        if not self.exceptions_parameters:
+            # Use the existing logic
+            cves_list = self.get_some_cve_exceptions_list(Wlid.get_name(wlids))
+            cve_exception_guid, cve_exception_guid_time = self.wait_for_report(timeout=360,
+                                                                               report_type=self.backend.set_cves_exceptions,
+                                                                               cves_list=cves_list,
+                                                                               cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                                               namespace=namespace,
+                                                                               conatiner_name=Wlid.get_name(wlids))
+            Logger.logger.info(f'Set CVE exceptions for namespace {namespace} and container {Wlid.get_name(wlids)}')
+        else:
+            # Use the provided exceptions parameters
+            for params in self.exceptions_parameters:
+                cluster_name = params.get("cluster_name")
+                namespace = params.get("namespace", namespace)
+                container_name = params.get("container_name", Wlid.get_name(wlids))
+
+                if not all([cluster_name, namespace, container_name]):
+                    # Fallback to the existing logic if any parameter is missing
+                    cves_list = self.get_some_cve_exceptions_list(Wlid.get_name(wlids))
+                    cve_exception_guid, cve_exception_guid_time = self.wait_for_report(timeout=360,
+                                                                                       report_type=self.backend.set_cves_exceptions,
+                                                                                       cves_list=cves_list,
+                                                                                       cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                                                       namespace=namespace,
+                                                                                       conatiner_name=Wlid.get_name(wlids))
+                    Logger.logger.info(f'Set CVE exceptions for namespace {namespace} and container {Wlid.get_name(wlids)}')
+                else:
+                    cves_list = self.get_some_cve_exceptions_list(container_name)
+                    cve_exception_guid, cve_exception_guid_time = self.wait_for_report(timeout=360,
+                                                                                       report_type=self.backend.set_cves_exceptions,
+                                                                                       cves_list=cves_list,
+                                                                                       cluster_name=cluster_name,
+                                                                                       namespace=namespace,
+                                                                                       conatiner_name=container_name)
+                    Logger.logger.info(f'Set CVE exceptions for namespace {namespace}, cluster {cluster_name}, and container {container_name}')
+        return
 
 
 class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):

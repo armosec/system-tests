@@ -1,0 +1,22 @@
+{
+    "policyType": "postureExceptionPolicy",
+    "name": "exclude-control-sa-resourceID-regex",
+    "actions": [
+      "alertOnly"
+    ],
+    "resources": [
+        {
+            "designatorType": "Attributes",
+            "attributes": {
+                "cluster": "minikube1",
+                "resourceID": "*/*"
+            }
+        }
+    ],
+    "posturePolicies": [
+        {
+            "controlName": "Automatic mapping of service account",
+            "frameworkName": "NSA"
+        }
+    ]
+}
