@@ -1,0 +1,39 @@
+{
+    "total": {
+        "value": 1,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "securityRiskID": "R_0037",
+            "securityRiskName": "Workloads with high exploitability risks",
+            "category": "Workloads",
+            "severity": "Critical",
+            "lastUpdated": "2024-07-17T11:20:53Z",
+            "affectedClustersCount": 1,
+            "affectedNamespacesCount": 1,
+            "affectedResourcesCount": 1,
+            "resourcesDetectedLastUpdateCount": 1,
+            "resourcesResolvedLastUpdateCount": 0,
+            "resourcesDetectedLastChangeCount": 1,
+            "resourcesDetectedLastChange": [
+                {
+                    "k8sResourceHash": "9279968128785507651",
+                    "cluster": "srvulneran",
+                    "clusterShortName": "srvulneran",
+                    "namespace": "systest-ns-pvn5",
+                    "kind": "Deployment",
+                    "name": "nginx-deployment"
+                }
+            ],
+            "resourcesResolvedLastChangeCount": 0,
+            "resourcesResolvedLastChange": [],
+            "resourcesDeletedLastChangeCount": 0,
+            "resourcesDeletedLastChange": [],
+            "affectedResourcesChange": 1,
+            "supportsSmartRemediation": false,
+            "smartRemediation": false
+        }
+    ],
+    "cursor": ""
+}
