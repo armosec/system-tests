@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+# Default namespace
+namespace="default"
+
+# Parse command line arguments for namespace
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+# Commands to delete deployments and wait for their deletion
+kubectl delete deployment nginx-deployment -n "$namespace"
+kubectl wait deployment/nginx-deployment --for=delete --timeout=90s -n "$namespace"

@@ -70,6 +70,20 @@ class SecurityRisksTests(object):
     
     @staticmethod
     # test security risks detection and resolve with kubescape helm chart
+    # using nginx scenario.
+    def sr_r_0037_vulnerability():
+        from tests_scripts.helm.ks_microservice import ScanSecurityRisksWithKubescapeHelmChart
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanSecurityRisksWithKubescapeHelmChart,
+            test_scenario="nginx",
+            test_job=[{"security_risks_ids": ["R_0037"]}],
+            fix_object="vulnerability",
+
+        )
+    
+    @staticmethod
+    # test security risks detection and resolve with kubescape helm chart
     # based on attack chain 5 scenarios.
     def sr_with_exceptions():
         from tests_scripts.helm.ks_microservice import ScanSecurityRisksExceptionsWithKubescapeHelmChart

@@ -29,6 +29,7 @@ SECURITY_RISKS_RESOURCES_PREFIX = {
     "R_0035": "_security-risks-resources_sidebar_R0035", # attack path security risk type
     "R_0005": "_security-risks-resources_sidebar_R0005", # control security risk type
     "R_0007": "_security-risks-resources_sidebar_R0007", # control security risk type with network policy
+    "R_0037": "_security-risks-resources_sidebar_R0037", # vulnerability security risk type
 
 }
 
@@ -380,9 +381,13 @@ class SecurityRisksScenarioManager(ScenarioManager):
         
         :param result: content retrieved from backend.
         """
+            
+
         ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
-                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'exceptionPolicyGUID'}
+                   'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'exceptionPolicyGUID',
+                   'riskFactorsCount', 'riskFactors', 'severityStats', 'criticalCount', 'highCount', 'mediumCount', 'lowCount'# vulnerability specific keys
+                   }
     
         if 'total' in result and 'total' in expected:
             assert result['total']['value'] == expected['total']['value'], f"'Total' value mismatch: result: {result['total']['value']} != expected: {expected['total']['value']}"
