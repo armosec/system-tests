@@ -649,8 +649,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": ""
