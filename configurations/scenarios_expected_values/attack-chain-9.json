@@ -1,0 +1,270 @@
+{
+    "total": {
+        "value": 2,
+        "relation": "eq"
+    },
+    "response": {
+        "attackChains": [
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                "kind": "Service",
+                                "name": "operator",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/operator"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "wordpress",
+                                    "imageScanID": "3a7939a7-bc06-2601-b4fb-752ae3e93427",
+                                    "names": [
+                                        "CVE-2019-8457",
+                                        "CVE-2020-36694",
+                                        "CVE-2021-30473",
+                                        "CVE-2021-30474",
+                                        "CVE-2021-30475",
+                                        "CVE-2021-46848",
+                                        "CVE-2022-1253",
+                                        "CVE-2022-1586",
+                                        "CVE-2022-1587",
+                                        "CVE-2022-24963",
+                                        "CVE-2022-32221",
+                                        "CVE-2022-36760",
+                                        "CVE-2022-37434",
+                                        "CVE-2022-37454",
+                                        "CVE-2023-23914",
+                                        "CVE-2023-25690",
+                                        "CVE-2023-27536",
+                                        "CVE-2023-28879"
+                                    ]
+                                }
+                            ],
+                            "relatedResources": null,
+                            "nextNodes": [
+                                {
+                                    "name": "Data Collection",
+                                    "description": "An attacker can gather data.",
+                                    "controlIDs": [
+                                        "C-0274"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                "kind": "Service",
+                                                "name": "operator",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/Service/operator"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "guid": "5d817063-096f-4d91-b39b-8665240080af",
+                "name": "workload-unauthenticated-service",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                    "kind": "Deployment",
+                    "name": "operator-deployment",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/operator-deployment"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                        "k8sResourceHash": "8247003671606639436",
+                        "kind": "Deployment",
+                        "name": "operator-deployment",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/operator-deployment"
+                    }
+                },
+                "description": "Public facing database without authentication",
+                "creationTime": "2024-07-23T14:23:14Z",
+                "attackChainID": "4082609516",
+                "clusterName": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                "latestReportGUID": "5249f931-c985-4b03-9321-2810875560f4",
+                "uiStatus": {
+                    "firstSeen": "2024-07-23T14:23:14Z",
+                    "viewedMainScreen": "2024-07-23T17:25:27Z",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            },
+            {
+                "attackChainNodes": {
+                    "name": "Initial Access",
+                    "description": "An attacker can access the Kubernetes environment.",
+                    "controlIDs": [
+                        "C-0256"
+                    ],
+                    "relatedResources": [
+                        {
+                            "designatorType": "Attributes",
+                            "attributes": {
+                                "apiVersion": "v1",
+                                "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                "kind": "Service",
+                                "name": "operator",
+                                "namespace": "default",
+                                "resourceID": "/v1/default/Service/operator"
+                            }
+                        }
+                    ],
+                    "nextNodes": [
+                        {
+                            "name": "Execution (Vulnerable Image)",
+                            "description": "An attacker can execute malicious code by exploiting vulnerable images.",
+                            "vulnerabilities": [
+                                {
+                                    "containerName": "wordpress",
+                                    "imageScanID": "3a7939a7-bc06-2601-b4fb-752ae3e93427",
+                                    "names": [
+                                        "CVE-2019-8457",
+                                        "CVE-2020-36694",
+                                        "CVE-2021-30473",
+                                        "CVE-2021-30474",
+                                        "CVE-2021-30475",
+                                        "CVE-2021-46848",
+                                        "CVE-2022-1253",
+                                        "CVE-2022-1586",
+                                        "CVE-2022-1587",
+                                        "CVE-2022-24963",
+                                        "CVE-2022-32221",
+                                        "CVE-2022-36760",
+                                        "CVE-2022-37434",
+                                        "CVE-2022-37454",
+                                        "CVE-2023-23914",
+                                        "CVE-2023-25690",
+                                        "CVE-2023-27536",
+                                        "CVE-2023-28879"
+                                    ]
+                                }
+                            ],
+                            "relatedResources": null,
+                            "nextNodes": [
+                                {
+                                    "name": "Credential access",
+                                    "description": "An attacker can steal account names and passwords.",
+                                    "controlIDs": [
+                                        "C-0259",
+                                        "C-0261"
+                                    ],
+                                    "relatedResources": [
+                                        {
+                                            "designatorType": "Attributes",
+                                            "attributes": {
+                                                "apiVersion": "v1",
+                                                "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                                                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                                                "kind": "ServiceAccount",
+                                                "name": "default",
+                                                "namespace": "default",
+                                                "resourceID": "/v1/default/ServiceAccount/default"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Privilege Escalation (Node)",
+                                    "description": "An attacker can gain permissions and access node resources.",
+                                    "controlIDs": [
+                                        "C-0045",
+                                        "C-0048",
+                                        "C-0211"
+                                    ],
+                                    "relatedResources": null
+                                },
+                                {
+                                    "name": "Persistence",
+                                    "description": "An attacker can create a foothold.",
+                                    "controlIDs": [
+                                        "C-0017"
+                                    ],
+                                    "relatedResources": null
+                                },
+                                {
+                                    "name": "Lateral Movement (Network)",
+                                    "description": "An attacker can move through the network.",
+                                    "controlIDs": [
+                                        "C-0260"
+                                    ],
+                                    "relatedResources": null
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "guid": "5d817063-096f-4d91-b39b-8665240080af",
+                "name": "workload-external-track",
+                "attributes": {
+                    "apiVersion": "apps/v1",
+                    "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                    "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                    "kind": "Deployment",
+                    "name": "operator-deployment",
+                    "namespace": "default",
+                    "resourceID": "apps/v1/default/Deployment/operator-deployment"
+                },
+                "resource": {
+                    "designatorType": "attributes",
+                    "attributes": {
+                        "apiVersion": "apps/v1",
+                        "cluster": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                        "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                        "k8sResourceHash": "8247003671606639436",
+                        "kind": "Deployment",
+                        "name": "operator-deployment",
+                        "namespace": "default",
+                        "resourceID": "apps/v1/default/Deployment/operator-deployment"
+                    }
+                },
+                "description": "Exposed operator-deployment with critical vulnerabilities and 4 severe impacts",
+                "creationTime": "2024-07-23T14:09:08Z",
+                "attackChainID": "1326319353",
+                "clusterName": "arn-aws-eks-eu-west-2-015253967648-cluster-Rina-test-bxsd8",
+                "customerGUID": "5d817063-096f-4d91-b39b-8665240080af",
+                "latestReportGUID": "5249f931-c985-4b03-9321-2810875560f4",
+                "uiStatus": {
+                    "firstSeen": "2024-07-23T14:09:08Z",
+                    "viewedMainScreen": "2024-07-23T17:12:23Z",
+                    "processingStatus": "done"
+                },
+                "status": "active"
+            }
+        ],
+        "attackChainsLastScan": "2024-07-24T07:53:44Z",
+        "frameworkName": "security"
+    },
+    "cursor": ""
+}

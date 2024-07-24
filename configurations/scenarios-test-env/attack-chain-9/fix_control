@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+
+kubectl delete ServiceScanResult operator -n default
+kubectl wait ServiceScanResult/operator --for=delete --timeout=-1s
