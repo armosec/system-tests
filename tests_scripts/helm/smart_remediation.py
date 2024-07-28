@@ -215,28 +215,28 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
 
         Logger.logger.info(f"3. Start testing controls: {control_to_files.keys()}")
+        Logger.logger.info(f"3.1. getting current report guid")
+        report_guid = self.get_report_guid(
+                cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
+            )
+        
+        previous_report_guid = report_guid
 
-        previous_report_guid = ""
-        for control, files in control_to_files.items():
-            namespace = control_to_namespace[control]
-            workload_fix_file = files[1]
-            TestUtil.sleep(10, "wait a bit for synchronizer to catch up for control: {control}")
-       
-            Logger.logger.info(f"Trigger a scan for control: {control}")
-            self.backend.trigger_posture_scan(
+        Logger.logger.info(f"4. Trigger a new scan")
+        self.backend.trigger_posture_scan(
                 cluster_name=cluster,
                 framework_list=["AllControls"],
                 with_host_sensor="false",
             )
-
-            Logger.logger.info(f"Get report guid for control: {control}")
-            report_guid = self.get_report_guid(
+        
+        Logger.logger.info(f"4.1. getting new report guid")
+        report_guid = self.get_report_guid(
                 cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=previous_report_guid
             )
-            assert report_guid != "", "report guid is empty for control: {control}"
-
-            previous_report_guid = report_guid
-
+        
+        Logger.logger.info(f"5. Check smart remediation is available for all controls")
+        for control, files in control_to_files.items():
+            workload = control_to_workload[control]
             Logger.logger.info(f"Check smart remediation is available for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
@@ -246,26 +246,36 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             }]}
             assert self.check_smart_remediation(body, retries=50), f"smartRemediations is not found for control: {control}"
 
+
+        Logger.logger.info(f"5. Apply fixes for all controls")
+        for control, files in control_to_files.items():
             Logger.logger.info(f"fix the issue for control: {control}")
+            namespace = control_to_namespace[control]
+            workload_fix_file = files[1]
             workload_fix = self.apply_yaml_file(
                 yaml_file=workload_fix_file, namespace=namespace, replace=True
             )
             self.verify_all_pods_are_running(namespace=namespace, workload=workload_fix, timeout=60)
 
-            Logger.logger.info(f"Trigger another scan for control: {control}")             
-            self.backend.trigger_posture_scan(
+
+        Logger.logger.info(f"6. Trigger another scan for all controls")
+        self.backend.trigger_posture_scan(
                 cluster_name=cluster,
                 framework_list=["AllControls"],
                 with_host_sensor="false",
             )
+        
+        previous_report_guid = report_guid
 
-            Logger.logger.info(f"Get report guid for control: {control}")
-            report_guid = self.get_report_guid(
+        Logger.logger.info(f"6.1. getting new report guid after fix")
+        report_guid = self.get_report_guid(
                 cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=previous_report_guid
             )
-            assert report_guid != "", f"report guid is empty for control: {control}"
-
-            previous_report_guid = report_guid
+        
+        assert report_guid != "", "report guid is empty"
+        
+        for control, files in control_to_files.items():
+            workload = control_to_workload[control]
 
             Logger.logger.info(f"Check the issue is resolved for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
