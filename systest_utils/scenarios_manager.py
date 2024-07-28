@@ -111,11 +111,12 @@ class AttackChainsScenarioManager(ScenarioManager):
     def __init__(self, test_obj, backend: backend_api.ControlPanelAPI, cluster, namespace):
         super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
 
-    def verify_scenario(self):
+    def verify_scenario(self, current_datetime=None):
         """
         verify_scenario validate the attack chains results on the backend
         """
-        current_datetime = datetime.now(timezone.utc)
+        if current_datetime == None:
+            current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
