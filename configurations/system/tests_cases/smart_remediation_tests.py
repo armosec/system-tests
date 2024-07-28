@@ -6,6 +6,27 @@ from systest_utils import statics
 
 class SmartRemediationTests(object):
 
+
+    # check smart remediation for controls C-0016, C-0017, C-0034, C-0045, C-0046, C-0048, C-0057, C-0074
+    @staticmethod
+    def smart_remediation_all_controls():
+        from tests_scripts.helm.smart_remediation import SmartRemediationNew
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            control_to_files={
+                "C-0016": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0016-fixed.yaml")),
+                "C-0017": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0017-fixed.yaml")),
+                "C-0034": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0034-fixed.yaml")),
+                "C-0045": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0045-fixed.yaml")),
+                "C-0046": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0046-fixed.yaml")),
+                "C-0048": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0048-fixed.yaml")),
+                "C-0057": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0057-fixed.yaml")),
+                "C-0074": (join(statics.DEFAULT_SMART_REMEDIATION_PATH, "nginx-deployment.yaml"), join(statics.DEFAULT_SMART_REMEDIATION_PATH, "c0074-fixed.yaml")),
+            },
+            test_obj=SmartRemediationNew)
+    
+
     # C-0016 - Allow privilege escalation
     @staticmethod
     def smart_remediation_c0016():

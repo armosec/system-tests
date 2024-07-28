@@ -707,12 +707,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0016",
     "skip_on_environment": "",
@@ -724,12 +724,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0017",
     "skip_on_environment": "",
@@ -741,18 +741,18 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0034",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "smart_remediation_c0045": {
+  "smart_remediation_all_controls":{
     "target": [
       "In cluster",
       "Backend"
@@ -764,6 +764,23 @@
       "cadashboardbe",
       "event-ingester-service",
       "synchronizer"
+    ],
+    "description": "Checks smart remediation for controls: C0016, C0017, C0034, C0045, C0046, C0048, C0057, C0074",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
+  "smart_remediation_c0045": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0045",
     "skip_on_environment": "",
@@ -775,12 +792,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
       "cadashboardbe_dummy",
       "event-ingester-service_dummy",
-      "synchronizer"
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0046",
     "skip_on_environment": "",
@@ -792,12 +809,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0048",
     "skip_on_environment": "",
@@ -809,12 +826,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0057",
     "skip_on_environment": "",
@@ -826,12 +843,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
+      "helm-chart-dummy",
+      "node-agent-dummy",
+      "storage-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "synchronizer-dummy"
     ],
     "description": "Checks smart remediation C0074",
     "skip_on_environment": "",
