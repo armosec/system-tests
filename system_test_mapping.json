@@ -151,8 +151,8 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service"
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
     "skip_on_environment": "",
@@ -677,10 +677,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
