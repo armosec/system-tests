@@ -216,6 +216,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"3. Start testing controls: {control_to_files.keys()}")
 
+        previous_report_guid = ""
         for control, files in control_to_files.items():
             namespace = control_to_namespace[control]
             workload_fix_file = files[1]
@@ -230,9 +231,11 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
 
             Logger.logger.info(f"Get report guid for control: {control}")
             report_guid = self.get_report_guid(
-                cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
+                cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=previous_report_guid
             )
             assert report_guid != "", "report guid is empty for control: {control}"
+
+            previous_report_guid = report_guid
 
             Logger.logger.info(f"Check smart remediation is available for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
@@ -258,9 +261,11 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
 
             Logger.logger.info(f"Get report guid for control: {control}")
             report_guid = self.get_report_guid(
-                cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
+                cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=previous_report_guid
             )
             assert report_guid != "", f"report guid is empty for control: {control}"
+
+            previous_report_guid = report_guid
 
             Logger.logger.info(f"Check the issue is resolved for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
