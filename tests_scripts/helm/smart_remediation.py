@@ -170,7 +170,8 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         """
         Test plan:
         1. Install Helm chart
-        2. Test each control
+        2. Apply all controls deployments.
+        3. Test each control
         ...
         """
         assert (
@@ -188,24 +189,36 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         )
 
         control_to_files = self.test_obj["control_to_files"]
+        control_to_namespace = {}
+        control_to_workload = {}
 
-        Logger.logger.info(f"Start testing controls: {control_to_files.keys()}")
-
+        # apply all controls deployments
+        Logger.logger.info(f"2. Applying all controls deployments")
         for control, files in control_to_files.items():
-            Logger.logger.info(f"Start testing control: {control}")
             Logger.logger.info(f"Creating namespace for control: {control}")
             namespace = self.create_namespace()
             Logger.logger.info(f"Namespace created: {namespace} for control: {control}")
+            control_to_namespace[control] = namespace
             workload_file = files[0]
-            workload_fix_file = files[1]
             Logger.logger.info(f"Applying workload: {workload_file} for control: {control}")
             workload = self.apply_yaml_file(
                 yaml_file=workload_file, namespace=namespace
             )
+            control_to_workload[control] = workload
+        
+        Logger.logger.info(f"2.1 Verifying all pods are running for all controls")
+        for control, namespace in control_to_namespace.items():
             self.verify_all_pods_are_running(
-                namespace=namespace, workload=workload, timeout=300
+                namespace=namespace, workload=control_to_workload[control], timeout=300
             )
 
+        TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
+
+        Logger.logger.info(f"3. Start testing controls: {control_to_files.keys()}")
+
+        for control, files in control_to_files.items():
+            namespace = control_to_namespace[control]
+            workload_fix_file = files[1]
             TestUtil.sleep(10, "wait a bit for synchronizer to catch up for control: {control}")
        
             Logger.logger.info(f"Trigger a scan for control: {control}")
@@ -221,7 +234,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
             assert report_guid != "", "report guid is empty for control: {control}"
 
-            Logger.logger.info(f"4. Check smart remediation is available")
+            Logger.logger.info(f"Check smart remediation is available for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
                 "controlID": control,
@@ -249,7 +262,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
             assert report_guid != "", f"report guid is empty for control: {control}"
 
-            Logger.logger.info(f"7. Check the issue is resolved for control: {control}")
+            Logger.logger.info(f"Check the issue is resolved for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
                 "controlID": control,
