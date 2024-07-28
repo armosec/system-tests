@@ -221,6 +221,7 @@ class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
         super(VulnerabilityScanningCVEExceptions, self).__init__(test_driver=test_driver, test_obj=test_obj,
                                                                  backend=backend,
                                                                  kubernetes_obj=kubernetes_obj)
+        self.exceptions_parameters = exceptions_parameters  # Initialize the attribute
 
     def start(self):
         assert self.backend != None;
@@ -268,7 +269,7 @@ class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
         # 4.2 Check logs for error- if there is 1 error- test fail
 
         # 5.0 set several cves exceptions
-        self.set_multiple_cves_exceptions()
+        cve_exception_guid, cves_list = self.set_multiple_cves_exceptions(namespace, wlids)
 
         # 5.1 rescan
         since_time = datetime.now(timezone.utc).astimezone().isoformat()
@@ -324,7 +325,7 @@ class VulnerabilityScanningCVEExceptions(BaseVulnerabilityScanning):
                                                                                        namespace=namespace,
                                                                                        conatiner_name=container_name)
                     Logger.logger.info(f'Set CVE exceptions for namespace {namespace}, cluster {cluster_name}, and container {container_name}')
-        return
+        return cve_exception_guid, cves_list
 
 
 class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):
