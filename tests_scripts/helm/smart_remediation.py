@@ -210,8 +210,9 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             applied_workloads += [workload]
         
         Logger.logger.info(f"2.1 Verifying all pods are running for all controls")
-        self.verify_all_pods_are_running(
-                namespace=namespace, workload=applied_workloads, timeout=300
+        for workload in applied_workloads:
+            self.verify_all_pods_are_running(
+                namespace=namespace, workload=workload, timeout=300
             )
 
         TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
@@ -261,7 +262,10 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
             applied_workloads_fixs += [workload_fix]
         
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_fix, timeout=60)
+        for workload_fix in applied_workloads_fixs:
+            self.verify_all_pods_are_running(
+                namespace=namespace, workload=workload_fix, timeout=60
+                )
 
         TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
 
