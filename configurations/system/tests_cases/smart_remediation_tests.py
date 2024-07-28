@@ -7,7 +7,7 @@ from systest_utils import statics
 class SmartRemediationTests(object):
 
 
-    # C-0016 - Allow privilege escalation
+    # check smart remediation for controls C-0016, C-0017, C-0034, C-0045, C-0046, C-0048, C-0057, C-0074
     @staticmethod
     def smart_remediation_all_controls():
         from tests_scripts.helm.smart_remediation import SmartRemediationNew
