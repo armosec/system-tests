@@ -130,8 +130,10 @@ class AttackChainsScenarioManager(ScenarioManager):
         response = json.loads(r.text)
 
         Logger.logger.info('comparing attack-chains result with expected ones')
-        assert self.check_attack_chains_results(response, expected), f"Attack chain response differs from the expected one. Response: {response}, Expected: {expected}"
-        return True
+        try:
+            self.check_attack_chains_results(response, expected)
+        except Exception as e:
+            raise Exception(f"Failed to validate attack chains scenario: {e}, response: {response}, expected: {expected}")
 
     def verify_fix(self):
         """
@@ -151,7 +153,7 @@ class AttackChainsScenarioManager(ScenarioManager):
    
     
 
-    def compare_nodes(self, obj1, obj2) -> bool:
+    def compare_nodes(self, obj1, obj2):
         """Walk 2 dictionary object to compare their values.
 
         :param obj1: dictionary one to be compared.
@@ -173,16 +175,14 @@ class AttackChainsScenarioManager(ScenarioManager):
 
                 # loop over the new nextNodes
                 for node1, node2 in zip(obj1['nextNodes'], obj2['nextNodes']):
-                    if not self.compare_nodes(node1, node2):
-                        return False
-                return True
+                    self.compare_nodes(node1, node2)
+
             else:
                 if 'name' in obj1 and 'name' in obj2:
                     assert obj1['name'] == obj2['name'], f"Node name mismatch: result: {obj1['name']} != expected: {obj2['name']}"
                 return all(self.compare_nodes(obj1[key], obj2[key]) for key in obj1.keys())
-        return False
 
-    def check_attack_chains_results(self, result, expected) -> bool:
+    def check_attack_chains_results(self, result, expected):
         """Validate the input content with the expected one.
         
         :param result: content retrieved from backend.
@@ -196,11 +196,8 @@ class AttackChainsScenarioManager(ScenarioManager):
             # comparing the 'name' (type: attack track) of the attack chain
             assert ac_node_result['name'] == ac_node_expected['name'], f"Attack chain name mismatch: result: {ac_node_result['name']} != expected: {ac_node_expected['name']}"
            
-            if not self.compare_nodes(ac_node_result, ac_node_expected):
-                return False
+            self.compare_nodes(ac_node_result, ac_node_expected)
 
-        
-        return True
 
 
 class SecurityRisksScenarioManager(ScenarioManager):
