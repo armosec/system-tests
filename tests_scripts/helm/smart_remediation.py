@@ -257,6 +257,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
             self.verify_all_pods_are_running(namespace=namespace, workload=workload_fix, timeout=60)
 
+        TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
 
         Logger.logger.info(f"6. Trigger another scan for all controls")
         self.backend.trigger_posture_scan(
