@@ -224,11 +224,11 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             Logger.logger.info(f"4. Check smart remediation is available")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
-                "controlID": self.test_obj["control"],
+                "controlID": control,
                 "reportGUID": report_guid,
                 "frameworkName": "AllControls"
             }]}
-            assert self.check_smart_remediation(body, retries=50), "smartRemediations is not found for control: {control}"
+            assert self.check_smart_remediation(body, retries=50), f"smartRemediations is not found for control: {control}"
 
             Logger.logger.info(f"fix the issue for control: {control}")
             workload_fix = self.apply_yaml_file(
@@ -247,15 +247,15 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             report_guid = self.get_report_guid(
                 cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
             )
-            assert report_guid != "", "report guid is empty for control: {control}"
+            assert report_guid != "", f"report guid is empty for control: {control}"
 
             Logger.logger.info(f"7. Check the issue is resolved for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
-                "controlID": self.test_obj["control"],
+                "controlID": control,
                 "reportGUID": report_guid,
                 "frameworkName": "AllControls"
             }]}
-            assert self.check_smart_remediation(body, want=False, retries=50), "smartRemediations should be empty for control: {control}"
+            assert self.check_smart_remediation(body, want=False, retries=50), f"smartRemediations should be empty for control: {control}"
 
         return self.cleanup()
