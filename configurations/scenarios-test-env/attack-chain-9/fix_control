@@ -2,3 +2,6 @@
 
 kubectl delete ServiceScanResult operator -n default
 kubectl wait ServiceScanResult/operator --for=delete --timeout=-1s
+
+kubectl delete deployment operator-deployment -n default
+kubectl wait --for=delete deployment/operator-deployment -n default --timeout=90s

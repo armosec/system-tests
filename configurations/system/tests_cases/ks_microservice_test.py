@@ -267,7 +267,7 @@ class KSMicroserviceTests(object):
     @staticmethod
     def ac_9_unauthenticated_service():
         """
-        install scenario #5 on the cluster, install the kubescape operator and run the scan.
+        install scenario #9 on the cluster, install the kubescape operator and run the scan.
         once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved
         by triggering a new control scan.
 
