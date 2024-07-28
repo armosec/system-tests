@@ -2,7 +2,7 @@
     "fields": {
         "category": [
             "RBAC configuration",
-            "Workload configuration"
+            "Workloads"
         ]
     },
     "fieldsCount": {
@@ -12,7 +12,7 @@
                 "count": 1
             },
             {
-                "key": "Workload configuration",
+                "key": "Workloads",
                 "count": 1
             }
         ]

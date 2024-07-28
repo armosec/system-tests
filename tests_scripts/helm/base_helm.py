@@ -91,6 +91,7 @@ class BaseHelm(BaseK8S):
 
         if self.helm_branch != DEFAULT_BRANCH:
             self.download_armo_helm_chart_from_branch(branch=self.helm_branch)
+            self.helm_dependency_update(repo=self.helm_armo_repo)
 
         helm_kwargs.update(self.get_in_cluster_tags())
 
@@ -195,3 +196,7 @@ class BaseHelm(BaseK8S):
     @staticmethod
     def remove_armo_from_repo():
         HelmWrapper.remove_armo_from_repo()
+
+    @staticmethod
+    def helm_dependency_update(repo):
+        HelmWrapper.helm_dependency_update(repo)

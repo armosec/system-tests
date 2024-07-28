@@ -120,13 +120,17 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
-        Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
+        scenario = self.test_obj[('test_scenario', None)]
+
+        Logger.logger.info(f'1. Install %s scenario manifests in the cluster', scenario)
+
+        # Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
         Logger.logger.info(
-            f"1.1 construct AttackChainsScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+            f"1.1 construct SecurityRisksScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
         scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
                                                          namespace=namespace)
 
-        Logger.logger.info("1.2 apply attack chains scenario manifests")
+        Logger.logger.info("1.2 apply scenario manifests")
         scenarios_manager.apply_scenario()
 
         Logger.logger.info("2. Install kubescape with helm-chart")
@@ -139,8 +143,10 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
         # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
-        time.sleep(60)
-        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+
+        if "trigger_by" in self.test_obj["test_job"][0]:
+            time.sleep(60)
+            scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("3. Verify scenario on backend")
         result = scenarios_manager.verify_scenario()
@@ -164,7 +170,8 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
 
         Logger.logger.info("9. trigger scan after fix")
-        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+        if "trigger_by" in self.test_obj["test_job"][0]:
+            scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
 
         Logger.logger.info("10. verify fix")
         scenarios_manager.verify_fix()
@@ -318,6 +325,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         super(ScanAttackChainsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
                                                                      kubernetes_obj=kubernetes_obj,
                                                                      test_driver=test_driver)
+        self.wait_for_agg_to_end = False
 
     def start(self):
         """
@@ -335,6 +343,8 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
+
+        current_datetime = datetime.now(timezone.utc)
 
         Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
         Logger.logger.info(
@@ -357,7 +367,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         time.sleep(10)
 
         Logger.logger.info("3. Verify scenario on backend")
-        scenarios_manager.verify_scenario()
+        scenarios_manager.verify_scenario(current_datetime)
         Logger.logger.info("attack chains detected, applying fix command")
 
         Logger.logger.info("4. Apply attack chain fix")

@@ -136,3 +136,7 @@ class HelmWrapper(object):
         if r != '\n':
             obj["global.proxySecretFile"] = r
         return obj
+
+    @staticmethod
+    def helm_dependency_update(repo):
+        TestUtil.run_command(command_args=["helm", "dependency", "update", repo])
