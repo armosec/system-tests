@@ -752,6 +752,23 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
+  "smart_remediation_all_controls":{
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart",
+      "node-agent",
+      "storage",
+      "cadashboardbe",
+      "event-ingester-service",
+      "synchronizer"
+    ],
+    "description": "Checks smart remediation C0045",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
   "smart_remediation_c0045": {
     "target": [
       "In cluster",
