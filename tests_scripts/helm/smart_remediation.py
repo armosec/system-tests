@@ -251,6 +251,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         for control, files in control_to_files.items():
             Logger.logger.info(f"fix the issue for control: {control}")
             namespace = control_to_namespace[control]
+            
             workload_fix_file = files[1]
             workload_fix = self.apply_yaml_file(
                 yaml_file=workload_fix_file, namespace=namespace, replace=True
@@ -277,7 +278,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         
         for control, files in control_to_files.items():
             workload = control_to_workload[control]
-
+            namespace = control_to_namespace[control]
             Logger.logger.info(f"Check the issue is resolved for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
                 "resourceID": "apps/v1/" + namespace + "/Deployment/" + workload["metadata"]["name"],
