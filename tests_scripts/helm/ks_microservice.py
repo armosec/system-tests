@@ -325,6 +325,7 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         super(ScanAttackChainsWithKubescapeHelmChart, self).__init__(test_obj=test_obj, backend=backend,
                                                                      kubernetes_obj=kubernetes_obj,
                                                                      test_driver=test_driver)
+        self.wait_for_agg_to_end = False
 
     def start(self):
         """
