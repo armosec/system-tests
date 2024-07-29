@@ -239,6 +239,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         
         Logger.logger.info(f"5. Check smart remediation is available for all controls")
         for control, files in control_to_files.items():
+            namespace = control_to_namespace[control]
             workload = control_to_workload[control]
             Logger.logger.info(f"Check smart remediation is available for control: {control}")
             body = {"pageNum": 1, "pageSize": 1, "cursor": "", "orderBy": "", "innerFilters": [{
