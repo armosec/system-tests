@@ -641,6 +641,19 @@
     "description": "",
     "skip_on_environment": ""
   },
+  "ac_9_unauthenticated_service": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "careportsreceiver",
+      "event-ingester-service"
+    ],
+    "description": "",
+    "skip_on_environment": ""
+  },
   "ac_6_fix_control_no_relevancy": {
     "target": [
       "In cluster",
