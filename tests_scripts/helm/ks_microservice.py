@@ -412,7 +412,7 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
         Logger.logger.info("Stage 1.2: Get old report-guid")
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True)
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False)
 
         Logger.logger.info("Installing kubescape with helm-chart")
         # 2.1 add and update armo in repo
