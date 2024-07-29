@@ -216,7 +216,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
 
 
-        TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
+        TestUtil.sleep(30, "wait a bit for synchronizer to catch up")
 
         Logger.logger.info(f"3. Start testing controls: {control_to_files.keys()}")
         Logger.logger.info(f"3.1. getting current report guid")
@@ -272,7 +272,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
             )
 
 
-        TestUtil.sleep(10, "wait a bit for synchronizer to catch up")
+        TestUtil.sleep(30, "wait a bit for synchronizer to catch up")
 
         Logger.logger.info(f"6. Trigger another scan for all controls")
         self.backend.trigger_posture_scan(
