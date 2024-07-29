@@ -210,6 +210,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         Logger.logger.info(f"2.1 Verifying all pods are running for all controls")
         for control, workload in control_to_workload.items():
             namespace = control_to_namespace[control]
+            Logger.logger.info(f"verifying all pods are running for control: {control}")
             self.verify_all_pods_are_running(
                 namespace=namespace, workload=workload, timeout=300
             )
@@ -265,7 +266,7 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         
         for control, fix in applied_workloads_fixs.items():
             namespace = control_to_namespace[control]
-            Logger.logger.info(f"verifying all pods are running for fix: {fix}")
+            Logger.logger.info(f"verifying all pods are running for control fix: {control}")
             self.verify_all_pods_are_running(
                 namespace=namespace, workload=fix, timeout=60
             )
