@@ -62,7 +62,7 @@ class ScenarioManager(base_test.BaseTest):
         Logger.logger.info(f"Applying scenario manifests for {self.test_scenario}")
         deploy_cmd = os.path.join(self.scenario_path, 'deploy_scenario') + ' ' + os.path.join(self.scenario_path , self.test_scenario) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
-        time.sleep(5)
+        time.sleep(30)
 
     
     def apply_fix(self, fix_type):
@@ -71,7 +71,6 @@ class ScenarioManager(base_test.BaseTest):
         """
         fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
-        time.sleep(5)
   
 
     def trigger_scan(self, trigger_by,  additional_params={}) -> None:
@@ -184,11 +183,15 @@ class AttackChainsScenarioManager(ScenarioManager):
                 return all(self.compare_nodes(obj1[key], obj2[key]) for key in obj1.keys())
 
     def check_attack_chains_results(self, result, expected):
-        """Validate the input content with the expected one.
+        """Validate the attack chains results on the backend
         
-        :param result: content retrieved from backend.
-        :return: True if all the controls passed, False otherwise.
+        :param 
+            result: attack chains retrieved from backend.
+            expected: expected attack chains.
+        :exception Exception: if the content is not as expected.
         """
+
+        assert len(result['response']['attackChains']) == len(expected['response']['attackChains']), f"Length mismatch: result: {len(result['response']['attackChains'])} != expected: {len(expected['response']['attackChains'])}"
         # Some example of assertion needed to recognize attack chain scenarios
         for acid, ac in enumerate(result['response']['attackChains']):
             ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
