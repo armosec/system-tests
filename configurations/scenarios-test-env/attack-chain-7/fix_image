@@ -1,4 +1,16 @@
 #!/usr/bin/bash
 
-kubectl patch deployment wordpress -n default --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"wordpress:6.3.1-php8.2"}]'
-kubectl rollout status deployment wordpress -n default --timeout=90s
+# Default namespace
+namespace="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+kubectl patch deployment wordpress -n "$namespace" --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"wordpress:6.3.1-php8.2"}]'
+kubectl rollout status deployment wordpress -n "$namespace" --timeout=90s

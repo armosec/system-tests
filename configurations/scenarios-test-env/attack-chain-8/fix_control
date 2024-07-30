@@ -1,7 +1,20 @@
 #!/usr/bin/bash
 
-kubectl delete ClusterRoleBinding read-secrets-global
-kubectl wait ClusterRoleBinding/read-secrets-global --for=delete --timeout=-1s
+# Default namespace
+namespace="default"
 
-kubectl delete -n default RoleBinding read-pods
-kubectl wait RoleBinding/read-pods --for=delete --timeout=-1s
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+
+kubectl delete ClusterRoleBinding read-secrets-global  -n "$namespace"
+kubectl wait ClusterRoleBinding/read-secrets-global  -n "$namespace" --for=delete --timeout=-1s
+
+kubectl delete RoleBinding read-pods  -n "$namespace"
+kubectl wait RoleBinding/read-pods  -n "$namespace" --for=delete --timeout=-1s

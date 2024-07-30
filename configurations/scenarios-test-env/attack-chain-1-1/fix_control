@@ -1,4 +1,18 @@
 #!/usr/bin/bash
 
-kubectl delete -n default ingress wordpress-ingress
-kubectl wait ingress/wordpress-ingress --for=delete --timeout=-1s
+
+# Default namespace
+namespace="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+
+kubectl delete ingress wordpress-ingress -n "$namespace"
+kubectl wait ingress/wordpress-ingress -n "$namespace" --for=delete --timeout=-1s

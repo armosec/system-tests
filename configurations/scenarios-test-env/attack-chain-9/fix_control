@@ -1,7 +1,19 @@
 #!/usr/bin/bash
 
-kubectl delete ServiceScanResult operator -n default
+# Default namespace
+namespace="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+kubectl delete ServiceScanResult operator -n "$namespace"
 kubectl wait ServiceScanResult/operator --for=delete --timeout=-1s
 
-kubectl delete deployment operator-deployment -n default
-kubectl wait --for=delete deployment/operator-deployment -n default --timeout=90s
+kubectl delete deployment operator-deployment -n "$namespace"
+kubectl wait --for=delete deployment/operator-deployment -n "$namespace" --timeout=90s

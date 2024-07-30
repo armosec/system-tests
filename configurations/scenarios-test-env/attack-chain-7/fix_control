@@ -1,4 +1,17 @@
 #!/usr/bin/bash
 
-kubectl delete -n default service wordpress
-kubectl wait svc/wordpress --for=delete --timeout=-1s
+# Default namespace
+namespace="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) namespace="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+
+kubectl delete service wordpress -n "$namespace"
+kubectl wait svc/wordpress -n "$namespace" --for=delete --timeout=-1s
