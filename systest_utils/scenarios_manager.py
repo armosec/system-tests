@@ -71,7 +71,6 @@ class ScenarioManager(base_test.BaseTest):
         """
         fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
-        time.sleep(30) # wait for the resources to be created
   
 
     def trigger_scan(self, trigger_by,  additional_params={}) -> None:
