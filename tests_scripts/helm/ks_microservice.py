@@ -364,7 +364,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        time.sleep(10)
 
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario(current_datetime)
