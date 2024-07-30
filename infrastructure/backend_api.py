@@ -2102,16 +2102,22 @@ class ControlPanelAPI(object):
                     self.customer, res.status_code, res.text))
         return res
 
-    def get_attack_chains(self, cluster_name=None):
+    def get_attack_chains(self, cluster_name=None, namespace=None):
         params = {"customerGUID": self.selected_tenant_id}
 
         filters = []
         if cluster_name is not None:
-            filters.append({"clusterName": cluster_name})
+            cluster_filter = {"clusterName": cluster_name}
+            if namespace is not None:
+                cluster_filter["namespace"] = namespace
+            filters.append(cluster_filter)
+        elif namespace is not None:
+            filters.append({"namespace": namespace})
 
         payload = {
             "innerFilters": filters,
         }
+
         r = self.post(API_ATTACK_CHAINS, params=params, json=payload, timeout=60)
         Logger.logger.info(r.text)
 
@@ -2188,8 +2194,8 @@ class ControlPanelAPI(object):
 
         return r, np, graph
 
-    def get_active_attack_chains(self, current_datetime=datetime, cluster_name=None) -> requests.Response:
-        r = self.get_attack_chains(cluster_name)
+    def get_active_attack_chains(self, current_datetime=datetime, cluster_name=None, namespace=None) -> requests.Response:
+        r = self.get_attack_chains(cluster_name, namespace)
         # checks if respose met conditions to be considered valid:
         # - parameter 'response.attackChainsLastScan' should have a value >= of current time
         # - parameter 'total.value' shoud be > 0
@@ -2209,8 +2215,8 @@ class ControlPanelAPI(object):
 
         return r
 
-    def has_active_attack_chains(self, cluster_name=None) -> bool:
-        r = self.get_attack_chains(cluster_name)
+    def has_active_attack_chains(self, cluster_name=None, namespace=None) -> bool:
+        r = self.get_attack_chains(cluster_name, namespace)
 
         response = json.loads(r.text)
         assert response['total']['value'] == 0, f"attack-chains not fixed yet"

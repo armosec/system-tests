@@ -122,7 +122,8 @@ class AttackChainsScenarioManager(ScenarioManager):
             self.backend.get_active_attack_chains, 
             timeout=600,
             current_datetime=current_datetime,
-            cluster_name=self.cluster
+            cluster_name=self.cluster,
+            namespace=self.namespace
             )
 
         Logger.logger.info('loading attack chain scenario to validate it')
@@ -146,7 +147,8 @@ class AttackChainsScenarioManager(ScenarioManager):
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
             timeout=600, 
-            cluster_name=self.cluster
+            cluster_name=self.cluster,
+            namespace=self.namespace
             )
 
         Logger.logger.info('attack-chain fixed properly')
