@@ -10,7 +10,7 @@
 # the Kubernetes cluster.
 #
 # Usage:
-#   ./deploy_scenario /path/to/manifests [--kubeconfig /path/to/kubeconfig] [--namespace namespace]
+#   ./deploy_scenario /path/to/manifests [--kubeconfig /path/to/kubeconfig]
 #
 # Author: ARMO
 # Date: 2023-07-27
@@ -21,7 +21,6 @@ check_kubectl_installed() {
     exit 1
   fi
 }
-
 apply_manifests() {
   local path=$1
   local kubeconfig=$2
@@ -44,7 +43,7 @@ apply_manifests() {
 
       if [ $? -eq 0 ]; then
         echo "Applied manifest: $(basename "$filename")"
-        wait_for_running "$filename" "$kubeconfig" "$namespace"
+        wait_for_running "$filename" "$kubeconfig"
       else
         echo "Error applying manifest: $(basename "$filename")"
       fi
@@ -57,26 +56,30 @@ apply_manifests() {
 wait_for_running() {
   local filename=$1
   local kubeconfig=$2
-  local namespace=$3
 
   local deployments=$(kubectl get -f "$filename" --kubeconfig "$kubeconfig" -o jsonpath='{.items[?(@.kind=="Deployment")].metadata.name}')
+  local namespaces=$(kubectl get -f "$filename" --kubeconfig "$kubeconfig" -o jsonpath='{.items[?(@.kind=="Deployment")].metadata.namespace}')
 
   if [ -n "$deployments" ]; then
     echo "Waiting for Pods to be Running..."
+    i=0
     for deployment in $deployments; do
+      namespace=$(echo "$namespaces" | cut -d ' ' -f $((i+1)))
       sleep 5
-      kubectl rollout status deployment "$deployment" ${namespace:+-n "$namespace"} --timeout=120s --kubeconfig "$kubeconfig"
+      #kubectl wait pod -l app="$deployment" -n "$namespace" --for=condition=Ready --timeout=120s --kubeconfig "$kubeconfig" >/dev/null 2>&1
+      #kubectl wait deployment/"$deployment" -n "$namespace" --for=condition=Available --timeout=120s --kubeconfig "$kubeconfig" >/dev/null 2>&1
+      kubectl rollout status deployment "$deployment" -n "$namespace" --timeout=90s --kubeconfig "$kubeconfig" >/dev/null 2>&1
       if [ $? -eq 0 ]; then
-        echo "Deployment '$deployment' in Namespace '${namespace:-default}' is Available."
+        echo "Deployment '$deployment' in Namespace '$namespace' is Available."
       else
-        echo "Timeout: Deployment '$deployment' in Namespace '${namespace:-default}' not Running within the specified time."
+        echo "Timeout: Deployment '$deployment' in Namespace '$namespace' not Running within the specified time."
       fi
+      ((i++))
     done
   else
     echo "No Deployments found in $filename. Skipping wait."
   fi
 }
-
 main() {
   if [ $# -lt 1 ]; then
     echo "Usage: $0 /path/to/manifests [--kubeconfig /path/to/kubeconfig] [--namespace namespace]"
