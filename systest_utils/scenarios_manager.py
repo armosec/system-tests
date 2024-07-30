@@ -62,7 +62,7 @@ class ScenarioManager(base_test.BaseTest):
         Logger.logger.info(f"Applying scenario manifests for {self.test_scenario}")
         deploy_cmd = os.path.join(self.scenario_path, 'deploy_scenario') + ' ' + os.path.join(self.scenario_path , self.test_scenario) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
-        time.sleep(5)
+        time.sleep(10)
 
     
     def apply_fix(self, fix_type):
@@ -71,7 +71,7 @@ class ScenarioManager(base_test.BaseTest):
         """
         fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
-        time.sleep(5)
+        time.sleep(10)
   
 
     def trigger_scan(self, trigger_by,  additional_params={}) -> None:
