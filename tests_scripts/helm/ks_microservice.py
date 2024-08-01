@@ -364,7 +364,6 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
 
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
-        time.sleep(10)
 
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario(current_datetime)
@@ -412,7 +411,7 @@ class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
         Logger.logger.info("Stage 1.2: Get old report-guid")
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True)
+        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False)
 
         Logger.logger.info("Installing kubescape with helm-chart")
         # 2.1 add and update armo in repo

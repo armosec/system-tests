@@ -117,7 +117,7 @@ def set_backends():
     backends.append(Backend(name='onprem',
                             dashboard='https://armo-platform-api.armodev.cloud',
                             api_url='armo-platform-api.armodev.cloud',
-                            auth_url='armo-platform.armodev.cloud',
+                            auth_url='https://armo-platform.armodev.cloud',
                             login_method=LOGIN_METHOD_KEYCLOAK,
                             tls_verify=False))
 
