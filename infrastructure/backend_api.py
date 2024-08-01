@@ -121,6 +121,11 @@ API_RUNTIME_INCIDENTS = "/api/v1/runtime/incidents"
 
 API_RUNTIME_INCIDENTSPERSEVERITY = "/api/v1/runtime/incidentsPerSeverity"
 API_RUNTIME_INCIDENTSOVERTIME = "/api/v1/runtime/incidentsOvertime"
+API_RUNTIME_INCIDENTSRULESET = "/api/v1/runtime/incidentsRuleSet"
+API_RUNTIME_INCIDENTTYPES = "/api/v1/runtime/incidentTypes"
+API_RUNTIME_POLICIES_LIST = "/api/v1/runtime/policies/list"
+API_RUNTIME_POLICIES = "/api/v1/runtime/policies"
+API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
 API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
@@ -2609,6 +2614,154 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete_security_risks_exception "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
 
+        return r
+
+    def get_runtime_incidents_rulesets(self, body = None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        if body is None:
+            body = {"pageSize": 50, "pageNum": 1}
+
+        Logger.logger.info("get_runtime_incidents_rulesets body: %s" % body)
+        r = self.post(API_RUNTIME_INCIDENTSRULESET, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_runtime_incidents_rules "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+    def get_runtime_incident_types(self, body = None):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        if body is None:
+            body = {"pageSize": 50, "pageNum": 1}
+
+        Logger.logger.info("get_runtime_incident_types body: %s" % body)
+        r = self.post(API_RUNTIME_INCIDENTTYPES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_runtime_incident_types "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+
+
+    def get_runtime_policies_list(self, body = None):
+        """
+        payload example:
+
+        {
+        "pageSize": 50,
+        "pageNum": 1,
+        "innerFilters": [
+            {
+            "scope.designators.cluster": "arn-aws-eks-eu-west-1-015253967648-cluster-ca-terraform-eks-dev-stage"
+            }
+        ]
+        }
+        """
+        params = {"customerGUID": self.selected_tenant_id}
+
+        if body is None:
+            body = {"pageSize": 50, "pageNum": 1}
+
+        Logger.logger.info("get_runtime_policies_list body: %s" % body)
+        r = self.post(API_RUNTIME_POLICIES_LIST, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_runtime_policies_list "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def delete_runtime_policies(self, body):
+        params = {"customerGUID": self.selected_tenant_id}
+        
+        Logger.logger.info("delete_runtime_policies body: %s" % body)
+        r = self.delete(API_RUNTIME_POLICIES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: delete_runtime_policies "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    
+    def new_runtime_policy(self, body):
+        """
+        mandatory fields: name, ruleSetType (Custom or Managed)
+
+        if "ruleSetType": "Managed" then you have to have at least 1 ruleset
+        
+        example:
+        {    
+            "name": "Malware-new",    
+            "description": "Default Malware RuleSet",
+            "enabled": true,
+            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+            "ruleSetType": "Managed",
+            "managedRuleSetIDs": [
+                "c9fe6345-c393-4595-bd7b-22110dbafe62"
+            ],    
+            "notifications": [],
+            "actions": []
+        }
+        """
+        params = {"customerGUID": self.selected_tenant_id}
+
+        Logger.logger.info("new_runtime_policy body: %s" % body)
+        r = self.post(API_RUNTIME_POLICIES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: new_runtime_policy "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+    
+    def update_runtime_policy(self, body):
+
+        """
+        mandatory fields: guid, name, ruleSetType (Custom or Managed)
+
+        if "ruleSetType": "Managed" then you have to have at least 1 ruleset
+
+        {
+            "guid": "093c28b1-894f-4aa2-a8b8-8ed71cb9ddf0",
+            "name": "Malware-new",
+            "description": "Default Malware RuleSet",
+            "enabled": true,
+            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+            "ruleSetType": "Custom",
+            "IncidentTypeIDs":["I001","I002"],
+            "notifications": [],
+            "actions": []
+        }
+        """
+        params = {"customerGUID": self.selected_tenant_id}
+
+        Logger.logger.info("update_runtime_policy body: %s" % body)
+
+        r = self.put(API_RUNTIME_POLICIES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update_runtime_policy "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def get_runtime_policies_uniquevalues(self, body):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        Logger.logger.info("get_runtime_policies_uniquevalues body: %s" % body)
+
+        r = self.post(API_RUNTIME_POLICIES_UNIQUEVALUES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_runtime_policies_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
         return r
 
     def get_integration_status(self, provider: str):

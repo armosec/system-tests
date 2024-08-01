@@ -16,3 +16,12 @@ class RuntimeTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             # create_test_tenant=True,
         )
+    
+    @staticmethod
+    def kdr_runtime_policies_configurations():
+        from tests_scripts.runtime.policies import RuntimePoliciesConfigurations
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=RuntimePoliciesConfigurations,
+            create_test_tenant=True,
+        )

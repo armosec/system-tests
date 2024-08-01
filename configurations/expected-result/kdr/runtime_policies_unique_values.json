@@ -1,0 +1,33 @@
+{
+    "fields": {
+        "name": [
+            "Anomaly",
+            "Malware"
+        ],
+        "ruleSetType": [
+            "Managed"
+        ],
+        "scope.designators.cluster": [],
+        "scope.designators.namespace": []
+    },
+    "fieldsCount": {
+        "name": [
+            {
+                "key": "Anomaly",
+                "count": 1
+            },
+            {
+                "key": "Malware",
+                "count": 1
+            }
+        ],
+        "ruleSetType": [
+            {
+                "key": "Managed",
+                "count": 2
+            }
+        ],
+        "scope.designators.cluster": [],
+        "scope.designators.namespace": []
+    }
+}

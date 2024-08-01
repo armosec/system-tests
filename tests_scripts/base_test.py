@@ -260,7 +260,7 @@ class BaseTest(object):
 
     def cleanup(self, wlid: str = None, display_wt: bool = False):
         self.delete_tenants()
-        return "", ""
+        return statics.SUCCESS, ""
 
     def validate_microservice_is_inactive(self, wlid, tries_num=5):
         for i in range(tries_num):
