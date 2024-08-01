@@ -24,7 +24,7 @@ class VulnerabilityScanningTests(object):
             expected_results="wikijs.json",
             proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
-    
+
     @staticmethod
     def vuln_v2_views():
         from tests_scripts.helm.vuln_scan import VulnerabilityV2Views
@@ -32,13 +32,13 @@ class VulnerabilityScanningTests(object):
         from os.path import join
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityV2Views, 
+            test_obj=VulnerabilityV2Views,
             services=join(DEFAULT_SERVICE_PATH, "viewsv2"),
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2"),
             database=supported_systemsAPI.WikiJS,
             helm_kwargs={"triggerNewImageScan": True}
         )
-     
+
     @staticmethod
     def vuln_v2_views_kev():
         from tests_scripts.helm.vuln_scan import VulnerabilityV2ViewsKEV
@@ -47,12 +47,12 @@ class VulnerabilityScanningTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityV2ViewsKEV,
-            services=join(DEFAULT_SERVICE_PATH, "viewsv2kev"),           
+            services=join(DEFAULT_SERVICE_PATH, "viewsv2kev"),
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "viewsv2kev"),
             secret="wikijs.yaml"
         )
-    
-    
+
+
 
     @staticmethod
     def vuln_scan():
@@ -82,6 +82,32 @@ class VulnerabilityScanningTests(object):
             deployment=join("nginx-vuln-scan-new-image.yaml"),
             expected_results="nginx-new-image.json",
             helm_kwargs={"triggerNewImageScan": True}
+        )
+
+    @staticmethod
+    def vuln_scan_cve_global_container_name_exceptions():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningCVEExceptions
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=VulnerabilityScanningCVEExceptions,
+            deployment=join("nginx-vuln-scan-new-image.yaml"),
+            expected_results="nginx-new-image.json",
+            exceptions_parameters={"container_name": "*/*"},
+            helm_kwargs={"triggerNewImageScan": True},
+        )
+
+    @staticmethod
+    def vuln_scan_cve_global_namespace_exceptions():
+        from tests_scripts.helm.vuln_scan import VulnerabilityScanningCVEExceptions
+        from os.path import join
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=VulnerabilityScanningCVEExceptions,
+            deployment=join("nginx-vuln-scan-new-image.yaml"),
+            expected_results="nginx-new-image.json",
+            exceptions_parameters={"namespace": "*/*"},
+            helm_kwargs={"triggerNewImageScan": True},
         )
 
     @staticmethod
