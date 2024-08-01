@@ -380,7 +380,7 @@ class TestUtil(object):
     @staticmethod
     def save_expceted_json(expected_json, path):
         with open(path, 'w') as f:
-            json.dump(expected_json, f)
+            json.dump(expected_json, f, indent=4)
 
     @staticmethod
     def get_expected_json(path):

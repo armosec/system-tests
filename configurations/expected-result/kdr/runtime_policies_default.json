@@ -1,0 +1,39 @@
+{
+    "total": {
+        "value": 2,
+        "relation": "eq"
+    },
+    "response": [
+        {
+            "guid": "301aaa48-1217-4da2-ac62-626cb59d47f2",
+            "name": "Malware",
+            "updatedTime": "2024-08-01T04:10:43Z",
+            "description": "Default Malware RuleSet",
+            "enabled": true,
+            "scope": {},
+            "ruleSetType": "Managed",
+            "managedRuleSetIDs": [
+                "c9fe6345-c393-4595-bd7b-22110dbafe62"
+            ],
+            "updatedBy": "ARMO",
+            "notifications": [],
+            "actions": []
+        },
+        {
+            "guid": "7af24eca-75e6-48dd-a244-de530f736bda",
+            "name": "Anomaly",
+            "updatedTime": "2024-08-01T04:10:43Z",
+            "description": "Default Anomaly RuleSet",
+            "enabled": true,
+            "scope": {},
+            "ruleSetType": "Managed",
+            "managedRuleSetIDs": [
+                "c9fe6345-c393-4595-bd7b-22110dbafe61"
+            ],
+            "updatedBy": "ARMO",
+            "notifications": [],
+            "actions": []
+        }
+    ],
+    "cursor": ""
+}

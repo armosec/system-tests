@@ -1,0 +1,49 @@
+{
+    "total": {
+        "value": 2,
+        "relation": ""
+    },
+    "response": [
+        {
+            "guid": "c9fe6345-c393-4595-bd7b-22110dbafe61",
+            "name": "Anomaly",
+            "updatedTime": "2024-07-09T12:11:19Z",
+            "incidentTypeIDs": [
+                "I006",
+                "I007",
+                "I008",
+                "I010",
+                "I011",
+                "I012",
+                "I013",
+                "I014",
+                "I015",
+                "I017",
+                "I018",
+                "I019",
+                "I020",
+                "I021",
+                "I022"
+            ],
+            "updatedBy": "ARMO",
+            "description": "Default Anomaly RuleSet"
+        },
+        {
+            "guid": "c9fe6345-c393-4595-bd7b-22110dbafe62",
+            "name": "Malware",
+            "updatedTime": "2024-07-09T12:11:19Z",
+            "incidentTypeIDs": [
+                "I001",
+                "I002",
+                "I003",
+                "I004",
+                "I005",
+                "I009",
+                "I016"
+            ],
+            "updatedBy": "ARMO",
+            "description": "Default Malware RuleSet"
+        }
+    ],
+    "cursor": ""
+}

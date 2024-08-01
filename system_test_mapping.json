@@ -1489,6 +1489,19 @@
     "skip_on_environment": "production",
     "owner": ""
   },
+  "kdr_runtime_policies_configurations": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "Test kdr runtime policy configurations - list, create, update, delete, unique values ",
+    "skip_on_environment": "",
+    "owner": ""
+  },
   "sr_ac_scan_status": {
     "target": [
       "In cluster",
