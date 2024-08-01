@@ -56,6 +56,8 @@ class RuntimePoliciesConfigurations(BaseTest):
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
             TestUtil.save_expceted_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
 
+        assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
+
 
         Logger.logger.info("4. validate unique values")
         unique_values_body = {
@@ -144,16 +146,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
             TestUtil.save_expceted_json(incident_rulesets, EXPECTED_RUNTIME_RULSETS_PATH)
         
-        expected_incident_rulesets = TestUtil.get_expected_json(EXPECTED_RUNTIME_RULSETS_PATH) 
-
-        try:
-            assert len(incident_rulesets["response"]) == len(expected_incident_rulesets["response"]), f"incident rulesets length is not equal, expected is {len(expected_incident_rulesets['response'])} but got {len(incident_rulesets['response'])}"
-            for i, _ in enumerate(incident_rulesets["response"]):
-                assert incident_rulesets["response"][i]["name"] == expected_incident_rulesets["response"][i]["name"], f"incident rulesets name is not equal, expected is {expected_incident_rulesets['response'][i]['name']} but got {incident_rulesets['response'][i]['name']}"
-                assert len(incident_rulesets["response"][i]["incidentTypeIDs"]) > 0, "incidentTypeIDs is empty"
-                assert incident_rulesets["response"][i]["guid"] != "", "guid is empty"
-        except Exception as e:
-            Logger.error(f"failed to validate default rulesets against backend, got error:{e}, expected is {expected_incident_rulesets},  got {incident_rulesets}")    
+        assert len(incident_rulesets["response"]) > 0, "no incident rulesets found"  
         
         return incident_rulesets["response"]
 
