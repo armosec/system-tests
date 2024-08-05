@@ -159,9 +159,7 @@ def enrich_teams_alert_notifications(data):
     data["notifications"]  =[
         {
             "provider": "teams",
-            "webhook" :{
-                "id": get_env("CHANNEL_WEBHOOK")
-            }
+            "teamsWebhookURL" : get_env("CHANNEL_WEBHOOK")
         }
     ]
 
