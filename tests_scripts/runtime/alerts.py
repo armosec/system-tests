@@ -131,7 +131,9 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         
 
         Logger.logger.info('7. verify messages were sent')
-        res = self.wait_for_report(self.assert_all_messages_sent, begin_time=before_test_message_ts, cluster=self.cluster)
+        res = self.wait_for_report(self.assert_all_messages_sent, 
+                                   timeout=5 * 60, 
+                                   begin_time=before_test_message_ts, cluster=self.cluster)
         return self.cleanup()
     
     def verify_incident_completed(self, incident_id):
