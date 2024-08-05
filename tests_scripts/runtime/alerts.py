@@ -122,7 +122,6 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
                                        cluster=self.cluster, namespace=namespace,
                                        incident_name="Unexpected process launched")
         
-        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
