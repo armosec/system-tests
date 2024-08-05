@@ -1502,6 +1502,32 @@
     "skip_on_environment": "",
     "owner": ""
   },
+  "kdr_slack_alerts": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "Test kdr incidents is being sent to slack",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
+  "kdr_teams_alerts": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "Test kdr incidents is being sent to teams",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
   "sr_ac_scan_status": {
     "target": [
       "In cluster",
