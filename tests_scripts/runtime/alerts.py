@@ -8,6 +8,7 @@ from infrastructure.kubectl_wrapper import KubectlWrapper
 from systest_utils.systests_utilities import TestUtil
 from systest_utils.tests_logger import Logger
 from tests_scripts.base_test import BaseTest
+from tests_scripts.runtime.incidents import __RELATED_ALERTS_KEY__
 from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE, RuntimePoliciesConfigurations
 from tests_scripts.users_notifications.alert_notifications import TEST_NAMESPACE, AlertNotifications, get_env
 
@@ -115,11 +116,42 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(6)
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
+
+        Logger.logger.info("Get incidents list")
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
+                                       cluster=self.cluster, namespace=namespace,
+                                       incident_name="Unexpected process launched")
+        
+        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
+        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
+                                      incident_id=incs[0]['guid'])
+        Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
+            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
 
         Logger.logger.info('7. verify messages were sent')
         res = self.wait_for_report(self.assert_all_messages_sent, begin_time=before_test_message_ts, cluster=self.cluster)
         return self.cleanup()
+    
+    def verify_incident_completed(self, incident_id):
+        response = self.backend.get_incident(incident_id)
+        assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
+
+        return response
+    
+    def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
+        Logger.logger.info("Get incidents list")
+        filters_dict = {
+            "designators.attributes.cluster": cluster,
+            "designators.attributes.namespace": namespace,
+            "name": incident_name
+        }
+
+        response = self.backend.get_incidents(filters=filters_dict)
+        incs = response['response']
+        assert len(incs) > 0, f"Failed to get incidents list {json.dumps(incs)}"
+        return incs
     
     def cleanup(self):
         for policy_guid in self.test_policy_guids:
