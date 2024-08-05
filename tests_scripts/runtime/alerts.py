@@ -49,6 +49,16 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         self.test_policy_guids = []
 
     def start(self):
+        """
+        agenda:
+        1. get runtime incidents rulesets
+        2. enrich the new runtime policy with alert notifications
+        3. create new runtime policy
+        4. Install kubescape
+        5. apply the deployment that will generate the incident
+        6. wait for the runtime incidents to be generated
+        7. verify messages were sent
+        """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
  
 
