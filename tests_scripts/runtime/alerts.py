@@ -144,6 +144,10 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
 def assert_runtime_incident_message_sent(messages, cluster):
         found = 0
+        Logger.logger.info(f"total messages found: {len(messages)}, looking for runtime incident messages")
+        if len(messages) > 0:
+            Logger.logger.info(f"first message: {messages[0]}")
+            
         for message in messages:
             message_string = str(message)
             if "New threat found" in message_string and cluster in message_string and "redis" in message_string:
