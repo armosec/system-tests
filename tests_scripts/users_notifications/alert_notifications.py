@@ -183,7 +183,8 @@ class AlertNotifications(BaseHelm):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-        self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
+        if self.fw_name:
+            self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         self.delete_all_alert_channels_for_cluster(self.cluster)
         return super().cleanup(**kwargs)
 
@@ -200,24 +201,25 @@ class AlertNotifications(BaseHelm):
         report_fw, _ = self.wait_for_report(report_type=self.backend.put_custom_framework, fw_object=ks_custom_fw)
         return ks_custom_fw, report_fw
 
-    def create_alert_channel(self, cluster: str):
-        data = self.get_alert_channel_payload(cluster)
+    def create_alert_channel(self, cluster: str = None, with_scope: bool = True):
+        data = self.get_alert_channel_payload(cluster, with_scope)
         created_alert_channel_response = self.backend.create_alert_channel(data)
         assert created_alert_channel_response, "Expected alert channel"
         guid = created_alert_channel_response.json()["channel"]["guid"]
         assert guid, "Expected alert channel's guid"
         return guid
 
-    def install_kubescape(self):
+    def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart()
+        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
-    def get_alert_channel_payload(self, cluster_name: str):
+    def get_alert_channel_payload(self, cluster_name: str = None, with_scope: bool = True):
         with open(self.test_obj["alert_channel_file"], 'r') as file:
             data = json.load(file)
         data["channel"]["name"] = cluster_name + "_cluster"
-        data["scope"][0]["cluster"] = cluster_name
+        if with_scope:
+            data["scope"][0]["cluster"] = cluster_name
         self.test_obj["enrichAlertChannelFunc"](data)
         return data
 

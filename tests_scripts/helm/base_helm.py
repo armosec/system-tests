@@ -5,11 +5,22 @@ from systest_utils import TestUtil, Logger, statics
 from tests_scripts.kubernetes.base_k8s import BaseK8S
 import signal
 import psutil
+from kubernetes.dynamic import ResourceField
+import json
+
+
 
 DEFAULT_BRANCH = "release"
 
 HTTPD_PROXY_CRT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.crt")
 HTTPD_PROXY_KEY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.key")
+
+
+class ResourceFieldEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ResourceField):
+            return obj.__dict__
+        return json.JSONEncoder.default(self, obj)
 
 
 class BaseHelm(BaseK8S):
@@ -182,6 +193,25 @@ class BaseHelm(BaseK8S):
         c_panel_info, t = self.wait_for_report(report_type=self.backend.get_posture_frameworks,
                                                framework_name=framework_name, report_guid=report_guid)
         return c_panel_info
+
+
+    def verify_application_profiles(self, wlids: list, namespace):
+        Logger.logger.info("Get application profiles")
+        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
+                                                          "ApplicationProfile").get(namespace=namespace).items
+        assert k8s_data is not None, "Failed to get application profiles"
+        assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
+        Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
+        ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
+        for i in wlids:
+            assert i in ap_wlids, f"Failed to get application profile for {i}"
+        # kubescape.io/status: completed, kubescape.io/completion: complete
+        # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
+        not_complete_application_profiles = [i for i in k8s_data if
+                                             i.metadata.annotations['kubescape.io/status'] != 'completed']
+
+        assert len(
+            not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 
     # ---------------------- helm ------------------------
     @staticmethod

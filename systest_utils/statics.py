@@ -69,6 +69,10 @@ DEFAULT_INPUT_YAML_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'yaml_file')
 # notifications
 DEFAULT_NOTIFICATIONS_PATHS = os.path.abspath(os.path.join('configurations', 'notifications'))
 DEFAULT_NOTIFICATIONS_DEPLOYMENT_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'deployments')
+DEFAULT_NOTIFICATIONS_JOB_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'jobs')
+
+# kdr
+DEFAULT_KDR_DEPLOYMENT_PATH = os.path.join(DEFAULT_K8S_PATHS, 'deployments')
 
 DEFAULT_DEPLOY_INTEGRATIONS_PATH = os.path.join(DEFAULT_K8S_PATHS, 'integrations')
 DEFAULT_INTEGRATIONS_PATH = os.path.abspath(os.path.join('configurations', 'integrations'))
