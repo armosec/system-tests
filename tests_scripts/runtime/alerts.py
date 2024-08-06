@@ -204,8 +204,7 @@ def enrich_slack_alert_notifications(data):
         {
             "provider": "slack",
             "slackChannel": {
-                "channelID": get_env("SLACK_CHANNEL_ID"),
-                "channelName": "dev-system-tests"
+                "id": get_env("SLACK_CHANNEL_ID")
             }
         }
     ]
