@@ -1509,7 +1509,8 @@
     "target_repositories": [
       "cadashboardbe",
       "event-ingester-service",
-      "config-service"
+      "config-service",
+      "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
@@ -1522,7 +1523,8 @@
     "target_repositories": [
       "cadashboardbe",
       "event-ingester-service",
-      "config-service"
+      "config-service",
+      "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to teams",
     "skip_on_environment": "",
