@@ -94,6 +94,8 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
         Logger.logger.info("3. create new runtime policy")
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
+        
+        Logger.logger.info(f"New policy created with guid {new_policy_guid}")
         self.test_policy_guids.append(new_policy_guid)
 
 

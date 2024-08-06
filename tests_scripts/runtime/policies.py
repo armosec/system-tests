@@ -173,6 +173,8 @@ class RuntimePoliciesConfigurations(BaseTest):
         props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions"]
         assert len(incident_policies)  > 0, f"failed to get new runtime policy, expected more than 1 but got {len(incident_policies)}, got result {incident_policies}"
 
+        Logger.logger.info(f"New policy created: {json.dumps(incident_policies[0], indent=4)}")
+
         for prop in props_to_check:
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
