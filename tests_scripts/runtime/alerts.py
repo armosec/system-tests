@@ -94,6 +94,8 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
         Logger.logger.info("3. create new runtime policy")
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
+        
+        Logger.logger.info(f"New policy created with guid {new_policy_guid}")
         self.test_policy_guids.append(new_policy_guid)
 
 
@@ -122,7 +124,6 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
                                        cluster=self.cluster, namespace=namespace,
                                        incident_name="Unexpected process launched")
         
-        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
@@ -203,8 +204,7 @@ def enrich_slack_alert_notifications(data):
         {
             "provider": "slack",
             "slackChannel": {
-                "channelID": get_env("SLACK_CHANNEL_ID"),
-                "channelName": "dev-system-tests"
+                "id": get_env("SLACK_CHANNEL_ID")
             }
         }
     ]
