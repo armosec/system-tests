@@ -507,7 +507,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
+      "event-ingester-service-dummy",
       "gateway"
     ],
     "description": "",
@@ -522,7 +522,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
+      "event-ingester-service-dummy",
       "gateway"
     ],
     "description": "",
@@ -537,7 +537,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
+      "event-ingester-service-dummy",
       "gateway"
     ],
     "description": "",
@@ -552,7 +552,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service"
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
