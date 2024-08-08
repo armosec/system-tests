@@ -122,7 +122,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
                                        cluster=self.cluster, namespace=namespace,
-                                       incident_name="Exec to pod")
+                                       incident_name="Unexpected process launched")
         
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
