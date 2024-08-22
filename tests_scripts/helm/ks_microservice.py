@@ -180,6 +180,8 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         total_events_resolved = total_events_detected
 
         Logger.logger.info('11. validate security risks trends')
+        # wait a bit for trends to be updated
+        time.sleep(5)
         # after resolve we expect total detected and total resolved to be the same and total new and total remaining to be 0
         scenarios_manager.verify_security_risks_trends(total_events_detected, total_events_resolved, 0, 0)
 
