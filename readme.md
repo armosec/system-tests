@@ -65,12 +65,12 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `ac_5_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_3_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_3_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `ac_8_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_8_external_workload_with_cluster_takeover`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_1_1_fix_control_no_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_1_1_fix_control_with_relevancy`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `ac_alpine_fix_image_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `ac_alpine_fix_image_with_relevancy_with_cronjob`             | helm-chart |                                    | in-cluster kubescape, backend |
-| `ac_alpine_fix_control_with_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_workload_external_track_fix_image`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_workload_external_track_fix_image_with_cronjob`             | helm-chart |                                    | in-cluster kubescape, backend |
+| `ac_alpine_workload_external_track_fix_control`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
