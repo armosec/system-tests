@@ -231,7 +231,7 @@ KNOWN_SERVERS_PLURAL = "knownservers"
 GENERATED_NETWORK_POLICY_PLURAL = "generatednetworkpolicies"
 
 APPLICATION_PROFILE_PLURAL = "applicationprofiles"
-NETWORK_NEIGHBOR_PLURAL = "networkneighborses"
+NETWORK_NEIGHBOR_PLURAL = "networkneighborhoods"
 
 STORAGE_CVE_LABEL = "kubescape.io/context"
 STORAGE_FILTERED_CVE_LABEL_VALUE = "filtered"

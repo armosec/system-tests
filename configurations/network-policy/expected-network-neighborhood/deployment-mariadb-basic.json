@@ -1,5 +1,5 @@
 {
-  "kind": "NetworkNeighbors",
+  "kind": "NetworkNeighborhood",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
     "name": "deployment-mariadb",
@@ -22,27 +22,32 @@
     "matchLabels": {
       "app": "mariadb"
     },
-    "ingress": [
+    "containers": [
       {
-        "identifier": "ee5c5b2f07834fa64174c3d2ad0505366e4b26777174906b91e83dcd163f8ec2",
-        "type": "internal",
-        "dns": "",
-        "ports": [
+        "name": "mariadb",
+        "ingress": [
           {
-            "name": "TCP-3306",
-            "protocol": "TCP",
-            "port": 3306
+            "identifier": "ee5c5b2f07834fa64174c3d2ad0505366e4b26777174906b91e83dcd163f8ec2",
+            "type": "internal",
+            "dns": "",
+            "ports": [
+              {
+                "name": "TCP-3306",
+                "protocol": "TCP",
+                "port": 3306
+              }
+            ],
+            "podSelector": {
+              "matchLabels": {
+                "app": "wikijs"
+              }
+            },
+            "namespaceSelector": null,
+            "ipAddress": ""
           }
         ],
-        "podSelector": {
-          "matchLabels": {
-            "app": "wikijs"
-          }
-        },
-        "namespaceSelector": null,
-        "ipAddress": ""
+        "egress": []
       }
-    ],
-    "egress": []
+    ]
   }
 }

@@ -2,11 +2,21 @@ from infrastructure.backend_api import (
     KUBERNETES_RESOURCES_METADATA_KEY,
     KUBERNETES_RESOURCES_OBJECT_KEY,
 )
-from systest_utils.systests_utilities import TestUtil
-from systest_utils import statics, Logger
 from systest_utils import statics, Logger, TestUtil
 from tests_scripts.helm.base_helm import BaseHelm
-from datetime import datetime, timezone
+
+
+def nameKind(cluster_resources):
+    results = []
+    for resource in cluster_resources:
+        if isinstance(resource, dict):
+            kind = resource.get("kind", "")
+            name = resource.get("metadata", {}).get("name")
+        else:
+            kind = getattr(resource, "kind", "")
+            name = getattr(getattr(resource, "metadata", {}), "name")
+        results.append(f"{kind}/{name}")
+    return ', '.join(results)
 
 
 class BaseSynchronizer(BaseHelm):
@@ -178,8 +188,8 @@ class BaseSynchronizer(BaseHelm):
 
                 assert len(be_resources) > 0, "BE kubernetes resources is empty"
                 assert len(be_resources) == len(cluster_resources), (
-                    "amount of kubernetes resources ('%d') is not as expected ('%d')"
-                    % (len(be_resources), len(cluster_resources))
+                    "amount of kubernetes resources ('%s') is not as expected ('%s')"
+                    % (nameKind(be_resources), nameKind(cluster_resources))
                 )
 
                 for be_resource in be_resources:
