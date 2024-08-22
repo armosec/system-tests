@@ -125,6 +125,7 @@ class AlertNotifications(BaseHelm):
                                                  kubernetes_obj=kubernetes_obj)
         self.fw_name = None
         self.cluster = None
+        self.wait_for_agg_to_end = False
 
     def start(self):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
