@@ -579,16 +579,16 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "ac_alpine_fix_image_with_relevancy": {
+  "ac_alpine_workload_external_track_fix_image": {
     "target": [
       "In cluster",
       "Backend"
@@ -603,7 +603,7 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "ac_alpine_fix_control_with_relevancy": {
+  "ac_alpine_workload_external_track_fix_control": {
     "target": [
       "In cluster",
       "Backend"
@@ -654,16 +654,16 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "ac_8_fix_control_with_relevancy": {
+  "ac_8_external_workload_with_cluster_takeover": {
     "target": [
       "In cluster",
       "Backend"
@@ -711,10 +711,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
