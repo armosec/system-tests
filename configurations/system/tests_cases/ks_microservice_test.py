@@ -281,8 +281,12 @@ class KSMicroserviceTests(object):
             test_job=[{"trigger_by": "scan_on_start"}],
             test_scenario="attack-chain-9",
             fix_object="control",
-        )
+            helm_kwargs={statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED,
+                         statics.HELM_VULNERABILITY_SCAN: statics.HELM_VULNERABILITY_SCAN_DISABLED,
+                         statics.HELM_OFFLINE_VULN_DB: False}
 
+        )
+      
     @staticmethod
     def ks_microservice_ns_creation():
         from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
