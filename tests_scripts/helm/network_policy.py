@@ -1,8 +1,9 @@
-from systest_utils.systests_utilities import TestUtil
-from tests_scripts.helm.base_network_policy import BaseNetworkPolicy
-from systest_utils import statics, Logger
 import json
+
+from systest_utils import statics, Logger
+from systest_utils.systests_utilities import TestUtil
 from tests_scripts import base_test
+from tests_scripts.helm.base_network_policy import BaseNetworkPolicy
 
 
 class NetworkPolicy(BaseNetworkPolicy):
@@ -16,8 +17,8 @@ class NetworkPolicy(BaseNetworkPolicy):
         1. Install Armo helm-chart
         2. Apply workloads
         3. Generate traffic
-        4. Validating in-cluster expected network neighbors and generated network policies
-        5. Validating backend expected network neighbors and generated network policies
+        4. Validating in-cluster expected network neighborhood and generated network policies
+        5. Validating backend expected network neighborhood and generated network policies
         6. Check deletion flow
         """
 
@@ -54,25 +55,25 @@ class NetworkPolicy(BaseNetworkPolicy):
         update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
         TestUtil.sleep(6 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_network_neighbors"])
+        expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_network_neighborhood"])
 
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("4. Validating in-cluster expected network neighbors and generated network policies")
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_network_neighbors_list,
+        Logger.logger.info("4. Validating in-cluster expected network neighborhood and generated network policies")
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        Logger.logger.info("5. Validating backend expected network neighborhood and generated network policies")
         self.wait_for_report(timeout=120,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
                              namespace=namespace,
                              expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
+                             expected_network_neighborhood_list=expected_network_neighborhood_list,
                              expected_generated_network_policy_list=expected_generated_network_policy_list
                              )
 
@@ -82,7 +83,7 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.kubernetes_obj.delete_workload(namespace=namespace, application=workload_objs[0])
         TestUtil.sleep(120, "wait for workload deletion", "info")
 
-        deleted_workload_nn = expected_network_neighbors_list.pop(0)
+        deleted_workload_nn = expected_network_neighborhood_list.pop(0)
         deleted_workload_np = expected_generated_network_policy_list.pop(0)
 
         Logger.logger.info(f"validating workload {deleted_workload_name} was deleted")
@@ -103,10 +104,10 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         Test plan:
         1. Install Armo helm-chart
         2. Apply workloads
-        3. Validating in-cluster expected network neighbors and generated network policies before generating traffic
+        3. Validating in-cluster expected network neighborhood and generated network policies before generating traffic
         4. Generate traffic
-        5. Validating in-cluster expected network neighbors and generated network policies after generating traffic
-        6. Validating backend expected network neighbors and generated network policies after generating traffic
+        5. Validating in-cluster expected network neighborhood and generated network policies after generating traffic
+        6. Validating backend expected network neighborhood and generated network policies after generating traffic
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -132,15 +133,15 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_network_neighbors"])
+        expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_network_neighborhood"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
         Logger.logger.info(
-            "3. Validating in-cluster expected network neighbors and generated network policies before generating traffic")
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_network_neighbors_list,
+            "3. Validating in-cluster expected network neighborhood and generated network policies before generating traffic")
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
         pod = self.wait_for_report(report_type=self.get_pod_if_ready, namespace=namespace, name="wikijs", timeout=180)
@@ -154,10 +155,10 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         TestUtil.sleep(5 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
         Logger.logger.info(
-            "5. Validating in-cluster expected network neighbors and generated network policies after generating traffic")
+            "5. Validating in-cluster expected network neighborhood and generated network policies after generating traffic")
 
-        expected_updated_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_updated_network_neighbors"])
+        expected_updated_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_updated_network_neighborhood"])
         expected_updated_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_updated_generated_network_policies"])
 
@@ -165,19 +166,19 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
                                                              expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
         Logger.logger.info("validated updated expected generated network policies")
 
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_updated_network_neighbors_list,
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_updated_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_updated_generated_network_policy_list)
 
         Logger.logger.info(
-            "6. Validating backend expected network neighbors and generated network policies after generating traffic")
+            "6. Validating backend expected network neighborhood and generated network policies after generating traffic")
         self.wait_for_report(timeout=120,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
                              namespace=namespace,
                              expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_updated_network_neighbors_list,
+                             expected_network_neighborhood_list=expected_updated_network_neighborhood_list,
                              expected_generated_network_policy_list=expected_updated_generated_network_policy_list
                              )
 
@@ -195,8 +196,8 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         1. Apply workloads
         2. Install Armo helm-chart
         3. Restart workloads
-        4. Validating in-cluster expected network neighbors and generated network policies
-        5. Validating bakcned expected network neighbors and generated network policies
+        4. Validating in-cluster expected network neighborhood and generated network policies
+        5. Validating backend expected network neighborhood and generated network policies
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -216,7 +217,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-        
+
         TestUtil.sleep(40, "wait for 40 seconds before restarting pods", "info")
 
         pods_list = list(map(lambda obj: obj['metadata']['name'], workload_objs))
@@ -230,24 +231,24 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(10 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_network_neighbors"])
+        expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_network_neighborhood"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("4. Validating in-cluster expected network neighbors and generated network policies")
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_network_neighbors_list,
+        Logger.logger.info("4. Validating in-cluster expected network neighborhood and generated network policies")
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        Logger.logger.info("5. Validating backend expected network neighborhood and generated network policies")
         self.wait_for_report(timeout=240,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
                              namespace=namespace,
                              expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
+                             expected_network_neighborhood_list=expected_network_neighborhood_list,
                              expected_generated_network_policy_list=expected_generated_network_policy_list
                              )
 
@@ -265,8 +266,8 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         1. Install Armo helm-chart
         2. Apply workloads
         3. Generate different traffic for one pod
-        4. Validating in-cluster expected network neighbors and generated network policies
-        5. Validating backend expected network neighbors and generated network policies
+        4. Validating in-cluster expected network neighborhood and generated network policies
+        5. Validating backend expected network neighborhood and generated network policies
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -296,24 +297,24 @@ class NetworkPolicyMultipleReplicas(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(6 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_network_neighbors"])
+        expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_network_neighborhood"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("4. Validating in-cluster expected network neighbors and generated network policies")
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_network_neighbors_list,
+        Logger.logger.info("4. Validating in-cluster expected network neighborhood and generated network policies")
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("5. Validating backend expected network neighbors and generated network policies")
+        Logger.logger.info("5. Validating backend expected network neighborhood and generated network policies")
         self.wait_for_report(timeout=120,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
                              namespace=namespace,
                              expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
+                             expected_network_neighborhood_list=expected_network_neighborhood_list,
                              expected_generated_network_policy_list=expected_generated_network_policy_list
                              )
 
@@ -332,8 +333,8 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         2. Apply workloads
         3. Send request from within Pod
         4. Apply Known Servers
-        5. Validating in-cluster expected network neighbors and generated network policies
-        6. Validating backend expected network neighbors and generated network policies
+        5. Validating in-cluster expected network neighborhood and generated network policies
+        6. Validating backend expected network neighborhood and generated network policies
         """
 
         cluster, namespace = self.setup(apply_services=False)
@@ -365,24 +366,24 @@ class NetworkPolicyKnownServers(BaseNetworkPolicy):
         duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
         TestUtil.sleep(5 * int(duration_in_seconds), "wait for node-agent learning period", "info")
 
-        expected_network_neighbors_list = TestUtil.load_objs_from_json_files(
-            self.test_obj["expected_network_neighbors"])
+        expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
+            self.test_obj["expected_network_neighborhood"])
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
-        Logger.logger.info("5. Validating in-cluster expected network neighbors and generated network policies")
-        self.validate_expected_network_neighbors_and_generated_network_policies_lists(namespace=namespace,
-                                                                                      expected_network_neighbors_list=expected_network_neighbors_list,
+        Logger.logger.info("5. Validating in-cluster expected network neighborhood and generated network policies")
+        self.validate_expected_network_neighborhood_and_generated_network_policies_lists(namespace=namespace,
+                                                                                      expected_network_neighborhood_list=expected_network_neighborhood_list,
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
-        Logger.logger.info("6. Validating backend expected network neighbors and generated network policies")
+        Logger.logger.info("6. Validating backend expected network neighborhood and generated network policies")
         self.wait_for_report(timeout=120,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
                              namespace=namespace,
                              expected_workloads_list=workload_objs,
-                             expected_network_neighbors_list=expected_network_neighbors_list,
+                             expected_network_neighborhood_list=expected_network_neighborhood_list,
                              expected_generated_network_policy_list=expected_generated_network_policy_list
                              )
 

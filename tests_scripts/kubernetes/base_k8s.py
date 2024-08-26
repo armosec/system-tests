@@ -3,7 +3,6 @@ from __future__ import print_function
 import json
 import operator
 import os
-import tempfile
 import time
 
 # allow support for python 3.10
@@ -13,21 +12,17 @@ except ImportError:
     from collections import Iterable
 #
 from datetime import datetime
-from threading import Thread
 
 import requests
-import hashlib
 
 from infrastructure import KubectlWrapper
-from infrastructure.helm_wrapper import HelmWrapper
 from infrastructure.thread_wrapper import WebsocketWrapper
 from systest_utils import Logger, TestUtil, statics
-from systest_utils.data_structures import DataStructuresUtils
 from systest_utils.sid import SID
 from systest_utils.statics import Statistics
 from systest_utils.wlid import Wlid
 from tests_scripts.dockerize import BaseDockerizeTest
-from kubernetes import config, client, dynamic
+from kubernetes import config
 
 
 class BaseK8S(BaseDockerizeTest):
@@ -1072,15 +1067,24 @@ class BaseK8S(BaseDockerizeTest):
             time.sleep(0.5)  # sleep between repeat's
 
     def get_generated_network_policy(self, namespace: str, name: str):
-        generated_network_policy = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+        metadata_list = self.kubernetes_obj.client_CustomObjectsApi.list_namespaced_custom_object(
             group=statics.STORAGE_AGGREGATED_API_GROUP,
             version=statics.STORAGE_AGGREGATED_API_VERSION,
-            name=name,
             namespace=namespace,
             plural=statics.GENERATED_NETWORK_POLICY_PLURAL,
         )
-
-        return generated_network_policy
+        for metadata in metadata_list['items']:
+            if metadata['metadata']['labels']['kubescape.io/workload-name'] != name:
+                continue
+            item = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=metadata['metadata']['name'],
+                namespace=metadata['metadata']['namespace'],
+                plural=statics.GENERATED_NETWORK_POLICY_PLURAL,
+            )
+            return item
+        raise Exception(f"no generated network policy found in namespace {namespace} with workload name {name}")
 
     def create_known_servers(self, body):
         self.kubernetes_obj.client_CustomObjectsApi.create_cluster_custom_object(
@@ -1090,16 +1094,25 @@ class BaseK8S(BaseDockerizeTest):
             body=body,
         )
 
-    def get_network_neighbors(self, name: str, namespace: str):
-        network_neighbors = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+    def get_network_neighborhood(self, name: str, namespace: str):
+        metadata_list = self.kubernetes_obj.client_CustomObjectsApi.list_namespaced_custom_object(
             group=statics.STORAGE_AGGREGATED_API_GROUP,
             version=statics.STORAGE_AGGREGATED_API_VERSION,
-            name=name,
             namespace=namespace,
             plural=statics.NETWORK_NEIGHBOR_PLURAL,
         )
-
-        return network_neighbors
+        for metadata in metadata_list['items']:
+            if metadata['metadata']['labels']['kubescape.io/workload-name'] != name:
+                continue
+            item = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=metadata['metadata']['name'],
+                namespace=metadata['metadata']['namespace'],
+                plural=statics.NETWORK_NEIGHBOR_PLURAL,
+            )
+            return item
+        raise Exception(f"no network neighborhood found in namespace {namespace} with workload name {name}")
 
     def get_SBOM_from_storage(self, SBOMKeys):
         SBOMs = []

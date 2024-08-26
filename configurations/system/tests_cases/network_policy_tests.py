@@ -1,8 +1,8 @@
 import inspect
+from os.path import join
 
 from systest_utils import statics
 from .structures import TestConfiguration
-from os.path import join
 
 
 class NetworkPolicyTests(object):
@@ -18,10 +18,10 @@ class NetworkPolicyTests(object):
             config_maps=join(statics.DEFAULT_CONFIGMAP_PATH, "wikijs"),
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_obj=NetworkPolicy,
-            expected_network_neighbors=[
-                "configurations/network-policy/expected-network-neighbors/deployment-wikijs.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-mariadb.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-nginx.json",
+            expected_network_neighborhood=[
+                "configurations/network-policy/expected-network-neighborhood/deployment-wikijs.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-nginx.json",
                 ],
             expected_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/deployment-wikijs.json",
@@ -44,20 +44,20 @@ class NetworkPolicyTests(object):
             config_maps=join(statics.DEFAULT_CONFIGMAP_PATH, "wikijs"),
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_obj=NetworkPolicyDataAppended,
-            expected_network_neighbors=[
-                "configurations/network-policy/expected-network-neighbors/deployment-wikijs-basic.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-mariadb-basic.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-nginx-basic.json",
+            expected_network_neighborhood=[
+                "configurations/network-policy/expected-network-neighborhood/deployment-wikijs-basic.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb-basic.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-nginx-basic.json",
                 ],
             expected_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/deployment-wikijs-basic.json",
                 "configurations/network-policy/expected-generated-network-policy/deployment-mariadb-basic.json",
                 "configurations/network-policy/expected-generated-network-policy/deployment-nginx-basic.json",
             ],
-            expected_updated_network_neighbors=[
-                "configurations/network-policy/expected-network-neighbors/deployment-wikijs.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-mariadb.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-nginx.json",
+            expected_updated_network_neighborhood=[
+                "configurations/network-policy/expected-network-neighborhood/deployment-wikijs.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-nginx.json",
                 ],
             expected_updated_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/deployment-wikijs.json",
@@ -78,10 +78,10 @@ class NetworkPolicyTests(object):
             config_maps=join(statics.DEFAULT_CONFIGMAP_PATH, "wikijs"),
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_obj=NetworkPolicyPodRestarted,
-            expected_network_neighbors=[
-                "configurations/network-policy/expected-network-neighbors/deployment-wikijs-basic.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-mariadb-basic.json",
-                "configurations/network-policy/expected-network-neighbors/deployment-nginx-basic.json",
+            expected_network_neighborhood=[
+                "configurations/network-policy/expected-network-neighborhood/deployment-wikijs-basic.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb-basic.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-nginx-basic.json",
                 ],
             expected_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/deployment-wikijs-basic.json",
@@ -99,7 +99,7 @@ class NetworkPolicyTests(object):
             name=inspect.currentframe().f_code.co_name,
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "busybox"),
             test_obj=NetworkPolicyMultipleReplicas,
-            expected_network_neighbors=["configurations/network-policy/expected-network-neighbors/busybox.json",
+            expected_network_neighborhood=["configurations/network-policy/expected-network-neighborhood/busybox.json",
                                         ],
             expected_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/busybox.json",
@@ -116,8 +116,8 @@ class NetworkPolicyTests(object):
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "busybox"),
             knownservers=join(statics.DEFAULT_KNOWN_SERVERS_PATH, "known-server.json"),
             test_obj=NetworkPolicyKnownServers,
-            expected_network_neighbors=[
-                "configurations/network-policy/expected-network-neighbors/busybox-known-server.json",
+            expected_network_neighborhood=[
+                "configurations/network-policy/expected-network-neighborhood/busybox-known-server.json",
                 ],
             expected_generated_network_policies=[
                 "configurations/network-policy/expected-generated-network-policy/busybox-known-server.json",

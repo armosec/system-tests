@@ -1,0 +1,93 @@
+{
+  "kind": "NetworkNeighborhood",
+  "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
+  "metadata": {
+    "name": "deployment-busybox-deployment",
+    "namespace": "systest-ns-rxrl",
+    "uid": "07e74b42-8ba2-46b1-9de9-f6c33e3b180c",
+    "resourceVersion": "1",
+    "creationTimestamp": "2024-07-03T15:30:40Z",
+    "labels": {
+      "kubescape.io/workload-api-group": "apps",
+      "kubescape.io/workload-api-version": "v1",
+      "kubescape.io/workload-kind": "Deployment",
+      "kubescape.io/workload-name": "busybox-deployment"
+    },
+    "annotations": {
+      "kubescape.io/completion": "complete",
+      "kubescape.io/status": "ready"
+    }
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "busybox",
+        "egress": [
+          {
+            "identifier": "66c89b9fd8bd51e9c16c2eb568c64285e1bf89a98e5eb878c7cfb123246857a6",
+            "type": "external",
+            "dns": "google.com.",
+            "dnsNames": [
+              "google.com."
+            ],
+            "ports": [
+              {
+                "name": "TCP-80",
+                "protocol": "TCP",
+                "port": 80
+              }
+            ],
+            "podSelector": null,
+            "namespaceSelector": null,
+            "ipAddress": "142.250.179.78"
+          },
+          {
+            "identifier": "35d62fc884ab3d8896d6be5bad0176619aa60756d33dfa47c9de024902a720c5",
+            "type": "external",
+            "dns": "www.google.com.",
+            "dnsNames": [
+              "www.google.com."
+            ],
+            "ports": [
+              {
+                "name": "TCP-80",
+                "protocol": "TCP",
+                "port": 80
+              }
+            ],
+            "podSelector": null,
+            "namespaceSelector": null,
+            "ipAddress": "142.250.179.68"
+          },
+          {
+            "identifier": "e5e8ca3d76f701a19b7478fdc1c8c24ccc6cef9902b52c8c7e015439e2a1ddf3",
+            "type": "internal",
+            "dns": "",
+            "ports": [
+              {
+                "name": "UDP-53",
+                "protocol": "UDP",
+                "port": 53
+              }
+            ],
+            "podSelector": {
+              "matchLabels": {
+                "k8s-app": "kube-dns"
+              }
+            },
+            "namespaceSelector": {
+              "matchLabels": {
+                "kubernetes.io/metadata.name": "kube-system"
+              }
+            },
+            "ipAddress": ""
+          }
+        ],
+        "ingress": []
+      }
+    ],
+    "matchLabels": {
+      "app": "busybox"
+    }
+  }
+}

@@ -1,15 +1,15 @@
 # encoding: utf-8
 import datetime
-from http.client import FOUND
-import time
-from crypt import methods
-
-from kubernetes.client import api_client
-from kubernetes import client, config, dynamic, utils
-from kubernetes.client.exceptions import ApiException
-import requests
-from systest_utils import Logger, TestUtil, statics
 import subprocess
+import time
+
+import requests
+from kubernetes import client, config, dynamic
+from kubernetes.client import api_client
+from kubernetes.client.exceptions import ApiException
+
+from systest_utils import Logger, TestUtil, statics
+
 
 class KubectlWrapper(object):
     """ CaKube provides kubernetes wrapper and helper functions"""
@@ -19,7 +19,7 @@ class KubectlWrapper(object):
         'ApplicationProfile': 'applicationprofiles',
         'ApplicationProfileSummary': 'applicationprofilesummaries',
         'GeneratedNetworkPolicy': 'generatednetworkpolicies',
-        'NetworkNeighbors': 'networkneighborses',
+        'NetworkNeighborhood': 'networkneighborhoods',
         'OpenVulnerabilityExchangeContainer': 'openvulnerabilityexchangecontainers',
         'SBOMSPDXv2p3Filtered': 'sbomspdxv2p3filtereds',
         'SBOMSPDXv2p3': 'sbomspdxv2p3s',

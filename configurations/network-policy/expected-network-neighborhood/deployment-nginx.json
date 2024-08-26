@@ -1,5 +1,5 @@
 {
-  "kind": "NetworkNeighbors",
+  "kind": "NetworkNeighborhood",
   "apiVersion": "spdx.softwarecomposition.kubescape.io/v1beta1",
   "metadata": {
     "name": "deployment-nginx",
@@ -19,8 +19,13 @@
     }
   },
   "spec": {
-    "egress": [],
-    "ingress": [],
+    "containers": [
+      {
+        "name": "nginx",
+        "egress": [],
+        "ingress": []
+      }
+    ],
     "matchLabels": {
       "app": "nginx"
     }
