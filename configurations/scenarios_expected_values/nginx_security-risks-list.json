@@ -6,7 +6,7 @@
     "response": [
         {
             "securityRiskID": "R_0037",
-            "securityRiskName": "Workloads with high exploitability risks",
+            "securityRiskName": "Workloads with high exploitability vulnerabilities",
             "category": "Workloads",
             "severity": "Critical",
             "lastUpdated": "2024-07-17T11:20:53Z",
