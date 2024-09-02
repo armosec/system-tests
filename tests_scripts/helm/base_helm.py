@@ -131,6 +131,8 @@ class BaseHelm(BaseK8S):
         if "nodeAgent.config.updatePeriod" not in helm_kwargs:
             helm_kwargs.update({"nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
 
+        helm_kwargs.update({"operator.podScanGuardTime": "1m"})
+
         create_namespace = True
         if self.docker_default_secret:
             self.create_namespace(unique_name=False, name=namespace)
