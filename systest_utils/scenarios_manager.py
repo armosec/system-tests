@@ -326,6 +326,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         exceptions = exceptions_res["response"]
 
         found = False
+        if len(exceptions) == 0:
+            return True
         for exception in exceptions:
             if exception["guid"] == exception_guid:
                 found = True
