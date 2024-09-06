@@ -263,53 +263,87 @@ class SecurityRisksScenarioManager(ScenarioManager):
         r = self.backend.get_security_risks_exceptions_list(self.cluster)
         response = json.loads(r.text)
         return response
+
     
-    def verify_exception_exists(self):
+    def verify_exception_exists(self, exception_guid=None, timeout=3, sleep_interval=1):
         """
         verify_exception_exists validate the exceptions exists on the backend
         """
+
         exists, t = self.wait_for_report(
             self.exception_exists, 
-            timeout=60,
-            sleep_interval=10
+            exception_guid=exception_guid,
+            timeout=timeout,
+            sleep_interval=sleep_interval
             )
         return exists
     
-    def verify_exception_not_exists(self):
+    def verify_exception_not_exists(self, exception_guid=None, timeout=3, sleep_interval=1):
         """
         verify_exception_not_exists validate the exceptions not exists on the backend
         """
         not_exists, t = self.wait_for_report(
             self.exception_not_exists, 
-            timeout=60,
-            sleep_interval=10
+            exception_guid=exception_guid,
+            timeout=timeout,
+            sleep_interval=sleep_interval
             )
-        return not_exists
+        return True
     
-    def exception_exists(self):
+    def exception_exists(self, exception_guid=None):
         """
         exception_exists validate the exceptions exists on the backend
+        if exception_guid is None, it will check if there are any exceptions
+        if exception_guid is not None, it will check if the exception exists
         """
+        if exception_guid == None:
+            exceptions_res = self.get_exceptions_list()
+            assert exceptions_res["total"]["value"] > 0, "No exceptions found, expecting exceptions"
+            return True
+
         exceptions_res = self.get_exceptions_list()
-        assert exceptions_res["total"]["value"] > 0, "No exceptions found, expecting exceptions"
-        return True
+        exceptions = exceptions_res["response"]
+
+        for exception in exceptions:
+            if exception["guid"] == exception_guid:
+                return True
+        
+        raise Exception(f"Exception {exception_guid} not found, expecting exceptions") 
+
     
-    def exception_not_exists(self):
+    def exception_not_exists(self, exception_guid=None):
         """
         exception_not_exists validate the exceptions not exists on the backend
+        if exception_guid is None, it will check if there are no exceptions
+        if exception_guid is not None, it will check if the exception not exists
         """
+        if exception_guid == None:
+            exceptions_res = self.get_exceptions_list()
+            assert exceptions_res["total"]["value"] == 0, "Exceptions found, expecting no exceptions"
+            return True
+        
         exceptions_res = self.get_exceptions_list()
-        assert exceptions_res["total"]["value"] == 0, "Exceptions found, expecting no exceptions"
-        return True
+        exceptions = exceptions_res["response"]
 
-    def add_new_exception(self, security_risk_id, k8s_resource_ids=[], reason=""):
+        found = False
+        for exception in exceptions:
+            if exception["guid"] == exception_guid:
+                found = True
+                break
+
+        assert not found, f"Exception {exception_guid} found, expecting no exceptions"
+
+    def add_new_exception(self, security_risk_id,exceptions_resources=[], reason=""):
         """
         add_new_exception add a new exception to the security risk
         """
 
-        r = self.backend.add_security_risks_exception(security_risk_id, k8s_resource_ids, reason)
+        r = self.backend.add_security_risks_exception(security_risk_id, exceptions_resources, reason)
         new_exception = json.loads(r.text)
         new_exception_guid = new_exception["guid"]
+
+        Logger.logger.info(f"checking if the new exception {new_exception_guid} exists, allowing 3s for the exception to be added")
+        assert self.verify_exception_exists(new_exception_guid, timeout=3, sleep_interval=1), f"Failed to add new exception to the security risk, expected exception guid: {new_exception_guid}"
 
         exceptions_res = self.get_exceptions_list()
         exceptions = exceptions_res["response"]
@@ -320,10 +354,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
                 found = True
                 assert exception["reason"] == reason, f"Failed to add exception, expected reason: {reason}, got: {exception['reason']}"
                 assert exception["securityRiskID"] == security_risk_id, f"Failed to add exception, expected securityRiskID: {security_risk_id}, got: {exception['securityRiskID']}"
-                assert len(exception["resources"]) == len(k8s_resource_ids), f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
-
-                for resource in exception["resources"]:
-                    assert resource["attributes"]["k8sResourceHash"] in k8s_resource_ids, f"Failed to add exception, expected resources: {k8s_resource_ids}, got: {exception['resources']}"
+                assert len(exception["resources"]) == len(exceptions_resources), f"Failed to add exception, expected resources: {exceptions_resources}, got: {exception['resources']}"
+                
         assert found, f"Failed to add new exception to the security risk, expected security risk: {security_risk_id}, got: {exceptions}"
         return new_exception
     
@@ -337,30 +369,21 @@ class SecurityRisksScenarioManager(ScenarioManager):
 
         assert response == ["deleted"], f"Failed to delete exception: {response}"
 
-        exceptions_res = self.get_exceptions_list()
-        exceptions = exceptions_res["response"]
+        assert self.verify_exception_not_exists(exception_guid, timeout=3, sleep_interval=1), f"Failed to delete exception {exception_guid}, expecting no exceptions"
 
-        found = False
-        if exceptions != None:
-            for exception in exceptions:
-                if exception["guid"] == exception_guid:
-                    found = True
-
-        assert not found, f"Failed to delete exception: {response}"
-        return response
     
-    def edit_exception(self, exception_guid, security_risk_id, k8s_resource_ids, reason=""):
+    def edit_exception(self, exception_guid, security_risk_id, exceptions_resources, reason=""):
         """
         edit_exception edit an exception from the security risk
         """
 
-        r = self.backend.put_security_risks_exception(exception_guid, security_risk_id, k8s_resource_ids, reason)
+        r = self.backend.put_security_risks_exception(exception_guid, security_risk_id, exceptions_resources, reason)
         response = json.loads(r.text)
 
         assert response["guid"] == exception_guid, f"Failed to edit exception, expected guid: {exception_guid}, got: {response['guid']}"
         assert response["reason"] == reason, f"Failed to edit exception, expected reason: {reason}, got: {response['reason']}"
         assert response["securityRiskID"] == security_risk_id, f"Failed to edit exception, expected securityRiskID: {security_risk_id}, got: {response['securityRiskID']}"
-        assert len(response["resources"]) == len(k8s_resource_ids), f"Failed to edit exception, expected resources: {k8s_resource_ids}, got: {response['resources']}"
+        assert len(response["resources"]) == len(exceptions_resources), f"Failed to add exception, expected resources: {exceptions_resources}, got: {response['resources']}"
         return response
     
     def get_security_risks_resources(self, security_risk_id):

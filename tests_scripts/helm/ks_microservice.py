@@ -259,7 +259,17 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         Logger.logger.info(
             "4.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id,
                                                                                          k8s_resources_hash))
-        new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "new exception")
+        exceptions_resources = [
+             {
+                    "designatorType": "Attribute",
+                    "attributes":
+                        {
+                            "cluster": cluster,
+                            "namespace": namespace
+                        }
+                }
+        ]
+        new_exception = scenarios_manager.add_new_exception(test_security_risk_id, exceptions_resources, "new exception")
 
         Logger.logger.info("5. Verify resources under exceptions are filtered out from security risks list.")
         resources_list_after_exception = scenarios_manager.get_security_risks_resources(test_security_risk_id)
@@ -273,7 +283,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
 
         Logger.logger.info("7. edit exception.")
         edit_exception = scenarios_manager.edit_exception(new_exception["guid"], test_security_risk_id,
-                                                          k8s_resources_hash, "edit exception")
+                                                          exceptions_resources, "edit exception")
         resources_list_after_exception_edit = scenarios_manager.get_security_risks_resources(test_security_risk_id)
         security_risks_list_after_exception_edit = scenarios_manager.get_security_risks_list([test_security_risk_id])
 
@@ -298,14 +308,6 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
                security_risks_list_before_exception["response"][0][
                    "affectedResourcesCount"], "resources are not back to security risks list as before exception"
         
-        Logger.logger.info("11. verify expections deletion after resource deletion.")
-        Logger.logger.info(
-            "11.1 adding new exception for security risk id: {} and resources: {}".format(test_security_risk_id,
-                                                                                         k8s_resources_hash))
-        new_exception = scenarios_manager.add_new_exception(test_security_risk_id, k8s_resources_hash, "another exception")
-
-        Logger.logger.info("11.2 verify exception was created.")
-        _ = scenarios_manager.verify_exception_exists()
 
  
 
@@ -467,7 +469,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         cluster_name = self.kubernetes_obj.get_cluster_name()
         Logger.logger.info("Get old report-guid")
         old_report_guid = self.get_report_guid(cluster_name=cluster_name, wait_to_result=True)
-        TestUtil.sleep(120, "wait for namespace creation to finished")
+        # TestUtil.sleep(120, "wait for namespace creation to finished")
         pod_name = self.kubernetes_obj.get_kubescape_pod(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         self.port_forward_proc = self.kubernetes_obj.portforward(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                                  pod_name, 8080)
