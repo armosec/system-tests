@@ -4,12 +4,12 @@ from infrastructure.backend_api import *
 
 class Backend(object):
 
-    def __init__(self, 
-                 name: str, 
-                 dashboard: str, 
+    def __init__(self,
+                 name: str,
+                 dashboard: str,
                  api_url: str,
-                 auth_url: str = None, 
-                 tls_verify: bool = True, 
+                 auth_url: str = None,
+                 tls_verify: bool = True,
                  login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
         self.name = name
         self.dashboard = dashboard
@@ -30,7 +30,7 @@ class Backend(object):
 
     def use_tls(self):
         return self.tls_verify
-    
+
     def get_login_method(self):
         return self.login_method
 
@@ -44,7 +44,7 @@ class Backend(object):
 def set_backends():
     backends = list()
 
-    
+
     # development frontEgg
     backends.append(Backend(name='development',
                             dashboard='https://eggdashbe-dev.armosec.io',
@@ -53,7 +53,7 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    
+
     # staging frontEgg
     backends.append(Backend(name='staging',
                             dashboard='https://eggdashbe-stage.armosec.io',
@@ -62,11 +62,19 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # staging frontEgg
+    # production frontEgg
     backends.append(Backend(name='production',
                             api_url="api.armosec.io",
                             dashboard='https://api.armosec.io',
                             auth_url='https://auth.armosec.io',
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
+    # production frontEgg
+    backends.append(Backend(name='production-us',
+                            api_url="api.us.armosec.io",
+                            dashboard='https://api.us.armosec.io',
+                            auth_url='https://auth.us.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
@@ -90,7 +98,7 @@ def set_backends():
     #                         login_method=LOGIN_METHOD_KEYCLOAK,
     #                         tls_verify=False))
 
-    
+
     # local
     # backends.append(Backend(name='local',
     #                         dashboard='http://localhost:7666',
