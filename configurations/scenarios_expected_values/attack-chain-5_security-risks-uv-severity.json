@@ -10,15 +10,15 @@
         "severity": [
             {
                 "key": "High",
-                "count": 1
+                "count": 0
             },
             {
                 "key": "Low",
-                "count": 1
+                "count": 0
             },
             {
                 "key": "Medium",
-                "count": 1
+                "count": 0
             }
         ]
     }

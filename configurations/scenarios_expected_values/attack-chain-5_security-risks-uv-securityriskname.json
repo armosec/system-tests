@@ -8,7 +8,7 @@
         "securityRiskName": [
             {
                 "key": "Allow privilege escalation",
-                "count": 1
+                "count": 0
             }
         ]
     }
