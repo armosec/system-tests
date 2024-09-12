@@ -836,7 +836,7 @@ def summarize_category(data):
     return new_data
 
 
-def summarize_uniquevalues(response, field_name):
+def summarize_uniquevalues(response, field_name, count=False):
     """
     Transforms a list of dictionaries into a structured output based on the specified field.
     
@@ -852,9 +852,13 @@ def summarize_uniquevalues(response, field_name):
         if field_name in item:
             value = item[field_name]
             if value in field_counts:
-                field_counts[value] += 1
+                if count:
+                    field_counts[value] += 1
             else:
-                field_counts[value] = 1
+                if count:
+                    field_counts[value] = 1
+                else: 
+                    field_counts[value] = 0
 
     # Creating lists of fields and field counts
     fields_list = sorted(field_counts.keys())  # Sorting keys to maintain order
