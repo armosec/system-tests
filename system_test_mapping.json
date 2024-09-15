@@ -1176,7 +1176,7 @@
       "config-service"
     ],
     "description": "",
-    "skip_on_environment": "production,custom",
+    "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io"
   },
   "stripe_plans": {
@@ -1200,7 +1200,7 @@
       "config-service"
     ],
     "description": "",
-    "skip_on_environment": "production,custom",
+    "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io"
   },
   "user_email_settings": {
@@ -1228,7 +1228,7 @@
       "config-service"
     ],
     "description": "",
-    "skip_on_environment": "production",
+    "skip_on_environment": "production,production-us",
     "owner": ""
   },
   "relevant_data_is_appended": {
@@ -1380,7 +1380,7 @@
       "config-service"
     ],
     "description": "testing teams alert channels with compliance and vulnerabilities notifications",
-    "skip_on_environment": "production",
+    "skip_on_environment": "production,production-us",
     "owner": ""
   },
   "slack_alerts": {
@@ -1394,7 +1394,7 @@
       "config-service"
     ],
     "description": "testing slack alert channels with compliance and vulnerabilities notifications",
-    "skip_on_environment": "production,custom",
+    "skip_on_environment": "production,production-us,custom",
     "owner": "refaelm@armosec.io"
   },
   "sr_r_0035_attack_chain": {
@@ -1486,7 +1486,7 @@
       "config-service"
     ],
     "description": "testing basic incident presented",
-    "skip_on_environment": "production",
+    "skip_on_environment": "production,production-us",
     "owner": ""
   },
   "kdr_runtime_policies_configurations": {
@@ -1542,7 +1542,7 @@
       "gateway"
     ],
     "description": "",
-    "skip_on_environment": "production,custom",
+    "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io"
   },
   "jira_integration": {
