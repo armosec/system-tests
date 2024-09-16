@@ -2470,7 +2470,7 @@ class ControlPanelAPI(object):
             filters["securityRiskID"] = security_risk_id
 
         if exception_applied:
-            filters["exceptionApplied"] = "|empty"
+            filters["exceptionApplied"] = "no,|empty"
 
         if resource_name is not None:
             filters["resourceName"] = resource_name
@@ -2521,25 +2521,15 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def add_security_risks_exception(self, security_risk_id, k8s_resource_hash_list, reason):
-        params = {"customerGUID": self.selected_tenant_id}
+    def add_security_risks_exception(self, security_risk_id, exceptions_resources, reason):
+        params = {"customerGUID": self.selected_tenant_id, "newapi": "true"}
 
-        resources_list = []
 
-        for k8s_resource_hash in k8s_resource_hash_list:
-            resources_list.append(
-                {
-                    "designatorType": "Attribute",
-                    "attributes":
-                        {
-                            "k8sResourceHash": k8s_resource_hash
-                        }
-                }
-            )
         payload = {
             "policyIDs": [security_risk_id],
-            "resources": resources_list,
-            "reason": reason
+            "resources": exceptions_resources,
+            "reason": reason,
+            "policyType": "securityRiskExceptionPolicy"
         }
 
         r = self.post(API_SECURITY_RISKS_EXCEPTIONS_NEW, params=params, json=payload)
@@ -2551,14 +2541,15 @@ class ControlPanelAPI(object):
         return r
 
     def get_security_risks_exceptions_list(self, cluster_name):
-        params = {"customerGUID": self.selected_tenant_id}
+        params = {"customerGUID": self.selected_tenant_id, "newapi": "true"}
 
         payload = {
             "pageSize": 50,
             "pageNum": 1,
             "innerFilters": [
                 {
-                    "clusterShortName": cluster_name
+                    # TODO: add support cluster filtering for exceptions list
+                    "cluster": cluster_name
                 }]
         }
 
@@ -2571,26 +2562,16 @@ class ControlPanelAPI(object):
         return r
 
     # edit security risks exception
-    def put_security_risks_exception(self, exception_id, security_risk_id, k8s_resource_hash_list, reason):
-        params = {"customerGUID": self.selected_tenant_id}
-        resources_list = []
-
-        for k8s_resource_hash in k8s_resource_hash_list:
-            resources_list.append(
-                {
-                    "designatorType": "Attribute",
-                    "attributes":
-                        {
-                            "k8sResourceHash": k8s_resource_hash
-                        }
-                }
-            )
+    def put_security_risks_exception(self, exception_id, security_risk_id, exceptions_resources, reason):
+        params = {"customerGUID": self.selected_tenant_id, "newapi": "true"}
 
         payload = {
             "guid": exception_id,
             "policyIDs": [security_risk_id],
-            "resources": resources_list,
-            "reason": reason
+            "resources": exceptions_resources,
+            "reason": reason,
+            "policyType": "securityRiskExceptionPolicy"
+
         }
 
         r = self.put(API_SECURITY_RISKS_EXCEPTIONS, params=params, json=payload)
@@ -2603,7 +2584,7 @@ class ControlPanelAPI(object):
         return r
 
     def delete_security_risks_exception(self, exception_id):
-        params = {"customerGUID": self.selected_tenant_id}
+        params = {"customerGUID": self.selected_tenant_id, "newapi": "true"}
 
         del_url = API_SECURITY_RISKS_EXCEPTIONS + "/" + exception_id
 
