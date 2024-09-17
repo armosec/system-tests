@@ -47,6 +47,10 @@ class HelmWrapper(object):
         # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
         if os.environ.get("DISABLE_RELEVANCY") == "true":
             command_args.extend(["--set", "capabilities.relevancy=disable"])
+        if os.environ.get("DISABLE_NODE_AGENT") == "true": 
+            command_args.extend(["--set", "capabilities.runtimeObservability=disable", 
+                                 "--set", "capabilities.relevancy=disable", 
+                                 "--set", "capabilities.networkPolicyService=disable"])
 
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
