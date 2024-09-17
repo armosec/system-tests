@@ -439,9 +439,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
-        
-        # disable node agent for this test
-        os.environ["DISABLE_NODE_AGENT"] = "true"
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
