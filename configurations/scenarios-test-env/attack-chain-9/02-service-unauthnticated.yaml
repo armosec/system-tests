@@ -42,8 +42,8 @@ spec:
               name: wordpress
           resources:
             requests:
-              cpu: 700m
-              memory: "1Gi"
+              cpu: 200m
+              memory: "200m"
             limits:
               cpu: 700m
               memory: "1Gi"

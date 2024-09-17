@@ -52,6 +52,18 @@ class HelmWrapper(object):
                                  "--set", "capabilities.relevancy=disable", 
                                  "--set", "capabilities.networkPolicyService=disable"])
 
+        # reduce resources requests
+        command_args.extend(["--set", "kubescape.resources.requests.cpu=100m"])
+        command_args.extend(["--set", "kubescape.resources.requests.memory=200Mi"])
+        command_args.extend(["--set", "nodeAgent.resources.requests.cpu=50m"])
+        command_args.extend(["--set", "nodeAgent.resources.requests.memory=100Mi"])
+        command_args.extend(["--set", "kubevuln.resources.requests.cpu=100m"])
+        command_args.extend(["--set", "kubevuln.resources.requests.memory=500Mi"])
+        command_args.extend(["--set", "storage.resources.requests.cpu=50m"])
+        command_args.extend(["--set", "storage.resources.requests.memory=200Mi"])
+        command_args.extend(["--set", "synchronizer.resources.requests.cpu=50m"])
+        command_args.extend(["--set", "synchronizer.resources.requests.memory=150Mi"])
+
         for k, v in helm_kwargs.items():
             command_args.extend(["--set", f"{k}={v}"])
 
