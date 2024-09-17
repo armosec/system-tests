@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import time
+import os
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 from systest_utils import Logger, TestUtil, statics
@@ -438,6 +439,9 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
+        
+        # disable node agent for this test
+        os.environ["DISABLE_NODE_AGENT"] = "true"
 
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)

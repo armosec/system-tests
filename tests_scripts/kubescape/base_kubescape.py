@@ -1109,7 +1109,7 @@ class BaseKubescape(BaseK8S):
         found = False
         Logger.logger.info("cluster_name: {}, framework_name: {}, old_report_guid: {}, wait_to_result: {}".format(
             cluster_name, framework_name, old_report_guid, wait_to_result))
-        for i in range(25):
+        for i in range(100):
             be_cluster_overtime = self.get_posture_clusters_overtime(cluster_name=cluster_name,
                                                                      framework_name=framework_name)
             if not wait_to_result and len(be_cluster_overtime) == 0:
