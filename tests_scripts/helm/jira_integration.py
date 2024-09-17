@@ -221,12 +221,16 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         security_risk_ids = [security_risk_id] if security_risk_id else []
         r = self.backend.get_security_risks_list(self.cluster, self.namespace, security_risk_ids, other_filters=other_filters)
         response = json.loads(r.text)
+        if response["response"] is None:
+            response["response"] = []
         assert len(response["response"]) == 1 , "Expected one security risk"
         return response["response"][0]
 
     def verify_security_risks_resource_exists(self, security_risk_id):
         r = self.backend.get_security_risks_resources(cluster_name=self.cluster, namespace=self.namespace, security_risk_id=security_risk_id, other_filters={"tickets":"|exists"})
         response = json.loads(r.text)
+        if response["response"] is None:
+            response["response"] = []
         assert len(response["response"]) == 1 , "Expected one resource for security risks"
 
     def verify_security_risks_resource_missing(self, security_risk_id):
@@ -238,6 +242,8 @@ class JiraIntegration(BaseKubescape, BaseHelm):
     def get_security_risks_resource(self, security_risk_id, other_filters={}):
         r = self.backend.get_security_risks_resources(cluster_name=self.cluster, namespace=self.namespace, security_risk_id=security_risk_id, other_filters=other_filters)
         response = json.loads(r.text)
+        if response["response"] is None:
+            response["response"] = []
         assert len(response["response"]) == 1 , "Expected one resource for security risks"
         return response["response"][0]
     
