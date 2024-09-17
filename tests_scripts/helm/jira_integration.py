@@ -15,6 +15,10 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             kubernetes_obj=kubernetes_obj,
         )
 
+        if self.test_driver.test_name == "jira_integration" and self.backend.server == "https://api.armosec.io": # skip test for production
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+
         self.helm_kwargs = {
             "capabilities.relevancy": "enable",
             "capabilities.configurationScan": "enable",
