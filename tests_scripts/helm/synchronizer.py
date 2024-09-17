@@ -444,6 +444,10 @@ class SynchronizerProxy(BaseSynchronizer):
             self.backend != None
         ), f"the test {self.test_driver.test_name} must run with backend"
 
+        if self.test_driver.test_name == "synchronizer_proxy" and self.backend.server == "https://api.armosec.io": # skip test for production
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+        
         cluster, namespace_1 = self.setup(apply_services=False)
 
         Logger.logger.info(f"1. Apply workloads")
