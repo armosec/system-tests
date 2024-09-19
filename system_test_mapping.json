@@ -1519,7 +1519,6 @@
     "target_repositories": [
       "cadashboardbe",
       "event-ingester-service",
-      "config-service",
       "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to teams",
