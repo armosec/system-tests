@@ -32,7 +32,7 @@ class HelmWrapper(object):
         command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,
                         "--set", "account={x}".format(x=customer),
                         "--set", "server={x}".format(x=server),
-                        "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
+                        "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug", "--version=1.21.2"]
         if create_namespace:
             command_args.append("--create-namespace")
 
