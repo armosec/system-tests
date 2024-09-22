@@ -62,6 +62,8 @@ class TestDriver(object):
             status = statics.FAILURE
             err = e
             Logger.logger.error(e)
+            fmt = traceback.format_exc()
+            Logger.logger.error(fmt)
             summary = e
         finally:
             self.clear()
