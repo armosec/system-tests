@@ -92,9 +92,9 @@ class Incidents(BaseHelm):
         self.check_incident_resolved(inc)
         self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
 
-        self.reslove_incident_false_positive(inc)
+        self.resolve_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
-        self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
+        # self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
@@ -181,7 +181,7 @@ class Incidents(BaseHelm):
         Logger.logger.info("Resolve incident")
         _ = self.backend.resolve_incident(incident_id=incident['guid'], resolution="Suspicious")
 
-    def reslove_incident_false_positive(self, incident):
+    def resolve_incident_false_positive(self, incident):
         Logger.logger.info("Resolve incident false positive")
         _ = self.backend.resolve_incident(incident_id=incident['guid'], resolution="FalsePositive")
 

@@ -33,8 +33,11 @@ class BaseK8S(BaseDockerizeTest):
         self.namespaces: list = list()
         self.cluster_resources: list = list()  # cluster scoped resources -> remove after test
         self.cluster: str = ""
-        self.kubernetes_obj = KubectlWrapper(
+        try:
+            self.kubernetes_obj = KubectlWrapper(
             cluster_name=TestUtil.get_arg_from_dict(self.test_driver.kwargs, "cluster", "minikube"))
+        except:
+            raise Exception("cluster is not running...")
 
         self.service_obj = None
         self.remove_kubescape_namespace = TestUtil.get_arg_from_dict(self.test_driver.kwargs,
