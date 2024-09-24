@@ -67,7 +67,7 @@ class Incidents(BaseHelm):
         Logger.logger.info(
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(6)
+        time.sleep(30)
         self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
 
         Logger.logger.info("Get incidents list")
