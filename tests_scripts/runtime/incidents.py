@@ -94,7 +94,7 @@ class Incidents(BaseHelm):
 
         self.resolve_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
-        # self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
+        self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
