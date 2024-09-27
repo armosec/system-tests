@@ -228,7 +228,6 @@ TEST_REGISTRY_CONNECTIVITY_RETRIEVE_REPOSITORIES_STATUS = "retrieveRepositories"
 # storage aggregated API
 HELM_STORAGE_FEATURE = "kubescapeStorage.enabled"
 STORAGE_SBOM_PLURAL = "sbomsyfts"
-STORAGE_FILTERED_SBOM_PLURAL = "sbomsyftfiltereds"
 STORAGE_CVES_PLURAL = "vulnerabilitymanifests"
 STORAGE_AGGREGATED_API_GROUP = "spdx.softwarecomposition.kubescape.io"
 STORAGE_AGGREGATED_API_VERSION = "v1beta1"

@@ -1173,31 +1173,6 @@ class BaseK8S(BaseDockerizeTest):
                 CVEs.append((name, CVE_data))
         return CVEs
 
-    def get_filtered_SBOM_from_storage(self, filteredSBOMKeys):
-        filteredSBOMs = []
-        if any(isinstance(i, list) for i in filteredSBOMKeys):
-            for keys in filteredSBOMKeys:
-                for key in keys:
-                    filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                        group=statics.STORAGE_AGGREGATED_API_GROUP,
-                        version=statics.STORAGE_AGGREGATED_API_VERSION,
-                        name=key,
-                        namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                        plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
-                    )
-                    filteredSBOMs.append((key, filtered_SBOM_data))
-        elif isinstance(filteredSBOMKeys, list):
-            for key in filteredSBOMKeys:
-                filtered_SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
-                    group=statics.STORAGE_AGGREGATED_API_GROUP,
-                    version=statics.STORAGE_AGGREGATED_API_VERSION,
-                    name=key,
-                    namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-                    plural=statics.STORAGE_FILTERED_SBOM_PLURAL,
-                )
-                filteredSBOMs.append((key, filtered_SBOM_data))
-        return filteredSBOMs
-
     def get_filtered_CVEs_from_storage(self, filteredCVEsKEys):
         filteredCVEs = []
         if any(isinstance(i, list) for i in filteredCVEsKEys):

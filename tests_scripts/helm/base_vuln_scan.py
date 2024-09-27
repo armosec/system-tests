@@ -988,32 +988,6 @@ class BaseVulnerabilityScanning(BaseHelm):
             with open(store_path, 'w') as f:
                 json.dump(result_data, f)
 
-    def validate_expected_filtered_SBOMs(self, SBOMs, expected_SBOM_paths, namespace):
-        verified_SBOMs = 0
-        for expected_SBOM in expected_SBOM_paths:
-            for SBOM in SBOMs:
-                if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
-                    self.store_filter_data_for_first_time_results(result=SBOM, store_path=expected_SBOM[1],
-                                                                  namespace=namespace)
-                    verified_SBOMs = len(SBOMs)
-                    continue
-                with open(expected_SBOM[1], 'r') as content_file:
-                    content = content_file.read()
-                expected_SBOM_data = json.loads(content)
-
-                if SBOM[1]['metadata']['labels'][statics.RELEVANCY_NAMESPACE_LABEL] != namespace:
-                    continue
-                if not self.is_mathing_filtered_crd(a=expected_SBOM_data, b=SBOM[1]):
-                    continue
-
-                expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
-                SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                diff = expected_SBOM_file_list.symmetric_difference(SBOM_file_list)
-                assert len(diff) == 0, f"the files in the SBOM in the storage is not as expected, difference: {diff}"
-                verified_SBOMs += 1
-                break
-        assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
-
     @staticmethod
     def is_mathing_filtered_crd(a, b):
 
