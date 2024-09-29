@@ -654,8 +654,15 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
 
         Logger.logger.info("validating lastPostureScanTriggered for this cluster was updated")
+        r, t = self.wait_for_report(
+            self.verify_cluster_lastPostureScanTriggered_time,
+            timeout=30,
+            sleep_interval=5,
+            cluster_name=self.cluster,
+            trigger_time=trigger_time
+            )
 
-        self.verify_cluster_lastPostureScanTriggered_time(cluster_name=self.cluster, trigger_time=trigger_time)
+        # self.verify_cluster_lastPostureScanTriggered_time(cluster_name=self.cluster, trigger_time=trigger_time)
 
         Logger.logger.info("validating scan status of attack chains is processing")
         r, t = self.wait_for_report(
@@ -710,6 +717,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         response = json.loads(r.text)
         for cluster_response in response['clusterScansStatus']:
             if cluster_response['clusterName'] == cluster_name:
+                assert "lastPostureScanTriggered" in cluster_response, f"Expected 'lastPostureScanTriggered' to be in the response, got {cluster_response}"
                 assert cluster_response['lastPostureScanTriggered'] >= trigger_time, f"Expected {'lastPostureScanTriggered'} to be >= than {trigger_time}, got {cluster_response['lastPostureScanTriggered']}"
         return True    
         
