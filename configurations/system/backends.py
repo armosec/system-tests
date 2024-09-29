@@ -72,8 +72,8 @@ def set_backends():
 
     # production frontEgg
     backends.append(Backend(name='production-us',
-                            api_url="api.us.armosec.io",
-                            dashboard='https://api.us.armosec.io',
+                            api_url="cloud-api.us.armosec.io",
+                            dashboard='https://cloud-api.us.armosec.io',
                             auth_url='https://auth.us.armosec.io',
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
