@@ -205,6 +205,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
                                                                                 kubernetes_obj=kubernetes_obj,
                                                                                 test_driver=test_driver)
         self.wait_for_agg_to_end = False
+        self.exceptions_guids = []
 
     def start(self):
         """
@@ -276,6 +277,7 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
                 }
         ]
         new_exception = scenarios_manager.add_new_exception(test_security_risk_id, exceptions_resources, "new exception")
+        self.exceptions_guids.append(new_exception["guid"])
 
         Logger.logger.info("5. Verify resources under exceptions are filtered out from security risks list.")
         resources_list_after_exception = scenarios_manager.get_security_risks_resources(test_security_risk_id)
@@ -318,6 +320,12 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
  
 
         return self.cleanup()
+    
+    def cleanup(self):
+        for exception_guid in self.exceptions_guids:
+            self.backend.delete_security_risks_exception(exception_guid)
+            Logger.logger.info(f"deleted exception with guid: {exception_guid}")
+        return super().cleanup()
 
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
