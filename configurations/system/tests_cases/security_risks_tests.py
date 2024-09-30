@@ -85,6 +85,7 @@ class SecurityRisksTests(object):
     @staticmethod
     # test security risks detection and resolve with kubescape helm chart
     # based on attack chain 5 scenarios.
+    # must create new tenant since we delete exceptions only on tenant deletion.
     def sr_with_exceptions():
         from tests_scripts.helm.ks_microservice import ScanSecurityRisksExceptionsWithKubescapeHelmChart
         return TestConfiguration(
@@ -99,7 +100,8 @@ class SecurityRisksTests(object):
                         statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
-                         }
+                         },
+            create_test_tenant = True
         )
     
     
