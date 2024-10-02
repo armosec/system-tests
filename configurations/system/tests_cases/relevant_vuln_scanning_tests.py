@@ -25,10 +25,6 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("nginx", "configurations/expected-result/CVEs/nginx.json"),
                            ("mariadb", "configurations/expected-result/CVEs/mariadb.json"),
                            ("wikijs", "configurations/expected-result/CVEs/wikijs.json")],
-            expected_filtered_SBOMs=[
-                ("nginx", "configurations/expected-result/filteredSBOM/nginx.json"),
-                ("mariadb", "configurations/expected-result/filteredSBOM/mariadb.json"),
-                ("wikijs", "configurations/expected-result/filteredSBOM/wikijs.json")],
             expected_filtered_CVEs=[
                 ("nginx", "configurations/expected-result/filteredCVEs/nginx.json"),
                 ("mariadb", "configurations/expected-result/filteredCVEs/mariadb.json"),
@@ -60,9 +56,6 @@ class RelevantVulnerabilityScanningTests(object):
                            ("wordpress", "configurations/expected-result/CVEs/wordpress.json"),
                            ("busybox", "configurations/expected-result/CVEs/busybox.json"),
                            ("alpine", "configurations/expected-result/CVEs/alpine.json")],
-            expected_filtered_SBOMs=[("alpine-container", "configurations/expected-result/filteredSBOM/alpine.json"),
-                                     ("redis", "configurations/expected-result/filteredSBOM/redis-collection.json"),
-                                     ("wordpress", "configurations/expected-result/filteredSBOM/wordpress.json")],
             expected_filtered_CVEs=[("alpine-container", "configurations/expected-result/filteredCVEs/alpine.json"),
                                     ("redis", "configurations/expected-result/filteredCVEs/redis-collection.json"),
                                     ("wordpress", "configurations/expected-result/filteredCVEs/wordpress.json")],
@@ -111,12 +104,8 @@ class RelevantVulnerabilityScanningTests(object):
                 ("redis-sleep", "configurations/expected-result/SBOM/redis_sleep.json")],
             expected_CVEs=[
                 ("redis-sleep", "configurations/expected-result/CVEs/redis_sleep.json")],
-            expected_filtered_SBOMs=[
-                ("redis-sleep", "configurations/expected-result/filteredSBOM/redis_sleep.json")],
             expected_filtered_CVEs=[
                 ("redis-sleep", "configurations/expected-result/filteredCVEs/redis_sleep.json")],
-            expected_updated_filtered_SBOMs=[("redis-sleep",
-                                              "configurations/expected-result/filteredSBOM/redis_sleep.json")],
             expected_updated_filtered_CVEs=[("redis-sleep",
                                              "configurations/expected-result/filteredCVEs/redis_sleep.json")],
             helm_kwargs={statics.HELM_STORAGE_FEATURE: True,
@@ -141,12 +130,8 @@ class RelevantVulnerabilityScanningTests(object):
                 ("redis-sleep", "configurations/expected-result/SBOM/redis_sleep.json")],
             expected_CVEs=[
                 ("redis-sleep", "configurations/expected-result/CVEs/redis_sleep.json")],
-            expected_filtered_SBOMs=[
-                ("redis-sleep", "configurations/expected-result/filteredSBOM/redis_sleep.json")],
             expected_filtered_CVEs=[
                 ("redis-sleep", "configurations/expected-result/filteredCVEs/redis_sleep.json")],
-            expected_updated_filtered_SBOMs=[("redis-sleep",
-                                              "configurations/expected-result/filteredSBOM/redis_sleep_updated.json")],
             expected_updated_filtered_CVEs=[("redis-sleep",
                                              "configurations/expected-result/filteredCVEs/redis_sleep_updated.json")],
             helm_kwargs={"nodeAgent.config.learningPeriod": "0.5m",
@@ -171,8 +156,6 @@ class RelevantVulnerabilityScanningTests(object):
             expected_CVEs=[("nginx", "configurations/expected-result/CVEs/nginx.json"),
                            ("mariadb", "configurations/expected-result/CVEs/mariadb.json"),
                            ("wikijs", "configurations/expected-result/CVEs/wikijs.json")],
-            expected_filtered_SBOMs=[
-                ("nginx", "configurations/expected-result/filteredSBOM/nginx_entrypoint.json")],
             expected_results="configurations/expected-result/BE_CVEs/wikijs.json",
             helm_kwargs={"triggerNewImageScan": True, statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_DISABLED}
@@ -190,8 +173,6 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyEnabledLargeImage,
             expected_SBOMs=[
                 ("redis", "configurations/expected-result/SBOM/redis_incomplete.json")],
-            expected_filtered_SBOMs=[
-                ("redis", "configurations/expected-result/filteredSBOM/redis_incomplete.json")],
             helm_kwargs={statics.HELM_MAX_IMAGE_SIZE: 5, statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
@@ -208,8 +189,6 @@ class RelevantVulnerabilityScanningTests(object):
             test_obj=RelevancyEnabledExtraLargeImage,
             expected_SBOMs=[
                 ("redis", "configurations/expected-result/SBOM/redis_incomplete.json")],
-            expected_filtered_SBOMs=[
-                ("redis", "configurations/expected-result/filteredSBOM/redis_incomplete.json")],
             helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: True,
                          statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
         )
@@ -244,9 +223,6 @@ class RelevantVulnerabilityScanningTests(object):
                 "redis-fixed", "configurations/expected-result/SBOM/redis-fixed.json")],
             expected_CVEs=[("redis", "configurations/expected-result/CVEs/redis.json"), (
                 "redis-fixed", "configurations/expected-result/CVEs/redis-fixed.json")],
-            expected_filtered_SBOMs=[
-                ("redis", "configurations/expected-result/filteredSBOM/redis.json"),
-                ("redis-fixed", "configurations/expected-result/filteredSBOM/redis-fixed.json")],
             expected_filtered_CVEs=[
                 ("redis", "configurations/expected-result/filteredCVEs/redis.json"),
                 ("redis-fixed", "configurations/expected-result/filteredCVEs/redis-fixed.json")],
@@ -267,8 +243,6 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "python-simple"),
             expected_SBOMs=[("python", "configurations/expected-result/SBOM/python-simple.json")],
             expected_CVEs=[("python", "configurations/expected-result/CVEs/python-simple.json")],
-            expected_filtered_SBOMs=[
-                ("python", "configurations/expected-result/filteredSBOM/python-simple.json")],
             expected_filtered_CVEs=[
                 ("python", "configurations/expected-result/filteredCVEs/python-simple.json")],
             expected_results="configurations/expected-result/BE_CVEs/python-simple.json",
@@ -288,8 +262,6 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "golang-simple"),
             expected_SBOMs=[("golang", "configurations/expected-result/SBOM/golang-simple.json")],
             expected_CVEs=[("golang", "configurations/expected-result/CVEs/golang-simple.json")],
-            expected_filtered_SBOMs=[
-                ("golang", "configurations/expected-result/filteredSBOM/golang-simple.json")],
             expected_filtered_CVEs=[
                 ("golang", "configurations/expected-result/filteredCVEs/golang-simple.json")],
             expected_results="configurations/expected-result/BE_CVEs/golang-simple.json",
@@ -309,8 +281,6 @@ class RelevantVulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "java-simple"),
             expected_SBOMs=[("java", "configurations/expected-result/SBOM/java-simple.json")],
             expected_CVEs=[("java", "configurations/expected-result/CVEs/java-simple.json")],
-            expected_filtered_SBOMs=[
-                ("java", "configurations/expected-result/filteredSBOM/java-simple.json")],
             expected_filtered_CVEs=[
                 ("java", "configurations/expected-result/filteredCVEs/java-simple.json")],
             expected_results="configurations/expected-result/BE_CVEs/java-simple.json",
@@ -333,10 +303,6 @@ class RelevantVulnerabilityScanningTests(object):
                             ("java", "configurations/expected-result/SBOM/java-simple.json")],
             expected_CVEs=[("python", "configurations/expected-result/CVEs/python-simple.json"),
                            ("java", "configurations/expected-result/CVEs/java-simple.json")],
-            expected_filtered_SBOMs=[("python",
-                                      "configurations/expected-result/filteredSBOM/python-client-to-java.json"),
-                                     ("java",
-                                      "configurations/expected-result/filteredSBOM/java-simple.json")],
             expected_filtered_CVEs=[("python",
                                      "configurations/expected-result/filteredCVEs/python-client-to-java.json"),
                                     ("java",
@@ -360,8 +326,6 @@ class RelevantVulnerabilityScanningTests(object):
                 ("golang", "configurations/expected-result/SBOM/golang-dynamic-simple.json")],
             expected_CVEs=[
                 ("golang", "configurations/expected-result/CVEs/golang-dynamic-simple.json")],
-            expected_filtered_SBOMs=[("golang",
-                                      "configurations/expected-result/filteredSBOM/golang-dynamic-simple.json")],
             expected_filtered_CVEs=[("golang",
                                      "configurations/expected-result/filteredCVEs/golang-dynamic-simple.json")],
             expected_results="configurations/expected-result/BE_CVEs/golang-dynamic.json",
