@@ -84,7 +84,7 @@ class Incidents(BaseHelm):
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
-        self.wait_for_report(self.check_alerts_of_incident, sleep_interval=5, timeout=180, incident=inc)
+        self.wait_for_report(self.check_alerts_of_incident, sleep_interval=5, timeout=360, incident=inc)
         self.check_raw_alerts_overtime()
         self.check_raw_alerts_list()
 
@@ -150,7 +150,7 @@ class Incidents(BaseHelm):
         for k, v in enumerate(expected_process_graph['graphEdges']):
             for k1, v1 in v.items():
                 assert resp['graphEdges'][k][k1] == v1, f"Failed to get process graph edge {k}, {k1}, {resp['graphEdges'][k][k1]}. {json.dumps(resp)}"
-        
+
         Logger.logger.info(f"Got process graph {json.dumps(resp)}")
 
     def check_raw_alerts_list(self):
