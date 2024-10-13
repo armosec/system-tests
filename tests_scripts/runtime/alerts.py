@@ -61,12 +61,12 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         7. verify messages were sent
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
- 
+
 
         self.cluster, namespace = self.setup(apply_services=False)
 
         before_test_message_ts = time.time()
-        
+
 
         Logger.logger.info("1. get runtime incidents rulesets")
         res = self.backend.get_runtime_incidents_rulesets()
@@ -77,7 +77,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
         # Update the name field
         new_runtime_policy_body = {
-            "name": f"Malware-new-systest-" + self.cluster,    
+            "name": f"Malware-new-systest-" + self.cluster,
             "description": "Default Malware RuleSet System Test",
             "enabled": True,
             "scope": {},
@@ -94,7 +94,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
         Logger.logger.info("3. create new runtime policy")
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
-        
+
         Logger.logger.info(f"New policy created with guid {new_policy_guid}")
         self.test_policy_guids.append(new_policy_guid)
 
@@ -117,32 +117,32 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
+        self.exec_pod(wlid=wlids[0], command="ls /tmp")
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
                                        cluster=self.cluster, namespace=namespace,
                                        incident_name="Unexpected process launched")
-        
+
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
-        
+
 
         Logger.logger.info('7. verify messages were sent')
-        res = self.wait_for_report(self.assert_all_messages_sent, 
-                                   timeout=5 * 60, 
+        res = self.wait_for_report(self.assert_all_messages_sent,
+                                   timeout=5 * 60,
                                    begin_time=before_test_message_ts, cluster=self.cluster)
         return self.cleanup()
-    
+
     def verify_incident_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
 
         return response
-    
+
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
         Logger.logger.info("Get incidents list")
         filters_dict = {
@@ -155,7 +155,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         incs = response['response']
         assert len(incs) > 0, f"Failed to get incidents list {json.dumps(incs)}"
         return incs
-    
+
     def cleanup(self):
         for policy_guid in self.test_policy_guids:
             body = {
@@ -174,7 +174,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         found = str(messages).count(cluster)
         assert found > 0, f"expected to have at least 1 message, found {found}"
         assert_runtime_incident_message_sent(messages, cluster)
-           
+
 
 
 def assert_runtime_incident_message_sent(messages, cluster):
@@ -182,7 +182,7 @@ def assert_runtime_incident_message_sent(messages, cluster):
         Logger.logger.info(f"total messages found: {len(messages)}, looking for runtime incident messages")
         if len(messages) > 0:
             Logger.logger.info(f"first message: {messages[0]}")
-            
+
         for message in messages:
             message_string = str(message)
             if "New threat found" in message_string and cluster in message_string and "redis" in message_string:
