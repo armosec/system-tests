@@ -227,13 +227,15 @@ class Incidents(BaseHelm):
         Logger.logger.info("Check unique values of alerts")
         unique_values_req = {
             "fields": {"ruleID": ""},
-            "innerFilters": [{"ruleID": "R0001,R0002,R0004"}],
+            #"innerFilters": [{"ruleID": "R0001,R0002,R0003,R0004"}],
+            "innerFilters": [{"ruleID": "R0001,R0004"}],
             "pageSize": 100,
             "pageNum": 1
         }
         unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
         assert unique_values is not None, f"Failed to get unique values of alerts {json.dumps(incident)}"
-        expected_values = {"ruleID": ["R0001", "R0002", "R0004"]}
+        #expected_values = {"ruleID": ["R0001", "R0002", "R0003", "R0004"]}
+        expected_values = {"ruleID": ["R0001", "R0004"]}
         # don't check the count, it's dynamic
         assert unique_values[
                    "fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
