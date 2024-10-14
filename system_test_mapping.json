@@ -1624,5 +1624,33 @@
     "description": "Checks seccomp profile generate on backend",
     "skip_on_environment": "",
     "owner": "rinao@armosec.io"
+  },
+  "slack_alerts_workflows": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service-dummy",
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
+    ],
+    "description": "Checks slack workflows",
+    "skip_on_environment": "",
+    "owner": "jonathang@armosec.io"
+  },
+  "teams_alerts_workflows": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service-dummy",
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
+    ],
+    "description": "Checks teams workflows",
+    "skip_on_environment": "",
+    "owner": "jonathang@armosec.io"
   }
 }

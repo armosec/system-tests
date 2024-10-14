@@ -90,6 +90,8 @@ API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
 API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
+API_ADMIN_ACTIVATE_WORKFLOWS = "/api/v1/admin/activateWorkflows"
+
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
@@ -456,6 +458,24 @@ class ControlPanelAPI(object):
         )
         assert res.status_code == client.OK, f"renew subscription failed for tenantID: {tenantID}"
         return res
+    
+    # ************** Activate Workflows ************** 
+    # relevant for feature transition phase
+    def active_workflow(self, tenantID: str) -> dict:
+        """
+            activate workflow for a tenant.
+        """
+
+        res = self.post(
+            API_ADMIN_ACTIVATE_WORKFLOWS,
+            json={
+                "tenantID": tenantID
+            },
+        )
+        assert res.status_code == client.OK, f"activate workflow failed for tenantID: {tenantID}"
+
+        return res
+
 
     def get_customer_guid(self):
         return self.selected_tenant_id
