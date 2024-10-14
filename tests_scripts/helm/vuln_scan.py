@@ -957,7 +957,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             }]}
         wl_summary = self.backend.get_vuln_v2_workload_details(body=body)
         if updateExpected:
-            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_details.json")
+            TestUtil.save_expected_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_details.json", wl_summary, wl_excluded_paths)
 
         Logger.logger.info('4. get workloads components')
@@ -978,16 +978,16 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                                 "root['architecture']", "root['os']", "root['size']", "root['baseImage']", 
                                 "root['clustersCount']", "root['namespacesCount']", "root['workloadsCount']"}
         if updateExpected:
-            TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
+            TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
 
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/image_details_temp.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
       
         Logger.logger.info('6. get workloads CVEs and match with workload summary')
         body['innerFilters'][0]['severity'] = "Critical"
         body['innerFilters'][0]['riskFactors'] = "External facing"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["criticalCount"])
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/cves_temp.json")
 
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Critical"]:
@@ -995,7 +995,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         
         body['innerFilters'][0]['severity'] = "High"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["highCount"])
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_high_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/cves_high_temp.json")
 
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["High"]:
@@ -1003,7 +1003,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         
         body['innerFilters'][0]['severity'] = "Medium"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["mediumCount"])
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_medium_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/cves_medium_temp.json")
 
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Medium"]:
@@ -1011,7 +1011,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             
         body['innerFilters'][0]['severity'] = "Low"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["lowCount"])
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_low_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/cves_low_temp.json")
 
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Low"]:
@@ -1021,7 +1021,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         body['innerFilters'][0]['severity'] = ""
         body['innerFilters'][0]['exploitable'] = "Known Exploited,High Likelihood"
         cve = self.backend.get_vulns_v2(body=body, expected_results=1)
-        TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_exploit_temp.json")
+        TestUtil.save_expected_json(image, "configurations/expected-result/V2_VIEWS/cves_exploit_temp.json")
 
         cve = cve[0]
         body['innerFilters'][0]['name'] = cve["name"]
@@ -1036,9 +1036,9 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                               "root['componentInfo']['version']",
                               "root['cvssInfo']['baseScore']"}
         if updateExpected:
-            TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details.json")
+            TestUtil.save_expected_json(cve, "configurations/expected-result/V2_VIEWS/cve_details.json")
 
-        TestUtil.save_expceted_json(cve, "configurations/expected-result/V2_VIEWS/cve_details_details.json")
+        TestUtil.save_expected_json(cve, "configurations/expected-result/V2_VIEWS/cve_details_details.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/cve_details.json", cve, cve_excluded_paths)
 
         if updateExpected:
@@ -1055,7 +1055,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
         wl_summary = wl_summary[0] 
         if updateExpected:
-            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
+            TestUtil.save_expected_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
         return wl_summary,wl_excluded_paths
     

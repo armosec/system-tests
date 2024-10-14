@@ -130,6 +130,10 @@ API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
 API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
 
+API_WORKFLOWS = "/api/v1/workflows"
+
+API_WEBHOOKS = "/api/v1/notifications/teams"
+
 
 def deco_cookie(func):
     def apply_cookie(*args, **kwargs):
@@ -2838,7 +2842,6 @@ class ControlPanelAPI(object):
         return r
 
     def generate_seccomp_profile(self, body: dict):
-
         r = self.post(API_SECCOMP_GENERATE, params={"customerGUID": self.customer_guid},
                       json=body, timeout=60)
         if not 200 <= r.status_code < 300:
@@ -2846,9 +2849,105 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     API_SECCOMP_GENERATE, self.customer, r.status_code, r.text))
         return r
+    
+    def get_workflows(self, filters, **kwargs):
+        url = API_WORKFLOWS + "/list"
+        params = {"customerGUID": self.selected_tenant_id}
+        if kwargs:
+            params.update(**kwargs)
+        r = self.post(url, params=params, json={"pageSize": 50, "pageNum": 1, "orderBy": "", "innerFilters": [filters]})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing workflows. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def create_workflow(self, body):
+        url = API_WORKFLOWS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating workflow. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def delete_workflow(self, body):
+        url = API_WORKFLOWS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.delete(url, params=params, body=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting workflow. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def update_workflow(self, body):
+        url = API_WORKFLOWS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating workflow. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def get_webhooks(self):
+        url = API_WEBHOOKS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing webhooks. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+        
+        
+    def create_webhook(self, body):
+        url = API_WEBHOOKS 
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def delete_webhook(self, body):
+        url = API_WEBHOOKS 
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.delete(url, params=params, body=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def update_webhook(self, body):
+        url = API_WEBHOOKS 
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def test_webhook_message(self, body):
+        url = "/api/v1/notifications/teams/testMessage"
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error testing webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    
+    
+    
+    
+    
+    
 class Solution(object):
     """docstring for Solution"""
 
