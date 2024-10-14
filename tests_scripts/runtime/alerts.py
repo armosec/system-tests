@@ -122,7 +122,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
                                        cluster=self.cluster, namespace=namespace,
-                                       incident_name="Unexpected process launched")
+                                       incident_name=["Unexpected process launched","Unexpected Sensitive File Access"])
 
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
@@ -143,13 +143,16 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
         return response
 
-    def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
+    def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):
         Logger.logger.info("Get incidents list")
         filters_dict = {
             "designators.attributes.cluster": cluster,
             "designators.attributes.namespace": namespace,
-            "name": incident_name
         }
+        if isinstance(incident_name,str):
+            filters_dict["name"] = incident_name
+        elif isinstance(incident_name, list):
+            filters_dict["name"] = ','.join(incident_name)
 
         response = self.backend.get_incidents(filters=filters_dict)
         incs = response['response']
