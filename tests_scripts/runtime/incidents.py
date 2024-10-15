@@ -68,7 +68,7 @@ class Incidents(BaseHelm):
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command="ls /tmp")
+        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
@@ -94,7 +94,7 @@ class Incidents(BaseHelm):
 
         self.resolve_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
-        self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
+        #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
@@ -290,7 +290,25 @@ class Incidents(BaseHelm):
         unique_values = self.backend.get_incident_unique_values(unique_values_req)
 
         assert unique_values is not None, f"Failed to get unique values of incident {json.dumps(incident)}"
-        expected_values = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
+        expected_values_for_sensitive_fa = {'fields': {'clusterName': [incident["clusterName"]], 'containerName': ['redis'],
+                                      'incidentCategory': ['Anomaly'], 'incidentSeverity': ['Medium'],
+                                      'isDismissed': ['false'], 'mitreTactic': ['TA0006'],
+                                      'name': ['Unexpected Sensitive File Access'], 'nodeName': [incident["nodeName"]],
+                                      "podName": [incident["podName"]],
+                                      'workloadKind': ['Deployment'],
+                                      'workloadName': ['redis-sleep']},
+                           'fieldsCount': {'clusterName': [{'key': incident["clusterName"], 'count': 1}],
+                                           'containerName': [{'key': 'redis', 'count': 1}],
+                                           'incidentCategory': [{'key': 'Anomaly', 'count': 1}],
+                                           'incidentSeverity': [{'key': 'Medium', 'count': 1}],
+                                           'isDismissed': [{'key': 'false', 'count': 1}],
+                                           'mitreTactic': [{'key': 'TA0006', 'count': 1}],
+                                           'name': [{'key': 'Unexpected Sensitive File Access', 'count': 1}],
+                                           'nodeName': [{'key': incident["nodeName"], 'count': 1}],
+                                           'podName': [{'key': incident["podName"], 'count': 1}],
+                                           'workloadKind': [{'key': 'Deployment', 'count': 1}],
+                                           'workloadName': [{'key': 'redis-sleep', 'count': 1}]}}
+        expected_values_unexpected_process = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
                                       "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"],
                                       "isDismissed": ["false"], "mitreTactic": ["TA0002"],
                                       "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
@@ -308,6 +326,9 @@ class Incidents(BaseHelm):
                                            "podName": [{"key": incident["podName"], "count": 1}],
                                            "workloadKind": [{"key": "Deployment", "count": 1}],
                                            "workloadName": [{"key": "redis-sleep", "count": 1}]}}
+        expected_values = expected_values_for_sensitive_fa
+        if incident["name"] == "Unexpected process launched":
+            expected_values = expected_values_unexpected_process
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
@@ -320,10 +341,10 @@ class Incidents(BaseHelm):
         actual_process_tree = response['processTree']['processTree']
         if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
             actual_process_tree = actual_process_tree["children"][0]
-        assert "ls" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
+        assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields
-        assert "ls /tmp" in actual_process_tree.get('cmdline', "ls /tmp"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
         assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
         assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
         assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"

@@ -117,7 +117,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command="ls /tmp")
+        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
