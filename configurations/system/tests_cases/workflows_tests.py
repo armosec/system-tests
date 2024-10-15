@@ -1,14 +1,39 @@
 import inspect
-from tests_scripts.runtime.workflows import WorkflowConfigurations
 from .structures import TestConfiguration
 
+
+
+
 class WorkflowsTests(object):
+    '''
+    NOTE: tests og 
+    
+    '''
+    
     @staticmethod
-    def workflow_configurations():
+    def slack_alerts_workflows():
+        from tests_scripts.workflows.workflows import WorkflowsSlack
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=WorkflowsSlack,
+            create_test_tenant = True
+        )    
+    
+    @staticmethod
+    def teams_alerts_workflows():
+        from tests_scripts.workflows.workflows import WorkflowsSlack
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=WorkflowsSlack,
+            create_test_tenant = True
+        )    
+
+    @staticmethod
+    def workflows_configurations():
+        from tests_scripts.workflows.workflows import WorkflowConfigurations
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=WorkflowConfigurations,
+            create_test_tenant = True
         )
-    
-
-    
+   

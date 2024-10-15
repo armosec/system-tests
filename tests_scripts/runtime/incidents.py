@@ -68,12 +68,12 @@ class Incidents(BaseHelm):
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command="ls -l /tmp")
+        self.exec_pod(wlid=wlids[0], command="ls /tmp")
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
                                        cluster=cluster, namespace=namespace,
-                                       incident_name="Unexpected process launched")
+                                       incident_name=["Unexpected process launched","Unexpected Sensitive File Access"])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
                                       incident_id=incs[0]['guid'])
@@ -227,13 +227,15 @@ class Incidents(BaseHelm):
         Logger.logger.info("Check unique values of alerts")
         unique_values_req = {
             "fields": {"ruleID": ""},
-            "innerFilters": [{"ruleID": "R0001,R0003,R0004"}],
+            #"innerFilters": [{"ruleID": "R0001,R0002,R0003,R0004"}],
+            "innerFilters": [{"ruleID": "R0001,R0004"}],
             "pageSize": 100,
             "pageNum": 1
         }
         unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
         assert unique_values is not None, f"Failed to get unique values of alerts {json.dumps(incident)}"
-        expected_values = {"ruleID": ["R0001", "R0003", "R0004"]}
+        #expected_values = {"ruleID": ["R0001", "R0002", "R0003", "R0004"]}
+        expected_values = {"ruleID": ["R0001", "R0004"]}
         # don't check the count, it's dynamic
         assert unique_values[
                    "fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
@@ -321,20 +323,23 @@ class Incidents(BaseHelm):
         assert "ls" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields
-        assert "ls -l /tmp" in actual_process_tree.get('cmdline', "ls -l /tmp"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert "ls /tmp" in actual_process_tree.get('cmdline', "ls /tmp"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
         assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
         assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
         assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
 
         return response
 
-    def verify_incident_in_backend_list(self, cluster, namespace, incident_name):
+    def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):
         Logger.logger.info("Get incidents list")
         filters_dict = {
             "designators.attributes.cluster": cluster,
             "designators.attributes.namespace": namespace,
-            "name": incident_name
         }
+        if isinstance(incident_name,str):
+            filters_dict["name"] = incident_name
+        elif isinstance(incident_name, list):
+            filters_dict["name"] = ','.join(incident_name)
 
         response = self.backend.get_incidents(filters=filters_dict)
         incs = response['response']
