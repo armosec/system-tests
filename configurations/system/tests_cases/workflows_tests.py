@@ -6,7 +6,7 @@ from .structures import TestConfiguration
 
 class WorkflowsTests(object):
     '''
-    NOTE: 
+    NOTE: tests og 
     
     '''
     
@@ -28,4 +28,12 @@ class WorkflowsTests(object):
             create_test_tenant = True
         )    
 
+    @staticmethod
+    def workflows_configurations():
+        from tests_scripts.workflows.workflows import WorkflowConfigurations
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=WorkflowConfigurations,
+            create_test_tenant = True
+        )
    

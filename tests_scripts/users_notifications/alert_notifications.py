@@ -130,7 +130,7 @@ class AlertNotifications(BaseHelm):
     def start(self):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
-        # 1. Create a new framework with controls that should pass and lead to high complaince score
+        # 1. Create a new framework with controls that should pass and lead to high compliance score
         # 2. Create Armo alert channel for the cluster
         # 3. Send test message to the created alert channel
         # 4. Create deployment from yaml

@@ -54,7 +54,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         incident_policies_default = json.loads(res.text)
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
+            TestUtil.save_expected_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
@@ -80,7 +80,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         unique_values = json.loads(res.text)
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
+            TestUtil.save_expected_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
 
         expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
         TestUtil.compare_jsons(expected_unique_values, unique_values, [])
@@ -144,7 +144,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         incident_rulesets = json.loads(res.text)
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(incident_rulesets, EXPECTED_RUNTIME_RULSETS_PATH)
+            TestUtil.save_expected_json(incident_rulesets, EXPECTED_RUNTIME_RULSETS_PATH)
         
         assert len(incident_rulesets["response"]) > 0, "no incident rulesets found"  
         
