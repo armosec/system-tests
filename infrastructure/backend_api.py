@@ -90,6 +90,11 @@ API_ADMIN_CREATE_SUBSCRIPTION = "/api/v1/admin/createSubscription"
 API_ADMIN_CANCEL_SUBSCRIPTION = "/api/v1/admin/cancelSubscription"
 API_ADMIN_RENEW_SUBSCRIPTION = "/api/v1/admin/renewSubscription"
 
+API_ADMIN_ACTIVATE_WORKFLOWS = "/api/v1/admin/activateWorkflows"
+API_ADMIN_WORKFLOWS_CONVERT = "/api/v1/admin/convertAndActivateWorkflows"
+API_ADMIN_COPY_SLACK_TOKEN = "/api/v1/admin/copySlackToken"
+
+
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
@@ -456,6 +461,64 @@ class ControlPanelAPI(object):
         )
         assert res.status_code == client.OK, f"renew subscription failed for tenantID: {tenantID}"
         return res
+    
+    # ************** Activate Workflows ************** 
+    # relevant for feature transition phase
+    def active_workflow(self, tenantID: str) -> dict:
+        """
+            activate workflow for a tenant.
+        """
+
+        res = self.post(
+            API_ADMIN_ACTIVATE_WORKFLOWS,
+            json={
+                "tenantID": tenantID
+            },
+        )
+        assert res.status_code == client.OK, f"activate workflow failed for tenantID: {tenantID}"
+
+        return res
+    
+    # ************** Convert and Activate Workflows **************
+    # relevant for feature transition phase
+    def convert_and_activate_workflows(self, tenantID: str, force_convert=True) -> dict:
+        """
+            convert and activate workflow for a tenant.
+        """
+
+        params = {}
+        if force_convert:
+            params["forceConvert"] = True
+
+
+        res = self.post(
+            API_ADMIN_WORKFLOWS_CONVERT,
+            params=params,
+            json={
+                "tenantID": tenantID
+            },
+        )
+        assert res.status_code == client.OK, f"convert and activate workflow failed for tenantID: {tenantID}"
+
+        return res
+    
+    # ************** Copy Slack Token **************
+    # relevant for workflos feature transition phase
+    def copy_slack_token(self, tenantID: str) -> dict:
+        """
+            copy slack token for a tenant.
+        """
+
+        res = self.post(
+            API_ADMIN_COPY_SLACK_TOKEN,
+            json={
+                "tenantID": tenantID
+            },
+        )
+        assert res.status_code == client.OK, f"copy slack token failed for tenantID: {tenantID}"
+
+        return res
+
 
     def get_customer_guid(self):
         return self.selected_tenant_id
