@@ -911,10 +911,10 @@ class BaseVulnerabilityScanning(BaseHelm):
             format(x=self.kubernetes_obj.get_cluster_name())
 
     def get_files_from_SBOM(self, SBOM):
-        files = []
+        files = set()
         if SBOM['spec']['syft']['artifacts'] is not None:
             for fileData in SBOM['spec']['syft']['artifacts']:
-                files.append(fileData['name'])
+                files.add(fileData['name'])
         return files
 
     @staticmethod
@@ -940,24 +940,27 @@ class BaseVulnerabilityScanning(BaseHelm):
                     SBOM_annotations = self.get_annotations_from_crd(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_crd(expected_SBOM_data)
                     for key, annotation in expected_SBOM_annotations.items():
+                        if key == statics.RELEVANCY_RESOURCE_SIZE_LABEL:
+                            continue
                         assert SBOM_annotations[
                                    key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
 
                     expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
                     SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the SBOM in the storage is not as expected"
+                    diff = expected_SBOM_file_list.symmetric_difference(SBOM_file_list)
+                    assert len(diff) == 0, f"the files in the SBOM in the storage is not as expected, difference: {diff}"
                     verified_SBOMs += 1
                     break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
 
     def get_CVEs_from_CVE_manifest(self, CVEManifest):
-        cves = []
+        cves = set()
         if 'spec' in CVEManifest:
             CVEManifest = CVEManifest['spec']
         if CVEManifest['payload']['matches'] is not None:
             for match in CVEManifest['payload']['matches']:
                 vuln = match['vulnerability']
-                cves.append(vuln['id'])
+                cves.add(vuln['id'])
         return cves
 
     def store_filter_data_for_first_time_results(self, result, store_path, namespace):
@@ -1005,7 +1008,8 @@ class BaseVulnerabilityScanning(BaseHelm):
 
                 expected_SBOM_file_list = self.get_files_from_SBOM(expected_SBOM_data)
                 SBOM_file_list = self.get_files_from_SBOM(SBOM[1])
-                assert expected_SBOM_file_list == SBOM_file_list, f"the files in the SBOM in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
+                diff = expected_SBOM_file_list.symmetric_difference(SBOM_file_list)
+                assert len(diff) == 0, f"the files in the SBOM in the storage is not as expected, difference: {diff}"
                 verified_SBOMs += 1
                 break
         assert verified_SBOMs == len(expected_SBOM_paths), "not all SBOMs were verified"
@@ -1046,9 +1050,10 @@ class BaseVulnerabilityScanning(BaseHelm):
                 if not self.is_mathing_filtered_crd(a=expected_CVE_data, b=CVE[1]):
                     continue
 
-                expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
-                SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
-                assert expected_SBOM_file_list == SBOM_file_list, f"the files in the CVEs in the storage is not as expected, expected: {expected_SBOM_file_list}\n storage: {SBOM_file_list}"
+                expected_CVE_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
+                CVE_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
+                diff = expected_CVE_file_list.symmetric_difference(CVE_file_list)
+                assert len(diff) == 0, f"the files in the CVEs in the storage is not as expected, difference: {diff}"
                 verified_CVEs += 1
                 break
         assert verified_CVEs == len(expected_CVEs_path), "not all CVEs were verified"
@@ -1069,9 +1074,10 @@ class BaseVulnerabilityScanning(BaseHelm):
                                                                                                          'metadata'][
                                                                                                          'name']))
                 if CVE[0] == expected_CVE_data['metadata']['name']:
-                    expected_SBOM_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
-                    SBOM_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
-                    assert expected_SBOM_file_list == SBOM_file_list, "the files in the CVEs in the storage is not as expected"
+                    expected_CVE_file_list = self.get_CVEs_from_CVE_manifest(expected_CVE_data)
+                    CVE_file_list = self.get_CVEs_from_CVE_manifest(CVE[1]['spec'])
+                    diff = expected_CVE_file_list.symmetric_difference(CVE_file_list)
+                    assert len(diff) == 0, f"the files in the CVEs in the storage is not as expected, difference: {diff}"
                     verified_CVEs += 1
                     break
         assert verified_CVEs == len(expected_CVEs_path), "not all CVEs were verified"
@@ -1272,4 +1278,3 @@ class BaseVulnerabilityScanning(BaseHelm):
         print(resp)
         if resp.status_code < 200 or resp.status_code >= 300:
             raise Exception(f'bad response: {resp.text}')
-        

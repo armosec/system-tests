@@ -243,6 +243,7 @@ RELEVANCY_TEMPLATE_HASH_LABEL = "kubescape.io/instance-template-hash"
 RELEVANCY_RESOURCE_VERSION_LABEL = "kubescape.io/workload-resource-version"
 RELEVANCY_CONTAINER_LABEL = "kubescape.io/workload-container-name"
 RELEVANCY_INSTANCE_ID_LABEL = "kubescape.io/instance-id"
+RELEVANCY_RESOURCE_SIZE_LABEL = "kubescape.io/resource-size"
 RELEVANCY_WLID_ANNOTATION = "kubescape.io/wlid"
 
 RELEVANCY_CONTAINER_ANNOTATIONS = "kubescape.io/workload-container-name"
