@@ -1856,6 +1856,7 @@ class ControlPanelAPI(object):
                 "clusterName": cj["clusterName"],
                 "registryProvider": cj["registryProvider"],
                 "registryName": cj["registryName"],
+                "registryType": cj['registryType'],
                 "action": statics.DELETE_REGISTRY_CJ_COMMAND
             }
         ]
