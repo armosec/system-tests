@@ -37,8 +37,8 @@ class BaseHelm(BaseK8S):
         self.proxy_config = test_obj[("proxy_config", None)]
         self.enable_security = self.test_obj[("enable_security", True)]
 
-        self.filtered_sbom_init_time = self.test_driver.kwargs.get("filtered_sbom_init_time", "2m")
-        self.filtered_sbom_update_time = self.test_driver.kwargs.get("filtered_sbom_update_time", "2m")
+        self.node_agent_learning_period = self.test_driver.kwargs.get("node_agent_learning_period", "2m")
+        self.node_agent_update_period = self.test_driver.kwargs.get("node_agent_update_period", "2m")
 
     @staticmethod
     def kill_child_processes(parent_pid, sig=signal.SIGTERM):
@@ -126,10 +126,10 @@ class BaseHelm(BaseK8S):
             helm_kwargs.update(security_params)
 
         if "nodeAgent.config.learningPeriod" not in helm_kwargs:
-            helm_kwargs.update({"nodeAgent.config.learningPeriod": self.filtered_sbom_init_time})
+            helm_kwargs.update({"nodeAgent.config.learningPeriod": self.node_agent_learning_period})
 
         if "nodeAgent.config.updatePeriod" not in helm_kwargs:
-            helm_kwargs.update({"nodeAgent.config.updatePeriod": self.filtered_sbom_update_time})
+            helm_kwargs.update({"nodeAgent.config.updatePeriod": self.node_agent_update_period})
 
         helm_kwargs.update({"operator.podScanGuardTime": "5s"})
 
