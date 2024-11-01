@@ -16,7 +16,7 @@ spec:
       containers:
       - name: mariadb
         # we use image sha for vulnerability-scanning, please don't change
-        image: mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66
+        image: docker.io/library/mariadb@sha256:821d0411208eaa88f9e1f0daccd1d534f88d19baf724eb9a2777cbedb10b6c66
         env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:

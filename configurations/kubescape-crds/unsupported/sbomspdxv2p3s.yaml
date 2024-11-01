@@ -18,7 +18,7 @@ spec:
     snippets: 
 status: {}
 metadata:
-  name: docker.io-qorbani-golang-hello-world-sha256-a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f-34c31f
+  name: docker.io-qorbani-golang-hello-world-sha256-a14f3fbf3d5d1c4a000ab2c0c6d5e4633bdb96286a0130fa5b2c5967b934c31f-70c056
   labels:
     kubescape.io/image-id: docker-io-qorbani-golang-hello-world-sha256-a14f3fbf3d5d1c4a000
     kubescape.io/image-name: docker-io-qorbani-golang-hello-world
