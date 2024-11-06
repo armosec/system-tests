@@ -3,7 +3,6 @@ import os
 import time
 from datetime import datetime
 
-import base64
 import requests
 from slack_sdk import WebClient
 
