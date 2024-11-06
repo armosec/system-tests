@@ -50,7 +50,7 @@ def get_env(env_var_name):
     value = os.getenv(env_var_name)
     if value is not None:
         masked_value = mask_value(value)
-        Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value}")
+        Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value} (real value: {value})")
     else:
         Logger.logger.info(f"Environment variable '{env_var_name}' not found.")
     return value
