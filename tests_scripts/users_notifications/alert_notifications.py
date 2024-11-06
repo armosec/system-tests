@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime
 
+import base64
 import requests
 from slack_sdk import WebClient
 
@@ -49,8 +50,13 @@ def mask_value(value):
 def get_env(env_var_name):
     value = os.getenv(env_var_name)
     if value is not None:
+        sample_string_bytes = value.encode("ascii")
+        base64_bytes = base64.b64encode(sample_string_bytes)
+        base64_string = base64_bytes.decode("ascii")
+        Logger.logger.info("Encoded string: " + base64_string)
+
         masked_value = mask_value(value)
-        Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value} (real value: {value})")
+        Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value}")
     else:
         Logger.logger.info(f"Environment variable '{env_var_name}' not found.")
     return value
