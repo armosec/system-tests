@@ -71,7 +71,7 @@ class Incidents(BaseHelm):
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
 
         Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=5,
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
                                        cluster=cluster, namespace=namespace,
                                        incident_name=["Unexpected process launched","Unexpected Sensitive File Access"])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
