@@ -126,27 +126,24 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
-        scenario = self.test_obj[('test_scenario', None)]
-
-        Logger.logger.info(f'1. Install %s scenario manifests in the cluster', scenario)
-
-        # Logger.logger.info('1. Install attack-chains scenario manifests in the cluster')
-        Logger.logger.info(
-            f"1.1 construct SecurityRisksScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
-        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
-                                                         namespace=namespace)
-
-        Logger.logger.info("1.2 apply scenario manifests")
-        scenarios_manager.apply_scenario()
-
-        Logger.logger.info("2. Install kubescape with helm-chart")
-        Logger.logger.info("2.1 Installing kubescape with helm-chart")
+        Logger.logger.info("1. Install kubescape with helm-chart")
+        Logger.logger.info("1.1 Installing kubescape with helm-chart")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
-        Logger.logger.info("2.2 verify installation")
+        Logger.logger.info("1.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
+        scenario = self.test_obj[('test_scenario', None)]
+        Logger.logger.info(f'2. Install %s scenario manifests in the cluster', scenario)
+
+        Logger.logger.info(
+            f"2.1 construct SecurityRisksScenarioManager with test_scenario: {self.test_obj[('test_scenario', None)]} and cluster {cluster}")
+        scenarios_manager = SecurityRisksScenarioManager(test_obj=self.test_obj, backend=self.backend, cluster=cluster,
+                                                         namespace=namespace)
+
+        Logger.logger.info("2.2 apply scenario manifests")
+        scenarios_manager.apply_scenario()
         # TODO: fix the case on which the scan result is logged and triggers security risks before all kubernetes objects are created on backend.
         # meanwhile, sleeping to allow all kubernetes objects to be created on backend and triggering scan.
 
