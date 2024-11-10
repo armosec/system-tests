@@ -83,13 +83,15 @@ class ScenarioManager(base_test.BaseTest):
             self.backend.create_kubescape_job_request(
                 cluster_name=self.cluster,
                 trigger_by=trigger_by,
-                framework_list=["security"],
+                framework_list=["allcontrols"],
                 with_host_sensor="false"
             )
         else:
             self.backend.trigger_posture_scan(
                 cluster_name=self.cluster,
-                framework_list=["security"],
+                 # scanning "allcontrols" framework will trigger a scan for the "security" framework, whereas scanning "security" framework alone is not enough 
+                 # since the BE looks at the last scan and scans containing only "security" framework are not returned as last posture scan
+                framework_list=["allcontrols"],
                 with_host_sensor="false",
                 additional_params=additional_params
                 )
