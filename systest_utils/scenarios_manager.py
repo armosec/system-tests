@@ -83,13 +83,13 @@ class ScenarioManager(base_test.BaseTest):
             self.backend.create_kubescape_job_request(
                 cluster_name=self.cluster,
                 trigger_by=trigger_by,
-                framework_list=["security"],
+                framework_list=["allcontrols"],
                 with_host_sensor="false"
             )
         else:
             self.backend.trigger_posture_scan(
                 cluster_name=self.cluster,
-                framework_list=["security"],
+                framework_list=["allcontrols"],
                 with_host_sensor="false",
                 additional_params=additional_params
                 )
