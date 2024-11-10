@@ -118,6 +118,7 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
+        TestUtil.sleep(60, "wait for 60 seconds after installing armo helm chart", "info")
 
         Logger.logger.info('apply services')
         self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
