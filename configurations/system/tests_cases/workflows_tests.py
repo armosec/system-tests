@@ -6,7 +6,7 @@ from .structures import TestConfiguration
 
 class WorkflowsTests(object):
     '''
-    NOTE: tests og 
+    NOTE:
     
     '''
     
