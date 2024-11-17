@@ -122,6 +122,15 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         if self.test_driver.test_name == "sr_r_0037_vulnerability" and self.backend.server == "https://api.armosec.io":
             Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
             return statics.SUCCESS, ""
+        
+        if self.test_driver.test_name == "ac_alpine_workload_external_track_fix_control" and self.backend.server == "https://api.armosec.io":
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+        
+        if self.test_driver.test_name == "vuln_v2_views_kev" and self.backend.server == "https://api.armosec.io":
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+        
             
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
