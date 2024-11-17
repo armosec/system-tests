@@ -131,6 +131,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
             Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
             return statics.SUCCESS, ""
         
+        
             
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
