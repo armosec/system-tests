@@ -1,0 +1,51 @@
+{
+  "channel": {
+    "name": "My Slack Channel",
+    "provider": "slack",
+    "context": {
+      "channel": {
+        "id": "abcd1234"
+      }
+    }
+  },
+  "notifications": [
+    {
+      "notificationType": "securityRiskPush:newSecurityRisk",
+      "disabled": false,
+      "parameters": {
+          "minSeverity": 300
+      }
+    },
+    {
+      "notificationType": "push:newClusterAdmin",
+      "disabled": false
+    },
+    {
+      "notificationType": "containerScanPush:newVulnerability",
+      "disabled": false,
+      "parameters": {
+        "minSeverity": 500
+      }
+    },
+    {
+      "notificationType": "containerScanPush:vulnerabilityNewFix",
+      "disabled": false,
+      "parameters": {
+        "minSeverity": 500
+      }
+    },
+    {
+      "notificationType": "push:complianceDrift",
+      "disabled": false,
+      "parameters": {
+        "driftPercentage": 15
+      }
+    }
+  ],
+  "scope": [
+    {
+      "cluster": "cluster",
+      "namespaces": ["alerts"]
+    }
+  ]
+}
