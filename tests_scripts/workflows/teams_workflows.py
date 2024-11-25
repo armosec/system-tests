@@ -50,8 +50,8 @@ class WorkflowsTeamsNotifications(Workflows):
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-        
         self.cluster, namespace = self.setup(apply_services=False)
+        # self.active_workflow(self.test_tenant_id)
         
         Logger.logger.info("Stage 1: Post custom framework")
         self.fw_name = "systest-fw-" + self.cluster
@@ -114,6 +114,7 @@ class WorkflowsTeamsNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
             self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME))
+            # self.backend.delete_tenant(self.test_tenant_id)
             return super().cleanup(**kwargs)
     
     
@@ -193,7 +194,6 @@ class WorkflowsTeamsNotifications(Workflows):
         workflows = self.backend.get_workflows()["response"]
         for workflow in workflows:
             assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
-            self.cleanup()
 
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]

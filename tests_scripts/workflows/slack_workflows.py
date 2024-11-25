@@ -28,7 +28,7 @@ class WorkflowsSlackNotifications(Workflows):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(Workflows, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                  kubernetes_obj=kubernetes_obj)
-        self.fw_name = "systest-fw-colima"
+        self.fw_name = None
         self.cluster = None
         self.wait_for_agg_to_end = False
 
@@ -50,8 +50,10 @@ class WorkflowsSlackNotifications(Workflows):
         12. Cleanup
         """
 
-        assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         
+        assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
+        # self.active_workflow(self.test_tenant_id)
+        # self.backend.copy_slack_token(tenantID=self.test_tenant_id)
         self.cluster, namespace = self.setup(apply_services=False)
         
         Logger.logger.info("Stage 1: Post custom framework")
@@ -114,6 +116,7 @@ class WorkflowsSlackNotifications(Workflows):
         self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
         self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
         self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME))
+        # self.backend.delete_tenant(self.test_tenant_id)
         return super().cleanup(**kwargs)
     
     

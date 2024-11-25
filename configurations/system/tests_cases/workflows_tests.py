@@ -40,18 +40,15 @@ class WorkflowsTests(object):
             create_test_tenant = False
         )   
      
-    # @staticmethod
-    # def jira_notifications_workflows():
-    #     from tests_scripts.workflows.jira_workflows import WorkflowsJiraNotifications
-    #     return TestConfiguration(
-    #         name=inspect.currentframe().f_code.co_name,
-    #         test_obj=WorkflowsJiraNotifications,
-    #         deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http"),
-    #         deployments1=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
-    #         # getMessagesFunc=, // TODO: implement this function
-    #         # enrichAlertChannelFunc=, // TODO: implement this function
-    #         create_test_tenant = False
-    #     )    
+    @staticmethod
+    def jira_notifications_workflows():
+        from tests_scripts.workflows.jira_workflows import WorkflowsJiraNotifications
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=WorkflowsJiraNotifications,
+            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http"),
+            create_test_tenant = False
+        )    
 
     @staticmethod
     def workflows_configurations():

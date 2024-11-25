@@ -10,11 +10,12 @@ EXPECTED_UPDATE_RESPONSE)
 
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger
-from tests_scripts.base_test import BaseTest
+from tests_scripts.workflows.workflows import Workflows
 
 
 
-class WorkflowConfigurations(BaseTest):
+
+class WorkflowConfigurations(Workflows):
     """
     Check workflow - list, create, update, delete
     """
@@ -33,6 +34,7 @@ class WorkflowConfigurations(BaseTest):
         6. cleanup
         """
         assert self.backend is not None, f'The test {self.test_driver.test_name} must run with backend'
+        # self.active_workflow(self.test_tenant_id)
 
         Logger.logger.info("1. create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(name=WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
@@ -191,7 +193,7 @@ class WorkflowConfigurations(BaseTest):
         workflows = self.backend.get_workflows()["response"]
         for workflow in workflows:
             assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
-            self.cleanup()
+
 
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]

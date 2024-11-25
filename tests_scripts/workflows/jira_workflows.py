@@ -1,7 +1,6 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     JIRA_PROVIDER_NAME,
@@ -11,10 +10,12 @@ from tests_scripts.workflows.utils import (
     SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME,
-    SECURITY_RISKS_WORKFLOW_NAME
+    SECURITY_RISKS_WORKFLOW_NAME,
+    SECURITY_RISKS_ID
 )
 from systest_utils import Logger, TestUtil
 import time
+import json
 from infrastructure import KubectlWrapper
 from systest_utils import Logger, statics, TestUtil
 
@@ -33,81 +34,53 @@ class WorkflowsJiraNotifications(Workflows):
     def start(self):
         """
         Agenda:
-        1. Post custom framework
-        2. Create new workflows
-        3. Validate workflows created successfully
-        4. Apply deployment
-        5. Install kubescape with helm-chart
-        6. Trigger first scan
-        7. Apply second deployment
-        8. Update custom framework
-        9. Add SA to cluster-admin
-        10. Trigger second scan
-        11. Assert all messages sent
-        12. Cleanup
+        1. Create new workflows
+        2. Validate workflows created successfully
+        3. Apply deployment
+        4. Install kubescape with helm-chart
+        5. Trigger first scan
+        6. Assert jira ticket was created
+        7. Cleanup
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-        
         self.cluster, namespace = self.setup(apply_services=False)
-        
-        Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster
-        _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
-                                           cluster_name=self.cluster)
-
-        
-        Logger.logger.info("Stage 2: Create new workflows")
+        # self.backend.active_workflow(self.test_tenant_id)
+                
+        Logger.logger.info("Stage 1: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        before_test_message_ts = time.time()
+        # workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        # self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
 
-        Logger.logger.info("Stage 3: Validate workflows created successfully")
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
+        Logger.logger.info("Stage 2: Validate workflows created successfully")
         self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
+        # self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
 
-        Logger.logger.info('Stage 4: Apply deployment')
+        Logger.logger.info('Stage 3: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
 
-        Logger.logger.info('Stage 6: Install kubescape with helm-chart')
+        Logger.logger.info('Stage 4: Install kubescape with helm-chart')
         self.install_kubescape()
 
-
-        Logger.logger.info('Stage 7: Trigger first scan')
+        Logger.logger.info('Stage 5: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
         TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
-        
-        Logger.logger.info('Stage 8: Apply second deployment')
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments1"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
-        
+                     
+        Logger.logger.info('Stage 6: Assert jira ticket was created')
+        r = self.backend.get_security_risks_list(cluster_name=self.cluster, security_risk_ids=[SECURITY_RISKS_ID])
+        self.assert_security_risks_jira_ticket_created(response=r)
 
-        Logger.logger.info('Stage 9: Update custom framework')
-        self.put_custom_framework(framework_file="system-test-framework-low-comp.json",
-                                  framework_guid=fw['guid'], cluster_name=self.cluster)
-
-        Logger.logger.info('Stage 10: Add SA to cluster-admin')
-        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
-                                                                namespace=namespace)
-
-        Logger.logger.info('Stage 11: Trigger second scan')
-        self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
-        
-        Logger.logger.info('Stage 12: Assert all messages sent')
-        # // TODO: implement this function
-
-        Logger.logger.info('Stage 13: Cleanup')
+        Logger.logger.info('Stage 7: Cleanup')
         return self.cleanup()
     
 
     
     def cleanup(self, **kwargs):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
-            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
+            # self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
+            # self.backend.delete_tenant(self.test_tenant_id)
             return super().cleanup(**kwargs)
     
     
@@ -124,14 +97,20 @@ class WorkflowsJiraNotifications(Workflows):
         report_fw, _ = self.wait_for_report(report_type=self.backend.put_custom_framework, fw_object=ks_custom_fw)
         return ks_custom_fw, report_fw
     
-    def assert_security_risks_message_sent(self, messages, cluster):
-        found = 0
-        for message in messages:
-            message_string = str(message)
-            if "Risk:" in message_string and cluster in message_string:
-                found += 1
-        assert found > 0, "expected to have at least one security risk message"
+    def assert_security_risks_jira_ticket_created(self, response):
+        try:
+            response_json = json.loads(response)
+        except json.JSONDecodeError as e:
+            raise AssertionError(f"Response is not valid JSON: {e}")
 
+        risks = response_json.get("response", [])
+        assert len(risks) > 0, "No security risks found in the response"
+
+        for risk in risks:
+            tickets = risk.get("tickets", [])
+            assert len(tickets) > 0, f"No tickets associated with security risk {risk.get('securityRiskID', 'Unknown')}"
+
+        
     def assert_vulnerability_message_sent(self, messages, cluster):
         found = 0
         for message in messages:
@@ -148,10 +127,6 @@ class WorkflowsJiraNotifications(Workflows):
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
 
-
-    
-    # def assert_jira_ticket_created(self, begin_time, cluster):
-        
 
     
     def install_kubescape(self, helm_kwargs: dict = None):
@@ -176,7 +151,6 @@ class WorkflowsJiraNotifications(Workflows):
         workflows = self.backend.get_workflows()["response"]
         for workflow in workflows:
             assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
-            self.cleanup()
 
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]
