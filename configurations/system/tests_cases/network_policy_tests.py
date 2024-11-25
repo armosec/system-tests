@@ -29,6 +29,7 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/deployment-nginx.json",
                 ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
+                         "storage.forceVirtualCrds": "true",
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
                          }
@@ -65,7 +66,10 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/deployment-nginx.json",
                 ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
-                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+                         "storage.forceVirtualCrds": "true",
+                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
+                         }
         )
 
     @staticmethod
@@ -89,7 +93,10 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/deployment-nginx-basic.json",
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
-                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+                         "storage.forceVirtualCrds": "true",
+                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
+                         }
         )
 
     @staticmethod
@@ -105,7 +112,10 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/busybox.json",
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
-                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+                         "storage.forceVirtualCrds": "true",
+                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
+                         }
         )
 
     @staticmethod
@@ -123,7 +133,10 @@ class NetworkPolicyTests(object):
                 "configurations/network-policy/expected-generated-network-policy/busybox-known-server.json",
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
-                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s', statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'}
+                         "storage.forceVirtualCrds": "true",
+                         statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
+                         }
         )
 
     @staticmethod
