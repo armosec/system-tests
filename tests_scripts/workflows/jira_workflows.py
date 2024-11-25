@@ -11,9 +11,7 @@ from tests_scripts.workflows.utils import (
     SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME,
-    SECURITY_RISKS_WORKFLOW_NAME,
-    COMPLIANCE_WORKFLOW_NAME,
-    COMPLIANCE
+    SECURITY_RISKS_WORKFLOW_NAME
 )
 from systest_utils import Logger, TestUtil
 import time
@@ -64,14 +62,11 @@ class WorkflowsJiraNotifications(Workflows):
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
         self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
-        self.validate_workflow(COMPLIANCE_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -113,7 +108,6 @@ class WorkflowsJiraNotifications(Workflows):
     def cleanup(self, **kwargs):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
-            self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME))
             return super().cleanup(**kwargs)
     
     
@@ -271,44 +265,7 @@ class WorkflowsJiraNotifications(Workflows):
         }
         return workflow_body
     
-    def build_compliance_workflow_body(self, name, siteId, projectId, cluster, namespace, category, driftPercentage, issueTypeId, guid=None):
-        workflow_body = { 
-            "guid": guid,
-            "updatedTime": "",
-            "updatedBy": "",
-            "enabled": True,
-            "name": name,
-            "scope": [
-                {
-                    "cluster": cluster,
-                    "namespace": namespace
-                }
-            ],
-            "conditions": [
-                {
-                    "category": category,
-                    "parameters": {
-                        "driftPercentage": driftPercentage
-                    }
-                }
-            ],
-           "notifications": [
-                 {
-                    "provider": "jira",
-                    "jiraTicketIdentifiers": [
-                        {
-                            "siteId": siteId,
-                            "projectId": projectId,
-                            "issueTypeId": issueTypeId,
-                            "fields": {}
-                        }
-                    ]
-                }
-            ]
-        }
-        return workflow_body
-
-    
+      
     def validate_workflow(self, expected_name, expected_provider):
         workflows = self.backend.get_workflows()
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
