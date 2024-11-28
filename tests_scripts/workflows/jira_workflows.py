@@ -45,17 +45,17 @@ class WorkflowsJiraNotifications(Workflows):
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, namespace = self.setup(apply_services=False)
-        # self.backend.active_workflow(self.test_tenant_id)
+        
                 
         Logger.logger.info("Stage 1: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        # workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        # self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
         self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
-        # self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
+        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
 
         Logger.logger.info('Stage 3: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -68,20 +68,39 @@ class WorkflowsJiraNotifications(Workflows):
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
         TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
                      
-        Logger.logger.info('Stage 6: Assert jira ticket was created')
-        r = self.backend.get_security_risks_list(cluster_name=self.cluster, security_risk_ids=[SECURITY_RISKS_ID])
-        self.assert_security_risks_jira_ticket_created(response=r)
+        Logger.logger.info('Stage 6: Assert jira tickets was created')
+        self.assert_jira_tickets_was_created(self.cluster, SECURITY_RISKS_ID)
 
         Logger.logger.info('Stage 7: Cleanup')
         return self.cleanup()
     
 
-    
     def cleanup(self, **kwargs):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
-            # self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
-            # self.backend.delete_tenant(self.test_tenant_id)
+            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
             return super().cleanup(**kwargs)
+    
+    def assert_jira_tickets_was_created(self, cluster_name, security_risk_ids, ):
+        r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=security_risk_ids)
+        self.assert_security_risks_jira_ticket_created(response=r)
+        body = {
+            "fields": {
+                "severity": ""
+            },
+            "innerFilters": [
+                {
+                    "severity": "High",
+                    "cluster": self.cluster,
+                    "cvssInfo.baseScore": "6|greater",
+                    "isRelevant": "Yes"
+                }
+            ],
+            "countFields": True
+        }
+        r2 = self.backend.get_vulns_v2(body=body, expected_results=1, scope=None)
+        self.assert_vulnerability_jira_ticket_created(response=r2)
+        
+
     
     
     def post_custom_framework(self, framework_file, cluster_name: str):
@@ -109,6 +128,21 @@ class WorkflowsJiraNotifications(Workflows):
         for risk in risks:
             tickets = risk.get("tickets", [])
             assert len(tickets) > 0, f"No tickets associated with security risk {risk.get('securityRiskID', 'Unknown')}"
+
+    def assert_vulnerability_jira_ticket_created(self, response):
+        try:
+            response_json = json.loads(response)
+        except json.JSONDecodeError as e:
+            raise AssertionError(f"Response is not valid JSON: {e}")
+
+        vulnerabilities = response_json.get("response", [])
+        assert len(vulnerability) > 0, "No vulnerability found in the response"
+
+        for vulnerability in vulnerabilities:
+            tickets = vulnerability.get("tickets", [])
+            assert len(tickets) > 0, f"No tickets associated with security risk {vulnerability.get('securityRiskID', 'Unknown')}"
+
+    
 
         
     def assert_vulnerability_message_sent(self, messages, cluster):

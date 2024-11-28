@@ -2367,7 +2367,7 @@ class ControlPanelAPI(object):
         if scope:
             params = {"scope": scope}
         return self.post_list_request(API_VULNERABILITY_V2, body, expected_results, params=params)
-
+    
     def get_vuln_v2_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2, body)
 

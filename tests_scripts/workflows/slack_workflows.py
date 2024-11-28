@@ -52,8 +52,6 @@ class WorkflowsSlackNotifications(Workflows):
 
         
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-        # self.active_workflow(self.test_tenant_id)
-        # self.backend.copy_slack_token(tenantID=self.test_tenant_id)
         self.cluster, namespace = self.setup(apply_services=False)
         
         Logger.logger.info("Stage 1: Post custom framework")
@@ -116,7 +114,6 @@ class WorkflowsSlackNotifications(Workflows):
         self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
         self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
         self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME))
-        # self.backend.delete_tenant(self.test_tenant_id)
         return super().cleanup(**kwargs)
     
     

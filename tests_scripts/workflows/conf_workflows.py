@@ -34,7 +34,6 @@ class WorkflowConfigurations(Workflows):
         6. cleanup
         """
         assert self.backend is not None, f'The test {self.test_driver.test_name} must run with backend'
-        # self.active_workflow(self.test_tenant_id)
 
         Logger.logger.info("1. create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(name=WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
