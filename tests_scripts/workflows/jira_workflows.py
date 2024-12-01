@@ -9,8 +9,8 @@ from tests_scripts.workflows.utils import (
     VULNERABILITIES,
     SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
-    VULNERABILITIES_WORKFLOW_NAME,
-    SECURITY_RISKS_WORKFLOW_NAME,
+    VULNERABILITIES_WORKFLOW_NAME_JIRA,
+    SECURITY_RISKS_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_ID
 )
 from systest_utils import Logger, TestUtil
@@ -48,14 +48,14 @@ class WorkflowsJiraNotifications(Workflows):
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
-        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME, JIRA_PROVIDER_NAME)
+        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA, JIRA_PROVIDER_NAME)
+        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA, JIRA_PROVIDER_NAME)
 
         Logger.logger.info('Stage 3: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -76,8 +76,8 @@ class WorkflowsJiraNotifications(Workflows):
     
 
     def cleanup(self, **kwargs):
-            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME))
-            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME))
+            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_JIRA))
+            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA))
             return super().cleanup(**kwargs)
     
     def assert_jira_tickets_was_created(self, cluster_name, security_risk_ids, ):
