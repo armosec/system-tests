@@ -1,4 +1,4 @@
-from utils import(get_env,
+from tests_scripts.workflows.utils import(get_env,
 WORKFLOW_NAME,
 SEVERITIES_CRITICAL,
 SLACK_CHANNEL_NAME,
