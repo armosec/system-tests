@@ -1,7 +1,6 @@
 from slack_sdk import WebClient
 import requests
 from datetime import datetime
-from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger
 import os
 
