@@ -72,12 +72,15 @@ class WorkflowConfigurations(Workflows):
         Logger.logger.info("10. delete teams workflow")
         workflow_guid = self.return_workflow_guid(UPDATED_WORKFLOW_NAME)
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
+
+        return True, "Workflow configurations test passed"
         
-        Logger.logger.info("11. cleanup")
-        return self.cleanup()
+    
 
         
 
+            
+            
     def build_slack_workflow_body(self, name, severities, channel_name, channel_id, guid=None):
         return {
             "guid": guid,
@@ -203,5 +206,3 @@ class WorkflowConfigurations(Workflows):
         return None
         
         
-    def cleanup(self, **kwargs):
-        return super().cleanup(**kwargs)
