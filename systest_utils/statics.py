@@ -71,6 +71,10 @@ DEFAULT_NOTIFICATIONS_PATHS = os.path.abspath(os.path.join('configurations', 'no
 DEFAULT_NOTIFICATIONS_DEPLOYMENT_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'deployments')
 DEFAULT_NOTIFICATIONS_JOB_PATH = os.path.join(DEFAULT_NOTIFICATIONS_PATHS, 'jobs')
 
+# workflows
+DEFAULT_WORKFLOWS_PATHS = os.path.abspath(os.path.join('configurations', 'workflows_notifications'))
+DEFAULT_WORKFLOWS_DEPLOYMENT_PATH = os.path.join(DEFAULT_WORKFLOWS_PATHS, 'deployments')
+
 # kdr
 DEFAULT_KDR_DEPLOYMENT_PATH = os.path.join(DEFAULT_K8S_PATHS, 'deployments')
 

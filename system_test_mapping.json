@@ -230,7 +230,6 @@
     "skip_on_environment": "",
     "owner": ""
   },
-
   "scan_local_file": {
     "target": [
       "CLI"
@@ -801,7 +800,7 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "smart_remediation_all_controls":{
+  "smart_remediation_all_controls": {
     "target": [
       "In cluster",
       "Backend"
@@ -1380,7 +1379,7 @@
       "users-notification-service"
     ],
     "description": "testing teams alert channels with compliance and vulnerabilities notifications",
-    "skip_on_environment": "production,production-us",
+    "skip_on_environment": "staging",
     "owner": ""
   },
   "slack_alerts": {
@@ -1394,7 +1393,7 @@
       "users-notification-service"
     ],
     "description": "testing slack alert channels with compliance and vulnerabilities notifications",
-    "skip_on_environment": "production,production-us,custom",
+    "skip_on_environment": "staging",
     "owner": "refaelm@armosec.io"
   },
   "sr_r_0035_attack_chain": {
@@ -1625,32 +1624,60 @@
     "skip_on_environment": "",
     "owner": "rinao@armosec.io"
   },
-  "slack_alerts_workflows": {
+  "slack_notifications_workflows": {
     "target": [
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service-dummy",
-      "config-service-dummy",
-      "cadashboardbe-dummy",
-      "event-ingester-service-dummy"
+      "users-notification-service",
+      "config-service",
+      "cadashboardbe",
+      "event-ingester-service"
     ],
-    "description": "Checks slack workflows",
-    "skip_on_environment": "",
+    "description": "Checks workflows slack notifications",
+    "skip_on_environment": "production,production-us",
     "owner": "jonathang@armosec.io"
   },
-  "teams_alerts_workflows": {
+  "teams_notifications_workflows": {
     "target": [
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service-dummy",
-      "config-service-dummy",
-      "cadashboardbe-dummy",
-      "event-ingester-service-dummy"
+      "users-notification-service",
+      "config-service",
+      "cadashboardbe",
+      "event-ingester-service"
     ],
-    "description": "Checks teams workflows",
-    "skip_on_environment": "",
+    "description": "Checks workflows teams notifications",
+    "skip_on_environment": "production,production-us",
+    "owner": "jonathang@armosec.io"
+  },
+  "jira_notifications_workflows": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service",
+      "config-service",
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks workflows jira notifications",
+    "skip_on_environment": "production,production-us",
+    "owner": "jonathang@armosec.io"
+  },
+  "workflows_configurations": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service",
+      "config-service",
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks workflows configurations",
+    "skip_on_environment": "production,production-us",
     "owner": "jonathang@armosec.io"
   }
 }
