@@ -82,6 +82,7 @@ class WorkflowsJiraNotifications(Workflows):
     
     def assert_jira_tickets_was_created(self, cluster_name, security_risk_ids, ):
         r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=security_risk_ids)
+        r.text
         self.assert_security_risks_jira_ticket_created(response=r)
         body = {
             "fields": {
