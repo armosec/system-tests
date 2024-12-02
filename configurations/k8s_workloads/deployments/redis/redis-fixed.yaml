@@ -20,7 +20,7 @@ spec:
         app: redis-fixed
     spec:
       containers:
-      - image: docker.io/rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96
+      - image: rcohendockerhub/redis@sha256:baf2f27e27cfc9dd2c8326f572909571afbbb59b9eec4dd47ff9c7c239014a96
         imagePullPolicy: IfNotPresent
         name: redis-fixed
         ports:
