@@ -42,8 +42,8 @@ class WorkflowConfigurations(Workflows):
         assert self.backend is not None, f'The test {self.test_driver.test_name} must run with backend'
 
         Logger.logger.info("Stage 1: Create webhook")
-        self.create_webhook(name=WEBHOOK_NAME + self.cluster)
-        channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster)
+        self.create_webhook(name=WEBHOOK_NAME + "conf_test")
+        channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + "conf_test")
 
         Logger.logger.info("stage 2: create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(name=WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
@@ -83,7 +83,6 @@ class WorkflowConfigurations(Workflows):
         workflow_guid = self.return_workflow_guid(UPDATED_WORKFLOW_NAME)
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
         self.delete_channel_by_guid(channel_guid)
-
         return True, "Workflow configurations test passed"
         
     
@@ -106,7 +105,7 @@ class WorkflowConfigurations(Workflows):
         return "Channel not found"
     
     def delete_channel_by_guid(self, channel_guid):
-        r = self.backend.delete_webhook(channel_guid)
+        r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
         assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
         channels = self.backend.get_webhooks()
         for channel in channels:

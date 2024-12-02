@@ -2994,7 +2994,7 @@ class ControlPanelAPI(object):
     def delete_webhook(self, body):
         url = API_WEBHOOKS 
         params = {"customerGUID": self.selected_tenant_id}
-        r = self.delete(url, params=params, body=body)
+        r = self.delete(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error deleting webhook. Customer: "%s" (code: %d, message: %s)' % (

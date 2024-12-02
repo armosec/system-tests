@@ -138,7 +138,7 @@ class WorkflowsTeamsNotifications(Workflows):
         return "Channel not found"
     
     def delete_channel_by_guid(self, channel_guid):
-        r = self.backend.delete_webhook(channel_guid)
+        r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
         assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
         channels = self.backend.get_webhooks()
         for channel in channels:
@@ -147,9 +147,7 @@ class WorkflowsTeamsNotifications(Workflows):
         return "Channel deleted"
 
 
-        
-
-
+    
     def post_custom_framework(self, framework_file, cluster_name: str):
         framework_name, ks_custom_fw = self.create_ks_custom_fw(cluster_name=cluster_name,
                                                                 framework_file=framework_file)
