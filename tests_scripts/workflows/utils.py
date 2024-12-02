@@ -20,16 +20,16 @@ SEVERITIES_HIGH = ["High"]
 WORKFLOW_NAME = "system_test_workflow"
 UPDATED_WORKFLOW_NAME = "system_test_workflow_updated"
 
-SECURITY_RISKS_WORKFLOW_NAME_TEAMS = "security_risks_workflow_teams"
-SECURITY_RISKS_WORKFLOW_NAME_SLACK = "security_risks_workflow_slack"
-SECURITY_RISKS_WORKFLOW_NAME_JIRA = "security_risks_workflow_jira"
+SECURITY_RISKS_WORKFLOW_NAME_TEAMS = "security_risks_workflow_teams_"
+SECURITY_RISKS_WORKFLOW_NAME_SLACK = "security_risks_workflow_slack_"
+SECURITY_RISKS_WORKFLOW_NAME_JIRA = "security_risks_workflow_jira_"
 
-VULNERABILITIES_WORKFLOW_NAME_TEAMS = "vulnerabilities_workflow_teams"
-VULNERABILITIES_WORKFLOW_NAME_SLACK = "vulnerabilities_workflow_slack"
-VULNERABILITIES_WORKFLOW_NAME_JIRA = "vulnerabilities_workflow_jira"
+VULNERABILITIES_WORKFLOW_NAME_TEAMS = "vulnerabilities_workflow_teams_"
+VULNERABILITIES_WORKFLOW_NAME_SLACK = "vulnerabilities_workflow_slack_"
+VULNERABILITIES_WORKFLOW_NAME_JIRA = "vulnerabilities_workflow_jira_"
 
-COMPLIANCE_WORKFLOW_NAME_TEAMS = "compliance_workflow_teams"
-COMPLIANCE_WORKFLOW_NAME_SLACK = "compliance_workflow_slack"
+COMPLIANCE_WORKFLOW_NAME_TEAMS = "compliance_workflow_teams_"
+COMPLIANCE_WORKFLOW_NAME_SLACK = "compliance_workflow_slack_"
 
 # channel provider names
 SLACK_CHANNEL_NAME = "system_tests_slack"
