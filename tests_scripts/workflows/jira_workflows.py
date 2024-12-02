@@ -69,7 +69,7 @@ class WorkflowsJiraNotifications(Workflows):
         TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
                      
         Logger.logger.info('Stage 6: Assert jira tickets was created')
-        self.assert_jira_tickets_was_created(self.cluster, SECURITY_RISKS_ID)
+        self.assert_jira_tickets_was_created(self.cluster)
 
         Logger.logger.info('Stage 7: Cleanup')
         return self.cleanup()
@@ -80,8 +80,8 @@ class WorkflowsJiraNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
             return super().cleanup(**kwargs)
     
-    def assert_jira_tickets_was_created(self, cluster_name, security_risk_ids, ):
-        r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=security_risk_ids)
+    def assert_jira_tickets_was_created(self, cluster_name):
+        r = self.backend.get_security_risks_list(cluster_name=cluster_name)
         r = r.text
         self.assert_security_risks_jira_ticket_created(response=r)
         body = {
