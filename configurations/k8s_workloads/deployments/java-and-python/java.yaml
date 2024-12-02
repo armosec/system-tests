@@ -16,4 +16,4 @@ spec:
     spec:
       containers:
       - name: java
-        image: docker.io/library/jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660
+        image: jetty@sha256:30fb2e30885acafd65073eed25c682d31329746d2934e8364982bfebec1d6660

@@ -43,12 +43,12 @@ class RelevantCVEs(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from local Storage')
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.2 test SBOM created as expected result in the storage
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
         # 3.3 test CVEs created in the storage
         CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.4 test CVES created as expected result in the storage
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
@@ -105,7 +105,7 @@ class RelevantCVEsBackendTest(BaseVulnerabilityScanning):
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
 
         CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         filteredCVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(
@@ -169,12 +169,12 @@ class RelevantDataIsAppended(BaseVulnerabilityScanning):
 
         Logger.logger.info('Get SBOMs from storage')
         SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         Logger.logger.info('Validate SBOMs was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
 
         CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         Logger.logger.info('Validate CVEs was created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
@@ -267,7 +267,7 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
         # 3.1 get CVEs
         Logger.logger.info('Get CVEs from storage')
         CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
 
@@ -305,7 +305,7 @@ class RelevantDataIsAppendedBackendTest(BaseVulnerabilityScanning):
         # 5.1 get CVEs
         Logger.logger.info('Get CVEs from storage')
         CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         TestUtil.sleep(300, "Waiting for new filtered CVEs to be created")
 
@@ -381,7 +381,7 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
         Logger.logger.info('Test SBOM was created in storage')
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         # 3.2 test SBOM created as expected result in the storage
         Logger.logger.info('Validate SBOM was created with expected data')
@@ -390,7 +390,7 @@ class RelevancyDisabled(BaseVulnerabilityScanning):
         # 3.3 test CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
         CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.4 test CVES created as expected result in the storage
         Logger.logger.info('Validate CVEs were created with expected data')
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
@@ -440,7 +440,7 @@ class RelevancyDisabledBackendTest(BaseVulnerabilityScanning):
         # 3.3 get CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
         CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         # # P4 get CVEs results
         # # 4.1 get summary result
@@ -497,12 +497,12 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
         Logger.logger.info('Test SBOM was created in storage')
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=600, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         # 3.2 test CVEs created in the storage
         Logger.logger.info('Test CVEs were created in storage')
         CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOMp was created')
         filteredSBOM, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_SBOM_from_storage,
@@ -515,13 +515,13 @@ class RelevancyEnabledDeletedImage(BaseVulnerabilityScanning):
 
         TestUtil.sleep(150, "wait for workload CRDs to be deleted")
 
-        workload_tags = self.get_workloads_images_tags(workload_objs, namespace=namespace)
-        SBOMS = self.get_SBOM_from_storage(workload_tags)
+        SBOM_keys = self.get_imagesIDs_keys(workload_objs, namespace=namespace)
+        SBOMS = self.get_SBOM_from_storage(SBOM_keys)
         assert SBOMS == {}, "SBOMs were not deleted"
 
         Logger.logger.info('Test CVEs were deleted in storage')
-        workload_tags = self.get_workloads_images_tags(workload_objs, namespace=namespace)
-        CVEs = self.get_CVEs_from_storage(workload_tags)
+        CVE_keys = self.get_imagesIDs_keys(workload_objs, namespace=namespace)
+        CVEs = self.get_CVEs_from_storage(CVE_keys)
         assert CVEs == {}, "CVEs were not deleted"
 
         Logger.logger.info('Test filtered SBOM was deleted in storage')
@@ -566,7 +566,7 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         # P3 verify results in storage
         Logger.logger.info('Test SBOM was created in storage')
         SBOMs, _ = self.wait_for_report(timeout=600, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
@@ -618,7 +618,7 @@ class RelevancyEnabledExtraLargeImage(BaseVulnerabilityScanning):
         # P3 verify results in storage
         Logger.logger.info('Test SBOM was created in storage')
         SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         Logger.logger.info('Validate SBOM was created with expected data')
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
@@ -722,12 +722,12 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
         Logger.logger.info('Get the scan result from local Storage')
         # 3.1 test SBOM created in the storage
         SBOMs, _ = self.wait_for_report(timeout=360, report_type=self.get_SBOM_from_storage,
-                                        workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                        SBOMKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.2 test SBOM created as expected result in the storage
         self.validate_expected_SBOM(SBOMs, self.test_obj["expected_SBOMs"])
         # 3.3 test CVEs created in the storage
         CVEs, _ = self.wait_for_report(timeout=360, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
         # 3.4 test CVES created as expected result in the storage
         self.validate_expected_CVEs(CVEs, self.test_obj["expected_CVEs"])
 
@@ -790,7 +790,7 @@ class RelevancyFixVulnBackendTest(BaseVulnerabilityScanning):
         # P3 get results in storage
         # 3 get CVEs created as expected in the storage
         CVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_CVEs_from_storage,
-                                       workload_tags=self.get_workloads_images_tags(workload_objs, namespace=namespace))
+                                       CVEsKeys=self.get_imagesIDs_keys(workload_objs, namespace=namespace))
 
         filteredCVEs, _ = self.wait_for_report(timeout=600, report_type=self.get_filtered_CVEs_from_storage,
                                                filteredCVEsKEys=self.get_filtered_data_keys(

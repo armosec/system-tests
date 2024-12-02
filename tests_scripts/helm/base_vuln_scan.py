@@ -940,7 +940,7 @@ class BaseVulnerabilityScanning(BaseHelm):
                     SBOM_annotations = self.get_annotations_from_crd(SBOM[1])
                     expected_SBOM_annotations = self.get_annotations_from_crd(expected_SBOM_data)
                     for key, annotation in expected_SBOM_annotations.items():
-                        if key in [statics.RELEVANCY_RESOURCE_SIZE_LABEL, statics.RELEVANCY_SYNC_CHECKSUM_LABEL]:
+                        if key == statics.RELEVANCY_RESOURCE_SIZE_LABEL:
                             continue
                         assert SBOM_annotations[
                                    key] == annotation, f"annotation {key}:{annotation} != {SBOM_annotations[key]} in the SBOM in the storage is not as expected"
@@ -1187,6 +1187,29 @@ class BaseVulnerabilityScanning(BaseHelm):
             return self.test_obj["helm_kwargs"][
                        statics.HELM_RELEVANCY_FEATURE] == statics.HELM_RELEVANCY_FEATURE_ENABLED
         return False
+
+    def get_imagesIDs_keys(self, workload_objs, namespace):
+        container_name_index = 0
+        container_image_tag_index = 1
+        container_image_id_index = 1
+        image_workload_tags = self.get_workloads_images_tags(workload_objs=workload_objs, namespace=namespace)
+        image_workload_ids = self.get_workloads_images_ids(workload_objs=workload_objs, namespace=namespace)
+        SBOM_keys = []
+        for image_tags in image_workload_tags:
+            found = False
+            for image_tag in image_tags:
+                found = False
+                for image_ids in image_workload_ids:
+                    for image_id in image_ids:
+                        if image_tag[container_name_index] == image_id[container_name_index]:
+                            SBOM_keys.append(
+                                BaseVulnerabilityScanning.parse_container_key(image_tag[container_image_tag_index],
+                                                                              image_id[container_image_id_index]))
+                            found = True
+                            break
+                    if found:
+                        break
+        return SBOM_keys
 
     @staticmethod
     def sanitize_image_tag(image_tag):

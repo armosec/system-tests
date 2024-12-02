@@ -482,10 +482,10 @@ class BaseK8S(BaseDockerizeTest):
 
     @staticmethod
     def get_image_ids(pod):
-        c = [(container_status.name, container_status.image) for container_status in
+        c = [(container_status.name, container_status.image_id) for container_status in
                 pod.status.container_statuses]
         if pod.status.init_container_statuses:
-            c.extend([(container_status.name, container_status.image) for container_status in
+            c.extend([(container_status.name, container_status.image_id) for container_status in
                     pod.status.init_container_statuses])
         return c
 
@@ -1117,60 +1117,50 @@ class BaseK8S(BaseDockerizeTest):
             return item
         raise Exception(f"no network neighborhood found in namespace {namespace} with workload name {name}")
 
-    def get_SBOM_from_storage(self, workload_tags):
+    def get_SBOM_from_storage(self, SBOMKeys):
         SBOMs = []
-        namespacedSBOMs = self.kubernetes_obj.client_CustomObjectsApi.list_namespaced_custom_object(
-            group=statics.STORAGE_AGGREGATED_API_GROUP,
-            version=statics.STORAGE_AGGREGATED_API_VERSION,
-            namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-            plural=statics.STORAGE_SBOM_PLURAL,
-        )
-        for container_tags in workload_tags:
-            for container, image_tag in container_tags:
-                name = ""
-                for sbom in namespacedSBOMs['items']:
-                    if sbom['metadata']['annotations']['kubescape.io/status'] == 'initializing':
-                        continue
-                    if sbom['metadata']['annotations']['kubescape.io/image-tag'] == image_tag:
-                        name = sbom['metadata']['name']
-                        break
+        if isinstance(SBOMKeys, str):
+            SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=SBOMKeys,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_SBOM_PLURAL,
+            )
+            SBOMs.append((SBOMKeys, SBOM_data))
+        elif isinstance(SBOMKeys, list):
+            for key in SBOMKeys:
                 SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                     group=statics.STORAGE_AGGREGATED_API_GROUP,
                     version=statics.STORAGE_AGGREGATED_API_VERSION,
-                    name=name,
+                    name=key,
                     namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                     plural=statics.STORAGE_SBOM_PLURAL,
                 )
-                if SBOM_data['metadata']['name'] != name:
-                    raise Exception(f"no SBOM found in storage for image tag {image_tag}")
-                SBOMs.append((name, SBOM_data))
+                SBOMs.append((key, SBOM_data))
         return SBOMs
 
-    def get_CVEs_from_storage(self, workload_tags):
+    def get_CVEs_from_storage(self, CVEsKeys):
         CVEs = []
-        namespacedCVEs = self.kubernetes_obj.client_CustomObjectsApi.list_namespaced_custom_object(
-            group=statics.STORAGE_AGGREGATED_API_GROUP,
-            version=statics.STORAGE_AGGREGATED_API_VERSION,
-            namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
-            plural=statics.STORAGE_CVES_PLURAL,
-        )
-        for container_tags in workload_tags:
-            for container, image_tag in container_tags:
-                name = ""
-                for cve in namespacedCVEs['items']:
-                    if cve['metadata']['annotations']['kubescape.io/image-tag'] == image_tag:
-                        name = cve['metadata']['name']
-                        break
+        if isinstance(CVEsKeys, str):
+            CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
+                group=statics.STORAGE_AGGREGATED_API_GROUP,
+                version=statics.STORAGE_AGGREGATED_API_VERSION,
+                name=CVEsKeys,
+                namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
+                plural=statics.STORAGE_CVES_PLURAL,
+            )
+            CVEs.append((CVEsKeys, CVE_data))
+        elif isinstance(CVEsKeys, list):
+            for key in CVEsKeys:
                 CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
                     group=statics.STORAGE_AGGREGATED_API_GROUP,
                     version=statics.STORAGE_AGGREGATED_API_VERSION,
-                    name=name,
+                    name=key,
                     namespace=statics.STORAGE_AGGREGATED_API_NAMESPACE,
                     plural=statics.STORAGE_CVES_PLURAL,
                 )
-                if CVE_data['metadata']['name'] != name:
-                    raise Exception(f"no CVE found in storage for image tag {image_tag}")
-                CVEs.append((name, CVE_data))
+                CVEs.append((key, CVE_data))
         return CVEs
 
     def get_filtered_SBOM_from_storage(self, filteredSBOMKeys):
