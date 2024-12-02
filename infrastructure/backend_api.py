@@ -2430,7 +2430,7 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error accessing dashboard. Request: get_security_risks_list "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
-        return r.text
+        return r
     
     def get_security_risks_severities(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
