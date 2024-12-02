@@ -12,7 +12,7 @@ from tests_scripts.workflows.utils import (
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME_TEAMS,
     SECURITY_RISKS_WORKFLOW_NAME_TEAMS,
-    COMPLIANCE_WORKFLOW_NAME_TEAMS,
+    VULNERABILITIES_WORKFLOW_NAME_TEAMS,
     COMPLIANCE
 )
 from systest_utils import Logger, TestUtil
@@ -59,18 +59,18 @@ class WorkflowsTeamsNotifications(Workflows):
 
         
         Logger.logger.info("Stage 2: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_compliance_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS, TEAMS_CHANNEL_NAME)
-        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_TEAMS, TEAMS_CHANNEL_NAME)
-        self.validate_workflow(COMPLIANCE_WORKFLOW_NAME_TEAMS, TEAMS_CHANNEL_NAME)
+        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
+        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
+        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -110,9 +110,9 @@ class WorkflowsTeamsNotifications(Workflows):
 
     
     def cleanup(self, **kwargs):
-            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_TEAMS))
-            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS))
-            self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME_TEAMS))
+            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster))
+            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
+            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
             return super().cleanup(**kwargs)
     
     
