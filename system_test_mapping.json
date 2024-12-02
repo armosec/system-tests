@@ -1265,16 +1265,6 @@
     "skip_on_environment": "",
     "owner": ""
   },
-  "relevancy_storage_disabled": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": ""
-  },
   "relevancy_enabled_stop_sniffing": {
     "target": [
       "In cluster",

@@ -21,4 +21,4 @@ spec:
         command:
         - /bin/sh
         - -c
-        image: python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07
+        image: docker.io/library/python@sha256:4e8e9a59bf1b3ca8e030244bc5f801f23e41e37971907371da21191312087a07

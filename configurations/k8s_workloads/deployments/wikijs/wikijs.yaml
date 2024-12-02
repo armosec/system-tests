@@ -16,7 +16,7 @@ spec:
       containers:
       - name: wikijs
         # we use image sha for vulnerability-scanning, please don't change
-        image: requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d
+        image: docker.io/requarks/wiki@sha256:dd83fff15e77843ff934b25c28c865ac000edf7653e5d11adad1dd51df87439d
         imagePullPolicy: Always
         env:
         - name: DB_TYPE
