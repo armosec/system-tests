@@ -116,6 +116,7 @@ class WorkflowsTeamsNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster))
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
+            self.delete_channel_by_guid(self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster))
             return super().cleanup(**kwargs)
     
     def create_webhook(self, name):
@@ -133,6 +134,10 @@ class WorkflowsTeamsNotifications(Workflows):
             if channel["name"] == channel_name:
                 return channel["guid"]
         return "Channel not found"
+    
+    def delete_channel_by_guid(self, channel_guid):
+        r = self.backend.delete_webhook(channel_guid)
+        assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
 
 
     def post_custom_framework(self, framework_file, cluster_name: str):

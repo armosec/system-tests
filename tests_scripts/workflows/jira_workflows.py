@@ -140,11 +140,6 @@ class WorkflowsJiraNotifications(Workflows):
         assert vulnerabilities_with_tickets > 0, "No vulnerabilities have associated tickets"
 
 
-
-
-    
-
-        
     def assert_vulnerability_message_sent(self, messages, cluster):
         found = 0
         for message in messages:
