@@ -48,6 +48,9 @@ VULNERABILITIES = "Vulnerability"
 COMPLIANCE = "Compliance"
 SECURITY_RISKS_ID = "R_0017"
 
+# webhooks
+WEBHOOK_NAME = "system_test_webhook_"
+
 
 def get_access_token():
     url = "https://login.microsoftonline.com/50a70646-52e3-4e46-911e-6ca1b46afba3/oauth2/v2.0/token"

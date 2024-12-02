@@ -81,7 +81,7 @@ class WorkflowsJiraNotifications(Workflows):
             return super().cleanup(**kwargs)
     
     def assert_jira_tickets_was_created(self, cluster_name):
-        r = self.backend.get_security_risks_list(cluster_name=cluster_name)
+        r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
         r = r.text
         self.assert_security_risks_jira_ticket_created(response=r)
         body = {
@@ -128,7 +128,7 @@ class WorkflowsJiraNotifications(Workflows):
 
         for risk in risks:
             tickets = risk.get("tickets", [])
-            assert len(tickets) > 0, f"No tickets associated with security risk {risk.get('securityRiskID', 'Unknown')}"
+            assert len(tickets) > 0, f"No tickets associated with security risk"
 
     def assert_vulnerability_jira_ticket_created(self, response):
         assert len(response) > 0, "No vulnerabilities found in the response"

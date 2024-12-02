@@ -13,7 +13,8 @@ from tests_scripts.workflows.utils import (
     VULNERABILITIES_WORKFLOW_NAME_TEAMS,
     SECURITY_RISKS_WORKFLOW_NAME_TEAMS,
     VULNERABILITIES_WORKFLOW_NAME_TEAMS,
-    COMPLIANCE
+    COMPLIANCE,
+    WEBHOOK_NAME
 )
 from systest_utils import Logger, TestUtil
 import time
@@ -56,14 +57,16 @@ class WorkflowsTeamsNotifications(Workflows):
         self.fw_name = "systest-fw-" + self.cluster
         _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
-
+        
+        self.create_webhook(name=WEBHOOK_NAME + self.cluster)
+        channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster)
         
         Logger.logger.info("Stage 2: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=get_env("TEAMS_CHANNEL_GUID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_compliance_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
@@ -115,7 +118,23 @@ class WorkflowsTeamsNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
             return super().cleanup(**kwargs)
     
-    
+    def create_webhook(self, name):
+        webhook_body = {
+            "guid": "",
+            "name": name,
+            "webhookURL": get_env("WEBHOOK_URL")
+        }
+        r = self.backend.create_webhook(webhook_body)
+        assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
+        
+    def get_channel_guid_by_name(self, channel_name):
+        channels = self.backend.get_webhooks()
+        for channel in channels:
+            if channel["name"] == channel_name:
+                return channel["guid"]
+        return "Channel not found"
+
+
     def post_custom_framework(self, framework_file, cluster_name: str):
         framework_name, ks_custom_fw = self.create_ks_custom_fw(cluster_name=cluster_name,
                                                                 framework_file=framework_file)
