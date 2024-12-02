@@ -81,9 +81,9 @@ class WorkflowsJiraNotifications(Workflows):
             return super().cleanup(**kwargs)
     
     def assert_jira_tickets_was_created(self, cluster_name):
-        r = self.backend.get_security_risks_list(cluster_name=cluster_name)
+        r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
         r = r.text
-        self.assert_security_risks_jira_ticket_created(response=r)
+        self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
         body = {
             "fields": {
                 "severity": ""
@@ -117,7 +117,7 @@ class WorkflowsJiraNotifications(Workflows):
         report_fw, _ = self.wait_for_report(report_type=self.backend.put_custom_framework, fw_object=ks_custom_fw)
         return ks_custom_fw, report_fw
     
-    def assert_security_risks_jira_ticket_created(self, response):
+    def assert_security_risks_jira_ticket_created(self, response, security_risk_id):
         try:
             response_json = json.loads(response)
         except json.JSONDecodeError as e:
@@ -128,7 +128,7 @@ class WorkflowsJiraNotifications(Workflows):
 
         for risk in risks:
             tickets = risk.get("tickets", [])
-            assert len(tickets) > 0, f"No tickets associated with security risk {risk.get('securityRiskID', 'Unknown')}"
+            assert len(tickets) > 0, f"No tickets associated with security risk with ID {security_risk_id}. response: {response}"
 
     def assert_vulnerability_jira_ticket_created(self, response):
         assert len(response) > 0, "No vulnerabilities found in the response"
@@ -140,11 +140,6 @@ class WorkflowsJiraNotifications(Workflows):
         assert vulnerabilities_with_tickets > 0, "No vulnerabilities have associated tickets"
 
 
-
-
-    
-
-        
     def assert_vulnerability_message_sent(self, messages, cluster):
         found = 0
         for message in messages:
