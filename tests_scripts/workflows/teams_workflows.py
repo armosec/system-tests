@@ -37,17 +37,18 @@ class WorkflowsTeamsNotifications(Workflows):
         """
         Agenda:
         1. Post custom framework
-        2. Create new workflows
-        3. Validate workflows created successfully
-        4. Apply deployment
-        5. Install kubescape with helm-chart
-        6. Trigger first scan
-        7. Apply second deployment
-        8. Update custom framework
-        9. Add SA to cluster-admin
-        10. Trigger second scan
-        11. Assert all messages sent
-        12. Cleanup
+        2. Create webhook
+        3. Create new workflows
+        4. Validate workflows created successfully
+        5. Apply deployment
+        6. Install kubescape with helm-chart
+        7. Trigger first scan
+        8. Apply second deployment
+        9. Update custom framework
+        10. Add SA to cluster-admin
+        11. Trigger second scan
+        12. Assert all messages sent
+        13. Cleanup
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
@@ -58,10 +59,11 @@ class WorkflowsTeamsNotifications(Workflows):
         _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
         
+        Logger.logger.info("Stage 2: Create webhook")
         self.create_webhook(name=WEBHOOK_NAME + self.cluster)
         channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster)
         
-        Logger.logger.info("Stage 2: Create new workflows")
+        Logger.logger.info("Stage 3: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
@@ -70,12 +72,12 @@ class WorkflowsTeamsNotifications(Workflows):
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
-        Logger.logger.info("Stage 3: Validate workflows created successfully")
+        Logger.logger.info("Stage 4: Validate workflows created successfully")
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
         self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
 
-        Logger.logger.info('Stage 4: Apply deployment')
+        Logger.logger.info('Stage 5: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
 
@@ -138,6 +140,14 @@ class WorkflowsTeamsNotifications(Workflows):
     def delete_channel_by_guid(self, channel_guid):
         r = self.backend.delete_webhook(channel_guid)
         assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
+        channels = self.backend.get_webhooks()
+        for channel in channels:
+            if channel["guid"] == channel_guid:
+                return f"Channel with guid {channel_guid} not deleted"
+        return "Channel deleted"
+
+
+        
 
 
     def post_custom_framework(self, framework_file, cluster_name: str):
