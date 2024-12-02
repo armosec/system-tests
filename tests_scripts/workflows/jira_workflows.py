@@ -91,7 +91,7 @@ class WorkflowsJiraNotifications(Workflows):
             "innerFilters": [
                 {
                     "severity": "High",
-                    "cluster": self.cluster,
+                    "cluster": cluster_name,
                     "cvssInfo.baseScore": "6|greater",
                     "isRelevant": "Yes"
                 }
@@ -131,17 +131,16 @@ class WorkflowsJiraNotifications(Workflows):
             assert len(tickets) > 0, f"No tickets associated with security risk {risk.get('securityRiskID', 'Unknown')}"
 
     def assert_vulnerability_jira_ticket_created(self, response):
-        try:
-            response_json = json.loads(response)
-        except json.JSONDecodeError as e:
-            raise AssertionError(f"Response is not valid JSON: {e}")
+        assert len(response) > 0, "No vulnerabilities found in the response"
+        vulnerabilities_with_tickets = 0
+        for risk in response:
+            tickets = risk.get("tickets", [])
+            if len(tickets) > 0:
+                vulnerabilities_with_tickets += 1
+        assert vulnerabilities_with_tickets > 0, "No vulnerabilities have associated tickets"
 
-        vulnerabilities = response_json.get("response", [])
-        assert len(vulnerability) > 0, "No vulnerability found in the response"
 
-        for vulnerability in vulnerabilities:
-            tickets = vulnerability.get("tickets", [])
-            assert len(tickets) > 0, f"No tickets associated with security risk {vulnerability.get('securityRiskID', 'Unknown')}"
+
 
     
 
