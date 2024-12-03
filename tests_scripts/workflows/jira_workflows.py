@@ -103,7 +103,7 @@ class WorkflowsJiraNotifications(Workflows):
                     found_sr = True
                 r2 = self.backend.get_vulns_v2(body=vuln_body, expected_results=1, scope=None)
                 self.assert_vulnerability_jira_ticket_created(response=r2)
-            except AssertionError as e:
+            except (AssertionError, Exception) as e:
                 Logger.logger.info(f"iteration: {i}: {e}")
                 if i == attempts - 1:
                     raise
