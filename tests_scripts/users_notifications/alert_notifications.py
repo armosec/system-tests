@@ -115,7 +115,7 @@ def assert_misconfiguration_message_sent(messages, cluster):
     found = 0
     for message in messages:
         message_string = str(message)
-        if "Your complaince score has decreased" in message_string and cluster in message_string:
+        if "Your compliance score has decreased" in message_string and cluster in message_string:
             found += 1
     assert found == 1, f"expected to have exactly one new misconfiguration message, found {found}"
 

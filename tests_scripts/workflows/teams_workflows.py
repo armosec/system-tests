@@ -187,8 +187,8 @@ class WorkflowsTeamsNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster):
-        for i in range(5):
+    def assert_messages_sent(self, begin_time, cluster, attempts=20, sleep_time=30):
+        for i in range(attempts):
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
@@ -196,10 +196,11 @@ class WorkflowsTeamsNotifications(Workflows):
                 self.assert_security_risks_message_sent(messages, cluster)
                 self.assert_vulnerability_message_sent(messages, cluster)
                 self.assert_misconfiguration_message_sent(messages, cluster)
-            except AssertionError:
-                if i == 0:
+            except AssertionError as e:
+                Logger.logger.info(f"iteration: {i}: {e}")
+                if i == attempts - 1:
                     raise
-                TestUtil.sleep(30, "waiting additional 30 seconds for messages to arrive")
+                TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
 
     
     def install_kubescape(self, helm_kwargs: dict = None):

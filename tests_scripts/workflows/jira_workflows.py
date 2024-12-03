@@ -66,7 +66,6 @@ class WorkflowsJiraNotifications(Workflows):
 
         Logger.logger.info('Stage 5: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
                      
         Logger.logger.info('Stage 6: Assert jira tickets was created')
         self.assert_jira_tickets_was_created(self.cluster)
@@ -80,14 +79,9 @@ class WorkflowsJiraNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
             return super().cleanup(**kwargs)
     
-    def assert_jira_tickets_was_created(self, cluster_name):
-        r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
-        r = r.text
-        self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
-        body = {
-            "fields": {
-                "severity": ""
-            },
+    def assert_jira_tickets_was_created(self, cluster_name, attempts=20, sleep_time=30):
+       
+        vuln_body = {
             "innerFilters": [
                 {
                     "severity": "High",
@@ -95,11 +89,26 @@ class WorkflowsJiraNotifications(Workflows):
                     "cvssInfo.baseScore": "6|greater",
                     "isRelevant": "Yes"
                 }
-            ],
-            "countFields": True
+            ]
         }
-        r2 = self.backend.get_vulns_v2(body=body, expected_results=1, scope=None)
-        self.assert_vulnerability_jira_ticket_created(response=r2)
+        found_sr = False
+
+        for i in range(attempts):
+            try:
+                if not found_sr:
+                    r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
+                    r = r.text
+                    self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
+                    found_sr = True
+                r2 = self.backend.get_vulns_v2(body=vuln_body, expected_results=1, scope=None)
+                self.assert_vulnerability_jira_ticket_created(response=r2)
+            except AssertionError as e:
+                Logger.logger.info(f"iteration: {i}: {e}")
+                if i == attempts - 1:
+                    raise
+                TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
+            
+       
         
 
     
