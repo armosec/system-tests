@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: http-alt
+  name: http1
   labels:
-    app: http-alt
+    app: http1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: http-alt
+      app: http1
   template:
     metadata:
       labels:
-        app: http-alt
+        app: http1
     spec:
       containers:
         - image: httpd:alpine3.16
-          name: http-alt
+          name: http1
           env:
             - name: app
-              value: http-alt
+              value: http1

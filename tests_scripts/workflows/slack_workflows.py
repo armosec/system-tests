@@ -142,7 +142,7 @@ class WorkflowsSlackNotifications(Workflows):
         found = 0
         for message in messages:
             message_string = str(message)
-            if "New Vulnerability found" in message_string and cluster:
+            if "New Vulnerability found" in message_string and cluster in message_string and "http1" in message_string:
                 found += 1
         assert found > 0, "expected to have at least one vulnerability message"
 
