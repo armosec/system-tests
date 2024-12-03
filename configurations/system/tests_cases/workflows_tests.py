@@ -20,8 +20,8 @@ class WorkflowsTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=WorkflowsSlackNotifications,
-            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http"),
-            deployments1=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
+            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
+            deployments1=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http2"),
             getMessagesFunc=get_messages_from_slack_channel,
             enrichAlertChannelFunc=enrich_slack_alert_channel,
             create_test_tenant = False
@@ -33,8 +33,8 @@ class WorkflowsTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=WorkflowsTeamsNotifications,
-            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http"),
-            deployments1=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
+            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
+            deployments1=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http2"),
             getMessagesFunc=get_messages_from_teams_channel,
             enrichAlertChannelFunc=enrich_teams_alert_channel,
             create_test_tenant = False
@@ -46,7 +46,7 @@ class WorkflowsTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=WorkflowsJiraNotifications,
-            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http"),
+            deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
             create_test_tenant = False
         )    
 

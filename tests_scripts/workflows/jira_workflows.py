@@ -48,9 +48,9 @@ class WorkflowsJiraNotifications(Workflows):
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
@@ -153,7 +153,7 @@ class WorkflowsJiraNotifications(Workflows):
         found = 0
         for message in messages:
             message_string = str(message)
-            if "New Vulnerability found" in message_string and cluster:
+            if "New Vulnerability found" in message_string and cluster in message_string and "http1" in message_string:
                 found += 1
         assert found > 0, "expected to have at least one vulnerability message"
 
