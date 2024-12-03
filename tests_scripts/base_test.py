@@ -136,7 +136,7 @@ class BaseTest(object):
         else:
             raise Exception("in create_ks_exceptions, exception_file is wrong type")
 
-    def create_ks_custom_fw(self, cluster_name: str, framework_file, framework_guid=""):
+    def create_ks_custom_fw(self, cluster_name: str, framework_file, framework_guid="", custom_framework_name=None):
         if not framework_file:
             return {}
         if isinstance(framework_file, list):
@@ -149,9 +149,15 @@ class BaseTest(object):
             ks_custom_fw['description'] += cluster_name
             if framework_guid != "":
                 ks_custom_fw['guid'] = framework_guid
+            
+            if custom_framework_name:
+                ks_custom_fw['name'] = custom_framework_name
             return ks_custom_fw['name'], ks_custom_fw
         else:
             raise Exception("in create_ks_custom_fw, framework_file is wrong type")
+    
+        
+
 
     def create_vulnerabilities_expected_results(self, expected_results):
         if not expected_results:
