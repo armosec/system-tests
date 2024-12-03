@@ -9,6 +9,7 @@ from tests_scripts.workflows.utils import (
     VULNERABILITIES,
     SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
+    SEVERITIES_MEDIUM,
     VULNERABILITIES_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_ID
@@ -48,7 +49,7 @@ class WorkflowsJiraNotifications(Workflows):
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
@@ -63,6 +64,7 @@ class WorkflowsJiraNotifications(Workflows):
 
         Logger.logger.info('Stage 4: Install kubescape with helm-chart')
         self.install_kubescape()
+        time.sleep(60)
 
         Logger.logger.info('Stage 5: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
@@ -171,7 +173,7 @@ class WorkflowsJiraNotifications(Workflows):
     def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, replicas=9)
     
 
     def create_and_assert_workflow(self, workflow_body, expected_response, update=False):

@@ -15,6 +15,7 @@ NOTIFICATIONS_SVC_DELAY = 7 * 60
 # severity levels
 SEVERITIES_CRITICAL = ["Critical"]
 SEVERITIES_HIGH = ["High"]
+SEVERITIES_MEDIUM = ["Medium"]
 
 # workflow names
 WORKFLOW_NAME = "system_test_workflow"
@@ -46,7 +47,7 @@ EXPECTED_DELETE_RESPONSE = "Workflow deleted"
 SECURITY_RISKS = "SecurityRisks"
 VULNERABILITIES = "Vulnerability"
 COMPLIANCE = "Compliance"
-SECURITY_RISKS_ID = "R_0017"
+SECURITY_RISKS_ID = "R_0007"
 
 # webhooks
 WEBHOOK_NAME = "system_test_webhook_"
