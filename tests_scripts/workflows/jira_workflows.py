@@ -44,7 +44,7 @@ class WorkflowsJiraNotifications(Workflows):
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-        self.cluster, namespace = self.setup(apply_services=False)
+        self.cluster, self.namespace = self.setup(apply_services=False)
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
@@ -58,8 +58,8 @@ class WorkflowsJiraNotifications(Workflows):
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
 
         Logger.logger.info('Stage 3: Apply deployment')
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
+        self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('Stage 4: Install kubescape with helm-chart')
         self.install_kubescape()
@@ -86,6 +86,7 @@ class WorkflowsJiraNotifications(Workflows):
                 {
                     "severity": "High",
                     "cluster": cluster_name,
+                    "namespace": self.namespace,
                     "cvssInfo.baseScore": "6|greater",
                     "isRelevant": "Yes"
                 }
@@ -96,7 +97,7 @@ class WorkflowsJiraNotifications(Workflows):
         for i in range(attempts):
             try:
                 if not found_sr:
-                    r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
+                    r = self.backend.get_security_risks_list(cluster_name=cluster_name, namespace=self.namespace, security_risk_ids=[SECURITY_RISKS_ID])
                     r = r.text
                     self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
                     found_sr = True
