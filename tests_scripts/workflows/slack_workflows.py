@@ -1,3 +1,4 @@
+import random
 from tests_scripts.workflows.workflows import Workflows
 
 from tests_scripts.workflows.utils import (
@@ -53,26 +54,32 @@ class WorkflowsSlackNotifications(Workflows):
         
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, namespace = self.setup(apply_services=False)
+
+        rand = str(random.randint(10000000, 99999999))
         
         Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster
+        self.fw_name = "systest-fw-" + self.cluster + "_" + rand
+        security_risks_workflow_slack = SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
+        vulnerabilities_workflow_slack = VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
+        compliance_workflow_slack = COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
-                                           cluster_name=self.cluster)
+                                           cluster_name=self.cluster,
+                                           framework_name=self.fw_name)
 
         
         Logger.logger.info("Stage 2: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
+        workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6)
+        workflow_body = self.build_vulnerabilities_workflow_body(name=vulnerabilities_workflow_slack, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15)
+        workflow_body = self.build_compliance_workflow_body(name=compliance_workflow_slack, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster, SLACK_CHANNEL_NAME)
-        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster, SLACK_CHANNEL_NAME)
-        self.validate_workflow(COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster, SLACK_CHANNEL_NAME)
+        self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
+        self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
+        self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
@@ -84,7 +91,7 @@ class WorkflowsSlackNotifications(Workflows):
 
         Logger.logger.info('Stage 7: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
+        TestUtil.sleep(60, "waiting for first scan to be saved in notification service")
         
         Logger.logger.info('Stage 8: Apply second deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments1"], namespace=namespace)
@@ -101,7 +108,6 @@ class WorkflowsSlackNotifications(Workflows):
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for second scan to be saved in notification service")
         
         Logger.logger.info('Stage 12: Assert all messages sent')
         self.assert_messages_sent(before_test_message_ts, self.cluster)
@@ -117,9 +123,11 @@ class WorkflowsSlackNotifications(Workflows):
         return super().cleanup(**kwargs)
     
     
-    def post_custom_framework(self, framework_file, cluster_name: str):
+    def post_custom_framework(self, framework_file, cluster_name, framework_name = None):
         framework_name, ks_custom_fw = self.create_ks_custom_fw(cluster_name=cluster_name,
-                                                                framework_file=framework_file)
+                                                                framework_file=framework_file,
+                                                                custom_framework_name=framework_name)
+
         report_fw, _ = self.wait_for_report(report_type=self.backend.post_custom_framework, fw_object=ks_custom_fw)
         return ks_custom_fw, report_fw
       
@@ -156,8 +164,8 @@ class WorkflowsSlackNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster):
-        for i in range(5):
+    def assert_messages_sent(self, begin_time, cluster, attempts=20, sleep_time=30):
+        for i in range(attempts):
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
@@ -165,10 +173,11 @@ class WorkflowsSlackNotifications(Workflows):
                 self.assert_security_risks_message_sent(messages, cluster)
                 self.assert_vulnerability_message_sent(messages, cluster)
                 self.assert_misconfiguration_message_sent(messages, cluster)
-            except AssertionError:
-                if i == 0:
+            except AssertionError as e:
+                Logger.logger.info(f"iteration: {i}: {e}")
+                if i == attempts - 1:
                     raise
-                TestUtil.sleep(30, "waiting additional 30 seconds for messages to arrive")
+                TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
 
     
     def install_kubescape(self, helm_kwargs: dict = None):
