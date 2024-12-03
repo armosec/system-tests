@@ -66,6 +66,7 @@ class WorkflowsSlackNotifications(Workflows):
                                            cluster_name=self.cluster,
                                            framework_name=self.fw_name)
 
+        self.workflows = [security_risks_workflow_slack, vulnerabilities_workflow_slack, compliance_workflow_slack]
         
         Logger.logger.info("Stage 2: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
@@ -117,9 +118,8 @@ class WorkflowsSlackNotifications(Workflows):
     
 
     def cleanup(self, **kwargs):
-        self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster))
-        self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster))
-        self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster))
+        for workflow in self.workflows:
+            self.delete_and_assert_workflow(self.return_workflow_guid(workflow))
         return super().cleanup(**kwargs)
     
     
