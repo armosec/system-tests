@@ -1629,10 +1629,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service",
-      "config-service",
-      "cadashboardbe",
-      "event-ingester-service"
+      "users-notification-service-dummy",
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks workflows slack notifications",
     "skip_on_environment": "production,production-us",
@@ -1643,10 +1643,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service",
-      "config-service",
-      "cadashboardbe",
-      "event-ingester-service"
+      "users-notification-service-dummy",
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks workflows teams notifications",
     "skip_on_environment": "production,production-us",
@@ -1657,10 +1657,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service",
-      "config-service",
-      "cadashboardbe",
-      "event-ingester-service"
+      "users-notification-service-dummy",
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks workflows jira notifications",
     "skip_on_environment": "production,production-us",
