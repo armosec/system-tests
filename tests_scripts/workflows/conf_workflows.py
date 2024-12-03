@@ -8,6 +8,7 @@ SEVERITIES_HIGH,
 EXPECTED_CREATE_RESPONSE,
 EXPECTED_UPDATE_RESPONSE,
 WEBHOOK_NAME)
+import random
 
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger
@@ -41,46 +42,54 @@ class WorkflowConfigurations(Workflows):
         """
         assert self.backend is not None, f'The test {self.test_driver.test_name} must run with backend'
 
+        rand = str(random.randint(10000000, 99999999))
+
+        webhook_test_name = WEBHOOK_NAME + "conf_test_" + rand
+        webhook_test_name_updated = webhook_test_name + "_updated_" + rand
+
+        workflow_test_name = WORKFLOW_NAME + "conf_test_" + rand
+        workflow_test_name_updated = workflow_test_name + "_updated_" + rand
+
         Logger.logger.info("Stage 1: Create webhook")
-        self.create_webhook(name=WEBHOOK_NAME + "conf_test")
-        channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + "conf_test")
+        self.create_webhook(name=webhook_test_name)
+        channel_guid = self.get_channel_guid_by_name(webhook_test_name)
 
         Logger.logger.info("stage 2: create slack workflow")
-        workflow_creation_body = self.build_slack_workflow_body(name=WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
+        workflow_creation_body = self.build_slack_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
         self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
         Logger.logger.info("stage 3: validate slack workflow created successfully")
-        self.validate_slack_workflow(WORKFLOW_NAME, SEVERITIES_CRITICAL, SLACK_CHANNEL_NAME)
+        workflow_guid = self.validate_slack_workflow(workflow_test_name, SEVERITIES_CRITICAL, SLACK_CHANNEL_NAME)
+        Logger.logger.info(f"slack workflow name {workflow_test_name} guid: {workflow_guid}")
 
         Logger.logger.info("stage 4: update slack workflow")
-        workflow_guid = self.return_workflow_guid(WORKFLOW_NAME)
-        update_workflow_body = self.build_slack_workflow_body(name=UPDATED_WORKFLOW_NAME, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), guid=workflow_guid)
+        update_workflow_body = self.build_slack_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), guid=workflow_guid)
         self.create_and_assert_workflow(update_workflow_body, EXPECTED_UPDATE_RESPONSE, update=True)
         
         Logger.logger.info("stage 5: validate slack updated workflow")
-        self.validate_slack_workflow(UPDATED_WORKFLOW_NAME, SEVERITIES_HIGH, SLACK_CHANNEL_NAME)
+        workflow_guid = self.validate_slack_workflow(workflow_test_name_updated, SEVERITIES_HIGH, SLACK_CHANNEL_NAME)
 
         Logger.logger.info("stage 6: delete slack workflow")
-        workflow_guid = self.return_workflow_guid(UPDATED_WORKFLOW_NAME)
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
 
         Logger.logger.info("stage 7: create teams workflow")
-        workflow_creation_body = self.build_teams_workflow_body(name=WORKFLOW_NAME, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
         Logger.logger.info("stage 8: validate teams workflow created successfully")
-        self.validate_teams_workflow(WORKFLOW_NAME, SEVERITIES_CRITICAL, TEAMS_CHANNEL_NAME)
+        workflow_guid = self.validate_teams_workflow(workflow_test_name, SEVERITIES_CRITICAL, TEAMS_CHANNEL_NAME)
+        Logger.logger.info(f"teams workflow name {workflow_test_name} guid: {workflow_guid}")
+
         
         Logger.logger.info("stage 9: update teams workflow")
-        workflow_guid = self.return_workflow_guid(WORKFLOW_NAME)
-        update_workflow_body = self.build_teams_workflow_body(name=UPDATED_WORKFLOW_NAME, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"), guid=workflow_guid)
+        workflow_guid = self.return_workflow_guid(workflow_test_name)
+        update_workflow_body = self.build_teams_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"), guid=workflow_guid)
         self.create_and_assert_workflow(update_workflow_body, EXPECTED_UPDATE_RESPONSE, update=True)
 
         Logger.logger.info("stage 10: validate teams updated workflow")
-        self.validate_teams_workflow(UPDATED_WORKFLOW_NAME, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
+        workflow_guid = self.validate_teams_workflow(workflow_test_name_updated, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
 
         Logger.logger.info("stage 11: delete teams workflow and teams channel")
-        workflow_guid = self.return_workflow_guid(UPDATED_WORKFLOW_NAME)
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
         self.delete_channel_by_guid(channel_guid)
         return True, "Workflow configurations test passed"
@@ -114,13 +123,13 @@ class WorkflowConfigurations(Workflows):
         return "Channel deleted"
             
             
-    def build_slack_workflow_body(self, name, severities, channel_name, channel_id, guid=None):
+    def build_slack_workflow_body(self, workflow_name, severities, channel_name, channel_id, guid=None):
         return {
             "guid": guid,
             "updatedTime": "",
             "updatedBy": "",
             "enabled": True,
-            "name": name,
+            "name": workflow_name,
             "scope": [],
             "conditions": [
                 {
@@ -143,13 +152,13 @@ class WorkflowConfigurations(Workflows):
             ]
         }
     
-    def build_teams_workflow_body(self, name, severities, channel_name, channel_id, webhook_url, guid=None):
+    def build_teams_workflow_body(self, workflow_name, severities, channel_name, channel_id, webhook_url, guid=None):
         return {
             "guid": guid,
             "updatedTime": "",
             "updatedBy": "",
             "enabled": True,
-            "name": name,
+            "name": workflow_name,
             "scope": [],
             "conditions": [
                 {
@@ -184,10 +193,11 @@ class WorkflowConfigurations(Workflows):
         return workflow_res
 
     def validate_slack_workflow(self, expected_name, expected_severities, expected_slack_channel):
-        workflows = self.backend.get_workflows()
+        json={"pageSize": 1, "pageNum": 1, "orderBy": "", "innerFilters":[{"name":expected_name}]}
+        workflows = self.backend.get_workflows(body=json)
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
 
-
+        guid = None
         found = False
         for workflow in workflows["response"]:
             if workflow["name"] == expected_name:
@@ -196,16 +206,18 @@ class WorkflowConfigurations(Workflows):
 
                 slack_channel = workflow["notifications"][0]["slackChannels"][0]["name"]
                 assert slack_channel == expected_slack_channel, f"Expected slack channel {expected_slack_channel} but got {slack_channel}"
-
+                guid = workflow["guid"]
                 found = True
                 break
 
         assert found, f"Workflow with name {expected_name} not found"
+        return guid
 
     def validate_teams_workflow(self, expected_name, expected_severities, expected_teams_channel):
         workflows = self.backend.get_workflows()
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
 
+        guid = None
         found = False
         for workflow in workflows["response"]:
             if workflow["name"] == expected_name:
@@ -215,19 +227,31 @@ class WorkflowConfigurations(Workflows):
                 teams_channel = workflow["notifications"][0]["teamsChannels"][0]["name"]
                 assert teams_channel == expected_teams_channel, f"Expected teams channel {expected_teams_channel} but got {teams_channel}"
 
+                guid = workflow["guid"]
                 found = True
                 break
 
         assert found, f"Workflow with name {expected_name} not found"
+        return guid
         
         
 
     def delete_and_assert_workflow(self, workflow_guid):
         workflow_delete_res = self.backend.delete_workflow(workflow_guid)
         assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
+        res = self.backend.get_workflows()
+        assert "response" in res, f"Expected response in {res}"
+
+        if len(res["response"]) == 0:
+            return
+
+        found = False
+        for workflow in res["response"]:
+            if workflow["guid"] == workflow_guid:
+                found = True
+                break
+        
+        assert not found, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists, got {res['response']} workflows"
 
 
     def return_workflow_guid(self, workflow_name):

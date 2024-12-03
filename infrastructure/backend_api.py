@@ -2918,12 +2918,15 @@ class ControlPanelAPI(object):
                     API_SECCOMP_GENERATE, self.customer, r.status_code, r.text))
         return r
     
-    def get_workflows(self, **kwargs):
+    def get_workflows(self,  body=None, **kwargs):
         url = API_WORKFLOWS + "/list"
+        if body is None:
+            body = {"pageSize": 150, "pageNum": 1}
+
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
             params.update(**kwargs)
-        r = self.post(url, params=params, json={"pageSize": 50, "pageNum": 1, "orderBy": "", "innerFilters":[]})
+        r = self.post(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing workflows. Customer: "%s" (code: %d, message: %s)' % (
