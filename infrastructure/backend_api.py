@@ -2349,8 +2349,8 @@ class ControlPanelAPI(object):
         j = r.json()
         if expected_results == 0:
             return j['response']
-        if 'response' not in j or len(j['response']) == 0:
-            raise Exception(f"Request: results is empty, {j}")
+        if 'response' not in j:
+            raise Exception(f"Response does not contain 'response' key: {j}")
         if len(j['response']) < expected_results:
             raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
         return j['response']
