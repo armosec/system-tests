@@ -6,6 +6,7 @@ from systest_utils import TestUtil
 from .tests_cases import KubescapeTests, KSMicroserviceTests, RuntimeTests
 from .tests_cases.ks_vuln_scan_tests import KsVulnerabilityScanningTests
 from .tests_cases.notifications_tests import NotificationSTests
+from .tests_cases.registry_tests import RegistryTests
 from .tests_cases.payments_tests import PaymentTests
 from .tests_cases.relevant_vuln_scanning_tests import RelevantVulnerabilityScanningTests
 from .tests_cases.seccomp_tests import SeccompProfileTests
@@ -32,6 +33,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(IntegrationsTests))
     tests.extend(TestUtil.get_class_methods(SeccompProfileTests))
     tests.extend(TestUtil.get_class_methods(WorkflowsTests))
+    tests.extend(TestUtil.get_class_methods(RegistryTests))
     return tests
 
 
@@ -66,6 +68,8 @@ def get_test(test_name):
         return SeccompProfileTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(WorkflowsTests):
         return WorkflowsTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(RegistryTests):
+        return RegistryTests().__getattribute__(test_name)()
 
 
 ALL_TESTS = all_tests_names()
