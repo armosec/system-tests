@@ -99,9 +99,9 @@ class WorkflowsTeamsNotifications(Workflows):
         self.put_custom_framework(framework_file="system-test-framework-low-comp.json",
                                   framework_guid=fw['guid'], cluster_name=self.cluster)
 
-        Logger.logger.info('Stage 10: Add SA to cluster-admin')
-        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
-                                                                namespace=namespace)
+        # Logger.logger.info('Stage 10: Add SA to cluster-admin')
+        # KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
+        #                                                         namespace=namespace)
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])

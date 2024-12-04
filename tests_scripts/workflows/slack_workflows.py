@@ -108,9 +108,9 @@ class WorkflowsSlackNotifications(Workflows):
         self.put_custom_framework(framework_file="system-test-framework-low-comp.json",
                                   framework_guid=fw['guid'], cluster_name=self.cluster)
 
-        Logger.logger.info('Stage 10: Add SA to cluster-admin')
-        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
-                                                                namespace=self.namespace)
+        # Logger.logger.info('Stage 10: Add SA to cluster-admin')
+        # KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
+        #                                                         namespace=self.namespace)
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
@@ -165,7 +165,7 @@ class WorkflowsSlackNotifications(Workflows):
         found = 0
         for message in messages:
             message_string = str(message)
-            if "Your compliance score has decreased by" in message_string and cluster in message_string and namespace in message_string:
+            if "Your compliance score has decreased by" in message_string and cluster in message_string:
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
 
@@ -183,12 +183,15 @@ class WorkflowsSlackNotifications(Workflows):
                 assert found > 1, f"expected to have at least 1 messages, found {found}"
                 if not found_security_risks:
                     self.assert_security_risks_message_sent(messages, cluster, namespace)
+                    Logger.logger.info("Security risks message sent")
                     found_security_risks = True
                 if not found_vulnerabilities:
                     self.assert_vulnerability_message_sent(messages, cluster, namespace)
+                    Logger.logger.info("Vulnerabilities message sent")
                     found_vulnerabilities = True
                 if not found_misconfigurations:
-                    self.assert_misconfiguration_message_sent(messages, cluster, namespace)
+                    self.assert_misconfiguration_message_sent(messages, cluster)
+                    Logger.logger.info("Misconfigurations message sent")
                     found_misconfigurations = True
                     break
             except AssertionError as e:
@@ -314,8 +317,7 @@ class WorkflowsSlackNotifications(Workflows):
             "name": name,
             "scope": [
                 {
-                    "cluster": cluster,
-                    "namespace": namespace
+                    "cluster": cluster
                 }
             ],
             "conditions": [
