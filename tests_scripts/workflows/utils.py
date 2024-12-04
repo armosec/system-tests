@@ -29,6 +29,7 @@ VULNERABILITIES_WORKFLOW_NAME_TEAMS = "vulnerabilities_workflow_teams_"
 VULNERABILITIES_WORKFLOW_NAME_SLACK = "vulnerabilities_workflow_slack_"
 VULNERABILITIES_WORKFLOW_NAME_JIRA = "vulnerabilities_workflow_jira_"
 
+
 COMPLIANCE_WORKFLOW_NAME_TEAMS = "compliance_workflow_teams_"
 COMPLIANCE_WORKFLOW_NAME_SLACK = "compliance_workflow_slack_"
 
