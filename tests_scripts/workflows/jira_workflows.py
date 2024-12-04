@@ -9,6 +9,7 @@ from tests_scripts.workflows.utils import (
     VULNERABILITIES,
     SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
+    SEVERITIES_MEDIUM,
     VULNERABILITIES_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_ID
@@ -44,11 +45,11 @@ class WorkflowsJiraNotifications(Workflows):
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-        self.cluster, namespace = self.setup(apply_services=False)
+        self.cluster, self.namespace = self.setup(apply_services=False)
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_CRITICAL, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
@@ -58,11 +59,12 @@ class WorkflowsJiraNotifications(Workflows):
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
 
         Logger.logger.info('Stage 3: Apply deployment')
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
+        self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('Stage 4: Install kubescape with helm-chart')
         self.install_kubescape()
+        time.sleep(60)
 
         Logger.logger.info('Stage 5: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
@@ -86,6 +88,7 @@ class WorkflowsJiraNotifications(Workflows):
                 {
                     "severity": "High",
                     "cluster": cluster_name,
+                    "namespace": self.namespace,
                     "cvssInfo.baseScore": "6|greater",
                     "isRelevant": "Yes"
                 }
@@ -96,13 +99,13 @@ class WorkflowsJiraNotifications(Workflows):
         for i in range(attempts):
             try:
                 if not found_sr:
-                    r = self.backend.get_security_risks_list(cluster_name=cluster_name, security_risk_ids=[SECURITY_RISKS_ID])
+                    r = self.backend.get_security_risks_list(cluster_name=cluster_name, namespace=self.namespace, security_risk_ids=[SECURITY_RISKS_ID])
                     r = r.text
                     self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
                     found_sr = True
                 r2 = self.backend.get_vulns_v2(body=vuln_body, expected_results=1, scope=None)
                 self.assert_vulnerability_jira_ticket_created(response=r2)
-            except AssertionError as e:
+            except (AssertionError, Exception) as e:
                 Logger.logger.info(f"iteration: {i}: {e}")
                 if i == attempts - 1:
                     raise
@@ -170,7 +173,7 @@ class WorkflowsJiraNotifications(Workflows):
     def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, replicas=9)
     
 
     def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
