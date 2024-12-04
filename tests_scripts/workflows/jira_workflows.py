@@ -173,7 +173,7 @@ class WorkflowsJiraNotifications(Workflows):
     def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, replicas=9)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
     
 
     def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
