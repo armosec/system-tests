@@ -98,6 +98,8 @@ API_ADMIN_COPY_SLACK_TOKEN = "/api/v1/admin/copySlackToken"
 API_NOTIFICATIONS_UNSUBSCRIBE = "/api/v1/notifications/unsubscribe"
 API_NOTIFICATIONS_ALERTCHANNEL = "/api/v1/notifications/alertChannel"
 
+API_REGISTRY_MANAGEMENT = "/api/v1/registry/management"
+
 API_ATTACK_CHAINS = "/api/v1/attackchains"
 
 API_NETWORK_POLICIES = "/api/v1/networkpolicies"
@@ -2176,6 +2178,54 @@ class ControlPanelAPI(object):
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: delete channel alert "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def check_registry(self, payload, provider) -> requests.Response:
+        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider + "/repositories", cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: check registry "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def create_registry(self, payload, provider) -> requests.Response:
+        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: create registry "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def get_registry(self, provider, guid) -> requests.Response:
+        res = self.get(API_REGISTRY_MANAGEMENT + "/" + provider + "/" + guid, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get registry "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def get_all_registries(self, provider) -> requests.Response:
+        res = self.get(API_REGISTRY_MANAGEMENT + "/" + provider, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get registry "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def update_registry(self, payload, provider, guid) -> requests.Response:
+        res = self.put(API_REGISTRY_MANAGEMENT + "/" + provider + "/" + guid, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update registry "%s" (code: %d, message: %s)' % (
+                    self.customer, res.status_code, res.text))
+        return res
+
+    def delete_registry(self, provider, guid) -> requests.Response:
+        res = self.delete(API_REGISTRY_MANAGEMENT + "/" + provider + "/" + guid, cookies=self.selected_tenant_cookie)
+        if not 200 <= res.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: delete registry "%s" (code: %d, message: %s)' % (
                     self.customer, res.status_code, res.text))
         return res
 

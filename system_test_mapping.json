@@ -1230,6 +1230,19 @@
     "skip_on_environment": "production,production-us",
     "owner": ""
   },
+  "test_registry_scanning": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": ""
+  },
   "relevant_data_is_appended": {
     "target": [
       "In cluster",

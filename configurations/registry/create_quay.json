@@ -1,0 +1,6 @@
+{
+  "containerRegistryName": "quay.io",
+  "robotAccountName": "systemtests+systemtests",
+  "scanFrequency": "*/10 5 1 * *",
+  "repositories": ["systemtests/webgoat"]
+}
