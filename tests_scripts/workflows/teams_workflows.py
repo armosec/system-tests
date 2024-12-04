@@ -64,11 +64,11 @@ class WorkflowsTeamsNotifications(Workflows):
         channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster)
         
         Logger.logger.info("Stage 3: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=VULNERABILITIES, cvss=6, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=None, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_body = self.build_compliance_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("WEBHOOK_URL"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
@@ -173,7 +173,7 @@ class WorkflowsTeamsNotifications(Workflows):
         found = 0
         for message in messages:
             message_string = str(message)
-            if "New Vulnerability found" in message_string and cluster:
+            if "New Vulnerability found" in message_string and cluster in message_string and "http1" in message_string:
                 found += 1
         assert found > 0, "expected to have at least one vulnerability message"
 
