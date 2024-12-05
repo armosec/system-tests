@@ -136,7 +136,7 @@ def get_tickets_from_jira_channel(before_test):
     while True:
         response = requests.get(url, headers=headers, auth=auth, params=params)
 
-        assert response.status_code == 200, f"Failed to fetch issues from Jira. Error: {response.status_code}, {response.text}"
+        assert response.status_code == 200, f"Failed to fetch issues from Jira. params: {params}, response: {response.text}, error: {response.status_code}"
 
         data = response.json()
         all_issues.extend(data.get("issues", []))
