@@ -122,7 +122,7 @@ class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         if self.test_driver.test_name == "sr_r_0037_vulnerability" and self.backend.server == "https://api.armosec.io":
             Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
             return statics.SUCCESS, ""
-            
+
         self.ignore_agent = True
         cluster, namespace = self.setup(apply_services=False)
 
@@ -312,12 +312,12 @@ class ScanSecurityRisksExceptionsWithKubescapeHelmChart(BaseHelm, BaseKubescape)
         assert security_risks_list_after_exception_delete["response"][0]["affectedResourcesCount"] == \
                security_risks_list_before_exception["response"][0][
                    "affectedResourcesCount"], "resources are not back to security risks list as before exception"
-        
 
- 
+
+
 
         return self.cleanup()
-    
+
     def cleanup(self):
         for exception_guid in self.exceptions_guids:
             self.backend.delete_security_risks_exception(exception_guid)
@@ -557,9 +557,8 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
 
             Logger.logger.info("check if kubescape cronjob created in backend")
-            assert self.backend.is_ks_cronjob_created_in_backend(cluster_name,
-                                                                 framework_list[
-                                                                     0]), "kubescape cronjob failed to create in backend"
+            self.wait_for_report(timeout=30, report_type=self.backend.is_ks_cronjob_created_in_backend, cluster_name=cluster_name,
+                                 framework_name=framework_list[0])
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")
             self.backend.is__backend_returning_only_ks_cronjob(
@@ -619,7 +618,7 @@ class ControlClusterFromCLI(BaseHelm, BaseKubescape):
                                                     kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):
-        # test check in cluster workloads and kubescape CLI 
+        # test check in cluster workloads and kubescape CLI
         # assert self.backend == None; f'the test {self.test_driver.test_name} must run without backend'
 
         # 1 install kubescape in cluster workloads
@@ -641,7 +640,7 @@ class ControlClusterFromCLI(BaseHelm, BaseKubescape):
         # 3.1 trigger in cluster components
         self.trigger_in_cluster_components(cli_args=self.parse_cli_args(args=self.test_obj["cli_args"]))
 
-        # 4 validate cluster trigger 
+        # 4 validate cluster trigger
         Logger.logger.info("Validate triggering in cluster components")
         # 4.1 validate cluster trigger
         self.validate_cluster_trigger_as_expected(cluster_name=self.get_cluster_name(), args=self.test_obj["cli_args"])
