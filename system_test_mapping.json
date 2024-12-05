@@ -1236,8 +1236,8 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service"
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
