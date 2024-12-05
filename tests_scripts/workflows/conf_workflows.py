@@ -73,7 +73,7 @@ class WorkflowConfigurations(Workflows):
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
 
         Logger.logger.info("stage 7: create teams workflow")
-        workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"))
+        workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
         Logger.logger.info("stage 8: validate teams workflow created successfully")
@@ -83,7 +83,7 @@ class WorkflowConfigurations(Workflows):
         
         Logger.logger.info("stage 9: update teams workflow")
         workflow_guid = self.return_workflow_guid(workflow_test_name)
-        update_workflow_body = self.build_teams_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("WEBHOOK_URL"), guid=workflow_guid)
+        update_workflow_body = self.build_teams_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"), guid=workflow_guid)
         self.create_and_assert_workflow(update_workflow_body, EXPECTED_UPDATE_RESPONSE, update=True)
 
         Logger.logger.info("stage 10: validate teams updated workflow")
@@ -101,7 +101,7 @@ class WorkflowConfigurations(Workflows):
         webhook_body = {
             "guid": "",
             "name": name,
-            "webhookURL": get_env("WEBHOOK_URL")
+            "webhookURL": get_env("CHANNEL_WEBHOOK")
         }
         r = self.backend.create_webhook(webhook_body)
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
