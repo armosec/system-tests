@@ -53,6 +53,7 @@ class WorkflowsJiraNotifications(Workflows):
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
         self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
@@ -70,7 +71,7 @@ class WorkflowsJiraNotifications(Workflows):
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
                      
         Logger.logger.info('Stage 6: Assert jira tickets was created')
-        self.assert_jira_tickets_was_created(self.cluster)
+        self.assert_jira_tickets_was_created(before_test_message_ts, self.cluster)
 
         Logger.logger.info('Stage 7: Cleanup')
         return self.cleanup()
@@ -81,7 +82,7 @@ class WorkflowsJiraNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
             return super().cleanup(**kwargs)
     
-    def assert_jira_tickets_was_created(self, cluster_name, attempts=20, sleep_time=30):
+    def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=20, sleep_time=20):
        
         vuln_body = {
             "innerFilters": [
@@ -90,27 +91,53 @@ class WorkflowsJiraNotifications(Workflows):
                     "cluster": cluster_name,
                     "namespace": self.namespace,
                     "cvssInfo.baseScore": "6|greater",
-                    "isRelevant": "Yes"
+                    "isRelevant": "Yes",
+                    "workload": "http1",
                 }
             ]
         }
         found_sr = False
+        found_vuln = False
 
         for i in range(attempts):
+            if found_sr and found_vuln:
+                self.unlink_issues(response_sr)
+                self.unlink_issues(response_vuln)
+                break
             try:
+                issues = self.test_obj["getMessagesFunc"](begin_time)
+                assert len(issues) > 0, "No messages found in the channel"
                 if not found_sr:
                     r = self.backend.get_security_risks_list(cluster_name=cluster_name, namespace=self.namespace, security_risk_ids=[SECURITY_RISKS_ID])
                     r = r.text
-                    self.assert_security_risks_jira_ticket_created(response=r, security_risk_id=SECURITY_RISKS_ID)
+                    response_sr = json.loads(r)
+                    self.assert_security_risks_jira_ticket_created(response=response_sr, security_risk_id=SECURITY_RISKS_ID)
+                    Logger.logger.info("Security risk jira ticket created")
                     found_sr = True
-                r2 = self.backend.get_vulns_v2(body=vuln_body, expected_results=1, scope=None)
-                self.assert_vulnerability_jira_ticket_created(response=r2)
+                
+                if not found_vuln:
+                    response_vuln = self.backend.get_vulns_v2(body=vuln_body, expected_results=1)
+                    self.assert_vulnerability_jira_ticket_created(issues=issues, response=response_vuln, cves=["CVE-2023-27522"])
+                    Logger.logger.info("Vulnerability jira ticket created")
+                    found_vuln = True
+               
             except (AssertionError, Exception) as e:
                 Logger.logger.info(f"iteration: {i}: {e}")
                 if i == attempts - 1:
                     raise
                 TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
-            
+
+    def unlink_issues(self, response):
+        if not response:
+            return 
+    
+        if "response" not in response:
+            return
+        
+        for item in response["response"]:  
+            if len(item["tickets"]) > 0:
+                for ticket in item["tickets"]:
+                    self.backend.unlink_issue(ticket["guid"])
        
         
 
@@ -130,26 +157,68 @@ class WorkflowsJiraNotifications(Workflows):
         return ks_custom_fw, report_fw
     
     def assert_security_risks_jira_ticket_created(self, response, security_risk_id):
-        try:
-            response_json = json.loads(response)
-        except json.JSONDecodeError as e:
-            raise AssertionError(f"Response is not valid JSON: {e}")
 
-        risks = response_json.get("response", [])
+        risks = response.get("response", [])
         assert len(risks) > 0, "No security risks found in the response"
 
         for risk in risks:
             tickets = risk.get("tickets", [])
             assert len(tickets) > 0, f"No tickets associated with security risk with ID {security_risk_id}. response: {response}"
 
-    def assert_vulnerability_jira_ticket_created(self, response):
-        assert len(response) > 0, "No vulnerabilities found in the response"
-        vulnerabilities_with_tickets = 0
-        for risk in response:
-            tickets = risk.get("tickets", [])
-            if len(tickets) > 0:
-                vulnerabilities_with_tickets += 1
-        assert vulnerabilities_with_tickets > 0, "No vulnerabilities have associated tickets"
+    def assert_vulnerability_jira_ticket_created(self, issues, response, cves=[]):
+        assert response, "No vulnerabilities found in the response"
+        assert issues, "No messages found in the channel"
+
+        for cve in cves:
+            # Check if CVE exists in Jira issues
+            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"]), None)
+            assert jira_issue, f"No vulnerability with CVE {cve} found in Jira. issues: {issues}"
+            Logger.logger.info(f"Found vulnerability with CVE {cve} in Jira")
+
+            # Check if CVE exists in the response vulnerabilities
+            response_vuln = next((vuln for vuln in response if vuln["name"] == cve), None)
+            assert response_vuln, f"No vulnerability with CVE {cve} found in response. response: {response}"
+            Logger.logger.info(f"Found vulnerability with CVE {cve} in response")
+
+            # Validate tickets associated with the vulnerability
+            tickets = response_vuln.get("tickets", [])
+            assert tickets, f"No tickets associated with vulnerability with CVE {cve}. response: {response}"
+            ticket_link_titles = [ticket["linkTitle"] for ticket in tickets]
+            assert jira_issue["key"] in ticket_link_titles, f"No ticket associated with vulnerability with CVE {cve} found in Jira. response: {response}"
+    
+
+
+
+    # def assert_vulnerability_jira_ticket_created(self, issues, response, cves=[]):
+    #     assert len(response) > 0, "No vulnerabilities found in the response"
+    #     assert len(issues) > 0, "No messages found in the channel"
+
+
+    #     for issue in issues:
+    #         for cve in cves:
+    #             found_in_jira = False
+    #             if cve in issue["summary"]:
+    #                 found_in_jira = True
+    #                 Logger.logger.info(f"Found vulnerability with CVE {cve} in Jira")
+    #                 for vuln in response:
+    #                     found_in_vuln = False
+    #                     if vuln["name"] == cve:
+    #                         found_in_vuln = True
+    #                         Logger.logger.info(f"Found vulnerability with CVE {cve} in response")
+    #                         tickets = vuln.get("tickets", [])
+    #                         assert len(tickets) > 0, f"No tickets associated with vulnerability with CVE {cve}. response: {response}"
+    #                         found_in_vuln_tickets = False
+    #                         for ticket in tickets:
+    #                             if ticket["linkTitle"] == issue["key"]:
+    #                                 found_in_vuln_tickets = True
+    #                                 break
+    #                         assert found_in_vuln_tickets, f"No ticket associated with vulnerability with CVE {cve} found in Jira. response: {response}"
+    #                         break
+    #                 assert found_in_vuln, f"No vulnerability with CVE {cve} found in response. response: {response}"
+    #                 break
+    #         assert found_in_jira, f"No vulnerability with CVE {cve} found in Jira. issues: {issues}"
+                    
+
 
 
     def assert_vulnerability_message_sent(self, messages, cluster):
