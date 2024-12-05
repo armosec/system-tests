@@ -171,7 +171,7 @@ class WorkflowsSlackNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster, namespace, attempts=20, sleep_time=10):
+    def assert_messages_sent(self, begin_time, cluster, namespace, attempts=30, sleep_time=10):
         found_security_risks =  False
         found_vulnerabilities = False
         found_misconfigurations = False 

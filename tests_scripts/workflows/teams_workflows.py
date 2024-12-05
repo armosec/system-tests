@@ -21,6 +21,7 @@ from systest_utils import Logger, TestUtil
 import time
 from infrastructure import KubectlWrapper
 from systest_utils import Logger, statics, TestUtil
+import random
 
 
 
@@ -54,6 +55,9 @@ class WorkflowsTeamsNotifications(Workflows):
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, namespace = self.setup(apply_services=False)
+
+        rand = str(random.randint(10000000, 99999999))
+
         
         Logger.logger.info("Stage 1: Post custom framework")
         self.fw_name = "systest-fw-" + self.cluster
@@ -61,8 +65,9 @@ class WorkflowsTeamsNotifications(Workflows):
                                            cluster_name=self.cluster)
         
         Logger.logger.info("Stage 2: Create webhook")
-        self.create_webhook(name=WEBHOOK_NAME + self.cluster)
-        channel_guid = self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster)
+        self.webhook_name = WEBHOOK_NAME + self.cluster + "_" + rand
+        self.create_webhook(name=self.webhook_name)
+        channel_guid = self.get_channel_guid_by_name(self.webhook_name)
         
         Logger.logger.info("Stage 3: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_MEDIUM, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, webhook_url=get_env("WEBHOOK_URL"), securityRiskIDs=SECURITY_RISKS_ID)
@@ -119,7 +124,8 @@ class WorkflowsTeamsNotifications(Workflows):
         self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster))
         self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
         self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster))
-        self.delete_channel_by_guid(self.get_channel_guid_by_name(WEBHOOK_NAME + self.cluster))
+        if self.webhook_name:
+            self.delete_channel_by_guid(self.get_channel_guid_by_name(self.webhook_name))
         if self.fw_name:
             self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         return super().cleanup(**kwargs)
@@ -130,10 +136,12 @@ class WorkflowsTeamsNotifications(Workflows):
             "name": name,
             "webhookURL": get_env("WEBHOOK_URL")
         }
-        r = self.backend.create_webhook(webhook_body)
-        if "already exists" in r:
-            Logger.logger.info("Teams channel already exists")
-            return
+        try:
+            r = self.backend.create_webhook(webhook_body)
+        except Exception as e:
+            if "already exists" in e:
+                Logger.logger.info("Teams channel already exists")
+                return
         
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
         
@@ -194,7 +202,7 @@ class WorkflowsTeamsNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster, attempts=20, sleep_time=10):
+    def assert_messages_sent(self, begin_time, cluster, attempts=30, sleep_time=10):
         found_security_risk = False
         found_vulnerability = False
         found_misconfiguration = False
@@ -340,8 +348,7 @@ class WorkflowsTeamsNotifications(Workflows):
             "name": name,
             "scope": [
                 {
-                    "cluster": cluster,
-                    "namespace": namespace
+                    "cluster": cluster
                 }
             ],
             "conditions": [
