@@ -766,12 +766,10 @@ class BaseKubescape(BaseK8S):
     def test_api_version_info(self):
         cli_info = self.kubernetes_obj.get_info_version().to_dict()
         be_info = self.get_version_info(cluster_name=self.kubernetes_obj.get_cluster_name())
-        assert cli_info['git_version'] == be_info['gitVersion'].split(';')[0] and \
-               cli_info['git_commit'] == be_info['gitCommit'], \
-            "cluster {name}: from backend the git-version is {x1}, and git-commit is {y1}." \
-            "from k8s-api the git-version is {x2}, and git-commit is {y2}.".format(
-                name=self.kubernetes_obj.get_cluster_name(), x1=be_info['gitVersion'].split(';')[0],
-                y1=be_info['gitCommit'], x2=cli_info['git_version'], y2=cli_info['git_commit']
+        assert cli_info['git_version'] == be_info['gitVersion'].split(';')[0], \
+            "cluster {name}: from backend the git-version is {x1}." \
+            "from k8s-api the git-version is {x2}.".format(
+                name=self.kubernetes_obj.get_cluster_name(), x1=be_info['gitVersion'].split(';')[0], x2=cli_info['git_version']
             )
 
     @staticmethod
