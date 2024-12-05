@@ -99,13 +99,13 @@ class WorkflowsTeamsNotifications(Workflows):
         self.put_custom_framework(framework_file="system-test-framework-low-comp.json",
                                   framework_guid=fw['guid'], cluster_name=self.cluster)
 
-        # Logger.logger.info('Stage 10: Add SA to cluster-admin')
-        # KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
-        #                                                         namespace=namespace)
+        Logger.logger.info('Stage 10: Add SA to cluster-admin')
+        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
+                                                                namespace=namespace)
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
+        # TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
         
         Logger.logger.info('Stage 12: Assert all messages sent')
         self.assert_messages_sent(before_test_message_ts, self.cluster)
@@ -131,6 +131,10 @@ class WorkflowsTeamsNotifications(Workflows):
             "webhookURL": get_env("WEBHOOK_URL")
         }
         r = self.backend.create_webhook(webhook_body)
+        if "already exists" in r:
+            Logger.logger.info("Teams channel already exists")
+            return
+        
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
         
     def get_channel_guid_by_name(self, channel_name):
@@ -190,7 +194,7 @@ class WorkflowsTeamsNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster, attempts=20, sleep_time=30):
+    def assert_messages_sent(self, begin_time, cluster, attempts=20, sleep_time=10):
         found_security_risk = False
         found_vulnerability = False
         found_misconfiguration = False
