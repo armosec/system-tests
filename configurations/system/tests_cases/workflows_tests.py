@@ -2,7 +2,7 @@ import inspect
 from .structures import TestConfiguration
 from systest_utils.statics import DEFAULT_WORKFLOWS_DEPLOYMENT_PATH
 from os.path import join
-from tests_scripts.workflows.utils import get_messages_from_slack_channel, enrich_slack_alert_channel, get_messages_from_teams_channel, enrich_teams_alert_channel
+from tests_scripts.workflows.utils import get_messages_from_slack_channel, enrich_slack_alert_channel, get_messages_from_teams_channel, enrich_teams_alert_channel, get_tickets_from_jira_channel
 
 
 
@@ -47,6 +47,7 @@ class WorkflowsTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=WorkflowsJiraNotifications,
             deployments=join(DEFAULT_WORKFLOWS_DEPLOYMENT_PATH, "http1"),
+            getMessagesFunc=get_tickets_from_jira_channel,
             create_test_tenant = False
         )    
 

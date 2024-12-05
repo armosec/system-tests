@@ -2399,8 +2399,8 @@ class ControlPanelAPI(object):
         j = r.json()
         if expected_results == 0:
             return j['response']
-        if 'response' not in j or len(j['response']) == 0:
-            raise Exception('Request: results is empty')
+        if 'response' not in j:
+            raise Exception(f"Response does not contain 'response' key: {j}")
         if len(j['response']) < expected_results:
             raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
         return j['response']
@@ -2412,7 +2412,6 @@ class ControlPanelAPI(object):
         return self.post_details_request(API_VULNERABILITY_V2_WORKLOAD, body)
 
     def get_vulns_v2(self, body: dict, expected_results: int = 0, scope: str = None):
-        url = API_VULNERABILITY_V2_IMAGE
         params = None
         if scope:
             params = {"scope": scope}
