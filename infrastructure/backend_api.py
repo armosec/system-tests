@@ -469,8 +469,8 @@ class ControlPanelAPI(object):
         )
         assert res.status_code == client.OK, f"renew subscription failed for tenantID: {tenantID}"
         return res
-    
-    # ************** Activate Workflows ************** 
+
+    # ************** Activate Workflows **************
     # relevant for feature transition phase
     def active_workflow(self, tenantID: str) -> dict:
         """
@@ -486,7 +486,7 @@ class ControlPanelAPI(object):
         assert res.status_code == client.OK, f"activate workflow failed for tenantID: {tenantID}"
 
         return res
-    
+
     # ************** Convert and Activate Workflows **************
     # relevant for feature transition phase
     def convert_and_activate_workflows(self, tenantID: str, force_convert=True) -> dict:
@@ -509,7 +509,7 @@ class ControlPanelAPI(object):
         assert res.status_code == client.OK, f"convert and activate workflow failed for tenantID: {tenantID}"
 
         return res
-    
+
     # ************** Copy Slack Token **************
     # relevant for workflos feature transition phase
     def copy_slack_token(self, tenantID: str) -> dict:
@@ -1897,7 +1897,7 @@ class ControlPanelAPI(object):
             return {}
 
     def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name: str):
-        params = {"customerGUID": self.selected_tenant_id}
+        params = {"customerGUID": self.selected_tenant_id} # , "cluster": cluster_name
         r = self.get(API_POSTURE_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -1908,7 +1908,7 @@ class ControlPanelAPI(object):
             if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name and "ks-scheduled-scan-{}".format(
                     framework_name.lower()) in cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED]:
                 return True
-        return False
+        raise Exception("kubescape cronjob failed to create in backend")
 
     def is__backend_returning_only_ks_cronjob(self, cluster_name: str):
         params = {"customerGUID": self.selected_tenant_id}
@@ -1980,7 +1980,7 @@ class ControlPanelAPI(object):
             args["timeout"] = 120
         url = self.server + url
         return requests.delete(url, **args)
-         
+
 
     def get_cookie(self):
         return self.selected_tenant_cookie
@@ -2416,7 +2416,7 @@ class ControlPanelAPI(object):
         if scope:
             params = {"scope": scope}
         return self.post_list_request(API_VULNERABILITY_V2, body, expected_results, params=params)
-    
+
     def get_vuln_v2_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2, body)
 
@@ -2480,7 +2480,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_security_risks_list "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-    
+
     def get_security_risks_severities(self, cluster_name=None, namespace=None, security_risk_ids=[]):
         params = {"customerGUID": self.selected_tenant_id}
 
@@ -2732,7 +2732,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_runtime_incidents_rules "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-    
+
     def get_runtime_incident_types(self, body = None):
         params = {"customerGUID": self.selected_tenant_id}
 
@@ -2780,7 +2780,7 @@ class ControlPanelAPI(object):
 
     def delete_runtime_policies(self, body):
         params = {"customerGUID": self.selected_tenant_id}
-        
+
         Logger.logger.info("delete_runtime_policies body: %s" % body)
         r = self.delete(API_RUNTIME_POLICIES, params=params, json=body)
 
@@ -2790,23 +2790,23 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    
+
     def new_runtime_policy(self, body):
         """
         mandatory fields: name, ruleSetType (Custom or Managed)
 
         if "ruleSetType": "Managed" then you have to have at least 1 ruleset
-        
+
         example:
-        {    
-            "name": "Malware-new",    
+        {
+            "name": "Malware-new",
             "description": "Default Malware RuleSet",
             "enabled": true,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
             "ruleSetType": "Managed",
             "managedRuleSetIDs": [
                 "c9fe6345-c393-4595-bd7b-22110dbafe62"
-            ],    
+            ],
             "notifications": [],
             "actions": []
         }
@@ -2821,7 +2821,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: new_runtime_policy "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-    
+
     def update_runtime_policy(self, body):
 
         """
@@ -2966,7 +2966,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
                     API_SECCOMP_GENERATE, self.customer, r.status_code, r.text))
         return r
-    
+
     def get_workflows(self,  body=None, **kwargs):
         url = API_WORKFLOWS + "/list"
         if body is None:
@@ -2981,7 +2981,7 @@ class ControlPanelAPI(object):
                 'Error accessing workflows. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
 
 
     def create_workflow(self, body):
@@ -3011,7 +3011,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
-   
+
 
     def update_workflow(self, body):
         url = API_WORKFLOWS
@@ -3022,7 +3022,7 @@ class ControlPanelAPI(object):
                 'Error updating workflow. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def get_webhooks(self):
         url = API_WEBHOOKS
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
@@ -3031,10 +3031,10 @@ class ControlPanelAPI(object):
                 'Error accessing webhooks. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-        
-    
+
+
     def create_webhook(self, body):
-        url = API_WEBHOOKS 
+        url = API_WEBHOOKS
         params = {"customerGUID": self.selected_tenant_id}
         r = self.post(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
@@ -3042,9 +3042,9 @@ class ControlPanelAPI(object):
                 'Error creating webhook. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def delete_webhook(self, body):
-        url = API_WEBHOOKS 
+        url = API_WEBHOOKS
         params = {"customerGUID": self.selected_tenant_id}
         r = self.delete(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
@@ -3052,9 +3052,9 @@ class ControlPanelAPI(object):
                 'Error deleting webhook. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def update_webhook(self, body):
-        url = API_WEBHOOKS 
+        url = API_WEBHOOKS
         params = {"customerGUID": self.selected_tenant_id}
         r = self.put(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
@@ -3062,7 +3062,7 @@ class ControlPanelAPI(object):
                 'Error updating webhook. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def test_webhook_message(self, body):
         params = {"customerGUID": self.selected_tenant_id}
         r = self.post(API_TEAMS_TEST_MESSAGE, params=params, json=body)
@@ -3071,13 +3071,13 @@ class ControlPanelAPI(object):
                 'Error testing webhook. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
 class Solution(object):
     """docstring for Solution"""
 
