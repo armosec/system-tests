@@ -122,7 +122,7 @@ def get_tickets_from_jira_channel(before_test):
     }
 
     # JQL to fetch issues updated before the specified time
-    jql = f'project = "{project_id}" AND created > "{formatted_date}"'
+    jql = f'project = "10013" AND created > "{formatted_date}"'
 
     params = {
         "jql": jql,
