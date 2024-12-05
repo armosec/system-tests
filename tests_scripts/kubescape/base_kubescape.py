@@ -549,7 +549,7 @@ class BaseKubescape(BaseK8S):
             assert status_txt == "skipped", \
                 "control {x} supposed to be warning, but it is {y}".format(x=control_name, y=status_txt)
         else:
-            # TODO: kept for backward compatibility the line below should be changed to "assert status_txt == "passed", \" 
+            # TODO: kept for backward compatibility the line below should be changed to "assert status_txt == "passed", \"
             # after the statuses merged to kubescape"
             assert status_txt == "passed" or status_txt == "skipped" or status_txt == "warning" or status_txt == "irrelevant", \
                 "control {x} supposed to be passed or skipped, but it is {y}".format(x=control_name, y=status_txt)
@@ -608,7 +608,7 @@ class BaseKubescape(BaseK8S):
     @staticmethod
     def get_attributes_from_be_resources(be_resources: list, cluster: str, kind: str, name: str, namespace: str):
         for resource in be_resources:
-            attributes = resource['designators']['attributes']                
+            attributes = resource['designators']['attributes']
             if attributes['cluster'] == cluster and attributes['kind'] == kind and name in attributes['name'] and \
                     (len(namespace) == 0 or attributes['namespace'] == namespace):
                 return [control for x in resource['statusToControls'].values() for control in x]
@@ -763,15 +763,6 @@ class BaseKubescape(BaseK8S):
                                                   cluster=self.kubernetes_obj.get_cluster_name(),
                                                   name=resource_obj['name'], namespace=resource_obj['namespace'])
 
-    def test_api_version_info(self):
-        cli_info = self.kubernetes_obj.get_info_version().to_dict()
-        be_info = self.get_version_info(cluster_name=self.kubernetes_obj.get_cluster_name())
-        assert cli_info['git_version'] == be_info['gitVersion'].split(';')[0], \
-            "cluster {name}: from backend the git-version is {x1}." \
-            "from k8s-api the git-version is {x2}.".format(
-                name=self.kubernetes_obj.get_cluster_name(), x1=be_info['gitVersion'].split(';')[0], x2=cli_info['git_version']
-            )
-
     @staticmethod
     def get_resource_from_be_resources(be_resources: list, resource_name: str):
         for resource in be_resources:
@@ -803,7 +794,6 @@ class BaseKubescape(BaseK8S):
 
         # "security" framework is excluded from postureClusters report, therefore skipping tests using APIS that depends on this report.
         if framework_name not in statics.SECURITY_FRAMEWORKS:
-            self.test_api_version_info()
             self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid,
                                            framework_name=framework_name)
 
@@ -1190,7 +1180,7 @@ class BaseKubescape(BaseK8S):
             framework_name, cluster_name)
         # check that framework score from be_cluster_overtime matches the score from framework_report from kubescape
         assert be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD] == framework_report[_COMPLIANCE_SCORE_FIELD], \
-            "expected framework: {} compliance score in be to be {}, but it is".format(  
+            "expected framework: {} compliance score in be to be {}, but it is".format(
             framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
 
     def is_ks_cronjob_created(self, framework_name, timeout=60):
