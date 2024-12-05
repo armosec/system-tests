@@ -34,16 +34,17 @@ class RegistryChecker(BaseHelm):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(RegistryChecker, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                               kubernetes_obj=kubernetes_obj)
+        self.cluster = None
 
     def start(self):
         Logger.logger.info('Stage 1: Install kubescape with helm-chart')
-        cluster, _ = self.setup(apply_services=False)
+        self.cluster, _ = self.setup(apply_services=False)
         self.install_kubescape()
         Logger.logger.info('Stage 2: Check registries connection')
-        self.check_registries_connection(cluster)
+        self.check_registries_connection(self.cluster)
         Logger.logger.info('Stage 3: Check quay.io registry CRUD operations')
-        self.check_registry_crud(cluster)
-        return self.cleanup(cluster=cluster)
+        self.check_registry_crud(self.cluster)
+        return self.cleanup()
 
     def check_registry_crud(self, cluster):
         quay_config = REGISTRY_PROVIDERS[0]
@@ -79,7 +80,6 @@ class RegistryChecker(BaseHelm):
         self.backend.delete_registry(provider, guid)
         registries = self.get_all_quay_registries_for_cluster(cluster)
         assert len(registries) == 0, "Expected to have no registries"
-        self.cleanup(cluster=cluster)
 
     def check_registries_connection(self, cluster):
         for provider_config in REGISTRY_PROVIDERS:
@@ -101,7 +101,7 @@ class RegistryChecker(BaseHelm):
                 f"'systemtests/webgoat' not found in any item of {repositories_response.json()}"
 
     def cleanup(self, **kwargs):
-        self.delete_all_quay_registries_for_cluster(kwargs['cluster'])
+        self.delete_all_quay_registries_for_cluster(self.cluster)
         return super().cleanup()
 
     def install_kubescape(self, helm_kwargs: dict = None):
