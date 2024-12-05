@@ -188,47 +188,6 @@ class WorkflowsJiraNotifications(Workflows):
     
 
 
-
-    # def assert_vulnerability_jira_ticket_created(self, issues, response, cves=[]):
-    #     assert len(response) > 0, "No vulnerabilities found in the response"
-    #     assert len(issues) > 0, "No messages found in the channel"
-
-
-    #     for issue in issues:
-    #         for cve in cves:
-    #             found_in_jira = False
-    #             if cve in issue["summary"]:
-    #                 found_in_jira = True
-    #                 Logger.logger.info(f"Found vulnerability with CVE {cve} in Jira")
-    #                 for vuln in response:
-    #                     found_in_vuln = False
-    #                     if vuln["name"] == cve:
-    #                         found_in_vuln = True
-    #                         Logger.logger.info(f"Found vulnerability with CVE {cve} in response")
-    #                         tickets = vuln.get("tickets", [])
-    #                         assert len(tickets) > 0, f"No tickets associated with vulnerability with CVE {cve}. response: {response}"
-    #                         found_in_vuln_tickets = False
-    #                         for ticket in tickets:
-    #                             if ticket["linkTitle"] == issue["key"]:
-    #                                 found_in_vuln_tickets = True
-    #                                 break
-    #                         assert found_in_vuln_tickets, f"No ticket associated with vulnerability with CVE {cve} found in Jira. response: {response}"
-    #                         break
-    #                 assert found_in_vuln, f"No vulnerability with CVE {cve} found in response. response: {response}"
-    #                 break
-    #         assert found_in_jira, f"No vulnerability with CVE {cve} found in Jira. issues: {issues}"
-                    
-
-
-
-    def assert_vulnerability_message_sent(self, messages, cluster):
-        found = 0
-        for message in messages:
-            message_string = str(message)
-            if "New Vulnerability found" in message_string and cluster in message_string and "http1" in message_string:
-                found += 1
-        assert found > 0, "expected to have at least one vulnerability message"
-
     def assert_misconfiguration_message_sent(self, messages, cluster):
         found = 0
         for message in messages:
