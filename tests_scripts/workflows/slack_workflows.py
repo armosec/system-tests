@@ -63,7 +63,7 @@ class WorkflowsSlackNotifications(Workflows):
         rand = str(random.randint(10000000, 99999999))
         
         Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster + "_" + rand
+        self.fw_name = "systest-fw-" + self.cluster
         security_risks_workflow_slack = SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         vulnerabilities_workflow_slack = VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         compliance_workflow_slack = COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
@@ -108,9 +108,9 @@ class WorkflowsSlackNotifications(Workflows):
         self.put_custom_framework(framework_file="system-test-framework-low-comp.json",
                                   framework_guid=fw['guid'], cluster_name=self.cluster)
 
-        # Logger.logger.info('Stage 10: Add SA to cluster-admin')
-        # KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
-        #                                                         namespace=self.namespace)
+        Logger.logger.info('Stage 10: Add SA to cluster-admin')
+        KubectlWrapper.add_new_service_account_to_cluster_admin(service_account="service-account",
+                                                                namespace=self.namespace)
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
@@ -161,7 +161,7 @@ class WorkflowsSlackNotifications(Workflows):
                 found += 1
         assert found > 0, "expected to have at least one vulnerability message"
 
-    def assert_misconfiguration_message_sent(self, messages, cluster, namespace):
+    def assert_misconfiguration_message_sent(self, messages, cluster):
         found = 0
         for message in messages:
             message_string = str(message)
@@ -171,12 +171,14 @@ class WorkflowsSlackNotifications(Workflows):
 
 
     
-    def assert_messages_sent(self, begin_time, cluster, namespace, attempts=20, sleep_time=30):
+    def assert_messages_sent(self, begin_time, cluster, namespace, attempts=20, sleep_time=10):
         found_security_risks =  False
         found_vulnerabilities = False
         found_misconfigurations = False 
 
         for i in range(attempts):
+            if found_security_risks and found_vulnerabilities and found_misconfigurations:
+                break
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
