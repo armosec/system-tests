@@ -260,19 +260,19 @@ class JiraIntegration(BaseKubescape, BaseHelm):
                 "kind":"deployment",
             }]}
         wl_list, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
-                                              body=body,expected_results=1)  
+                                              body=body,expected_results=1, enrich_tickets=True) 
         self.vulnWL = wl_list[0]
         body['innerFilters'][0]['workload'] = "nginx"
         del body['innerFilters'][0]['name']
 
         Logger.logger.info('get nginx workload image')
-        image = self.backend.get_vuln_v2_images(body=body, expected_results=1)
+        image = self.backend.get_vuln_v2_images(body=body, expected_results=1, enrich_tickets=True)
         self.vulnImage = image[0]
 
         Logger.logger.info('get nginx workload vulnerabilities')
         body['orderBy'] = "severityScore:desc"
         body['pageSize'] = 1
-        vulns = self.backend.get_vulns_v2(body=body, expected_results=1)
+        vulns = self.backend.get_vulns_v2(body=body, expected_results=1, enrich_tickets=True)
         self.vuln = vulns[0]
 
     def create_vuln_tickets(self):
@@ -313,22 +313,22 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Verify Jira issue in image")
         body={"innerFilters": [{"digest": self.vulnImage['digest'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}
-        image = self.backend.get_vuln_v2_images(body=body, scope='workload')
+        image = self.backend.get_vuln_v2_images(body=body, scope='workload', enrich_tickets=True)
         assert len(image) == 1, f"Expected one image, got: {image}"
         assert len(image[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in vulnerability")
-        vulns = self.backend.get_vulns_v2(body={"innerFilters": [{"id": self.vuln['id'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload')
+        vulns = self.backend.get_vulns_v2(body={"innerFilters": [{"id": self.vuln['id'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload', enrich_tickets=True)
         assert len(vulns) == 1, f"Expected one vulnerability, got: {vulns}"
         assert len(vulns[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in component")
-        components = self.backend.get_vuln_v2_components(body={"innerFilters": [{"name": self.vuln['componentInfo']['name'],"version": self.vuln['componentInfo']['version'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload')
+        components = self.backend.get_vuln_v2_components(body={"innerFilters": [{"name": self.vuln['componentInfo']['name'],"version": self.vuln['componentInfo']['version'], "kind":self.vulnWL['kind'], "workload" : self.vulnWL['name'], "cluster":self.cluster, "namespace":self.namespace}]}, scope='workload', enrich_tickets=True)
         assert len(components) == 1, f"Expected one component, got: {components}"
         assert len(components[0]['tickets']) > 0, "Image is missing Jira issue"
 
         Logger.logger.info(f"Verify Jira issue in workload")
-        workloads = self.backend.get_vuln_v2_workloads(body={"innerFilters": [{"resourceHash": self.vulnWL['resourceHash']}]})
+        workloads = self.backend.get_vuln_v2_workloads(body={"innerFilters": [{"resourceHash": self.vulnWL['resourceHash']}]}, enrich_tickets=True)
         assert len(workloads) == 1, f"Expected one workload, got: {workloads}"
         assert len(workloads[0]['tickets']) > 0, "Image is missing Jira issue"
 
