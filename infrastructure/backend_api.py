@@ -2405,33 +2405,42 @@ class ControlPanelAPI(object):
             raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
         return j['response']
 
-    def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0):
-        return self.post_list_request(API_VULNERABILITY_V2_WORKLOAD, body, expected_results)
+    def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0, enrich_tickets=False):
+        params = {}
+        if not enrich_tickets:
+            params = {"enrichTickets": "false"}
+        return self.post_list_request(API_VULNERABILITY_V2_WORKLOAD, body, expected_results, params=params)
 
     def get_vuln_v2_workload_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2_WORKLOAD, body)
 
-    def get_vulns_v2(self, body: dict, expected_results: int = 0, scope: str = None):
-        params = None
+    def get_vulns_v2(self, body: dict, expected_results: int = 0, scope: str = None, enrich_tickets=False):
+        params = {}
         if scope:
             params = {"scope": scope}
+        if not enrich_tickets:
+            params = {"enrichTickets": "false"}
         return self.post_list_request(API_VULNERABILITY_V2, body, expected_results, params=params)
 
     def get_vuln_v2_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2, body)
 
-    def get_vuln_v2_images(self, body: dict, expected_results: int = 0, scope: str = None):
+    def get_vuln_v2_images(self, body: dict, expected_results: int = 0, scope: str = None, enrich_tickets=False):
         url = API_VULNERABILITY_V2_IMAGE
-        params = None
+        params = {}
         if scope:
             params = {"scope": scope}
+        if not enrich_tickets:
+            params = {"enrichTickets": "false"}
         return self.post_list_request(url, body, expected_results, params=params)
 
-    def get_vuln_v2_components(self, body: dict, expected_results: int = 0, scope: str = None):
+    def get_vuln_v2_components(self, body: dict, expected_results: int = 0, scope: str = None, enrich_tickets=False):
         url = API_VULNERABILITY_V2_IMAGE
-        params = None
+        params = {}
         if scope:
             params = {"scope": scope}
+        if not enrich_tickets:
+            params = {"enrichTickets": "false"}
         return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results, params=params)
 
     def get_posture_resources_highlights(self, body: dict):
