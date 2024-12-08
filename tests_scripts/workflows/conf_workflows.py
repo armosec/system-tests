@@ -130,7 +130,12 @@ class WorkflowConfigurations(Workflows):
             "updatedBy": "",
             "enabled": True,
             "name": workflow_name,
-            "scope": [],
+            "scope": [
+                {
+                    "cluster": "some-cluster",
+                    "namespace": "some-namespace"
+                }
+            ],
             "conditions": [
                 {
                     "category": "SecurityRisks",
@@ -159,7 +164,12 @@ class WorkflowConfigurations(Workflows):
             "updatedBy": "",
             "enabled": True,
             "name": workflow_name,
-            "scope": [],
+             "scope": [
+                {
+                    "cluster": "some-cluster",
+                    "namespace": "some-namespace"
+                }
+            ],
             "conditions": [
                 {
                     "category": "SecurityRisks",
