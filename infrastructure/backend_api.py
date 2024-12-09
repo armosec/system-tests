@@ -1790,7 +1790,8 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get registry scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         cronjob_list = r.json()
-
+        if cronjob_list is None:
+            cronjob_list = []
         for cj in cronjob_list:
             if cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED] == cj_name:
                 return cj
