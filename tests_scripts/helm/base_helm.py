@@ -99,6 +99,8 @@ class BaseHelm(BaseK8S):
 
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
+        
+        self.helm_branch = "nokollector" # hardcoded to forcer the use of the nokollector branch in all tests
 
         if self.helm_branch != DEFAULT_BRANCH:
             self.download_armo_helm_chart_from_branch(branch=self.helm_branch)
