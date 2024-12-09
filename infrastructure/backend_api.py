@@ -1723,6 +1723,8 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get registry scan cronjob list "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         cronjob_list = r.json()
+        if cronjob_list is None:
+            cronjob_list = []
         registry_scan_cronjob_list = [cj for cj in cronjob_list if
                                       cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
         self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs,
