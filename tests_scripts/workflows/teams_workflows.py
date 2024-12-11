@@ -1,14 +1,12 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     TEAMS_CHANNEL_NAME,
     SECURITY_RISKS,
     SECURITY_RISKS_ID,
     VULNERABILITIES,
-    SEVERITIES_CRITICAL,
     SEVERITIES_MEDIUM,
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME_TEAMS,
@@ -110,7 +108,6 @@ class WorkflowsTeamsNotifications(Workflows):
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        # TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
         
         Logger.logger.info('Stage 12: Assert all messages sent')
         self.assert_messages_sent(before_test_message_ts, self.cluster)

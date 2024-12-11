@@ -1,13 +1,11 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     JIRA_PROVIDER_NAME,
     SECURITY_RISKS,
     SECURITY_RISKS_ID,
     VULNERABILITIES,
-    SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
     SEVERITIES_MEDIUM,
     VULNERABILITIES_WORKFLOW_NAME_JIRA,
