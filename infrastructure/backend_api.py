@@ -2185,7 +2185,7 @@ class ControlPanelAPI(object):
         return res
 
     def check_registry(self, payload, provider) -> requests.Response:
-        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider + "/repositories", cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider + "/repositories", cookies=self.selected_tenant_cookie, data=json.dumps(payload), timeout=60)
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: check registry "%s" (code: %d, message: %s)' % (
@@ -2193,7 +2193,7 @@ class ControlPanelAPI(object):
         return res
 
     def create_registry(self, payload, provider) -> requests.Response:
-        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        res = self.post(API_REGISTRY_MANAGEMENT + "/" + provider, cookies=self.selected_tenant_cookie, data=json.dumps(payload), timeout=60)
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: create registry "%s" (code: %d, message: %s)' % (
@@ -2217,7 +2217,7 @@ class ControlPanelAPI(object):
         return res
 
     def update_registry(self, payload, provider, guid) -> requests.Response:
-        res = self.put(API_REGISTRY_MANAGEMENT + "/" + provider + "/" + guid, cookies=self.selected_tenant_cookie, data=json.dumps(payload))
+        res = self.put(API_REGISTRY_MANAGEMENT + "/" + provider + "/" + guid, cookies=self.selected_tenant_cookie, data=json.dumps(payload), timeout=60)
         if not 200 <= res.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: update registry "%s" (code: %d, message: %s)' % (
