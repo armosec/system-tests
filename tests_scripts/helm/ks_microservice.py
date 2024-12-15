@@ -564,12 +564,11 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             self.backend.is__backend_returning_only_ks_cronjob(
                 cluster_name), "kubescape cronjob failed to create in backend"
 
-            sleep_time += 30
-            TestUtil.sleep(sleep_time, "wait till data will arrive to backend")
             Logger.logger.info("Get report-guid")
             report_guid = self.get_report_guid(cluster_name=cluster_name,
                                                old_report_guid=old_report_guid,
-                                               framework_name=framework_list[0])
+                                               framework_name=framework_list[0],
+                                               wait_to_result=True)
 
             Logger.logger.info('get result from kubescape in cluster')
             kubescape_result = self.get_kubescape_as_server_last_result(cluster_name, port=port)
