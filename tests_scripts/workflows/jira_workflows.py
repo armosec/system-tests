@@ -49,9 +49,9 @@ class WorkflowsJiraNotifications(Workflows):
         
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, jiraCollaborationGUID=get_env("JIRA_COLLABORATION_GUID"), siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, jiraCollaborationGUID=get_env("JIRA_COLLABORATION_GUID"), siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
@@ -229,7 +229,7 @@ class WorkflowsJiraNotifications(Workflows):
         print(f"Workflow with name {workflow_name} not found")
         return None
     
-    def build_securityRisk_workflow_body(self, name, severities, siteId,  projectId, cluster, namespace, category, securityRiskIDs, issueTypeId, guid=None):
+    def build_securityRisk_workflow_body(self, name, severities, jiraCollaborationGUID, siteId,  projectId, cluster, namespace, category, securityRiskIDs, issueTypeId, guid=None):
         workflow_body = { 
             "guid": guid,
             "updatedTime": "",
@@ -257,6 +257,7 @@ class WorkflowsJiraNotifications(Workflows):
                     "provider": "jira",
                     "jiraTicketIdentifiers": [
                         {
+                            "collaborationGUID": jiraCollaborationGUID,
                             "siteId": siteId,
                             "projectId": projectId,
                             "issueTypeId": issueTypeId,
@@ -268,7 +269,7 @@ class WorkflowsJiraNotifications(Workflows):
         }
         return workflow_body
     
-    def build_vulnerabilities_workflow_body(self, name, severities, siteId, projectId, cluster, namespace, category, cvss, issueTypeId, guid=None):
+    def build_vulnerabilities_workflow_body(self, name, severities, jiraCollaborationGUID, siteId, projectId, cluster, namespace, category, cvss, issueTypeId, guid=None):
         workflow_body = { 
             "guid": guid,
             "updatedTime": "",
@@ -297,6 +298,7 @@ class WorkflowsJiraNotifications(Workflows):
                     "provider": "jira",
                     "jiraTicketIdentifiers": [
                         {
+                            "collaborationGUID": jiraCollaborationGUID,
                             "siteId": siteId,
                             "projectId": projectId,
                             "issueTypeId": issueTypeId,
