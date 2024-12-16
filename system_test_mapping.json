@@ -1672,7 +1672,8 @@
       "cadashboardbe",
       "event-ingester-service"
     ],
-    "skip_on_environment": "staging,production,production-us",
+    "description": "Checks workflows jira notifications",
+    "skip_on_environment": "",
     "owner": "jonathang@armosec.io"
   },
   "workflows_configurations": {
