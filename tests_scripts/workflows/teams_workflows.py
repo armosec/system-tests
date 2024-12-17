@@ -113,7 +113,7 @@ class WorkflowsTeamsNotifications(Workflows):
         # TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
         
         Logger.logger.info('Stage 12: Assert all messages sent')
-        self.assert_messages_sent(before_test_message_ts, self.cluster)
+        self.assert_messages_sent(before_test_message_ts, self.cluster, attempts=50, sleep_time=10)
 
         Logger.logger.info('Stage 13: Cleanup')
         return self.cleanup()
