@@ -76,7 +76,7 @@ class FrontEggSecretAPILogin(APILogin):
         self.set_FrontEgg_auth_user_id(auth)
         
         cookie = super().getCookie(self.base_url, auth, customer_guid)
-        return customer_guid, cookie, cookie["auth"]
+        return customer_guid, cookie, auth
     
     def set_FrontEgg_auth_user_id(self, auth):
         self.frontEgg_auth = auth
