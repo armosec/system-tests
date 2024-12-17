@@ -207,6 +207,8 @@ class WorkflowsTeamsNotifications(Workflows):
         found_vulnerability = False
         found_misconfiguration = False
         for i in range(attempts):
+            if found_misconfiguration and found_security_risk and found_vulnerability:
+                break
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
