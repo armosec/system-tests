@@ -2889,6 +2889,23 @@ class ControlPanelAPI(object):
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
+    
+    def get_jira_collaboration_guid_by_site_name(self, site_name: str):
+        config = self.get_jira_config()
+        jira_connections = config.get("jiraConnections", [])
+        if not jira_connections:
+            raise Exception("No Jira connections found in the response")
+        
+        for connection in jira_connections:
+            selected_site = connection.get("selectedSite", {})
+            if selected_site.get("name") == site_name:
+                collabGUID = connection.get("jiraCollabGUID", "")
+                if collabGUID:
+                    return collabGUID
+                else:
+                    raise Exception(f"Jira collaboration GUID is empty or missing for site '{site_name}'")
+        
+        raise Exception(f"No Jira collaboration found for site '{site_name}'")
 
     def update_jira_config(self, body: dict):
         url = API_INTEGRATIONS + "/jira/configV2"

@@ -65,7 +65,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         jiraStatus = next((status for status in connectionStatus if status['provider'] == 'jira'), None)
         assert jiraStatus, "Jira is missing form connection status"
         assert jiraStatus['status'] == "connected", "Jira is not connected"
-        jiraCollaborationGUID = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        jiraCollaborationGUID = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
 
         Logger.logger.info('get cyberarmor-io site')   
         projectsResp = self.backend.search_jira_projects(body={'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID}]})
@@ -118,24 +118,6 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.project = project
         self.issueType = issueType
 
-    def get_jira_collaboration_guid_by_site_name(self, site_name: str):
-        config = self.backend.get_jira_config()
-        jira_connections = config.get("jiraConnections", [])
-        if not jira_connections:
-            raise Exception("No Jira connections found in the response")
-        
-        for connection in jira_connections:
-            selected_site = connection.get("selectedSite", {})
-            if selected_site.get("name") == site_name:
-                collabGUID = connection.get("jiraCollabGUID", "")
-                if collabGUID:
-                    return collabGUID
-                else:
-                    raise Exception(f"Jira collaboration GUID is empty or missing for site '{site_name}'")
-        
-        raise Exception(f"No Jira collaboration found for site '{site_name}'")
-
-
 
     def setup_cluster_and_run_posture_scan(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -172,7 +154,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and control {controlId}")
         issue = self.test_obj["issueTemplate"].copy()
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
         issue['issueTypeId'] = self.issueType['id']
@@ -216,7 +198,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and security_risk_id {security_risk_id}")
         issue = self.test_obj["issueTemplate"].copy()
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['issueType'] = "securityIssue"
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
@@ -307,7 +289,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
     def create_vuln_tickets(self):
         Logger.logger.info('create global ticket for CVE')
         issue = self.test_obj["issueTemplate"].copy()
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['issueType'] = "vulnerability"
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
@@ -318,7 +300,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert globalCVEicket, "Jira ticket is empty"
 
         Logger.logger.info('create  ticket for workload CVE')
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test CVE Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
         workloadCVEicket = self.backend.create_jira_issue(issue)
@@ -329,7 +311,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info('create global ticket for image')
         del issue['owner']
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['issueType'] = "image"
         issue['subjects'] = [{"imageRepository": self.vulnImage['repository']}]
         issue['fields']['summary'] = f"Jira System Test global Issue image:{self.vulnImage['repository']}"
@@ -337,7 +319,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert globalImageTicket, "Jira ticket is empty"
 
         Logger.logger.info('create ticket for image in workload')
-        issue["collaborationGUID"] = self.get_jira_collaboration_guid_by_site_name(self.site_name)
+        issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test image Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
         workloadImageTicket = self.backend.create_jira_issue(issue)
