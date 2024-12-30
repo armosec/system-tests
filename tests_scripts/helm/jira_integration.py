@@ -58,7 +58,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
     def setup_jira_config(self):       
         Logger.logger.info('check jira connection status')
-        connectionStatus = self.backend.laget_integration_status("jira")
+        connectionStatus = self.backend.get_integration_status("jira")
         assert connectionStatus, "Connection status is empty"
         assert len(connectionStatus) ==  1, "Got more than one connection status"
         jiraStatus = next((status for status in connectionStatus if status['provider'] == 'jira'), None)
@@ -118,10 +118,18 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         jira_connections = config.get("jiraConnections", [])
         if not jira_connections:
             raise Exception("No Jira connections found in the response")
-        collabGUID = jira_connections[0].get("jiraCollabGUID", "")
-        if not collabGUID:
-            raise Exception("Jira collaboration GUID is empty or missing")
-        return collabGUID
+        
+        for connection in jira_connections:
+            selected_site = connection.get("selectedSite", {})
+            if selected_site.get("name") == "cyberarmor-io":
+                collabGUID = connection.get("jiraCollabGUID", "")
+                if collabGUID:
+                    return collabGUID
+                else:
+                    raise Exception("Jira collaboration GUID is empty or missing for site 'cyberarmor-io'")
+        
+        raise Exception("No Jira collaboration found for site 'cyberarmor-io'")
+
 
 
     def setup_cluster_and_run_posture_scan(self):

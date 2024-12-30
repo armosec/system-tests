@@ -2878,7 +2878,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def laget_integration_status(self, provider: str):
+    def get_integration_status(self, provider: str):
         url = API_INTEGRATIONS + "/connectionV2/status"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id, "provider": provider})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
