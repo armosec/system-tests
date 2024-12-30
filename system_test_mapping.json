@@ -1695,11 +1695,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "config-service"
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks accounts",
     "skip_on_environment": "",
-    "owner": ""
+    "owner": "eranm@armosec.io"
   }
 }

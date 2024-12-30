@@ -146,8 +146,8 @@ API_ACCOUNTS = "/api/v1/accounts"
 API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
 API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
-API_ACCOUNTS_CLOUD_UNIQUEVALUES = "/api/v1/accounts/cloud/uniquevalues"
-API_ACCOUNTS_KUBERNETES_UNIQUEVALUES = "/api/v1/accounts/kubernetes/uniquevalues"
+API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
+API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
 
 
 
@@ -3123,6 +3123,32 @@ class ControlPanelAPI(object):
         return r.json()
 
 
+    def get_cloud_accounts_uniquevalues(self, body):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        Logger.logger.info("get_cloud_accounts_uniquevalues body: %s" % body)
+
+        r = self.post(API_UNIQUEVALUES_ACCOUNTS_CLOUD, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_cloud_accounts_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def get_kubernetes_accounts_uniquevalues(self, body):
+        params = {"customerGUID": self.selected_tenant_id}
+
+        Logger.logger.info("get_kubernetes_accounts_uniquevalues body: %s" % body)
+
+        r = self.post(API_UNIQUEVALUES_ACCOUNTS_KUBERNETES, params=params, json=body)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get_kubernetes_accounts_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
     def create_cloud_account(self, body, provider):
         url = API_ACCOUNTS
         params = {"customerGUID": self.selected_tenant_id,
@@ -3165,7 +3191,14 @@ class ControlPanelAPI(object):
         return r.json()
 
 
-
+    def get_aws_regions(self):
+        url = API_ACCOUNTS_AWS_REGIONS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
 
 
