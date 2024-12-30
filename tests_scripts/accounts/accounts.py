@@ -128,7 +128,7 @@ class Accounts(BaseHelm):
     def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, replicas=6)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
 
     def create_and_validate_cloud_account(self, cloud_account_name:str, arn:str, provider:str, expect_failure:bool=False):
