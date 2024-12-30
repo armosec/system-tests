@@ -1,4 +1,5 @@
 {
+    "collaborationGUID": "",
     "issueType": "clusterControl",
     "fields": {
         "summary": "armo system test",

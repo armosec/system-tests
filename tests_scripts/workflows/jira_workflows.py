@@ -1,13 +1,11 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     JIRA_PROVIDER_NAME,
     SECURITY_RISKS,
     SECURITY_RISKS_ID,
     VULNERABILITIES,
-    SEVERITIES_CRITICAL,
     SEVERITIES_HIGH,
     SEVERITIES_MEDIUM,
     VULNERABILITIES_WORKFLOW_NAME_JIRA,
@@ -30,6 +28,7 @@ class WorkflowsJiraNotifications(Workflows):
         self.fw_name = None
         self.cluster = None
         self.wait_for_agg_to_end = False
+        self.site_name = "cyberarmor-io"
 
 
     def start(self):
@@ -47,11 +46,13 @@ class WorkflowsJiraNotifications(Workflows):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, self.namespace = self.setup(apply_services=False)
         
+
                 
         Logger.logger.info("Stage 1: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, jiraCollaborationGUID=get_env("JIRA_COLLABORATION_GUID"), siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        jiraCollaborationGUID = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, jiraCollaborationGUID=get_env("JIRA_COLLABORATION_GUID"), siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
@@ -81,6 +82,7 @@ class WorkflowsJiraNotifications(Workflows):
             self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster))
             self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
             return super().cleanup(**kwargs)
+    
     
     def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=20, sleep_time=20):
        

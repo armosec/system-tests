@@ -2879,19 +2879,36 @@ class ControlPanelAPI(object):
         return r
 
     def get_integration_status(self, provider: str):
-        url = API_INTEGRATIONS + "/connection/status"
+        url = API_INTEGRATIONS + "/connectionV2/status"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id, "provider": provider})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
     def get_jira_config(self):
-        url = API_INTEGRATIONS + "/jira/config"
+        url = API_INTEGRATIONS + "/jira/configV2"
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
+    
+    def get_jira_collaboration_guid_by_site_name(self, site_name: str):
+        config = self.get_jira_config()
+        jira_connections = config.get("jiraConnections", [])
+        if not jira_connections:
+            raise Exception("No Jira connections found in the response")
+        
+        for connection in jira_connections:
+            selected_site = connection.get("selectedSite", {})
+            if selected_site.get("name") == site_name:
+                collabGUID = connection.get("jiraCollabGUID", "")
+                if collabGUID:
+                    return collabGUID
+                else:
+                    raise Exception(f"Jira collaboration GUID is empty or missing for site '{site_name}'")
+        
+        raise Exception(f"No Jira collaboration found for site '{site_name}'")
 
     def update_jira_config(self, body: dict):
-        url = API_INTEGRATIONS + "/jira/config"
+        url = API_INTEGRATIONS + "/jira/configV2"
         r = self.post(url,
                       params={"customerGUID": self.selected_tenant_id},
                       json=body)
@@ -2901,7 +2918,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
 
     def search_jira_projects(self, body: dict):
-        url = API_INTEGRATIONS + "/jira/projects/search"
+        url = API_INTEGRATIONS + "/jira/projectsV2/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
                       json=body)
         if not 200 <= r.status_code < 300:
@@ -2911,7 +2928,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def search_jira_issue_types(self, body: dict):
-        url = API_INTEGRATIONS + "/jira/issueTypes/search"
+        url = API_INTEGRATIONS + "/jira/issueTypesV2/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
                       json=body)
         if not 200 <= r.status_code < 300:
@@ -2921,7 +2938,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def search_jira_schema(self, body: dict):
-        url = API_INTEGRATIONS + "/jira/issueTypes/schema/search"
+        url = API_INTEGRATIONS + "/jira/issueTypesV2/schema/search"
         r = self.post(url, params={"customerGUID": self.customer_guid},
                       json=body)
         if not 200 <= r.status_code < 300:
@@ -2941,7 +2958,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def create_jira_issue(self, body: dict):
-        url = API_INTEGRATIONS + "/jira/issue"
+        url = API_INTEGRATIONS + "/jira/issueV2"
         r = self.post(url, params={"customerGUID": self.customer_guid},
                       json=body)
         if not 200 <= r.status_code < 300:
