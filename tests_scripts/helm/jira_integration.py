@@ -58,21 +58,22 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
     def setup_jira_config(self):       
         Logger.logger.info('check jira connection status')
-        connectionStatus = self.backend.get_integration_status("jira")
+        connectionStatus = self.backend.laget_integration_status("jira")
         assert connectionStatus, "Connection status is empty"
         assert len(connectionStatus) ==  1, "Got more than one connection status"
         jiraStatus = next((status for status in connectionStatus if status['provider'] == 'jira'), None)
         assert jiraStatus, "Jira is missing form connection status"
         assert jiraStatus['status'] == "connected", "Jira is not connected"
+        jiraCollaborationGUID = self.get_jira_collaboration_guid()
 
         Logger.logger.info('get cyberarmor-io site')   
-        projectsResp = self.backend.search_jira_projects({})
+        projectsResp = self.backend.search_jira_projects(body={'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID}]})
         assert projectsResp, "Jira projects response is empty"
         site = next((site for site in projectsResp['availableSites'] if site['name'] == 'cyberarmor-io'), None)
         assert site, "cyberarmor-io is missing from available sites"
 
         Logger.logger.info('get Jira System Tests project')       
-        projectsResp = projectsResp = self.backend.search_jira_projects({'innerFilters': [{'siteId': site['id'], 'name': 'Jira System Tests'}]})
+        projectsResp = projectsResp = self.backend.search_jira_projects({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'name': 'Jira System Tests'}]})
         assert projectsResp, "Jira projects response is empty"
         project = next((project for project in projectsResp['projects'] if project['name'] == 'Jira System Tests'), None)
         assert project, "Jira System Tests is missing from projects"
@@ -83,18 +84,20 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         Logger.logger.info('verify Jira configuration')
         config = self.backend.get_jira_config()
         assert config, "Jira configuration is empty"
-        assert config['selectedSite']['name'] == 'cyberarmor-io', "Jira site is not cyberarmor-io"
-        assert config['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
+        assert 'jiraConnections' in config and isinstance(config['jiraConnections'], list) and config['jiraConnections'], "No Jira connections found in the configuration"
+        connection = config['jiraConnections'][0]
+        assert 'selectedSite' in connection and connection['selectedSite']['name'] == 'cyberarmor-io', "Jira site is not cyberarmor-io"
+        assert 'projects' in connection and isinstance(connection['projects'], list) and connection['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
 
 
         Logger.logger.info('get jira test issue type')
-        issueTypesRes = self.backend.search_jira_issue_types({'innerFilters': [{'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
+        issueTypesRes = self.backend.search_jira_issue_types({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
         assert issueTypesRes, "Jira issue types response is empty"
         issueType = next((issueType for issueType in issueTypesRes['response'] if issueType['name'] == 'System Test Issue Type'), None)
         assert issueType, "System Test Issue Type is missing from issue types"
 
         Logger.logger.info('verify issue type schema')
-        schema = self.backend.search_jira_schema({'innerFilters': [{
+        schema = self.backend.search_jira_schema({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID,
             'siteId': site['id'], 'projectId': project['id'], 'issueTypeId': issueType['id'],
             'includeFields': 'summary,description,reporter,labels,assignee,users,user'}]})
         assert schema, "Jira schema response is empty"
@@ -109,6 +112,17 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.site = site
         self.project = project
         self.issueType = issueType
+
+    def get_jira_collaboration_guid(self):
+        config = self.backend.get_jira_config()
+        jira_connections = config.get("jiraConnections", [])
+        if not jira_connections:
+            raise Exception("No Jira connections found in the response")
+        collabGUID = jira_connections[0].get("jiraCollabGUID", "")
+        if not collabGUID:
+            raise Exception("Jira collaboration GUID is empty or missing")
+        return collabGUID
+
 
     def setup_cluster_and_run_posture_scan(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -145,6 +159,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and control {controlId}")
         issue = self.test_obj["issueTemplate"].copy()
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
         issue['issueTypeId'] = self.issueType['id']
@@ -188,6 +203,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and security_risk_id {security_risk_id}")
         issue = self.test_obj["issueTemplate"].copy()
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['issueType'] = "securityIssue"
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
@@ -278,6 +294,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
     def create_vuln_tickets(self):
         Logger.logger.info('create global ticket for CVE')
         issue = self.test_obj["issueTemplate"].copy()
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['issueType'] = "vulnerability"
         issue['siteId'] = self.site['id']
         issue['projectId'] = self.project['id']
@@ -288,6 +305,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert globalCVEicket, "Jira ticket is empty"
 
         Logger.logger.info('create  ticket for workload CVE')
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test CVE Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
         workloadCVEicket = self.backend.create_jira_issue(issue)
@@ -298,6 +316,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         Logger.logger.info('create global ticket for image')
         del issue['owner']
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['issueType'] = "image"
         issue['subjects'] = [{"imageRepository": self.vulnImage['repository']}]
         issue['fields']['summary'] = f"Jira System Test global Issue image:{self.vulnImage['repository']}"
@@ -305,6 +324,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert globalImageTicket, "Jira ticket is empty"
 
         Logger.logger.info('create ticket for image in workload')
+        issue["collaborationGUID"] = self.get_jira_collaboration_guid()
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test image Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
         workloadImageTicket = self.backend.create_jira_issue(issue)
