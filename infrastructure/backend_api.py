@@ -142,6 +142,13 @@ API_WORKFLOWS = "/api/v1/workflows"
 API_WEBHOOKS = "/api/v1/notifications/teams"
 API_TEAMS_TEST_MESSAGE = "/api/v1/notifications/teams/testMessage"
 
+API_ACCOUNTS = "/api/v1/accounts"
+API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
+API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
+API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
+API_ACCOUNTS_CLOUD_UNIQUEVALUES = "/api/v1/accounts/cloud/uniquevalues"
+API_ACCOUNTS_KUBERNETES_UNIQUEVALUES = "/api/v1/accounts/kubernetes/uniquevalues"
+
 
 
 def deco_cookie(func):
@@ -3081,6 +3088,79 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error testing webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+
+    def get_cloud_accounts(self,  body=None, **kwargs):
+        url = API_ACCOUNTS_CLOUD_LIST
+        if body is None:
+            body = {"pageSize": 150, "pageNum": 1}
+
+        params = {"customerGUID": self.selected_tenant_id}
+        if kwargs:
+            params.update(**kwargs)
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing cloud accounts. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def get_kubernetes_accounts(self,  body=None, **kwargs):
+        url = API_ACCOUNTS_KUBERNETES_LIST
+        if body is None:
+            body = {"pageSize": 150, "pageNum": 1}
+
+        params = {"customerGUID": self.selected_tenant_id}
+        if kwargs:
+            params.update(**kwargs)
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing cloud accounts. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+
+    def create_cloud_account(self, body, provider):
+        url = API_ACCOUNTS
+        params = {"customerGUID": self.selected_tenant_id,
+                  "provider": provider}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating cloud account. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def delete_cloud_account(self, guid):
+        url = API_ACCOUNTS
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "innerFilters": [
+                {
+                    "guid": guid
+                }
+            ]
+        }
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting cloud account. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+
+
+    def update_cloud_account(self, body, provider):
+        url = API_ACCOUNTS
+        params = {"customerGUID": self.selected_tenant_id,
+                  "provider": provider}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating cloud account. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 

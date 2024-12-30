@@ -13,6 +13,7 @@ from .tests_cases.seccomp_tests import SeccompProfileTests
 from .tests_cases.security_risks_tests import SecurityRisksTests
 from .tests_cases.vuln_scan_tests import VulnerabilityScanningTests
 from .tests_cases.workflows_tests import WorkflowsTests
+from .tests_cases.accounts_tests import AccountsTests
 
 
 def all_tests_names():
@@ -34,6 +35,7 @@ def all_tests_names():
     tests.extend(TestUtil.get_class_methods(SeccompProfileTests))
     tests.extend(TestUtil.get_class_methods(WorkflowsTests))
     tests.extend(TestUtil.get_class_methods(RegistryTests))
+    tests.extend(TestUtil.get_class_methods(AccountsTests))
     return tests
 
 
@@ -70,6 +72,8 @@ def get_test(test_name):
         return WorkflowsTests().__getattribute__(test_name)()
     if test_name in TestUtil.get_class_methods(RegistryTests):
         return RegistryTests().__getattribute__(test_name)()
+    if test_name in TestUtil.get_class_methods(AccountsTests):
+        return AccountsTests().__getattribute__(test_name)()
 
 
 ALL_TESTS = all_tests_names()
