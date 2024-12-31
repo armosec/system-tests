@@ -767,7 +767,6 @@ class BaseK8S(BaseDockerizeTest):
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
-                Logger.logger.info(f"running pods {KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True)}")
                 result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 Logger.logger.info(f"cluster state {result}")
                 return
