@@ -3,6 +3,7 @@ from __future__ import print_function
 import json
 import operator
 import os
+import subprocess
 import time
 
 # allow support for python 3.10
@@ -626,11 +627,23 @@ class BaseK8S(BaseDockerizeTest):
         if wlid:
             namespace = Wlid.get_namespace(wlid=wlid)
             name = Wlid.get_name(wlid=wlid)
-        assert namespace is not None, "namespace is None"
+        assert namespace is not None, "Namespace cannot be None"
+        
         pods = self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace)
-        pods = list(filter(lambda x: name in x.metadata.name if isinstance(name, str) else list(
-            filter(lambda n: n in x.metadata.name, name)), pods)) if name else pods
-        return pods if include_terminating else list(filter(lambda x: x.status.phase != "Terminating", pods))
+
+        if pods is None:
+            return []
+        
+        if name:
+            if isinstance(name, str):
+                pods = [pod for pod in pods if name in pod.metadata.name]
+            else:
+                pods = [pod for pod in pods if any(n in pod.metadata.name for n in name)]
+        
+        if not include_terminating:
+            pods = [pod for pod in pods if pod.status.phase != "Terminating"]
+        
+        return pods
 
     def get_all_cluster_images(self, namespace: str = None, name: str = None, include_terminating: bool = True,
                                wlid: str = None):
@@ -689,9 +702,10 @@ class BaseK8S(BaseDockerizeTest):
         """
         :return: list of running pods with all containers ready
         """
-        return list(
+        ready_pods =  list(
             filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []),
                    self.get_pods(namespace=namespace, name=name)))
+        return ready_pods
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
         """
@@ -752,7 +766,9 @@ class BaseK8S(BaseDockerizeTest):
         while delta_t <= timeout:
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
-                Logger.logger.info(f"all pods are running after {timeout - delta_t} seconds")
+                Logger.logger.info(f"all pods are running after {delta_t} seconds")
+                result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                Logger.logger.info(f"cluster state {result}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
@@ -761,9 +777,11 @@ class BaseK8S(BaseDockerizeTest):
         Logger.logger.error("wrong number of pods are running, timeout: {} seconds. non_running_pods: {}".
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
-        # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
-        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
-                        .format(timeout, replicas, len(running_pods)))  # , len(total_pods)))
+        
+        result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        Logger.logger.info(f"cluster state {result}")
+        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
+                        .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
 
     def is_namespace_running(self, namespace):
         for ns in self.kubernetes_obj.client_CoreV1Api.list_namespace().items:
