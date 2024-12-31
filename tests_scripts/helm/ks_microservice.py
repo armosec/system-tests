@@ -374,6 +374,18 @@ class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("2.2 verify installation")
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
+        Logger.logger.info(f"Waiting for resources of namespace {self.namespace} to be created in kubernetes resources")
+        resources, t = self.wait_for_report(
+            self.backend.get_kubernetes_resources,
+            timeout=120,
+            cluster_name=cluster,
+            namespace=namespace
+            )
+        
+        assert len(resources) > 0, "No resources found, expecting resources"
+        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"])
+        
+
         Logger.logger.info("3. Verify scenario on backend")
         scenarios_manager.verify_scenario(current_datetime)
         Logger.logger.info("attack chains detected, applying fix command")
