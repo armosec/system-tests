@@ -2999,7 +2999,11 @@ class ControlPanelAPI(object):
     def get_workflows(self,  body=None, **kwargs):
         url = API_WORKFLOWS + "/list"
         if body is None:
-            body = {"pageSize": 150, "pageNum": 1}
+            body = {
+                        "pageSize": 150, 
+                        "pageNum": 1, 
+                        "orderBy": "updatedTime:desc"
+                  }
 
         params = {"customerGUID": self.selected_tenant_id}
         if kwargs:
