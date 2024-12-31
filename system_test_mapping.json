@@ -164,9 +164,9 @@
       "In cluster"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
@@ -178,9 +178,9 @@
       "In cluster"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
