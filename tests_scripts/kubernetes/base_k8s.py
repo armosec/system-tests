@@ -777,7 +777,9 @@ class BaseK8S(BaseDockerizeTest):
         Logger.logger.error("wrong number of pods are running, timeout: {} seconds. non_running_pods: {}".
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
-        # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
+        
+        result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        Logger.logger.info(f"cluster state {result}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
                         .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
 
