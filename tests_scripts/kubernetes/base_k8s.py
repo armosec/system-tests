@@ -778,7 +778,7 @@ class BaseK8S(BaseDockerizeTest):
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
-                        .format(timeout, replicas, len(running_pods)), running_pods)  # , len(total_pods)))
+                        .format(timeout, replicas, len(running_pods), running_pods))  # , len(total_pods)))
 
     def is_namespace_running(self, namespace):
         for ns in self.kubernetes_obj.client_CoreV1Api.list_namespace().items:
