@@ -765,7 +765,7 @@ class BaseK8S(BaseDockerizeTest):
         while delta_t <= timeout:
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
-                Logger.logger.info(f"all pods are running after {timeout - delta_t} seconds")
+                Logger.logger.info(f"all pods are running after {delta_t} seconds")
                 Logger.logger.info(f"running pods {KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True)}")
                 Logger.logger.info(f"cluster state {KubectlWrapper.run_kubectl_command('get pods -A', f_json=True)}")
                 return
@@ -778,7 +778,7 @@ class BaseK8S(BaseDockerizeTest):
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         # KubectlWrapper.convert_workload_to_dict(total_pods, f_json=True, indent=2)))
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
-                        .format(timeout, replicas, len(running_pods), running_pods))  # , len(total_pods)))
+                        .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
 
     def is_namespace_running(self, namespace):
         for ns in self.kubernetes_obj.client_CoreV1Api.list_namespace().items:
