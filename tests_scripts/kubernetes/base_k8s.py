@@ -767,7 +767,7 @@ class BaseK8S(BaseDockerizeTest):
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {timeout - delta_t} seconds")
                 Logger.logger.info(f"running pods {KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True)}")
-                Logger.logger.info(f"cluster state {KubectlWrapper.convert_workload_to_dict(self.get_all_pods(), f_json=True)}")
+                Logger.logger.info(f"cluster state {KubectlWrapper.run_kubectl_command('get pods -A', f_json=True)}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
