@@ -626,11 +626,23 @@ class BaseK8S(BaseDockerizeTest):
         if wlid:
             namespace = Wlid.get_namespace(wlid=wlid)
             name = Wlid.get_name(wlid=wlid)
-        assert namespace is not None, "namespace is None"
+        assert namespace is not None, "Namespace cannot be None"
+        
         pods = self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace)
-        pods = list(filter(lambda x: name in x.metadata.name if isinstance(name, str) else list(
-            filter(lambda n: n in x.metadata.name, name)), pods)) if name else pods
-        return pods if include_terminating else list(filter(lambda x: x.status.phase != "Terminating", pods))
+
+        if pods is None:
+            return []
+        
+        if name:
+            if isinstance(name, str):
+                pods = [pod for pod in pods if name in pod.metadata.name]
+            else:
+                pods = [pod for pod in pods if any(n in pod.metadata.name for n in name)]
+        
+        if not include_terminating:
+            pods = [pod for pod in pods if pod.status.phase != "Terminating"]
+        
+        return pods
 
     def get_all_cluster_images(self, namespace: str = None, name: str = None, include_terminating: bool = True,
                                wlid: str = None):
@@ -689,9 +701,11 @@ class BaseK8S(BaseDockerizeTest):
         """
         :return: list of running pods with all containers ready
         """
-        return list(
+        ready_pods =  list(
             filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []),
                    self.get_pods(namespace=namespace, name=name)))
+        Logger.logger.debug(f"ready pods in namespace {namespace}: {ready_pods}")
+        return ready_pods
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
         """
