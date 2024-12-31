@@ -3,6 +3,7 @@ from __future__ import print_function
 import json
 import operator
 import os
+import subprocess
 import time
 
 # allow support for python 3.10
@@ -767,7 +768,8 @@ class BaseK8S(BaseDockerizeTest):
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
                 Logger.logger.info(f"running pods {KubectlWrapper.convert_workload_to_dict(running_pods, f_json=True)}")
-                Logger.logger.info(f"cluster state {KubectlWrapper.run_kubectl_command('get pods -A', f_json=True)}")
+                result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                Logger.logger.info(f"cluster state {result}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
