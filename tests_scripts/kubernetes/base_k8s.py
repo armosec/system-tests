@@ -807,8 +807,6 @@ class BaseK8S(BaseDockerizeTest):
         
         all_pods_message = self.get_all_pods_printable_details()
         Logger.logger.info(f"cluster states:\n{all_pods_message}") 
-        not_running_pods_message = self.get_all_not_running_pods_describe_details()   
-        Logger.logger.info(f"not running pods details:\n{not_running_pods_message}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
 
