@@ -768,6 +768,7 @@ class BaseK8S(BaseDockerizeTest):
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
                 result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = " ".join(result.stdout.splitlines())
                 Logger.logger.info(f"cluster state {result}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
@@ -779,6 +780,7 @@ class BaseK8S(BaseDockerizeTest):
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
         result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = " ".join(result.stdout.splitlines())
         Logger.logger.info(f"cluster state {result}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
                         .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
