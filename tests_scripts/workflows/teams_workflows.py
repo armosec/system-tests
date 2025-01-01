@@ -215,6 +215,7 @@ class WorkflowsTeamsNotifications(Workflows):
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
                 assert found > 1, f"expected to have at least 1 messages, found {found}"
+                Logger.logger.info(f"number of messages found: {found}")
 
                 if not found_security_risk:
                     self.assert_security_risks_message_sent(messages, cluster)
