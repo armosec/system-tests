@@ -159,20 +159,8 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.cluster = cluster
 
     def create_jira_issue(self, issue, retries=3, sleep=45):
-        for i in range(retries):
-            Logger.logger.info(f"Create Jira issue attempt {i+1}")
-            try:
-                ticket = self.backend.create_jira_issue(issue)
-                assert ticket, "Jira ticket is empty"
-                return ticket
-            except (Exception, AssertionError) as e:
-                # we can get RetryAfter error, so we will retry
-                if "RetryAfter".lower() in str(e).lower():
-                    Logger.logger.info(f"Jira issue creation failed with RetryAfter, retrying in {sleep} seconds")
-                    time.sleep(sleep)
-                else:
-                    raise e
-
+        return self.backend.create_jira_issue(issue)
+    
 
     def create_jira_issue_for_posture(self):
         resource = self.get_posture_resource()

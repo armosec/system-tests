@@ -1965,12 +1965,51 @@ class ControlPanelAPI(object):
         if not url.startswith("http://") and not url.startswith("https://"):
             url = self.server + url
         return requests.post(url, **args)
+    
+    @deco_cookie
+    def post_with_ratelimit(self, url, **args):
+        rate_limit_retries = 1
+        if "rate_limit_retries" in args:
+            rate_limit_retries = args["rate_limit_retries"]
+            del args["rate_limit_retries"]
+        
+        rate_limit_sleep = 45
+        if "rate_limit_sleep" in args:
+            rate_limit_sleep = args["rate_limit_sleep"]
+            del args["rate_limit_sleep"]
+        
+        for i in range(rate_limit_retries):
+            r = self.post(url, **args)
+            if r.status_code == 429  or "retryAfter".lower() in r.text.lower():
+                Logger.logger.debug(f"Rate limit reached for url: {url}. Retrying in {rate_limit_sleep} seconds")
+                time.sleep(rate_limit_sleep)
+            else:
+                return r
 
     @deco_cookie
     def get(self, url, **args):
         if not url.startswith("http://") and not url.startswith("https://"):
             url = self.server + url
         return requests.get(url, **args)
+
+    def get_with_rate_limit(self, url, **args):
+        rate_limit_retries = 1
+        if "rate_limit_retries" in args:
+            rate_limit_retries = args["rate_limit_retries"]
+            del args["rate_limit_retries"]
+        
+        rate_limit_sleep = 45
+        if "rate_limit_sleep" in args:
+            rate_limit_sleep = args["rate_limit_sleep"]
+            del args["rate_limit_sleep"]
+        
+        for i in range(rate_limit_retries):
+            r = self.get(url, **args)
+            if r.status_code == 429  or "retryAfter".lower() in r.text.lower():
+                Logger.logger.debug(f"Rate limit reached for url: {url}. Retrying in {rate_limit_sleep} seconds")
+                time.sleep(rate_limit_sleep)
+            else:
+                return r
 
     @deco_cookie
     def put(self, url, **args):
@@ -2886,7 +2925,7 @@ class ControlPanelAPI(object):
 
     def get_jira_config(self):
         url = API_INTEGRATIONS + "/jira/configV2"
-        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        r = self.get_with_rate_limit(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
@@ -2909,9 +2948,7 @@ class ControlPanelAPI(object):
 
     def update_jira_config(self, body: dict):
         url = API_INTEGRATIONS + "/jira/configV2"
-        r = self.post(url,
-                      params={"customerGUID": self.selected_tenant_id},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing smart remediation. Request: results of posture resources highlights "%s" (code: %d, message: %s)' % (
@@ -2919,8 +2956,7 @@ class ControlPanelAPI(object):
 
     def search_jira_projects(self, body: dict):
         url = API_INTEGRATIONS + "/jira/projectsV2/search"
-        r = self.post(url, params={"customerGUID": self.customer_guid},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
@@ -2929,8 +2965,7 @@ class ControlPanelAPI(object):
 
     def search_jira_issue_types(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issueTypesV2/search"
-        r = self.post(url, params={"customerGUID": self.customer_guid},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
@@ -2939,8 +2974,7 @@ class ControlPanelAPI(object):
 
     def search_jira_schema(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issueTypesV2/schema/search"
-        r = self.post(url, params={"customerGUID": self.customer_guid},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
@@ -2949,8 +2983,7 @@ class ControlPanelAPI(object):
 
     def search_jira_issue_field(self, body: dict):
         url = API_INTEGRATIONS + "jira/issueTypes/fields/search"
-        r = self.post(url, params={"customerGUID": self.customer_guid},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
@@ -2959,8 +2992,7 @@ class ControlPanelAPI(object):
 
     def create_jira_issue(self, body: dict):
         url = API_INTEGRATIONS + "/jira/issueV2"
-        r = self.post(url, params={"customerGUID": self.customer_guid},
-                      json=body)
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
