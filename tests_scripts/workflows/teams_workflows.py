@@ -195,18 +195,10 @@ class WorkflowsTeamsNotifications(Workflows):
 
     def assert_misconfiguration_message_sent(self, messages, cluster):
         found = 0
-        found_compliance = False
-        found_cluster = False
         for message in messages:
             message_string = str(message)
             # split message check for debug
-            if "Your compliance score has decreased by" in message_string:
-                Logger.logger.info("Compliance message found")
-                found_compliance = True
-            if cluster in message_string:
-                Logger.logger.info(f"Cluster {cluster} found in message")
-                found_cluster = True
-            if found_compliance and found_cluster:
+            if "Your compliance score has decreased by" in message_string and cluster in message_string:
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
 
