@@ -144,25 +144,23 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
         )
         assert report_guid != "", "report guid is empty"
-        self.report_guid = report_guid
+
+
+        # to make sure kubernetes resources are created
+        time.sleep(20)
+        Logger.logger.info(f"Trigger posture scan")
+        self.backend.trigger_posture_scan(cluster)
+
+        report_guid_new = self.get_report_guid(
+            cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=report_guid
+        )
+        self.report_guid = report_guid_new
         self.namespace = namespace
         self.cluster = cluster
 
     def create_jira_issue(self, issue, retries=3, sleep=45):
-        for i in range(retries):
-            Logger.logger.info(f"Create Jira issue attempt {i+1}")
-            try:
-                ticket = self.backend.create_jira_issue(issue)
-                assert ticket, "Jira ticket is empty"
-                return ticket
-            except (Exception, AssertionError) as e:
-                # we can get RetryAfter error, so we will retry
-                if "RetryAfter".lower() in str(e).lower():
-                    Logger.logger.info(f"Jira issue creation failed with RetryAfter, retrying in {sleep} seconds")
-                    time.sleep(sleep)
-                else:
-                    raise e
-
+        return self.backend.create_jira_issue(issue)
+    
 
     def create_jira_issue_for_posture(self):
         resource = self.get_posture_resource()
@@ -209,7 +207,15 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
     def create_jira_issue_for_security_risks(self):
         security_risk_id = "R_0011"
-        resource = self.get_security_risks_resource(security_risk_id)
+
+        resource, t = self.wait_for_report(
+            report_type=self.get_security_risks_resource,
+            timeout=220, 
+            sleep_interval=10,
+            security_risk_id=security_risk_id,
+        )
+
+        # resource = self.get_security_risks_resource(security_risk_id)
         resourceHash = resource['k8sResourceHash']
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and security_risk_id {security_risk_id}")

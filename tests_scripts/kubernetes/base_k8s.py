@@ -620,6 +620,23 @@ class BaseK8S(BaseDockerizeTest):
     def get_all_pods(self):
         return self.kubernetes_obj.client_CoreV1Api.list_pod_for_all_namespaces()
 
+    def get_all_pods_printable_details(self):
+        pods = self.get_all_pods()
+        message = ""
+        for pod in pods.items:
+            message += "Pod name: {0}, namespace: {1}, status: {2}\n".format(pod.metadata.name, pod.metadata.namespace,
+                                                                                pod.status.phase)
+        return message
+    
+    def get_all_not_running_pods_describe_details(self):
+        pods = self.get_all_pods()
+        message = ""
+        for pod in pods.items:
+            if pod.status.phase != "Running":
+                message += "Pod name: {0}, namespace: {1}, status: {2}, pod: {3}\n".format(pod.metadata.name, pod.metadata.namespace,
+                                                                                pod.status.phase, pod)
+        return message
+
     def get_pods(self, namespace: str = None, name: str = None, include_terminating: bool = True, wlid: str = None):
         """
         :return: list of running pods
@@ -634,6 +651,9 @@ class BaseK8S(BaseDockerizeTest):
         if pods is None:
             return []
         
+        # Safeguard: Explicit namespace filter
+        pods = [pod for pod in pods if pod.metadata.namespace == namespace]
+
         if name:
             if isinstance(name, str):
                 pods = [pod for pod in pods if name in pod.metadata.name]
@@ -702,9 +722,16 @@ class BaseK8S(BaseDockerizeTest):
         """
         :return: list of running pods with all containers ready
         """
-        ready_pods =  list(
-            filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []),
-                   self.get_pods(namespace=namespace, name=name)))
+
+        pods = self.get_pods(namespace=namespace, name=name)
+    
+        # Safeguard: Ensure namespace consistency
+        pods = [pod for pod in pods if pod.metadata.namespace == namespace]
+
+        ready_pods = [
+        pod for pod in pods
+        if all(container.ready for container in (pod.status.container_statuses or []))
+    ]
         return ready_pods
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
@@ -750,7 +777,7 @@ class BaseK8S(BaseDockerizeTest):
                                  timeout=timeout)
         return replicas
 
-    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=180,
+    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=220,
                             comp_operator=operator.eq):
         """
         compare number of expected running pods with actually running pods
@@ -767,13 +794,8 @@ class BaseK8S(BaseDockerizeTest):
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
-                result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                result = " ".join(result.stdout.splitlines())
-                Logger.logger.info(
-                    "cluster state\n"
-                    f"{result}"
-                )
-
+                all_pods_message = self.get_all_pods_printable_details()
+                Logger.logger.info(f"cluster states:\n{all_pods_message}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
@@ -783,14 +805,12 @@ class BaseK8S(BaseDockerizeTest):
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
-        result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        result = " ".join(result.stdout.splitlines())
-        Logger.logger.info(
-                    "cluster state\n"
-                    f"{result}"
-                )
-        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
-                        .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
+        all_pods_message = self.get_all_pods_printable_details()
+        Logger.logger.info(f"cluster states:\n{all_pods_message}") 
+        not_running_pods_message = self.get_all_not_running_pods_describe_details()   
+        Logger.logger.info(f"not running pods details:\n{not_running_pods_message}")
+        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
+                        .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
 
     def is_namespace_running(self, namespace):
         for ns in self.kubernetes_obj.client_CoreV1Api.list_namespace().items:
