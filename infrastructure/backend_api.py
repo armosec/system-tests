@@ -1966,25 +1966,31 @@ class ControlPanelAPI(object):
             url = self.server + url
         return requests.post(url, **args)
     
-    @deco_cookie
     def post_with_ratelimit(self, url, **args):
-        rate_limit_retries = 1
-        if "rate_limit_retries" in args:
-            rate_limit_retries = args["rate_limit_retries"]
-            del args["rate_limit_retries"]
-        
-        rate_limit_sleep = 45
-        if "rate_limit_sleep" in args:
-            rate_limit_sleep = args["rate_limit_sleep"]
-            del args["rate_limit_sleep"]
-        
-        for i in range(rate_limit_retries):
+        # Extract optional parameters with defaults
+        rate_limit_retries = args.pop("rate_limit_retries", 1)
+        rate_limit_sleep = args.pop("rate_limit_sleep", 45)
+
+        for attempt in range(1, rate_limit_retries + 1):
             r = self.post(url, **args)
-            if r.status_code == 429  or "retryAfter".lower() in r.text.lower():
-                Logger.logger.debug(f"Rate limit reached for url: {url}. Retrying in {rate_limit_sleep} seconds")
-                time.sleep(rate_limit_sleep)
+            
+            # Check for rate limiting in status code or response text
+            if r.status_code == 429 or "retryafter" in r.text.lower():
+                Logger.logger.debug(
+                    f"Rate limit reached for URL: {url}. Attempt {attempt} of {rate_limit_retries}. "
+                    f"Retrying in {rate_limit_sleep} seconds."
+                )
+                if attempt < rate_limit_retries:
+                    time.sleep(rate_limit_sleep)
+                else:
+                    Logger.logger.warning(
+                        f"Rate limit retries exhausted for URL: {url}. Returning last response."
+                    )
             else:
                 return r
+
+        # Return the last response if retries are exhausted
+        return r
 
     @deco_cookie
     def get(self, url, **args):
@@ -1993,23 +1999,28 @@ class ControlPanelAPI(object):
         return requests.get(url, **args)
 
     def get_with_rate_limit(self, url, **args):
-        rate_limit_retries = 1
-        if "rate_limit_retries" in args:
-            rate_limit_retries = args["rate_limit_retries"]
-            del args["rate_limit_retries"]
-        
-        rate_limit_sleep = 45
-        if "rate_limit_sleep" in args:
-            rate_limit_sleep = args["rate_limit_sleep"]
-            del args["rate_limit_sleep"]
-        
-        for i in range(rate_limit_retries):
+        rate_limit_retries = args.pop("rate_limit_retries", 1)
+        rate_limit_sleep = args.pop("rate_limit_sleep", 45)
+
+        for attempt in range(1, rate_limit_retries + 1):
             r = self.get(url, **args)
-            if r.status_code == 429  or "retryAfter".lower() in r.text.lower():
-                Logger.logger.debug(f"Rate limit reached for url: {url}. Retrying in {rate_limit_sleep} seconds")
-                time.sleep(rate_limit_sleep)
+            
+            if r.status_code == 429 or "retryafter" in r.text.lower():
+                Logger.logger.debug(
+                    f"Rate limit reached for URL: {url}. Attempt {attempt} of {rate_limit_retries}. "
+                    f"Retrying in {rate_limit_sleep} seconds."
+                )
+                if attempt < rate_limit_retries:
+                    time.sleep(rate_limit_sleep)
+                else:
+                    Logger.logger.warning(
+                        f"Rate limit retries exhausted for URL: {url}. Returning last response."
+                    )
             else:
                 return r
+        
+        # Return the last response if retries are exhausted
+        return r
 
     @deco_cookie
     def put(self, url, **args):
