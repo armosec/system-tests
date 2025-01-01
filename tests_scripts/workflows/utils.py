@@ -82,8 +82,15 @@ def get_messages_from_teams_channel(before_test):
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     }
-    response = requests.get(endpoint, headers=headers)
-    return response.json().get('value', [])
+    
+    messages = []
+    while endpoint:
+        response = requests.get(endpoint, headers=headers)
+        data = response.json()
+        messages.extend(data.get('value', []))
+        endpoint = data.get('@odata.nextLink')  # Set the endpoint to the next page link if present
+    return messages
+
 
 
 def get_messages_from_slack_channel(before_test):
