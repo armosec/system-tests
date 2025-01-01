@@ -634,6 +634,9 @@ class BaseK8S(BaseDockerizeTest):
         if pods is None:
             return []
         
+        # Safeguard: Explicit namespace filter
+        pods = [pod for pod in pods if pod.metadata.namespace == namespace]
+
         if name:
             if isinstance(name, str):
                 pods = [pod for pod in pods if name in pod.metadata.name]
@@ -702,9 +705,16 @@ class BaseK8S(BaseDockerizeTest):
         """
         :return: list of running pods with all containers ready
         """
-        ready_pods =  list(
-            filter(lambda pod: not any(container.ready is False for container in pod.status.container_statuses or []),
-                   self.get_pods(namespace=namespace, name=name)))
+
+        pods = self.get_pods(namespace=namespace, name=name)
+    
+        # Safeguard: Ensure namespace consistency
+        pods = [pod for pod in pods if pod.metadata.namespace == namespace]
+
+        ready_pods = [
+        pod for pod in pods
+        if all(container.ready for container in (pod.status.container_statuses or []))
+    ]
         return ready_pods
 
     def restart_pods(self, wlid=None, namespace: str = None, name: str = None):
