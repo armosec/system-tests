@@ -1,3 +1,4 @@
+import time
 from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
@@ -147,6 +148,22 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.namespace = namespace
         self.cluster = cluster
 
+    def create_jira_issue(self, issue, retries=3, sleep=40):
+        for i in range(retries):
+            Logger.logger.info(f"Create Jira issue attempt {i+1}")
+            try:
+                ticket = self.backend.create_jira_issue(issue)
+                assert ticket, "Jira ticket is empty"
+                return ticket
+            except Exception as e:
+                # we can get RetryAfter error, so we will retry
+                if "RetryAfter".lower() in str(e).lower():
+                    Logger.logger.info(f"Jira issue creation failed with RetryAfter, retrying in {sleep} seconds")
+                    time.sleep(sleep)
+                else:
+                    raise e
+
+
     def create_jira_issue_for_posture(self):
         resource = self.get_posture_resource()
         controlId = resource['failedControls'][0]
@@ -161,8 +178,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['owner'] = {"resourceHash": resourceHash}
         issue['subjects'] = [{"controlId": controlId}]
         issue['fields']['summary'] = f"Jira System Test control Issue cluster:{self.cluster} namespace:{self.namespace} resource:{resourceHash}"
-        ticket = self.backend.create_jira_issue(issue)
-        assert ticket, "Jira ticket is empty"
+        ticket = self.create_jira_issue(issue)
         self.postureTicket = ticket
         assert ticket['owner']['resourceHash'] == resourceHash, "Resource hash is not matching"
         assert ticket['subjects'][0]['controlID'] == controlId, "Control id is not matching"
@@ -206,7 +222,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['owner'] = {"resourceHash": resourceHash}
         issue['subjects'] = [{"securityRiskID": security_risk_id}]
         issue['fields']['summary'] = f"Jira System Test security risks Issue cluster:{self.cluster} namespace:{self.namespace} resource:{resourceHash}"
-        ticket = self.backend.create_jira_issue(issue)
+        ticket = self.create_jira_issue(issue)
         assert ticket, "Jira ticket is empty"
         self.securityTicket = ticket
         assert ticket['owner']['resourceHash'] == resourceHash, "Resource hash is not matching"
@@ -296,14 +312,14 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['issueTypeId'] = self.issueType['id']        
         issue['subjects'] = [{"cveName": self.vuln['name'],"severity": self.vuln['severity'] , "component": self.vuln['componentInfo']['name'], "componentVersion": self.vuln['componentInfo']['version']}]
         issue['fields']['summary'] = f"Jira System Test global Issue CVE:{self.vuln['name']}"
-        globalCVEicket = self.backend.create_jira_issue(issue)
+        globalCVEicket = self.create_jira_issue(issue)
         assert globalCVEicket, "Jira ticket is empty"
 
         Logger.logger.info('create  ticket for workload CVE')
         issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test CVE Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
-        workloadCVEicket = self.backend.create_jira_issue(issue)
+        workloadCVEicket = self.create_jira_issue(issue)
         assert workloadCVEicket, "Jira ticket is empty"
         assert workloadCVEicket, "Jira ticket is empty"
 
@@ -315,14 +331,14 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['issueType'] = "image"
         issue['subjects'] = [{"imageRepository": self.vulnImage['repository']}]
         issue['fields']['summary'] = f"Jira System Test global Issue image:{self.vulnImage['repository']}"
-        globalImageTicket = self.backend.create_jira_issue(issue)
+        globalImageTicket = self.create_jira_issue(issue)
         assert globalImageTicket, "Jira ticket is empty"
 
         Logger.logger.info('create ticket for image in workload')
         issue["collaborationGUID"] = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         issue['owner'] = {"cluster": self.vulnWL['cluster'], "namespace": self.vulnWL['namespace'], "kind": self.vulnWL['kind'], "name": self.vulnWL['name']}
         issue['fields']['summary'] = f"Jira System Test image Issue for workload cluster:{self.cluster} namespace:{self.namespace} image:{self.vulnImage['repository']}"
-        workloadImageTicket = self.backend.create_jira_issue(issue)
+        workloadImageTicket = self.create_jira_issue(issue)
         assert workloadImageTicket, "Jira ticket is empty"
  
 
