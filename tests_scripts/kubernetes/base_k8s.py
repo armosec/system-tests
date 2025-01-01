@@ -620,6 +620,14 @@ class BaseK8S(BaseDockerizeTest):
     def get_all_pods(self):
         return self.kubernetes_obj.client_CoreV1Api.list_pod_for_all_namespaces()
 
+    def get_all_pods_printable_details(self):
+        pods = self.get_all_pods()
+        message = ""
+        for pod in pods.items:
+            message += "Pod name: {0}, namespace: {1}, status: {2}\n".format(pod.metadata.name, pod.metadata.namespace,
+                                                                                pod.status.phase)
+        return message
+
     def get_pods(self, namespace: str = None, name: str = None, include_terminating: bool = True, wlid: str = None):
         """
         :return: list of running pods
@@ -777,12 +785,8 @@ class BaseK8S(BaseDockerizeTest):
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
-                all_pods = self.get_all_pods()
-                Logger.logger.info("cluster states:")
-               # Print the pod details
-                for pod in all_pods.items:
-                    Logger.logger.info(f"Namespace: {pod.metadata.namespace}, Name: {pod.metadata.name}, Status: {pod.status.phase}")
-
+                all_pods_message = self.get_all_pods_printable_details()
+                Logger.logger.info(f"cluster states:\n{all_pods_message}")
                 return
             delta_t = (datetime.now() - start).total_seconds()
             time.sleep(10)
@@ -792,12 +796,8 @@ class BaseK8S(BaseDockerizeTest):
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
-        all_pods = self.get_all_pods()
-        Logger.logger.info("cluster states:")
-        # Print the pod details
-        for pod in all_pods.items:
-            Logger.logger.info(f"Namespace: {pod.metadata.namespace}, Name: {pod.metadata.name}, Status: {pod.status.phase}")
-        
+        all_pods_message = self.get_all_pods_printable_details()
+        Logger.logger.info(f"cluster states:\n{all_pods_message}")    
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
                         .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
 
