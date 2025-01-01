@@ -209,7 +209,15 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
     def create_jira_issue_for_security_risks(self):
         security_risk_id = "R_0011"
-        resource = self.get_security_risks_resource(security_risk_id)
+
+        resource, t = self.wait_for_report(
+            timeout=120, 
+            sleep_interval=10,
+            report_type=self.backend.get_security_risks_list,
+            security_risk_id=security_risk_id,
+        )
+
+        # resource = self.get_security_risks_resource(security_risk_id)
         resourceHash = resource['k8sResourceHash']
 
         Logger.logger.info(f"Create Jira issue for resource {resourceHash} and security_risk_id {security_risk_id}")
