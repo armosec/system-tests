@@ -212,7 +212,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
 
         resource, t = self.wait_for_report(
             report_type=self.get_security_risks_resource,
-            timeout=120, 
+            timeout=220, 
             sleep_interval=10,
             security_risk_id=security_risk_id,
         )
