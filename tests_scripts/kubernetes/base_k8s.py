@@ -777,7 +777,7 @@ class BaseK8S(BaseDockerizeTest):
             running_pods = self.get_ready_pods(namespace=namespace, name=name)
             if comp_operator(len(running_pods), replicas):  # and len(running_pods) == len(total_pods):
                 Logger.logger.info(f"all pods are running after {delta_t} seconds")
-                result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                result = subprocess.run("kubectl get pods -A --cache=false", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 result = " ".join(result.stdout.splitlines())
                 Logger.logger.info(
                     "cluster state\n"
@@ -793,7 +793,7 @@ class BaseK8S(BaseDockerizeTest):
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
-        result = subprocess.run("kubectl get pods -A", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run("kubectl get pods -A --cache=false", timeout=300, shell=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         result = " ".join(result.stdout.splitlines())
         Logger.logger.info(
                     "cluster state\n"
