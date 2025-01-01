@@ -77,6 +77,7 @@ class WorkflowsTeamsNotifications(Workflows):
         workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
+        Logger.logger.info(f"before_test_message_ts: {before_test_message_ts}")
 
         Logger.logger.info("Stage 4: Validate workflows created successfully")
         self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
