@@ -144,7 +144,17 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             cluster_name=cluster, wait_to_result=True, framework_name="AllControls"
         )
         assert report_guid != "", "report guid is empty"
-        self.report_guid = report_guid
+
+
+        # to make sure kubernetes resources are created
+        time.sleep(20)
+        Logger.logger.info(f"Trigger posture scan")
+        self.backend.trigger_posture_scan(cluster)
+
+        report_guid_new = self.get_report_guid(
+            cluster_name=cluster, wait_to_result=True, framework_name="AllControls", old_report_guid=report_guid
+        )
+        self.report_guid = report_guid_new
         self.namespace = namespace
         self.cluster = cluster
 
