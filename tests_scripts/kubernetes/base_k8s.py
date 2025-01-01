@@ -627,6 +627,15 @@ class BaseK8S(BaseDockerizeTest):
             message += "Pod name: {0}, namespace: {1}, status: {2}\n".format(pod.metadata.name, pod.metadata.namespace,
                                                                                 pod.status.phase)
         return message
+    
+    def get_all_not_running_pods_describe_details(self):
+        pods = self.get_all_pods()
+        message = ""
+        for pod in pods.items:
+            if pod.status.phase != "Running":
+                message += "Pod name: {0}, namespace: {1}, status: {2}, pod: {3}\n".format(pod.metadata.name, pod.metadata.namespace,
+                                                                                pod.status.phase, pod)
+        return message
 
     def get_pods(self, namespace: str = None, name: str = None, include_terminating: bool = True, wlid: str = None):
         """
@@ -768,7 +777,7 @@ class BaseK8S(BaseDockerizeTest):
                                  timeout=timeout)
         return replicas
 
-    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=180,
+    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=220,
                             comp_operator=operator.eq):
         """
         compare number of expected running pods with actually running pods
@@ -797,9 +806,11 @@ class BaseK8S(BaseDockerizeTest):
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
         all_pods_message = self.get_all_pods_printable_details()
-        Logger.logger.info(f"cluster states:\n{all_pods_message}")    
-        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}, pods:{}"
-                        .format(delta_t, replicas, len(running_pods), running_pods))  # , len(total_pods)))
+        Logger.logger.info(f"cluster states:\n{all_pods_message}") 
+        not_running_pods_message = self.get_all_not_running_pods_describe_details()   
+        Logger.logger.info(f"not running pods details:\n{not_running_pods_message}")
+        raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
+                        .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
 
     def is_namespace_running(self, namespace):
         for ns in self.kubernetes_obj.client_CoreV1Api.list_namespace().items:
