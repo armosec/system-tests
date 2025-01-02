@@ -45,9 +45,13 @@ class Workflows(BaseHelm, BaseKubescape):
         
         assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res}"
         return workflow_res
-
-
     
+    def add_workflow_test_guid(self, workflow_guid):
+        self.test_workflows_guids.append(workflow_guid)
+
+    def remove_workflow_test_guid(self, workflow_guid):
+        self.test_workflows_guids.remove(workflow_guid)
+
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]
         for workflow in workflows:
@@ -72,4 +76,4 @@ class Workflows(BaseHelm, BaseKubescape):
                 break
         
         assert not found, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists, got {res['response']} workflows"
-        self.test_workflows_guids.remove(workflow_guid)
+        self.remove_workflow_test_guid(workflow_guid)

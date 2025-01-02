@@ -79,11 +79,11 @@ class WorkflowsSlackNotifications(Workflows):
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
         guid = self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)

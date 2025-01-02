@@ -79,11 +79,11 @@ class WorkflowsTeamsNotifications(Workflows):
 
         Logger.logger.info("Stage 4: Validate workflows created successfully")
         guid = self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
-        self.test_workflows_guids.append(guid)
+        self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 5: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)

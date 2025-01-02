@@ -62,7 +62,7 @@ class WorkflowConfigurations(Workflows):
         Logger.logger.info("stage 3: validate slack workflow created successfully")
         workflow_guid = self.validate_slack_workflow(workflow_test_name, SEVERITIES_CRITICAL, SLACK_CHANNEL_NAME)
         Logger.logger.info(f"slack workflow name {workflow_test_name} guid: {workflow_guid}")
-        self.test_workflows_guids.append(workflow_guid)
+        self.add_workflow_test_guid(workflow_guid)
 
         Logger.logger.info("stage 4: update slack workflow")
         update_workflow_body = self.build_slack_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), guid=workflow_guid)
@@ -81,7 +81,7 @@ class WorkflowConfigurations(Workflows):
         Logger.logger.info("stage 8: validate teams workflow created successfully")
         workflow_guid = self.validate_teams_workflow(workflow_test_name, SEVERITIES_CRITICAL, TEAMS_CHANNEL_NAME)
         Logger.logger.info(f"teams workflow name {workflow_test_name} guid: {workflow_guid}")
-        self.test_workflows_guids.append(workflow_guid)
+        self.add_workflow_test_guid(workflow_guid)
 
         
         Logger.logger.info("stage 9: update teams workflow")
@@ -90,8 +90,8 @@ class WorkflowConfigurations(Workflows):
         self.create_and_assert_workflow(update_workflow_body, EXPECTED_UPDATE_RESPONSE, update=True)
 
         Logger.logger.info("stage 10: validate teams updated workflow")
-        workflow_guid = self.validate_teams_workflow(workflow_test_name_updated, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
-        self.test_workflows_guids.append(workflow_guid)
+        guid = self.validate_teams_workflow(workflow_test_name_updated, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
 
         Logger.logger.info("stage 11: delete teams workflow and teams channel")
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
