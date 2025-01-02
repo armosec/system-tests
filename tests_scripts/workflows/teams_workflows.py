@@ -1,7 +1,6 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     TEAMS_CHANNEL_NAME,
@@ -91,9 +90,17 @@ class WorkflowsTeamsNotifications(Workflows):
         Logger.logger.info('Stage 6: Install kubescape with helm-chart')
         self.install_kubescape()
 
+        report_guid_init = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name="AllControls"
+        )
+
 
         Logger.logger.info('Stage 7: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
+
+        report_guid_first = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, report_guid_old=report_guid_init
+        )
         TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
         
         Logger.logger.info('Stage 8: Apply second deployment')
@@ -111,7 +118,9 @@ class WorkflowsTeamsNotifications(Workflows):
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        # TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
+        report_guid_second = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, report_guid_old=report_guid_first
+        )
         
         Logger.logger.info('Stage 12: Assert all messages sent')
         self.assert_messages_sent(before_test_message_ts, self.cluster, attempts=50, sleep_time=10)

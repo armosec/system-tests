@@ -2,10 +2,12 @@ import json
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger
 from tests_scripts.helm.base_helm import BaseHelm
+from ..kubescape.base_kubescape import BaseKubescape
 
 
 
-class Workflows(BaseHelm):
+
+class Workflows(BaseHelm, BaseKubescape):
     def __init__(self, test_obj=None, backend=None, test_driver=None, kubernetes_obj=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
         
