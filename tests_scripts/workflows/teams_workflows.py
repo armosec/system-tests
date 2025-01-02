@@ -101,7 +101,7 @@ class WorkflowsTeamsNotifications(Workflows):
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
 
         report_guid_first = self.get_report_guid(
-            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, report_guid_old=report_guid_init
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, old_report_guid=report_guid_init
         )
         TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
         
@@ -121,7 +121,7 @@ class WorkflowsTeamsNotifications(Workflows):
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
         report_guid_second = self.get_report_guid(
-            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, report_guid_old=report_guid_first
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, old_report_guid=report_guid_first
         )
         
         Logger.logger.info('Stage 12: Assert all messages sent')

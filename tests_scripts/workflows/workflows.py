@@ -16,7 +16,10 @@ class Workflows(BaseHelm, BaseKubescape):
 
     def cleanup(self, **kwargs):
         for guid in self.test_workflows_guids:
-            self.delete_and_assert_workflow(guid)
+            try:
+                self.delete_and_assert_workflow(guid)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete workflow with guid {guid}, got exception {e}")
         self.test_workflows_guids = []
         return super().cleanup(**kwargs)
 
