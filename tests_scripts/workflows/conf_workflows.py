@@ -75,12 +75,12 @@ class WorkflowConfigurations(Workflows):
 
         Logger.logger.info("stage 7: create teams workflow")
         workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"))
-        wf = self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
         Logger.logger.info("stage 8: validate teams workflow created successfully")
         workflow_guid = self.validate_teams_workflow(workflow_test_name, SEVERITIES_CRITICAL, TEAMS_CHANNEL_NAME)
         Logger.logger.info(f"teams workflow name {workflow_test_name} guid: {workflow_guid}")
+        self.test_workflows_guids.append(workflow_guid)
 
         
         Logger.logger.info("stage 9: update teams workflow")

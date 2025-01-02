@@ -42,8 +42,6 @@ class Workflows(BaseHelm, BaseKubescape):
             workflow_res = self.backend.update_workflow(body=workflow_body)
         else:
             workflow_res = self.backend.create_workflow(body=workflow_body)
-            self.test_workflows_guids.append(workflow_res["response"]["guid"])
-        
         
         assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res}"
         return workflow_res
