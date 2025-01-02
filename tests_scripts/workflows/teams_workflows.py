@@ -26,7 +26,7 @@ import random
 
 class WorkflowsTeamsNotifications(Workflows):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(Workflows, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+        super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                  kubernetes_obj=kubernetes_obj)
         self.fw_name = None
         self.cluster = None
