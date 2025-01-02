@@ -628,14 +628,33 @@ class BaseK8S(BaseDockerizeTest):
                                                                                 pod.status.phase)
         return message
     
-    def get_all_not_running_pods_describe_details(self):
-        pods = self.get_all_pods()
-        message = ""
-        for pod in pods.items:
-            if pod.status.phase != "Running":
-                message += "Pod name: {0}, namespace: {1}, status: {2}, pod: {3}\n".format(pod.metadata.name, pod.metadata.namespace,
-                                                                                pod.status.phase, pod)
-        return message
+    
+    def describe_pods(self, pods):
+        """
+        Describe pods in the given namespace using kubectl.
+        """
+        descriptions = []
+        
+        for pod in pods:
+            try:
+                result = subprocess.run(
+                    f"kubectl describe pod {pod.metadata.name} -n {pod.metadata.namespace}",
+                    timeout=300,
+                    shell=True,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                if result.returncode == 0:
+                    descriptions.append(result.stdout)
+                    print(result.stdout)
+                    print("-" * 80)  # Separator for readability
+                else:
+                    print(f"Error describing pod {pod.metadata.name}: {result.stderr}")
+            except subprocess.TimeoutExpired:
+                print(f"Timeout describing pod {pod.metadata.name}")
+        
+        return descriptions
 
     def get_pods(self, namespace: str = None, name: str = None, include_terminating: bool = True, wlid: str = None):
         """
@@ -807,6 +826,8 @@ class BaseK8S(BaseDockerizeTest):
         
         all_pods_message = self.get_all_pods_printable_details()
         Logger.logger.info(f"cluster states:\n{all_pods_message}") 
+        none_running_pods_describe = self.describe_pods(non_running_pods)
+        Logger.logger.info(f"none_running_pods_describe: {none_running_pods_describe}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
 
