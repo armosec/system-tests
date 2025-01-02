@@ -56,6 +56,7 @@ class WorkflowConfigurations(Workflows):
 
         Logger.logger.info("stage 2: create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
+        self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
 
         Logger.logger.info("stage 3: validate slack workflow created successfully")
