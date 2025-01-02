@@ -1689,5 +1689,18 @@
     "description": "Checks workflows configurations",
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io"
+  },
+  "accounts": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
+    ],
+    "description": "Checks accounts",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
   }
 }
