@@ -12,18 +12,16 @@ from tests_scripts.workflows.utils import (
     SECURITY_RISKS_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_ID
 )
-from systest_utils import Logger, TestUtil
 import time
 import json
-from infrastructure import KubectlWrapper
-from systest_utils import Logger, statics, TestUtil
+from systest_utils import Logger, TestUtil
 
 
 
 
 class WorkflowsJiraNotifications(Workflows):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(Workflows, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+        super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                  kubernetes_obj=kubernetes_obj)
         self.fw_name = None
         self.cluster = None
@@ -57,8 +55,10 @@ class WorkflowsJiraNotifications(Workflows):
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
-        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        guid = self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        self.add_workflow_test_guid(guid)
+        guid = self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 3: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
@@ -79,9 +79,7 @@ class WorkflowsJiraNotifications(Workflows):
     
 
     def cleanup(self, **kwargs):
-            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster))
-            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
-            return super().cleanup(**kwargs)
+        return super().cleanup(**kwargs)
     
     
     def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=20, sleep_time=20):
@@ -197,39 +195,10 @@ class WorkflowsJiraNotifications(Workflows):
             if "Your compliance score has decreased by" in message_string and cluster in message_string:
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
-
-
-    
-    def install_kubescape(self, helm_kwargs: dict = None):
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
     
 
-    def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
-        if update:
-            workflow_res = self.backend.update_workflow(body=workflow_body)
-        else:
-            workflow_res = self.backend.create_workflow(body=workflow_body)
-        
-        
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
-        return workflow_res
-    
-    def delete_and_assert_workflow(self, workflow_guid):
-        workflow_delete_res = self.backend.delete_workflow(workflow_guid)
-        assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
 
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
+
     
     def build_securityRisk_workflow_body(self, name, severities, jiraCollaborationGUID, siteId,  projectId, cluster, namespace, category, securityRiskIDs, issueTypeId, guid=None):
         workflow_body = { 
@@ -317,13 +286,13 @@ class WorkflowsJiraNotifications(Workflows):
         workflows = self.backend.get_workflows()
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
 
-        found = False
+        guid = None
         for workflow in workflows["response"]:
             if workflow["name"] == expected_name:
                 provider = workflow["notifications"][0]["provider"]
                 assert provider == expected_provider, f"Expected provider {expected_provider} but got {provider}"
-                found = True
+                guid = workflow["guid"]
                 break
 
-        assert found, f"Workflow with name {expected_name} not found"
+        assert guid, f"Workflow with name {expected_name} not found"
 

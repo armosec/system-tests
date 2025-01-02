@@ -3,14 +3,12 @@ from tests_scripts.workflows.workflows import Workflows
 
 from tests_scripts.workflows.utils import (
     get_env,
-    NOTIFICATIONS_SVC_DELAY,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
     SLACK_CHANNEL_NAME,
     SECURITY_RISKS,
     SECURITY_RISKS_ID,
     VULNERABILITIES,
-    SEVERITIES_CRITICAL,
     SEVERITIES_MEDIUM,
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME_SLACK,
@@ -21,14 +19,14 @@ from tests_scripts.workflows.utils import (
 from systest_utils import Logger, TestUtil
 import time
 from infrastructure import KubectlWrapper
-from systest_utils import Logger, statics, TestUtil
+from systest_utils import Logger, TestUtil
 
 
 
 class WorkflowsSlackNotifications(Workflows):
 
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(Workflows, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
+        super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                  kubernetes_obj=kubernetes_obj)
         self.fw_name = None
         self.cluster = None
@@ -69,8 +67,6 @@ class WorkflowsSlackNotifications(Workflows):
         compliance_workflow_slack = COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
-
-        self.workflows = [security_risks_workflow_slack, vulnerabilities_workflow_slack, compliance_workflow_slack]
         
         Logger.logger.info("Stage 2: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_MEDIUM, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
@@ -82,9 +78,12 @@ class WorkflowsSlackNotifications(Workflows):
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
-        self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
-        self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
-        self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
+        guid = self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
+        guid = self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
+        guid = self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
@@ -93,10 +92,18 @@ class WorkflowsSlackNotifications(Workflows):
         Logger.logger.info('Stage 6: Install kubescape with helm-chart')
         self.install_kubescape(self.helm_kwargs)
 
+        report_guid_init = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name="AllControls"
+        )
+
 
         Logger.logger.info('Stage 7: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
-        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY, "waiting for first scan to be saved in notification service")
+
+        report_guid_first = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, old_report_guid=report_guid_init
+        )
+        TestUtil.sleep(NOTIFICATIONS_SVC_DELAY_FIRST_SCAN, "waiting for first scan to be saved in notification service")
 
         
         Logger.logger.info('Stage 8: Apply second deployment')
@@ -114,6 +121,9 @@ class WorkflowsSlackNotifications(Workflows):
 
         Logger.logger.info('Stage 11: Trigger second scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
+        report_guid_second = self.get_report_guid(
+            cluster_name=self.cluster, wait_to_result=True, framework_name=self.fw_name, old_report_guid=report_guid_first
+        )
         
         Logger.logger.info('Stage 12: Assert all messages sent')
         self.assert_messages_sent(before_test_message_ts, self.cluster, self.namespace)
@@ -123,8 +133,6 @@ class WorkflowsSlackNotifications(Workflows):
     
 
     def cleanup(self, **kwargs):
-        for workflow in self.workflows:
-            self.delete_and_assert_workflow(self.return_workflow_guid(workflow))
         if self.fw_name:
             self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         return super().cleanup(**kwargs)
@@ -201,39 +209,10 @@ class WorkflowsSlackNotifications(Workflows):
                 if i == attempts - 1:
                     raise
                 TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
-
-    
-    def install_kubescape(self, helm_kwargs: dict = None):
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
     
 
-    def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
-        if update:
-            workflow_res = self.backend.update_workflow(body=workflow_body)
-        else:
-            workflow_res = self.backend.create_workflow(body=workflow_body)
-        
-        
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
-        return workflow_res
-    
-    def delete_and_assert_workflow(self, workflow_guid):
-        workflow_delete_res = self.backend.delete_workflow(workflow_guid)
-        assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
 
 
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
     
     def build_securityRisk_workflow_body(self, name, severities, channel_name,  channel_id, cluster, namespace, category, securityRiskIDs, guid=None):
         workflow_body = { 
