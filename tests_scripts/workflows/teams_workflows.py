@@ -243,16 +243,7 @@ class WorkflowsTeamsNotifications(Workflows):
                 if i == attempts - 1:
                     raise
                 TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
-    
 
-
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
     
     def build_securityRisk_workflow_body(self, name, severities, channel_name,  channel_guid, cluster, namespace, category, webhook_url, securityRiskIDs, guid=None):
         workflow_body = { 

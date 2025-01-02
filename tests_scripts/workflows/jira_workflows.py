@@ -49,16 +49,16 @@ class WorkflowsJiraNotifications(Workflows):
         Logger.logger.info("Stage 1: Create new workflows")
         jiraCollaborationGUID = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
-        self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
-        self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        guid = self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        self.test_workflows_guids.append(guid)
+        guid = self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
+        self.test_workflows_guids.append(guid)
 
         Logger.logger.info('Stage 3: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
@@ -198,13 +198,7 @@ class WorkflowsJiraNotifications(Workflows):
     
 
 
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
+
     
     def build_securityRisk_workflow_body(self, name, severities, jiraCollaborationGUID, siteId,  projectId, cluster, namespace, category, securityRiskIDs, issueTypeId, guid=None):
         workflow_body = { 
@@ -292,13 +286,13 @@ class WorkflowsJiraNotifications(Workflows):
         workflows = self.backend.get_workflows()
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
 
-        found = False
+        guid = None
         for workflow in workflows["response"]:
             if workflow["name"] == expected_name:
                 provider = workflow["notifications"][0]["provider"]
                 assert provider == expected_provider, f"Expected provider {expected_provider} but got {provider}"
-                found = True
+                guid = workflow["guid"]
                 break
 
-        assert found, f"Workflow with name {expected_name} not found"
+        assert guid, f"Workflow with name {expected_name} not found"
 

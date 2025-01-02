@@ -70,20 +70,20 @@ class WorkflowsSlackNotifications(Workflows):
         
         Logger.logger.info("Stage 2: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_MEDIUM, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
-        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_vulnerabilities_workflow_body(name=vulnerabilities_workflow_slack, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6)
-        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_compliance_workflow_body(name=compliance_workflow_slack, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=COMPLIANCE, driftPercentage=15)
-        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        self.test_workflows_guids.append(wf["guid"])
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 3: Validate workflows created successfully")
-        self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
-        self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
-        self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
+        guid = self.validate_workflow(vulnerabilities_workflow_slack, SLACK_CHANNEL_NAME)
+        self.test_workflows_guids.append(guid)
+        guid = self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
+        self.test_workflows_guids.append(guid)
+        guid = self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
+        self.test_workflows_guids.append(guid)
 
         Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
@@ -213,13 +213,6 @@ class WorkflowsSlackNotifications(Workflows):
 
 
 
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
     
     def build_securityRisk_workflow_body(self, name, severities, channel_name,  channel_id, cluster, namespace, category, securityRiskIDs, guid=None):
         workflow_body = { 

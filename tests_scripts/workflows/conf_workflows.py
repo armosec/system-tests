@@ -56,11 +56,12 @@ class WorkflowConfigurations(Workflows):
 
         Logger.logger.info("stage 2: create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
-        self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
+
 
         Logger.logger.info("stage 3: validate slack workflow created successfully")
         workflow_guid = self.validate_slack_workflow(workflow_test_name, SEVERITIES_CRITICAL, SLACK_CHANNEL_NAME)
         Logger.logger.info(f"slack workflow name {workflow_test_name} guid: {workflow_guid}")
+        self.test_workflows_guids.append(workflow_guid)
 
         Logger.logger.info("stage 4: update slack workflow")
         update_workflow_body = self.build_slack_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), guid=workflow_guid)
@@ -68,13 +69,14 @@ class WorkflowConfigurations(Workflows):
         
         Logger.logger.info("stage 5: validate slack updated workflow")
         workflow_guid = self.validate_slack_workflow(workflow_test_name_updated, SEVERITIES_HIGH, SLACK_CHANNEL_NAME)
-
         Logger.logger.info("stage 6: delete slack workflow")
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
+        
 
         Logger.logger.info("stage 7: create teams workflow")
         workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"))
-        self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
+        wf = self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
+        self.test_workflows_guids.append(wf["guid"])
 
         Logger.logger.info("stage 8: validate teams workflow created successfully")
         workflow_guid = self.validate_teams_workflow(workflow_test_name, SEVERITIES_CRITICAL, TEAMS_CHANNEL_NAME)
@@ -88,6 +90,7 @@ class WorkflowConfigurations(Workflows):
 
         Logger.logger.info("stage 10: validate teams updated workflow")
         workflow_guid = self.validate_teams_workflow(workflow_test_name_updated, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
+        self.test_workflows_guids.append(workflow_guid)
 
         Logger.logger.info("stage 11: delete teams workflow and teams channel")
         self.delete_and_assert_workflow(workflow_guid=workflow_guid)
@@ -191,16 +194,7 @@ class WorkflowConfigurations(Workflows):
                 }
             ]
         }   
-    
-    def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
-        if update:
-            workflow_res = self.backend.update_workflow(body=workflow_body)
-        else:
-            workflow_res = self.backend.create_workflow(body=workflow_body)
-        
-        
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
-        return workflow_res
+
 
     def validate_slack_workflow(self, expected_name, expected_severities, expected_slack_channel):
         json={"pageSize": 1, "pageNum": 1, "orderBy": "", "innerFilters":[{"name":expected_name}]}
@@ -246,30 +240,8 @@ class WorkflowConfigurations(Workflows):
         
         
 
-    def delete_and_assert_workflow(self, workflow_guid):
-        workflow_delete_res = self.backend.delete_workflow(workflow_guid)
-        assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        res = self.backend.get_workflows()
-        assert "response" in res, f"Expected response in {res}"
-
-        if len(res["response"]) == 0:
-            return
-
-        found = False
-        for workflow in res["response"]:
-            if workflow["guid"] == workflow_guid:
-                found = True
-                break
-        
-        assert not found, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists, got {res['response']} workflows"
+    
 
 
-    def return_workflow_guid(self, workflow_name):
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            if workflow["name"] == workflow_name:
-                return workflow["guid"]
-        print(f"Workflow with name {workflow_name} not found")
-        return None
         
         

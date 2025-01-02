@@ -42,14 +42,36 @@ class Workflows(BaseHelm, BaseKubescape):
             workflow_res = self.backend.update_workflow(body=workflow_body)
         else:
             workflow_res = self.backend.create_workflow(body=workflow_body)
+            self.test_workflows_guids.append(workflow_res["response"]["guid"])
         
         
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
+        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res}"
         return workflow_res
+
+
+    
+    def return_workflow_guid(self, workflow_name):
+        workflows = self.backend.get_workflows()["response"]
+        for workflow in workflows:
+            if workflow["name"] == workflow_name:
+                return workflow["guid"]
+        Logger.logger.info(f"Workflow with name {workflow_name} not found")
+        return None
 
     def delete_and_assert_workflow(self, workflow_guid):
         workflow_delete_res = self.backend.delete_workflow(workflow_guid)
         assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
+        res = self.backend.get_workflows()
+        assert "response" in res, f"Expected response in {res}"
+
+        if len(res["response"]) == 0:
+            return
+
+        found = False
+        for workflow in res["response"]:
+            if workflow["guid"] == workflow_guid:
+                found = True
+                break
+        
+        assert not found, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists, got {res['response']} workflows"
+        self.test_workflows_guids.remove(workflow_guid)
