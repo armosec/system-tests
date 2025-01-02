@@ -12,11 +12,9 @@ from tests_scripts.workflows.utils import (
     SECURITY_RISKS_WORKFLOW_NAME_JIRA,
     SECURITY_RISKS_ID
 )
-from systest_utils import Logger, TestUtil
 import time
 import json
-from infrastructure import KubectlWrapper
-from systest_utils import Logger, statics, TestUtil
+from systest_utils import Logger, TestUtil
 
 
 
@@ -51,9 +49,11 @@ class WorkflowsJiraNotifications(Workflows):
         Logger.logger.info("Stage 1: Create new workflows")
         jiraCollaborationGUID = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_MEDIUM, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        self.test_workflows_guids.append(wf["guid"])
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, severities=SEVERITIES_HIGH, jiraCollaborationGUID=jiraCollaborationGUID, siteId=get_env("JIRA_SITE_ID"), projectId=get_env("JIRA_PROJECT_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6, issueTypeId=get_env("JIRA_ISSUE_TYPE_ID"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        self.test_workflows_guids.append(wf["guid"])
         before_test_message_ts = time.time()
 
         Logger.logger.info("Stage 2: Validate workflows created successfully")
@@ -79,9 +79,7 @@ class WorkflowsJiraNotifications(Workflows):
     
 
     def cleanup(self, **kwargs):
-            self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_JIRA + self.cluster))
-            self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster))
-            return super().cleanup(**kwargs)
+        return super().cleanup(**kwargs)
     
     
     def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=20, sleep_time=20):
@@ -197,31 +195,8 @@ class WorkflowsJiraNotifications(Workflows):
             if "Your compliance score has decreased by" in message_string and cluster in message_string:
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
-
-
-    
-    def install_kubescape(self, helm_kwargs: dict = None):
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
     
 
-    def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
-        if update:
-            workflow_res = self.backend.update_workflow(body=workflow_body)
-        else:
-            workflow_res = self.backend.create_workflow(body=workflow_body)
-        
-        
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
-        return workflow_res
-    
-    def delete_and_assert_workflow(self, workflow_guid):
-        workflow_delete_res = self.backend.delete_workflow(workflow_guid)
-        assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
 
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]

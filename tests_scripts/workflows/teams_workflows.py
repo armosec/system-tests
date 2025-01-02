@@ -7,7 +7,6 @@ from tests_scripts.workflows.utils import (
     SECURITY_RISKS,
     SECURITY_RISKS_ID,
     VULNERABILITIES,
-    SEVERITIES_CRITICAL,
     SEVERITIES_MEDIUM,
     SEVERITIES_HIGH,
     VULNERABILITIES_WORKFLOW_NAME_TEAMS,
@@ -19,7 +18,7 @@ from tests_scripts.workflows.utils import (
 from systest_utils import Logger, TestUtil
 import time
 from infrastructure import KubectlWrapper
-from systest_utils import Logger, statics, TestUtil
+from systest_utils import Logger, TestUtil
 import random
 
 
@@ -70,11 +69,14 @@ class WorkflowsTeamsNotifications(Workflows):
         
         Logger.logger.info("Stage 3: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_MEDIUM, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, webhook_url=get_env("CHANNEL_WEBHOOK"), securityRiskIDs=SECURITY_RISKS_ID)
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        self.test_workflows_guids.append(wf["guid"])
         workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=VULNERABILITIES, cvss=6, webhook_url=get_env("CHANNEL_WEBHOOK"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        self.test_workflows_guids.append(wf["guid"])
         workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("CHANNEL_WEBHOOK"))
-        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        wf = self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        self.test_workflows_guids.append(wf["guid"])
         before_test_message_ts = time.time()
         Logger.logger.info(f"before_test_message_ts: {before_test_message_ts}")
 
@@ -131,9 +133,6 @@ class WorkflowsTeamsNotifications(Workflows):
 
     
     def cleanup(self, **kwargs):
-        self.delete_and_assert_workflow(self.return_workflow_guid(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster))
-        self.delete_and_assert_workflow(self.return_workflow_guid(VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster))
-        self.delete_and_assert_workflow(self.return_workflow_guid(COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster))
         if self.webhook_name:
             self.delete_channel_by_guid(self.get_channel_guid_by_name(self.webhook_name))
         if self.fw_name:
@@ -244,30 +243,8 @@ class WorkflowsTeamsNotifications(Workflows):
                 if i == attempts - 1:
                     raise
                 TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
-
-    
-    def install_kubescape(self, helm_kwargs: dict = None):
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
     
 
-    def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
-        if update:
-            workflow_res = self.backend.update_workflow(body=workflow_body)
-        else:
-            workflow_res = self.backend.create_workflow(body=workflow_body)
-        
-        
-        assert workflow_res == expected_response, f"Expected {expected_response}, but got {workflow_res['response']}"
-        return workflow_res
-    
-    def delete_and_assert_workflow(self, workflow_guid):
-        workflow_delete_res = self.backend.delete_workflow(workflow_guid)
-        assert workflow_delete_res == "Workflow deleted", f"Expected 'Workflow deleted', but got {workflow_delete_res['response']}"
-        workflows = self.backend.get_workflows()["response"]
-        for workflow in workflows:
-            assert workflow["guid"] != workflow_guid, f"Expected workflow with guid {workflow_guid} to be deleted, but it still exists"
 
     def return_workflow_guid(self, workflow_name):
         workflows = self.backend.get_workflows()["response"]
