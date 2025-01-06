@@ -136,6 +136,10 @@ class VulnerabilityScanningTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=VulnerabilityScanningRegistry,
+
+            # This test is forced to use version 1.24.2 of the helm chart since this is the last version which supports the old registry scan API
+            # Please remove this test once the BE will stop supporting this functionality')
+            helm_branch="kubescape-operator-1.24.2",
             deployment=join(DEFAULT_DEPLOYMENT_PATH, "public-registry.yaml"),
             service=join(DEFAULT_SERVICE_PATH, "public-registry.yaml"),
             properties={'http': True},  # https://hub.armosec.io/docs/registry-vulnerability-scan

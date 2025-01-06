@@ -349,6 +349,10 @@ class VulnerabilityScanningRegistry(BaseVulnerabilityScanning):
         return secret_data, registry
 
     def start(self):
+        helm_branch = self.test_obj.kwargs['helm_branch'] if 'helm_branch' in self.test_obj.kwargs else None
+        if helm_branch and helm_branch != "":
+            Logger.logger.info(f'using helm branch from test definition: {helm_branch}')
+            self.helm_branch = helm_branch
 
         cluster, namespace = self.setup_helm_chart()
         secret_data, registry = self.setup_phase(cluster, namespace)
