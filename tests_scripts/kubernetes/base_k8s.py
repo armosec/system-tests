@@ -634,7 +634,7 @@ class BaseK8S(BaseDockerizeTest):
         Describe pods in the given namespace using kubectl.
         """
         descriptions = []
-        
+
         for pod in pods:
             try:
                 result = subprocess.run(
@@ -653,7 +653,7 @@ class BaseK8S(BaseDockerizeTest):
                     print(f"Error describing pod {pod.metadata.name}: {result.stderr}")
             except subprocess.TimeoutExpired:
                 print(f"Timeout describing pod {pod.metadata.name}")
-        
+
         return descriptions
 
     def get_pods(self, namespace: str = None, name: str = None, include_terminating: bool = True, wlid: str = None):
@@ -825,9 +825,8 @@ class BaseK8S(BaseDockerizeTest):
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
         
         all_pods_message = self.get_all_pods_printable_details()
-        Logger.logger.info(f"cluster states:\n{all_pods_message}") 
-        none_running_pods_describe = self.describe_pods(non_running_pods)
-        Logger.logger.info(f"none_running_pods_describe: {none_running_pods_describe}")
+        Logger.logger.info(f"cluster pod states states:\n{all_pods_message}") 
+        Logger.logger.info(f"cluster describe none running pods:\n{self.describe_pods(non_running_pods)}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
 
