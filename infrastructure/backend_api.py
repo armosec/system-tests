@@ -2059,7 +2059,7 @@ class ControlPanelAPI(object):
         for cookie in self.selected_tenant_cookie:
             cookie = "Cookie: {}={}".format(cookie.name, cookie.value)
 
-        authorization = f"Authorization: Bearer {self.api_login.get_frontEgg_auth_user_id()}",
+        authorization = f"Authorization: Bearer {self.api_login.get_frontEgg_auth_user_id()}"
 
         ws.connect(server, header=[cookie, authorization])
         return ws
