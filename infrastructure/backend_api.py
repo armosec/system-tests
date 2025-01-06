@@ -1976,7 +1976,7 @@ class ControlPanelAPI(object):
     def post_with_ratelimit(self, url, **args):
         # Extract optional parameters with defaults
         rate_limit_retries = args.pop("rate_limit_retries", 1)
-        rate_limit_sleep = args.pop("rate_limit_sleep", 45)
+        rate_limit_sleep = args.pop("rate_limit_sleep", 60)
 
         for attempt in range(1, rate_limit_retries + 1):
             r = self.post(url, **args)
@@ -2007,7 +2007,7 @@ class ControlPanelAPI(object):
 
     def get_with_rate_limit(self, url, **args):
         rate_limit_retries = args.pop("rate_limit_retries", 1)
-        rate_limit_sleep = args.pop("rate_limit_sleep", 45)
+        rate_limit_sleep = args.pop("rate_limit_sleep", 60)
 
         for attempt in range(1, rate_limit_retries + 1):
             r = self.get(url, **args)
