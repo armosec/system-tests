@@ -2058,7 +2058,10 @@ class ControlPanelAPI(object):
         Logger.logger.debug("WS connection url:{0}".format(server))
         for cookie in self.selected_tenant_cookie:
             cookie = "Cookie: {}={}".format(cookie.name, cookie.value)
-        ws.connect(server, header=[cookie])
+
+        authorization = f"Authorization: Bearer {self.api_login.get_frontEgg_auth_user_id()}",
+
+        ws.connect(server, header=[cookie, authorization])
         return ws
 
     def ws_send(self, ws, message):
