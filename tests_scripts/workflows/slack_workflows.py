@@ -338,3 +338,5 @@ class WorkflowsSlackNotifications(Workflows):
                 break
 
         assert found, f"Workflow with name {expected_name} not found"
+
+        return workflow["guid"]
