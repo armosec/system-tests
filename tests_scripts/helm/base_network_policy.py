@@ -10,6 +10,11 @@ class BaseNetworkPolicy(BaseHelm):
         super(BaseNetworkPolicy, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                         kubernetes_obj=kubernetes_obj)
 
+        self.helm_kwargs = {
+            "capabilities.vulnerabilityScan": "disable",
+            "capabilities.relevancy": "disable"
+        }
+
     def validate_basic_metadata(self, actual_obj, expected_obj, namespace):
         """
         Validate basic metadata of the object

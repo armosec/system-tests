@@ -801,6 +801,12 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
         self.expected_layers = self.create_vulnerabilities_expected_results(
             expected_results=self.test_obj.kwargs['expected_layers'])
 
+        self.helm_kwargs = {
+            "capabilities.vulnerabilityScan": "disable",
+            "capabilities.relevancy": "disable"
+        }
+
+
     def start(self):
         # create registry scan cronjob and check
         # update both cronjob schedule and depth (in configmap)
@@ -811,7 +817,7 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
             Logger.logger.info(f'using helm branch from test definition: {helm_branch}')
             self.helm_branch = helm_branch
         
-        cluster, namespace = self.setup_helm_chart()
+        cluster, namespace = self.setup_helm_chart(helm_kwargs=self.helm_kwargs)
         secret_data, registry = self.setup_phase(cluster, namespace)
         Logger.logger.info('applying registry secret')
         self.apply_registry_secret(secret_data)

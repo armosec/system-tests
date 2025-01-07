@@ -139,7 +139,8 @@ class SmartRemediationNew(BaseKubescape, BaseHelm):
         )
 
         self.helm_kwargs = {
-            "capabilities.relevancy": "enable",
+            "capabilities.vulnerabilityScan": "disable",
+            "capabilities.relevancy": "disable",
             "capabilities.configurationScan": "enable",
             "capabilities.continuousScan": "disable",
             "capabilities.nodeScan": "disable",

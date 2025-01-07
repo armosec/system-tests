@@ -114,6 +114,9 @@ class NetworkPolicyDataAppended(BaseNetworkPolicy):
 
         helm_kwargs = self.test_obj.get_arg("helm_kwargs")
 
+        if self.helm_kwargs is not None:
+            helm_kwargs.update(self.helm_kwargs)
+
         Logger.logger.info('1. Install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
