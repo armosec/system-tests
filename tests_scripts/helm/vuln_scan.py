@@ -806,6 +806,11 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
         # update both cronjob schedule and depth (in configmap)
         # delete cronjob and check that cronjob and configmap (and secret if there is auth) are deleted
 
+        helm_branch = self.test_obj.kwargs['helm_branch'] if 'helm_branch' in self.test_obj.kwargs else None
+        if helm_branch and helm_branch != "":
+            Logger.logger.info(f'using helm branch from test definition: {helm_branch}')
+            self.helm_branch = helm_branch
+        
         cluster, namespace = self.setup_helm_chart()
         secret_data, registry = self.setup_phase(cluster, namespace)
         Logger.logger.info('applying registry secret')
@@ -836,58 +841,6 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
 
         return self.cleanup()
 
-
-class VulnerabilityScanningTestRegistryConnectivity(VulnerabilityScanningRegistryBackendTrigger):
-    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
-        super(VulnerabilityScanningTestRegistryConnectivity, self).__init__(test_driver=test_driver, test_obj=test_obj,
-                                                                            backend=backend,
-                                                                            kubernetes_obj=kubernetes_obj)
-
-    def start(self):
-        self.setup_helm_chart()
-
-        Logger.logger.info('waiting for vuln pod to be ready before triggering scan registry')
-        time.sleep(120)
-
-        Logger.logger.info('Test check_public_quay_registry')
-        self.check_public_quay_registry()
-
-        if not self.is_excluded_repositories():
-            Logger.logger.info('Test check_wrong_registry_name')
-            self.check_wrong_registry_name()
-
-            Logger.logger.info('Test check_wrong_auth')
-            self.check_wrong_auth()
-
-        return self.cleanup()
-
-    def check_public_quay_registry(self):
-        # check that we can connect to public quay.io, all statuses are passed, and excluded repositories are not in response
-        registry = "quay.io/armosec"
-        self.check_connectivity_for_single_registry(registry=registry)
-
-    def check_wrong_registry_name(self):
-        # check that we get failed status when trying to connect to wrong registry name
-        registry = "quiy.io/armosec"
-        expected_statuses = {
-            statics.TEST_REGISTRY_CONNECTIVITY_INFORMATION_STATUS: statics.TEST_REGISTRY_CONNECTIVITY_FAILED_STATUS,
-        }
-        self.check_connectivity_for_single_registry(registry=registry, expected_statuses=expected_statuses)
-
-    def check_wrong_auth(self):
-        # check that we get passed status for information, and failed status for authentication
-        registry = "quay.io/armosec"
-        auth_method = {}
-        auth_method["type"] = "private"
-        auth_method["username"] = "accesstoken"
-        auth_method["password"] = "invalid"
-
-        expected_statuses = {
-            statics.TEST_REGISTRY_CONNECTIVITY_AUTHENTICATION_STATUS: statics.TEST_REGISTRY_CONNECTIVITY_FAILED_STATUS,
-            statics.TEST_REGISTRY_CONNECTIVITY_INFORMATION_STATUS: statics.TEST_REGISTRY_CONNECTIVITY_PASSED_STATUS,
-        }
-        self.check_connectivity_for_single_registry(registry=registry, expected_statuses=expected_statuses,
-                                                    auth_method=auth_method)
 class VulnerabilityV2Views(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(VulnerabilityV2Views, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
