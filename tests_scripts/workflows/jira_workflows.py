@@ -283,16 +283,20 @@ class WorkflowsJiraNotifications(Workflows):
     
       
     def validate_workflow(self, expected_name, expected_provider):
-        workflows = self.backend.get_workflows()
-        assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
+        body = {
+                    "pageSize": 150, 
+                    "pageNum": 1, 
+                    "innerFilters": [{
+                        "name": expected_name
+                    }],
+                    "orderBy": "updatedTime:desc"
+                }
+        workflows = self.backend.get_workflows(body=body)
+        assert workflows["total"]["value"] == 1, f"Expected total value to be equal to 1, but got {workflows['total']['value']}"
 
-        guid = None
-        for workflow in workflows["response"]:
-            if workflow["name"] == expected_name:
-                provider = workflow["notifications"][0]["provider"]
-                assert provider == expected_provider, f"Expected provider {expected_provider} but got {provider}"
-                guid = workflow["guid"]
-                break
-
-        assert guid, f"Workflow with name {expected_name} not found"
+        workflow = workflows["response"][0]
+        assert workflow["name"] == expected_name, f"Expected name {expected_name} but got {workflow['name']}"
+        assert workflow["notifications"][0]["provider"] == expected_provider, f"Expected provider {expected_provider} but got {workflow['notifications'][0]['provider']}"
+        assert workflow["guid"], f"Expected guid to be not None, but got {workflow['guid']}"
+        return workflow["guid"]
 
