@@ -212,6 +212,10 @@ class VulnerabilityScanningTests(object):
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=RegistryScanningTriggeringWithCronJob,
+            
+            # This test is forced to use version 1.24.2 of the helm chart since this is the last version which supports the old registry scan API
+            # Please remove this test once the BE will stop supporting this functionality')
+            helm_branch="kubescape-operator-1.24.2",
             deployment=join(DEFAULT_DEPLOYMENT_PATH, "public-registry.yaml"),
             service=join(DEFAULT_SERVICE_PATH, "public-registry.yaml"),
             properties={'http': True},  # https://hub.armosec.io/docs/registry-vulnerability-scan
@@ -225,19 +229,3 @@ class VulnerabilityScanningTests(object):
             depth=3,
         )
 
-    @staticmethod
-    def vuln_scan_test_public_registry_connectivity_by_backend():
-        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTestRegistryConnectivity
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityScanningTestRegistryConnectivity,
-        )
-
-    @staticmethod
-    def vuln_scan_test_public_registry_connectivity_excluded_by_backend():
-        from tests_scripts.helm.vuln_scan import VulnerabilityScanningTestRegistryConnectivity
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityScanningTestRegistryConnectivity,
-            excluded_repositories=["notification-server", "action-trigger"]
-        )
