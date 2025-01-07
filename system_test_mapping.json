@@ -1,4 +1,113 @@
+
 {
+  "relevancy_golang_dynamic": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_java_and_python": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_java": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_golang": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_python": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_extra_large_image": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_large_image": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevant_data_is_appended": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
+  "relevancy_enabled_stop_sniffing": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "operator"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "matthiasb@armosec.io"
+  },
   "scan_with_exceptions": {
     "target": [
       "CLI"
