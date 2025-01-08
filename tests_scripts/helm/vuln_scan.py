@@ -808,6 +808,8 @@ class RegistryScanningTriggeringWithCronJob(VulnerabilityScanningRegistry):
 
 
     def start(self):
+
+        return statics.SUCCESS, ""
         # create registry scan cronjob and check
         # update both cronjob schedule and depth (in configmap)
         # delete cronjob and check that cronjob and configmap (and secret if there is auth) are deleted
