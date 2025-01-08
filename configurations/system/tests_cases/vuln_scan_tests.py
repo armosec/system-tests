@@ -1,7 +1,6 @@
 import inspect
 
 from infrastructure import supported_systemsAPI
-from tests_scripts.helm.vuln_scan import VulnerabilityScanningRegistry
 from .structures import TestConfiguration
 from systest_utils import statics
 
