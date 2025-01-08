@@ -445,6 +445,11 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         super(ScanWithKubescapeAsServiceTest, self).__init__(test_obj=test_obj, backend=backend,
                                                              kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
+        self.helm_kwargs = {
+            "capabilities.vulnerabilityScan": "disable",
+            "capabilities.relevancy": "disable"
+        }
+
     def start(self):
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
@@ -467,7 +472,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         # 2.1 add and update armo in repo
         self.add_and_upgrade_armo_to_repo()
         # 2.2 install armo helm-chart
-        self.install_armo_helm_chart()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
