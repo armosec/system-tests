@@ -549,10 +549,10 @@
       "In cluster"
     ],
     "target_repositories": [
-      "operator",
-      "helm-chart",
-      "cadashboardbe",
-      "careportsreceiver"
+      "operator-dummy",
+      "helm-chart-dummy",
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
