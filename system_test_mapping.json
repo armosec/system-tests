@@ -1,5 +1,25 @@
 
 {
+  "relevancy_disabled_installation": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "relevancy_storage_disabled": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
   "relevancy_golang_dynamic": {
     "target": [
       "In cluster",
