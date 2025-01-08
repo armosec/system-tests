@@ -563,21 +563,6 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "registry_scanning_triggering_with_cron_job": {
-    "target": [
-      "Backend",
-      "In cluster"
-    ],
-    "target_repositories": [
-      "operator-dummy",
-      "helm-chart-dummy",
-      "cadashboardbe-dummy",
-      "careportsreceiver-dummy"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
-  },
   "smart_remediation_all_controls": {
     "target": [
       "In cluster",
@@ -788,34 +773,6 @@
     "description": "",
     "skip_on_environment": "",
     "owner": "amirm@armosec.io"
-  },
-  "vuln_scan_trigger_scan_public_registry": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe-tbd",
-      "careportsreceiver-tbd",
-      "gateway-tbd"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
-  },
-  "vuln_scan_trigger_scan_public_registry_excluded": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "gateway"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
   },
   "vuln_scan_triggering_with_cron_job": {
     "target": [

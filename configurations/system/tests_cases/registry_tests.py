@@ -1,10 +1,7 @@
 import inspect
 from os.path import join
 
-from systest_utils.statics import DEFAULT_NOTIFICATIONS_PATHS, DEFAULT_NOTIFICATIONS_DEPLOYMENT_PATH, \
-    DEFAULT_REGISTRY_PATHS
-from tests_scripts.users_notifications.alert_notifications import get_messages_from_teams_channel, \
-    enrich_teams_alert_channel, get_messages_from_slack_channel, enrich_slack_alert_channel
+from systest_utils.statics import DEFAULT_REGISTRY_PATHS
 from .structures import TestConfiguration
 
 class RegistryTests(object):

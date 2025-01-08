@@ -530,15 +530,6 @@ class KubectlWrapper(object):
                 result.append(cj)
         return result
 
-    def get_registry_scan_cronjob(self, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
-        cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
-        result = []
-        for cj in cronjobs.items:
-            if statics.CA_VULN_SCAN_CRONJOB_ARMO_TIER_LABEL_FIELD in cj.metadata.labels.keys() and \
-                    cj.metadata.labels[statics.CA_VULN_SCAN_CRONJOB_ARMO_TIER_LABEL_FIELD] == \
-                    statics.CA_REGISTRY_SCAN_CRONJOB_ARMO_TIER_LABEL_NAME:
-                result.append(cj)
-        return result
 
     def get_namespaced_pods_information(self, namespace='default'):
         return self.run(method=self.client_CoreV1Api.list_namespaced_pod, namespace=namespace).items
