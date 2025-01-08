@@ -74,9 +74,6 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `ac_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `vuln_scan_trigger_scan_public_registry`          | helm-chart |                                                                        | kubevuln, backend             |
-| `vuln_scan_trigger_scan_public_registry_excluded` | helm-chart |                                                                        | kubevuln, backend             |
-| `vuln_scan_trigger_scan_private_quay_registry`    | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_scan_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`                                              | payment |                                                                           | stripe, backend             |
 | `stripe_billing_portal`                                        | payment |                                                                           | stripe, backend             |

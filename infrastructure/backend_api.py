@@ -70,14 +70,6 @@ API_REPOSITORYPOSTURE_REPOSITORIES = "/api/v1/repositoryPosture/repositories"
 API_REPOSITORYPOSTURE_FILES = "/api/v1/repositoryPosture/files"
 API_REPOSITORYPOSTURE_RESOURCES = "/api/v1/repositoryPosture/resources"
 
-API_REGISTRY_SCANRESULTSSUMSUMMARY = "/api/v1/registry/scanResultsSumSummary"
-API_REGISTRY_SCANRESULTSSUMSUMMARY_DELETE = "/api/v1/registry/scanResultsSumSummary/delete"
-API_REGISTRY_SCANRESULTSDETAILS = "/api/v1/registry/scanResultsDetails"
-API_REGISTRY_SCANRESULTSLAYERSUMMARY = "/api/v1/registry/scanResultsLayerSummary"
-API_REGISTRY_SCAN = "/api/v1/registry/scan/"
-API_REGISTRY_JOBREPORTSSTATUS = "/api/v1/registry/jobReportsStatus"
-API_REGISTRY_RESPOSITORIESLIST = "/api/v1/registry/repositoriesList"
-
 API_FRAMEWORK = "/api/v1/framework"
 
 API_CUSTOMERCONFIGURATION = "/api/v1/customerConfiguration"
@@ -1332,52 +1324,6 @@ class ControlPanelAPI(object):
                 )
         return result
 
-    def get_scan_registry_results_sum_summary(self, since_time: str, expected_results: int, namespace: str = None,
-                                              cluster_name: str = None, expected_status_code: int = None,
-                                              containers_scan_id=None):
-        params = {"customerGUID": self.selected_tenant_id}
-        if cluster_name:
-            params['cluster'] = cluster_name
-        if namespace:
-            params['namespace'] = namespace
-        js = {"since": since_time}
-        if containers_scan_id != None:
-            innerFilters = []
-            innerFilters.extend({"containersScanID": id[1]} for id in containers_scan_id)
-            js = {"pageNum": 1, "pageSize": 1, "innerFilters": innerFilters}
-        r = self.post(API_REGISTRY_SCANRESULTSSUMSUMMARY, params=params, json=js)
-
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        if expected_status_code and expected_status_code == 404:
-            if r.json()['total']['value'] == 0:
-                return True
-            else:
-                raise Exception(
-                    'Expected to receive 0 in results of get_scan_results_sum_summary, and received {}, message {}'.format(
-                        (r.json()['total']['value']), r.json()['response']))
-
-        result = r.json()['response']
-        # this part is for debug because backend return always error in results
-        # result = list(filter(lambda scan: (scan['status'] == 'Error' and
-        #                                  print('Delete container %s, Because he has an error' % scan['containerName'])
-        #                                    and False) or (scan['status'] != 'Error'), result))
-
-        if len(result) < expected_results:
-            scan_names = []
-            for r in result:
-                scan_names.append(r['containerName'])
-            raise Exception('Excepted %d scans, receive %d: %s' % (expected_results,
-                                                                   len(result), ', '.join(scan_names)))
-        for scan in result:
-            if (scan['status'] == 'Pending') or ('isStub' in scan.keys() and scan['isStub']):
-                raise Exception(
-                    'Error receive scan result: Container "%s is still in pending' % (scan['containerName'])
-                )
-        return result
-
     def set_cves_exceptions(self, cves_list, cluster_name, namespace, conatiner_name):
         params = {"customerGUID": self.selected_tenant_id}
         vulnerabilities = []
@@ -1398,55 +1344,6 @@ class ControlPanelAPI(object):
 
     def scan_image_in_namespace(self, cluster_name, namespace):
         return self.create_vuln_scan_job_request(cluster_name=cluster_name, namespaces_list=[namespace])
-
-    def get_registry_container_cve(self, since_time: str, containers_scan_id: str, total_cve):
-        page_size = 100
-
-        params = {"customerGUID": self.selected_tenant_id}
-        body = {
-            "pageNum": 1,
-            "pageSize": page_size,
-            "since": since_time,
-            "orderBy": "timestamp:desc,name:desc",
-            "innerFilters": [{"containersScanID": containers_scan_id}]}
-
-        result_length = self.get_length_of_post_response(url=API_REGISTRY_SCANRESULTSDETAILS, params=params, body=body)
-
-        result = []
-        for i in range(1, math.ceil(result_length / page_size) + 1):
-            body['pageNum'] = i
-            r = self.post(API_REGISTRY_SCANRESULTSDETAILS, params=params, json=body)
-            if not 200 <= r.status_code < 300 or len(r.json()['response']) == 0:
-                raise Exception(
-                    'Error accessing dashboard. Request: get scan results details "%s" (code: %d, message: %s)' % (
-                        self.customer, r.status_code, r.text))
-            result.extend(r.json()['response'])
-        Logger.logger.info(
-            'container scan id : {} len(result) {} < {} len(expected_results)'.format(containers_scan_id, len(result),
-                                                                                      total_cve))
-
-        return result
-
-    def get_registry_container_layers(self, container_scan_id: str):
-        page_size = 30
-
-        params = {"customerGUID": self.selected_tenant_id}
-        body = {
-            "pageNum": 1,
-            "pageSize": page_size,
-            "orderBy": "severities.critical:desc",
-            "innerFilters": [{"containersScanID": container_scan_id}]}
-
-        r = self.post(API_REGISTRY_SCANRESULTSLAYERSUMMARY, params=params, json=body)
-        if not 200 <= r.status_code < 300 or len(r.json()['response']) == 0:
-            raise Exception(
-                'Error accessing layers summery. Request: get scan layer summery "%s" (code: %d, message: %s). Url: "%s" ContainersScanID "%s" ' % (
-                    self.customer, r.status_code, r.text, self.server + API_REGISTRY_SCANRESULTSLAYERSUMMARY,
-                    container_scan_id))
-
-        Logger.logger.info(
-            'layers of container scan id : {} response {}'.format(container_scan_id, r.json()))
-        return r.json()
 
     def get_unique_values_for_field_scan_summary(self, since_time, field, customer_guid):
         params = {"customerGUID": customer_guid}
@@ -1637,60 +1534,6 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def create_registry_scan_job_request_deprecated(self, cluster_name, registry_name: str, schedule_string: str = ''):
-        params = {"customerGUID": self.selected_tenant_id}
-        body = []
-
-        body.append({"clusterName": cluster_name, "registryName": registry_name,
-                     "cronTabSchedule": schedule_string})
-
-        r = self.post(API_REGISTRY_SCAN, params=params, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: create registry scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
-
-    def create_registry_scan_job_request(self, cluster_name, registry_name: str, auth_method: dict,
-                                         schedule_string: str, registry_type: str,
-                                         excluded_repositories: list = []):
-        return self.send_registry_command(command=statics.CREATE_REGISTRY_CJ_COMMAND, cluster_name=cluster_name,
-                                          registry_name=registry_name, excluded_repositories=excluded_repositories,
-                                          registry_type=registry_type, auth_method=auth_method,
-                                          schedule_string=schedule_string)
-
-    def send_registry_command(self, command, cluster_name, registry_name: str, registry_type: str, auth_method: dict,
-                              schedule_string: str, depth: int = 1, excluded_repositories: list = []):
-        params = {"customerGUID": self.selected_tenant_id}
-        provider = registry_name.split(":")[0]
-        provider = provider.split("/")[0]
-        body = json.dumps([
-            {
-                "registryProvider": provider,
-                "action": command,
-                "clusterName": cluster_name,
-                "registryName": registry_name,
-                "cronTabSchedule": schedule_string,
-                "registryType": registry_type,
-                "depth": depth,
-                "include": [],
-                "exclude": excluded_repositories,
-                "isHTTPs": False,
-                "skipTLS": True,
-                "authMethod": {
-                    "type": auth_method["type"],
-                    "username": auth_method["username"],
-                    "password": auth_method["password"]
-                }
-            }
-        ])
-        r = self.post(API_REGISTRY_SCAN, params=params, data=body, timeout=15)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
-                    command, self.customer, r.status_code, r.text))
-        return r
-
     def get_vuln_scan_cronjob_list(self, cluster_name: str, expected_cjs):
         params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_VULNERABILITY_SCAN_V2, params=params)
@@ -1722,55 +1565,6 @@ class ControlPanelAPI(object):
                     assert actual[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith(
                         "kubevuln"), f'cronjob name is not as expected'
 
-    def get_registry_scan_cronjob_list(self, cluster_name: str, expected_cjs):
-        params = {"customerGUID": self.selected_tenant_id}
-        r = self.get(API_REGISTRY_SCAN, params=params, timeout=15)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get registry scan cronjob list "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        cronjob_list = r.json()
-        if cronjob_list is None:
-            cronjob_list = []
-        registry_scan_cronjob_list = [cj for cj in cronjob_list if
-                                      cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
-        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs,
-                                                 cluster_name=cluster_name)
-        return registry_scan_cronjob_list
-
-    def get_registry_scan_cronjob_list_deprecated(self, cluster_name: str, expected_cjs):
-        params = {"customerGUID": self.selected_tenant_id}
-        r = self.get(API_REGISTRY_SCAN, params=params)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get registry scan cronjob list "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        cronjob_list = r.json()
-        registry_scan_cronjob_list = [cj for cj in cronjob_list if
-                                      cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name]
-        self.compare_registry_be_cjs_to_expected(actual_cjs=registry_scan_cronjob_list, expected_cjs=expected_cjs,
-                                                 cluster_name=cluster_name)
-        return registry_scan_cronjob_list
-
-    def compare_registry_be_cjs_to_expected(self, actual_cjs, expected_cjs, cluster_name):
-        if len(actual_cjs) != len(expected_cjs):
-            raise Exception(
-                f'Error accessing dashboard. Request: get registry scan cronjob list, expected to receive '
-                f'{expected_cjs} cron jobs, and receive {len(actual_cjs)}: {actual_cjs}')
-
-        for actual in actual_cjs:
-            for expected in expected_cjs:
-                if expected.metadata.name == actual[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED]:
-                    assert cluster_name == actual[
-                        statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED], f'cluster name is not as expected'
-                    assert expected.spec.schedule == actual[
-                        statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED], f'cronjob schedule is not as expected'
-                    assert actual[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith(
-                        "kubescape-registry-scan"), f'cronjob name is not as expected'
-                    assert actual[statics.CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_FIELD] == \
-                           expected.spec.job_template.spec.template.metadata.annotations[
-                               statics.CA_REGISTRY_SCAN_CRONJOB_REGISTRY_NAME_ANNOTATION_FIELD], f'registry name is not as expected'
-
     def get_vuln_scan_cronjob(self, cj_name: str, expect_to_results: bool = True):
         params = {"customerGUID": self.selected_tenant_id}
         r = self.get(API_VULNERABILITY_SCAN_V2, params=params)
@@ -1789,25 +1583,6 @@ class ControlPanelAPI(object):
             f'Error accessing dashboard. Request: get vuln scan cronjob, cronjob {cj_name}, not found in backend. '
             f'cronjob-list: {cronjob_list}')
 
-    def get_registry_scan_cronjob(self, cj_name: str, expect_to_results: bool = True):
-        params = {"customerGUID": self.selected_tenant_id}
-        r = self.get(API_REGISTRY_SCAN, params=params)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get registry scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        cronjob_list = r.json()
-        if cronjob_list is None:
-            cronjob_list = []
-        for cj in cronjob_list:
-            if cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED] == cj_name:
-                return cj
-        if not expect_to_results:
-            return {}
-        raise Exception(
-            f'Error accessing dashboard. Request: get registry scan cronjob, cronjob {cj_name}, not found in backend. '
-            f'cronjob-list: {cronjob_list}')
-
     def update_vuln_scan_cronjob(self, cj):
         cj = [cj] if isinstance(cj, dict) else cj
         params = {"customerGUID": self.selected_tenant_id}
@@ -1815,43 +1590,6 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: update vuln scan cronjob "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
-
-    def update_registry_scan_cronjob(self, cj_name, cj_id, cluster_name, registry_name, registry_type,
-                                     cron_tab_schedule, depth, auth_method=None):
-        params = {"customerGUID": self.selected_tenant_id}
-        provider = registry_name.split(":")[0]
-        provider = provider.split("/")[0]
-        body = {
-            "name": cj_name,
-            "id": cj_id,
-            "clusterName": cluster_name,
-            "registryProvider": provider,
-            "registryName": registry_name,
-            "registryType": registry_type,
-            "cronTabSchedule": cron_tab_schedule,
-            "depth": depth,
-            "repositories": [],
-            "action": statics.UPDATE_REGISTRY_CJ_COMMAND
-        }
-        if auth_method != None:
-            body['authMethod'] = auth_method
-
-        r = self.post(API_REGISTRY_SCAN, params=params, data=json.dumps([body]), timeout=20)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
-                    statics.UPDATE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
-        return r
-
-    def update_registry_scan_cronjob_deprecated(self, cj):
-        cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_tenant_id}
-        r = self.put(API_REGISTRY_SCAN, params=params, json=cj)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: update registry scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
 
@@ -1864,47 +1602,6 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: delete vuln scan cronjob "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-
-    def delete_registry_scan_cronjob(self, cj):
-        params = {"customerGUID": self.selected_tenant_id}
-        body = [
-            {
-                "name": cj["name"],
-                "id": cj["id"],
-                "clusterName": cj["clusterName"],
-                "registryProvider": cj["registryProvider"],
-                "registryName": cj["registryName"],
-                "registryType": cj['registryType'],
-                "action": statics.DELETE_REGISTRY_CJ_COMMAND
-            }
-        ]
-
-        r = self.delete(API_REGISTRY_SCAN, params=params, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request:  %s "%s" (code: %d, message: %s)' % (
-                    statics.DELETE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
-        try:
-            return r.json()
-        except Exception as ex:
-            Logger.logger.debug(
-                "delete_registry_scan_cronjob failed to parse response: {0};{1};{2}".format(cj, ex, r.status_code))
-            return {}
-
-    def delete_registry_scan_cronjob_deprecated(self, cj):
-        cj = [cj] if isinstance(cj, dict) else cj
-        params = {"customerGUID": self.selected_tenant_id}
-        r = self.delete(API_REGISTRY_SCAN, params=params, json=cj)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: %s "%s" (code: %d, message: %s)' % (
-                    statics.DELETE_REGISTRY_CJ_COMMAND, self.customer, r.status_code, r.text))
-        try:
-            return r.json()
-        except Exception as ex:
-            Logger.logger.debug(
-                "delete_registry_scan_cronjob failed to parse response: {0};{1};{2}".format(cj, ex, r.status_code))
-            return {}
 
     def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name: str):
         params = {"customerGUID": self.selected_tenant_id} # , "cluster": cluster_name
@@ -2085,89 +1782,6 @@ class ControlPanelAPI(object):
         assert total == len(result), 'Excepted %d total, receive %d' % (total, len(result))
         Logger.logger.debug("Loaded {}".format(len(result)))
         return result
-
-    def create_scan_registry_request(self, cluster_name, registry_name):
-        params = {"customerGUID": self.selected_tenant_id, "relatedExceptions": True, "ignoreRulesSummary": True}
-        body = [{"clusterName": cluster_name, "registryName": registry_name, "cronTabSchedule": ""}]
-
-        r = self.post(API_REGISTRY_SCAN, params=params, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
-
-    def get_job_report_request(self, job_id):
-        params = {"customerGUID": self.selected_tenant_id, "jobID": job_id}
-
-        for i in range(5):
-            r = self.get(API_REGISTRY_JOBREPORTSSTATUS, params=params)
-            if 200 <= r.status_code < 300:
-                return r.json()
-            time.sleep(5)
-
-        raise Exception(
-            'Error accessing dashboard. Request: get job report status "%s" (code: %d, message: %s, jobID: "%s")' % (
-                self.customer, r.status_code, r.text, job_id))
-
-    def get_repositories_list(self, job_id):
-        params = {"customerGUID": self.selected_tenant_id, "jobID": job_id}
-
-        for i in range(5):
-            r = self.get(API_REGISTRY_RESPOSITORIESLIST, params=params)
-            if 200 <= r.status_code < 300:
-                return r.json()
-            time.sleep(5)
-
-        raise Exception(
-            'Error accessing dashboard. Request: get repositories list "%s" (code: %d, message: %s, jobID: %s)' % (
-                self.customer, r.status_code, r.text, job_id))
-
-    def test_registry_connectivity_request(self, cluster_name, registry_name, auth_method, excluded_repositories):
-        params = {"customerGUID": self.selected_tenant_id}
-        provider = registry_name.split(":")[0]
-        provider = provider.split("/")[0]
-        body = json.dumps([
-            {
-                "registryProvider": provider,
-                "action": "testRegistryConnectivity",
-                "clusterName": cluster_name,
-                "registryName": registry_name,
-                "cronTabSchedule": "",
-                "registryType": "public",
-                "depth": 3,
-                "include": [],
-                "exclude": excluded_repositories,
-                "kind": "",
-                "isHTTPs": False,
-                "skipTLS": True,
-                "authMethod": {
-                    "type": auth_method["type"],
-                    "username": auth_method["username"],
-                    "password": auth_method["password"]
-                }
-            }
-        ])
-
-        r = self.post(API_REGISTRY_SCAN, params=params, data=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: test registry connectivity "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r.json()[0]
-
-    def delete_registry_scan(self, containers_scan_id):
-        params = {"customerGUID": self.selected_tenant_id}
-        payload = {
-            "innerFilters": [{"containersScanID": containers_scan_id}],
-        }
-        r = self.post(API_REGISTRY_SCANRESULTSSUMSUMMARY_DELETE, params=params, json=payload)
-
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
 
     def get_notifications_unsubscribed(self) -> requests.Response:
         res = self.get(API_NOTIFICATIONS_UNSUBSCRIBE, cookies=self.selected_tenant_cookie)

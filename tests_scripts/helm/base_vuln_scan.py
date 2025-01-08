@@ -127,19 +127,6 @@ class BaseVulnerabilityScanning(BaseHelm):
         else:
             self.test_scan_results_against_expected(containers_cve=containers_cve, storage_CVEs=storage_CVEs)
 
-    def test_expected_scan_registry_result(self, containers_cve: dict):
-        expected_results = self.create_vulnerabilities_expected_results(
-            expected_results=self.test_obj.get_arg('expected_results'))
-        failed_paths = []
-        for container_name, cve_list in expected_results.items():
-            image = [image_name for image_name in containers_cve.keys() if container_name in image_name]
-            for cve in cve_list:
-                if cve not in containers_cve[image[0]].keys():
-                    failed_paths.append(f"{container_name} -> {cve}")
-
-        assert not failed_paths, 'Expect the data from backend would not fail less CVEs then the expected results.\n' \
-                                 f'in the following entries is happened:\nfailed_paths: {failed_paths}\n containers_cve: {containers_cve}'
-
     def test_applied_cve_exceptions(self, namespace, cve_exception_guid, cves_list, since_time):
         be_summary = self.backend.get_scan_results_sum_summary(
             namespace=namespace, since_time=since_time,
@@ -328,35 +315,6 @@ class BaseVulnerabilityScanning(BaseHelm):
                     return True
         return False
 
-    def test_registry_cve_result(self, since_time: str, containers_scan_id, be_summary, timeout: int = 600):
-
-        start = time.time()
-        err = ""
-        success = False
-        while time.time() - start < timeout:
-            Logger.logger.info('wait for detailed CVE aggregation to end in backend')
-            try:
-                containers_cve = self.get_registry_container_cve(since_time=since_time,
-                                                                 container_scan_id=containers_scan_id)
-                Logger.logger.info('Test results against expected results')
-                self.test_expected_scan_registry_result(containers_cve=containers_cve)
-                success = True
-                break
-            except Exception as e:
-                if str(e).find("502 Bad Gateway") > 0:
-                    raise e
-                err = e
-                Logger.logger.warning(
-                    "timeout {} since_time {} containers_scan_id {} error: {}".format(timeout // 60, since_time,
-                                                                                      containers_scan_id, err))
-            time.sleep(30)
-        if not success:
-            raise Exception(
-                f"test_cve_result, timeout: {timeout // 60} minutes, error: {err}. ")
-
-        Logger.logger.info('Test backend results_details against results_sum_summary')
-        self.test_results_details_against_results_sum_summary(containers_cve=containers_cve, be_summary=be_summary)
-
     def get_container_cve(self, since_time: str, container_scan_id):
         """
         params:
@@ -412,38 +370,6 @@ class BaseVulnerabilityScanning(BaseHelm):
                                                           statics.SCAN_RESULT_IMAGE_TAG_NAME_FIELD]}
 
             result[container[_CONTAINER_NAME]] = container_cve_dict
-
-        return result
-
-    def get_registry_container_cve(self, since_time: str, container_scan_id):
-        """
-        params:
-            container_scan_id: list of tuples.. [(container-name, container-scan-id), ...]
-        return:
-            dict of dict: {container-name: dict-of-CVEs, ...}
-                dict-of-CVEs contains:{CVE-name: {severity: value, isRce: true/false}}
-        """
-
-        _IMAGE_TAG_NAME = 0
-        _IMAGE_TAG_SCAN_ID = 1
-        _IMAGE_TAG_TOTAL_CVE = 2
-        if isinstance(container_scan_id, tuple):
-            container_scan_id = [container_scan_id]
-            return self.get_registry_container_cve(since_time=since_time, container_scan_id=container_scan_id)
-
-        result = {}
-        for container in container_scan_id:
-            container_cve, time = self.wait_for_report(timeout=1250,
-                                                       report_type=self.backend.get_registry_container_cve,
-                                                       containers_scan_id=container[_IMAGE_TAG_SCAN_ID],
-                                                       since_time=since_time, total_cve=container[_IMAGE_TAG_TOTAL_CVE])
-            name = statics.SCAN_RESULT_NAME_FIELD
-            severity = statics.SCAN_RESULT_SEVERITY_FIELD
-            is_rce = statics.SCAN_RESULT_IS_RCE_FIELD
-            categories = statics.SCAN_RESULT_CATEGORIES_FIELD
-            container_cve = {i[name]: {severity: i[severity], is_rce: i[categories][is_rce]} for i in container_cve}
-            result[container[_IMAGE_TAG_NAME]] = container_cve
-            Logger.logger.info("container {} has cves {}".format(container[_IMAGE_TAG_NAME], container_cve))
 
         return result
 
@@ -669,35 +595,6 @@ class BaseVulnerabilityScanning(BaseHelm):
                                      expect_to_results=False)
         assert not cj, f"Failed to verify from backend the cronjob was deleted, cronjob: {cj}"
 
-    def test_delete_registry_scan_cronjob(self, cron_job: dict, credentials: dict = None):
-        self.backend.delete_registry_scan_cronjob(cj=cron_job)
-
-        TestUtil.sleep(30, "wait till delete cronjob will arrive to backend")
-
-        # check that the cronjob was deleted from cluster
-        cj = self.kubernetes_obj.run(self.kubernetes_obj.client_BatchV1Api.read_namespaced_cron_job,
-                                     namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job['name'])
-        assert len(cj) == 0 \
-            , "Cronjob {}  was not deleted in cluster".format(cron_job['name'])
-
-        # check that the configmap was deleted from cluster
-        configmap = self.kubernetes_obj.run(self.kubernetes_obj.client_CoreV1Api.read_namespaced_config_map,
-                                            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job['name'])
-        assert len(configmap) == 0 \
-            , "Configmap with for {} cronjob was not deleted in cluster".format(cron_job['name'])
-
-        if credentials is not None and credentials['password'] != '':
-            # check that the secret was deleted from cluster
-            secret = self.kubernetes_obj.run(self.kubernetes_obj.client_CoreV1Api.read_namespaced_secret,
-                                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job['name'])
-            assert len(secret) == 0 \
-                , "Secret with for {} cronjob was not deleted in cluster".format(cron_job['name'])
-
-        # check that cronjob was deleted from be
-        cj, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob, cj_name=cron_job['name'],
-                                     expect_to_results=False)
-        assert not cj, f"Failed to verify from backend the cronjob was deleted, cronjob: {cj}"
-
     def test_update_vuln_scan_cronjob(self, cron_job: dict, schedule_string: str):
         cron_job[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED] = schedule_string
         self.backend.update_vuln_scan_cronjob(cj=cron_job)
@@ -711,50 +608,6 @@ class BaseVulnerabilityScanning(BaseHelm):
             f'cronjob {cron_job["name"]} has wrong label for {statics.CA_VULN_SCAN_CRONJOB_NAME_FILED}. '
         return new_cj
 
-    def test_update_registry_scan_cronjob(self, cron_job: dict, schedule_string: str, depth: int, auth_method=None):
-        self.backend.update_registry_scan_cronjob(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                  registry_name=cron_job['registryName'],
-                                                  registry_type=cron_job['registryType'],
-                                                  cron_tab_schedule=schedule_string, cj_name=cron_job['name'],
-                                                  cj_id=cron_job['id'], depth=depth, auth_method=auth_method)
-
-        TestUtil.sleep(30, "wait till update cronjob will arrive to backend")
-
-        # check that configmap was updated in cluster
-        configmap = self.kubernetes_obj.run(self.kubernetes_obj.client_CoreV1Api.read_namespaced_config_map,
-                                            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job['name'])
-        assert f'"depth":{depth}' in configmap.data['request-body.json'], \
-            f'configmap {cron_job["name"]} has wrong depth: expected {depth}, configmap: {configmap.data["request-body.json"]}.  '
-
-        if auth_method is not None:
-            # check that secret was updated in cluster
-            secret = self.kubernetes_obj.run(self.kubernetes_obj.client_CoreV1Api.read_namespaced_secret,
-                                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, name=cron_job
-                ['name'])
-
-            username = auth_method['username']
-            password = auth_method['password']
-            registries_auth = secret.data['registriesAuth']
-            registries_auth = base64.b64decode(registries_auth).decode()
-            assert f'"username":"{username}"' in registries_auth, \
-                f'secret {cron_job["name"]} has wrong username: expected {username}, registries_auth: {registries_auth}.  '
-
-            assert f'"password":"{password}"' in registries_auth, \
-                f'secret {cron_job["name"]} has wrong password: expected {password}, registries_auth: {registries_auth}.  '
-
-        # check that cronjob was updated in be
-        new_cj, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob, cj_name=cron_job['name'])
-        assert new_cj[statics.CA_VULN_SCAN_CRONJOB_CRONTABSCHEDULE_FILED] == schedule_string, \
-            f'Failed to verify that cronjob {cron_job["name"]} with schedule {schedule_string} was updated. ' \
-            f'cronjob: {new_cj}'
-        assert new_cj['depth'] == depth, \
-            f'Failed to verify that cronjob {cron_job["name"]} with depth {depth} was updated. ' \
-            f'cronjob: {new_cj}'
-        assert (new_cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith("kubescape-registry-scan")), \
-            f'cronjob {cron_job["name"]} has wrong name for {statics.CA_VULN_SCAN_CRONJOB_NAME_FILED}. '
-
-        return new_cj
-
     def test_create_vuln_scan_cronjob(self, namespaces_list: list, schedule_string: str):
         old_expected_cjs = self.kubernetes_obj.get_vuln_scan_cronjob()
         old_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_vuln_scan_cronjob_list,
@@ -766,33 +619,6 @@ class BaseVulnerabilityScanning(BaseHelm):
         TestUtil.sleep(30, "wait till cronjob will arrive to backend")
         new_expected_cjs = self.kubernetes_obj.get_vuln_scan_cronjob()
         new_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_vuln_scan_cronjob_list,
-                                                 expected_cjs=new_expected_cjs,
-                                                 cluster_name=self.kubernetes_obj.get_cluster_name())
-
-        new_cj = self.get_new_cronjob(old_cronjob_list=old_actual_cjs, new_cronjob_list=new_actual_cjs)
-        assert new_cj, f"Failed to find the new cronjob, old_cronjob_list: {old_actual_cjs}. " \
-                       f"new_cronjob_list: {new_actual_cjs}"
-
-        return new_cj
-
-    def test_create_registry_scan_cronjob(self, registry_name: str, schedule_string: str, credentials: dict):
-        old_expected_cjs = self.kubernetes_obj.get_registry_scan_cronjob()
-        old_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob_list,
-                                                 expected_cjs=old_expected_cjs,
-                                                 cluster_name=self.kubernetes_obj.get_cluster_name())
-        if credentials is not None:
-            auth_method = {"type": "private", "username": credentials["username"], "password": credentials["password"]}
-            registry_type = "private"
-        else:
-            auth_method = {"type": "public", "username": "", "password": ""}
-            registry_type = "public"
-        self.backend.create_registry_scan_job_request(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                      schedule_string=schedule_string, registry_name=registry_name,
-                                                      auth_method=auth_method, registry_type=registry_type)
-
-        TestUtil.sleep(30, "wait till cronjob will arrive to backend")
-        new_expected_cjs = self.kubernetes_obj.get_registry_scan_cronjob()
-        new_actual_cjs, t = self.wait_for_report(report_type=self.backend.get_registry_scan_cronjob_list,
                                                  expected_cjs=new_expected_cjs,
                                                  cluster_name=self.kubernetes_obj.get_cluster_name())
 
