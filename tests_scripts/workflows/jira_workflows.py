@@ -116,7 +116,7 @@ class WorkflowsJiraNotifications(Workflows):
                     found_sr = True
                 
                 if not found_vuln:
-                    response_vuln = self.backend.get_vulns_v2(body=vuln_body, expected_results=1, enrich_tickets=True)
+                    response_vuln = self.backend.get_vulns_v2(body=vuln_body, enrich_tickets=True)
                     self.assert_vulnerability_jira_ticket_created(issues=issues, response=response_vuln, cves=["CVE-2023-27522"])
                     Logger.logger.info("Vulnerability jira ticket created")
                     found_vuln = True
