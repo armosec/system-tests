@@ -174,6 +174,87 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io"
   },
+  "scan_nsa": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_custom_framework_scanning_file_scope_testing": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_custom_framework_scanning_cluster_scope_testing": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_mitre": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_repository": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_local_file": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_local_glob_files": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
+  "scan_local_list_of_files": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io"
+  },
   "scan_nsa_and_submit_to_backend": {
     "target": [
       "CLI",
