@@ -15,12 +15,7 @@ class Workflows(BaseHelm, BaseKubescape):
     
 
     def cleanup(self, **kwargs):
-        for guid in self.test_workflows_guids:
-            try:
-                self.delete_and_assert_workflow(guid)
-            except Exception as e:
-                Logger.logger.error(f"Failed to delete workflow with guid {guid}, got exception {e}")
-        self.test_workflows_guids = []
+        self.cleanup_workflows()
         return super().cleanup(**kwargs)
 
     def active_workflow(self):
@@ -39,6 +34,14 @@ class Workflows(BaseHelm, BaseKubescape):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+    
+    def cleanup_workflows(self):
+        for guid in self.test_workflows_guids:
+            try:
+                self.delete_and_assert_workflow(guid)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete workflow with guid {guid}, got exception {e}")
+        self.test_workflows_guids = []
 
     def create_and_assert_workflow(self, workflow_body, expected_response, update=False):
         if update:

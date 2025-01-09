@@ -133,8 +133,12 @@ class WorkflowsTeamsNotifications(Workflows):
 
     
     def cleanup(self, **kwargs):
+        super().cleanup_workflows()
         if self.webhook_name:
-            self.delete_channel_by_guid(self.get_channel_guid_by_name(self.webhook_name))
+            try:
+                self.delete_channel_by_guid(self.get_channel_guid_by_name(self.webhook_name))
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete channel with name {self.webhook_name}, got exception {e}")
         if self.fw_name:
             self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         return super().cleanup(**kwargs)
