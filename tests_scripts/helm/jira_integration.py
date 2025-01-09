@@ -81,7 +81,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         assert project, "Jira System Tests is missing from projects"
 
         Logger.logger.info('update Jira configuration')
-        self.backend.update_jira_config({'selectedSite': site, 'projects':[project]})
+        self.backend.update_jira_config({"jiraCollabGUID": jiraCollaborationGUID, 'selectedSite': site, 'projects':[project]})
 
         Logger.logger.info('verify Jira configuration')
         config = self.backend.get_jira_config()
