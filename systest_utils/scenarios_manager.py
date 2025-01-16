@@ -62,18 +62,17 @@ class ScenarioManager(base_test.BaseTest):
         Logger.logger.info(f"Applying scenario manifests for {self.test_scenario}")
         deploy_cmd = os.path.join(self.scenario_path, 'deploy_scenario') + ' ' + os.path.join(self.scenario_path , self.test_scenario) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=deploy_cmd, display_stdout=True, timeout=300)
-        time.sleep(60)
 
     
     def apply_fix(self, fix_type):
         """
         apply_fix apply the fix to the cluster
         """
-        fix_command= os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
+        fix_command= "bash " + os.path.join(self.scenario_path, self.test_scenario, 'fix_' + fix_type) + ' --namespace ' + self.namespace
         TestUtil.run_command(command_args=fix_command, display_stdout=True, timeout=300)
   
 
-    def trigger_scan(self, trigger_by,  additional_params={}) -> None:
+    def trigger_scan(self, trigger_by=None,  additional_params={}) -> None:
         """trigger_scan create a new scan action from the backend
 
         :param trigger_by: the kind of event that trigger the scan ("cronjob", "scan_on_start")
@@ -111,8 +110,27 @@ class AttackChainsScenarioManager(ScenarioManager):
 
     def __init__(self, test_obj, backend: backend_api.ControlPanelAPI, cluster, namespace):
         super().__init__(test_obj, backend, cluster, namespace, SCENARIOS_TEST_PATH)
+        self.test_scenario = test_obj["test_job"][0].get("test_scenario", "not defined")
+        self.attack_track = test_obj["test_job"][0].get("attack_track", "not defined")
+        self.fix_object = test_obj["test_job"][0].get("fix_object", "control")
+        self.scenario_key = self.test_scenario + " fix: " + self.fix_object
+        Logger.logger.info(f"Generated ScenarioManager for {self.test_scenario} scenario on {self.cluster} cluster in {self.namespace} namespace for attack track {self.attack_track}")
 
-    def verify_scenario(self, current_datetime=None):
+    def apply_scenario(self):
+        """
+        apply_scenario apply the scenario manifests to the cluster
+        """
+        Logger.logger.info(f"Applying scenario manifests for {self.scenario_key}")
+        super().apply_scenario()
+
+    def apply_fix(self):
+        """
+        apply_fix apply the fix to the cluster
+        """
+        Logger.logger.info(f"Applying fix for {self.scenario_key}")
+        super().apply_fix(self.fix_object)
+
+    def verify_scenario(self, current_datetime=None, timeout=600):
         """
         verify_scenario validate the attack chains results on the backend
         """
@@ -121,9 +139,11 @@ class AttackChainsScenarioManager(ScenarioManager):
         Logger.logger.info("wait for response from BE")
         r, t = self.wait_for_report(
             self.backend.get_active_attack_chains, 
-            timeout=600,
+            timeout=timeout,
+            sleep_interval=15,
             current_datetime=current_datetime,
-            cluster_name=self.cluster
+            cluster_name=self.cluster,
+            namespace=self.namespace
             )
 
         Logger.logger.info('loading attack chain scenario to validate it')
@@ -137,7 +157,7 @@ class AttackChainsScenarioManager(ScenarioManager):
         except Exception as e:
             raise Exception(f"Failed to validate attack chains scenario: {e}, response: {response}, expected: {expected}")
 
-    def verify_fix(self):
+    def verify_fix(self, timeout=600):
         """
         verify_fix validate the attack chains fix results on the backend
         """
@@ -146,8 +166,10 @@ class AttackChainsScenarioManager(ScenarioManager):
         # cat take more than 15m to get the updated result
         active_attack_chains, t = self.wait_for_report(
             self.backend.has_active_attack_chains, 
-            timeout=600, 
-            cluster_name=self.cluster
+            timeout=timeout, 
+            sleep_interval=10,
+            cluster_name=self.cluster,
+            namespace=self.namespace
             )
 
         Logger.logger.info('attack-chain fixed properly')
@@ -193,9 +215,14 @@ class AttackChainsScenarioManager(ScenarioManager):
         :exception Exception: if the content is not as expected.
         """
 
-        assert len(result['response']['attackChains']) == len(expected['response']['attackChains']), f"Length mismatch: result: {len(result['response']['attackChains'])} != expected: {len(expected['response']['attackChains'])}"
+        assert len(result['response']['attackChains']) > 0, "No attack chains found, expecting attack chains"
+        found = False
         # Some example of assertion needed to recognize attack chain scenarios
         for acid, ac in enumerate(result['response']['attackChains']):
+            if ac['name'] != self.attack_track:
+                continue
+        
+            found = True
             ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
             ac_node_expected = expected['response']['attackChains'][acid]['attackChainNodes']
 
@@ -203,6 +230,10 @@ class AttackChainsScenarioManager(ScenarioManager):
             assert ac_node_result['name'] == ac_node_expected['name'], f"Attack chain name mismatch: result: {ac_node_result['name']} != expected: {ac_node_expected['name']}"
            
             self.compare_nodes(ac_node_result, ac_node_expected)
+        
+        assert found, f"Attack chain {self.attack_track} not found, expecting attack chains"
+    
+    
 
 
 

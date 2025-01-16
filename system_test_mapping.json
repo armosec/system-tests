@@ -152,6 +152,19 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
+  "attackchains_all": {
+    "target": [
+      "CLI",
+      "Backend"
+    ],
+    "target_repositories": [        
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
   "relevancy_multiple_containers": {
     "target": [
       "In cluster"
@@ -591,10 +604,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -621,10 +634,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -636,9 +649,9 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",

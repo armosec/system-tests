@@ -1,4 +1,15 @@
 #!/usr/bin/bash
 
-kubectl patch deployment alpine-deployment -n default --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"alpine:latest"}]'
-kubectl rollout status deployment alpine-deployment -n default --timeout=90s
+# Default namespace
+NAMESPACE="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) NAMESPACE="$2"; shift ;;
+    esac
+    shift
+done
+
+kubectl patch deployment alpine-deployment -n "$NAMESPACE" --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value":"alpine:latest"}]'
+kubectl rollout status deployment alpine-deployment -n "$NAMESPACE" --timeout=90s
