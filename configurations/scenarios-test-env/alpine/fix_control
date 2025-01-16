@@ -1,4 +1,15 @@
 #!/usr/bin/bash
 
-kubectl delete -n default service alpine-service
-kubectl wait svc/alpine-service --for=delete --timeout=-1s
+# Default namespace
+NAMESPACE="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) NAMESPACE="$2"; shift ;;
+    esac
+    shift
+done
+
+kubectl delete -n "$NAMESPACE" service alpine-service
+kubectl wait svc/alpine-service -n "$NAMESPACE" --for=delete --timeout=-1s

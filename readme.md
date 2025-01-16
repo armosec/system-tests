@@ -73,6 +73,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `ac_alpine_workload_external_track_fix_control`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_alpine_fix_image_no_relevancy`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `ac_alpine_fix_image_no_relevancy_with_cronjob`                | helm-chart |                                    | in-cluster kubescape, backend |
+| `attackchains_all`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vuln_scan_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`                                              | payment |                                                                           | stripe, backend             |

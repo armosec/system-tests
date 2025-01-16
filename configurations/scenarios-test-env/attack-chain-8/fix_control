@@ -1,7 +1,20 @@
 #!/usr/bin/bash
 
+# Default namespace
+NAMESPACE="default"
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) NAMESPACE="$2"; shift ;;
+    esac
+    shift
+done
+
+# ClusterRoleBinding (no namespace required)
 kubectl delete ClusterRoleBinding read-secrets-global
 kubectl wait ClusterRoleBinding/read-secrets-global --for=delete --timeout=-1s
 
-kubectl delete -n default RoleBinding read-pods
-kubectl wait RoleBinding/read-pods --for=delete --timeout=-1s
+# RoleBinding (namespace-specific)
+kubectl delete -n "$NAMESPACE" RoleBinding read-pods
+kubectl wait RoleBinding/read-pods -n "$NAMESPACE" --for=delete --timeout=-1s

@@ -1,7 +1,18 @@
 #!/usr/bin/bash
 
-kubectl delete ServiceScanResult operator -n default
-kubectl wait ServiceScanResult/operator --for=delete --timeout=-1s
+# Default namespace
+NAMESPACE="default"
 
-kubectl delete deployment operator-deployment -n default
-kubectl wait --for=delete deployment/operator-deployment -n default --timeout=90s
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --namespace) NAMESPACE="$2"; shift ;;
+    esac
+    shift
+done
+
+kubectl delete ServiceScanResult operator -n "$NAMESPACE"
+kubectl wait ServiceScanResult/operator --for=delete --timeout=-1s -n "$NAMESPACE"
+
+kubectl delete deployment operator-deployment -n "$NAMESPACE"
+kubectl wait --for=delete deployment/operator-deployment -n "$NAMESPACE" --timeout=90s

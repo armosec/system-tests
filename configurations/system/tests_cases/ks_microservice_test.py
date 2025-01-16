@@ -245,6 +245,31 @@ class KSMicroserviceTests(object):
             relevancy_enabled=False
         )
     
+    
+    @staticmethod
+    def attackchains_all():
+        """
+        check multiple attack chains scenarios.
+        once the attack chain has been detected on the backend, fix the attack chain and verify that is has been solved 
+        by triggering a new control scan.
+
+        'fix_object' parameter is used to determine which type of fix you want to apply, to test the attack-chain fix functionality.
+        fix_object = ["control", "image"]
+        """
+        from tests_scripts.helm.ks_microservice import ScanAttackChainsWithKubescapeHelmChartMultiple
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanAttackChainsWithKubescapeHelmChartMultiple,
+            test_job=[
+                {"test_scenario": "attack-chain-8", "fix_object": "control", "attack_track": "external-workload-with-cluster-takeover-roles", "default_namespace":True}, # external workload with cluster takeover, must use default for the role subjects
+                {"test_scenario": "attack-chain-9", "fix_object": "control", "attack_track": "workload-unauthenticated-service"}, # unauthenticated service
+                {"test_scenario": "alpine", "fix_object": "image", "attack_track": "workload-external-track"}, # alpine workload external track fix image
+                {"test_scenario": "alpine", "fix_object": "control", "attack_track": "workload-external-track"}, # alpine workload external track fix control
+                ],
+        )
+    
+
+    
     @staticmethod
     def ac_8_external_workload_with_cluster_takeover():
         """
