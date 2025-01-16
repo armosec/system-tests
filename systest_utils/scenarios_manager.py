@@ -214,9 +214,11 @@ class AttackChainsScenarioManager(ScenarioManager):
             expected: expected attack chains.
         :exception Exception: if the content is not as expected.
         """
-
+        assert "response" in result, f"'response' key not found in the result"
         assert len(result['response']['attackChains']) > 0, "No attack chains found, expecting attack chains"
         found = False
+
+        expected_ac = expected['response']['attackChains'][0]
         # Some example of assertion needed to recognize attack chain scenarios
         for acid, ac in enumerate(result['response']['attackChains']):
             if ac['name'] != self.attack_track:
@@ -224,12 +226,13 @@ class AttackChainsScenarioManager(ScenarioManager):
         
             found = True
             ac_node_result = result['response']['attackChains'][acid]['attackChainNodes']
-            ac_node_expected = expected['response']['attackChains'][acid]['attackChainNodes']
+            ac_node_expected = expected_ac['attackChainNodes']
 
             # comparing the 'name' (type: attack track) of the attack chain
             assert ac_node_result['name'] == ac_node_expected['name'], f"Attack chain name mismatch: result: {ac_node_result['name']} != expected: {ac_node_expected['name']}"
            
             self.compare_nodes(ac_node_result, ac_node_expected)
+            break
         
         assert found, f"Attack chain {self.attack_track} not found, expecting attack chains"
     
