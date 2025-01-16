@@ -877,8 +877,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "users-notification-service"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -892,8 +891,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "users-notification-service"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1171,7 +1169,6 @@
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service",
       "config-service",
       "cadashboardbe",
       "event-ingester-service"
