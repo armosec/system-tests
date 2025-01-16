@@ -689,15 +689,6 @@ class SecurityRisksScenarioManager(ScenarioManager):
         verify_scenario validate the scan status results on the backend
         """
 
-        Logger.logger.info("validating lastPostureScanTriggered for this cluster was updated")
-        r, t = self.wait_for_report(
-            self.verify_cluster_lastPostureScanTriggered_time,
-            timeout=30,
-            sleep_interval=5,
-            cluster_name=self.cluster,
-            trigger_time=trigger_time
-            )
-
         # self.verify_cluster_lastPostureScanTriggered_time(cluster_name=self.cluster, trigger_time=trigger_time)
 
         Logger.logger.info("validating scan status of attack chains is processing")
@@ -705,6 +696,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
             self.verify_cluster_field_in_scan_status, 
             timeout=60,
             cluster_name=self.cluster,
+            sleep_interval=5,
             expected_field='attackChainsProcessingStatus',
             expectedStatus='processing'
             )
@@ -727,10 +719,18 @@ class SecurityRisksScenarioManager(ScenarioManager):
         Logger.logger.info("validating scan status of security risks is done")
         r, t = self.wait_for_report(
             self.verify_cluster_field_in_scan_status, 
-            timeout=600,
+            timeout=180,
             cluster_name=self.cluster,
             expected_field='securityRisksProcessingStatus',
             expectedStatus='done'
+            )
+        
+        Logger.logger.info("validating lastPostureScanTriggered for this cluster was updated")
+        r, t = self.wait_for_report(
+            self.verify_cluster_lastPostureScanTriggered_time,
+            timeout=1,
+            cluster_name=self.cluster,
+            trigger_time=trigger_time
             )
         
         
