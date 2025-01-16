@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import time
 import os
+import traceback
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
 from systest_utils import Logger, TestUtil, statics
@@ -438,7 +439,8 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             try:
                 scenarios_manager.verify_scenario(current_datetime, timeout=timeout)
             except Exception as e:
-                verification_report[scenario_key] = f"Failed to verify scenario on backend, got exception {e}"
+                error_stack = traceback.format_exc()
+                verification_report[scenario_key] = f"Failed to verify scenario on backend, got exception {e}, stack: {error_stack}"
                 succeded = False
             else:
                 Logger.logger.info(f"scenario verified {scenario_key}")
@@ -446,7 +448,8 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             end_last_run = datetime.now(timezone.utc)
         
         if not succeded:
-            raise Exception(f"Failed to verify all scenarios on backend: {verification_report}")
+            nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
+            raise Exception(f"Failed to verify all scenarios on backend: {nice_report}")
     
     def apply_fixes(self):
         for scenarios_manager in self.scenario_managers:
@@ -475,7 +478,8 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             try:
                 scenarios_manager.verify_fix(timeout=timeout)
             except Exception as e:
-                verification_report[scenario_key] = f"Failed to verify fix, got exception {e}"
+                error_stack = traceback.format_exc()
+                verification_report[scenario_key] = f"Failed to verify fix, got exception {e} stack: {error_stack}"
                 succeded = False
             else:
                 Logger.logger.info(f"fix verified for scenario {scenarios_manager.scenario_key}")
@@ -484,7 +488,8 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             
     
         if not succeded:
-            raise Exception(f"Failed to verify all fixes: {verification_report}")
+            nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
+            raise Exception(f"Failed to verify all fixes: {nice_report}")
 
 class ScanAttackChainsWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
