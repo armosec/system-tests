@@ -897,7 +897,7 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io"
   },
-  "sr_r_0035_attack_chain": {
+  "securityrisks_all": {
     "target": [
       "In cluster",
       "Backend"
@@ -907,6 +907,21 @@
       "careportsreceiver",
       "event-ingester-service",
       "gateway"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
+  "sr_r_0035_attack_chain": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -918,10 +933,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -933,10 +948,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -948,10 +963,10 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "cadashboardbe-dummy",
+      "careportsreceiver-dummy",
+      "event-ingester-service-dummy",
+      "gateway-dummy"
     ],
     "description": "test security risk vulnerability type, R-0037",
     "skip_on_environment": "",

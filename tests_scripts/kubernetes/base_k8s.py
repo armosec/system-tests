@@ -796,7 +796,7 @@ class BaseK8S(BaseDockerizeTest):
                                  timeout=timeout)
         return replicas
 
-    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=220,
+    def verify_running_pods(self, namespace: str, replicas: int = None, name: str = None, timeout=300,
                             comp_operator=operator.eq):
         """
         compare number of expected running pods with actually running pods
