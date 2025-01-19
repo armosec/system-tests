@@ -75,7 +75,7 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         scenarios_manager.verify_scan_status(time_before_scan)
 
         Logger.logger.info("6. Apply attack chain fix")
-        scenarios_manager.apply_fix(self.test_obj[("fix_object", "control")])
+        scenarios_manager.apply_fix()
 
         Logger.logger.info("7. trigger scan after fix")
         time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
