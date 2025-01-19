@@ -8,6 +8,27 @@ from os.path import join
 
 class SecurityRisksTests(object):
 
+
+    @staticmethod
+    def securityrisks_all():
+        """
+        check multiple security risks scenarios.
+        once the security risks has been detected on the backend, fix the security risks and verify that is has been solved 
+        by triggering a new control scan.
+        """
+        from tests_scripts.helm.ks_microservice import ScanSecurityRisksWithKubescapeHelmChartMultiple
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=ScanSecurityRisksWithKubescapeHelmChartMultiple,
+            test_job=[
+                {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0035"]}, # attack chain security risk
+                {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0005"]}, # control security risk
+                {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0007"], "with_network_policy": True}, # control networkpolicy security risk
+                {"test_scenario": "nginx", "fix_object": "vulnerability", "security_risks_ids": ["R_0037"]}, # vulnerability security risk
+                ],
+        )
+    
+
     @staticmethod
     # test security risks detection and resolve with kubescape helm chart
     # based on attack chain 5 scenarios.

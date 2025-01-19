@@ -89,6 +89,208 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         return self.cleanup()
 
 
+class ScanSecurityRisksWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
+    """
+    ScanSecurityRisksExceptionsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanSecurityRisksWithKubescapeHelmChartMultiple, self).__init__(test_obj=test_obj, backend=backend,
+                                                                      kubernetes_obj=kubernetes_obj,
+                                                                      test_driver=test_driver)
+        # disable node agent capabilities
+        self.helm_kwargs = {
+            "capabilities.runtimeObservability": "disable",
+            # "capabilities.networkPolicyService": "disable", # network policy is enabled in order to check network policy security risks
+            "capabilities.relevancy": "disabled",
+            "capabilities.malwareDetection": "disable",
+            "capabilities.runtimeDetection": "disable",
+            "capabilities.seccompProfileService": "disable",
+            "capabilities.nodeProfileService": "disable",
+
+        }
+
+        if self.test_obj.get_arg("helm_kwargs", default={}) != {}:
+            self.helm_kwargs.update(self.test_obj.get_arg("helm_kwargs"))
+        self.wait_for_agg_to_end = False
+        self.scenario_managers: list[SecurityRisksScenarioManager] = []
+
+        self.wait_for_agg_to_end = False
+
+    def start(self):
+        """
+        Agenda:
+        1. construct SecurityRisksScenarioManager objects
+        2. apply security risks scenario manifests
+        3. Install kubescape with helm-chart
+        4. Verify scenarios on backend
+        5. Apply security risks fixes
+        6. trigger scan after fixes
+        7. verify security risks fixes
+        8. validate security risks trends
+
+        """
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
+
+
+        self.ignore_agent = True
+        self.cluster = self.get_cluster_name()
+
+        current_datetime = datetime.now(timezone.utc)
+
+        Logger.logger.info('1. construct SecurityRisksScenarioManager objects')
+        self.constuct_scenario_managers()
+
+        Logger.logger.info("2. apply security risks scenario manifests")
+        self.apply_scenarios()
+
+        Logger.logger.info("3. Install kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(30)
+
+        Logger.logger.info("4. Verify scenarios on backend")
+        self.scenario_managers[0].trigger_scan()
+        total_events_detected = self.verify_scenarios(current_datetime)
+
+        Logger.logger.info("5. Apply security risks fixes")
+        self.apply_fixes()
+        
+        Logger.logger.info("6. trigger scan after fixes")
+        self.scenario_managers[0].trigger_scan()
+
+        Logger.logger.info("7. verify security risks fixes")
+        self.verify_fixes()
+
+        Logger.logger.info('7. validate security risks trends')
+        self.verify_security_risks_trends(total_events_detected)
+
+        return self.cleanup()
+
+    def constuct_scenario_managers(self):
+        for item in self.test_obj["test_job"]:
+
+            # create a new test_obj for each scenario
+            # take the first test_obj and update the test_job to be the current item
+            tmp_test_obj = self.test_obj
+            tmp_test_obj.kwargs["test_job"] = [item]
+
+            namespace =  self.create_namespace()
+            scenarios_manager = SecurityRisksScenarioManager(test_obj=tmp_test_obj, backend=self.backend, cluster=self.cluster, namespace=namespace)
+            self.scenario_managers.append(scenarios_manager)
+
+    def apply_scenarios(self):
+        for scenarios_manager in self.scenario_managers:
+            scenarios_manager.apply_scenario()
+        time.sleep(30)
+
+    def verify_scenarios(self, current_datetime, timeoutsec=600):
+        start_datetime = datetime.now(timezone.utc)
+        end_last_run = start_datetime
+
+        verification_report = {}
+        succeded = True
+        total_events_detected = []
+        for scenarios_manager in self.scenario_managers:
+            scenario_key = scenarios_manager.scenario_key
+            verification_report[scenario_key] = "Scenario not verified yet"
+
+            time_difference_seconds = round((end_last_run - start_datetime).total_seconds())
+            timeout = timeoutsec - time_difference_seconds
+            if timeout < 0:
+                verification_report[scenario_key] = "Timeout reached"
+                succeded = False
+                break
+            Logger.logger.info(f"verify scenario {scenario_key}")
+            try:
+                result = scenarios_manager.verify_scenario(timeout=timeout)
+
+                events_detected = sum(res['affectedResourcesCount'] for res in result['response'])
+                total_events_detected.append(events_detected)
+
+                scenarios_manager.construct_message("validating security risks categories")
+                scenarios_manager.verify_security_risks_categories(result)
+                
+                scenarios_manager.construct_message("validating security risks severities")
+                scenarios_manager.verify_security_risks_severities(result)
+
+                # verify unique values - no need to wait.
+                scenarios_manager.construct_message("validating security risks unique values")
+                scenarios_manager.verify_security_risks_list_uniquevalues(result["response"])
+
+                # verify resources side panel - no need to wait.
+                scenarios_manager.construct_message("validating security risks resources")
+                scenarios_manager.verify_security_risks_resources()
+
+            except Exception as e:
+                error_stack = traceback.format_exc()
+                verification_report[scenario_key] = f"Failed to verify scenario on backend, got exception {e}, stack: {error_stack}"
+                succeded = False
+            else:
+                Logger.logger.info(f"scenario verified {scenario_key}")
+                verification_report[scenario_key] = "verified"
+            end_last_run = datetime.now(timezone.utc)
+        
+        if not succeded:
+            nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
+            raise Exception(f"Failed to verify all scenarios on backend: \n {nice_report}")
+        
+        return total_events_detected
+    
+    def apply_fixes(self):
+        for scenarios_manager in self.scenario_managers:
+            Logger.logger.info(f"apply fix for scenario {scenarios_manager.scenario_key}")
+            scenarios_manager.apply_fix()
+
+    def verify_fixes(self, timeoutsec=600):
+        start_datetime = datetime.now(timezone.utc)
+        end_last_run = start_datetime
+
+        verification_report = {}
+        succeded = True
+        for scenarios_manager in self.scenario_managers:
+            scenario_key = scenarios_manager.scenario_key
+            verification_report[scenario_key] = "Fix not verified yet"
+
+            time_difference_seconds = round((end_last_run - start_datetime).total_seconds())
+            timeout = timeoutsec - time_difference_seconds
+
+            # break if timeout is reached
+            if timeout < 0:
+                verification_report[scenario_key] = "Timeout reached"
+                succeded = False
+                break
+            Logger.logger.info(f"verify fix for scenario {scenarios_manager.scenario_key}")
+            try:
+                scenarios_manager.verify_fix(timeout=timeout)
+            except Exception as e:
+                error_stack = traceback.format_exc()
+                verification_report[scenario_key] = f"Failed to verify fix, got exception {e} stack: {error_stack}"
+                succeded = False
+            else:
+                Logger.logger.info(f"fix verified for scenario {scenarios_manager.scenario_key}")
+                verification_report[scenario_key] = "verified"
+            end_last_run = datetime.now(timezone.utc)
+            
+    
+        if not succeded:
+            nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
+            raise Exception(f"Failed to verify all fixes: \n {nice_report}")
+        
+    def verify_security_risks_trends(self, total_events_detected:list):
+        """
+        validate security risks trends
+        params:
+        total_events_detected: list of total events detected for each scenario
+        """
+        for i in range(len(total_events_detected)):
+            self.scenario_managers[i].verify_security_risks_trends(total_events_detected[i], total_events_detected[i], 0, 0)
+        Logger.logger.info('attack-chain fixed properly')
+        return self.cleanup()
+    
+
 class ScanSecurityRisksWithKubescapeHelmChart(BaseHelm, BaseKubescape):
     """
     ScanSecurityRisksExceptionsWithKubescapeHelmChart install the kubescape operator and run the scan to check attack-chains.
@@ -449,7 +651,7 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
         
         if not succeded:
             nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
-            raise Exception(f"Failed to verify all scenarios on backend: {nice_report}")
+            raise Exception(f"Failed to verify all scenarios on backend: \n {nice_report}")
     
     def apply_fixes(self):
         for scenarios_manager in self.scenario_managers:
@@ -489,7 +691,7 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
     
         if not succeded:
             nice_report = "\n".join([f"{key}: {value}" for key, value in verification_report.items()])
-            raise Exception(f"Failed to verify all fixes: {nice_report}")
+            raise Exception(f"Failed to verify all fixes: \n {nice_report}")
 
 
 class ScanWithKubescapeHelmChart(BaseHelm, BaseKubescape):
