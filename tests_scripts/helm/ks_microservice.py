@@ -209,17 +209,18 @@ class ScanSecurityRisksWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
                 events_detected = sum(res['affectedResourcesCount'] for res in result['response'])
                 total_events_detected.append(events_detected)
 
-                Logger.logger.info("4. validating security risks categories")
+                scenarios_manager.construct_message("validating security risks categories")
                 scenarios_manager.verify_security_risks_categories(result)
-
-                Logger.logger.info("5. validating security risks severities")
+                
+                scenarios_manager.construct_message("validating security risks severities")
                 scenarios_manager.verify_security_risks_severities(result)
+
                 # verify unique values - no need to wait.
-                Logger.logger.info("6. validating security risks unique values")
+                scenarios_manager.construct_message("validating security risks unique values")
                 scenarios_manager.verify_security_risks_list_uniquevalues(result["response"])
 
                 # verify resources side panel - no need to wait.
-                Logger.logger.info("7. validating security risks resources")
+                scenarios_manager.construct_message("validating security risks resources")
                 scenarios_manager.verify_security_risks_resources()
 
             except Exception as e:
