@@ -149,6 +149,7 @@ class ScanSecurityRisksWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        time.sleep(30)
 
         Logger.logger.info("4. Verify scenarios on backend")
         self.scenario_managers[0].trigger_scan()
