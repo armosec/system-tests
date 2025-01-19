@@ -23,7 +23,7 @@ class SecurityRisksTests(object):
             test_job=[
                 {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0035"]}, # attack chain security risk
                 {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0005"]}, # control security risk
-                # {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0007"], "with_network_policy": True}, # control networkpolicy security risk
+                {"test_scenario": "attack-chain-5", "fix_object": "control", "security_risks_ids": ["R_0007"], "with_network_policy": True}, # control networkpolicy security risk
                 {"test_scenario": "nginx", "fix_object": "vulnerability", "security_risks_ids": ["R_0037"]}, # vulnerability security risk
                 ],
         )
