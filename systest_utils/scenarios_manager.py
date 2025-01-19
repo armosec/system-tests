@@ -463,7 +463,8 @@ class SecurityRisksScenarioManager(ScenarioManager):
         ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
                    'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'exceptionPolicyGUID',
-                   'riskFactorsCount', 'riskFactors', 'severityStats', 'criticalCount', 'highCount', 'mediumCount', 'lowCount'# vulnerability specific keys
+                   'riskFactorsCount', 'riskFactors', 'severityStats', 'criticalCount', 'highCount', 'mediumCount', 'lowCount',# vulnerability specific keys
+                   'networkPolicyStatus'
                    }
     
         if 'total' in result and 'total' in expected:
