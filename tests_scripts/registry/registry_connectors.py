@@ -22,11 +22,11 @@ REGISTRY_PROVIDERS: List[Dict[str, any]] = [
         "secret_field_name": "accessToken",
         "secret_value_env_var": "AZURE_REGISTRY_ACCESS_TOKEN",
     },
-    {
-        "provider": "google",
-        "secret_field_name": "key",
-        "secret_value_env_var": "GOOGLE_REGISTRY_KEY",
-    },
+    # {
+    #     "provider": "google",
+    #     "secret_field_name": "key",
+    #     "secret_value_env_var": "GOOGLE_REGISTRY_KEY",
+    # },
 ]
 
 class RegistryChecker(BaseHelm):
