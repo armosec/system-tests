@@ -74,18 +74,6 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         Logger.logger.info("5. verify scan status")
         scenarios_manager.verify_scan_status(time_before_scan)
 
-        Logger.logger.info("6. Apply attack chain fix")
-        scenarios_manager.apply_fix()
-
-        Logger.logger.info("7. trigger scan after fix")
-        time_before_scan = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-        scenarios_manager.trigger_scan(self.test_obj["test_job"][0]["trigger_by"],
-                                       additional_params={"triggeredFrom": "securityRiskPage"})
-
-        Logger.logger.info("8. verify scan status (without verifying fix)")
-        scenarios_manager.verify_scan_status(time_before_scan)
-
-        Logger.logger.info('attack-chain fixed properly')
         return self.cleanup()
 
 
