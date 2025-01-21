@@ -27,10 +27,6 @@ class ScanStatusWithKubescapeHelmChart(BaseHelm, BaseKubescape):
         3. Verify scenario on backend
         4. trigger posture scan
         5. verify scan status
-        6. Apply attack chain fix
-        7. trigger scan after fix
-        8. verify scan status (without verifying fix)
-
 
         """
         assert self.backend != None;
