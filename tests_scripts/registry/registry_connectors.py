@@ -40,6 +40,7 @@ class RegistryChecker(BaseHelm):
         Logger.logger.info('Stage 1: Install kubescape with helm-chart')
         self.cluster, _ = self.setup(apply_services=False)
         self.install_kubescape()
+        TestUtil.sleep(10)
         Logger.logger.info('Stage 2: Check registries connection')
         self.check_registries_connection(self.cluster)
         Logger.logger.info('Stage 3: Check quay.io registry CRUD operations')
