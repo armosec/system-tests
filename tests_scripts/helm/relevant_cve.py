@@ -649,12 +649,11 @@ class RelevancyFixVuln(BaseVulnerabilityScanning):
 
         # 1.3 verify installation
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-        TestUtil.sleep(60, "sleep for 60 seconds before creation of workloads")
 
         # P2 apply workloads
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
+        self.verify_running_pods(namespace=namespace, timeout=360)
 
         # P3 verify results in storage
         # 3 test SBOM and CVEs created as expected in the storage
