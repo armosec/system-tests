@@ -365,13 +365,10 @@ class WorkflowsTeamsNotifications(Workflows):
         workflows = self.backend.get_workflows()
         assert workflows["total"]["value"] >= 1, f"Expected total value to be greater or equal to 1, but got {workflows['total']['value']}"
 
-        found = False
         for workflow in workflows["response"]:
             if workflow["name"] == expected_name:
                 teams_channel = workflow["notifications"][0]["teamsChannels"][0]["name"]
                 assert teams_channel == expected_teams_channel, f"Expected Teams channel {expected_teams_channel} but got {teams_channel}"
+                return workflow["guid"]
 
-                found = True
-                break
-
-        assert found, f"Workflow with name {expected_name} not found"
+        raise AssertionError(f"Workflow with name {expected_name} not found")
