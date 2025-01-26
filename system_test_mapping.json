@@ -1192,7 +1192,7 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "accounts": {
+  "cspm": {
     "target": [
       "Backend"
     ],
