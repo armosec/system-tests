@@ -17,8 +17,8 @@ PROVIDER_GCP = "gcp"
 # a generated good arn from Eran aws dev account - consider moving to an env var?
 GOOD_ARN = "arn:aws:iam::015253967648:role/armo-scan-role-015253967648"
 
-# cspm template url - consider moving to an env var?
-CSPM_TEMPLATE_URL = "https://armo-scan-user-stack.s3.us-east-1.amazonaws.com/cspm-template-dev.yaml"
+# # cspm template url - consider moving to an env var?
+# CSPM_TEMPLATE_URL = "https://armo-scan-user-stack.s3.us-east-1.amazonaws.com/cspm-template-dev.yaml"
 
 # system test trail name : system-test-dev
 
@@ -132,7 +132,8 @@ class CSPM(Accounts):
         Get and validate cspm link.
         """
         tenant = self.backend.get_selected_tenant()
-        parsed_cspm_template = quote(CSPM_TEMPLATE_URL, safe='')
+        expected_template_url = os.environ.get("CSPM_TEMPLATE_URL")
+        parsed_cspm_template = quote(expected_template_url, safe='')
         stack_link = self.backend.get_cspm_link(region=region)
         expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=create-armo-scan-user\u0026templateUrl={parsed_cspm_template}"
         assert stack_link == expected_link,  f"failed to get cspm link, link is {stack_link}, expected link is {expected_link}"
@@ -156,6 +157,7 @@ class CSPM(Accounts):
         try:
             res = self.backend.create_cloud_account(body=body, provider=provider)
         except Exception as e:
+            Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
             failed = True
         
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
