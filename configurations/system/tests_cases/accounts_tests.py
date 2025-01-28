@@ -10,6 +10,13 @@ class AccountsTests(object):
         from tests_scripts.accounts.cspm import CSPM
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=CSPM,
-            create_test_tenant=True
+            test_obj=CSPM
+        )
+
+    @staticmethod
+    def clusters():
+        from tests_scripts.accounts.clusters import Clusters
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=Clusters
         )
