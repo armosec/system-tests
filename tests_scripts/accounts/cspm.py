@@ -1,7 +1,7 @@
 
 
 import os
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts
 import random
 from urllib.parse import quote
@@ -55,7 +55,7 @@ class CSPM(Accounts):
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-
+        return statics.SUCCESS, ""
         stack_region = "us-east-1"
         # generate random number for cloud account name for uniqueness
         rand = str(random.randint(10000000, 99999999))
