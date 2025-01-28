@@ -1,6 +1,5 @@
 # encoding: utf-8
 import math
-import subprocess
 import sys
 import time
 import traceback
@@ -15,7 +14,6 @@ from systest_utils import statics
 
 from systest_utils.tests_logger import Logger
 from systest_utils.wlid import Wlid
-from systest_utils import TestUtil
 
 import json
 from infrastructure.api_login import *
@@ -138,6 +136,8 @@ API_ACCOUNTS = "/api/v1/accounts"
 API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
 API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
+API_ACCOUNTS_CSPM_LINK = "/api/v1/accounts/aws/cspmstack"
+API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
 API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
 
@@ -2778,6 +2778,28 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def get_cspm_link(self, region):
+        url = API_ACCOUNTS_CSPM_LINK + "?region=" + region
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def delete_accounts_feature(self, account_guid, feature_name):
+        url = API_ACCOUNTS_DELETE_FEATURE
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "guid": account_guid,
+            "featureName": feature_name
+        }
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting account feature. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
     def get_cloud_accounts(self,  body=None, **kwargs):
         url = API_ACCOUNTS_CLOUD_LIST
