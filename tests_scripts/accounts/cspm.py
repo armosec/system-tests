@@ -202,7 +202,7 @@ class CSPM(Accounts):
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
 
         if not expect_failure:
-            assert "Cloud account created" in res, f"Cloud account was not created, body used: {body}"
+            assert "guid" in res, f"guid not in {res}"
             
     
     def validate_accounts_cloud_list_cspm(self, cloud_account_name:str, arn:str):
