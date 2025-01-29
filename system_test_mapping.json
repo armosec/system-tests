@@ -1202,7 +1202,7 @@
       "event-ingester-service"
     ],
     "description": "Checks accounts cspm",
-    "skip_on_environment": "",
+    "skip_on_environment": "production-us",
     "owner": "eranm@armosec.io"
   },
   "clusters": {

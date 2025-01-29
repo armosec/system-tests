@@ -14,7 +14,7 @@ class Clusters(BaseHelm):
             "capabilities.runtimeObservability": "disable",
             "capabilities.networkPolicyService": "disable",
             "capabilities.seccompProfileService": "disable",
-            "capabilities.nodeProfileService": "disable",
+            "capabilities.nodeProfileService": "enable",
             "capabilities.vulnerabilityScan": "disable",
             "grypeOfflineDB.enabled": "false",
             "capabilities.relevancy": "disabled",

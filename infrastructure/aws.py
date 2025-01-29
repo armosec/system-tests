@@ -4,6 +4,8 @@ from botocore.exceptions import ClientError
 import time
 from urllib.parse import urlparse, parse_qs
 from systest_utils import Logger
+import re
+
 
 
 class CloudFormationManager:
@@ -121,3 +123,17 @@ class CloudFormationManager:
         except ClientError as e:
             Logger.logger.error(f"An error occurred while deleting the stack: {e}")
             raise e
+
+
+
+
+def extract_account_id(arn):
+    """
+    Extracts the AWS account ID from an ARN string.
+
+    :param arn: The ARN string (e.g., "arn:aws:iam::12345678:role/armo-scan-role-cross-with_customer-12345678")
+    :return: The extracted account ID as a string or None if not found.
+    """
+    match = re.search(r"arn:aws:iam::(\d+):", arn)
+    return match.group(1) if match else None
+
