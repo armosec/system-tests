@@ -1197,9 +1197,9 @@
       "Backend"
     ],
     "target_repositories": [
-      "config-service",
-      "cadashboardbe",
-      "event-ingester-service"
+      "config-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
     ],
     "description": "Checks accounts cspm",
     "skip_on_environment": "production-us",
