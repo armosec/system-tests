@@ -29,6 +29,8 @@ class CSPM(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
 
+        self.stack_manager = None
+
 
 
 
@@ -55,6 +57,7 @@ class CSPM(Accounts):
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
+
         stack_region = "us-east-1"
         # generate random number for cloud account name for uniqueness
         rand = str(random.randint(10000000, 99999999))
@@ -83,6 +86,10 @@ class CSPM(Accounts):
 
         Logger.logger.info('Stage 3: Create bad arn cloud account with cspm')
         self.create_and_validate_cloud_account_with_cspm(cloud_account_name, bad_arn, PROVIDER_AWS, region=stack_region, expect_failure=True)
+
+        account_id = aws.extract_account_id(test_arn)
+        self.cleanup_existing_aws_cloud_accounts(account_id)
+
 
         Logger.logger.info('Stage 4: Create new arn cloud account with cspm')
         self.create_and_validate_cloud_account_with_cspm(cloud_account_name, test_arn, PROVIDER_AWS, region=stack_region, expect_failure=False)
@@ -121,10 +128,42 @@ class CSPM(Accounts):
  
 
     def cleanup(self, **kwargs):
-        self.stack_manager.delete_stack()
+        if self.stack_manager:
+            self.stack_manager.delete_stack()
         return super().cleanup(**kwargs)
 
     
+
+    def cleanup_existing_aws_cloud_accounts(self, account_id):
+        """
+        Cleanup existing aws cloud accounts.
+        """
+
+        if not account_id:
+            raise Exception("account_id is required")
+
+        body = {
+            "pageSize": 100,
+            "pageNum": 0,
+            "innerFilters": [
+                {
+                    "provider": PROVIDER_AWS,
+                    "providerInfo.accountID":account_id
+                }
+            ]
+        }
+        res = self.backend.get_cloud_accounts(body=body)
+
+        if "response" in res:
+            if len(res["response"]) == 0:
+                Logger.logger.info(f"No existing aws cloud accounts to cleanup for account_id {account_id}")
+                return
+            for account in res["response"]:
+                guid = account["guid"]
+                self.backend.delete_cloud_account(guid)
+                Logger.logger.info(f"Deleted cloud account with guid {guid} for account_id {account_id}")
+
+        return res
 
     def get_and_validate_cspm_link(self, region) -> str:
         """
@@ -156,7 +195,8 @@ class CSPM(Accounts):
         try:
             res = self.backend.create_cloud_account(body=body, provider=provider)
         except Exception as e:
-            Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
+            if not expect_failure:
+                Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
             failed = True
         
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
