@@ -1196,12 +1196,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "config-service-dummy",
-      "cadashboardbe-dummy",
-      "event-ingester-service-dummy"
+      "config-service",
+      "cadashboardbe",
+      "event-ingester-service"
     ],
     "description": "Checks accounts cspm",
-    "skip_on_environment": "production-us",
+    "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
   "clusters": {
