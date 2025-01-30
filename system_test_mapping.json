@@ -133,7 +133,6 @@
       "CLI"
     ],
     "target_repositories": [
-      "cadashboardbe"
     ],
     "description": "",
     "skip_on_environment": "",
