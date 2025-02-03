@@ -80,7 +80,7 @@ class CloudFormationManager:
             raise e
 
     def get_stack_output_role_arn(self):
-        return self.get_stack_output("RoleArn")
+        return self.get_stack_output("ArmoRoleArn")
     
     def get_stack_output(self, output_key):
         try:
