@@ -173,7 +173,7 @@ class CSPM(Accounts):
         expected_template_url = os.environ.get("CSPM_TEMPLATE_URL")
         parsed_cspm_template = quote(expected_template_url, safe='')
         stack_link = self.backend.get_cspm_link(region=region)
-        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=create-armo-scan-user\u0026templateUrl={parsed_cspm_template}"
+        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=armo-security-readonly\u0026templateUrl={parsed_cspm_template}"
         assert stack_link == expected_link,  f"failed to get cspm link, link is {stack_link}, expected link is {expected_link}"
         return stack_link
 
