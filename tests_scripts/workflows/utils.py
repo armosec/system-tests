@@ -95,14 +95,33 @@ def get_messages_from_teams_channel(before_test):
 
 def get_messages_from_slack_channel(before_test):
     formatted_time = format(before_test, ".6f")
-    Logger.logger.info('Attempting to read messages from slack before timestamp ' + formatted_time)
+    Logger.logger.info(f'Attempting to read messages from slack before timestamp {formatted_time}')
+    
     client = WebClient(token=get_env("SLACK_SYSTEM_TEST_TOKEN"))
-    result = client.conversations_history(channel=f'{get_env("SLACK_CHANNEL_ID")}', oldest=formatted_time)
-    if result is not None and isinstance(result.data, dict) and 'messages' in result.data:
-        return result.data['messages']
-    else:
-        Logger.logger.info("No 'messages' key found in the result.")
-        return []
+    channel_id = get_env("SLACK_CHANNEL_ID")
+    
+    messages = []
+    cursor = None
+
+    while True:
+        result = client.conversations_history(
+            channel=channel_id, 
+            oldest=formatted_time,
+            limit=200,  # Adjust based on your needs (max is 200)
+            cursor=cursor
+        )
+        
+        if result and isinstance(result.data, dict) and 'messages' in result.data:
+            messages.extend(result.data['messages'])
+
+            cursor = result.data.get("response_metadata", {}).get("next_cursor")
+            if not cursor:
+                break  # No more pages to fetch
+        else:
+            Logger.logger.info("No 'messages' key found in the result.")
+            break  # Stop if response is not as expected
+
+    return messages
     
 
 def get_tickets_from_jira_channel(before_test):
