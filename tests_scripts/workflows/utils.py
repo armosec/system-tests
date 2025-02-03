@@ -13,7 +13,7 @@ import time
 
 
 # tests constants
-NOTIFICATIONS_SVC_DELAY_FIRST_SCAN = 7 * 60
+NOTIFICATIONS_SVC_DELAY_FIRST_SCAN = 4 * 60
 NOTIFICATIONS_SVC_DELAY = 7 * 60
 
 # severity levels
