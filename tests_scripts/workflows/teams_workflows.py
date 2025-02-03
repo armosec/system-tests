@@ -152,7 +152,7 @@ class WorkflowsTeamsNotifications(Workflows):
         try:
             r = self.backend.create_webhook(webhook_body)
         except Exception as e:
-            if "already exists" in e:
+            if "already exists" in str(e):
                 Logger.logger.info("Teams channel already exists")
                 return
         
