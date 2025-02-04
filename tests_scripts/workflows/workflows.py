@@ -18,18 +18,6 @@ class Workflows(BaseHelm, BaseKubescape):
         self.cleanup_workflows()
         return super().cleanup(**kwargs)
 
-    def active_workflow(self):
-
-        # activating workflows feature for the tenant.
-        # TODO: remove this activate once feature is live (i.e. no need to activate it)
-        res = self.backend.active_workflow(self.test_tenant_id)
-        response = json.loads(res.text)
-
-        # verify that the workflows feature is enabled
-        assert response["workflowsEnabled"] == True, f"workflowsEnabled is False"
-        assert response["workflowsConverted"] == True, f"workflowsConverted is False"
-        Logger.logger.info(f"active_workflow response: {response}")
-
     def install_kubescape(self, helm_kwargs: dict = None):
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
@@ -39,6 +27,7 @@ class Workflows(BaseHelm, BaseKubescape):
         for guid in self.test_workflows_guids:
             try:
                 self.delete_and_assert_workflow(guid)
+                Logger.logger.info(f"Deleted workflow with guid {guid}")
             except Exception as e:
                 Logger.logger.error(f"Failed to delete workflow with guid {guid}, got exception {e}")
         self.test_workflows_guids = []

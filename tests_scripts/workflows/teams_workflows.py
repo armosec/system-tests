@@ -31,6 +31,7 @@ class WorkflowsTeamsNotifications(Workflows):
         self.fw_name = None
         self.cluster = None
         self.wait_for_agg_to_end = False
+        self.channel_guid = None
 
 
     def start(self):
@@ -65,14 +66,14 @@ class WorkflowsTeamsNotifications(Workflows):
         Logger.logger.info("Stage 2: Create webhook")
         self.webhook_name = WEBHOOK_NAME + self.cluster + "_" + rand
         self.create_webhook(name=self.webhook_name)
-        channel_guid = self.get_channel_guid_by_name(self.webhook_name)
+        self.channel_guid = self.get_channel_guid_by_name(self.webhook_name)
         
         Logger.logger.info("Stage 3: Create new workflows")
-        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_MEDIUM, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, webhook_url=get_env("CHANNEL_WEBHOOK"), securityRiskIDs=SECURITY_RISKS_ID)
+        workflow_body = self.build_securityRisk_workflow_body(name=SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_MEDIUM, channel_name=TEAMS_CHANNEL_NAME, channel_guid=self.channel_guid, cluster=self.cluster, namespace=namespace, category=SECURITY_RISKS, webhook_url=get_env("CHANNEL_WEBHOOK"), securityRiskIDs=SECURITY_RISKS_ID)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=VULNERABILITIES, cvss=6, webhook_url=get_env("CHANNEL_WEBHOOK"))
+        workflow_body = self.build_vulnerabilities_workflow_body(name=VULNERABILITIES_WORKFLOW_NAME_TEAMS + self.cluster, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_guid=self.channel_guid, cluster=self.cluster, namespace=namespace, category=VULNERABILITIES, cvss=6, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
-        workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("CHANNEL_WEBHOOK"))
+        workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=self.channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
         Logger.logger.info(f"before_test_message_ts: {before_test_message_ts}")
@@ -134,11 +135,12 @@ class WorkflowsTeamsNotifications(Workflows):
     
     def cleanup(self, **kwargs):
         super().cleanup_workflows()
-        if self.webhook_name:
+        if self.channel_guid:
             try:
-                self.delete_channel_by_guid(self.get_channel_guid_by_name(self.webhook_name))
+                self.delete_channel_by_guid(self.channel_guid)
+                Logger.logger.info(f"Deleted webhook channel with guid {self.channel_guid}")
             except Exception as e:
-                Logger.logger.error(f"Failed to delete channel with name {self.webhook_name}, got exception {e}")
+                Logger.logger.error(f"Failed to delete channel with name {self.webhook_name} and guid {self.channel_guid}, got exception {e}")
         if self.fw_name:
             self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         return super().cleanup(**kwargs)
@@ -151,8 +153,8 @@ class WorkflowsTeamsNotifications(Workflows):
         }
         try:
             r = self.backend.create_webhook(webhook_body)
-        except Exception as e:
-            if "already exists" in e:
+        except (Exception, BaseException) as e:
+            if "already exists" in str(e):
                 Logger.logger.info("Teams channel already exists")
                 return
         

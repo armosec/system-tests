@@ -11,7 +11,7 @@ WEBHOOK_NAME)
 import random
 
 from configurations.system.tests_cases.structures import TestConfiguration
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.workflows.workflows import Workflows
 
 
@@ -24,6 +24,7 @@ class WorkflowConfigurations(Workflows):
     def __init__(self, test_obj=None, backend=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend)
         self.test_obj: TestConfiguration = test_obj
+        self.channel_guid = None
 
     def start(self):
         """
@@ -38,7 +39,6 @@ class WorkflowConfigurations(Workflows):
         8. Validate teams workflow created successfully
         9. Update teams workflow
         10. Validate teams updated workflow
-        11. Delete teams workflow and teams channel
         """
         assert self.backend is not None, f'The test {self.test_driver.test_name} must run with backend'
 
@@ -52,7 +52,7 @@ class WorkflowConfigurations(Workflows):
 
         Logger.logger.info("Stage 1: Create webhook")
         self.create_webhook(name=webhook_test_name)
-        channel_guid = self.get_channel_guid_by_name(webhook_test_name)
+        self.channel_guid  = self.get_channel_guid_by_name(webhook_test_name)
 
         Logger.logger.info("stage 2: create slack workflow")
         workflow_creation_body = self.build_slack_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"))
@@ -75,7 +75,7 @@ class WorkflowConfigurations(Workflows):
         
 
         Logger.logger.info("stage 7: create teams workflow")
-        workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"))
+        workflow_creation_body = self.build_teams_workflow_body(workflow_name=workflow_test_name, severities=SEVERITIES_CRITICAL, channel_name=TEAMS_CHANNEL_NAME, channel_id=self.channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_creation_body, EXPECTED_CREATE_RESPONSE)
 
         Logger.logger.info("stage 8: validate teams workflow created successfully")
@@ -86,20 +86,25 @@ class WorkflowConfigurations(Workflows):
         
         Logger.logger.info("stage 9: update teams workflow")
         workflow_guid = self.return_workflow_guid(workflow_test_name)
-        update_workflow_body = self.build_teams_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"), guid=workflow_guid)
+        update_workflow_body = self.build_teams_workflow_body(workflow_name=workflow_test_name_updated, severities=SEVERITIES_HIGH, channel_name=TEAMS_CHANNEL_NAME, channel_id=self.channel_guid, webhook_url=get_env("CHANNEL_WEBHOOK"), guid=workflow_guid)
         self.create_and_assert_workflow(update_workflow_body, EXPECTED_UPDATE_RESPONSE, update=True)
 
         Logger.logger.info("stage 10: validate teams updated workflow")
         guid = self.validate_teams_workflow(workflow_test_name_updated, SEVERITIES_HIGH, TEAMS_CHANNEL_NAME)
-        self.add_workflow_test_guid(guid)
 
-        Logger.logger.info("stage 11: delete teams workflow and teams channel")
-        self.delete_and_assert_workflow(workflow_guid=workflow_guid)
-        self.delete_channel_by_guid(channel_guid)
-        return True, "Workflow configurations test passed"
+        return self.cleanup()
         
     
-
+    def cleanup(self, **kwargs):
+        super().cleanup_workflows()
+        if self.channel_guid:
+            try:
+                self.delete_channel_by_guid(self.channel_guid)
+                Logger.logger.info(f"Deleted webhook channel with guid {self.channel_guid}")
+                self.channel_guid = None
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete channel guid {self.channel_guid}, got exception {e}")
+        return statics.SUCCESS, "Cleanup completed successfully"
         
     def create_webhook(self, name):
         webhook_body = {
