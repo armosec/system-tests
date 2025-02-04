@@ -31,6 +31,7 @@ class WorkflowsTeamsNotifications(Workflows):
         self.fw_name = None
         self.cluster = None
         self.wait_for_agg_to_end = False
+        self.channel_guid = None
 
 
     def start(self):
@@ -137,6 +138,7 @@ class WorkflowsTeamsNotifications(Workflows):
         if self.channel_guid:
             try:
                 self.delete_channel_by_guid(self.channel_guid)
+                Logger.logger.info(f"Deleted webhook channel with guid {self.channel_guid}")
             except Exception as e:
                 Logger.logger.error(f"Failed to delete channel with name {self.webhook_name} and guid {self.channel_guid}, got exception {e}")
         if self.fw_name:
@@ -151,7 +153,7 @@ class WorkflowsTeamsNotifications(Workflows):
         }
         try:
             r = self.backend.create_webhook(webhook_body)
-        except Exception as e:
+        except (Exception, BaseException) as e:
             if "already exists" in str(e):
                 Logger.logger.info("Teams channel already exists")
                 return
