@@ -157,6 +157,7 @@ class WorkflowsTeamsNotifications(Workflows):
             if "already exists" in str(e):
                 Logger.logger.info("Teams channel already exists")
                 return
+            raise e
         
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
         
