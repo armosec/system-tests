@@ -198,7 +198,7 @@ class BaseK8S(BaseDockerizeTest):
         except Exception as e:
             pass
 
-    def delete_cluster_from_backend(self, confirm_deletion: bool = True) -> bool:
+    def delete_cluster_from_backend(self, confirm_deletion: bool = False) -> bool:
         if self.cluster_deleted:
             return True
 
@@ -231,6 +231,8 @@ class BaseK8S(BaseDockerizeTest):
             Logger.logger.info("Cluster was deleted successfully '{}'".format(self.kubernetes_obj.get_cluster_name()))
 
             self.cluster_deleted = True
+        else:
+            Logger.logger.info("skipping cluster deletion confirmation")
         return True
 
     def apply_secret(self, **kwargs):
