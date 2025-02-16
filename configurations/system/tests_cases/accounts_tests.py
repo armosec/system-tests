@@ -4,14 +4,7 @@ from .structures import KubescapeConfiguration
 
 
 class AccountsTests(object):
-    
-    @staticmethod
-    def cspm():
-        from tests_scripts.accounts.cspm import CSPM
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=CSPM
-        )
+
 
     @staticmethod
     def clusters():
@@ -19,4 +12,12 @@ class AccountsTests(object):
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Clusters
+        )
+    
+    @staticmethod
+    def cloud_connect():
+        from tests_scripts.accounts.connect import CloudConnect
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudConnect
         )
