@@ -168,15 +168,26 @@ class Accounts(base_test.BaseTest):
         assert "features" in res["response"][0], f"features not in {res['response'][0]}"
         assert CADR_FEATURE_NAME in res["response"][0]["features"], f"cadr not in {res['response'][0]['features']}"
 
-        self.wait_for_report(self.is_cadr_connected, 
+
+        Logger.logger.info('Verify cadr is connected - happens when "StackReady" message is received')
+        self.wait_for_report(self.verify_cadr_status, 
                                 timeout=180,
-                                sleep_interval=5,
-                                 cloud_account_guid=cloud_account_guid)
+                                sleep_interval=10,
+                                 cloud_account_guid=cloud_account_guid,
+                                 expected_status=ACCOUNT_STATUS_CONNECTED)
+        
+    
+        Logger.logger.info('Verify cadr is disconnected - happens when "StackReady" message is expired, for system test is after 15 seconds')
+        self.wait_for_report(self.verify_cadr_status,
+                                timeout=180,
+                                sleep_interval=10,
+                                 cloud_account_guid=cloud_account_guid,
+                                 expected_status=ACCOUNT_STATUS_PARTIALLY_CONNECTED)
 
 
         return cloud_account_guid
     
-    def is_cadr_connected(self, cloud_account_guid):
+    def verify_cadr_status(self, cloud_account_guid, expected_status):
         body = {
                 "pageSize": 1,
                 "pageNum": 1,
@@ -187,12 +198,17 @@ class Accounts(base_test.BaseTest):
                 ],
             }
         
+        expected_feature_connected = False
+
+        if expected_status == ACCOUNT_STATUS_CONNECTED:
+            expected_feature_connected = True
+        
         res = self.backend.get_cloud_accounts(body=body)
 
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["accountStatus"] == ACCOUNT_STATUS_CONNECTED, f"accountStatus is not {ACCOUNT_STATUS_CONNECTED} but {res['response'][0]['accountStatus']}"
-        assert res["response"][0]["features"][CADR_FEATURE_NAME]["isConnected"] == True, f"isConnected is not True"
+        assert res["response"][0]["accountStatus"] == expected_status, f"accountStatus is not {expected_status} but {res['response'][0]['accountStatus']}"
+        assert res["response"][0]["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['response'][0]['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
     
 
