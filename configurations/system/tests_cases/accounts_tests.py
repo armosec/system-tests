@@ -15,7 +15,7 @@ class AccountsTests(object):
         )
     
     @staticmethod
-    def cloud_connect():
+    def cloud_connect_aws():
         from tests_scripts.accounts.connect import CloudConnect
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
