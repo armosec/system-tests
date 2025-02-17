@@ -136,7 +136,9 @@ API_ACCOUNTS = "/api/v1/accounts"
 API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
 API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
+APT_ACCOUNTS_AWS_REGIONS_DETAILS = "/api/v1/accounts/aws/regionsdetails"
 API_ACCOUNTS_CSPM_LINK = "/api/v1/accounts/aws/cspmstack"
+API_ACCOUNTS_CADR_LINK = "/api/v1/accounts/aws/cadrstack"
 API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
 API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
@@ -2787,6 +2789,15 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
+    def get_cadr_link(self, region, cloud_account_guid):
+        url = API_ACCOUNTS_CADR_LINK + "?region=" + region + "&cloudAccountGUID=" + cloud_account_guid
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing CADR link. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
     def delete_accounts_feature(self, account_guid, feature_name):
         url = API_ACCOUNTS_DELETE_FEATURE
         params = {"customerGUID": self.selected_tenant_id}
@@ -2906,6 +2917,15 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def get_aws_regions_details(self):
+        url = APT_ACCOUNTS_AWS_REGIONS_DETAILS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing AWS regions details. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 
