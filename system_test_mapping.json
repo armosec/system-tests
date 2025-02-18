@@ -1214,5 +1214,17 @@
     "description": "Checks cloud accounts connect",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
+  },
+  "cloud_scan_aws": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks cloud aws account scan",
+    "skip_on_environment": "",
+    "owner": "idoh@armosec.io"
   }
 }

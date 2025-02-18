@@ -143,6 +143,11 @@ API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
 API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
 
+API_CLOUD_COMPLIANCE_BASE = "/api/v1/cloudposture/"
+API_CLOUD_COMPLIANCE_ACCOUNTS = API_CLOUD_COMPLIANCE_BASE+"accounts"
+API_CLOUD_COMPLIANCE_SEVERITY_COUNTS = API_CLOUD_COMPLIANCE_BASE+"severityCounts"
+
+
 
 
 def deco_cookie(func):
@@ -2928,6 +2933,25 @@ class ControlPanelAPI(object):
                 'Error accessing AWS regions details. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+
+    def get_cloud_severity_count(self):
+        url = API_CLOUD_COMPLIANCE_SEVERITY_COUNTS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def get_cloud_compliance_account(self,body):
+        url = API_CLOUD_COMPLIANCE_ACCOUNTS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id},json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
 
 
 

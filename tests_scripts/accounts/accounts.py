@@ -18,6 +18,8 @@ CSPM_FEATURE_NAME = "cspm"
 ACCOUNT_STATUS_CONNECTED = "Connected"
 ACCOUNT_STATUS_PARTIALLY_CONNECTED = "Partially connected"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
+CSPM_SCAN_STATE_COMPLETED = "Completed"
+CSPM_SCAN_STATE_FAILED = "Failed"
 
 
 class Accounts(base_test.BaseTest):
@@ -47,7 +49,8 @@ class Accounts(base_test.BaseTest):
         self.cleanup_existing_aws_cloud_accounts(account_id)
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
-        guid = self.validate_accounts_cloud_list_cspm(cloud_account_name, arn)
+        account = self.validate_accounts_cloud_list_cspm(cloud_account_name, arn ,CSPM_SCAN_STATE_IN_PROGRESS)
+        guid = account["guid"]
         self.test_cloud_accounts_guids.append(guid)
 
         if validate_apis:
@@ -333,7 +336,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_name:str, arn:str):
+    def validate_accounts_cloud_list_cspm(self, cloud_account_name:str, arn:str ,scan_status: str):
         """
         Validate accounts cloud list.
         """
@@ -355,15 +358,21 @@ class Accounts(base_test.BaseTest):
         assert res["response"][0]["accountStatus"] == ACCOUNT_STATUS_CONNECTED, f"accountStatus is not {ACCOUNT_STATUS_CONNECTED}"
         assert "features" in res["response"][0], f"features not in {res['response'][0]}"
         assert CSPM_FEATURE_NAME in res["response"][0]["features"], f"cspm not in {res['response'][0]['features']}"
-        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == CSPM_SCAN_STATE_IN_PROGRESS, f"scanState is not {CSPM_SCAN_STATE_IN_PROGRESS}"
+        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
         assert "config" in res["response"][0]["features"][CSPM_FEATURE_NAME], f"config not in {res['response'][0]['features']['cspm']}"
         assert "crossAccountsRoleARN" in res["response"][0]["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {res['response'][0]['features']['cspm']['config']}"
         assert res["response"][0]["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
+        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
 
-        guid = res["response"][0]["guid"]
-        return guid
-    
-    
+        if scan_status== CSPM_SCAN_STATE_COMPLETED:
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+        elif scan_status==CSPM_SCAN_STATE_FAILED:
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+
+        return res["response"][0]
+
+
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
         """
         Validate accounts cloud uniquevalues.
@@ -462,9 +471,39 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) == 0, f"response is not empty"
 
         self.test_cloud_accounts_guids.remove(guid)
-    
-    
-    
+
+    def validate_compliance_accounts_api(self,cloud_account_name:str ,last_success_scan_id:str):
+        severity_counts_res =self.backend.get_cloud_severity_count()
+        body = {
+            "pageSize": 1,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "guid": cloud_account_name
+                }
+            ],
+        }
+
+        total_critical_severity_count = severity_counts_res["response"][0]["Critical"]
+        total_high_severity_count = severity_counts_res["response"][0]["High"]
+        total_medium_severity_count = severity_counts_res["response"][0]["Medium"]
+        total_low_severity_count = severity_counts_res["response"][0]["Low"]
+
+        accounts_data_res=self.backend.get_cloud_compliance_account(body=body)["response"]
+        assert len(accounts_data_res) == 1
+
+        assert accounts_data_res[0]["accountName"] == cloud_account_name
+        assert accounts_data_res[0]["reportGUID"] == last_success_scan_id
+
+        assert accounts_data_res[0]["criticalSeverityResources"] == total_critical_severity_count
+        assert accounts_data_res[0]["highSeverityResources"] == total_high_severity_count
+        assert accounts_data_res[0]["mediumSeverityResources"] == total_medium_severity_count
+        assert accounts_data_res[0]["lowSeverityResources"] == total_low_severity_count
+
+
+    def validate_scan_data(self,cloud_account_name:str ,last_success_scan_id:str):
+        self.validate_compliance_accounts_api(cloud_account_name =cloud_account_name,last_success_scan_id=last_success_scan_id)
+        Logger.logger.info("compliance account API data is valid")
 
 
 def extract_parameters_from_url(url):
