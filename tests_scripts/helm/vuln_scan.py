@@ -380,7 +380,6 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                                                          kubernetes_obj=kubernetes_obj)
 
     def start(self):
-        return statics.SUCCESS, "" 
         assert self.backend != None
         #use this flag to update expected results (test will fail if flag is not set to prevent accidental overwrite of expected results)
         updateExpected = False
