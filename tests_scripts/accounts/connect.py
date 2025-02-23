@@ -55,8 +55,6 @@ class CloudConnect(Accounts):
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
-        return statics.SUCCESS, ""
-
         stack_region = REGION_SYSTEM_TEST
         # generate random number for cloud account name for uniqueness
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
