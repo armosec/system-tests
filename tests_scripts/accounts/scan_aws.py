@@ -48,7 +48,6 @@ class CloudScanAWS(Accounts):
                                                        aws_secret_access_key=os.environ.get(
                                                            "AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
 
-        # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifer_rand + "-cspm"
         stack_link = self.get_and_validate_cspm_link(stack_region)
@@ -67,27 +66,33 @@ class CloudScanAWS(Accounts):
 
         #wait for success
         self.wait_for_report(self.validate_accounts_cloud_list_cspm,
-                             timeout=300,
+                             timeout=600,
                              sleep_interval=30,
-                             cloud_account_name= self.cspm_cloud_account_name,
+                             cloud_account_guid= cloud_account_guid,
                              arn = test_arn,
                              scan_status=CSPM_SCAN_STATE_COMPLETED)
         Logger.logger.info("the account has been scan successfully")
 
-        account = self.validate_accounts_cloud_list_cspm( cloud_account_name= self.cspm_cloud_account_name,
-                             arn = test_arn,
-                             scan_status=CSPM_SCAN_STATE_COMPLETED)
+        body = {
+            "pageSize": 100,
+            "pageNum": 0,
+            "innerFilters": [
+                {
+                    "guid": cloud_account_guid
+                }
+            ],
+        }
+
+        res = self.backend.get_cloud_accounts(body=body)
+        account = res["response"][0]
+        self.cspm_cloud_account_name = account["name"]
         last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
         Logger.logger.info("extracted last success scan id from created account")
 
         Logger.logger.info('Stage 4: Validate all scan results')
-        self.validate_scan_data(self.cspm_cloud_account_name,last_success_scan_id)
+        self.validate_scan_data(cloud_account_guid,self.cspm_cloud_account_name,last_success_scan_id)
         Logger.logger.info("all scan data is being validated successfully")
-
-
-
         return self.cleanup()
-
 
     def cleanup(self, **kwargs):
         if self.stack_manager:

@@ -2945,7 +2945,7 @@ class ControlPanelAPI(object):
 
     def get_cloud_compliance_account(self,body):
         url = API_CLOUD_COMPLIANCE_ACCOUNTS
-        r = self.get(url, params={"customerGUID": self.selected_tenant_id},json=body)
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id},json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
