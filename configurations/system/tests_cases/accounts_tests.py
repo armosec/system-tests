@@ -19,11 +19,3 @@ class AccountsTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=CloudConnect
         )
-
-    @staticmethod
-    def cloud_scan_aws():
-        from tests_scripts.accounts.scan_aws import CloudScanAWS
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=CloudScanAWS
-        )
