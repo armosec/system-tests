@@ -2,7 +2,7 @@
 
 import os
 from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import Accounts
+from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED
 from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, CSPM_FEATURE_NAME, extract_parameters_from_url
 import random
 from urllib.parse import parse_qs, quote, urlparse
@@ -101,41 +101,60 @@ class CloudConnect(Accounts):
         Logger.logger.info('Stage 4: Connect cspm new account')
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name)
 
-        Logger.logger.info('Stage 5: Connect cadr existing account')
+        Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
+        # wait for success
+        self.wait_for_report(self.validate_accounts_cloud_list_cspm,
+                             timeout=600,
+                             sleep_interval=30,
+                             cloud_account_guid=cloud_account_guid,
+                             arn=test_arn,
+                             scan_status=CSPM_SCAN_STATE_COMPLETED)
+        Logger.logger.info("the account has been scan successfully")
+
+        account = self.get_cloud_account(cloud_account_guid)
+        self.cspm_cloud_account_name = account["name"]
+        last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
+        Logger.logger.info("extracted last success scan id from created account")
+
+        Logger.logger.info('Stage 6: Validate all scan results')
+        self.validate_scan_data(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
+        Logger.logger.info("all scan data is being validated successfully")
+
+        Logger.logger.info('Stage 7: Connect cadr existing account')
         self.connect_cadr_existing_account(stack_region, self.cadr_stack_name_second, cloud_account_guid, log_location)
 
-        Logger.logger.info('Stage 6: Delete and validate feature cspm when cspm is first')
+        Logger.logger.info('Stage 8: Delete and validate feature cspm when cspm is first')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
 
-        Logger.logger.info('Stage 7: Delete and validate feature cadr when cspm is first')
+        Logger.logger.info('Stage 9: Delete and validate feature cadr when cspm is first')
         self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
-        Logger.logger.info('Stage 8: Delete and validate cloud account where cspm is first')
+        Logger.logger.info('Stage 10: Delete and validate cloud account where cspm is first')
         self.delete_and_validate_cloud_account(cloud_account_guid)
 
-        Logger.logger.info('Stage 9: Create bad log location cloud account with cadr')
+        Logger.logger.info('Stage 11: Create bad log location cloud account with cadr')
         cloud_account_guid = self.connect_cadr_bad_log_location(stack_region, self.cadr_first_cloud_account_name, bad_log_location)
 
-        Logger.logger.info('Stage 10: Connect cadr new account')
+        Logger.logger.info('Stage 12: Connect cadr new account')
         cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, self.bucket_name, log_location)
 
-        Logger.logger.info('Stage 11: Connect cspm existing account')
+        Logger.logger.info('Stage 13: Connect cspm existing account')
         self.connect_cspm_existing_account(cloud_account_guid, stack_region, test_arn)
 
-        Logger.logger.info('Stage 12: Delete and validate feature cadr when cadr is first')
+        Logger.logger.info('Stage 14: Delete and validate feature cadr when cadr is first')
         self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
-        Logger.logger.info('Stage 13: Delete and validate feature cspm when cadr is first')
+        Logger.logger.info('Stage 15: Delete and validate feature cspm when cadr is first')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
 
-        Logger.logger.info('Stage 14: Delete and validate cloud account where cadr is first')
+        Logger.logger.info('Stage 16: Delete and validate cloud account where cadr is first')
         self.delete_and_validate_cloud_account(cloud_account_guid)
 
-        Logger.logger.info('Stage 15: Validate aws regions')
+        Logger.logger.info('Stage 17: Validate aws regions')
         res = self.backend.get_aws_regions()
         assert len(res) > 0, f"failed to get aws regions, res is {res}"
 
-        Logger.logger.info('Stage 16: Validate aws regions details')
+        Logger.logger.info('Stage 18: Validate aws regions details')
         res = self.backend.get_aws_regions_details()
         assert len(res) > 0, f"failed to get aws regions details, res is {res}"
 

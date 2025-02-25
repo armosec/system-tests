@@ -39,6 +39,21 @@ class Accounts(base_test.BaseTest):
         return super().cleanup(**kwargs)
 
 
+    def get_cloud_account(self, cloud_account_guid):
+        body = {
+                "pageSize": 1,
+                "pageNum": 1,
+                "innerFilters": [
+                    {
+                        "guid": cloud_account_guid
+                    }
+                ],
+            }
+
+        res = self.backend.get_cloud_accounts(body=body)
+        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
+        assert len(res["response"]) > 0, f"response is empty"
+        return res["response"][0]
 
     def create_stack_cspm(self, stack_name, template_url, parameters)->str:
         self.create_stack(stack_name, template_url, parameters)
