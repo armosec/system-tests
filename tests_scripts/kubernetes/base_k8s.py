@@ -629,8 +629,8 @@ class BaseK8S(BaseDockerizeTest):
             message += "Pod name: {0}, namespace: {1}, status: {2}\n".format(pod.metadata.name, pod.metadata.namespace,
                                                                                 pod.status.phase)
         return message
-    
-    
+
+
     def describe_pods(self, pods):
         """
         Describe pods in the given namespace using kubectl.
@@ -666,12 +666,12 @@ class BaseK8S(BaseDockerizeTest):
             namespace = Wlid.get_namespace(wlid=wlid)
             name = Wlid.get_name(wlid=wlid)
         assert namespace is not None, "Namespace cannot be None"
-        
+
         pods = self.kubernetes_obj.get_namespaced_workloads(kind='Pod', namespace=namespace)
 
         if pods is None:
             return []
-        
+
         # Safeguard: Explicit namespace filter
         pods = [pod for pod in pods if pod.metadata.namespace == namespace]
 
@@ -680,10 +680,10 @@ class BaseK8S(BaseDockerizeTest):
                 pods = [pod for pod in pods if name in pod.metadata.name]
             else:
                 pods = [pod for pod in pods if any(n in pod.metadata.name for n in name)]
-        
+
         if not include_terminating:
             pods = [pod for pod in pods if pod.status.phase != "Terminating"]
-        
+
         return pods
 
     def get_all_cluster_images(self, namespace: str = None, name: str = None, include_terminating: bool = True,
@@ -745,7 +745,7 @@ class BaseK8S(BaseDockerizeTest):
         """
 
         pods = self.get_pods(namespace=namespace, name=name)
-    
+
         # Safeguard: Ensure namespace consistency
         pods = [pod for pod in pods if pod.metadata.namespace == namespace]
 
@@ -825,9 +825,9 @@ class BaseK8S(BaseDockerizeTest):
         Logger.logger.error("wrong number of pods are running, timeout: {} seconds. non_running_pods: {}".
                             format(timeout,
                                    KubectlWrapper.convert_workload_to_dict(non_running_pods, f_json=True, indent=2)))
-        
+
         all_pods_message = self.get_all_pods_printable_details()
-        Logger.logger.info(f"cluster pod states states:\n{all_pods_message}") 
+        Logger.logger.info(f"cluster pod states states:\n{all_pods_message}")
         Logger.logger.info(f"cluster describe none running pods:\n{self.describe_pods(non_running_pods)}")
         raise Exception("wrong number of pods are running after {} seconds. expected: {}, running: {}"
                         .format(delta_t, replicas, len(running_pods)))  # , len(total_pods)))
@@ -1198,7 +1198,7 @@ class BaseK8S(BaseDockerizeTest):
                 for sbom in namespacedSBOMs['items']:
                     if sbom['metadata']['annotations']['kubescape.io/status'] == 'initializing':
                         continue
-                    if sbom['metadata']['annotations']['kubescape.io/image-tag'] == image_tag:
+                    if sbom['metadata']['annotations']['kubescape.io/image-id'].endswith(image_tag):
                         name = sbom['metadata']['name']
                         break
                 SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
@@ -1225,7 +1225,7 @@ class BaseK8S(BaseDockerizeTest):
             for container, image_tag in container_tags:
                 name = ""
                 for cve in namespacedCVEs['items']:
-                    if cve['metadata']['annotations']['kubescape.io/image-tag'] == image_tag:
+                    if cve['metadata']['annotations']['kubescape.io/image-id'].endswith(image_tag):
                         name = cve['metadata']['name']
                         break
                 CVE_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(
