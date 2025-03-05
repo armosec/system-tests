@@ -21,6 +21,7 @@ class VulnerabilityScanningTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             database=supported_systemsAPI.WikiJS,
             expected_results="wikijs.json",
+            helm_kwargs={statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED},
             proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
         )
 

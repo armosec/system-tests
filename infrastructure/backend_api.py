@@ -1349,7 +1349,7 @@ class ControlPanelAPI(object):
             scan_names = []
             for r in result:
                 scan_names.append(r['containerName'])
-            raise Exception('Excepted %d scans, receive %d: %s' % (expected_results,
+            raise Exception('Expected %d scans, received %d: %s' % (expected_results,
                                                                    len(result), ', '.join(scan_names)))
         for scan in result:
             if (scan['status'] == 'Pending') or ('isStub' in scan.keys() and scan['isStub']):
@@ -1486,7 +1486,7 @@ class ControlPanelAPI(object):
         self.ws_send(ws, json.dumps(message))
         result = self.ws_extract_receive(ws)
 
-        assert len(result) == expected_results, 'Excepted %d scans, receive %d' % (expected_results, len(result))
+        assert len(result) == expected_results, 'Expected %d scans, received %d' % (expected_results, len(result))
 
         return result
 
@@ -1703,7 +1703,7 @@ class ControlPanelAPI(object):
         if not url.startswith("http://") and not url.startswith("https://"):
             url = self.server + url
         return requests.post(url, **args)
-    
+
     def post_with_ratelimit(self, url, **args):
         # Extract optional parameters with defaults
         rate_limit_retries = args.pop("rate_limit_retries", 3)
@@ -1711,7 +1711,7 @@ class ControlPanelAPI(object):
 
         for attempt in range(1, rate_limit_retries + 1):
             r = self.post(url, **args)
-            
+
             # Check for rate limiting in status code or response text
             if r.status_code == 429 or "retryafter" in r.text.lower():
                 Logger.logger.debug(
@@ -1742,7 +1742,7 @@ class ControlPanelAPI(object):
 
         for attempt in range(1, rate_limit_retries + 1):
             r = self.get(url, **args)
-            
+
             if r.status_code == 429 or "retryafter" in r.text.lower():
                 Logger.logger.debug(
                     f"Rate limit reached for URL: {url}. Attempt {attempt} of {rate_limit_retries}. "
@@ -1756,7 +1756,7 @@ class ControlPanelAPI(object):
                     )
             else:
                 return r
-        
+
         # Return the last response if retries are exhausted
         return r
 
@@ -1812,8 +1812,8 @@ class ControlPanelAPI(object):
                 Logger.logger.debug("request chunk: {}".format(r))
                 result.extend(r['response'])
                 nbmsg += 1
-        assert nbmsg == totalChunks, 'Excepted %d chunks, receive %d' % (totalChunks, nbmsg)
-        assert total == len(result), 'Excepted %d total, receive %d' % (total, len(result))
+        assert nbmsg == totalChunks, 'Expected %d chunks, received %d' % (totalChunks, nbmsg)
+        assert total == len(result), 'Expected %d total, received %d' % (total, len(result))
         Logger.logger.debug("Loaded {}".format(len(result)))
         return result
 
@@ -2119,7 +2119,7 @@ class ControlPanelAPI(object):
         if 'response' not in j:
             raise Exception(f"Response does not contain 'response' key: {j}")
         if len(j['response']) < expected_results:
-            raise Exception('Excepted %d workloads, receive %d' % (expected_results, len(j['response'])))
+            raise Exception('Expected %d workloads, received %d' % (expected_results, len(j['response'])))
         return j['response']
 
     def get_vuln_v2_workloads(self, body: dict, expected_results: int = 0, enrich_tickets=False):
@@ -2603,13 +2603,13 @@ class ControlPanelAPI(object):
         r = self.get_with_rate_limit(url, params={"customerGUID": self.selected_tenant_id})
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
-    
+
     def get_jira_collaboration_guid_by_site_name(self, site_name: str):
         config = self.get_jira_config()
         jira_connections = config.get("jiraConnections", [])
         if not jira_connections:
             raise Exception("No Jira connections found in the response")
-        
+
         for connection in jira_connections:
             selected_site = connection.get("selectedSite", {})
             if selected_site.get("name") == site_name:
@@ -2618,7 +2618,7 @@ class ControlPanelAPI(object):
                     return collabGUID
                 else:
                     raise Exception(f"Jira collaboration GUID is empty or missing for site '{site_name}'")
-        
+
         raise Exception(f"No Jira collaboration found for site '{site_name}'")
 
     def update_jira_config(self, body: dict):
@@ -2707,8 +2707,8 @@ class ControlPanelAPI(object):
         url = API_WORKFLOWS + "/list"
         if body is None:
             body = {
-                        "pageSize": 150, 
-                        "pageNum": 1, 
+                        "pageSize": 150,
+                        "pageNum": 1,
                         "orderBy": "updatedTime:desc"
                   }
 
@@ -2874,7 +2874,7 @@ class ControlPanelAPI(object):
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def get_cadr_link(self, region, cloud_account_guid):
         url = API_ACCOUNTS_CADR_LINK + "?region=" + region + "&cloudAccountGUID=" + cloud_account_guid
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
@@ -2883,7 +2883,7 @@ class ControlPanelAPI(object):
                 'Error accessing CADR link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def delete_accounts_feature(self, account_guid, feature_name):
         url = API_ACCOUNTS_DELETE_FEATURE
         params = {"customerGUID": self.selected_tenant_id}
@@ -2912,7 +2912,7 @@ class ControlPanelAPI(object):
                 'Error accessing cloud accounts. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def get_kubernetes_accounts(self,  body=None, **kwargs):
         url = API_ACCOUNTS_KUBERNETES_LIST
         if body is None:
@@ -2941,7 +2941,7 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get_cloud_accounts_uniquevalues "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def get_kubernetes_accounts_uniquevalues(self, body):
         params = {"customerGUID": self.selected_tenant_id}
 
