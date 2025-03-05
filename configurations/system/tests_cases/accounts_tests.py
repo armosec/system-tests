@@ -4,8 +4,6 @@ from .structures import KubescapeConfiguration
 
 
 class AccountsTests(object):
-
-
     @staticmethod
     def clusters():
         from tests_scripts.accounts.clusters import Clusters
