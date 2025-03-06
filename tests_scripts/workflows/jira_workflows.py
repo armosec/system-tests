@@ -124,6 +124,9 @@ class WorkflowsJiraNotifications(Workflows):
             except (AssertionError, Exception) as e:
                 Logger.logger.info(f"iteration: {i}: {e}")
                 if i == attempts - 1:
+                    Logger.logger.error(f"Failed to assert jira tickets was created after {attempts} attempts, cleaning up")
+                    response_vuln = self.backend.get_vulns_v2(body=vuln_body, enrich_tickets=True)
+                    self.unlink_issues(response_vuln)
                     raise
                 TestUtil.sleep(sleep_time, f"iteration: {i}, waiting additional {sleep_time} seconds for messages to arrive")
 
@@ -177,14 +180,14 @@ class WorkflowsJiraNotifications(Workflows):
 
             # Check if CVE exists in the response vulnerabilities
             response_vuln = next((vuln for vuln in response if vuln["name"] == cve), None)
-            assert response_vuln, f"No vulnerability with CVE {cve} found in response. response: {response}"
+            assert response_vuln, f"No vulnerability with CVE {cve} found in response."
             Logger.logger.info(f"Found vulnerability with CVE {cve} in response")
 
             # Validate tickets associated with the vulnerability
             tickets = response_vuln.get("tickets", [])
-            assert tickets, f"No tickets associated with vulnerability with CVE {cve}. response: {response}"
+            assert tickets, f"No tickets associated with vulnerability with CVE {cve}."
             ticket_link_titles = [ticket["linkTitle"] for ticket in tickets]
-            assert jira_issue["key"] in ticket_link_titles, f"No ticket associated with vulnerability with CVE {cve} found in Jira. response: {response}"
+            assert jira_issue["key"] in ticket_link_titles, f"No ticket associated with vulnerability with CVE {cve} found in Jira."
     
 
 
