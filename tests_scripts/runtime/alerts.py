@@ -124,7 +124,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
                                        cluster=self.cluster, namespace=namespace,
                                        incident_name=["Unexpected process launched","Unexpected Sensitive File Access"])
 
-        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=5,
+        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=5 * 60, sleep_interval=20,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
