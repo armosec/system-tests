@@ -153,7 +153,7 @@ def get_tickets_from_jira_channel(before_test):
     params = {
         "jql": jql,
         "maxResults": 100,  # Adjust this to control the number of issues per page
-        "fields": "summary,created",  # Specify the fields you want to retrieve
+        "fields": "summary,created,description",  # Specify the fields you want to retrieve
         "startAt": 0
     }
 
@@ -183,6 +183,18 @@ def enrich_teams_alert_channel(data):
     data["channel"]["context"]["webhook"]["id"] = get_env("CHANNEL_WEBHOOK")
 
 
+def extract_text_from_adf(adf):
+    """ Recursively extract text from Jira's Atlassian Document Format (ADF) """
+    if isinstance(adf, str):
+        return adf
+    elif isinstance(adf, dict):
+        if adf.get("text"):  # Direct text
+            return adf["text"]
+        elif "content" in adf:  # Nested content
+            return " ".join(extract_text_from_adf(item) for item in adf["content"] if item)
+    elif isinstance(adf, list):
+        return " ".join(extract_text_from_adf(item) for item in adf if item)
+    return ""
 
 def mask_value(value):
     if len(value) <= 3:

@@ -1,5 +1,6 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
+    extract_text_from_adf,
     get_env,
     EXPECTED_CREATE_RESPONSE,
     JIRA_PROVIDER_NAME,
@@ -117,7 +118,7 @@ class WorkflowsJiraNotifications(Workflows):
                 
                 if not found_vuln:
                     response_vuln = self.backend.get_vulns_v2(body=vuln_body, enrich_tickets=True)
-                    self.assert_vulnerability_jira_ticket_created(issues=issues, response=response_vuln, cves=["CVE-2023-27522"])
+                    self.assert_vulnerability_jira_ticket_created(issues=issues, response=response_vuln, cluster=cluster_name, cves=["CVE-2023-27522"])
                     Logger.logger.info("Vulnerability jira ticket created")
                     found_vuln = True
                
@@ -168,15 +169,15 @@ class WorkflowsJiraNotifications(Workflows):
             tickets = risk.get("tickets", [])
             assert len(tickets) > 0, f"No tickets associated with security risk with ID {security_risk_id}. response: {response}"
 
-    def assert_vulnerability_jira_ticket_created(self, issues, response, cves=[]):
+    def assert_vulnerability_jira_ticket_created(self, issues, response, cluster, cves=[]):
         assert response, "No vulnerabilities found in the response"
         assert issues, "No messages found in the channel"
 
         for cve in cves:
             # Check if CVE exists in Jira issues
-            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"]), None)
-            assert jira_issue, f"No vulnerability with CVE {cve} found in Jira. issues: {issues}"
-            Logger.logger.info(f"Found vulnerability with CVE {cve} in Jira")
+            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"] and cluster in extract_text_from_adf(issue["fields"]["description"])), None)
+            assert jira_issue, f"No vulnerability with CVE {cve} and cluster {cluster} found in Jira issues."
+            Logger.logger.info(f"Found vulnerability with CVE {cve} and cluster {cluster} in Jira issues")
 
             # Check if CVE exists in the response vulnerabilities
             response_vuln = next((vuln for vuln in response if vuln["name"] == cve), None)
