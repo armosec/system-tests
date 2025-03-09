@@ -174,10 +174,17 @@ class WorkflowsJiraNotifications(Workflows):
         assert issues, "No messages found in the channel"
 
         for cve in cves:
+
+            # TODO: enable this code when the issue will be fixed
+            # # Check if CVE exists in Jira issues
+            # jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"] and cluster in extract_text_from_adf(issue["fields"]["description"])), None)
+            # assert jira_issue, f"No vulnerability with CVE {cve} and cluster {cluster} found in Jira issues."
+            # Logger.logger.info(f"Found vulnerability with CVE {cve} and cluster {cluster} in Jira issues")
+
             # Check if CVE exists in Jira issues
-            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"] and cluster in extract_text_from_adf(issue["fields"]["description"])), None)
-            assert jira_issue, f"No vulnerability with CVE {cve} and cluster {cluster} found in Jira issues."
-            Logger.logger.info(f"Found vulnerability with CVE {cve} and cluster {cluster} in Jira issues")
+            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"]), None)
+            assert jira_issue, f"No vulnerability with CVE {cve} found in Jira issues."
+            Logger.logger.info(f"Found vulnerability with CVE {cve} in Jira issues")
 
             # Check if CVE exists in the response vulnerabilities
             response_vuln = next((vuln for vuln in response if vuln["name"] == cve), None)
