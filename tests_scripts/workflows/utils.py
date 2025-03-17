@@ -1,3 +1,4 @@
+import base64
 from slack_sdk import WebClient
 import requests
 from datetime import datetime
@@ -143,8 +144,15 @@ def get_tickets_from_jira_channel(before_test):
 
     auth = HTTPBasicAuth(email, token)
 
+    # headers = {
+    #     "Accept": "application/json"
+    # }
+
     headers = {
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {base64.b64encode(f'{email}:{token}'.encode()).decode()}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
 
     # JQL to fetch issues updated before the specified time
