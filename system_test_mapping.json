@@ -1041,7 +1041,7 @@
       "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to teams",
-    "skip_on_environment": "staging",
+    "skip_on_environment": "",
     "owner": "jonathang@armosec.io"
   },
   "sr_ac_scan_status": {
@@ -1162,7 +1162,7 @@
       "event-ingester-service"
     ],
     "description": "Checks workflows teams notifications",
-    "skip_on_environment": "staging",
+    "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
   "jira_notifications_workflows": {
@@ -1175,7 +1175,7 @@
       "event-ingester-service"
     ],
     "description": "Checks workflows jira notifications",
-    "skip_on_environment": "",
+    "skip_on_environment": "production",
     "owner": "eranm@armosec.io"
   },
   "workflows_configurations": {
