@@ -143,6 +143,18 @@ API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
 API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
 
+API_CLOUD_COMPLIANCE_BASE = "/api/v1/cloudposture/"
+API_CLOUD_COMPLIANCE_ACCOUNTS = API_CLOUD_COMPLIANCE_BASE+"accounts"
+API_CLOUD_COMPLIANCE_SEVERITY_COUNTS = API_CLOUD_COMPLIANCE_BASE+"severityCounts"
+API_CLOUD_COMPLIANCE_FRAMEWORKS = API_CLOUD_COMPLIANCE_BASE+"frameworks"
+API_CLOUD_COMPLIANCE_FRAMEWORKS_OVER_TIME = API_CLOUD_COMPLIANCE_BASE+"frameworksOvertime"
+API_CLOUD_COMPLIANCE_CONTROLS = API_CLOUD_COMPLIANCE_BASE+"controls"
+API_CLOUD_COMPLIANCE_RULES = API_CLOUD_COMPLIANCE_BASE+"rules"
+API_CLOUD_COMPLIANCE_RESOURCES = API_CLOUD_COMPLIANCE_BASE+"resources"
+API_CLOUD_COMPLIANCE_EXCEPTIONS = API_CLOUD_COMPLIANCE_BASE+"exceptions"
+API_CLOUD_COMPLIANCE_EXCEPTIONS_NEW = API_CLOUD_COMPLIANCE_EXCEPTIONS+"/new"
+API_CLOUD_COMPLIANCE_EXCEPTIONS_LIST = API_CLOUD_COMPLIANCE_EXCEPTIONS+"/list"
+API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
 
 
 def deco_cookie(func):
@@ -2929,8 +2941,298 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def get_cloud_severity_count(self):
+        url = API_CLOUD_COMPLIANCE_SEVERITY_COUNTS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing AWS regions. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def get_cloud_compliance_account(self,body):
+        url = API_CLOUD_COMPLIANCE_ACCOUNTS
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id},json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing account api "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def get_cloud_compliance_framework(self,body):
+        url = API_CLOUD_COMPLIANCE_FRAMEWORKS
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error getting framework. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+
+        return r.json()
+
+    def get_cloud_compliance_framework_over_time(self,body):
+        url = API_CLOUD_COMPLIANCE_FRAMEWORKS_OVER_TIME
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error getting framework over time. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def get_cloud_compliance_controls(self,body,with_rules:bool):
+        url = API_CLOUD_COMPLIANCE_CONTROLS
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id ,"includeRules" : with_rules} , json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error getting controls. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def get_cloud_compliance_rules(self,body):
+        url = API_CLOUD_COMPLIANCE_RULES
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id} , json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error getting rules. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def get_cloud_compliance_resources(self,rule_hash,body):
+        url = API_CLOUD_COMPLIANCE_RESOURCES
+
+        if rule_hash is not None:
+            r = self.post(url, params={"customerGUID": self.selected_tenant_id,
+                                        "ruleHash": rule_hash} , json=body)
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error getting resources. Customer: "%s" (code: %d, message: %s)' % (
+                        self.customer, r.status_code, r.text))
+            return r.json()
+        else:
+            r = self.post(url, params={"customerGUID": self.selected_tenant_id} , json=body)
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error getting resources. Customer: "%s" (code: %d, message: %s)' % (
+                        self.customer, r.status_code, r.text))
+            return r.json()
+
+    def add_cspm_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = ""):
+        """
+        Add a new CSPM exception policy.
+        
+        Args:
+            policy_ids (List[str]): List of policy IDs to create exceptions for
+            resources (List[Dict]): List of resources to apply the exception to. Each resource should have:
+                                  - designatorType: str (e.g. "Attribute")
+                                  - attributes: Dict with account and resourceHash
+            reason (str): Reason for creating the exception (optional)
+        """
+        params = {"customerGUID": self.selected_tenant_id}
+
+        payload = {
+            "policyIDs": policy_ids,
+            "resources": resources,
+            "reason": reason,
+            "policyType": "cspmExceptionPolicy"
+        }
+
+        r = self.post(API_CLOUD_COMPLIANCE_EXCEPTIONS_NEW, params=params, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: add_cspm_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def create_cspm_exception(self, rule_hashes: List[str], accounts: List[str] = None, resource_hashes: List[str] = None, reason: str = ""):
+        """
+        Create CSPM exceptions with flexible account and resource targeting.
+        
+        Args:
+            rule_hashes (List[str]): List of rule hashes (policy GUIDs) to create exceptions for
+            accounts (List[str], optional): List of account IDs. If None, applies to all accounts (*/*).
+            resource_hashes (List[str], optional): List of resource hashes. If None, applies to all resources (*/*).
+            reason (str, optional): Reason for creating the exception.
+            
+        Examples:
+            # Exception for all accounts and all resources
+            create_cspm_exception(["rule-hash-1"])
+            
+            # Exception for specific accounts but all their resources
+            create_cspm_exception(["rule-hash-1"], accounts=["account-1", "account-2"])
+            
+            # Exception for specific accounts and specific resources
+            create_cspm_exception(["rule-hash-1"], accounts=["account-1"], resource_hashes=["resource-1"])
+        """
+        # Handle the case where no accounts specified means all accounts
+        if not accounts:
+            resources = [{
+                "designatorType": "Attribute",
+                "attributes": {
+                    "account": "*/*",
+                    "resourceHash": "*/*"
+                }
+            }]
+        # Handle specific accounts
+        else:
+            resources = []
+            for account in accounts:
+                # If no specific resources, apply to all resources in the account
+                if not resource_hashes:
+                    resources.append({
+                        "designatorType": "Attribute",
+                        "attributes": {
+                            "account": account,
+                            "resourceHash": "*/*"
+                        }
+                    })
+                # If specific resources, create an entry for each account-resource combination
+                else:
+                    for resource_hash in resource_hashes:
+                        resources.append({
+                            "designatorType": "Attribute",
+                            "attributes": {
+                                "account": account,
+                                "resourceHash": resource_hash
+                            }
+                        })
+
+        return self.add_cspm_exception(policy_ids=rule_hashes, resources=resources, reason=reason)
+
+    def delete_cspm_exception(self, exception_guid: str):
+        """
+        Delete a CSPM exception by its GUID.
+        
+        Args:
+            exception_guid (str): The GUID of the exception to delete
+        """
+        url = f"{API_CLOUD_COMPLIANCE_EXCEPTIONS}/{exception_guid}"
+        r = self.delete(url, params={"customerGUID": self.selected_tenant_id})
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting CSPM exception. Request: delete_cspm_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def update_cspm_exception(self, exception_guid: str, policy_ids: List[str], resources: List[Dict], reason: str = ""):
+        """
+        Update an existing CSPM exception.
+        
+        Args:
+            exception_guid (str): The GUID of the exception to update
+            policy_ids (List[str]): List of policy IDs for the exception
+            resources (List[Dict]): List of resources to apply the exception to. Each resource should have:
+                                  - designatorType: str (e.g. "Attribute")
+                                  - attributes: Dict with account and resourceHash
+            reason (str): Reason for the exception (optional)
+        """
+        payload = {
+            "guid": exception_guid,
+            "policyIDs": policy_ids,
+            "resources": resources,
+            "reason": reason,
+            "policyType": "cspmExceptionPolicy"
+        }
+
+        r = self.put(API_CLOUD_COMPLIANCE_EXCEPTIONS, params={"customerGUID": self.selected_tenant_id}, json=payload)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating CSPM exception. Request: update_cspm_exception "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
+
+    def update_cspm_exception_resources(self, exception_guid: str, rule_hash: str, accounts: List[str] = None, resource_hashes: List[str] = None, reason: str = ""):
+        """
+        Update the resources of an existing CSPM exception with a more user-friendly interface.
+        
+        Args:
+            exception_guid (str): The GUID of the exception to update
+            rule_hash (str): The rule hash (policy GUID) for the exception
+            accounts (List[str], optional): List of account IDs. If None, applies to all accounts (*/*).
+            resource_hashes (List[str], optional): List of resource hashes. If None, applies to all resources (*/*).
+            reason (str, optional): Reason for the exception.
+            
+        Examples:
+            # Update to apply to all resources in an account
+            update_cspm_exception_resources("exception-guid", "rule-hash", accounts=["account-1"])
+            
+            # Update to apply to specific resources
+            update_cspm_exception_resources(
+                "exception-guid",
+                "rule-hash",
+                accounts=["account-1"],
+                resource_hashes=["resource-1", "resource-2"]
+            )
+            
+            # Update to apply to all accounts and resources
+            update_cspm_exception_resources("exception-guid", "rule-hash")
+        """
+        # Handle the case where no accounts specified means all accounts
+        if not accounts:
+            resources = [{
+                "designatorType": "Attribute",
+                "attributes": {
+                    "account": "*/*",
+                    "resourceHash": "*/*"
+                }
+            }]
+        # Handle specific accounts
+        else:
+            resources = []
+            for account in accounts:
+                # If no specific resources, apply to all resources in the account
+                if not resource_hashes:
+                    resources.append({
+                        "designatorType": "Attribute",
+                        "attributes": {
+                            "account": account,
+                            "resourceHash": "*/*"
+                        }
+                    })
+                # If specific resources, create an entry for each account-resource combination
+                else:
+                    for resource_hash in resource_hashes:
+                        resources.append({
+                            "designatorType": "Attribute",
+                            "attributes": {
+                                "account": account,
+                                "resourceHash": resource_hash
+                            }
+                        })
+
+        return self.update_cspm_exception(
+            exception_guid=exception_guid,
+            policy_ids=[rule_hash],
+            resources=resources,
+            reason=reason
+        )
+
+    def cspm_scan_now(self, cloud_account_guid: str) -> requests.Response:
+        """
+        Trigger an immediate CSPM scan for a specific cloud account.
+
+        Args:
+            cloud_account_guid (str): The GUID of the cloud account to scan
+
+        Returns:
+            requests.Response: The response from the API
+        """
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "innerFilters": [
+                {
+                    "cloudAccountGUID": cloud_account_guid
+                }
+            ]
+        }
+
+        r = self.post(API_CLOUD_COMPLIANCE_SCAN_NOW, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error triggering CSPM scan. Request: scan now "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r
 
 class Solution(object):
     """docstring for Solution"""

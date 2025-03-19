@@ -1,12 +1,35 @@
-
 import os
+import datetime
+from dateutil import parser
+from typing import List, Tuple
+
 from infrastructure import aws
 from systest_utils import Logger, statics
 from urllib.parse import parse_qs, quote, urlparse
 from tests_scripts import base_test
+from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
+from .cspm_test_models import (
+    SeverityCount,
+    ComplianceAccountResponse,
+    ComplianceFramework,
+    ComplianceFrameworkOverTime,
+    ComplianceControl,
+    ComplianceRuleSummary,
+    ComplianceResourceToCheck,
+    ComplianceResourceSummaries,
+    ComplianceControlWithChecks,
+    FRAMEWORKS_CONFIG,
+    DEFAULT_TEST_CONFIG,
+    get_expected_control_response,
+    get_expected_rules_response,
+    get_expected_resources_under_check_response,
+    get_expected_resource_summaries_response,
+    get_expected_only_check_under_control_response
+)
 
 
 
+SCAN_TIME_WINDOW = 2000
 
 PROVIDER_AWS = "aws"
 PROVIDER_AZURE = "azure"
@@ -17,7 +40,10 @@ CSPM_FEATURE_NAME = "cspm"
 
 ACCOUNT_STATUS_CONNECTED = "Connected"
 ACCOUNT_STATUS_PARTIALLY_CONNECTED = "Partially connected"
+ACCOUNT_STATUS_DISCONNECTED = "Disconnected"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
+CSPM_SCAN_STATE_COMPLETED = "Completed"
+CSPM_SCAN_STATE_FAILED = "Failed"
 
 
 class Accounts(base_test.BaseTest):
@@ -35,29 +61,46 @@ class Accounts(base_test.BaseTest):
             self.backend.delete_cloud_account(guid=guid)
             Logger.logger.info(f"Deleted cloud account with guid {guid}")
         return super().cleanup(**kwargs)
-    
 
+    def setup_jira_config(self, site_name=DEFAULT_JIRA_SITE_NAME):
+        """Setup Jira configuration using the standalone function."""
+        self.site, self.project, self.issueType, self.jiraCollaborationGUID = setup_jira_config(self.backend, site_name)
+
+    def get_cloud_account(self, cloud_account_guid):
+        body = {
+                "pageSize": 1,
+                "pageNum": 1,
+                "innerFilters": [
+                    {
+                        "guid": cloud_account_guid
+                    }
+                ],
+            }
+
+        res = self.backend.get_cloud_accounts(body=body)
+        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
+        assert len(res["response"]) > 0, f"response is empty"
+        return res["response"][0]
 
     def create_stack_cspm(self, stack_name, template_url, parameters)->str:
         self.create_stack(stack_name, template_url, parameters)
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
-    
+
     def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name, validate_apis=True)->str:
         self.cleanup_existing_aws_cloud_accounts(account_id)
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
-        guid = self.validate_accounts_cloud_list_cspm(cloud_account_name, arn)
-        self.test_cloud_accounts_guids.append(guid)
+        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , ACCOUNT_STATUS_CONNECTED)
+        self.test_cloud_accounts_guids.append(cloud_account_guid)
 
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm uniquevalues')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
-    
+
             Logger.logger.info('Edit name and validate cloud account with cspm')
-            self.update_and_validate_cloud_account(guid, cloud_account_name + " updated", arn)
+            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
             return cloud_account_guid
-    
 
     def connect_cspm_existing_account(self, cloud_account_guid, region, arn, validate_apis=True)->str:
         body = {
@@ -79,7 +122,7 @@ class Accounts(base_test.BaseTest):
                     }
                 ],
             }
-        
+
         res = self.backend.get_cloud_accounts(body=body)
 
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
@@ -88,7 +131,7 @@ class Accounts(base_test.BaseTest):
 
 
         return cloud_account_guid
-    
+
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=True)
@@ -110,11 +153,9 @@ class Accounts(base_test.BaseTest):
         self.tested_stacks.append(stack_name)
 
 
-    
     def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location)->str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
-    
 
     def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, validate_apis=True)->str:
         Logger.logger.info('Connect cadr new account')
@@ -333,7 +374,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_name:str, arn:str):
+    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,account_status :str):
         """
         Validate accounts cloud list.
         """
@@ -343,7 +384,7 @@ class Accounts(base_test.BaseTest):
                 "pageNum": 0,
                 "innerFilters": [
                     {
-                        "name": cloud_account_name
+                        "guid": cloud_account_guid
                     }
                 ],
             }
@@ -351,19 +392,24 @@ class Accounts(base_test.BaseTest):
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"response not in {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["name"] == cloud_account_name, f"name is not {cloud_account_name}"
-        assert res["response"][0]["accountStatus"] == ACCOUNT_STATUS_CONNECTED, f"accountStatus is not {ACCOUNT_STATUS_CONNECTED}"
+        assert res["response"][0]["accountStatus"] == account_status, f"accountStatus is not {account_status} but {res['response'][0]['accountStatus']}"
         assert "features" in res["response"][0], f"features not in {res['response'][0]}"
         assert CSPM_FEATURE_NAME in res["response"][0]["features"], f"cspm not in {res['response'][0]['features']}"
-        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == CSPM_SCAN_STATE_IN_PROGRESS, f"scanState is not {CSPM_SCAN_STATE_IN_PROGRESS}"
+        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
         assert "config" in res["response"][0]["features"][CSPM_FEATURE_NAME], f"config not in {res['response'][0]['features']['cspm']}"
         assert "crossAccountsRoleARN" in res["response"][0]["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {res['response'][0]['features']['cspm']['config']}"
         assert res["response"][0]["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
+        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
 
-        guid = res["response"][0]["guid"]
-        return guid
-    
-    
+        if scan_status== CSPM_SCAN_STATE_COMPLETED:
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+        elif scan_status==CSPM_SCAN_STATE_FAILED:
+            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+
+        return res["response"][0]
+
+
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
         """
         Validate accounts cloud uniquevalues.
@@ -415,7 +461,7 @@ class Accounts(base_test.BaseTest):
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
         assert res["response"][0]["name"] == cloud_account_name, f"failed to update cloud account, name is not {cloud_account_name}"
-    
+
     def delete_and_validate_feature(self, guid:str, feature_name:str):
         """
         Delete and validate feature.
@@ -462,10 +508,467 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) == 0, f"response is not empty"
 
         self.test_cloud_accounts_guids.remove(guid)
-    
-    
-    
 
+    def validate_scan_data(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str, with_accepted_resources: bool = False, with_jira: bool = False):
+        """
+        Validate CSPM scan data across all relevant APIs.
+
+        Args:
+            cloud_account_guid (str): The GUID of the cloud account
+            cloud_account_name (str): The name of the cloud account
+            last_success_scan_id (str): The ID of the last successful scan
+            with_accepted_resources (bool): Whether to validate with accepted resources
+            with_jira (bool): Whether to validate with Jira tickets
+        """
+        Logger.logger.info(f"Validating account {cloud_account_guid}|{cloud_account_name} and its last scan ID {last_success_scan_id}")
+
+        # self.validate_compliance_accounts(cloud_account_name, last_success_scan_id)
+        self.validate_compliance_frameworks(cloud_account_guid, last_success_scan_id)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira)
+        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id,rule_hash,with_accepted_resources,with_jira)
+        self.validate_resource_summaries_response(last_success_scan_id,resource_name,with_accepted_resources,with_jira)
+        self.validate_control_and_checks_under_resource(last_success_scan_id,resource_hash,with_accepted_resources,with_jira)
+
+        Logger.logger.info("Compliance account API data validation completed successfully")
+
+    def validate_compliance_accounts(self, cloud_account_name: str, last_success_scan_id: str):
+        """Validate compliance accounts data."""
+        # Get and validate severity counts
+        severity_counts_res = self.backend.get_cloud_severity_count()
+        severity_counts = SeverityCount(**severity_counts_res["response"])
+
+        # Get and validate account data
+        body = {
+            "pageSize": 1,
+            "pageNum": 1,
+            "innerFilters": [{"accountName": cloud_account_name}],
+        }
+
+        accounts_data_res = self.backend.get_cloud_compliance_account(body=body)
+        account_data = ComplianceAccountResponse(**accounts_data_res["response"][0])
+
+        # Validate severity counts match
+        assert account_data.criticalSeverityResources == severity_counts.Critical
+        assert account_data.highSeverityResources == severity_counts.High
+        assert account_data.mediumSeverityResources == severity_counts.Medium
+        assert account_data.lowSeverityResources == severity_counts.Low
+        assert account_data.reportGUID == last_success_scan_id
+
+    def validate_compliance_frameworks(self, cloud_account_guid: str, last_success_scan_id: str):
+        """Validate compliance frameworks data."""
+        # Validate frameworks API
+        body = {
+            "innerFilters": [{"cloudAccountGUID": cloud_account_guid}],
+        }
+
+        frameworks_res = self.backend.get_cloud_compliance_framework(body=body)
+        frameworks = [ComplianceFramework(**f) for f in frameworks_res["response"]]
+
+        self._validate_frameworks(frameworks, last_success_scan_id)
+
+        # Validate frameworks over time
+        body = {
+            "pageSize": 10000,
+            "pageNum": 1,
+            "innerFilters": [{"cloudAccountGUID": cloud_account_guid}],
+        }
+
+        framework_over_time_resp = self.backend.get_cloud_compliance_framework_over_time(body=body)
+        framework_over_time = ComplianceFrameworkOverTime(**framework_over_time_resp["response"][0])
+
+        self._validate_framework_over_time(framework_over_time, cloud_account_guid, last_success_scan_id)
+
+    def _validate_frameworks(self, frameworks: List[ComplianceFramework], last_success_scan_id: str):
+        """Validate framework data against expected values."""
+        assert len(frameworks) == len(FRAMEWORKS_CONFIG), f"Expected {len(FRAMEWORKS_CONFIG)} frameworks, got {len(frameworks)}"
+
+        now = datetime.datetime.now(datetime.timezone.utc)
+        scan_time_window = now - datetime.timedelta(minutes=SCAN_TIME_WINDOW)
+
+        framework_names = set()
+        for framework in frameworks:
+            framework_names.add(framework.name)
+            assert framework.name in FRAMEWORKS_CONFIG, f"Unexpected framework name: {framework.name}"
+            assert framework.reportGUID == last_success_scan_id
+            assert framework.failedControls > 0
+            assert framework.complianceScorev1 > 0
+
+            timestamp = parser.parse(str(framework.timestamp))
+            assert scan_time_window <= timestamp <= now, f"Timestamp {framework.timestamp} is not within the last {SCAN_TIME_WINDOW} minutes"
+
+        missing_frameworks = set(FRAMEWORKS_CONFIG.keys()) - framework_names
+        assert not missing_frameworks, f"Missing frameworks: {missing_frameworks}"
+
+    def _validate_framework_over_time(self, framework_over_time: ComplianceFrameworkOverTime,
+                                    cloud_account_guid: str, last_success_scan_id: str):
+        """Validate framework over time data."""
+        assert framework_over_time.cloudAccountGUID == cloud_account_guid
+        assert framework_over_time.provider == "aws"
+
+        framework_names = set()
+        for framework in framework_over_time.frameworks:
+            framework_names.add(framework.frameworkName)
+            assert framework.frameworkName in FRAMEWORKS_CONFIG
+            assert framework.complianceScore > 0
+            # assert len(framework.cords) == 1
+
+            cord = framework.cords[0]
+            assert cord.reportGUID == last_success_scan_id
+            assert cord.complianceScore > 0
+
+            timestamp = parser.parse(str(cord.timestamp))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            scan_time_window = now - datetime.timedelta(minutes=SCAN_TIME_WINDOW)
+            assert scan_time_window <= timestamp <= now
+
+        missing_frameworks = set(FRAMEWORKS_CONFIG.keys()) - framework_names
+        assert not missing_frameworks, f"Missing frameworks: {missing_frameworks}"
+
+
+    def validate_compliance_controls(self, last_success_scan_id: str, with_accepted_resources: bool, with_jira: bool = False) -> str:
+        """Validate compliance controls data and return control hash."""
+        body = {
+            "pageSize": 100,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "reportGUID": last_success_scan_id,
+                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "cloudControlName": DEFAULT_TEST_CONFIG["control_name"],
+                    "status": DEFAULT_TEST_CONFIG["status"]
+                }
+            ],
+        }
+
+        if with_accepted_resources:
+            body["innerFilters"][0]["status"] = "ACCEPT"
+
+        if with_jira:
+            body["innerFilters"][0]["tickets"] = "|exists"
+
+        control_resp = self.backend.get_cloud_compliance_controls(body=body, with_rules=False)
+        control = ComplianceControl(**control_resp["response"][0])
+
+        assert control.reportGUID == last_success_scan_id , f"Expected reportGUID: {last_success_scan_id}, got: {control.reportGUID}"
+        expected_response = get_expected_control_response(with_accepted_resources)
+        for key, value in expected_response.items():
+            if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(control, key) == value, f"Expected {key}: {value}, got: {getattr(control, key)}"
+            elif key == "section":
+                assert getattr(control, key) != "", f"Expected non-empty section, got empty string"
+
+        if with_jira:
+            assert control.tickets is not None and len(control.tickets) > 0, "Expected tickets to be present"
+
+        return control.cloudControlHash
+
+    def validate_compliance_rules(self, last_success_scan_id: str, control_hash: str,
+                                 with_accepted_resources: bool = False, with_jira: bool = False) ->str:
+        """Validate compliance checks data."""
+        body = {
+            "pageSize": 100,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "reportGUID": last_success_scan_id,
+                    "controlHash": control_hash,
+                    "frameworkName": DEFAULT_TEST_CONFIG["framework"]
+                }
+            ],
+        }
+
+
+        check_resp = self.backend.get_cloud_compliance_rules(body=body)
+        rule = ComplianceRuleSummary(**check_resp["response"][0])
+
+        expected_response = get_expected_rules_response(with_accepted_resources)
+        for key, value in expected_response.items():
+            assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+
+        assert len(rule.affectedControls) > 0
+
+        if with_jira:
+            assert rule.tickets is not None and len(rule.tickets) > 0, "Expected tickets to be present"
+
+        return rule.cloudCheckHash
+    def validate_compliance_resources_under_rule(self, last_success_scan_id: str, rule_hash: str,
+                                              with_accepted_resources: bool, with_jira: bool) -> Tuple[str, str]:
+        """Validate compliance resources under rule and return resource hash and name."""
+        body = {
+            "pageSize": 100,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "reportGUID": last_success_scan_id,
+                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "exceptionApplied": "|empty"
+                }
+            ],
+        }
+        if with_accepted_resources:
+            body["innerFilters"][0]["exceptionApplied"] = "true,|empty"
+
+        resources_resp = self.backend.get_cloud_compliance_resources(rule_hash=rule_hash, body=body)
+        resources = [ComplianceResourceToCheck(**r) for r in resources_resp["response"]]
+        assert len(resources) == 1, f"Expected 1 resource, got: {len(resources)}"
+
+        resource = resources[0]
+        expected_response = get_expected_resources_under_check_response(with_accepted_resources)
+        for key, value in expected_response.items():
+            if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+
+        if with_jira:
+            assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
+
+        return resource.cloudResourceHash, resource.cloudResourceName
+
+    def validate_resource_summaries_response(self,last_success_scan_id:str,resource_name:str,with_accepted_resources:bool,with_jira:bool):
+        body = {
+            "pageSize": 100,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "cloudResourceName": resource_name,
+                    "reportGUID": last_success_scan_id
+                }
+            ]
+        }
+
+        if with_jira:
+            body["innerFilters"][0]["tickets"] = "|exists"
+
+        resources_resp = self.backend.get_cloud_compliance_resources(rule_hash=None,body=body)
+        resources = [ComplianceResourceSummaries(**r) for r in resources_resp["response"]]
+        assert len(resources) == 1, f"Expected resources, got: {resources}"
+        resource = resources[0]
+        expected_response = get_expected_resource_summaries_response(with_accepted_resources)
+        for key, value in expected_response.items():
+              if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+
+        if with_jira:
+            assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
+
+    def validate_control_and_checks_under_resource(self,last_success_scan_id:str,resource_hash:str,with_accepted_resources:bool ,with_jira:bool):
+        body = {
+            "pageSize": 100,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "exceptionApplied" :"|empty",
+                    "reportGUID": last_success_scan_id,
+                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "cloudResourceHash": resource_hash,
+                    "status": DEFAULT_TEST_CONFIG["status"],
+                }
+            ]
+        }
+        if with_accepted_resources:
+            body["innerFilters"][0]["exceptionApplied"] = "true,|empty"
+            body["innerFilters"][0]["status"] =f"{DEFAULT_TEST_CONFIG['status']},ACCEPT"
+            
+
+        control_with_checks_resp = self.backend.get_cloud_compliance_controls(with_rules=True,body=body)
+        control_with_checks = ComplianceControlWithChecks(**control_with_checks_resp["response"][0])
+        assert control_with_checks.reportGUID == last_success_scan_id, f"Expected reportGUID: {last_success_scan_id}, got: {control_with_checks.ComplianceControl.reportGUID}"
+        assert control_with_checks.cloudControlName == DEFAULT_TEST_CONFIG["control_name"], f"Expected control name: {DEFAULT_TEST_CONFIG['control_name']}, got: {control_with_checks.ComplianceControl.name}"
+        assert len(control_with_checks.rules) == 1, f"Expected 1 rule, got: {len(control_with_checks.rules)}"
+
+        rule = control_with_checks.rules[0]
+        expected_response = get_expected_only_check_under_control_response(with_accepted_resources)
+        for key, value in expected_response.items():
+            if value != "":
+                assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+
+        if with_jira:
+            assert control_with_checks.tickets is not None and len(control_with_checks.tickets) > 0, "Expected tickets to be present in control"
+            assert rule.tickets is not None and len(rule.tickets) > 0, "Expected tickets to be present in rule"
+
+    def create_jira_issue_for_cspm(self, last_success_scan_id: str, site_name: str = DEFAULT_JIRA_SITE_NAME):
+        """Create and validate a Jira issue for CSPM resource.
+        Args:
+            last_success_scan_id (str): The ID of the last successful scan
+            site_name (str): The Jira site name (default: cyberarmor-io)
+        """
+        # Setup Jira configuration if not already done
+        if not hasattr(self, 'site') or not hasattr(self, 'project') or not hasattr(self, 'issueType'):
+            self.setup_jira_config(site_name)
+
+        # Get control data first to use in the ticket
+        control_hash = self.validate_compliance_controls(last_success_scan_id, False, False)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, False)
+        resource_hash, resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False)
+
+        # Create Jira issue
+        Logger.logger.info(f"Create Jira issue for resource {resource_name} and rule {rule_hash}")
+        issue = self.test_obj["issueTemplate"].copy()
+        issue["collaborationGUID"] = self.jiraCollaborationGUID
+        issue["issueType"] = "cloudRule"
+        issue["siteId"] = self.site["id"]
+        issue["projectId"] = self.project["id"]
+        issue["issueTypeId"] = self.issueType["id"]
+        issue["owner"] = {
+            "resourceHash": resource_hash
+        }
+        issue["subjects"] = [{
+            "ruleHash": rule_hash
+        }]
+        issue["fields"]["summary"] = f"{resource_name} ({DEFAULT_TEST_CONFIG['resource_type']}) - {DEFAULT_TEST_CONFIG['rule_name']}"
+        issue["fields"]["description"] = f"""CSPM System Test Issue
+            Resource Name: {resource_name}
+            Resource Hash: {resource_hash}
+            Framework: {DEFAULT_TEST_CONFIG['framework']}
+            Control: {DEFAULT_TEST_CONFIG['control_name']}
+            Status: {DEFAULT_TEST_CONFIG['status']}
+            Severity: {DEFAULT_TEST_CONFIG['severity']}
+            """
+
+        ticket = self.backend.create_jira_issue(issue)
+        assert ticket['owner']['resourceHash'] == resource_hash, "Resource hash mismatch"
+        assert ticket['subjects'][0]['ruleHash'] == rule_hash, "Rule hash mismatch"
+
+        # Validate ticket presence using existing validation functions with with_jira=True
+        Logger.logger.info("Validating ticket presence in all APIs")
+        self.validate_compliance_controls(last_success_scan_id, False, True)
+        self.validate_compliance_rules(last_success_scan_id, control_hash, False, True)
+        self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, True)
+        self.validate_resource_summaries_response(last_success_scan_id, resource_name, False, True)
+        self.validate_control_and_checks_under_resource(last_success_scan_id, resource_hash, False, True)
+
+        Logger.logger.info(f"Unlink Jira issue")
+        self.backend.unlink_issue(ticket['guid'])
+
+        return ticket
+    
+    def accept_cspm_risk(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str):
+        """
+        Accept CSPM risk with different scopes and validate after each change.
+        
+        Flow:
+        1. Accept risk for specific resource and rule
+        2. Validate scan data with accepted=True
+        3. Update to all resources in account
+        4. Validate scan data
+        5. Update to all accounts and resources
+        6. Validate scan data
+        7. Delete exception
+        8. Validate scan data with accepted=False
+        """
+        # Get initial control and rule data
+        control_hash = self.validate_compliance_controls(last_success_scan_id, False)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False)
+        resource_hash, _ = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False)
+
+        # 1. Create exception for specific resource
+        Logger.logger.info("Creating exception for specific resource")
+        response = self.backend.create_cspm_exception(
+            rule_hashes=[rule_hash],
+            accounts=[cloud_account_guid],
+            resource_hashes=[resource_hash]
+        )
+        exception_guid = response.json()["guid"]
+
+        # Wait and validate scan data with accepted=True
+        Logger.logger.info("Validating scan data after specific resource exception")
+        self.wait_for_report(
+            self.validate_scan_data,
+            timeout=60,
+            sleep_interval=5,
+            cloud_account_guid=cloud_account_guid,
+            cloud_account_name=cloud_account_name,
+            last_success_scan_id=last_success_scan_id,
+            with_accepted_resources=True
+        )
+
+        # 2. Update to all resources in account
+        Logger.logger.info("Updating exception to all resources in account")
+        self.backend.update_cspm_exception_resources(
+            exception_guid=exception_guid,
+            rule_hash=rule_hash,
+            accounts=[cloud_account_guid]  # No resource_hashes means all resources
+        )
+
+        # Wait and validate scan data
+        Logger.logger.info("Validating scan data after all resources exception")
+        self.wait_for_report(
+            self.validate_scan_data,
+            timeout=60,
+            sleep_interval=5,
+            cloud_account_guid=cloud_account_guid,
+            cloud_account_name=cloud_account_name,
+            last_success_scan_id=last_success_scan_id,
+            with_accepted_resources=True
+        )
+
+        # 3. Update to all accounts and resources
+        Logger.logger.info("Updating exception to all accounts and resources")
+        self.backend.update_cspm_exception_resources(
+            exception_guid=exception_guid,
+            rule_hash=rule_hash  # No accounts means all accounts
+        )
+
+        # Wait and validate scan data
+        Logger.logger.info("Validating scan data after all accounts exception")
+        self.wait_for_report(
+            self.validate_scan_data,
+            timeout=60,
+            sleep_interval=5,
+            cloud_account_guid=cloud_account_guid,
+            cloud_account_name=cloud_account_name,
+            last_success_scan_id=last_success_scan_id,
+            with_accepted_resources=True
+        )
+
+        # 4. Delete exception
+        Logger.logger.info("Deleting exception")
+        self.backend.delete_cspm_exception(exception_guid)
+
+        # Wait and validate scan data with accepted=False
+        Logger.logger.info("Validating scan data after exception deletion")
+        self.wait_for_report(
+            self.validate_scan_data,
+            timeout=60,
+            sleep_interval=5,
+            cloud_account_guid=cloud_account_guid,
+            cloud_account_name=cloud_account_name,
+            last_success_scan_id=last_success_scan_id,
+            with_accepted_resources=False
+        )
+
+    def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str , test_arn: str):
+        self.stack_manager.delete_stack(stack_name)
+        Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
+        self.backend.cspm_scan_now(cloud_account_guid)
+        Logger.logger.info("Waiting for scan to complete with failed status")
+        self.wait_for_report(self.validate_accounts_cloud_list_cspm,
+                             timeout=120,
+                             sleep_interval=10,
+                             cloud_account_guid=cloud_account_guid,
+                             arn=test_arn,
+                             scan_status=CSPM_SCAN_STATE_FAILED,
+                             account_status = ACCOUNT_STATUS_DISCONNECTED)
+        Logger.logger.info("Scan failed, disconnecting account")
+
+        body = {
+            "pageSize": 150,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "guid": cloud_account_guid
+                }
+            ]
+        }
+        res = self.backend.get_cloud_accounts(body=body)
+        assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
+        account= res["response"][0]
+        assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] is not None, f"Expected lastTimeScanFail to be set, got: {account['features'][CSPM_FEATURE_NAME]['lastTimeScanFail']}"
+        assert account["features"][CSPM_FEATURE_NAME]["scanFailureReason"] is not None, f"Expected scanFailureReason to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanFailureReason']}"
+        assert account["features"][CSPM_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanState']}"
+
+        Logger.logger.info("the account has been successfully disconnected")
 
 def extract_parameters_from_url(url):
     parsed_url = urlparse(url)
