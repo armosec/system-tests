@@ -37,6 +37,15 @@ class CloudFormationManager:
             aws_session_token=aws_session_token
         )
 
+        # Add logs client during initialization
+        self.logs = boto3.client(
+            "logs",
+            region_name=self.region,
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            aws_session_token=aws_session_token
+        )
+
 
     def get_account_id(self):
         sts_client = boto3.client("sts")
@@ -77,7 +86,7 @@ class CloudFormationManager:
         except ClientError as e:
             Logger.logger.error(f"An error occurred while waiting for stack creation: {e}")
             raise e
-        
+
     def get_stack_failure_reason(self, stack_name):
         try:
             response = self.cloudformation.describe_stack_events(StackName=stack_name)
@@ -247,6 +256,28 @@ class CloudFormationManager:
         except ClientError as e:
             Logger.logger.error(f"An error occurred while listing or deleting CloudTrails: {e}")
 
+    def delete_stack_log_groups(self, stack_name):
+        """Delete log groups associated with a particular stack"""
+        try:
+
+            # Define log group patterns to delete
+            log_group_patterns = [
+                f"/aws/lambda/{stack_name}-log-processing-function",
+                f"/aws/lambda/{stack_name}-notification-config"
+            ]
+
+            # Try to delete each log group
+            for log_group_name in log_group_patterns:
+                try:
+                    self.logs.delete_log_group(logGroupName=log_group_name)
+                    Logger.logger.info(f"Log group {log_group_name} deleted successfully.")
+                except self.logs.exceptions.ResourceNotFoundException:
+                    Logger.logger.info(f"Log group {log_group_name} not found, skipping.")
+                except Exception as e:
+                    Logger.logger.error(f"Error deleting log group {log_group_name}: {e}")
+
+        except Exception as e:
+            Logger.logger.error(f"An error occurred while deleting log groups for stack {stack_name}: {e}")
 
 
 

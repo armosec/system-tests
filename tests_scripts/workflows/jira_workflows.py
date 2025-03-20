@@ -15,7 +15,7 @@ from tests_scripts.workflows.utils import (
 )
 import time
 import json
-from systest_utils import Logger, TestUtil, statics
+from systest_utils import Logger, TestUtil
 
 
 
@@ -41,7 +41,6 @@ class WorkflowsJiraNotifications(Workflows):
         6. Assert jira ticket was created
         7. Cleanup
         """
-
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, self.namespace = self.setup(apply_services=False)

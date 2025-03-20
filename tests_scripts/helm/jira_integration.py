@@ -4,6 +4,70 @@ from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
 import json
 
+DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
+
+def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME):       
+    """Setup and validate Jira configuration. Returns necessary Jira config objects.
+    
+    Args:
+        backend: Backend instance with Jira API methods
+        site_name (str): Name of the Jira site (default: cyberarmor-io)
+        
+    Returns:
+        tuple: (site, project, issueType, jiraCollaborationGUID)
+    """
+    Logger.logger.info('check jira connection status')
+    connectionStatus = backend.get_integration_status("jira")
+    assert connectionStatus, "Connection status is empty"
+    assert len(connectionStatus) ==  1, "Got more than one connection status"
+    jiraStatus = next((status for status in connectionStatus if status['provider'] == 'jira'), None)
+    assert jiraStatus, "Jira is missing form connection status"
+    assert jiraStatus['status'] == "connected", "Jira is not connected"
+    jiraCollaborationGUID = backend.get_jira_collaboration_guid_by_site_name(site_name)
+
+    Logger.logger.info('get cyberarmor-io site')   
+    projectsResp = backend.search_jira_projects(body={'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID}]})
+    assert projectsResp, "Jira projects response is empty"
+    site = next((site for site in projectsResp['availableSites'] if site['name'] == site_name), None)
+    assert site, f"{site_name} is missing from available sites"
+
+    Logger.logger.info('get Jira System Tests project')       
+    projectsResp = backend.search_jira_projects({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'name': 'Jira System Tests'}]})
+    assert projectsResp, "Jira projects response is empty"
+    project = next((project for project in projectsResp['projects'] if project['name'] == 'Jira System Tests'), None)
+    assert project, "Jira System Tests is missing from projects"
+
+    Logger.logger.info('update Jira configuration')
+    backend.update_jira_config({"jiraCollabGUID": jiraCollaborationGUID, 'selectedSite': site, 'projects':[project]})
+
+    Logger.logger.info('verify Jira configuration')
+    config = backend.get_jira_config()
+    assert config, "Jira configuration is empty"
+    assert 'jiraConnections' in config and isinstance(config['jiraConnections'], list) and config['jiraConnections'], "No Jira connections found in the configuration"
+    connection = next(
+        (conn for conn in config['jiraConnections'] if conn.get('selectedSite', {}).get('name') == site_name),
+        None
+    )
+    assert connection, f"No Jira connection found for site '{site_name}'"
+    assert 'projects' in connection and isinstance(connection['projects'], list) and connection['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
+
+    Logger.logger.info('get jira test issue type')
+    issueTypesRes = backend.search_jira_issue_types({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
+    assert issueTypesRes, "Jira issue types response is empty"
+    issueType = next((issueType for issueType in issueTypesRes['response'] if issueType['name'] == 'System Test Issue Type'), None)
+    assert issueType, "System Test Issue Type is missing from issue types"
+
+    Logger.logger.info('verify issue type schema')
+    schema = backend.search_jira_schema({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID,
+        'siteId': site['id'], 'projectId': project['id'], 'issueTypeId': issueType['id'],
+        'includeFields': 'summary,description,reporter,labels,assignee,users,user'}]})
+    assert schema, "Jira schema response is empty"
+    assert len(schema['response'])> 0 , "Jira schema response is empty"
+    for field in schema['response']:
+        field['topValues'] = None
+
+    return site, project, issueType, jiraCollaborationGUID
+
 
 class JiraIntegration(BaseKubescape, BaseHelm):
     def __init__(
@@ -31,7 +95,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             self.helm_kwargs.update(test_helm_kwargs)
         
         self.wait_for_agg_to_end = False
-        self.site_name = "cyberarmor-io"
+        self.site_name = DEFAULT_JIRA_SITE_NAME
 
     def cleanup(self, **kwargs):
         super().cleanup(**kwargs)
@@ -58,67 +122,9 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         return self.cleanup()
     
 
-    def setup_jira_config(self):       
-        Logger.logger.info('check jira connection status')
-        connectionStatus = self.backend.get_integration_status("jira")
-        assert connectionStatus, "Connection status is empty"
-        assert len(connectionStatus) ==  1, "Got more than one connection status"
-        jiraStatus = next((status for status in connectionStatus if status['provider'] == 'jira'), None)
-        assert jiraStatus, "Jira is missing form connection status"
-        assert jiraStatus['status'] == "connected", "Jira is not connected"
-        jiraCollaborationGUID = self.backend.get_jira_collaboration_guid_by_site_name(self.site_name)
-
-        Logger.logger.info('get cyberarmor-io site')   
-        projectsResp = self.backend.search_jira_projects(body={'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID}]})
-        assert projectsResp, "Jira projects response is empty"
-        site = next((site for site in projectsResp['availableSites'] if site['name'] == 'cyberarmor-io'), None)
-        assert site, "cyberarmor-io is missing from available sites"
-
-        Logger.logger.info('get Jira System Tests project')       
-        projectsResp = projectsResp = self.backend.search_jira_projects({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'name': 'Jira System Tests'}]})
-        assert projectsResp, "Jira projects response is empty"
-        project = next((project for project in projectsResp['projects'] if project['name'] == 'Jira System Tests'), None)
-        assert project, "Jira System Tests is missing from projects"
-
-        Logger.logger.info('update Jira configuration')
-        self.backend.update_jira_config({"jiraCollabGUID": jiraCollaborationGUID, 'selectedSite': site, 'projects':[project]})
-
-        Logger.logger.info('verify Jira configuration')
-        config = self.backend.get_jira_config()
-        assert config, "Jira configuration is empty"
-        assert 'jiraConnections' in config and isinstance(config['jiraConnections'], list) and config['jiraConnections'], "No Jira connections found in the configuration"
-        connection = next(
-            (conn for conn in config['jiraConnections'] if conn.get('selectedSite', {}).get('name') == 'cyberarmor-io'),
-            None
-        )
-        assert connection, "No Jira connection found for site 'cyberarmor-io'"
-        assert 'projects' in connection and isinstance(connection['projects'], list) and connection['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
-
-
-
-        Logger.logger.info('get jira test issue type')
-        issueTypesRes = self.backend.search_jira_issue_types({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
-        assert issueTypesRes, "Jira issue types response is empty"
-        issueType = next((issueType for issueType in issueTypesRes['response'] if issueType['name'] == 'System Test Issue Type'), None)
-        assert issueType, "System Test Issue Type is missing from issue types"
-
-        Logger.logger.info('verify issue type schema')
-        schema = self.backend.search_jira_schema({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID,
-            'siteId': site['id'], 'projectId': project['id'], 'issueTypeId': issueType['id'],
-            'includeFields': 'summary,description,reporter,labels,assignee,users,user'}]})
-        assert schema, "Jira schema response is empty"
-        assert len(schema['response'])> 0 , "Jira schema response is empty"
-        for field in schema['response']:
-            field['topValues'] = None
-                
-        #uncomment to update expected 
-        # TestUtil.save_expceted_json(schema, "configurations/expected-result/integrations/expectedJiraSchema_1.json")     
-        TestUtil.compare_with_expected_file("configurations/expected-result/integrations/expectedJiraSchema.json", schema, {})
-        #set site, project and issueType for the test
-        self.site = site
-        self.project = project
-        self.issueType = issueType
-
+    def setup_jira_config(self, site_name="cyberarmor-io"):
+        """Setup Jira configuration using the standalone function."""
+        self.site, self.project, self.issueType, self.jiraCollaborationGUID = setup_jira_config(self.backend, site_name)
 
     def setup_cluster_and_run_posture_scan(self):
         cluster, namespace = self.setup(apply_services=False)
@@ -374,15 +380,3 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.backend.unlink_issue(workloadCVEicket['guid'])
         self.backend.unlink_issue(globalImageTicket['guid'])
         self.backend.unlink_issue(workloadImageTicket['guid'])
-
-    
-
-
-
-
-
-
-
-
-
-    
