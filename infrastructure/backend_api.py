@@ -3015,7 +3015,7 @@ class ControlPanelAPI(object):
                         self.customer, r.status_code, r.text))
             return r.json()
 
-    def add_cspm_exception(self, payload:str):
+    def create_cspm_exception_req(self, payload:str):
         """
         Add a new CSPM exception policy.
         
@@ -3093,7 +3093,7 @@ class ControlPanelAPI(object):
             "policyType": "cspmExceptionPolicy"
         }
 
-        return self.add_cspm_exception(payload=payload)
+        return self.create_cspm_exception_req(payload=payload)
 
     def delete_cspm_exception(self, exception_guid: str):
         """
@@ -3110,8 +3110,8 @@ class ControlPanelAPI(object):
                 'Error deleting CSPM exception. Request: delete_cspm_exception "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
-
-    def update_cspm_exception(self, exception_guid: str, policy_ids: List[str], resources: List[Dict], reason: str = ""):
+        
+    def update_cspm_exception(self, payload:str):
         """
         Update an existing CSPM exception.
         
@@ -3123,14 +3123,7 @@ class ControlPanelAPI(object):
                                   - attributes: Dict with account and resourceHash
             reason (str): Reason for the exception (optional)
         """
-        payload = {
-            "guid": exception_guid,
-            "policyIDs": policy_ids,
-            "resources": resources,
-            "reason": reason,
-            "policyType": "cspmExceptionPolicy"
-        }
-
+       
         r = self.put(API_CLOUD_COMPLIANCE_EXCEPTIONS, params={"customerGUID": self.selected_tenant_id}, json=payload)
 
         if not 200 <= r.status_code < 300:
@@ -3197,12 +3190,17 @@ class ControlPanelAPI(object):
                                 "resourceHash": resource_hash
                             }
                         })
+        payload = {
+            "guid": exception_guid,
+            "policyIDs": resource_hashes,
+            "resources": resources,
+            "reason": reason,
+            "policyType": "cspmExceptionPolicy"
+        }
+
 
         return self.update_cspm_exception(
-            exception_guid=exception_guid,
-            policy_ids=[rule_hash],
-            resources=resources,
-            reason=reason
+            payload=payload
         )
 
     def cspm_scan_now(self, cloud_account_guid: str) -> requests.Response:
