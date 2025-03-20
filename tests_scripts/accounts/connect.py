@@ -94,7 +94,7 @@ class CloudConnect(Accounts):
 
         Logger.logger.info('Stage 4: Connect cspm new account')
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name)
-       
+
         Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
         # wait for success
         self.wait_for_report(self.validate_accounts_cloud_list_cspm,

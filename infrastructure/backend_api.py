@@ -3015,25 +3015,14 @@ class ControlPanelAPI(object):
                         self.customer, r.status_code, r.text))
             return r.json()
 
-    def add_cspm_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = ""):
+    def add_cspm_exception(self, payload:str):
         """
         Add a new CSPM exception policy.
         
         Args:
-            policy_ids (List[str]): List of policy IDs to create exceptions for
-            resources (List[Dict]): List of resources to apply the exception to. Each resource should have:
-                                  - designatorType: str (e.g. "Attribute")
-                                  - attributes: Dict with account and resourceHash
-            reason (str): Reason for creating the exception (optional)
+            payload (str) the body of the create request
         """
         params = {"customerGUID": self.selected_tenant_id}
-
-        payload = {
-            "policyIDs": policy_ids,
-            "resources": resources,
-            "reason": reason,
-            "policyType": "cspmExceptionPolicy"
-        }
 
         r = self.post(API_CLOUD_COMPLIANCE_EXCEPTIONS_NEW, params=params, json=payload)
 
@@ -3096,12 +3085,20 @@ class ControlPanelAPI(object):
                             }
                         })
 
-        return self.add_cspm_exception(policy_ids=rule_hashes, resources=resources, reason=reason)
+        #build requeest body
+        payload = {
+            "policyIDs": rule_hashes,
+            "resources": resources,
+            "reason": reason,
+            "policyType": "cspmExceptionPolicy"
+        }
+
+        return self.add_cspm_exception(payload=payload)
 
     def delete_cspm_exception(self, exception_guid: str):
         """
         Delete a CSPM exception by its GUID.
-        
+
         Args:
             exception_guid (str): The GUID of the exception to delete
         """
