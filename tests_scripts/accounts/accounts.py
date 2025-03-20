@@ -903,26 +903,7 @@ class Accounts(base_test.BaseTest):
             with_accepted_resources=True
         )
 
-        # 3. Update to all accounts and resources
-        Logger.logger.info("Updating exception to all accounts and resources")
-        self.backend.update_cspm_exception_resources(
-            exception_guid=exception_guid,
-            rule_hash=rule_hash  # No accounts means all accounts
-        )
-
-        # Wait and validate scan data
-        Logger.logger.info("Validating scan data after all accounts exception")
-        self.wait_for_report(
-            self.validate_scan_data,
-            timeout=60,
-            sleep_interval=5,
-            cloud_account_guid=cloud_account_guid,
-            cloud_account_name=cloud_account_name,
-            last_success_scan_id=last_success_scan_id,
-            with_accepted_resources=True
-        )
-
-        # 4. Delete exception
+        # 3. Delete exception
         Logger.logger.info("Deleting exception")
         self.backend.delete_cspm_exception(exception_guid)
 

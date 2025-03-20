@@ -3041,49 +3041,41 @@ class ControlPanelAPI(object):
             accounts (List[str], optional): List of account IDs. If None, applies to all accounts (*/*).
             resource_hashes (List[str], optional): List of resource hashes. If None, applies to all resources (*/*).
             reason (str, optional): Reason for creating the exception.
-            
+
         Examples:
             # Exception for all accounts and all resources
             create_cspm_exception(["rule-hash-1"])
-            
+
             # Exception for specific accounts but all their resources
             create_cspm_exception(["rule-hash-1"], accounts=["account-1", "account-2"])
-            
+
             # Exception for specific accounts and specific resources
             create_cspm_exception(["rule-hash-1"], accounts=["account-1"], resource_hashes=["resource-1"])
         """
-        # Handle the case where no accounts specified means all accounts
-        if not accounts:
-            resources = [{
-                "designatorType": "Attribute",
-                "attributes": {
-                    "account": "*/*",
-                    "resourceHash": "*/*"
-                }
-            }]
-        # Handle specific accounts
-        else:
-            resources = []
-            for account in accounts:
-                # If no specific resources, apply to all resources in the account
-                if not resource_hashes:
+
+        assert accounts is not None and len(accounts) > 0, "got 0 accounts, cannot open exception on 0 account - need at least 1"
+
+        resources = []
+        for account in accounts:
+            # If no specific resources, apply to all resources in the account
+            if not resource_hashes:
+                resources.append({
+                    "designatorType": "Attribute",
+                    "attributes": {
+                        "account": account,
+                        "resourceHash": "*/*"
+                    }
+                })
+            # If specific resources, create an entry for each account-resource combination
+            else:
+                for resource_hash in resource_hashes:
                     resources.append({
                         "designatorType": "Attribute",
                         "attributes": {
                             "account": account,
-                            "resourceHash": "*/*"
+                            "resourceHash": resource_hash
                         }
                     })
-                # If specific resources, create an entry for each account-resource combination
-                else:
-                    for resource_hash in resource_hashes:
-                        resources.append({
-                            "designatorType": "Attribute",
-                            "attributes": {
-                                "account": account,
-                                "resourceHash": resource_hash
-                            }
-                        })
 
         #build requeest body
         payload = {
@@ -3158,41 +3150,33 @@ class ControlPanelAPI(object):
             # Update to apply to all accounts and resources
             update_cspm_exception_resources("exception-guid", "rule-hash")
         """
-        # Handle the case where no accounts specified means all accounts
-        if not accounts:
-            resources = [{
-                "designatorType": "Attribute",
-                "attributes": {
-                    "account": "*/*",
-                    "resourceHash": "*/*"
-                }
-            }]
-        # Handle specific accounts
-        else:
-            resources = []
-            for account in accounts:
-                # If no specific resources, apply to all resources in the account
-                if not resource_hashes:
+
+        assert accounts is not None and len(accounts) > 0, "got 0 accounts, cannot open exception on 0 account - need at least 1"
+
+        resources = []
+        for account in accounts:
+            # If no specific resources, apply to all resources in the account
+            if not resource_hashes:
+                resources.append({
+                    "designatorType": "Attribute",
+                    "attributes": {
+                        "account": account,
+                        "resourceHash": "*/*"
+                    }
+                })
+            # If specific resources, create an entry for each account-resource combination
+            else:
+                for resource_hash in resource_hashes:
                     resources.append({
                         "designatorType": "Attribute",
                         "attributes": {
                             "account": account,
-                            "resourceHash": "*/*"
+                            "resourceHash": resource_hash
                         }
                     })
-                # If specific resources, create an entry for each account-resource combination
-                else:
-                    for resource_hash in resource_hashes:
-                        resources.append({
-                            "designatorType": "Attribute",
-                            "attributes": {
-                                "account": account,
-                                "resourceHash": resource_hash
-                            }
-                        })
         payload = {
             "guid": exception_guid,
-            "policyIDs": resource_hashes,
+            "policy_ids": [rule_hash],
             "resources": resources,
             "reason": reason,
             "policyType": "cspmExceptionPolicy"
