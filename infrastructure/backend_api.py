@@ -3174,9 +3174,11 @@ class ControlPanelAPI(object):
                             "resourceHash": resource_hash
                         }
                     })
+
+        #build requeest body
         payload = {
             "guid": exception_guid,
-            "policy_ids": [rule_hash],
+            "policyIDs": [rule_hash],
             "resources": resources,
             "reason": reason,
             "policyType": "cspmExceptionPolicy"
