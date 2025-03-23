@@ -4,6 +4,7 @@ python_virtual_env
 python_virtual_env/*
 *_env
 venv/*
+.venv/*
 .vscode
 logger
 logger/*
