@@ -51,7 +51,7 @@ class WorkflowConfigurations(Workflows):
         workflow_test_name_updated = workflow_test_name + "_updated_" + rand
 
         Logger.logger.info("Stage 1: Create webhook")
-        self.create_webhook(name=webhook_test_name)
+        self.create_teams_webhook(name=webhook_test_name)
         self.channel_guid  = self.get_channel_guid_by_name(webhook_test_name)
 
         Logger.logger.info("stage 2: create slack workflow")
@@ -106,26 +106,26 @@ class WorkflowConfigurations(Workflows):
                 Logger.logger.error(f"Failed to delete channel guid {self.channel_guid}, got exception {e}")
         return statics.SUCCESS, "Cleanup completed successfully"
         
-    def create_webhook(self, name):
+    def create_teams_webhook(self, name):
         webhook_body = {
             "guid": "",
             "name": name,
             "webhookURL": get_env("CHANNEL_WEBHOOK")
         }
-        r = self.backend.create_webhook(webhook_body)
+        r = self.backend.create_teams_webhook(webhook_body)
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
         
     def get_channel_guid_by_name(self, channel_name):
-        channels = self.backend.get_webhooks()
+        channels = self.backend.get_teams_webhooks()
         for channel in channels:
             if channel["name"] == channel_name:
                 return channel["guid"]
         return "Channel not found"
     
     def delete_channel_by_guid(self, channel_guid):
-        r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
+        r = self.backend.delete_teams_webhook(body={"innerFilters": [{"guid": channel_guid}]})
         assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
-        channels = self.backend.get_webhooks()
+        channels = self.backend.get_teams_webhooks()
         for channel in channels:
             if channel["guid"] == channel_guid:
                 return f"Channel with guid {channel_guid} not deleted"

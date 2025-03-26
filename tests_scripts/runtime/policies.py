@@ -1,11 +1,14 @@
 
 
 import json
+import random
 
 
 from configurations.system.tests_cases.structures import TestConfiguration
-from systest_utils import Logger, TestUtil
+from systest_utils import Logger, TestUtil, statics
 from tests_scripts.base_test import BaseTest
+from tests_scripts.users_notifications.alert_notifications import get_env
+from tests_scripts.workflows.utils import WEBHOOK_NAME
 
 UPDATE_EXPECTED_RUNTIME_POLICIES = False
 
@@ -25,6 +28,9 @@ class RuntimePoliciesConfigurations(BaseTest):
 
     def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
         super(RuntimePoliciesConfigurations, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
+
+        self.tested_webhook_guid = []
+        self.tested_policy_guid = []
         
     
     def start(self):
@@ -41,6 +47,9 @@ class RuntimePoliciesConfigurations(BaseTest):
 
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
+
+
+        Logger.logger.info(self.backend.server + statics.ARMO_TEST_WEBHOOK_API)
 
 
         Logger.logger.info("1. validate incident types")
@@ -85,6 +94,25 @@ class RuntimePoliciesConfigurations(BaseTest):
         expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
         TestUtil.compare_jsons(expected_unique_values, unique_values, [])
 
+        rand = str(random.randint(10000000, 99999999))
+
+        Logger.logger.info("Create webhook")
+        self.webhook_name = WEBHOOK_NAME+ "_" + rand
+        armo_test_webhook = self.backend.server + statics.ARMO_TEST_WEBHOOK_API + "?customerGUID=" + self.backend.get_customer_guid()
+        guid = self.create_webhook(name=self.webhook_name, webhook_url=armo_test_webhook, testWebhook=True)
+
+
+        notifications = [
+            {
+                "provider": "webhook",
+                "webhookChannel": {
+                    "guid": guid,
+                    "name": self.webhook_name,
+                    "webhookURL": armo_test_webhook
+                }
+            }
+        ]
+
         new_runtime_policy_body =  {    
             "name": "Malware-new-systest",    
             "description": "Default Malware RuleSet System Test",
@@ -94,12 +122,12 @@ class RuntimePoliciesConfigurations(BaseTest):
             "managedRuleSetIDs": [
                 incident_rulesets[0]["guid"]
             ],    
-            "notifications": [],
+            "notifications":notifications,
             "actions": []
         }
 
         Logger.logger.info("5. create new runtime policy")
-        new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
+        new_policy_guid = self.validate_new_policy(new_runtime_policy_body, notifications)
 
         # TODO: check the case of updating empty scope
         update_runtime_policy_body = {    
@@ -124,13 +152,59 @@ class RuntimePoliciesConfigurations(BaseTest):
         Logger.logger.info("8. validate expected errors")
         self.validate_expected_errors()
 
+        self.delete_channel_by_guid(guid)
+
+
 
         return self.cleanup()
   
 
         # cluster, namespace = self.setup()
     def cleanup(self, **kwargs):
+        for guid in self.tested_webhook_guid:
+            self.delete_channel_by_guid(guid)
+
+        for guid in self.tested_policy_guid:
+            self.validate_delete_policy(guid)
         return super().cleanup(**kwargs)
+    
+    def get_channel_guid_by_name(self, channel_name):
+        channels = self.backend.get_webhooks()
+        for channel in channels:
+            if channel["name"] == channel_name:
+                return channel["guid"]
+        return "Channel not found"
+    
+    def delete_channel_by_guid(self, channel_guid):
+        r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
+        assert r == "Webhooks channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
+        channels = self.backend.get_webhooks()
+        for channel in channels:
+            if channel["guid"] == channel_guid:
+                return f"Channel with guid {channel_guid} not deleted"
+        self.tested_webhook_guid.remove(channel_guid)
+        return "Channel deleted"
+
+    def create_webhook(self, name, webhook_url, testWebhook=True)->str:
+        webhook_body = {
+            "guid": "",
+            "name": name,
+            "webhookURL": webhook_url
+        }
+        try:
+            r = self.backend.create_webhook(webhook_body, testWebhook)
+        except (Exception, BaseException) as e:
+            if "already exists" in str(e):
+                Logger.logger.info("Teams channel already exists")
+                return
+            raise e
+        
+        assert r == "Webhook channel created", f"Expected 'Teams channel created', but got {r['response']}"
+
+        guid = self.get_channel_guid_by_name(self.webhook_name)
+        self.tested_webhook_guid.append(guid)
+        return guid
+
     
     def validate_incident_types(self):
         res = self.backend.get_runtime_incident_types()
@@ -151,7 +225,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         return incident_rulesets["response"]
 
 
-    def validate_new_policy(self, body):
+    def validate_new_policy(self, body, notifications=[]):
         res = self.backend.new_runtime_policy(body)
         new_runtime_policy_no_scope_res = json.loads(res.text)
         assert new_runtime_policy_no_scope_res == POLICY_CREATED_RESPONSE, f"failed to create new runtime policy, got {new_runtime_policy_no_scope_res}"
@@ -170,15 +244,42 @@ class RuntimePoliciesConfigurations(BaseTest):
 
         res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
         incident_policies = json.loads(res.text)["response"]
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions"]
+        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions", "notifications"]
         assert len(incident_policies)  > 0, f"failed to get new runtime policy, expected more than 1 but got {len(incident_policies)}, got result {incident_policies}"
 
         Logger.logger.info(f"New policy created: {json.dumps(incident_policies[0], indent=4)}")
 
         for prop in props_to_check:
+            if prop == "notifications":
+                continue
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
-        return incident_policies[0]["guid"]
+
+
+        provider_to_data = {
+            "webhook": "webhookChannel"
+        }
+
+        data_to_fields = {
+            "webhookChannel": ["guid", "name", "webhookURL"]
+        }
+        
+
+        for i in range(len(notifications)):
+            found_provider = None
+            for j in range(len(incident_policies[0]["notifications"])):
+                if incident_policies[0]["notifications"][j]["provider"] == notifications[i]["provider"]:
+                    found_provider = incident_policies[0]["notifications"][j]["provider"]
+                    data = provider_to_data[found_provider]
+
+                    for field in data_to_fields[data]:
+                        assert incident_policies[0]["notifications"][j][data][field] == notifications[i][data][field], f"failed to get new runtime policy, expected notification '{notifications[i]}' but got {incident_policies[0]['notifications'][j]}, got result {incident_policies}"
+                    break
+                assert found_provider, f"failed to get new runtime policy, didnt find provider '{notifications[i]['provider']}' in {incident_policies[0]['notifications']}, got result {incident_policies}"
+
+        guid = incident_policies[0]["guid"]
+        self.tested_policy_guid.append(guid)
+        return guid
     
 
     def validate_update_policy_against_backend(self, guid, body):
@@ -202,7 +303,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         incident_policies = json.loads(res.text)["response"]
         assert len(incident_policies)  == 1, f"failed to get new runtime policy, expected 1 but got {len(incident_policies)}, got result {incident_policies}"
 
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "notifications", "actions"]
+        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions"]
         for prop in props_to_check:
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
@@ -233,6 +334,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
         incident_policies = json.loads(res.text)["response"]
         assert len(incident_policies)  == 0, f"failed to delete new runtime policy, expected 0 but got {len(incident_policies)}, got result {incident_policies}"
+        self.tested_policy_guid.remove(guid)
 
     def validate_expected_errors(self):
         test_cases = [

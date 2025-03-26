@@ -129,8 +129,12 @@ API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
 
 API_WORKFLOWS = "/api/v1/workflows"
 
-API_WEBHOOKS = "/api/v1/notifications/teams"
+API_TEAMS = "/api/v1/notifications/teams"
 API_TEAMS_TEST_MESSAGE = "/api/v1/notifications/teams/testMessage"
+
+
+API_WEBHOOKS = "/api/v1/notifications/webhooks"
+API_WEBHOOKS_TEST_MESSAGE = "/api/v1/notifications/webhooks/testMessage"
 
 API_ACCOUNTS = "/api/v1/accounts"
 API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
@@ -2743,6 +2747,56 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def get_teams_webhooks(self):
+        url = API_TEAMS
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing webhooks. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+
+    def create_teams_webhook(self, body):
+        url = API_TEAMS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def delete_teams_webhook(self, body):
+        url = API_TEAMS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def update_teams_webhook(self, body):
+        url = API_TEAMS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def test_teams_webhook_message(self, body):
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(API_TEAMS_TEST_MESSAGE, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error testing webhook. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+
     def get_webhooks(self):
         url = API_WEBHOOKS
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
@@ -2753,9 +2807,13 @@ class ControlPanelAPI(object):
         return r.json()
 
 
-    def create_webhook(self, body):
+    def create_webhook(self, body, testWebhook=True):
         url = API_WEBHOOKS
         params = {"customerGUID": self.selected_tenant_id}
+
+        if not testWebhook:
+            params["testWebhook"] = False
+    
         r = self.post(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
@@ -2785,13 +2843,13 @@ class ControlPanelAPI(object):
 
     def test_webhook_message(self, body):
         params = {"customerGUID": self.selected_tenant_id}
-        r = self.post(API_TEAMS_TEST_MESSAGE, params=params, json=body)
+        r = self.post(API_WEBHOOKS_TEST_MESSAGE, params=params, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error testing webhook. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-
+    
     def get_cspm_link(self, region):
         url = API_ACCOUNTS_CSPM_LINK + "?region=" + region
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})

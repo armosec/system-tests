@@ -1,6 +1,10 @@
 import os
 
 
+# test webhook
+
+ARMO_TEST_WEBHOOK_API = "/api/v1/notifications/webhooks/testWebhook"
+
 # seccomp workloads statuses
 
 SECCOMP_STATUS_UNKNOWN = 0
