@@ -65,7 +65,7 @@ class WorkflowsTeamsNotifications(Workflows):
         
         Logger.logger.info("Stage 2: Create webhook")
         self.webhook_name = WEBHOOK_NAME + self.cluster + "_" + rand
-        self.create_webhook(name=self.webhook_name)
+        self.create_teams_webhook(name=self.webhook_name)
         self.channel_guid = self.get_channel_guid_by_name(self.webhook_name)
         
         Logger.logger.info("Stage 3: Create new workflows")
@@ -145,14 +145,14 @@ class WorkflowsTeamsNotifications(Workflows):
             self.wait_for_report(report_type=self.backend.delete_custom_framework, framework_name=self.fw_name)
         return super().cleanup(**kwargs)
     
-    def create_webhook(self, name):
+    def create_teams_webhook(self, name):
         webhook_body = {
             "guid": "",
             "name": name,
             "webhookURL": get_env("CHANNEL_WEBHOOK")
         }
         try:
-            r = self.backend.create_webhook(webhook_body)
+            r = self.backend.create_teams_webhook(webhook_body)
         except (Exception, BaseException) as e:
             if "already exists" in str(e):
                 Logger.logger.info("Teams channel already exists")
@@ -160,18 +160,19 @@ class WorkflowsTeamsNotifications(Workflows):
             raise e
         
         assert r == "Teams channel created", f"Expected 'Teams channel created', but got {r['response']}"
-        
+
     def get_channel_guid_by_name(self, channel_name):
-        channels = self.backend.get_webhooks()
+        channels = self.backend.get_teams_webhooks()
         for channel in channels:
             if channel["name"] == channel_name:
                 return channel["guid"]
         return "Channel not found"
     
+
     def delete_channel_by_guid(self, channel_guid):
-        r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
+        r = self.backend.delete_teams_webhook(body={"innerFilters": [{"guid": channel_guid}]})
         assert r == "Teams channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
-        channels = self.backend.get_webhooks()
+        channels = self.backend.get_teams_webhooks()
         for channel in channels:
             if channel["guid"] == channel_guid:
                 return f"Channel with guid {channel_guid} not deleted"
