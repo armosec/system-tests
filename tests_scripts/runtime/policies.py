@@ -152,9 +152,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         Logger.logger.info("8. validate expected errors")
         self.validate_expected_errors()
 
-        self.delete_channel_by_guid(guid)
-
-
+        self.delete_webhook(guid)
 
         return self.cleanup()
   
@@ -162,20 +160,20 @@ class RuntimePoliciesConfigurations(BaseTest):
         # cluster, namespace = self.setup()
     def cleanup(self, **kwargs):
         for guid in self.tested_webhook_guid:
-            self.delete_channel_by_guid(guid)
+            self.delete_webhook(guid)
 
         for guid in self.tested_policy_guid:
             self.validate_delete_policy(guid)
         return super().cleanup(**kwargs)
     
-    def get_channel_guid_by_name(self, channel_name):
+    def get_webhook_name(self, channel_name):
         channels = self.backend.get_webhooks()
         for channel in channels:
             if channel["name"] == channel_name:
                 return channel["guid"]
         return "Channel not found"
     
-    def delete_channel_by_guid(self, channel_guid):
+    def delete_webhook(self, channel_guid):
         r = self.backend.delete_webhook(body={"innerFilters": [{"guid": channel_guid}]})
         assert r == "Webhooks channel deleted", f"Expected 'Teams channel deleted', but got {r['response']}"
         channels = self.backend.get_webhooks()
@@ -201,7 +199,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         
         assert r == "Webhook channel created", f"Expected 'Teams channel created', but got {r['response']}"
 
-        guid = self.get_channel_guid_by_name(self.webhook_name)
+        guid = self.get_webhook_name(self.webhook_name)
         self.tested_webhook_guid.append(guid)
         return guid
 
