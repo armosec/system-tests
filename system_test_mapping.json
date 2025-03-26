@@ -1021,9 +1021,9 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service",
-      "config-service",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "config-service-dummy",
       "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to slack",
@@ -1035,14 +1035,25 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service",
-      "config-service",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy",
+      "config-service-dummy",
       "users-notification-service"
     ],
     "description": "Test kdr incidents is being sent to teams",
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io"
+  },
+  "kdr_webhook_alerts": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe-dummy"
+    ],
+    "description": "Test kdr incidents is being sent to slack",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
   },
   "sr_ac_scan_status": {
     "target": [
@@ -1175,7 +1186,7 @@
       "event-ingester-service"
     ],
     "description": "Checks workflows jira notifications",
-    "skip_on_environment": "production",
+    "skip_on_environment": "production", 
     "owner": "eranm@armosec.io"
   },
   "workflows_configurations": {

@@ -40,10 +40,11 @@ class RuntimePoliciesConfigurations(BaseTest):
         2. validate default rulesets
         3. get runtime policies list
         4. validate unique values
-        5. create new runtime policy
-        6. update runtime policy
-        7. delete runtime policy
-        8. validate expected errors
+        5. create new runtime policy with webhook
+        6. update runtime policy with teams
+        7. update runtime policy with slack
+        8. delete runtime policy
+        9. validate expected errors
 
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
@@ -102,7 +103,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         guid = self.create_webhook(name=self.webhook_name, webhook_url=armo_test_webhook, testWebhook=True)
 
 
-        notifications = [
+        notifications_webhook = [
             {
                 "provider": "webhook",
                 "webhookChannel": {
@@ -122,12 +123,14 @@ class RuntimePoliciesConfigurations(BaseTest):
             "managedRuleSetIDs": [
                 incident_rulesets[0]["guid"]
             ],    
-            "notifications":notifications,
+            "notifications":notifications_webhook,
             "actions": []
         }
 
-        Logger.logger.info("5. create new runtime policy")
-        new_policy_guid = self.validate_new_policy(new_runtime_policy_body, notifications)
+
+        Logger.logger.info("5. create new runtime policy with webhook")
+        new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
+        self.validate_notifications(notifications_webhook, new_runtime_policy_body)
 
         # TODO: check the case of updating empty scope
         update_runtime_policy_body = {    
@@ -143,13 +146,40 @@ class RuntimePoliciesConfigurations(BaseTest):
             "actions": []
         }
 
-        Logger.logger.info("6. update runtime policy")
-        self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
+        notifcations_teams = [
+            {
+                "provider": "teams",
+                "teamsWebhookURL" : get_env("CHANNEL_WEBHOOK")
+            }
+        ]
 
-        Logger.logger.info("7. delete runtime policy")
+        update_runtime_policy_body["notifications"]  = notifcations_teams
+
+        
+        Logger.logger.info("6. update runtime policy with teams")
+        update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
+        self.validate_notifications(notifcations_teams, update_runtime_policy_body_res)
+
+
+        notifications_slack = [
+            {
+                "provider": "slack",
+                "slackChannel": {
+                    "id": get_env("SLACK_CHANNEL_ID")
+                }
+            }
+        ]
+
+        update_runtime_policy_body["notifications"]  = notifications_slack
+        Logger.logger.info("7. update runtime policy with slack")
+        update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
+        self.validate_notifications(notifications_slack, update_runtime_policy_body_res)
+
+
+        Logger.logger.info("8. delete runtime policy")
         self.validate_delete_policy(new_policy_guid)
 
-        Logger.logger.info("8. validate expected errors")
+        Logger.logger.info("9. validate expected errors")
         self.validate_expected_errors()
 
         self.delete_webhook(guid)
@@ -223,7 +253,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         return incident_rulesets["response"]
 
 
-    def validate_new_policy(self, body, notifications=[]):
+    def validate_new_policy(self, body):
         res = self.backend.new_runtime_policy(body)
         new_runtime_policy_no_scope_res = json.loads(res.text)
         assert new_runtime_policy_no_scope_res == POLICY_CREATED_RESPONSE, f"failed to create new runtime policy, got {new_runtime_policy_no_scope_res}"
@@ -252,32 +282,42 @@ class RuntimePoliciesConfigurations(BaseTest):
                 continue
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
-
-
-        provider_to_data = {
-            "webhook": "webhookChannel"
-        }
-
-        data_to_fields = {
-            "webhookChannel": ["guid", "name", "webhookURL"]
-        }
         
-
-        for i in range(len(notifications)):
-            found_provider = None
-            for j in range(len(incident_policies[0]["notifications"])):
-                if incident_policies[0]["notifications"][j]["provider"] == notifications[i]["provider"]:
-                    found_provider = incident_policies[0]["notifications"][j]["provider"]
-                    data = provider_to_data[found_provider]
-
-                    for field in data_to_fields[data]:
-                        assert incident_policies[0]["notifications"][j][data][field] == notifications[i][data][field], f"failed to get new runtime policy, expected notification '{notifications[i]}' but got {incident_policies[0]['notifications'][j]}, got result {incident_policies}"
-                    break
-                assert found_provider, f"failed to get new runtime policy, didnt find provider '{notifications[i]['provider']}' in {incident_policies[0]['notifications']}, got result {incident_policies}"
-
         guid = incident_policies[0]["guid"]
         self.tested_policy_guid.append(guid)
         return guid
+    
+
+    def validate_notifications(self, expected_notifications, policy):
+        provider_to_data = {
+            "webhook": "webhookChannel",
+            "slack": "slackChannel",
+            "teams": "teamsWebhookURL"
+        }
+
+        data_to_fields = {
+            "webhookChannel": ["guid", "name", "webhookURL"],
+            "slackChannel": ["id"]
+        }
+        
+
+        for i in range(len(expected_notifications)):
+            found_provider = None
+            for j in range(len(policy["notifications"])):
+                if policy["notifications"][j]["provider"] == expected_notifications[i]["provider"]:
+                    found_provider = policy["notifications"][j]["provider"]
+                    data = provider_to_data[found_provider]
+
+                    if found_provider == "teams":
+                        assert policy["notifications"][j][data] == expected_notifications[i][data], f"failed to get new runtime policy, expected notification '{expected_notifications}' but got {policy['notifications'][j]}, got result {policy}"
+                    else:
+                        for field in data_to_fields[data]:
+                            assert policy["notifications"][j][data][field] == expected_notifications[i][data][field], f"failed to get new runtime policy, expected notification '{expected_notifications}' but got {policy['notifications'][j]}, got result {policy}"
+                        break
+
+                assert found_provider, f"failed to get new runtime policy, didnt find provider '{expected_notifications[i]['provider']}' in {policy['notifications']}, got result {policy}"
+
+
     
 
     def validate_update_policy_against_backend(self, guid, body):
@@ -305,6 +345,7 @@ class RuntimePoliciesConfigurations(BaseTest):
         for prop in props_to_check:
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
+        return incident_policies[0]
 
     def validate_delete_policy(self, guid):
         body = {
