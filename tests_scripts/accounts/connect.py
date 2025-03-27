@@ -127,13 +127,14 @@ class CloudConnect(Accounts):
         Logger.logger.info('Stage 9: Connect cadr existing account')
         self.connect_cadr_existing_account(stack_region, self.cadr_stack_name_second, cloud_account_guid, log_location)
 
-        Logger.logger.info('Stage 10: disconnect the cspm account')
-        self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
-        self.tested_stacks.remove(self.cspm_stack_name)
+        if not self.skip_apis_validation:
+            Logger.logger.info('Stage 10: disconnect the cspm account')
+            self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
+            self.tested_stacks.remove(self.cspm_stack_name)
 
-        Logger.logger.info('Stage 11: return the cspm stack after disconnect')
-        new_arn =self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
-        assert new_arn == test_arn ,f"excepted the arns to be the same but got old:{test_arn} and new:{new_arn}"
+            Logger.logger.info('Stage 11: return the cspm stack after disconnect')
+            new_arn =self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+            assert new_arn == test_arn ,f"excepted the arns to be the same but got old:{test_arn} and new:{new_arn}"
 
         Logger.logger.info('Stage 12: Delete and validate feature cspm when cspm is first')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
