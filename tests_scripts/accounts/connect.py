@@ -26,7 +26,7 @@ class CloudConnect(Accounts):
         self.cspm_stack_name = None
         self.cadr_stack_name = None
 
-
+        self.skip_apis_validation = True
 
 
     def start(self):
@@ -49,9 +49,6 @@ class CloudConnect(Accounts):
         15. Validate aws regions
         16. Validate aws regions details
         """
-
-        Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
-        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -98,33 +95,34 @@ class CloudConnect(Accounts):
         Logger.logger.info('Stage 4: Connect cspm new account')
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name)
 
-        Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
-        # wait for success
-        self.wait_for_report(self.validate_accounts_cloud_list_cspm,
-                             timeout=1200,
-                             sleep_interval=60,
-                             cloud_account_guid=cloud_account_guid,
-                             arn=test_arn,
-                             scan_status=CSPM_SCAN_STATE_COMPLETED,
-                             account_status=ACCOUNT_STATUS_CONNECTED)
-        Logger.logger.info("the account has been scan successfully")
+        if not self.skip_apis_validation:
+            Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
+            # wait for success
+            self.wait_for_report(self.validate_accounts_cloud_list_cspm,
+                                timeout=1200,
+                                sleep_interval=60,
+                                cloud_account_guid=cloud_account_guid,
+                                arn=test_arn,
+                                scan_status=CSPM_SCAN_STATE_COMPLETED,
+                                account_status=ACCOUNT_STATUS_CONNECTED)
+            Logger.logger.info("the account has been scan successfully")
 
-        account = self.get_cloud_account(cloud_account_guid)
-        self.cspm_cloud_account_name = account["name"]
-        last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
-        Logger.logger.info("extracted last success scan id from created account")
+            account = self.get_cloud_account(cloud_account_guid)
+            self.cspm_cloud_account_name = account["name"]
+            last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
+            Logger.logger.info("extracted last success scan id from created account")
 
-        Logger.logger.info('Stage 6: Validate all scan results')
-        self.validate_scan_data(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
-        Logger.logger.info("all scan data is being validated successfully")
+            Logger.logger.info('Stage 6: Validate all scan results')
+            self.validate_scan_data(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
+            Logger.logger.info("all scan data is being validated successfully")
 
-        Logger.logger.info('Stage 7: Create Jira issue for resource')
-        self.create_jira_issue_for_cspm(last_success_scan_id)
-        Logger.logger.info("Jira issue for resource has been created successfully")
+            Logger.logger.info('Stage 7: Create Jira issue for resource')
+            self.create_jira_issue_for_cspm(last_success_scan_id)
+            Logger.logger.info("Jira issue for resource has been created successfully")
 
-        Logger.logger.info('Stage 8: accept the risk')
-        self.accept_cspm_risk(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
-        Logger.logger.info("risk has been accepted successfully")
+            Logger.logger.info('Stage 8: accept the risk')
+            self.accept_cspm_risk(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
+            Logger.logger.info("risk has been accepted successfully")
 
         Logger.logger.info('Stage 9: Connect cadr existing account')
         self.connect_cadr_existing_account(stack_region, self.cadr_stack_name_second, cloud_account_guid, log_location)
