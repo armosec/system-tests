@@ -26,7 +26,7 @@ class CloudConnect(Accounts):
         self.cspm_stack_name = None
         self.cadr_stack_name = None
 
-        self.skip_apis_validation = True
+        self.skip_apis_validation = False
 
 
     def start(self):
