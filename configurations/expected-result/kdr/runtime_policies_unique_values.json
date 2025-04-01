@@ -2,6 +2,7 @@
     "fields": {
         "name": [
             "Anomaly",
+            "CDR",
             "Malware"
         ],
         "ruleSetType": [
@@ -19,12 +20,16 @@
             {
                 "key": "Malware",
                 "count": 1
+            }, 
+            {
+                "key": "CDR",
+                "count": 1
             }
         ],
         "ruleSetType": [
             {
                 "key": "Managed",
-                "count": 2
+                "count": 3
             }
         ],
         "scope.designators.cluster": [],
