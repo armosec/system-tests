@@ -14,6 +14,19 @@ class IncidentResponse(Incidents):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        """
+        agenda:
+
+        1. Simulate unexpected process
+        2. Apply network policy - should succeed
+        3. Kill process - should succeed
+        4. Pause container - should succeed
+        5. Stop container - should succeed
+        6. Apply seccomp profile - should succeed
+        7. Kill process - should fail
+
+        """
+
     def start(self):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -28,7 +41,7 @@ class IncidentResponse(Incidents):
 
 
         # namespace = self.create_namespace()
-        Logger.logger.info('Simulate unexpected process')
+        Logger.logger.info('1. Simulate unexpected process')
         inc = self.simulate_unexpected_process(deployments_path=self.test_obj["deployments"],
                                                cluster=cluster, namespace=namespace, command="cat /etc/hosts", expected_incident_name="Unexpected process launched")
         
@@ -42,37 +55,49 @@ class IncidentResponse(Incidents):
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_NETWORK_POLICY,
                 "networkPolicyKind": "kubernetes"
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
+                "timeout": 150,
+                "sleep_interval": 10
             },
             "KillProcess": {
                 "body": {
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
+                "timeout": 90,
+                "sleep_interval": 10
             },
             "PauseContainer": {
                 "body": {
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE            
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
+                "timeout": 90,
+                "sleep_interval": 10
             },
             "StopContainer": {
                 "body": {
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_STOP
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
+                "timeout": 90,
+                "sleep_interval": 10
             },
             "ApplySeccompProfile": {
                 "body": {
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE            
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
+                 "timeout": 150,
+                "sleep_interval": 10
             },
              "KillProcess": {
                 "body": {
                 "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
                 },
-                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_FAILED
+                "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_FAILED,
+                "timeout": 90,
+                "sleep_interval": 10
             },
         }
 
@@ -81,10 +106,12 @@ class IncidentResponse(Incidents):
         for test_name, test_body in tests_to_body.items():
             body = test_body["body"]
             expected_applied_status = test_body["expected_applied_status"]
+            timeout = test_body["timeout"]
+            sleep_interval = test_body["sleep_interval"]
 
             Logger.logger.info(f"Testing {test_name} with body {body}")
             try:
-                self.response_and_assert(incident_guid=inc["guid"], body=body, expected_applied_status=expected_applied_status)
+                self.response_and_assert(incident_guid=inc["guid"], body=body, expected_applied_status=expected_applied_status, timeout=timeout, sleep_interval=sleep_interval)
                 Logger.logger.info(f"Test {test_name} with body {body} was successful")
             except Exception as e:
                 Logger.logger.error(f"Failed to test {test_name} with body {body}, got exception {e}")
@@ -102,7 +129,7 @@ class IncidentResponse(Incidents):
     def cleanup(self, **kwargs):
         return statics.SUCCESS, "Cleanup done"
 
-    def response_and_assert(self, incident_guid, body, expected_applied_status):
+    def response_and_assert(self, incident_guid, body, expected_applied_status, timeout=120, sleep_interval=10):
         """
         This function is used to send a response to an incident and assert the response.
         :param incident_guid: The GUID of the incident to respond to.
@@ -110,10 +137,10 @@ class IncidentResponse(Incidents):
         :return: The response from the backend.
         """
         Logger.logger.info(f"Response to incident {incident_guid} with body {body}")
-        _ = self.backend.response_incident(incident_id=incident_guid, body=body, expected_applied_status=expected_applied_status)
+        _ = self.backend.response_incident(incident_id=incident_guid, body=body)
         
         auditlog, _ = self.wait_for_report(self.verify_audit_log, timeout=120, sleep_interval=10,
-                                            incident_guid=incident_guid, action=body["responseType"])
+                                            incident_guid=incident_guid, action=body["responseType"],  expected_applied_status=expected_applied_status)
     
     def verify_audit_log(self, incident_guid, action, expected_applied_status):
         Logger.logger.info("Get incidents list")
