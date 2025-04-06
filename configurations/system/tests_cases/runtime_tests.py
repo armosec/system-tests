@@ -1,7 +1,7 @@
 import inspect
 
 from tests_scripts.runtime.alerts import enrich_slack_alert_notifications, enrich_teams_alert_notifications
-from tests_scripts.users_notifications.alert_notifications import enrich_slack_alert_channel, enrich_teams_alert_channel, get_messages_from_slack_channel, get_messages_from_teams_channel
+from tests_scripts.users_notifications.alert_notifications import get_messages_from_slack_channel, get_messages_from_teams_channel
 from .structures import KubescapeConfiguration, TestConfiguration
 from os.path import join
 from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
