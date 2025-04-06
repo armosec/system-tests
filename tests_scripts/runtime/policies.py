@@ -92,8 +92,8 @@ class RuntimePoliciesConfigurations(BaseTest):
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
             TestUtil.save_expceted_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
 
-        # expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
-        # TestUtil.compare_jsons(expected_unique_values, unique_values, [])
+        expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
+        TestUtil.compare_jsons(expected_unique_values, unique_values, [])
 
         rand = str(random.randint(10000000, 99999999))
 
