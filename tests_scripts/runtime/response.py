@@ -20,11 +20,11 @@ class IncidentResponse(Incidents):
         cluster, namespace = self.setup(apply_services=False)
 
 
-        # Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
-        # self.add_and_upgrade_armo_to_repo()
-        # self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        # self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
-        #                      namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
+                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
 
         # namespace = self.create_namespace()
