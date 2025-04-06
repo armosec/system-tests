@@ -20,6 +20,7 @@ class Incidents(BaseHelm):
     def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
         super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
         self.helm_kwargs = {
+            "capabilities.manageWorkloads":"enable",
             "capabilities.configurationScan": "disable",
             "capabilities.continuousScan": "disable",
             "capabilities.nodeScan": "disable",
@@ -57,29 +58,9 @@ class Incidents(BaseHelm):
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
-        Logger.logger.info('apply workloads')
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
-        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
-        if isinstance(wlids, str):
-            wlids = [wlids]
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
-
-        Logger.logger.info(
-            f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
-        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
-
-        Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
-                                       cluster=cluster, namespace=namespace,
-                                       incident_name=["Unexpected process launched","Unexpected Sensitive File Access"])
-        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
-        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=10 * 60, sleep_interval=10,
-                                      incident_id=incs[0]['guid'])
-        Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
-            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        Logger.logger.info('Simulate unexpected process')
+        inc = self.simulate_unexpected_process(deployments_path=self.test_obj["deployments"],
+                                               cluster=cluster, namespace=namespace, command="cat /etc/hosts", expected_incident_name="Unexpected process launched")
 
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
@@ -99,6 +80,34 @@ class Incidents(BaseHelm):
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
+
+    def simulate_unexpected_process(self, deployments_path: str, cluster: str, namespace: str, command: str, expected_incident_name: str = "Unexpected process launched"):
+        Logger.logger.info(f"Simulate unexpected process from {deployments_path}")
+        Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
+        workload_objs: list = self.apply_directory(path=deployments_path, namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+        if isinstance(wlids, str):
+            wlids = [wlids]
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
+
+        Logger.logger.info(
+            f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
+        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
+        time.sleep(30)
+        self.exec_pod(wlid=wlids[0], command=command)
+
+        Logger.logger.info("Get incidents list")
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
+                                       cluster=cluster, namespace=namespace,
+                                       incident_name=[expected_incident_name])
+        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
+        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=10 * 60, sleep_interval=10,
+                                      incident_id=incs[0]['guid'])
+        Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
+            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        
+        return inc
 
     def verify_kdr_monitored_counters(self, cluster: str):
         Logger.logger.info("Get monitored assets")
