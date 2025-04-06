@@ -60,7 +60,7 @@ class Incidents(BaseHelm):
 
         Logger.logger.info('Simulate unexpected process')
         inc = self.simulate_unexpected_process(deployments_path=self.test_obj["deployments"],
-                                               cluster=cluster, namespace=namespace, command="cat /etc/hosts", incident_name="Unexpected process launched")
+                                               cluster=cluster, namespace=namespace, command="cat /etc/hosts", expected_incident_name="Unexpected process launched")
 
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
