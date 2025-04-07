@@ -1,16 +1,14 @@
+
 import json
 import time
 
-
+from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
 from tests_scripts.helm.base_helm import BaseHelm
 
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
-
-
-
 
 class Incidents(BaseHelm):
     """
@@ -40,28 +38,51 @@ class Incidents(BaseHelm):
             "nodeAgent.config.learningPeriod": "50s",
             "nodeAgent.config.updatePeriod": "30s",
             "nodeAgent.config.nodeProfileInterval": "1m",
-            # "nodeAgent.image.repository": "docker.io/amitschendel/node-agent",
-            # "nodeAgent.image.tag": "v0.0.5",
+            "nodeAgent.config.hostMalwareSensor": "enable",
+            "nodeAgent.config.hostNetworkSensor": "enable",
+            "nodeAgent.image.repository": "quay.io/armosec/image-registry-test",
+            "nodeAgent.image.tag": "private-node-agentfixed-amd64",
+            "logger.level": "debug",
         }
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
 
     def start(self):
-        assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         cluster, namespace = self.setup()
-
         Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
+        self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help"])
+        self.test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self.test_connection_to_malicious_destination(wlids=wlids, command="wget sodiumlaurethsulfatedesyroyer.com", cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
+        self.test_malware_found(wlids=wlids, command="cat /root/malware.o", cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
+        return self.cleanup()
+        
+    
+    def test_malware_found(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
+        Logger.logger.info(f"Simulate malware found from {wlids}")
+        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name, sleep_after_cmd=60)
+        assert inc['md5Hash'] == MALWARE_INCIDENT_MD5, f"Expected md5Hash to be {MALWARE_INCIDENT_MD5}, got {inc['md5Hash']}"
+    
+    def test_connection_to_malicious_destination(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
+        Logger.logger.info(f"Simulate connection to malicious destination from {wlids}")
+        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
+        assert inc['networkscan']['domain'] == MALICIOUS_DOMAIN, f"Expected domain to be {MALICIOUS_DOMAIN}, got {inc['networkscan']['domain']}"
 
-        Logger.logger.info('Simulate unexpected process')
-        inc = self.simulate_unexpected_process(deployments_path=self.test_obj["deployments"],
-                                               cluster=cluster, namespace=namespace, command="cat /etc/hosts", expected_incident_name="Unexpected process launched")
-
+    def test_unexpected_process(self, wlids: list, command: str, cluster: str, namespace: str, 
+                                  expected_incident_name: str = "Unexpected process launched"):
+        """
+        Original function now using the split functions
+        """
+        Logger.logger.info(f"Simulate unexpected process from {wlids}")
+        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
@@ -77,37 +98,51 @@ class Incidents(BaseHelm):
         self.resolve_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
-        self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
-        return self.cleanup()
 
-    def simulate_unexpected_process(self, deployments_path: str, cluster: str, namespace: str, command: str, expected_incident_name: str = "Unexpected process launched"):
-        Logger.logger.info(f"Simulate unexpected process from {deployments_path}")
-        Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
-        workload_objs: list = self.apply_directory(path=deployments_path, namespace=namespace)
-        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
-        if isinstance(wlids, str):
-            wlids = [wlids]
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
-
-        Logger.logger.info(
-            f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
+    def create_application_profile(self, wlids: list, namespace: str, commands: list[str] = None):
+        for command in commands:
+            self.exec_pod(wlid=wlids[0], command=command)
+        
+        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(30)
-        self.exec_pod(wlid=wlids[0], command=command)
 
+
+    def run_and_wait_for_incident(self, wlids: list, command: str, cluster: str, namespace: str, 
+                                expected_incident_name: str = "Unexpected process launched", sleep_after_cmd: int = 0) -> dict:
+        """
+        Execute command in pod and wait for incident to be completed
+        """
+        self.exec_pod(wlid=wlids[0], command=command)
+        time.sleep(sleep_after_cmd)
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
                                        cluster=cluster, namespace=namespace,
                                        incident_name=[expected_incident_name])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
+        
         inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=10 * 60, sleep_interval=10,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
         return inc
+
+    def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
+        """
+        Deploy workloads and wait for pods and application profiles to be ready
+        """
+        Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
+        workload_objs: list = self.apply_directory(path=deployments_path, namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+        if isinstance(wlids, str):
+            wlids = [wlids]
+        
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)        
+        return wlids
 
     def verify_kdr_monitored_counters(self, cluster: str):
         Logger.logger.info("Get monitored assets")

@@ -1,4 +1,4 @@
-
+from tests_scripts.runtime.consts import *
 
 import json
 from random import random
@@ -59,6 +59,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         5. apply the deployment that will generate the incident
         6. wait for the runtime incidents to be generated
         7. verify messages were sent
+        8. verify old data in backend
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -135,7 +136,39 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
         res = self.wait_for_report(self.assert_all_messages_sent,
                                    timeout=5 * 60,
                                    begin_time=before_test_message_ts, cluster=self.cluster)
+        
+        Logger.logger.info('8. verify old data in backend')
+        self.verify_old_data_in_backend()
+
         return self.cleanup()
+    
+    def verify_old_data_in_backend(self):
+        filters_dict = {
+            "designators.attributes.cluster": OLD_CLUSTER_NAME,
+        }
+        res = self.backend.get_incidents(filters=filters_dict)
+        assert res.status_code == 200, f"Failed to get incidents list {res.text}"
+        incidents = json.loads(res.text)
+        incident = incidents[0]
+        assert len(incidents) != 1, f"Expected to have 1 incident, got {len(incidents)}"
+        assert incident['name'] == OLD_INCIDENT_NAME, f"Expected to have incident name {OLD_INCIDENT_NAME}, got {incident['name']}"
+        assert incident['attributes']['incidentStatus'] == "completed", f"Expected to have incident status completed, got {incident['attributes']['incidentStatus']}"
+        assert incident['attributes']['responseStates']['networkPolicyStatus'] == 3, f"Expected to have network policy status 3, got {incident['attributes']['responseStates']['networkPolicyStatus']}"
+        res = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
+        assert len(res) != 2, f"Expected to have 2 alerts, got {len(res)}"
+        
+        expected_descriptions = dict()
+        expected_descriptions["Exec to pod detected on pod afek-test"] = False
+        expected_descriptions["Unexpected process launched: /bin/cat"] = False
+        
+        for alert in res['response']:
+            assert alert['clusterName'] == OLD_CLUSTER_NAME, f"Expected to have cluster name {OLD_CLUSTER_NAME}, got {alert['clusterName']}"
+            expected_descriptions[alert['ruleDescription']] = True
+                
+        for description, expected in expected_descriptions.items():
+            assert expected, f"Expected to have description {description}, got {expected}"
+            
+
 
     def verify_incident_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
