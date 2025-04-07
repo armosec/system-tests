@@ -52,8 +52,8 @@ class IncidentResponse(Incidents):
         tests_to_body = {
             "ApplyNetworkPolicy": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_NETWORK_POLICY,
-                "networkPolicyKind": "kubernetes"
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_NETWORK_POLICY,
+                    "networkPolicyKind": "kubernetes"
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                 "timeout": 150,
@@ -61,7 +61,7 @@ class IncidentResponse(Incidents):
             },
             "KillProcess": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                 "timeout": 90,
@@ -69,7 +69,7 @@ class IncidentResponse(Incidents):
             },
             "PauseContainer": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE            
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE            
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                 "timeout": 90,
@@ -77,7 +77,7 @@ class IncidentResponse(Incidents):
             },
             "StopContainer": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_STOP
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_STOP
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                 "timeout": 90,
@@ -85,15 +85,15 @@ class IncidentResponse(Incidents):
             },
             "ApplySeccompProfile": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE            
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE            
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                  "timeout": 150,
                 "sleep_interval": 10
             },
-             "KillProcess": {
+             "KillProcess Failed": {
                 "body": {
-                "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
+                    "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL            
                 },
                 "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_FAILED,
                 "timeout": 90,
