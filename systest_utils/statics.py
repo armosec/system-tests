@@ -292,6 +292,15 @@ HELM_STORAGE_LIMITS_MEMORY = "storage.resources.limits.memory"
 # cli arguments
 CREATE_TEST_FIRST_TIME_RESULTS = "create_first_time_results"
 
+RUNTIME_INCIDENT_RESPONSE_TYPE_KILL = "Kill"
+RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE = "Pause"
+RUNTIME_INCIDENT_RESPONSE_TYPE_STOP = "Stop"
+RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_NETWORK_POLICY = "ApplyNetworkPolicy"
+RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE = "ApplySeccompProfile"
+
+RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS = "Success"
+RUNTIME_INCIDENT_APPLIED_STATUS_FAILED = "Failed"
+
 class Statistics(object):
     clear_state = "clear"
     attached_state = "attached"
