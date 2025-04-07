@@ -80,24 +80,50 @@ class Incidents(BaseHelm):
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
         return self.cleanup()
+    
+    def apply_directory_and_verify(self, path: str, namespace: str):
+        """
+        Apply the directory and verify that the workloads are running.
+        """
+        Logger.logger.info(f"Simulate unexpected process from {path}")
+        Logger.logger.info(f"Apply workload from {path} to {namespace}")
+        Logger.logger.info(f"Apply directory {path} to {namespace}")
+        workload_objs: list = self.apply_directory(path=path, namespace=namespace)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
+        return workload_objs
 
-    def simulate_unexpected_process(self, deployments_path: str, cluster: str, namespace: str, command: str, expected_incident_name: str = "Unexpected process launched"):
+
+    def simulate_unexpected_process(self, deployments_path: str, cluster: str, namespace: str, command: str, expected_incident_name: str = "Unexpected process launched", apply_workload: bool = True, wlids: list = None, verify_backend=True, wait_for_application_profile_cache=30):
         Logger.logger.info(f"Simulate unexpected process from {deployments_path}")
         Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
-        workload_objs: list = self.apply_directory(path=deployments_path, namespace=namespace)
-        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+        if apply_workload:
+            workload_objs = self.apply_directory_and_verify(path=deployments_path, namespace=namespace)
+            Logger.logger.info(f"Get workloads wlids")
+            wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+        else:
+            if wlids is None:
+                raise Exception("wlids is None, please provide wlids")
+            Logger.logger.info(f"wlids are {wlids}")
+
         if isinstance(wlids, str):
-            wlids = [wlids]
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
+                wlids = [wlids]
+
 
         Logger.logger.info(
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(30)
+        time.sleep(wait_for_application_profile_cache)
         self.exec_pod(wlid=wlids[0], command=command)
 
+        if verify_backend:
+            return self.verify_unexpected_process_on_backend(cluster=cluster, namespace=namespace,
+                                                      expected_incident_name=expected_incident_name)    
+        else:
+            return None
+    
+    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
         Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                        cluster=cluster, namespace=namespace,
                                        incident_name=[expected_incident_name])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
@@ -108,6 +134,7 @@ class Incidents(BaseHelm):
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
         return inc
+
 
     def verify_kdr_monitored_counters(self, cluster: str):
         Logger.logger.info("Get monitored assets")
