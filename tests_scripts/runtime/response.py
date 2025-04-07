@@ -293,7 +293,7 @@ class IncidentResponse(Incidents):
 
         tests_to_errors = {}
 
-        Logger.logger.info(f"Testing incident response with tests {tests_to_body.keys()}")
+        Logger.logger.info(f"Testing incident response with tests {list(tests_to_body.keys())}")
         for test_name, test_body in tests_to_body.items():
             incident = test_body["incident"]
             for phase_name in test_body["phases"]:
@@ -313,14 +313,23 @@ class IncidentResponse(Incidents):
                         sleep_interval=sleep_interval,
                     )
                     Logger.logger.info(f"Test {test_name} phase {phase_name} passed")
+                    tests_to_errors[test_name] = None
                 except Exception as e:
                     Logger.logger.error(f"Failed to test {test_name} phase {phase_name} with body {body}, got exception {e}")
                     tests_to_errors[test_name] = str(e)
 
-        if len(tests_to_errors) > 0:
-            for test_name, error in tests_to_errors.items():
-                Logger.logger.error(f"Test {test_name} failed with error: {error}")
+        # Nicely formatted summary
+        Logger.logger.info("\n========== Test Summary ==========")
+        for test_name, error in tests_to_errors.items():
+            if error is None:
+                Logger.logger.info(f"[✔] {test_name} passed")
+            else:
+                Logger.logger.error(f"[✖] {test_name} failed - {error}")
+        Logger.logger.info("==================================\n")
+
+        if any(tests_to_errors.values()):
             raise Exception(f"Failed to test the following tests: {tests_to_errors}")
+
 
         
 
