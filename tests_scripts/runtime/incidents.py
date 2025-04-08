@@ -40,10 +40,16 @@ class Incidents(BaseHelm):
             "nodeAgent.config.nodeProfileInterval": "1m",
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
-            "nodeAgent.image.repository": "quay.io/armosec/image-registry-test",
-            "nodeAgent.image.tag": "private-node-agentfixed-amd64",
+            "nodeAgent.image.repository": "quay.io/armosec/node-agent",
+            "nodeAgent.image.tag": "latest",
             "logger.level": "debug",
+            "imagePullSecret.password": "Q5UMRCFPRAHAIRWAYTOP7P4PK9ZNV2H26JFTB70CMNZ2KG1NHGPYXK6PNPNC677E",
+            "imagePullSecret.server": "quay.io",
+            "imagePullSecret.username": "armosec+armosec_ro",
+            "imagePullSecrets": "armosec-readonly",
+
         }
+
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
