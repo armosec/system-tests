@@ -31,7 +31,7 @@ class IncidentResponse(Incidents):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         tests = self.test_obj["tests"]
-        with_private_node_agent = self.test_obj.get("with_private_node_agent", False)
+        with_private_node_agent = self.test_obj["with_private_node_agent"] if "with_private_node_agent" in self.test_obj else False
 
         Logger.logger.info(f"Tests to run: {tests}")
 
