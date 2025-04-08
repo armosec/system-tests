@@ -3,6 +3,8 @@
 import json
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
+import re
+from typing import Optional
 
 
 class IncidentResponse(Incidents):
@@ -45,6 +47,16 @@ class IncidentResponse(Incidents):
 
 
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
+        helm = self.backend.get_helm()
+
+        repository = extract_set_param(helm["installCommand"], "nodeAgent.image.repository")
+        assert repository is not None, f"Failed to extract nodeAgent.image.repository from helm command: {helm['installCommand']}"
+        tag = extract_set_param(helm["installCommand"], "nodeAgent.image.tag")
+        assert tag is not None, f"Failed to extract nodeAgent.image.tag from helm command: {helm['installCommand']}"
+
+        self.helm_kwargs["nodeAgent.image.repository"] = repository
+        self.helm_kwargs["nodeAgent.image.tag"] = tag
+
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
@@ -353,3 +365,21 @@ def get_log_action_name(action):
         statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE: "Apply Seccomp Profile",
     }
     return mapping.get(action, action)  # fallback to original if not found
+
+
+def extract_set_param(command: str, param_name: str) -> Optional[str]:
+    """
+    Extracts the value of a given --set parameter from a Helm command string.
+
+    Args:
+        command (str): The Helm install or upgrade command string.
+        param_name (str): The parameter name to extract (e.g., "nodeAgent.image.repository").
+
+    Returns:
+        Optional[str]: The value of the parameter, or None if not found.
+    """
+    # Escape dots for regex and build pattern
+    pattern = rf'--set {re.escape(param_name)}=([^\s]+)'
+    match = re.search(pattern, command)
+
+    return match.group(1) if match else None
