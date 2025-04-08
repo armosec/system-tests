@@ -3,8 +3,6 @@
 import json
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
-import re
-from typing import Optional
 
 
 class IncidentResponse(Incidents):
@@ -33,6 +31,7 @@ class IncidentResponse(Incidents):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         tests = self.test_obj["tests"]
+        with_private_node_agent = self.test_obj.get("with_private_node_agent", False)
 
         Logger.logger.info(f"Tests to run: {tests}")
 
@@ -47,30 +46,8 @@ class IncidentResponse(Incidents):
 
 
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
-        helm = self.backend.get_helm()
-
-        repository = extract_set_param(helm["installCommand"], "nodeAgent.image.repository")
-        assert repository is not None, f"Failed to extract nodeAgent.image.repository from helm command: {helm['installCommand']}"
-        tag = extract_set_param(helm["installCommand"], "nodeAgent.image.tag")
-        assert tag is not None, f"Failed to extract nodeAgent.image.tag from helm command: {helm['installCommand']}"
-        secret_password = extract_set_param(helm["installCommand"], "imagePullSecret.password")
-        assert secret_password is not None, f"Failed to extract imagePullSecret.password from helm command: {helm['installCommand']}"
-        secret_server = extract_set_param(helm["installCommand"], "imagePullSecret.server")
-        assert secret_server is not None, f"Failed to extract imagePullSecret.server from helm command: {helm['installCommand']}"
-        secret_username = extract_set_param(helm["installCommand"], "imagePullSecret.username")
-        assert secret_username is not None, f"Failed to extract imagePullSecret.username from helm command: {helm['installCommand']}"
-        pull_secrets = extract_set_param(helm["installCommand"], "imagePullSecrets")
-        assert pull_secrets is not None, f"Failed to extract imagePullSecrets from helm command: {helm['installCommand']}"
-
-        self.helm_kwargs["nodeAgent.image.repository"] = repository
-        self.helm_kwargs["nodeAgent.image.tag"] = tag
-        self.helm_kwargs["imagePullSecret.password"] = secret_password
-        self.helm_kwargs["imagePullSecret.server"] = secret_server
-        self.helm_kwargs["imagePullSecret.username"] = secret_username
-        self.helm_kwargs["imagePullSecrets"] = pull_secrets
-
         self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs, private_node_agent=with_private_node_agent)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
@@ -96,6 +73,9 @@ class IncidentResponse(Incidents):
         self._execute_incident_tests(tests_to_body)
 
         return self.cleanup()
+
+    def cleanup(self):
+        return statics.SUCCESS, "Test completed successfully"
         
 
     def response_and_assert(self, incident_guid, body, expected_applied_status, timeout=120, sleep_interval=10):
@@ -378,20 +358,3 @@ def get_log_action_name(action):
     }
     return mapping.get(action, action)  # fallback to original if not found
 
-
-def extract_set_param(command: str, param_name: str) -> Optional[str]:
-    """
-    Extracts the value of a given --set parameter from a Helm command string.
-
-    Args:
-        command (str): The Helm install or upgrade command string.
-        param_name (str): The parameter name to extract (e.g., "nodeAgent.image.repository").
-
-    Returns:
-        Optional[str]: The value of the parameter, or None if not found.
-    """
-    # Escape dots for regex and build pattern
-    pattern = rf'--set {re.escape(param_name)}=([^\s]+)'
-    match = re.search(pattern, command)
-
-    return match.group(1) if match else None
