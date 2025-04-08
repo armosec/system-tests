@@ -30,12 +30,18 @@ class IncidentResponse(Incidents):
     def start(self):
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
-        cluster, namespace_test_network_policy = self.setup(apply_services=False)
-        namespace_test_kill_process = self.create_namespace()
-        namespace_test_container = self.create_namespace()
-        namespace_apply_seccomp_profile = self.create_namespace()
-        namespaces = [namespace_test_network_policy, namespace_test_kill_process, namespace_test_container, namespace_apply_seccomp_profile]
+        tests = self.test_obj["tests"]
 
+        Logger.logger.info(f"Tests to run: {tests}")
+
+        test_to_namespace = {}
+
+        cluster, _ = self.setup(apply_services=False)
+
+        for response in tests:
+            test_to_namespace[response] = self.create_namespace()
+
+        namespaces = list(test_to_namespace.values())
 
 
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
@@ -58,11 +64,8 @@ class IncidentResponse(Incidents):
         # testing happy flow - order is important because, for example, if we apply seccomp profile and then kill process, the kill process will fail
         Logger.logger.info("5. Build test bodies for incident response")
         tests_to_body = self._build_test_bodies(
-            namespace_to_incident,
-            namespace_test_network_policy,
-            namespace_test_kill_process,
-            namespace_test_container,
-            namespace_apply_seccomp_profile,
+            test_to_namespace,
+            namespace_to_incident
         )
 
         Logger.logger.info(f"6. Testing incident response with tests {tests_to_body.keys()}")
@@ -218,8 +221,8 @@ class IncidentResponse(Incidents):
         return namespace_to_incident
 
 
-    def _build_test_bodies(self, namespace_to_incident, ns_net, ns_kill, ns_cont, ns_seccomp):
-        return {
+    def _build_test_bodies(self, test_to_namespace, namespace_to_incident):
+        all_test_data = {
             "ApplyNetworkPolicy": {
                 "phases": {
                     "step 1: Apply Network Policy": {
@@ -232,26 +235,24 @@ class IncidentResponse(Incidents):
                         "sleep_interval": 20,
                     },
                 },
-                "incident": namespace_to_incident[ns_net],
             },
             "KillProcess": {
                 "phases": {
                     "step 1: Kill Process": {
                         "body": {
-                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL
+                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_KILL,
                         },
                         "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                         "timeout": 90,
                         "sleep_interval": 20,
                     },
                 },
-                "incident": namespace_to_incident[ns_kill],
             },
             "Container": {
                 "phases": {
                     "step 1: Pause Container": {
                         "body": {
-                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE
+                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_PAUSE,
                         },
                         "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                         "timeout": 90,
@@ -259,29 +260,39 @@ class IncidentResponse(Incidents):
                     },
                     "step 2: Stop Container": {
                         "body": {
-                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_STOP
+                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_STOP,
                         },
                         "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                         "timeout": 90,
                         "sleep_interval": 20,
                     },
                 },
-                "incident": namespace_to_incident[ns_cont],
             },
             "ApplySeccompProfile": {
                 "phases": {
                     "step 1: Apply Seccomp Profile": {
                         "body": {
-                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE
+                            "responseType": statics.RUNTIME_INCIDENT_RESPONSE_TYPE_APPLY_SECCOMP_PROFILE,
                         },
                         "expected_applied_status": statics.RUNTIME_INCIDENT_APPLIED_STATUS_SUCCESS,
                         "timeout": 150,
                         "sleep_interval": 10,
                     },
                 },
-                "incident": namespace_to_incident[ns_seccomp],
             },
         }
+
+        result = {}
+        for test_name, namespace in test_to_namespace.items():
+            if test_name in all_test_data:
+                result[test_name] = {
+                    "phases": all_test_data[test_name]["phases"],
+                    "incident": namespace_to_incident[namespace],
+                }
+
+        return result
+
+
 
 
     def _execute_incident_tests(self, tests_to_body):
@@ -319,7 +330,7 @@ class IncidentResponse(Incidents):
                     tests_to_errors[test_name] = str(e)
 
         # Nicely formatted summary
-        Logger.logger.info("\n========== Test Summary ==========")
+        Logger.logger.info("========== Test Summary ==========")
         for test_name, error in tests_to_errors.items():
             if error is None:
                 Logger.logger.info(f"[✔] {test_name} passed")

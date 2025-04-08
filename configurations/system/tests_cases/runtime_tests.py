@@ -59,6 +59,7 @@ class RuntimeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=IncidentResponse,
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            tests=["ApplyNetworkPolicy", "ApplySeccompProfile"],
             # create_test_tenant=True,
         )
     
