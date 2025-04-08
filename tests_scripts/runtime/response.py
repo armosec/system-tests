@@ -53,9 +53,21 @@ class IncidentResponse(Incidents):
         assert repository is not None, f"Failed to extract nodeAgent.image.repository from helm command: {helm['installCommand']}"
         tag = extract_set_param(helm["installCommand"], "nodeAgent.image.tag")
         assert tag is not None, f"Failed to extract nodeAgent.image.tag from helm command: {helm['installCommand']}"
+        secret_password = extract_set_param(helm["installCommand"], "imagePullSecret.password")
+        assert secret_password is not None, f"Failed to extract imagePullSecret.password from helm command: {helm['installCommand']}"
+        secret_server = extract_set_param(helm["installCommand"], "imagePullSecret.server")
+        assert secret_server is not None, f"Failed to extract imagePullSecret.server from helm command: {helm['installCommand']}"
+        secret_username = extract_set_param(helm["installCommand"], "imagePullSecret.username")
+        assert secret_username is not None, f"Failed to extract imagePullSecret.username from helm command: {helm['installCommand']}"
+        pull_secrets = extract_set_param(helm["installCommand"], "imagePullSecrets")
+        assert pull_secrets is not None, f"Failed to extract imagePullSecrets from helm command: {helm['installCommand']}"
 
         self.helm_kwargs["nodeAgent.image.repository"] = repository
         self.helm_kwargs["nodeAgent.image.tag"] = tag
+        self.helm_kwargs["imagePullSecret.password"] = secret_password
+        self.helm_kwargs["imagePullSecret.server"] = secret_server
+        self.helm_kwargs["imagePullSecret.username"] = secret_username
+        self.helm_kwargs["imagePullSecrets"] = pull_secrets
 
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
