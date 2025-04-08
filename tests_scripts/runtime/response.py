@@ -1,6 +1,5 @@
-
-
 import json
+import time
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
 
@@ -185,27 +184,19 @@ class IncidentResponse(Incidents):
         :return: A dictionary mapping each namespace to its incident.
         """
         wait_for_application_profile_cache = 30
-
+        wlid_to_namespace = {}
         for namespace in namespaces:
             Logger.logger.info(f"Simulating unexpected process in namespace {namespace}")
-            _ = self.simulate_unexpected_process(
-                deployments_path=self.test_obj["deployments"],
-                cluster=cluster,
-                namespace=namespace,
-                command="cat /etc/hosts",
-                expected_incident_name="Unexpected process launched",
-                apply_workload=False,
-                wlids=namespace_to_wlid[namespace],
-                verify_backend=False,
-                wait_for_application_profile_cache=wait_for_application_profile_cache,
-            )
+            wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], 
+                                        cluster=cluster, 
+                                        namespace=namespace)
+            wlid_to_namespace[wlids[0]] = namespace
+        time.sleep(wait_for_application_profile_cache)
 
-            # after we waited on first iteration, no need to wait again
-            if wait_for_application_profile_cache > 0:
-                wait_for_application_profile_cache = 0
-
-            Logger.logger.info(f"Simulated unexpected process in namespace {namespace} with wlids {namespace_to_wlid[namespace]}")
-
+        for wlid in wlid_to_namespace:
+            self.wait_for_report(self.verify_application_profiles, wlids=[wlid], namespace=wlid_to_namespace[wlid])
+            self.exec_pod(wlid=wlid, command="cat /etc/hosts")
+            
         Logger.logger.info('Verify unexpected process on backend')
         namespace_to_incident = {}
         for namespace in namespaces:
