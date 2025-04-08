@@ -124,6 +124,7 @@ API_RUNTIME_POLICIES_LIST = "/api/v1/runtime/policies/list"
 API_RUNTIME_POLICIES = "/api/v1/runtime/policies"
 API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 
+
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
 API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
 
@@ -653,6 +654,18 @@ class ControlPanelAPI(object):
     def get_incident(self, incident_id: str):
         url = API_RUNTIME_INCIDENTS + "/" + incident_id
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def response_incident(self, incident_id: str, body: str):
+        url = API_RUNTIME_INCIDENTS + "/" + incident_id + "/response"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def audit_log_incident(self, incident_id: str, body: str):
+        url = API_RUNTIME_INCIDENTS + "/" + incident_id + "/auditlog"
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 

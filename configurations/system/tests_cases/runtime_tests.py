@@ -52,3 +52,24 @@ class RuntimeTests(object):
             enrichAlertChannelFunc=enrich_slack_alert_notifications,
         )
     
+    @staticmethod
+    def kdr_response_by_user():
+        from tests_scripts.runtime.response import IncidentResponse
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=IncidentResponse,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            # create_test_tenant=True,
+        )
+    
+    # @staticmethod
+    # def kdr_webhook_alerts():
+    #     from tests_scripts.runtime.alerts import IncidentsAlerts
+    #     return TestConfiguration(
+    #         name=inspect.currentframe().f_code.co_name,
+    #         test_obj=IncidentsAlerts,
+    #         deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+    #         getMessagesFunc=get_messages_from_webhook_channel,
+    #         enrichAlertChannelFunc=enrich_webhooks_alert_notifications,
+    #     )
+    

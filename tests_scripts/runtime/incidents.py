@@ -105,16 +105,6 @@ class Incidents(BaseHelm):
         self.check_incident_resolved_false_positive(inc)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
 
-
-    def create_application_profile(self, wlids: list, namespace: str, commands: list[str] = None):
-        for command in commands:
-            self.exec_pod(wlid=wlids[0], command=command)
-        
-        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
-        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(30)
-
-
     def run_and_wait_for_incident(self, wlids: list, command: str, cluster: str, namespace: str, 
                                 expected_incident_name: str = "Unexpected process launched", sleep_after_cmd: int = 0) -> dict:
         """
@@ -122,8 +112,11 @@ class Incidents(BaseHelm):
         """
         self.exec_pod(wlid=wlids[0], command=command)
         time.sleep(sleep_after_cmd)
+        return self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
+    
+    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
         Logger.logger.info("Get incidents list")
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                        cluster=cluster, namespace=namespace,
                                        incident_name=[expected_incident_name])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
@@ -136,6 +129,14 @@ class Incidents(BaseHelm):
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
         return inc
+
+    def create_application_profile(self, wlids: list, namespace: str, commands: list[str] = None):
+        for command in commands:
+            self.exec_pod(wlid=wlids[0], command=command)
+        
+        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
+        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
+        time.sleep(30)
 
     def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
         """
