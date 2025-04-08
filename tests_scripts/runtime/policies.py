@@ -6,7 +6,7 @@ import random
 
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import Logger, TestUtil, statics
-from tests_scripts.base_test import BaseTest
+from tests_scripts.runtime.incidents import Incidents
 from tests_scripts.users_notifications.alert_notifications import get_env
 from tests_scripts.workflows.utils import WEBHOOK_NAME
 
@@ -21,7 +21,7 @@ POLICY_UPDATED_RESPONSE = "Incident policy updated"
 POLICY_DELETED_RESPONSE = "Incident policy deleted"
 
 
-class RuntimePoliciesConfigurations(BaseTest):
+class RuntimePoliciesConfigurations(Incidents):
     """
         check incidents policy configurations - list, create, update, delete, unique values
     """

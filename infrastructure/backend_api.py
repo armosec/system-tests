@@ -124,6 +124,9 @@ API_RUNTIME_POLICIES_LIST = "/api/v1/runtime/policies/list"
 API_RUNTIME_POLICIES = "/api/v1/runtime/policies"
 API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 
+API_RUNTIME_EXCEPTION = "/api/v1/runtime/exceptions"
+API_RUNTIME_EXCEPTION_NEW = API_RUNTIME_EXCEPTION + "/new"
+
 
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
 API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
@@ -3285,6 +3288,51 @@ class ControlPanelAPI(object):
                 'Error triggering CSPM scan. Request: scan now "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "") -> requests.Response:
+        """
+        Create a new runtime exception
+        Args:
+            policy_ids: List of policy IDs to create exception for
+            resources: List of resources to apply the exception to
+            reason: Reason for the exception
+        Returns:
+            Response from the API
+        Example:
+            "resources":[{"designatorType":"Attribute",
+            "attributes":{"cluster":"do-fra1-k8s-1-32-1-do-0-fra1-amit-demo",
+            "namespace":"systest-ns-mli2","name":"redis-sleep","kind":"Deployment"}}]
+        """
+        payload = {
+            "policyIDs": policy_ids,
+            "reason": reason,
+            "policyType": "runtimeIncidentExceptionPolicy",
+            "resources": resources
+        }
+        return self.post(f"{API_RUNTIME_EXCEPTION_NEW}", json=payload)
+
+    def delete_runtime_exception(self, exception_id: str) -> requests.Response:
+        """
+        Delete a runtime exception
+        Args:
+            exception_id: ID of the exception to delete
+        Returns:
+            Response from the API
+        """
+        return self.delete(f"{API_RUNTIME_EXCEPTION}/{exception_id}")
+
+    def get_runtime_exceptions(self, filters: Dict = None) -> requests.Response:
+        """
+        Get list of runtime exceptions
+        Args:
+            filters: Optional filters to apply to the request
+        Returns:
+            Response from the API containing list of exceptions
+        """
+        params = {}
+        if filters:
+            params.update(filters)
+        return self.get(f"{API_RUNTIME_EXCEPTION}", params=params)
 
 class Solution(object):
     """docstring for Solution"""

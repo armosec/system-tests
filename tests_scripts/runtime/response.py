@@ -183,7 +183,6 @@ class IncidentResponse(Incidents):
         :param namespace_to_wlid: A dictionary mapping each namespace to its workload ID (WLID).
         :return: A dictionary mapping each namespace to its incident.
         """
-        wait_for_application_profile_cache = 30
         wlid_to_namespace = {}
         for namespace in namespaces:
             Logger.logger.info(f"Simulating unexpected process in namespace {namespace}")
@@ -191,12 +190,11 @@ class IncidentResponse(Incidents):
                                         cluster=cluster, 
                                         namespace=namespace)
             wlid_to_namespace[wlids[0]] = namespace
-        time.sleep(wait_for_application_profile_cache)
 
         for wlid in wlid_to_namespace:
             self.wait_for_report(self.verify_application_profiles, wlids=[wlid], namespace=wlid_to_namespace[wlid])
             self.exec_pod(wlid=wlid, command="cat /etc/hosts")
-            
+
         Logger.logger.info('Verify unexpected process on backend')
         namespace_to_incident = {}
         for namespace in namespaces:

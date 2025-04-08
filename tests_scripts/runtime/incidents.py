@@ -65,24 +65,24 @@ class Incidents(BaseHelm):
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help"])
-        self.test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
-        self.test_connection_to_malicious_destination(wlids=wlids, command="wget sodiumlaurethsulfatedesyroyer.com", cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
-        self.test_malware_found(wlids=wlids, command="cat /root/malware.o", cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        self._test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self._test_connection_to_malicious_destination(wlids=wlids, command="wget sodiumlaurethsulfatedesyroyer.com", cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
+        self._test_malware_found(wlids=wlids, command="cat /root/malware.o", cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
         return self.cleanup()
         
     
-    def test_malware_found(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
+    def _test_malware_found(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
         Logger.logger.info(f"Simulate malware found from {wlids}")
         inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name, sleep_after_cmd=60)
         assert inc['md5Hash'] == MALWARE_INCIDENT_MD5, f"Expected md5Hash to be {MALWARE_INCIDENT_MD5}, got {inc['md5Hash']}"
     
-    def test_connection_to_malicious_destination(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
+    def _test_connection_to_malicious_destination(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
         Logger.logger.info(f"Simulate connection to malicious destination from {wlids}")
         inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
         assert inc['networkscan']['domain'] == MALICIOUS_DOMAIN, f"Expected domain to be {MALICIOUS_DOMAIN}, got {inc['networkscan']['domain']}"
 
-    def test_unexpected_process(self, wlids: list, command: str, cluster: str, namespace: str, 
+    def _test_unexpected_process(self, wlids: list, command: str, cluster: str, namespace: str, 
                                   expected_incident_name: str = "Unexpected process launched"):
         """
         Original function now using the split functions
