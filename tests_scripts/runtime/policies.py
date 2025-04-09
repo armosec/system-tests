@@ -48,20 +48,28 @@ class RuntimePoliciesConfigurations(Incidents):
 
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
-
-
         Logger.logger.info(self.backend.server + statics.ARMO_TEST_WEBHOOK_API)
 
+        cluster, namespace = self.setup()
+        Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        Logger.logger.info("2. Deploy and wait for report")
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
+                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
+        self.create_application_profile(wlids=wlids, namespace=namespace)
 
-        Logger.logger.info("1. validate incident types")
-        incident_ruletypes = self.validate_incident_types()
+        Logger.logger.info("3. validate incident types")
+        self.validate_incident_types()
 
-        Logger.logger.info("2. validate default rulesets")
+        Logger.logger.info("4. validate default rulesets")
         incident_rulesets = self.validate_default_rulesets()
 
-        Logger.logger.info("3. get runtime policies list")
+        Logger.logger.info("5. get runtime policies list")
         res = self.backend.get_runtime_policies_list()
         incident_policies_default = json.loads(res.text)
+        policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
             TestUtil.save_expceted_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
@@ -69,7 +77,7 @@ class RuntimePoliciesConfigurations(Incidents):
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
 
-        Logger.logger.info("4. validate unique values")
+        Logger.logger.info("6. validate unique values")
         unique_values_body = {
             "fields": {
                 "name": "",
@@ -92,8 +100,8 @@ class RuntimePoliciesConfigurations(Incidents):
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
             TestUtil.save_expceted_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
 
-        # expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
-        # TestUtil.compare_jsons(expected_unique_values, unique_values, [])
+        expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
+        TestUtil.compare_jsons(expected_unique_values, unique_values, [])
 
         rand = str(random.randint(10000000, 99999999))
 
@@ -128,7 +136,7 @@ class RuntimePoliciesConfigurations(Incidents):
         }
 
 
-        Logger.logger.info("5. create new runtime policy with webhook")
+        Logger.logger.info("7. create new runtime policy with webhook")
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
         self.validate_notifications(notifications_webhook, new_runtime_policy_body)
 
@@ -156,7 +164,7 @@ class RuntimePoliciesConfigurations(Incidents):
         update_runtime_policy_body["notifications"]  = notifcations_teams
 
         
-        Logger.logger.info("6. update runtime policy with teams")
+        Logger.logger.info("8. update runtime policy with teams")
         update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
         self.validate_notifications(notifcations_teams, update_runtime_policy_body_res)
 
@@ -171,23 +179,57 @@ class RuntimePoliciesConfigurations(Incidents):
         ]
 
         update_runtime_policy_body["notifications"]  = notifications_slack
-        Logger.logger.info("7. update runtime policy with slack")
+        Logger.logger.info("9. update runtime policy with slack")
         update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
         self.validate_notifications(notifications_slack, update_runtime_policy_body_res)
 
 
-        Logger.logger.info("8. delete runtime policy")
+        Logger.logger.info("10. delete runtime policy")
         self.validate_delete_policy(new_policy_guid)
 
-        Logger.logger.info("9. validate expected errors")
-        self.validate_expected_errors()
+        Logger.logger.info("11. validate expected errors")
+        self. validate_expected_errors()
 
+        Logger.logger.info("12. Delete webhook")
         self.delete_webhook(guid)
+
+        Logger.logger.info("13. Create exception")
+        exception_id = self.backend.create_runtime_exception(policy_ids=["I013"], resources=[{
+            "designatorType":"Attribute",
+             "attributes":
+             {
+                "cluster": cluster,
+                "namespace": namespace,
+                "name":"*/*",
+                "kind":"*/*"
+             }
+            }
+        ]).json()["guid"]
+        self.ensure_no_incident(wlids=wlids, cluster=cluster, namespace=namespace)
+
+        Logger.logger.info("14. Delete exception")
+        self.backend.delete_runtime_exception(exception_id=exception_id)
+        self.run_and_wait_for_incident(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+
+        Logger.logger.info("15. Delete policies")
+        for policy_guid in policies_guids:
+            self.validate_delete_policy(policy_guid)
+
+        Logger.logger.info("16. Check no incident")
+        self.ensure_no_incident(wlids=wlids, cluster=cluster, namespace=namespace)
 
         return self.cleanup()
   
-
-        # cluster, namespace = self.setup()
+    def ensure_no_incident(self, wlids: list, cluster: str, namespace: str):
+        exception_occured = False
+        try:
+            self.run_and_wait_for_incident(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        except Exception as e:
+            exception_occured = True
+        if not exception_occured:
+            raise Exception("Exception not created")
+        
+        
     def cleanup(self, **kwargs):
         for guid in self.tested_webhook_guid:
             self.delete_webhook(guid)
@@ -373,7 +415,8 @@ class RuntimePoliciesConfigurations(Incidents):
         res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
         incident_policies = json.loads(res.text)["response"]
         assert len(incident_policies)  == 0, f"failed to delete new runtime policy, expected 0 but got {len(incident_policies)}, got result {incident_policies}"
-        self.tested_policy_guid.remove(guid)
+        if guid in self.tested_policy_guid:
+            self.tested_policy_guid.remove(guid)
 
     def validate_expected_errors(self):
         test_cases = [

@@ -27,6 +27,7 @@ class RuntimeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=RuntimePoliciesConfigurations,
             create_test_tenant=True,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
         )
     
     @staticmethod

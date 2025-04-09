@@ -1,4 +1,3 @@
-
 import json
 import time
 
@@ -47,6 +46,7 @@ class Incidents(BaseHelm):
             "imagePullSecret.server": "quay.io",
             "imagePullSecret.username": "armosec+armosec_ro",
             "imagePullSecrets": "armosec-readonly",
+            "capabilities.httpDetection": "disable",
 
         }
 
@@ -58,7 +58,7 @@ class Incidents(BaseHelm):
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         cluster, namespace = self.setup()
-        Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
+        Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
@@ -130,7 +130,7 @@ class Incidents(BaseHelm):
         
         return inc
 
-    def create_application_profile(self, wlids: list, namespace: str, commands: list[str] = None):
+    def create_application_profile(self, wlids: list, namespace: str, commands: list = []):
         for command in commands:
             self.exec_pod(wlid=wlids[0], command=command)
         

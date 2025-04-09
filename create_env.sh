@@ -44,7 +44,7 @@ if [ "$(uname)" == "Darwin" ]; then
   brew unlink openssl
 else
   echo "OS: Linux"
-  sudo apt-get install libpq-dev
+  # sudo apt-get install libpq-dev
   . systests_python_env/bin/activate
   pip3 install -r requirements.txt
   wget https://github.com/Kitware/CMake/releases/download/v3.18.2/cmake-3.18.2-Linux-x86_64.sh -O cmake.sh
