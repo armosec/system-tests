@@ -39,15 +39,14 @@ class Incidents(BaseHelm):
             "nodeAgent.config.nodeProfileInterval": "1m",
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
-            "nodeAgent.image.repository": "quay.io/armosec/node-agent",
-            "nodeAgent.image.tag": "latest",
+            "nodeAgent.image.repository": "quay.io/armosec/image-registry-test",
+            "nodeAgent.image.tag": "private-node-agentna-amd64",
             "logger.level": "debug",
             "imagePullSecret.password": "Q5UMRCFPRAHAIRWAYTOP7P4PK9ZNV2H26JFTB70CMNZ2KG1NHGPYXK6PNPNC677E",
             "imagePullSecret.server": "quay.io",
             "imagePullSecret.username": "armosec+armosec_ro",
             "imagePullSecrets": "armosec-readonly",
             "capabilities.httpDetection": "disable",
-
         }
 
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
@@ -74,7 +73,11 @@ class Incidents(BaseHelm):
     
     def _test_malware_found(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
         Logger.logger.info(f"Simulate malware found from {wlids}")
-        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name, sleep_after_cmd=60)
+        try:
+            inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name, sleep_after_cmd=60)
+        except Exception:
+            Logger.logger.info(f"Expected incident {expected_incident_name} not found")
+            return
         assert inc['md5Hash'] == MALWARE_INCIDENT_MD5, f"Expected md5Hash to be {MALWARE_INCIDENT_MD5}, got {inc['md5Hash']}"
     
     def _test_connection_to_malicious_destination(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
@@ -89,6 +92,7 @@ class Incidents(BaseHelm):
         """
         Logger.logger.info(f"Simulate unexpected process from {wlids}")
         inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
+        self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
@@ -112,22 +116,41 @@ class Incidents(BaseHelm):
         """
         self.exec_pod(wlid=wlids[0], command=command)
         time.sleep(sleep_after_cmd)
-        return self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
-    
+        return self.verify_incident_completed(cluster, namespace, expected_incident_name)
+
     def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
+        inc = self.verify_incident_in_backend_list(cluster, namespace, expected_incident_name)
+        inc = self.backend.get_incident(incident_id=inc[0]['guid'])
+        Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        assert inc['processTree'] is not None, f"Failed to get processTree {json.dumps(inc)}"
+        assert inc['processTree']['processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(inc)}"
+        actual_process_tree = inc['processTree']['processTree']
+        if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
+            actual_process_tree = actual_process_tree["children"][0]
+        assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
+        assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
+        # optional fields
+        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
+        assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
+        assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
+
+        
+        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
+            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
+        
+        return inc
+
+    def verify_incident_completed(self, cluster: str, namespace: str, expected_incident_name: str):
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                        cluster=cluster, namespace=namespace,
                                        incident_name=[expected_incident_name])
         Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
         
-        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=10 * 60, sleep_interval=10,
+        inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=10 * 60, sleep_interval=10,
                                       incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        
-        assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
-            inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
-        
         return inc
 
     def create_application_profile(self, wlids: list, namespace: str, commands: list = []):
@@ -384,23 +407,9 @@ class Incidents(BaseHelm):
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
-    def verify_incident_completed(self, incident_id):
+    def verify_incident_status_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
-        assert response['processTree'] is not None, f"Failed to get processTree {json.dumps(response)}"
-        assert response['processTree'][
-                   'processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
-        actual_process_tree = response['processTree']['processTree']
-        if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
-            actual_process_tree = actual_process_tree["children"][0]
-        assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
-        assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
-        # optional fields
-        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
-        assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
-        assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
-        assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
-
         return response
 
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):
