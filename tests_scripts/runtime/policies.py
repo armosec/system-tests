@@ -45,6 +45,10 @@ class RuntimePoliciesConfigurations(Incidents):
         7. update runtime policy with slack
         8. delete runtime policy
         9. validate expected errors
+        10. create exception
+        11. check no incident
+        12. delete exception
+        13. delete policies
 
         """
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
