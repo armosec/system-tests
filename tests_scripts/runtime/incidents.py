@@ -378,6 +378,8 @@ class Incidents(BaseHelm):
         actual_process_tree = response['processTree']['processTree']
         if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
             actual_process_tree = actual_process_tree["children"][0]
+        # because of race condition, comm might be 'runc:[2:INIT]'
+        # assert "cat" in actual_process_tree['comm'] or "runc:[2:INIT]", f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields

@@ -1232,9 +1232,9 @@
     "Backend"
   ],
   "target_repositories": [
-    "cadashboardbe-dummy",
-    "event-ingester-service-dummy",
-    "config-service-dummy"
+    "cadashboardbe",
+    "event-ingester-service",
+    "config-service"
   ],
   "description": "testing basic incident presented",
   "skip_on_environment": "production,production-us",

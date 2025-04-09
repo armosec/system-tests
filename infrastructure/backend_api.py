@@ -162,6 +162,9 @@ API_CLOUD_COMPLIANCE_EXCEPTIONS_LIST = API_CLOUD_COMPLIANCE_EXCEPTIONS+"/list"
 API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
 
 
+API_COMMAND_HELM = "/api/v1/commands/helm"
+
+
 def deco_cookie(func):
     def apply_cookie(*args, **kwargs):
         ControlPanelAPIObj = args[0]
@@ -3285,6 +3288,15 @@ class ControlPanelAPI(object):
                 'Error triggering CSPM scan. Request: scan now "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r
+
+    def get_helm(self):
+
+        r = self.get(API_COMMAND_HELM)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get helm "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
 class Solution(object):
     """docstring for Solution"""
