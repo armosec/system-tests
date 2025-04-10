@@ -756,8 +756,8 @@ class BaseVulnerabilityScanning(BaseHelm):
             for SBOM in SBOMs:
                 if TestUtil.get_arg_from_dict(self.test_driver.kwargs, statics.CREATE_TEST_FIRST_TIME_RESULTS, False):
                     self.store_unfilter_data_for_first_time_results(result=SBOM, store_path=expected_SBOM[1] )
-                    verified_SBOMs = len(SBOMs)
-                    continue
+                    verified_SBOMs += 1
+                    break
                 with open(expected_SBOM[1], 'r') as content_file:
                     content = content_file.read()
                 expected_SBOM_data = json.loads(content)

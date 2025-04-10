@@ -266,6 +266,10 @@ HELM_VULNERABILITY_SCAN = "capabilities.vulnerabilityScan"
 HELM_VULNERABILITY_SCAN_ENABLED = "enable"
 HELM_VULNERABILITY_SCAN_DISABLED = "disable"
 
+HELM_NODE_SBOM_GENERATION = "capabilities.nodeSbomGeneration"
+HELM_NODE_SBOM_GENERATION_ENABLED = "enable"
+HELM_NODE_SBOM_GENERATION_DISABLED = "disable"
+
 # relevancy feature
 HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"
 HELM_NODE_AGENT_LEARNING_PERIOD = "nodeAgent.config.learningPeriod"
