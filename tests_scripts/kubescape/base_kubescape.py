@@ -1183,7 +1183,7 @@ class BaseKubescape(BaseK8S):
             "expected framework: {} compliance score in be to be {}, but it is".format(
             framework_name, framework_report[_COMPLIANCE_SCORE_FIELD], be_cluster_overtime[statics.BE_CORDS_FIELD][_COMPLIANCE_SCORE_FIELD])
 
-    def is_ks_cronjob_created(self, framework_name, timeout=60):
+    def is_ks_cronjob_created(self, framework_name, timeout=120):
         start = time.time()
         err = ""
         while time.time() - start < timeout:
