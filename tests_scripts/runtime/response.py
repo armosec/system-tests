@@ -74,8 +74,8 @@ class IncidentResponse(Incidents):
 
         return self.cleanup()
 
-    def cleanup(self):
-        return statics.SUCCESS, "Test completed successfully"
+    # def cleanup(self):
+    #     return statics.SUCCESS, "Test completed successfully"
         
 
     def response_and_assert(self, incident_guid, body, expected_applied_status, timeout=120, sleep_interval=10):
