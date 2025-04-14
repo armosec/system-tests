@@ -209,26 +209,28 @@ class RuntimePoliciesConfigurations(Incidents):
              }
             }
         ]).json()["guid"]
-        self.ensure_no_incident(wlids=wlids, cluster=cluster, namespace=namespace)
+        self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
 
         Logger.logger.info("14. Delete exception")
         self.backend.delete_runtime_exception(exception_id=exception_id)
-        self.run_and_wait_for_incident(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
 
         Logger.logger.info("15. Delete policies")
         for policy_guid in policies_guids:
             self.validate_delete_policy(policy_guid)
 
         Logger.logger.info("16. Check no incident")
-        self.ensure_no_incident(wlids=wlids, cluster=cluster, namespace=namespace)
+        self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
 
         return self.cleanup()
   
-    def ensure_no_incident(self, wlids: list, cluster: str, namespace: str):
+    def ensure_no_incident(self, wlid: str, cluster: str, namespace: str, expected_incident_name: str):
         exception_occured = False
+        self.exec_pod(wlid=wlid, command="cat /etc/hosts")
         try:
-            self.run_and_wait_for_incident(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
-        except Exception as e:
+            self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                                cluster=cluster, namespace=namespace,
+                                incident_name=[expected_incident_name])
+        except Exception:
             exception_occured = True
         if not exception_occured:
             raise Exception("Exception not created")

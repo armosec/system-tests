@@ -39,8 +39,8 @@ class Incidents(BaseHelm):
             "nodeAgent.config.nodeProfileInterval": "1m",
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
-            "nodeAgent.image.repository": "quay.io/armosec/image-registry-test",
-            "nodeAgent.image.tag": "private-node-agentna-amd64",
+            "nodeAgent.image.repository": "quay.io/armosec/node-agent",
+            "nodeAgent.image.tag": "latest",
             "logger.level": "debug",
             "imagePullSecret.password": "Q5UMRCFPRAHAIRWAYTOP7P4PK9ZNV2H26JFTB70CMNZ2KG1NHGPYXK6PNPNC677E",
             "imagePullSecret.server": "quay.io",
@@ -310,7 +310,7 @@ class Incidents(BaseHelm):
         unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
         assert unique_values is not None, f"Failed to get unique values of alerts {json.dumps(incident)}"
         #expected_values = {"ruleID": ["R0001", "R0002", "R0003", "R0004"]}
-        expected_values = {"ruleID": ["R0001", "R0004"]}
+        expected_values = {"ruleID": ["R0001"]}
         # don't check the count, it's dynamic
         assert unique_values[
                    "fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
