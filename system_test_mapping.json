@@ -1237,7 +1237,7 @@
     "config-service"
   ],
   "description": "testing basic incident presented",
-  "skip_on_environment": "production,production-us",
+  "skip_on_environment": "",
   "owner": "eranm@armosec.io"
 }
 }
