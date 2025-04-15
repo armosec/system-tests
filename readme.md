@@ -81,7 +81,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `sr_with_exceptions`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `basic_incident_presented`         | helm-chart |  basic incident from in cluster presented in BE API | in-cluster , backend |
 | `smart_remediation_all_controls` | helm-chart | Test all smart remediation controls | in-cluster , backend |
-| `kdr_runtime_policies_configurations`  | helm-chart | Test runtime policy configurations - list, create, update, delete, unique values | backend |
+| `kdr_runtime_policies_configurations`  | helm-chart | Test runtime policy configurations - list, create, update, delete, unique values | in-cluster, backend |
 
 ### Install:
 * download/clone repository
