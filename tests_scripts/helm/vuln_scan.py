@@ -54,7 +54,7 @@ class VulnerabilityScanningProxy(BaseVulnerabilityScanning):
 
         Logger.logger.info('3. install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart()
+        self.install_armo_helm_chart(helm_kwargs=self.test_obj.get_arg("helm_kwargs", default={}))
 
         Logger.logger.info('3.1 verify helm installation')
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
@@ -380,7 +380,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                                                          kubernetes_obj=kubernetes_obj)
 
     def start(self):
-        return statics.SUCCESS, "" 
+        return statics.SUCCESS, ""
         assert self.backend != None
         #use this flag to update expected results (test will fail if flag is not set to prevent accidental overwrite of expected results)
         updateExpected = False
@@ -398,7 +398,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
 
         Logger.logger.info('1.3 verify all pods are running')
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)        
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('1.4 install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
@@ -416,12 +416,12 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
                 "riskFactors":"External facing",
             }]}
         wl_list, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
-                                              body=body,expected_results=1)  
-        
+                                              body=body,expected_results=1)
+
         Logger.logger.info("received httpd-proxy scan {}".format(wl_list))
 
         Logger.logger.info('2.1 get httpd-proxy workload with filteres and compare with expected')
-        body =  {"innerFilters": [{   
+        body =  {"innerFilters": [{
             "exploitable":"Known Exploited,High Likelihood",
             "riskFactors":"External facing",
             "isRelevant":"Yes",
@@ -431,9 +431,9 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             "labels":"app:httpd-proxy",
             "cluster": cluster,
             "namespace": namespace,
-            "name": "httpd-proxy"                     
+            "name": "httpd-proxy"
             }]}
-        
+
         res, _ = self.wait_for_report(timeout=300, report_type=self.get_filtered_workload_summary, updateExpected=updateExpected, body=body)
 
         wl_summary, wl_excluded_paths = res[0], res[1]
@@ -459,20 +459,20 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
             }]}
         components = self.backend.get_vuln_v2_components(body=body)
         assert len(components) == 41, f'Expected 41 components, but found {len(components)} for httpd-proxy'
-      
+
         Logger.logger.info('5. get workloads images and compare with expected')
         image = self.backend.get_vuln_v2_images(body=body, expected_results=wl_summary["imagesCount"])
         image = image[0]
         image_excluded_paths = {"root['lastScanTime']", "root['customerGUID']", "root['digest']",
                                 "root['repository']", "root['registry']", "root['namespaces']", "root['clusters']",
-                                "root['architecture']", "root['os']", "root['size']", "root['baseImage']", 
+                                "root['architecture']", "root['os']", "root['size']", "root['baseImage']",
                                 "root['clustersCount']", "root['namespacesCount']", "root['workloadsCount']"}
         if updateExpected:
             TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details.json")
 
         TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/image_details_temp.json")
-        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)        
-      
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/image_details.json", image, image_excluded_paths)
+
         Logger.logger.info('6. get workloads CVEs and match with workload summary')
         body['innerFilters'][0]['severity'] = "Critical"
         body['innerFilters'][0]['riskFactors'] = "External facing"
@@ -482,7 +482,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Critical"]:
                 raise Exception(f'cve {cve["name"]} not found in critical cves')
-        
+
         body['innerFilters'][0]['severity'] = "High"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["highCount"])
         TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_high_temp.json")
@@ -490,7 +490,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["High"]:
                 raise Exception(f'cve {cve["name"]} not found in high cves')
-        
+
         body['innerFilters'][0]['severity'] = "Medium"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["mediumCount"])
         TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_medium_temp.json")
@@ -498,7 +498,7 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Medium"]:
                 raise Exception(f'cve {cve["name"]} not found in medium cves')
-            
+
         body['innerFilters'][0]['severity'] = "Low"
         cves = self.backend.get_vulns_v2(body=body, expected_results=wl_summary["lowCount"])
         TestUtil.save_expceted_json(image, "configurations/expected-result/V2_VIEWS/cves_low_temp.json")
@@ -506,8 +506,8 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         for cve in cves:
             if cve["name"] not in wl_summary["severityStats"]["Low"]:
                 raise Exception(f'cve {cve["name"]} not found in low cves')
-            
-        Logger.logger.info('7. get exploitable CVE details and compare with expected')        
+
+        Logger.logger.info('7. get exploitable CVE details and compare with expected')
         body['innerFilters'][0]['severity'] = ""
         body['innerFilters'][0]['exploitable'] = "Known Exploited,High Likelihood"
         cve = self.backend.get_vulns_v2(body=body, expected_results=1)
@@ -538,17 +538,17 @@ class VulnerabilityV2Views(BaseVulnerabilityScanning):
         return self.cleanup()
 
     def get_filtered_workload_summary(self, updateExpected, body):
-        wl_summary = self.backend.get_vuln_v2_workloads(body)        
+        wl_summary = self.backend.get_vuln_v2_workloads(body)
         if len(wl_summary) == 0:
             raise Exception('no results for httpd-proxy with exploitable filters (check possible exploitability change)')
-        
+
         wl_excluded_paths = {"root['cluster']", "root['namespace']","root['wlid']","root['resourceHash']", "root['clusterShortName']", "root['customerGUID']", "root['lastScanTime']", "root['missingRuntimeInfoReason']"}
-        wl_summary = wl_summary[0] 
+        wl_summary = wl_summary[0]
         if updateExpected:
-            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")     
+            TestUtil.save_expceted_json(wl_summary, "configurations/expected-result/V2_VIEWS/wl_filtered.json")
         TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/wl_filtered.json", wl_summary, wl_excluded_paths)
         return wl_summary,wl_excluded_paths
-    
+
 
 
 class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
@@ -565,14 +565,14 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
         Logger.logger.info('1. apply cluster resources')
 
         Logger.logger.info('1.1 apply services')
-        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)       
+        self.apply_directory(path=self.test_obj[("services", None)], namespace=namespace)
 
         Logger.logger.info('1.2 apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
 
         Logger.logger.info('2. verify all pods are running')
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)        
+        self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('3. install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
@@ -590,8 +590,8 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
                 "name": "mariadb"
             }]}
         self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
-                                              body=body,expected_results=1)  
-       
+                                              body=body,expected_results=1)
+
         Logger.logger.info('4.1 get mariadb knwon exploited cve 2023-44487')
         body =  {"innerFilters": [{
             "name":"CVE-2023-44487",
@@ -601,18 +601,16 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
             "workload":"mariadb",
             "componentInfo.name":"stdlib",
             "componentInfo.version":"go1.16.7"}]}
-        kev_vulan = self.backend.get_vuln_v2_details(body)        
-      
+        kev_vulan = self.backend.get_vuln_v2_details(body)
+
         Logger.logger.info('4.1 get mariadb knwon exploited cve 2023-44487 using exploitable filter')
         body['innerFilters'][0]['exploitable'] = "Known Exploited"
-        kev_vulan = self.backend.get_vuln_v2_details(body) 
-        if len(kev_vulan["cisaKevInfo"]) == 0:   
+        kev_vulan = self.backend.get_vuln_v2_details(body)
+        if len(kev_vulan["cisaKevInfo"]) == 0:
             raise Exception('vuilnerability CVE-2023-44487 does not include kev info')
-     
-        Logger.logger.info('check cve kev info')           
-        kev_excluded_paths = {"root['knownRansomwareCampaignUse']"}
-        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/kev_vulan.json", kev_vulan["cisaKevInfo"],kev_excluded_paths)       
-      
-        return self.cleanup()
-    
 
+        Logger.logger.info('check cve kev info')
+        kev_excluded_paths = {"root['knownRansomwareCampaignUse']"}
+        TestUtil.compare_with_expected_file("configurations/expected-result/V2_VIEWS/kev_vulan.json", kev_vulan["cisaKevInfo"],kev_excluded_paths)
+
+        return self.cleanup()

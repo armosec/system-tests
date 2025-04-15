@@ -2,5 +2,5 @@
     "dateAdded": "2023-10-10",
     "dueDate": "2023-10-31",
     "knownRansomwareCampaignUse": "Unknown",
-    "notes": "This vulnerability affects a common open-source component, third-party library, or a protocol used by different products. Please check with specific vendors for information on patching status.   For more information, please see: https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/ ; https://nvd.nist.gov/vuln/detail/CVE-2023-44487"
+    "notes": "This vulnerability affects a common open-source component, third-party library, or protocol used by different products. For more information, please see: HTTP/2 Rapid Reset Vulnerability, CVE-2023-44487 | CISA: https://www.cisa.gov/news-events/alerts/2023/10/10/http2-rapid-reset-vulnerability-cve-2023-44487; https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/;  https://nvd.nist.gov/vuln/detail/CVE-2023-44487"
 }

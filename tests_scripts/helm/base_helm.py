@@ -1,4 +1,6 @@
 import os
+import re
+from typing import Optional
 
 from infrastructure.helm_wrapper import HelmWrapper
 from systest_utils import TestUtil, Logger, statics
@@ -93,9 +95,38 @@ class BaseHelm(BaseK8S):
             except:
                 pass
 
-    def install_armo_helm_chart(self, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME, helm_kwargs: dict = None, use_offline_db: bool = True):
+    def get_private_node_agent_params(self):
+        helm_kwargs = {}
+        helm = self.backend.get_helm()
+
+        repository = extract_set_param(helm["installCommand"], "nodeAgent.image.repository")
+        assert repository is not None, f"Failed to extract nodeAgent.image.repository from helm command: {helm['installCommand']}"
+        tag = extract_set_param(helm["installCommand"], "nodeAgent.image.tag")
+        assert tag is not None, f"Failed to extract nodeAgent.image.tag from helm command: {helm['installCommand']}"
+        secret_password = extract_set_param(helm["installCommand"], "imagePullSecret.password")
+        assert secret_password is not None, f"Failed to extract imagePullSecret.password from helm command: {helm['installCommand']}"
+        secret_server = extract_set_param(helm["installCommand"], "imagePullSecret.server")
+        assert secret_server is not None, f"Failed to extract imagePullSecret.server from helm command: {helm['installCommand']}"
+        secret_username = extract_set_param(helm["installCommand"], "imagePullSecret.username")
+        assert secret_username is not None, f"Failed to extract imagePullSecret.username from helm command: {helm['installCommand']}"
+        pull_secrets = extract_set_param(helm["installCommand"], "imagePullSecrets")
+        assert pull_secrets is not None, f"Failed to extract imagePullSecrets from helm command: {helm['installCommand']}"
+
+        helm_kwargs["nodeAgent.image.repository"] = repository
+        helm_kwargs["nodeAgent.image.tag"] = tag
+        helm_kwargs["imagePullSecret.password"] = secret_password
+        helm_kwargs["imagePullSecret.server"] = secret_server
+        helm_kwargs["imagePullSecret.username"] = secret_username
+        helm_kwargs["imagePullSecrets"] = pull_secrets
+
+        return helm_kwargs
+
+    def install_armo_helm_chart(self, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME, helm_kwargs: dict = None, use_offline_db: bool = True, private_node_agent: bool = False):
         if helm_kwargs is None:
             helm_kwargs = {}
+
+        if private_node_agent:
+            helm_kwargs.update(self.get_private_node_agent_params())
 
         if self.local_helm_chart:
             self.helm_armo_repo = self.local_helm_chart
@@ -232,3 +263,22 @@ class BaseHelm(BaseK8S):
     @staticmethod
     def helm_dependency_update(repo):
         HelmWrapper.helm_dependency_update(repo)
+
+
+
+def extract_set_param(command: str, param_name: str) -> Optional[str]:
+    """
+    Extracts the value of a given --set parameter from a Helm command string.
+
+    Args:
+        command (str): The Helm install or upgrade command string.
+        param_name (str): The parameter name to extract (e.g., "nodeAgent.image.repository").
+
+    Returns:
+        Optional[str]: The value of the parameter, or None if not found.
+    """
+    # Escape dots for regex and build pattern
+    pattern = rf'--set {re.escape(param_name)}=([^\s]+)'
+    match = re.search(pattern, command)
+
+    return match.group(1) if match else None
