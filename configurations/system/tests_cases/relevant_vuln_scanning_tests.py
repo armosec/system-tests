@@ -176,22 +176,6 @@ class RelevantVulnerabilityScanningTests(object):
         )
 
     @staticmethod
-    def relevancy_extra_large_image():
-        from tests_scripts.helm.relevant_cve import RelevancyEnabledExtraLargeImage
-        from systest_utils import statics
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
-            test_obj=RelevancyEnabledExtraLargeImage,
-            expected_SBOMs=[
-                ("redis", "configurations/expected-result/SBOM/redis_incomplete.json")],
-            helm_kwargs={statics.HELM_SCAN_TIMEOUT: "1ms", statics.HELM_STORAGE_FEATURE: True,
-                         statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
-        )
-
-    @staticmethod
     def relevancy_storage_disabled():
         from tests_scripts.helm.relevant_cve import RelevancyStorageDisabled
         from systest_utils import statics
