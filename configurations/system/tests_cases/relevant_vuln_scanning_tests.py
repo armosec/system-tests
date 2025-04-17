@@ -211,7 +211,8 @@ class RelevantVulnerabilityScanningTests(object):
             expected_results="configurations/expected-result/BE_CVEs/redis-fixed.json",
             test_obj=RelevancyFixVuln,
             helm_kwargs={statics.HELM_STORAGE_FEATURE: True,
-                         statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED}
+                         statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
+                         statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED}
         )
 
     @staticmethod

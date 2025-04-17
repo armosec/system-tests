@@ -88,6 +88,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             "capabilities.vulnerabilityScan": "enable",
             "capabilities.runtimeObservability": "enable",
             "grypeOfflineDB.enabled": "true",
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
         }
 
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")

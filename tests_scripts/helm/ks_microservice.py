@@ -91,6 +91,7 @@ class ScanSecurityRisksWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             "capabilities.runtimeDetection": "disable",
             "capabilities.seccompProfileService": "disable",
             "capabilities.nodeProfileService": "disable",
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
 
         }
 
@@ -532,7 +533,7 @@ class ScanAttackChainsWithKubescapeHelmChartMultiple(BaseHelm, BaseKubescape):
             "capabilities.runtimeDetection": "disable",
             "capabilities.seccompProfileService": "disable",
             "capabilities.nodeProfileService": "disable",
-
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
         }
 
         if self.test_obj.get_arg("helm_kwargs", default={}) != {}:
