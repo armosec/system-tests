@@ -555,6 +555,10 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super(VulnerabilityV2ViewsKEV, self).__init__(test_driver=test_driver, test_obj=test_obj, backend=backend,
                                                          kubernetes_obj=kubernetes_obj)
+    
+        self.helm_kwargs = {
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
+        }
 
     def start(self):
         assert self.backend != None;
@@ -576,7 +580,7 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
 
         Logger.logger.info('3. install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(use_offline_db=False)
+        self.install_armo_helm_chart(use_offline_db=False, helm_kwargs=self.helm_kwargs)
 
         Logger.logger.info('3.1 verify helm installation')
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
