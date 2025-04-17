@@ -15,7 +15,7 @@ from tests_scripts.workflows.utils import (
 )
 import time
 import json
-from systest_utils import Logger, TestUtil
+from systest_utils import Logger, TestUtil, statics
 
 
 
@@ -28,6 +28,10 @@ class WorkflowsJiraNotifications(Workflows):
         self.cluster = None
         self.wait_for_agg_to_end = False
         self.site_name = "cyberarmor-io"
+
+        self.helm_kwargs = {
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
+        }
 
 
     def start(self):
@@ -66,7 +70,7 @@ class WorkflowsJiraNotifications(Workflows):
         self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('Stage 4: Install kubescape with helm-chart')
-        self.install_kubescape()
+        self.install_kubescape(helm_kwargs=self.helm_kwargs)
         time.sleep(60)
 
         Logger.logger.info('Stage 5: Trigger first scan')
