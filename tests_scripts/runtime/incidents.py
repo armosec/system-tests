@@ -30,6 +30,7 @@ class Incidents(BaseHelm):
             "capabilities.malwareDetection": "enable",
             "capabilities.runtimeDetection": "enable",
             "capabilities.nodeProfileService": "enable",
+            "capabilities.admissionController": "disable",
             "alertCRD.installDefault": True,
             "alertCRD.scopeClustered": True,
             # short learning period

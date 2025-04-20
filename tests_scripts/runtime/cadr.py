@@ -1,9 +1,9 @@
-
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
-from os.path import join
+from infrastructure.backend_api import EventReceiver
+from tests_scripts.runtime.consts import CDR_ALERT_TYPE
 import json
-
+import time
 
 class CADRIncidents(Incidents):
     def __init__(self, *args, **kwargs):
@@ -25,13 +25,12 @@ class CADRIncidents(Incidents):
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         cluster, namespace = self.setup()
-        Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
-        self.create_application_profile(wlids=wlids, namespace=namespace, commands=[""])
+        self.create_application_profile(wlids=wlids, namespace=namespace)
         self._test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace)
         return self.cleanup()
     
@@ -54,25 +53,37 @@ class CADRIncidents(Incidents):
     def _verify_incident_alerts(self, incident_id: str, public_ip: str):
         response = self.backend.get_alerts_of_incident(incident_id=incident_id)
         alerts = response["response"]
-        assert len(alerts) != 3, f"Failed to get alerts of incident {incident_id}, got {alerts}"
+        assert len(alerts) > 3, f"Failed to get alerts of incident {incident_id}, got {alerts}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
+        expected_rule_ids =["C0002", "C0001"]
+        cdr_rule_ids = []
+
         for alert in alerts:
-            assert alert["ruleName"] != "Detect AWS Systems Manager Parameters Retrieved", f"Wrong alert {alert}"
-            assert alert["eventData"]["sourceIPAddress"] != public_ip, f"Wrong source IP {alert}"
+            if alert["alertType"] == CDR_ALERT_TYPE:
+                assert alert["cdrevent"]["eventData"]["awsCloudTrail"]["sourceIPAddress"] == public_ip, f"Wrong source IP {alert}"
+                cdr_rule_ids.append(alert["ruleID"])
+        
+        assert len(cdr_rule_ids) == len(expected_rule_ids), f"Failed to get expected rule ids, got {cdr_rule_ids}"
+        for rule_id in expected_rule_ids:
+            assert rule_id in cdr_rule_ids, f"Failed to get expected rule id {rule_id}, got {cdr_rule_ids}"
+        
         return alerts
     
     def _prepare_and_send_cdr_alerts(self, node_ip: str, customer_guid: str):
         cdr_mock_path = self.test_obj["cdr_mock_path"]
-        cdr_mock_path = join(cdr_mock_path, "cdr.json")
         with open(cdr_mock_path, "r") as f:
             cdr_mock = json.load(f)
 
         for rule in cdr_mock["ruleFailures"]:
-            rule["eventData"]["sourceIPAddress"] = node_ip
+            rule["eventData"]["awsCloudTrail"]["sourceIPAddress"] = node_ip
 
         cdr_mock["customerGUID"] = customer_guid
-        self.backend.post_cdr_alerts(cdr_mock)
+        
+        event_receiver = self._get_event_receiver()
+        response = event_receiver.post_cdr_alerts(cdr_mock)
+        assert response.status_code == 200, f"Failed to send cdr alerts, got {response.status_code}"
 
 
-        
-        
+    def _get_event_receiver(self):
+        event_receiver_server = self.test_driver.backend_obj.get_event_receiver_server()
+        return EventReceiver(server=event_receiver_server, customer_guid=self.backend.get_customer_guid(), api_key=self.backend.get_access_key())

@@ -167,6 +167,7 @@ API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
 
+POST_CDR_ALERTS = "/cloud/v1/cdrAlert"
 
 def deco_cookie(func):
     def apply_cookie(*args, **kwargs):
@@ -3604,3 +3605,13 @@ class Service(object):
                 200 <= r.status_code < 300), 'Error getting session service info from dashboard (code: %d, message: %s)' % (
             r.status_code, r.text)
         return r.json()
+
+class EventReceiver(object):
+    def __init__(self,  server: str, customer_guid: str, api_key: str):
+        self.server = server
+        self.customer_guid = customer_guid
+        self.api_key = api_key
+    
+    def post_cdr_alerts(self, cdr_alerts: dict):
+        return requests.post(f"{self.server}{POST_CDR_ALERTS}", json=cdr_alerts, headers={"X-API-KEY": self.api_key}, params={"customerGUID": self.customer_guid})
+
