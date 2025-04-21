@@ -99,7 +99,7 @@ class CloudConnect(Accounts):
             Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
             # wait for success
             self.wait_for_report(self.validate_accounts_cloud_list_cspm,
-                                timeout=1200,
+                                timeout=1600,
                                 sleep_interval=60,
                                 cloud_account_guid=cloud_account_guid,
                                 arn=test_arn,
