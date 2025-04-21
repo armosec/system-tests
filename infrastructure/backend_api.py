@@ -3293,7 +3293,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "") -> requests.Response:
+    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "") -> dict:
         """
         Create a new runtime exception
         Args:
@@ -3313,7 +3313,9 @@ class ControlPanelAPI(object):
             "policyType": "runtimeIncidentExceptionPolicy",
             "resources": resources
         }
-        return self.post(f"{API_RUNTIME_EXCEPTION_NEW}", json=payload)
+        response = self.post(f"{API_RUNTIME_EXCEPTION_NEW}", json=payload)
+        assert 200 <= response.status_code < 300, f"Failed to create runtime exception, got {response.status_code}"
+        return response.json()
 
     def delete_runtime_exception(self, exception_id: str) -> requests.Response:
         """
@@ -3323,7 +3325,9 @@ class ControlPanelAPI(object):
         Returns:
             Response from the API
         """
-        return self.delete(f"{API_RUNTIME_EXCEPTION}/{exception_id}")
+        response = self.delete(f"{API_RUNTIME_EXCEPTION}/{exception_id}")
+        assert 200 <= response.status_code < 300, f"Failed to delete runtime exception, got {response.status_code}"
+        return response.json()
 
     def get_runtime_exceptions(self, filters: Dict = None) -> requests.Response:
         """
@@ -3336,7 +3340,9 @@ class ControlPanelAPI(object):
         params = {}
         if filters:
             params.update(filters)
-        return self.get(f"{API_RUNTIME_EXCEPTION}", params=params)
+        response = self.get(f"{API_RUNTIME_EXCEPTION}", params=params)
+        assert 200 <= response.status_code < 300, f"Failed to get runtime exceptions, got {response.status_code}"
+        return response.json()
 
     def get_helm(self):
 
@@ -3613,5 +3619,6 @@ class EventReceiver(object):
         self.api_key = api_key
     
     def post_cdr_alerts(self, cdr_alerts: dict):
-        return requests.post(f"{self.server}{POST_CDR_ALERTS}", json=cdr_alerts, headers={"X-API-KEY": self.api_key}, params={"customerGUID": self.customer_guid})
-
+        response = requests.post(f"{self.server}{POST_CDR_ALERTS}", json=cdr_alerts, headers={"X-API-KEY": self.api_key}, params={"customerGUID": self.customer_guid})
+        assert 200 <= response.status_code < 300, f"Failed to send cdr alerts, got {response.status_code}"
+        return response

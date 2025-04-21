@@ -43,11 +43,12 @@ class CADRIncidents(Incidents):
                                        cluster=cluster, namespace=namespace,
                                        incident_name=[expected_incident_name])
         inc = incs[0]
-        self._prepare_and_send_cdr_alerts(node_ip=inc["cloudMetadata"]["public_ip"], customer_guid=self.backend.get_customer_guid())
+        public_ip = inc["cloudMetadata"].get("public_ip", "")
+        self._prepare_and_send_cdr_alerts(node_ip=public_ip, customer_guid=self.backend.get_customer_guid())
         inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=10 * 60, sleep_interval=10,
                                       incident_id=inc["guid"])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
-        self._verify_incident_alerts(incident_id=inc["guid"], public_ip=inc["cloudMetadata"]["public_ip"])
+        self._verify_incident_alerts(incident_id=inc["guid"], public_ip=public_ip)
         return inc
 
     def _verify_incident_alerts(self, incident_id: str, public_ip: str):
@@ -80,9 +81,7 @@ class CADRIncidents(Incidents):
         cdr_mock["customerGUID"] = customer_guid
         
         event_receiver = self._get_event_receiver()
-        response = event_receiver.post_cdr_alerts(cdr_mock)
-        assert response.status_code == 200, f"Failed to send cdr alerts, got {response.status_code}"
-
+        event_receiver.post_cdr_alerts(cdr_mock)
 
     def _get_event_receiver(self):
         event_receiver_server = self.test_driver.backend_obj.get_event_receiver_server()

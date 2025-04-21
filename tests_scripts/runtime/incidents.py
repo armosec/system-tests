@@ -40,14 +40,17 @@ class Incidents(BaseHelm):
             "nodeAgent.config.nodeProfileInterval": "1m",
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
-            "nodeAgent.image.repository": "quay.io/armosec/node-agent",
-            "nodeAgent.image.tag": "latest",
+            "nodeAgent.image.repository": "quay.io/armosec/image-registry-test",
+            "nodeAgent.image.tag": "private-node-agentkl211-amd64",
             "logger.level": "debug",
             "imagePullSecret.password": "Q5UMRCFPRAHAIRWAYTOP7P4PK9ZNV2H26JFTB70CMNZ2KG1NHGPYXK6PNPNC677E",
             "imagePullSecret.server": "quay.io",
             "imagePullSecret.username": "armosec+armosec_ro",
             "imagePullSecrets": "armosec-readonly",
             "capabilities.httpDetection": "disable",
+            "capabilities.networkEventsStreaming": "enable",
+            "capabilities.nodeSbomGeneration": "disable",
+            "nodeAgent.config.networkStreamingInterval": "5s",
         }
 
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
@@ -65,34 +68,40 @@ class Incidents(BaseHelm):
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help"])
-        self._test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
-        self._test_connection_to_malicious_destination(wlids=wlids, command="wget sodiumlaurethsulfatedesyroyer.com", cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
-        self._test_malware_found(wlids=wlids, command="cat /root/malware.o", cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
+        time.sleep(1)
+        self.exec_pod(wlid=wlids[0], command="cat /root/malware.o")
+        time.sleep(1)
+        self.exec_pod(wlid=wlids[0], command="wget sodiumlaurethsulfatedesyroyer.com")
+        time.sleep(160)
+        self._test_unexpected_process(cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self._test_connection_to_malicious_destination(cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
+        self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
         return self.cleanup()
         
     
-    def _test_malware_found(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
-        Logger.logger.info(f"Simulate malware found from {wlids}")
+    def _test_malware_found(self, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
+        Logger.logger.info(f"Simulate malware found from {cluster} {namespace}")
         try:
-            inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name, sleep_after_cmd=60)
+            inc = self.wait_for_incident(cluster, namespace, expected_incident_name, sleep_after_cmd=60)
         except Exception:
             Logger.logger.info(f"Expected incident {expected_incident_name} not found")
             return
         assert inc['md5Hash'] == MALWARE_INCIDENT_MD5, f"Expected md5Hash to be {MALWARE_INCIDENT_MD5}, got {inc['md5Hash']}"
     
-    def _test_connection_to_malicious_destination(self, wlids: list, command: str, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
-        Logger.logger.info(f"Simulate connection to malicious destination from {wlids}")
-        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
+    def _test_connection_to_malicious_destination(self, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
+        Logger.logger.info(f"Simulate connection to malicious destination from {cluster} {namespace}")
+        inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
         assert inc['networkscan']['domain'] == MALICIOUS_DOMAIN, f"Expected domain to be {MALICIOUS_DOMAIN}, got {inc['networkscan']['domain']}"
 
-    def _test_unexpected_process(self, wlids: list, command: str, cluster: str, namespace: str, 
+    def _test_unexpected_process(self, cluster: str, namespace: str, 
                                   expected_incident_name: str = "Unexpected process launched"):
         """
         Original function now using the split functions
         """
-        Logger.logger.info(f"Simulate unexpected process from {wlids}")
-        inc = self.run_and_wait_for_incident(wlids, command, cluster, namespace, expected_incident_name)
+        Logger.logger.info(f"Simulate unexpected process from {cluster} {namespace}")
+        inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
         self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
@@ -110,12 +119,11 @@ class Incidents(BaseHelm):
         self.check_incident_resolved_false_positive(inc)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
 
-    def run_and_wait_for_incident(self, wlids: list, command: str, cluster: str, namespace: str, 
+    def wait_for_incident(self, cluster: str, namespace: str, 
                                 expected_incident_name: str = "Unexpected process launched", sleep_after_cmd: int = 0) -> dict:
         """
         Execute command in pod and wait for incident to be completed
         """
-        self.exec_pod(wlid=wlids[0], command=command)
         time.sleep(sleep_after_cmd)
         return self.verify_incident_completed(cluster, namespace, expected_incident_name)
 

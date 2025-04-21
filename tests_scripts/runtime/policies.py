@@ -62,7 +62,7 @@ class RuntimePoliciesConfigurations(Incidents):
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
-        self.create_application_profile(wlids=wlids, namespace=namespace)
+        self.create_application_profile(wlids=wlids, namespace=namespace, commands=["more /etc/os-release"])
 
         Logger.logger.info("3. validate incident types")
         self.validate_incident_types()
@@ -197,7 +197,13 @@ class RuntimePoliciesConfigurations(Incidents):
         Logger.logger.info("12. Delete webhook")
         self.delete_webhook(guid)
 
-        Logger.logger.info("13. Create exception")
+        Logger.logger.info("13. Create incident to validate BE")
+        self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
+        self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                                cluster=cluster, namespace=namespace,
+                                incident_name=["Malware found"])
+
+        Logger.logger.info("14. Create exception")
         exception_id = self.backend.create_runtime_exception(policy_ids=["I013"], resources=[{
             "designatorType":"Attribute",
              "attributes":
@@ -208,17 +214,17 @@ class RuntimePoliciesConfigurations(Incidents):
                 "kind":"*/*"
              }
             }
-        ]).json()["guid"]
+        ])["guid"]
         self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
 
-        Logger.logger.info("14. Delete exception")
+        Logger.logger.info("15. Delete exception")
         self.backend.delete_runtime_exception(exception_id=exception_id)
 
-        Logger.logger.info("15. Delete policies")
+        Logger.logger.info("16. Delete policies")
         for policy_guid in policies_guids:
             self.validate_delete_policy(policy_guid)
 
-        Logger.logger.info("16. Check no incident")
+        Logger.logger.info("17. Check no incident")
         self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
 
         return self.cleanup()
