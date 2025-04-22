@@ -2,6 +2,7 @@ import inspect
 
 from .structures import TestConfiguration
 from systest_utils import statics
+from os.path import join
 
 
 
@@ -21,6 +22,16 @@ class KSMicroserviceTests(object):
         )
 
 
+    @staticmethod
+    def sbom_test():
+         from tests_scripts.helm.ks_microservice import ScanSBOM
+
+         return TestConfiguration(
+                name=inspect.currentframe().f_code.co_name,
+                test_obj=ScanSBOM,
+                deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+
+         )
 
     @staticmethod
     def attackchains_all():
