@@ -1227,5 +1227,18 @@
   "description": "testing basic incident presented",
   "skip_on_environment": "",
   "owner": "eranm@armosec.io"
-}
+},
+"sbom_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "testing basic incident presented",
+    "skip_on_environment": "production,production-us",
+    "owner": "eranm@armosec.io"
+  }
 }
