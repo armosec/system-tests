@@ -79,18 +79,6 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io"
   },
-  "relevancy_extra_large_image": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "operator"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
-  },
   "relevancy_large_image": {
     "target": [
       "In cluster",
@@ -1225,16 +1213,29 @@
     "owner": "eranm@armosec.io"
   },
   "kdr_response_by_user": {
+  "target": [
+    "In cluster",
+    "Backend"
+  ],
+  "target_repositories": [
+    "cadashboardbe",
+    "event-ingester-service",
+    "config-service"
+  ],
+  "description": "testing basic incident presented",
+  "skip_on_environment": "",
+  "owner": "eranm@armosec.io"
+},
+"sbom_test": {
     "target": [
       "In cluster",
       "Backend"
     ],
     "target_repositories": [
       "cadashboardbe",
-      "event-ingester-service",
-      "config-service"
+      "event-ingester-service"
     ],
-    "description": "testing basic incident presented",
+    "description": "testing sbom",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
