@@ -1,4 +1,5 @@
 # encoding: utf-8
+import json
 import datetime
 import subprocess
 import time
@@ -657,6 +658,44 @@ class KubectlWrapper(object):
     @staticmethod
     def scale(namespace: str, kind: str, name: str, replicas: int):
         TestUtil.run_command(f"kubectl scale --replicas={replicas} {kind} {name} -n {namespace}".split(" "), timeout=None)
+
+    def add_value_to_configmap(self, namespace, configmap_name, values_to_add, json_key=None):
+        """
+        Add values to a ConfigMap in the specified namespace.
+        
+        Args:
+            namespace (str): The namespace where the ConfigMap is located
+            configmap_name (str): The name of the ConfigMap
+            values_to_add (dict): Dictionary with key-value pairs to add to the ConfigMap
+            json_key (str, optional): If specified, treats this key's value as JSON and 
+                                     merges values_to_add into that JSON object
+        
+        Returns:
+            The response from updating the ConfigMap
+        """
+        try:
+            configmap: client.V1ConfigMap = self.run(method=self.client_CoreV1Api.read_namespaced_config_map, 
+                                 name=configmap_name, 
+                                 namespace=namespace)
+            
+            if json_key and json_key in configmap.data:                
+                config_data: dict = json.loads(configmap.data[json_key])
+                config_data.update(values_to_add)
+                configmap.data[json_key] = json.dumps(config_data, indent=2)
+            else:
+                if configmap.data is None:
+                    configmap.data = {}
+                    
+                for key, value in values_to_add.items():
+                    configmap.data[key] = str(value)
+            return self.run(method=self.client_CoreV1Api.patch_namespaced_config_map,
+                            name=configmap_name,
+                            namespace=namespace,
+                            body=configmap)
+                            
+        except Exception as ex:
+            Logger.logger.error(f"Failed to update ConfigMap {configmap_name} in namespace {namespace}: {ex}")
+            raise ex
 
 
 def get_name(obj: dict):

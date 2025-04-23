@@ -1,7 +1,7 @@
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
 from infrastructure.backend_api import EventReceiver
-from tests_scripts.runtime.consts import CDR_ALERT_TYPE
+from tests_scripts.runtime.consts import CDR_ALERT_TYPE, NodeAgentK8s
 import json
 import time
 
@@ -29,6 +29,7 @@ class CADRIncidents(Incidents):
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.enable_node_agent_test_mode()
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace)
         self._test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace)
@@ -82,6 +83,13 @@ class CADRIncidents(Incidents):
         
         event_receiver = self._get_event_receiver()
         event_receiver.post_cdr_alerts(cdr_mock)
+
+    def enable_node_agent_test_mode(self):
+        self.kubernetes_obj.add_value_to_configmap(namespace=NodeAgentK8s.NAMESPACE, configmap_name=NodeAgentK8s.CONFIGMAP_NAME, values_to_add=NodeAgentK8s.TEST_MODE, json_key=NodeAgentK8s.JSON_KEY)
+        self.kubernetes_obj.restart_workloads_in_namespace(namespace=NodeAgentK8s.NAMESPACE, kind=NodeAgentK8s.KIND, name=NodeAgentK8s.NAME)
+        time.sleep(30)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
+                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 
     def _get_event_receiver(self):
         event_receiver_server = self.test_driver.backend_obj.get_event_receiver_server()
