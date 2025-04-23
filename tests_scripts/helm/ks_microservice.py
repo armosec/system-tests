@@ -938,3 +938,88 @@ class ControlClusterFromCLI(BaseHelm, BaseKubescape):
         self.validate_cluster_trigger_as_expected(cluster_name=self.get_cluster_name(), args=self.test_obj["cli_args"])
 
         return self.cleanup()
+
+
+
+
+class ScanSBOM(BaseHelm, BaseKubescape):
+    """
+    ScanSBOM install the kubescape operator and check SBOM.
+    """
+
+    def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
+        super(ScanSBOM, self).__init__(test_obj=test_obj, backend=backend,
+                                                                     kubernetes_obj=kubernetes_obj,
+                                                                     test_driver=test_driver)
+        
+        # disable node agent capabilities
+        self.helm_kwargs = {
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
+            statics.HELM_SYNC_SBOM: statics.HELM_SYNC_SBOM_ENABLED,
+        }
+
+        if self.test_obj.get_arg("helm_kwargs", default={}) != {}:
+            self.helm_kwargs.update(self.test_obj.get_arg("helm_kwargs"))
+        self.wait_for_agg_to_end = False
+
+    def start(self):
+        """
+        Agenda:
+
+
+        """
+        assert self.backend != None;
+        f'the test {self.test_driver.test_name} must run with backend'
+
+        self.ignore_agent = True
+        self.cluster, self.namespace = self.setup(apply_services=False)
+
+
+        Logger.logger.info('1. Install deployments in the cluster')
+        current_datetime = datetime.now(timezone.utc)
+        workload_objs: list = self.apply_directory(path=self.test_obj[("deployments", None)], namespace=self.namespace)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=10, timeout=180, namespace=self.namespace)
+
+
+        Logger.logger.info("2. Install kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
+
+        Logger.logger.info("3. verify SBOM scan")
+        self.wait_for_report(self.verify_backend_results, sleep_interval=5, timeout=180)
+
+        
+        return self.cleanup()
+    
+
+    def verify_backend_results(self):
+        """
+        Verify the results of the scan
+        """
+        body = {
+            "pageSize":50,
+            "pageNum":1,
+            "innerFilters":[
+                {
+                    "cluster":self.cluster,
+                    "namespace":self.namespace,
+                    "workload":"redis-sleep",
+                    "name":"libcrypto3"
+                }
+            ]
+        }
+
+        components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert len(components) == 1, f"expected 1 component, got {len(components)}"
+    
+        component = components[0]
+        assert component["name"] == "libcrypto3", f"expected libcrypto3, got {component['name']}"
+        assert component["version"] == "3.0.8-r0", f"expected 3.0.8-r0, got {component['version']}"
+        assert component["packageType"] == "apk", f"expected apk, got {component['packageType']}"
+        assert "licenses" in component, "expected licenses, got None"
+        assert len(component["licenses"]) > 0, f"expected some licenses, got {component['licenses']}"
+        assert "severityStats" in component, "expected severityStats, got None"
+        assert len(component["severityStats"]) > 0, f"expected some severityStats, got {component['severityStats']}"
+
+        

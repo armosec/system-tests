@@ -2152,12 +2152,11 @@ class ControlPanelAPI(object):
         return self.post_list_request(url, body, expected_results, params=params)
 
     def get_vuln_v2_components(self, body: dict, expected_results: int = 0, scope: str = None, enrich_tickets=False):
-        url = API_VULNERABILITY_V2_IMAGE
         params = {}
         if scope:
-            params = {"scope": scope}
+            params["scope"] = scope
         if not enrich_tickets:
-            params = {"enrichTickets": "false"}
+            params["enrichTickets"] = "false"
         return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results, params=params)
 
     def get_posture_resources_highlights(self, body: dict):

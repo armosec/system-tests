@@ -270,6 +270,10 @@ HELM_NODE_SBOM_GENERATION = "capabilities.nodeSbomGeneration"
 HELM_NODE_SBOM_GENERATION_ENABLED = "enable"
 HELM_NODE_SBOM_GENERATION_DISABLED = "disable"
 
+HELM_SYNC_SBOM = "capabilities.syncSBOM"
+HELM_SYNC_SBOM_ENABLED = "enable"
+HELM_SYNC_SBOM_DISABLED = "disable"
+
 # relevancy feature
 HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"
 HELM_NODE_AGENT_LEARNING_PERIOD = "nodeAgent.config.learningPeriod"
