@@ -14,8 +14,8 @@ class Incidents(BaseHelm):
         check incidents page.
     """
 
-    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
-        super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
+    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None, kubernetes_obj=None):
+        super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver, kubernetes_obj=kubernetes_obj)
         self.helm_kwargs = {
             "capabilities.manageWorkloads":"enable",
             "capabilities.configurationScan": "disable",

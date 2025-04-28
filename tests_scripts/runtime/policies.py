@@ -26,8 +26,8 @@ class RuntimePoliciesConfigurations(Incidents):
         check incidents policy configurations - list, create, update, delete, unique values
     """
 
-    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
-        super(RuntimePoliciesConfigurations, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
+    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None, kubernetes_obj=None):
+        super(RuntimePoliciesConfigurations, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver, kubernetes_obj=kubernetes_obj)
 
         self.tested_webhook_guid = []
         self.tested_policy_guid = []
