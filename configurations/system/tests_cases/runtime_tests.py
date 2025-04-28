@@ -4,7 +4,7 @@ from tests_scripts.runtime.alerts import enrich_slack_alert_notifications, enric
 from tests_scripts.users_notifications.alert_notifications import get_messages_from_slack_channel, get_messages_from_teams_channel
 from .structures import KubescapeConfiguration, TestConfiguration
 from os.path import join
-from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH
+from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_CDR_MOCK_PATH
 
 
 
@@ -27,6 +27,7 @@ class RuntimeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=RuntimePoliciesConfigurations,
             create_test_tenant=True,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
         )
     
     @staticmethod
@@ -61,6 +62,17 @@ class RuntimeTests(object):
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             tests=["ApplyNetworkPolicy", "ApplySeccompProfile"],
             with_private_node_agent=False,
+            # create_test_tenant=True,
+        )
+    
+    @staticmethod
+    def cadr_incident_presented():
+        from tests_scripts.runtime.cadr import CADRIncidents
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CADRIncidents,
+            deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+            cdr_mock_path=DEFAULT_CDR_MOCK_PATH,
             # create_test_tenant=True,
         )
     

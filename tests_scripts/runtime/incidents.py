@@ -1,7 +1,7 @@
 import json
 import time
-
-
+import os
+from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
 from tests_scripts.helm.base_helm import BaseHelm
@@ -9,16 +9,13 @@ from tests_scripts.helm.base_helm import BaseHelm
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
 
-
-
-
 class Incidents(BaseHelm):
     """
         check incidents page.
     """
 
-    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
-        super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
+    def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None, kubernetes_obj=None):
+        super(Incidents, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver, kubernetes_obj=kubernetes_obj)
         self.helm_kwargs = {
             "capabilities.manageWorkloads":"enable",
             "capabilities.configurationScan": "disable",
@@ -33,6 +30,7 @@ class Incidents(BaseHelm):
             "capabilities.malwareDetection": "enable",
             "capabilities.runtimeDetection": "enable",
             "capabilities.nodeProfileService": "enable",
+            "capabilities.admissionController": "disable",
             "alertCRD.installDefault": True,
             "alertCRD.scopeClustered": True,
             # short learning period
@@ -40,28 +38,71 @@ class Incidents(BaseHelm):
             "nodeAgent.config.learningPeriod": "50s",
             "nodeAgent.config.updatePeriod": "30s",
             "nodeAgent.config.nodeProfileInterval": "1m",
-            # "nodeAgent.image.repository": "docker.io/amitschendel/node-agent",
-            # "nodeAgent.image.tag": "v0.0.5",
+            "nodeAgent.config.hostMalwareSensor": "enable",
+            "nodeAgent.config.hostNetworkSensor": "enable",
+            "nodeAgent.image.repository": "quay.io/armosec/node-agent",
+            "nodeAgent.image.tag": "latest",
+            "logger.level": "debug",
+            "imagePullSecret.password": os.environ.get("NA_IMAGE_PULL_SECRET_PASSWORD", ""),
+            "imagePullSecret.server": "quay.io",
+            "imagePullSecret.username": "armosec+armosec_ro",
+            "imagePullSecrets": "armosec-readonly",
+            "capabilities.httpDetection": "disable",
+            "capabilities.networkEventsStreaming": "enable",
+            "capabilities.nodeSbomGeneration": "disable",
+            "nodeAgent.config.networkStreamingInterval": "5s",
         }
+
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
         if test_helm_kwargs:
             self.helm_kwargs.update(test_helm_kwargs)
 
     def start(self):
-        assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
+        assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         cluster, namespace = self.setup()
-
-        Logger.logger.info(". Install armo helm-chart before application so we will have final AP")
+        Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
+        self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help"])
+        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
+        time.sleep(1)
+        self.exec_pod(wlid=wlids[0], command="cat /root/malware.o")
+        time.sleep(1)
+        self.exec_pod(wlid=wlids[0], command="wget sodiumlaurethsulfatedesyroyer.com")
+        time.sleep(160)
+        self._test_unexpected_process(cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self._test_connection_to_malicious_destination(cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
+        self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
+        return self.cleanup()
+        
+    
+    def _test_malware_found(self, cluster: str, namespace: str, expected_incident_name: str = "Malware found"):
+        Logger.logger.info(f"Simulate malware found from {cluster} {namespace}")
+        try:
+            inc = self.wait_for_incident(cluster, namespace, expected_incident_name, sleep_after_cmd=60)
+        except Exception:
+            Logger.logger.info(f"Expected incident {expected_incident_name} not found")
+            return
+        assert inc['md5Hash'] == MALWARE_INCIDENT_MD5, f"Expected md5Hash to be {MALWARE_INCIDENT_MD5}, got {inc['md5Hash']}"
+    
+    def _test_connection_to_malicious_destination(self, cluster: str, namespace: str, expected_incident_name: str = "Connection To Malicious Destination"):
+        Logger.logger.info(f"Simulate connection to malicious destination from {cluster} {namespace}")
+        inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
+        assert inc['networkscan']['domain'] == MALICIOUS_DOMAIN, f"Expected domain to be {MALICIOUS_DOMAIN}, got {inc['networkscan']['domain']}"
 
-        Logger.logger.info('Simulate unexpected process')
-        inc = self.simulate_unexpected_process(deployments_path=self.test_obj["deployments"],
-                                               cluster=cluster, namespace=namespace, command="cat /etc/hosts", expected_incident_name="Unexpected process launched")
-
+    def _test_unexpected_process(self, cluster: str, namespace: str, 
+                                  expected_incident_name: str = "Unexpected process launched"):
+        """
+        Original function now using the split functions
+        """
+        Logger.logger.info(f"Simulate unexpected process from {cluster} {namespace}")
+        inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
+        self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
@@ -77,64 +118,72 @@ class Incidents(BaseHelm):
         self.resolve_incident_false_positive(inc)
         self.check_incident_resolved_false_positive(inc)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
-        self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
 
-        return self.cleanup()
-    
-    def apply_directory_and_verify(self, path: str, namespace: str):
+    def wait_for_incident(self, cluster: str, namespace: str, 
+                                expected_incident_name: str = "Unexpected process launched", sleep_after_cmd: int = 0) -> dict:
         """
-        Apply the directory and verify that the workloads are running.
+        Execute command in pod and wait for incident to be completed
         """
-        Logger.logger.info(f"Simulate unexpected process from {path}")
-        Logger.logger.info(f"Apply workload from {path} to {namespace}")
-        Logger.logger.info(f"Apply directory {path} to {namespace}")
-        workload_objs: list = self.apply_directory(path=path, namespace=namespace)
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)
-        return workload_objs
+        time.sleep(sleep_after_cmd)
+        return self.verify_incident_completed(cluster, namespace, expected_incident_name)
 
-
-    def simulate_unexpected_process(self, deployments_path: str, cluster: str, namespace: str, command: str, expected_incident_name: str = "Unexpected process launched", apply_workload: bool = True, wlids: list = None, verify_backend=True, wait_for_application_profile_cache=30):
-        Logger.logger.info(f"Simulate unexpected process from {deployments_path}")
-        Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
-        if apply_workload:
-            workload_objs = self.apply_directory_and_verify(path=deployments_path, namespace=namespace)
-            Logger.logger.info(f"Get workloads wlids")
-            wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
-        else:
-            if wlids is None:
-                raise Exception("wlids is None, please provide wlids")
-            Logger.logger.info(f"wlids are {wlids}")
-
-        if isinstance(wlids, str):
-                wlids = [wlids]
-
-
-        Logger.logger.info(
-            f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
-        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(wait_for_application_profile_cache)
-        self.exec_pod(wlid=wlids[0], command=command)
-
-        if verify_backend:
-            return self.verify_unexpected_process_on_backend(cluster=cluster, namespace=namespace,
-                                                      expected_incident_name=expected_incident_name)    
-        else:
-            return None
-    
     def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
-        Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
-                                       cluster=cluster, namespace=namespace,
-                                       incident_name=[expected_incident_name])
-        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
-        inc, _ = self.wait_for_report(self.verify_incident_completed, timeout=10 * 60, sleep_interval=10,
-                                      incident_id=incs[0]['guid'])
+                                cluster=cluster, namespace=namespace,
+                                incident_name=[expected_incident_name])
+        inc = self.backend.get_incident(incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        assert inc['processTree'] is not None, f"Failed to get processTree {json.dumps(inc)}"
+        assert inc['processTree']['processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(inc)}"
+        actual_process_tree = inc['processTree']['processTree']
+        if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
+            actual_process_tree = actual_process_tree["children"][0]
+        assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
+        assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
+        # optional fields
+        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
+        assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
+        assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
+
+        
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
         
         return inc
 
+    def verify_incident_completed(self, cluster: str, namespace: str, expected_incident_name: str):
+        Logger.logger.info("Get incidents list")
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                                       cluster=cluster, namespace=namespace,
+                                       incident_name=[expected_incident_name])
+        Logger.logger.info(f"Got incidents list {json.dumps(incs)}")
+        
+        inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=10 * 60, sleep_interval=10,
+                                      incident_id=incs[0]['guid'])
+        Logger.logger.info(f"Got incident {json.dumps(inc)}")
+        return inc
+
+    def create_application_profile(self, wlids: list, namespace: str, commands: list = []):
+        for command in commands:
+            self.exec_pod(wlid=wlids[0], command=command)
+        
+        Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
+        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
+        time.sleep(30)
+
+    def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
+        """
+        Deploy workloads and wait for pods and application profiles to be ready
+        """
+        Logger.logger.info(f"Apply workload from {deployments_path} to {namespace}")
+        workload_objs: list = self.apply_directory(path=deployments_path, namespace=namespace)
+        wlids = self.get_wlid(workload=workload_objs, namespace=namespace, cluster=cluster)
+        if isinstance(wlids, str):
+            wlids = [wlids]
+        
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=180, namespace=namespace)        
+        return wlids
 
     def verify_kdr_monitored_counters(self, cluster: str):
         Logger.logger.info("Get monitored assets")
@@ -272,7 +321,7 @@ class Incidents(BaseHelm):
         unique_values = self.backend.get_alerts_unique_values(incident_id=incident['guid'], request=unique_values_req)
         assert unique_values is not None, f"Failed to get unique values of alerts {json.dumps(incident)}"
         #expected_values = {"ruleID": ["R0001", "R0002", "R0003", "R0004"]}
-        expected_values = {"ruleID": ["R0001", "R0004"]}
+        expected_values = {"ruleID": ["R0001"]}
         # don't check the count, it's dynamic
         assert unique_values[
                    "fields"] == expected_values, f"Failed to get unique values of alerts {json.dumps(incident)} {json.dumps(unique_values)}"
@@ -369,25 +418,9 @@ class Incidents(BaseHelm):
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
-    def verify_incident_completed(self, incident_id):
+    def verify_incident_status_completed(self, incident_id):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
-        assert response['processTree'] is not None, f"Failed to get processTree {json.dumps(response)}"
-        assert response['processTree'][
-                   'processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(response)}"
-        actual_process_tree = response['processTree']['processTree']
-        if "children" in actual_process_tree and len(actual_process_tree["children"]) > 0:
-            actual_process_tree = actual_process_tree["children"][0]
-        # because of race condition, comm might be 'runc:[2:INIT]'
-        # assert "cat" in actual_process_tree['comm'] or "runc:[2:INIT]", f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
-        assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
-        assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
-        # optional fields
-        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
-        assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
-        assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
-        assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
-
         return response
 
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):

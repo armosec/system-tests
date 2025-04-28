@@ -9,6 +9,7 @@ class Backend(object):
                  dashboard: str,
                  api_url: str,
                  auth_url: str = None,
+                 event_receiver_server: str = None,
                  tls_verify: bool = True,
                  login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
         self.name = name
@@ -18,6 +19,7 @@ class Backend(object):
         self.login_method = login_method
         self.customer_guid = customer_guid
         self.api_url = api_url
+        self.event_receiver_server = event_receiver_server
 
     def get_dashboard_url(self):
         return self.dashboard
@@ -39,6 +41,9 @@ class Backend(object):
 
     def get_api_url(self):
         return self.api_url
+    
+    def get_event_receiver_server(self):
+        return self.event_receiver_server
 
 
 def set_backends():
@@ -50,6 +55,7 @@ def set_backends():
                             dashboard='https://eggdashbe-dev.armosec.io',
                             api_url="api-dev.armosec.io",
                             auth_url='https://eggauth-dev.armosec.io',
+                            event_receiver_server="https://report-ks.eudev3.cyberarmorsoft.com",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
@@ -59,6 +65,7 @@ def set_backends():
                             dashboard='https://eggdashbe-stage.armosec.io',
                             api_url="api-stage.armosec.io",
                             auth_url='https://eggauth-stage.armosec.io',
+                            event_receiver_server="https://report-ks.eustage2.cyberarmorsoft.com",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
@@ -67,6 +74,7 @@ def set_backends():
                             api_url="api.armosec.io",
                             dashboard='https://api.armosec.io',
                             auth_url='https://auth.armosec.io',
+                            event_receiver_server="https://report.armo.cloud",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
@@ -75,6 +83,7 @@ def set_backends():
                             api_url="api.us.armosec.io",
                             dashboard='https://api.us.armosec.io',
                             auth_url='https://auth.us.armosec.io',
+                            event_receiver_server="https://report.us.armo.cloud",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 

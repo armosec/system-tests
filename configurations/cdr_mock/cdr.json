@@ -1,0 +1,144 @@
+{
+  "customerGUID": "a079d6f3-ee8e-452e-b7ea-3b432712e818",
+  "cloudAccountID": "015253967648",
+  "ruleFailures": [
+    {
+      "cloudMetadata": {
+        "provider": "aws",
+        "sourceService": "cloudtrail"
+      },
+      "eventData": {
+        "awsCloudTrail": {
+          "eventVersion": "1.08",
+          "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAQHDJVCMQOFZGXLVG4:1733314429145507797",
+            "arn": "arn:aws:sts::015253967648:assumed-role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05/1733314429145507797",
+            "accountId": "015253967648",
+            "accessKeyId": "ASIAQHDJVCMQJVBAYFIO",
+            "sessionContext": {
+              "sessionIssuer": {
+                "type": "Role",
+                "principalId": "AROAQHDJVCMQOFZGXLVG4",
+                "arn": "arn:aws:iam::015253967648:role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05",
+                "accountId": "015253967648",
+                "userName": "KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05"
+              },
+              "attributes": {
+                "mfaAuthenticated": "false",
+                "creationDate": "2024-12-04T12:13:49Z"
+              }
+            }
+          },
+          "eventTime": "2024-12-04T12:47:29Z",
+          "eventSource": "ssm.amazonaws.com",
+          "eventName": "GetParameter",
+          "awsRegion": "eu-west-2",
+          "sourceIPAddress": "3.8.160.233",
+          "userAgent": "aws-sdk-go/1.50.10 (go1.21.6; linux; amd64) karpenter.sh-v0.34.0",
+          "requestParameters": {
+            "name": "/aws/service/eks/optimized-ami/1.28/amazon-linux-2/recommended/image_id"
+          },
+          "requestId": "c65d0fea-c15e-4f5e-b970-319ba736b5ae",
+          "eventId": "69b50935-a764-4b07-9890-fbdebf4438bd",
+          "eventType": "AwsApiCall",
+          "readOnly": true,
+          "managementEvent": true,
+          "resources": [
+            {
+              "resourceType": "",
+              "ARN": "arn:aws:ssm:eu-west-2::parameter/aws/service/eks/optimized-ami/1.28/amazon-linux-2/recommended/image_id"
+            }
+          ],
+          "recipientAccountId": "015253967648",
+          "tlsDetails": {
+            "tlsVersion": "TLSv1.2",
+            "cipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+            "clientProvidedHostHeader": "ssm.eu-west-2.amazonaws.com"
+          }
+        }
+      },
+      "ruleName": "Detect AWS Systems Manager Parameters Retrieved",
+      "ruleID": "C0001",
+      "description": "Detect when data about one or more parameters is retrieved from AWS Systems Manager.",
+      "severity": "INFO",
+      "tags": [
+        "cloud",
+        "aws",
+        "aws_systems_manager"
+      ],
+      "message": "Data about parameters was retrieved from AWS Systems Manager (requesting user=map[accessKeyId:ASIAQHDJVCMQJVBAYFIO accountId:015253967648 arn:arn:aws:sts::015253967648:assumed-role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05/1733314429145507797 principalId:AROAQHDJVCMQOFZGXLVG4:1733314429145507797 sessionContext:map[attributes:map[creationDate:2024-12-04T12:13:49Z mfaAuthenticated:false] sessionIssuer:map[accountId:015253967648 arn:arn:aws:iam::015253967648:role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05 principalId:AROAQHDJVCMQOFZGXLVG4 type:Role userName:KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05] webIdFederationData:map[attributes:map[] federatedProvider:arn:aws:iam::015253967648:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/43235678B5A965629353045A4D1A9393]] type:AssumedRole], requesting IP=3.8.160.233, AWS region=eu-west-2, parameter names=event.requestParameters.names, parameter path=event.requestParameters.path)",
+      "mitreTactic": "TA0006",
+      "mitreTechnique": "T1552"
+    },
+    {
+      "cloudMetadata": {
+        "provider": "aws",
+        "sourceService": "cloudtrail"
+      },
+      "eventData": {
+        "awsCloudTrail": {
+          "eventVersion": "1.08",
+          "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAQHDJVCMQOFZGXLVG4:1733314429145507797",
+            "arn": "arn:aws:sts::015253967648:assumed-role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05/1733314429145507797",
+            "accountId": "015253967648",
+            "accessKeyId": "ASIAQHDJVCMQJVBAYFIO",
+            "sessionContext": {
+              "sessionIssuer": {
+                "type": "Role",
+                "principalId": "AROAQHDJVCMQOFZGXLVG4",
+                "arn": "arn:aws:iam::015253967648:role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05",
+                "accountId": "015253967648",
+                "userName": "KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05"
+              },
+              "attributes": {
+                "mfaAuthenticated": "false",
+                "creationDate": "2024-12-04T12:13:49Z"
+              }
+            }
+          },
+          "eventTime": "2024-12-04T12:47:29Z",
+          "eventSource": "ssm.amazonaws.com",
+          "eventName": "GetParameter",
+          "awsRegion": "eu-west-2",
+          "sourceIPAddress": "3.8.160.233",
+          "userAgent": "aws-sdk-go/1.50.10 (go1.21.6; linux; amd64) karpenter.sh-v0.34.0",
+          "requestParameters": {
+            "name": "/aws/service/eks/optimized-ami/1.28/amazon-linux-2-arm64/recommended/image_id"
+          },
+          "requestId": "da4802d1-f207-447e-a9d4-8c572ab76274",
+          "eventId": "824f5688-b2f2-4dc8-b882-0ed5b4a97e45",
+          "eventType": "AwsApiCall",
+          "readOnly": true,
+          "managementEvent": true,
+          "resources": [
+            {
+              "resourceType": "",
+              "ARN": "arn:aws:ssm:eu-west-2::parameter/aws/service/eks/optimized-ami/1.28/amazon-linux-2-arm64/recommended/image_id"
+            }
+          ],
+          "recipientAccountId": "015253967648",
+          "tlsDetails": {
+            "tlsVersion": "TLSv1.2",
+            "cipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+            "clientProvidedHostHeader": "ssm.eu-west-2.amazonaws.com"
+          }
+        }
+      },
+      "ruleName": "Detect AWS Systems Manager Parameters Retrieved",
+      "ruleID": "C0002",
+      "description": "Detect when data about one or more parameters is retrieved from AWS Systems Manager.",
+      "severity": "INFO",
+      "tags": [
+        "cloud",
+        "aws",
+        "aws_systems_manager"
+      ],
+      "message": "Data about parameters was retrieved from AWS Systems Manager (requesting user=map[accessKeyId:ASIAQHDJVCMQJVBAYFIO accountId:015253967648 arn:arn:aws:sts::015253967648:assumed-role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05/1733314429145507797 principalId:AROAQHDJVCMQOFZGXLVG4:1733314429145507797 sessionContext:map[attributes:map[creationDate:2024-12-04T12:13:49Z mfaAuthenticated:false] sessionIssuer:map[accountId:015253967648 arn:arn:aws:iam::015253967648:role/KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05 principalId:AROAQHDJVCMQOFZGXLVG4 type:Role userName:KarpenterControllerRole-PR-Backend-Deployment-Cluster-test-peu05] webIdFederationData:map[attributes:map[] federatedProvider:arn:aws:iam::015253967648:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/43235678B5A965629353045A4D1A9393]] type:AssumedRole], requesting IP=3.8.160.233, AWS region=eu-west-2, parameter names=event.requestParameters.names, parameter path=event.requestParameters.path)",
+      "mitreTactic": "TA0006",
+      "mitreTechnique": "T1552"
+    }
+  ]
+}

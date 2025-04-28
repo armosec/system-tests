@@ -38,6 +38,8 @@ DEFAULT_SP_PATH = os.path.abspath(os.path.join('configurations', 'signing-profil
 DEFAULT_KS_EXCEPTIONS_PATH = os.path.abspath(os.path.join('configurations', 'ks-exceptions'))
 DEFAULT_KS_CUSTOM_FW_PATH = os.path.abspath(os.path.join('configurations', 'ks-custom-fw'))
 
+DEFAULT_CDR_MOCK_PATH = os.path.abspath(os.path.join('configurations', 'cdr_mock', 'cdr.json'))
+
 RESOURCES_PATH = os.path.abspath('resources')
 
 DEFAULT_GRYPE_BINARIES_PATH = os.path.abspath('grype-versioning/grype-binaries')

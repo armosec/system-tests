@@ -1,4 +1,3 @@
-
 {
   "relevancy_disabled_installation": {
     "target": [
@@ -120,8 +119,7 @@
     "target": [
       "CLI"
     ],
-    "target_repositories": [
-    ],
+    "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
@@ -1240,5 +1238,19 @@
     "description": "testing sbom",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
+  },
+  "cadr_incident_presented": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "careportsreceiver",
+      "event-ingester-service"
+    ],
+    "description": "testing cadr incident presented",
+    "skip_on_environment": "",
+    "owner": "afekb@armosec.io"
   }
 }

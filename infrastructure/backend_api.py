@@ -124,6 +124,9 @@ API_RUNTIME_POLICIES_LIST = "/api/v1/runtime/policies/list"
 API_RUNTIME_POLICIES = "/api/v1/runtime/policies"
 API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 
+API_RUNTIME_EXCEPTION = "/api/v1/runtime/exceptions"
+API_RUNTIME_EXCEPTION_NEW = API_RUNTIME_EXCEPTION + "/new"
+
 
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
 API_SECCOMP_GENERATE = "/api/v1/seccomp/generate"
@@ -164,6 +167,7 @@ API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
 
+POST_CDR_ALERTS = "/cloud/v1/cdrAlert"
 
 def deco_cookie(func):
     def apply_cookie(*args, **kwargs):
@@ -3288,6 +3292,57 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
+    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "") -> dict:
+        """
+        Create a new runtime exception
+        Args:
+            policy_ids: List of policy IDs to create exception for
+            resources: List of resources to apply the exception to
+            reason: Reason for the exception
+        Returns:
+            Response from the API
+        Example:
+            "resources":[{"designatorType":"Attribute",
+            "attributes":{"cluster":"do-fra1-k8s-1-32-1-do-0-fra1-amit-demo",
+            "namespace":"systest-ns-mli2","name":"redis-sleep","kind":"Deployment"}}]
+        """
+        payload = {
+            "policyIDs": policy_ids,
+            "reason": reason,
+            "policyType": "runtimeIncidentExceptionPolicy",
+            "resources": resources
+        }
+        response = self.post(f"{API_RUNTIME_EXCEPTION_NEW}", json=payload)
+        assert 200 <= response.status_code < 300, f"Failed to create runtime exception, got {response.status_code}"
+        return response.json()
+
+    def delete_runtime_exception(self, exception_id: str) -> requests.Response:
+        """
+        Delete a runtime exception
+        Args:
+            exception_id: ID of the exception to delete
+        Returns:
+            Response from the API
+        """
+        response = self.delete(f"{API_RUNTIME_EXCEPTION}/{exception_id}")
+        assert 200 <= response.status_code < 300, f"Failed to delete runtime exception, got {response.status_code}"
+        return response.json()
+
+    def get_runtime_exceptions(self, filters: Dict = None) -> requests.Response:
+        """
+        Get list of runtime exceptions
+        Args:
+            filters: Optional filters to apply to the request
+        Returns:
+            Response from the API containing list of exceptions
+        """
+        params = {}
+        if filters:
+            params.update(filters)
+        response = self.get(f"{API_RUNTIME_EXCEPTION}", params=params)
+        assert 200 <= response.status_code < 300, f"Failed to get runtime exceptions, got {response.status_code}"
+        return response.json()
+
     def get_helm(self):
 
         r = self.get(API_COMMAND_HELM)
@@ -3555,3 +3610,14 @@ class Service(object):
                 200 <= r.status_code < 300), 'Error getting session service info from dashboard (code: %d, message: %s)' % (
             r.status_code, r.text)
         return r.json()
+
+class EventReceiver(object):
+    def __init__(self,  server: str, customer_guid: str, api_key: str):
+        self.server = server
+        self.customer_guid = customer_guid
+        self.api_key = api_key
+    
+    def post_cdr_alerts(self, cdr_alerts: dict):
+        response = requests.post(f"{self.server}{POST_CDR_ALERTS}", json=cdr_alerts, headers={"X-API-KEY": self.api_key}, params={"customerGUID": self.customer_guid})
+        assert 200 <= response.status_code < 300, f"Failed to send cdr alerts, got {response.status_code}"
+        return response
