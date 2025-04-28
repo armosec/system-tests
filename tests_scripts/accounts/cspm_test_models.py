@@ -21,7 +21,7 @@ DEFAULT_TEST_CONFIG = {
     "framework": "cis_3.0",
     "control_name": "Ensure IAM instance roles are used for AWS resource access from instances",
     "rule_name": "Ensure IAM instance roles are used for AWS resource access from instances",
-    "rule_hash": "f385f3a3-0368-cfd2-5c75-85e5bd1c35cf",
+    "rule_hash": "f68b74c3-5ac9-77d0-8554-79b962779e66",
     "rule_id": "ec2_instance_profile_attached",
     "check_type": "AUTOMATED",
     "severity": "medium",
