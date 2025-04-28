@@ -23,18 +23,21 @@ class CADRIncidents(Incidents):
 
     def start(self):
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
-
+        Logger.logger.info("1. Install armo helm-chart.")
         cluster, namespace = self.setup()
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        Logger.logger.info("2. Enable node agent test mode.")
         self.enable_node_agent_test_mode()
+        Logger.logger.info("3. Deploy deployments.")
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace)
+        Logger.logger.info("4. Simulate unexpected process.")
         self._test_unexpected_process(wlids=wlids, command="cat /etc/hosts", cluster=cluster, namespace=namespace)
         return self.cleanup()
-    
+
     def _test_unexpected_process(self, wlids: list, command: str, cluster: str, namespace: str, 
                                 expected_incident_name: str = "Unexpected process launched"):
         Logger.logger.info(f"Simulate unexpected process from {wlids}")
@@ -45,7 +48,9 @@ class CADRIncidents(Incidents):
                                        incident_name=[expected_incident_name])
         inc = incs[0]
         public_ip = inc["cloudMetadata"].get("public_ip", "")
+        Logger.logger.info("5. Send mock data of cdr alerts.")
         self._prepare_and_send_cdr_alerts(node_ip=public_ip, customer_guid=self.backend.get_customer_guid())
+        Logger.logger.info("6. Verify the incident data in the backend.")
         inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=10 * 60, sleep_interval=10,
                                       incident_id=inc["guid"])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")

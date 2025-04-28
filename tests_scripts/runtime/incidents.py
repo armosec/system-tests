@@ -1,6 +1,6 @@
 import json
 import time
-
+import os
 from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
@@ -43,7 +43,7 @@ class Incidents(BaseHelm):
             "nodeAgent.image.repository": "quay.io/armosec/node-agent",
             "nodeAgent.image.tag": "latest",
             "logger.level": "debug",
-            "imagePullSecret.password": "Q5UMRCFPRAHAIRWAYTOP7P4PK9ZNV2H26JFTB70CMNZ2KG1NHGPYXK6PNPNC677E",
+            "imagePullSecret.password": os.environ.get("NA_IMAGE_PULL_SECRET_PASSWORD", ""),
             "imagePullSecret.server": "quay.io",
             "imagePullSecret.username": "armosec+armosec_ro",
             "imagePullSecrets": "armosec-readonly",
