@@ -128,8 +128,10 @@ class Incidents(BaseHelm):
         return self.verify_incident_completed(cluster, namespace, expected_incident_name)
 
     def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
-        inc = self.verify_incident_in_backend_list(cluster, namespace, expected_incident_name)
-        inc = self.backend.get_incident(incident_id=inc[0]['guid'])
+        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                                cluster=cluster, namespace=namespace,
+                                incident_name=[expected_incident_name])
+        inc = self.backend.get_incident(incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc['processTree'] is not None, f"Failed to get processTree {json.dumps(inc)}"
         assert inc['processTree']['processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(inc)}"

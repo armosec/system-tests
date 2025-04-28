@@ -200,6 +200,9 @@ class IncidentResponse(Incidents):
 
         for wlid in wlid_to_namespace:
             self.wait_for_report(self.verify_application_profiles, wlids=[wlid], namespace=wlid_to_namespace[wlid])
+        time.sleep(30)
+        
+        for wlid in wlid_to_namespace:
             self.exec_pod(wlid=wlid, command="cat /etc/hosts")
 
         Logger.logger.info('Verify unexpected process on backend')
@@ -211,6 +214,7 @@ class IncidentResponse(Incidents):
                 expected_incident_name="Unexpected process launched",
             )
             Logger.logger.info(f"Verified unexpected process on backend in namespace {namespace} with incident {namespace_to_incident[namespace]}")
+
         return namespace_to_incident
 
 
