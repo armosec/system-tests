@@ -67,10 +67,10 @@ class Incidents(BaseHelm):
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
-        self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help"])
+        self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help", "more /etc/passwd"])
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
         time.sleep(1)
-        self.exec_pod(wlid=wlids[0], command="cat /root/malware.o")
+        self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
         time.sleep(1)
         self.exec_pod(wlid=wlids[0], command="wget sodiumlaurethsulfatedesyroyer.com")
         time.sleep(160)
@@ -170,7 +170,7 @@ class Incidents(BaseHelm):
         
         Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(30)
+        time.sleep(35)
 
     def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
         """

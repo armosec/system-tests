@@ -83,7 +83,7 @@ def set_backends():
                             api_url="api.us.armosec.io",
                             dashboard='https://api.us.armosec.io',
                             auth_url='https://auth.us.armosec.io',
-                            event_receiver_server="https://report.us.armo.cloud",
+                            event_receiver_server="https://cloud-report.us.armosec.io",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
