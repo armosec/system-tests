@@ -1198,7 +1198,7 @@ class BaseK8S(BaseDockerizeTest):
                 for sbom in namespacedSBOMs['items']:
                     if sbom['metadata']['annotations']['kubescape.io/status'] == 'initializing':
                         continue
-                    if sbom['metadata']['annotations']['kubescape.io/image-id'].endswith(image_tag):
+                    if sbom['metadata']['annotations']['kubescape.io/image-tag'].endswith(image_tag):
                         name = sbom['metadata']['name']
                         break
                 SBOM_data = self.kubernetes_obj.client_CustomObjectsApi.get_namespaced_custom_object(

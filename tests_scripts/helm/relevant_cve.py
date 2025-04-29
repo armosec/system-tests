@@ -524,6 +524,7 @@ class RelevancyEnabledLargeImage(BaseVulnerabilityScanning):
         Logger.logger.info('apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=360)
+        TestUtil.sleep(5, "wait a bit", "info")
 
         # P3 verify results in storage
         Logger.logger.info('Test SBOM was created in storage')
