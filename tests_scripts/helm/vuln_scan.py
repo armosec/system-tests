@@ -591,7 +591,7 @@ class VulnerabilityV2ViewsKEV(BaseVulnerabilityScanning):
                 "cluster": cluster,
                 "namespace": namespace,
                 "kind" : "deployment",
-                "name": "mariadb"
+                "workload": "mariadb"
             }]}
         self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
                                               body=body,expected_results=1)
