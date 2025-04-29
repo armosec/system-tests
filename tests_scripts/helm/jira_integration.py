@@ -296,14 +296,12 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             {
                 "cluster": self.cluster,
                 "namespace": self.namespace,
-                "name": "nginx",
+                "workload": "nginx",
                 "kind":"deployment",
             }]}
         wl_list, _ = self.wait_for_report(timeout=600, report_type=self.backend.get_vuln_v2_workloads,
                                               body=body,expected_results=1, enrich_tickets=True) 
         self.vulnWL = wl_list[0]
-        body['innerFilters'][0]['workload'] = "nginx"
-        del body['innerFilters'][0]['name']
 
         Logger.logger.info('get nginx workload image')
         image = self.backend.get_vuln_v2_images(body=body, expected_results=1, enrich_tickets=True)
