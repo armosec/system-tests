@@ -60,6 +60,7 @@ API_VULNERABILITY_V2_WORKLOAD = "/api/v1/vulnerability_v2/workload"
 API_VULNERABILITY_V2 = "/api/v1/vulnerability_v2/vulnerability"
 API_VULNERABILITY_V2_IMAGE = "/api/v1/vulnerability_v2/image"
 API_VULNERABILITY_V2_COMPONENT = "/api/v1/vulnerability_v2/component"
+API_VULNERABILITY_V2_COMPONENT_UNIQUEVALUES =  "/api/v1/uniqueValues/vulnerability_v2/component"
 
 API_INTEGRATIONS = "/api/v1/integrations"
 
@@ -2162,6 +2163,18 @@ class ControlPanelAPI(object):
         if not enrich_tickets:
             params["enrichTickets"] = "false"
         return self.post_list_request(API_VULNERABILITY_V2_COMPONENT, body, expected_results, params=params)
+    
+    def get_vuln_v2_component_uniquevalues(self, body: dict):
+        params = {"customerGUID": self.selected_tenant_id}
+      
+        r = self.post(API_VULNERABILITY_V2_COMPONENT_UNIQUEVALUES, params=params, json=body, timeout=60)
+        Logger.logger.info(r.text)
+
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: get get_vuln_v2_component_uniquevalues "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
     def get_posture_resources_highlights(self, body: dict):
         r = self.post(API_POSTURE_RESOURCES + '/highlights',
