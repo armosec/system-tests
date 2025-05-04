@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import time
-import os
 import traceback
 from tests_scripts.helm.base_helm import BaseHelm
 from tests_scripts.kubescape.base_kubescape import BaseKubescape
@@ -966,7 +965,10 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         """
         Agenda:
 
-
+        1. Install deployments in the cluster
+        2. Install kubescape with helm-chart
+        3. verify SBOM scan results
+        4. verify SBOM scan results unique values
         """
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
@@ -986,27 +988,37 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
         self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
-        Logger.logger.info("3. verify SBOM scan")
-        self.wait_for_report(self.verify_backend_results, sleep_interval=5, timeout=180)
 
-        
+
+        Logger.logger.info("3. verify SBOM scan results")
+        filters = {
+            "cluster": self.cluster,
+            "namespace": self.namespace,
+            "workload": "redis-sleep",
+            "name": "libcrypto3"
+        }
+        self.wait_for_report(self.verify_backend_results, sleep_interval=10, timeout=180, filters=filters)
+
+
+        Logger.logger.info("4. verify SBOM scan results unique values")
+        self.verify_backend_results_uniquevalues(filters=filters, field="workload", expected_value="redis-sleep")
+
+
         return self.cleanup()
     
 
-    def verify_backend_results(self):
+
+    def verify_backend_results(self, filters):
         """
         Verify the results of the scan
         """
+
+      
         body = {
             "pageSize":50,
             "pageNum":1,
             "innerFilters":[
-                {
-                    "cluster":self.cluster,
-                    "namespace":self.namespace,
-                    "workload":"redis-sleep",
-                    "name":"libcrypto3"
-                }
+              filters
             ]
         }
 
@@ -1022,4 +1034,25 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert "severityStats" in component, "expected severityStats, got None"
         assert len(component["severityStats"]) > 0, f"expected some severityStats, got {component['severityStats']}"
 
+
+    def verify_backend_results_uniquevalues(self, filters, field, expected_value):
+        """
+        Verify the results of the scan
+        """
+
+        uniuqevalues_body = {
+            "pageSize":50,
+            "pageNum":1,
+            "fields":{field:""},
+            "innerFilters":[
+              filters
+            ]
+        }
+
+        uniquevalues = self.backend.get_vuln_v2_component_uniquevalues(body=uniuqevalues_body)
+
+        assert "fields" in uniquevalues, "expected fields in uniquevalues, got None"
+        assert "workload" in uniquevalues["fields"], "expected workload in uniquevalues, got None"
+        assert len(uniquevalues["fields"]["workload"]) == 1, f"expected 1 workload, got {len(uniquevalues['fields']['workload'])}"
+        assert uniquevalues["fields"]["workload"][0] == expected_value, f"expected {expected_value}, got {uniquevalues['fields']['workload'][0]}"
         
