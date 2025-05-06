@@ -581,6 +581,7 @@ class Accounts(base_test.BaseTest):
 
     def _validate_frameworks(self, frameworks: List[ComplianceFramework], last_success_scan_id: str):
         """Validate framework data against expected values."""
+        Logger.logger.info(f"frameworks: {frameworks}")
         assert len(frameworks) == len(FRAMEWORKS_CONFIG), f"Expected {len(FRAMEWORKS_CONFIG)} frameworks, got {len(frameworks)}"
 
         now = datetime.datetime.now(datetime.timezone.utc)
