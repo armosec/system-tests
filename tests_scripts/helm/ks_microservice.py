@@ -969,6 +969,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         2. Install kubescape with helm-chart
         3. verify SBOM scan results
         4. verify SBOM scan results unique values
+        5. verify SBOM scan results in use
         """
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
@@ -1004,6 +1005,15 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         self.verify_backend_results_uniquevalues(filters=filters, field="workload", expected_value="redis-sleep")
 
 
+        filters = {
+            "cluster": self.cluster,
+            "namespace": self.namespace,
+            "workload": "redis-sleep",
+        }
+
+        Logger.logger.info("5. verify SBOM scan results in use")
+        self.wait_for_report(self.verify_backend_results_in_use, sleep_interval=10, timeout=180, filters=filters)
+
         return self.cleanup()
     
 
@@ -1034,6 +1044,30 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert "severityStats" in component, "expected severityStats, got None"
         assert len(component["severityStats"]) > 0, f"expected some severityStats, got {component['severityStats']}"
 
+    
+    def verify_backend_results_in_use(self, filters):
+        """
+        Verify the results of the scan
+        """
+
+        body = {
+            "pageSize":50,
+            "pageNum":1,
+            "innerFilters":[
+              filters
+            ]
+        }
+
+        filters["isRelevant"] = "Yes"
+
+        components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert len(components) > 0, f"expected at least 1 component, got {len(components)}"    
+       
+        filters["isRelevant"] = "No"
+
+        components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert len(components) > 0 , f"expected at least 1 component, got {len(components)}"
+
 
     def verify_backend_results_uniquevalues(self, filters, field, expected_value):
         """
@@ -1055,4 +1089,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert "workload" in uniquevalues["fields"], "expected workload in uniquevalues, got None"
         assert len(uniquevalues["fields"]["workload"]) == 1, f"expected 1 workload, got {len(uniquevalues['fields']['workload'])}"
         assert uniquevalues["fields"]["workload"][0] == expected_value, f"expected {expected_value}, got {uniquevalues['fields']['workload'][0]}"
+
+
+
         
