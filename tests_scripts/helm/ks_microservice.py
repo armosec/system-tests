@@ -1063,12 +1063,12 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         filters["isRelevant"] = "Yes"
 
         components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
-        assert len(components) > 0, f"expected at least 1 component, got {len(components)}"    
+        assert len(components) > 0, f"expected at least 1 in use component, got {len(components)}"    
        
         filters["isRelevant"] = "No"
 
         components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
-        assert len(components) > 0 , f"expected at least 1 component, got {len(components)}"
+        assert len(components) > 0 , f"expected at least 1 not in use component, got {len(components)}"
 
 
     def verify_backend_results_uniquevalues(self, filters, field, expected_value):
