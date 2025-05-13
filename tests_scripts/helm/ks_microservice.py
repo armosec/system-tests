@@ -965,8 +965,8 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         """
         Agenda:
 
-        1. Install deployments in the cluster
-        2. Install kubescape with helm-chart
+        1. Install kubescape with helm-chart
+        2. Install deployments in the cluster
         3. verify SBOM scan results
         4. verify SBOM scan results unique values
         5. verify SBOM scan results in use
@@ -978,20 +978,22 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         self.cluster, self.namespace = self.setup(apply_services=False)
 
 
+
+
+
+        Logger.logger.info("1. Install kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
+
         Logger.logger.info('1. Install deployments in the cluster')
         current_datetime = datetime.now(timezone.utc)
         workload_objs: list = self.apply_directory(path=self.test_obj[("deployments", None)], namespace=self.namespace)
         self.wait_for_report(self.verify_running_pods, sleep_interval=10, timeout=180, namespace=self.namespace)
 
 
-        Logger.logger.info("2. Install kubescape with helm-chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
-
-
-        Logger.logger.info("3. verify SBOM scan results")
+        Logger.logger.info("2. verify SBOM scan results")
         filters = {
             "cluster": self.cluster,
             "namespace": self.namespace,
