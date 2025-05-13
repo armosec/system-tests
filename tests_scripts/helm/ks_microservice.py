@@ -965,10 +965,11 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         """
         Agenda:
 
-        1. Install deployments in the cluster
-        2. Install kubescape with helm-chart
+        1. Install kubescape with helm-chart
+        2. Install deployments in the cluster
         3. verify SBOM scan results
         4. verify SBOM scan results unique values
+        5. verify SBOM scan results in use
         """
         assert self.backend != None;
         f'the test {self.test_driver.test_name} must run with backend'
@@ -977,20 +978,22 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         self.cluster, self.namespace = self.setup(apply_services=False)
 
 
+
+
+
+        Logger.logger.info("1. Install kubescape with helm-chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
+
         Logger.logger.info('1. Install deployments in the cluster')
         current_datetime = datetime.now(timezone.utc)
         workload_objs: list = self.apply_directory(path=self.test_obj[("deployments", None)], namespace=self.namespace)
         self.wait_for_report(self.verify_running_pods, sleep_interval=10, timeout=180, namespace=self.namespace)
 
 
-        Logger.logger.info("2. Install kubescape with helm-chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=240)
 
-
-
-        Logger.logger.info("3. verify SBOM scan results")
+        Logger.logger.info("2. verify SBOM scan results")
         filters = {
             "cluster": self.cluster,
             "namespace": self.namespace,
@@ -1003,6 +1006,15 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         Logger.logger.info("4. verify SBOM scan results unique values")
         self.verify_backend_results_uniquevalues(filters=filters, field="workload", expected_value="redis-sleep")
 
+
+        filters = {
+            "cluster": self.cluster,
+            "namespace": self.namespace,
+            "workload": "redis-sleep",
+        }
+
+        Logger.logger.info("5. verify SBOM scan results in use")
+        self.wait_for_report(self.verify_backend_results_in_use, sleep_interval=10, timeout=180, filters=filters)
 
         return self.cleanup()
     
@@ -1034,6 +1046,30 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert "severityStats" in component, "expected severityStats, got None"
         assert len(component["severityStats"]) > 0, f"expected some severityStats, got {component['severityStats']}"
 
+    
+    def verify_backend_results_in_use(self, filters):
+        """
+        Verify the results of the scan
+        """
+
+        body = {
+            "pageSize":50,
+            "pageNum":1,
+            "innerFilters":[
+              filters
+            ]
+        }
+
+        filters["isRelevant"] = "Yes"
+
+        components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert len(components) > 0, f"expected at least 1 in use component, got {len(components)}"    
+       
+        filters["isRelevant"] = "No"
+
+        components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert len(components) > 0 , f"expected at least 1 not in use component, got {len(components)}"
+
 
     def verify_backend_results_uniquevalues(self, filters, field, expected_value):
         """
@@ -1055,4 +1091,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert "workload" in uniquevalues["fields"], "expected workload in uniquevalues, got None"
         assert len(uniquevalues["fields"]["workload"]) == 1, f"expected 1 workload, got {len(uniquevalues['fields']['workload'])}"
         assert uniquevalues["fields"]["workload"][0] == expected_value, f"expected {expected_value}, got {uniquevalues['fields']['workload'][0]}"
+
+
+
         
