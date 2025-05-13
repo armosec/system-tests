@@ -953,7 +953,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         
         # disable node agent capabilities
         self.helm_kwargs = {
-            # statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
+            statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
             statics.HELM_SYNC_SBOM: statics.HELM_SYNC_SBOM_ENABLED,
         }
 
