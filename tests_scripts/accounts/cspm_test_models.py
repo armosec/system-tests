@@ -14,7 +14,8 @@ FRAMEWORKS_CONFIG = {
     "mitre_attack": 43,
     "nist_800_53_revision_5": 263,
     "pci_3.2.1": 13,
-    "soc2": 53
+    "soc2": 53,
+    "iso27001_2022": 100
 }
 
 DEFAULT_TEST_CONFIG = {
