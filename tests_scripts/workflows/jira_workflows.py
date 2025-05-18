@@ -66,13 +66,13 @@ class WorkflowsJiraNotifications(Workflows):
         guid = self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
         self.add_workflow_test_guid(guid)
 
-        Logger.logger.info('Stage 3: Apply deployment')
-        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
-        self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
-
         Logger.logger.info('Stage 4: Install kubescape with helm-chart')
         self.install_kubescape(helm_kwargs=self.helm_kwargs)
         time.sleep(60)
+
+        Logger.logger.info('Stage 3: Apply deployment')
+        workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
+        self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
 
         Logger.logger.info('Stage 5: Trigger first scan')
         self.backend.create_kubescape_job_request(cluster_name=self.cluster, framework_list=[self.fw_name])
