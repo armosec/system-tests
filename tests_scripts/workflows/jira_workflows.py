@@ -40,8 +40,8 @@ class WorkflowsJiraNotifications(Workflows):
         Agenda:
         1. Create new workflows
         2. Validate workflows created successfully
-        3. Apply deployment
-        4. Install kubescape with helm-chart
+        3. Install kubescape with helm-chart
+        4. Apply deployment
         5. Trigger first scan
         6. Assert jira ticket was created
         7. Cleanup
@@ -66,11 +66,11 @@ class WorkflowsJiraNotifications(Workflows):
         guid = self.validate_workflow(VULNERABILITIES_WORKFLOW_NAME_JIRA + self.cluster, JIRA_PROVIDER_NAME)
         self.add_workflow_test_guid(guid)
 
-        Logger.logger.info('Stage 4: Install kubescape with helm-chart')
+        Logger.logger.info('Stage 3: Install kubescape with helm-chart')
         self.install_kubescape(helm_kwargs=self.helm_kwargs)
         time.sleep(60)
 
-        Logger.logger.info('Stage 3: Apply deployment')
+        Logger.logger.info('Stage 4: Apply deployment')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=self.namespace)
         self.verify_all_pods_are_running(namespace=self.namespace, workload=workload_objs, timeout=240)
 
