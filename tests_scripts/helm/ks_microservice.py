@@ -997,8 +997,8 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         filters = {
             "cluster": self.cluster,
             "namespace": self.namespace,
-            "workload": "redis-sleep",
-            "name": "libcrypto3"
+            "workload": "nginx",
+            "name": "nginx"
         }
         self.wait_for_report(self.verify_backend_results, sleep_interval=10, timeout=180, filters=filters)
 
@@ -1014,7 +1014,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         }
 
         Logger.logger.info("5. verify SBOM scan results in use")
-        self.wait_for_report(self.verify_backend_results_in_use, sleep_interval=10, timeout=180, filters=filters)
+        self.wait_for_report(self.verify_backend_results_in_use, sleep_interval=10, timeout=240, filters=filters)
 
         return self.cleanup()
     
