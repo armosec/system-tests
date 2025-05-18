@@ -30,6 +30,7 @@ class WorkflowsJiraNotifications(Workflows):
         self.site_name = "cyberarmor-io"
 
         self.helm_kwargs = {
+            statics.HELM_RELEVANCY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
             statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED,
         }
 
