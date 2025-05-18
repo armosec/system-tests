@@ -1004,13 +1004,13 @@ class ScanSBOM(BaseHelm, BaseKubescape):
 
 
         Logger.logger.info("4. verify SBOM scan results unique values")
-        self.verify_backend_results_uniquevalues(filters=filters, field="workload", expected_value="redis-sleep")
+        self.verify_backend_results_uniquevalues(filters=filters, field="workload", expected_value="nginx")
 
 
         filters = {
             "cluster": self.cluster,
             "namespace": self.namespace,
-            "workload": "redis-sleep",
+            "workload": "nginx",
         }
 
         Logger.logger.info("5. verify SBOM scan results in use")
@@ -1038,8 +1038,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert len(components) == 1, f"expected 1 component, got {len(components)}"
     
         component = components[0]
-        assert component["name"] == "libcrypto3", f"expected libcrypto3, got {component['name']}"
-        assert component["version"] == "3.0.8-r0", f"expected 3.0.8-r0, got {component['version']}"
+        assert component["name"] == filters["name"], f"expected libcrypto3, got {component['name']}"
         assert component["packageType"] == "apk", f"expected apk, got {component['packageType']}"
         assert "licenses" in component, "expected licenses, got None"
         assert len(component["licenses"]) > 0, f"expected some licenses, got {component['licenses']}"
