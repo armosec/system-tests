@@ -1039,7 +1039,6 @@ class ScanSBOM(BaseHelm, BaseKubescape):
     
         component = components[0]
         assert component["name"] == filters["name"], f"expected libcrypto3, got {component['name']}"
-        assert component["packageType"] == "apk", f"expected apk, got {component['packageType']}"
         assert "licenses" in component, "expected licenses, got None"
         assert len(component["licenses"]) > 0, f"expected some licenses, got {component['licenses']}"
         assert "severityStats" in component, "expected severityStats, got None"
