@@ -1035,6 +1035,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         }
 
         components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
+        assert components != None, "expected components, got None"
         assert len(components) == 1, f"expected 1 component, got {len(components)}"
     
         component = components[0]
