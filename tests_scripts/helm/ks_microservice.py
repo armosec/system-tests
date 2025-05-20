@@ -998,7 +998,8 @@ class ScanSBOM(BaseHelm, BaseKubescape):
             "cluster": self.cluster,
             "namespace": self.namespace,
             "workload": "nginx",
-            "name": "nginx"
+            "name": "nginx",
+            "packageType": "deb"
         }
         self.wait_for_report(self.verify_backend_results, sleep_interval=10, timeout=240, filters=filters)
 
@@ -1011,6 +1012,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
             "cluster": self.cluster,
             "namespace": self.namespace,
             "workload": "nginx",
+            "packageType": "deb"
         }
 
         Logger.logger.info("5. verify SBOM scan results in use")
