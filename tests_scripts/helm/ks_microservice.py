@@ -1057,7 +1057,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         assert isinstance(component["licenses"], list), f"Expected licenses to be a list, got {type(component['licenses'])}"
         assert len(component["licenses"]) > 0, "Expected at least one license"
             
-        assert isinstance(component["severityStats"], list), f"Expected severityStats to be a list, got {type(component['severityStats'])}"
+        assert isinstance(component["severityStats"], dict), f"Expected severityStats to be a list, got {type(component['severityStats'])}"
         assert len(component["severityStats"]) > 0, "Expected at least one severity stat"
 
     
