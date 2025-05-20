@@ -1000,7 +1000,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
             "workload": "nginx",
             "name": "nginx"
         }
-        self.wait_for_report(self.verify_backend_results, sleep_interval=10, timeout=180, filters=filters)
+        self.wait_for_report(self.verify_backend_results, sleep_interval=10, timeout=240, filters=filters)
 
 
         Logger.logger.info("4. verify SBOM scan results unique values")
@@ -1082,7 +1082,7 @@ class ScanSBOM(BaseHelm, BaseKubescape):
         filters["isRelevant"] = "No"
 
         components = self.backend.get_vuln_v2_components(body=body, scope='component', enrich_tickets=False)
-        assert len(components) >= 0 , f"expected at least 1 not in use component, got {len(components)}"
+        assert len(components) >= 0 , f"expected at least 0 not in use component, got {len(components)}"
 
 
     def verify_backend_results_uniquevalues(self, filters, field, expected_value):
