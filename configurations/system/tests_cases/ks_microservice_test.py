@@ -29,7 +29,7 @@ class KSMicroserviceTests(object):
          return TestConfiguration(
                 name=inspect.currentframe().f_code.co_name,
                 test_obj=ScanSBOM,
-                deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
+                deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "nginx"),
 
          )
 
