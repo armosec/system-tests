@@ -41,7 +41,7 @@ class Incidents(BaseHelm):
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
             "nodeAgent.image.repository": "quay.io/armosec/node-agent",
-            "nodeAgent.image.tag": "latest",
+            "nodeAgent.image.tag": "v0.0.139",
             "logger.level": "debug",
             "imagePullSecret.password": os.environ.get("NA_IMAGE_PULL_SECRET_PASSWORD", ""),
             "imagePullSecret.server": "quay.io",
