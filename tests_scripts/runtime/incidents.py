@@ -51,6 +51,7 @@ class Incidents(BaseHelm):
             "capabilities.networkEventsStreaming": "enable",
             "capabilities.nodeSbomGeneration": "disable",
             "nodeAgent.config.networkStreamingInterval": "5s",
+            "nodeAgent.config.profilesCacheRefreshRate": "5s",
         }
 
         test_helm_kwargs = self.test_obj.get_arg("helm_kwargs")
