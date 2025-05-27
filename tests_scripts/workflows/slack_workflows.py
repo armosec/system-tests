@@ -2,6 +2,8 @@ import random
 from tests_scripts.workflows.workflows import Workflows
 
 from tests_scripts.workflows.utils import (
+    SYSTEM_HEALTH,
+    SYSTEM_HEALTH_WORKFLOW_NAME_SLACK,
     get_env,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
@@ -61,12 +63,13 @@ class WorkflowsSlackNotifications(Workflows):
         rand = str(random.randint(10000000, 99999999))
         
         Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster
         security_risks_workflow_slack = SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         vulnerabilities_workflow_slack = VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         compliance_workflow_slack = COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
-        _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
+        system_health_workflow_slack = SYSTEM_HEALTH_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
+        ks_custom_fw, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
+        self.fw_name = ks_custom_fw['name']
         
         Logger.logger.info("Stage 2: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_MEDIUM, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
@@ -74,6 +77,8 @@ class WorkflowsSlackNotifications(Workflows):
         workflow_body = self.build_vulnerabilities_workflow_body(name=vulnerabilities_workflow_slack, severities=SEVERITIES_HIGH, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=VULNERABILITIES, cvss=6)
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_compliance_workflow_body(name=compliance_workflow_slack, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=COMPLIANCE, driftPercentage=15)
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        workflow_body = self.build_system_health_workflow_body(name=system_health_workflow_slack, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=SYSTEM_HEALTH, cluster_status=["healthy", "degraded", "disconnected"])
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
 
@@ -83,6 +88,8 @@ class WorkflowsSlackNotifications(Workflows):
         guid = self.validate_workflow(security_risks_workflow_slack, SLACK_CHANNEL_NAME)
         self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(compliance_workflow_slack, SLACK_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
+        guid = self.validate_workflow(system_health_workflow_slack, SLACK_CHANNEL_NAME)
         self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 4: Apply deployment')
@@ -177,15 +184,31 @@ class WorkflowsSlackNotifications(Workflows):
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
 
-
+    def assert_system_health_message_sent(self, messages, cluster, status):
+        if status == "healthy":
+            expected_message = "Cluster successfully connected"
+        elif status == "degraded":
+            expected_message = "Cluster degraded"
+        elif status == "disconnected":
+            expected_message = "Cluster disconnected"
+        else:
+            raise ValueError(f"Invalid status: {status}")
+        
+        found = 0
+        for message in messages:
+            message_string = str(message)
+            if expected_message in message_string and cluster in message_string:
+                found += 1
+        assert found > 0, "expected to have at least one system health message"
     
     def assert_messages_sent(self, begin_time, cluster, namespace, attempts=30, sleep_time=10):
         found_security_risks =  False
         found_vulnerabilities = False
         found_misconfigurations = False 
+        found_system_health = False
 
         for i in range(attempts):
-            if found_security_risks and found_vulnerabilities and found_misconfigurations:
+            if found_security_risks and found_vulnerabilities and found_misconfigurations and found_system_health:
                 break
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
@@ -203,7 +226,12 @@ class WorkflowsSlackNotifications(Workflows):
                     self.assert_misconfiguration_message_sent(messages, cluster)
                     Logger.logger.info("Misconfigurations message sent")
                     found_misconfigurations = True
+                if not found_system_health:
+                    self.assert_system_health_message_sent(messages, cluster, "healthy") 
+                    Logger.logger.info("System health message sent")
+                    found_system_health = True
                     break
+
             except AssertionError as e:
                 Logger.logger.info(f"iteration: {i}: {e}")
                 if i == attempts - 1:
@@ -323,6 +351,41 @@ class WorkflowsSlackNotifications(Workflows):
         }
         return workflow_body
 
+    def build_system_health_workflow_body(self, name, channel_name, channel_id, cluster, namespace, category, cluster_status, guid=None):
+        workflow_body = { 
+            "guid": guid,
+            "updatedTime": "",
+            "updatedBy": "",
+            "enabled": True,
+            "name": name,
+            "scope": [
+                {
+                    "cluster": cluster
+                }
+            ],
+            "conditions": [
+                {
+                    "category": category,
+                    "parameters": {
+                        "clusterStatus": cluster_status
+                    }
+                }
+            ],
+            "notifications": [
+                {
+                    "provider": "slack",
+                    "slackChannels": [
+                        {
+                            "id": channel_id,
+                            "name": channel_name
+                        }
+                    ]
+                }
+            ]
+        }
+
+        return workflow_body
+         
     
     def validate_workflow(self, expected_name, expected_slack_channel):
         workflows = self.backend.get_workflows()
