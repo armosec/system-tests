@@ -61,9 +61,9 @@ class WorkflowsTeamsNotifications(Workflows):
 
         
         Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster
-        _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
+        ks_custom_fw, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
+        self.fw_name = ks_custom_fw['name']
         
         Logger.logger.info("Stage 2: Create webhook")
         self.webhook_name = WEBHOOK_NAME + self.cluster + "_" + rand

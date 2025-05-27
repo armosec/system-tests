@@ -63,13 +63,13 @@ class WorkflowsSlackNotifications(Workflows):
         rand = str(random.randint(10000000, 99999999))
         
         Logger.logger.info("Stage 1: Post custom framework")
-        self.fw_name = "systest-fw-" + self.cluster
         security_risks_workflow_slack = SECURITY_RISKS_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         vulnerabilities_workflow_slack = VULNERABILITIES_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         compliance_workflow_slack = COMPLIANCE_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
         system_health_workflow_slack = SYSTEM_HEALTH_WORKFLOW_NAME_SLACK + self.cluster + "_" + rand
-        _, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
+        ks_custom_fw, fw = self.post_custom_framework(framework_file="system-test-framework-high-comp.json",
                                            cluster_name=self.cluster)
+        self.fw_name = ks_custom_fw['name']
         
         Logger.logger.info("Stage 2: Create new workflows")
         workflow_body = self.build_securityRisk_workflow_body(name=security_risks_workflow_slack, severities=SEVERITIES_MEDIUM, channel_name=SLACK_CHANNEL_NAME, channel_id=get_env("SLACK_CHANNEL_ID"), cluster=self.cluster, namespace=self.namespace, category=SECURITY_RISKS, securityRiskIDs=SECURITY_RISKS_ID)
