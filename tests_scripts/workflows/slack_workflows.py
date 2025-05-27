@@ -352,7 +352,7 @@ class WorkflowsSlackNotifications(Workflows):
         return workflow_body
 
     def build_system_health_workflow_body(self, name, channel_name, channel_id, cluster, namespace, category, cluster_status, guid=None):
-         workflow_body = { 
+        workflow_body = { 
             "guid": guid,
             "updatedTime": "",
             "updatedBy": "",
@@ -383,6 +383,9 @@ class WorkflowsSlackNotifications(Workflows):
                 }
             ]
         }
+
+        return workflow_body
+         
     
     def validate_workflow(self, expected_name, expected_slack_channel):
         workflows = self.backend.get_workflows()
