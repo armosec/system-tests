@@ -1,5 +1,7 @@
 from tests_scripts.workflows.workflows import Workflows
 from tests_scripts.workflows.utils import (
+    SYSTEM_HEALTH,
+    SYSTEM_HEALTH_WORKFLOW_NAME_TEAMS,
     get_env,
     NOTIFICATIONS_SVC_DELAY_FIRST_SCAN,
     EXPECTED_CREATE_RESPONSE,
@@ -75,6 +77,8 @@ class WorkflowsTeamsNotifications(Workflows):
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         workflow_body = self.build_compliance_workflow_body(name=COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=self.channel_guid, cluster=self.cluster, namespace=namespace, category=COMPLIANCE, driftPercentage=15, webhook_url=get_env("CHANNEL_WEBHOOK"))
         self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
+        workflow_body = self.build_system_health_workflow_body(name=SYSTEM_HEALTH_WORKFLOW_NAME_TEAMS + self.cluster, channel_name=TEAMS_CHANNEL_NAME, channel_guid=self.channel_guid, cluster=self.cluster, category=SYSTEM_HEALTH, cluster_status=["healthy", "degraded", "disconnected"], webhook_url=get_env("CHANNEL_WEBHOOK"))
+        self.create_and_assert_workflow(workflow_body, EXPECTED_CREATE_RESPONSE, update=False)
         before_test_message_ts = time.time()
         Logger.logger.info(f"before_test_message_ts: {before_test_message_ts}")
 
@@ -84,6 +88,8 @@ class WorkflowsTeamsNotifications(Workflows):
         guid = self.validate_workflow(SECURITY_RISKS_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
         self.add_workflow_test_guid(guid)
         guid = self.validate_workflow(COMPLIANCE_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
+        self.add_workflow_test_guid(guid)
+        guid = self.validate_workflow(SYSTEM_HEALTH_WORKFLOW_NAME_TEAMS + self.cluster, TEAMS_CHANNEL_NAME)
         self.add_workflow_test_guid(guid)
 
         Logger.logger.info('Stage 5: Apply deployment')
@@ -218,20 +224,42 @@ class WorkflowsTeamsNotifications(Workflows):
                 found += 1
         assert found > 0, f"expected to have exactly one new misconfiguration message, found {found}"
 
+    def assert_system_health_message_sent(self, messages, cluster, status):
+        if status == "healthy":
+            expected_message = "Cluster successfully connected"
+        elif status == "degraded":
+            expected_message = "Cluster degraded"
+        elif status == "disconnected":
+            expected_message = "Cluster disconnected"
+        else:
+            raise ValueError(f"Invalid status: {status}")
 
+        found = 0
+        for message in messages:
+            message_string = str(message)
+            if expected_message in message_string and cluster in message_string:
+                found += 1
+        assert found > 0, "expected to have at least one system health message"
     
     def assert_messages_sent(self, begin_time, cluster, attempts=30, sleep_time=10):
         found_security_risk = False
         found_vulnerability = False
         found_misconfiguration = False
+        found_system_health = False
         for i in range(attempts):
-            if found_misconfiguration and found_security_risk and found_vulnerability:
+            if found_misconfiguration and found_security_risk and found_vulnerability and found_system_health:
                 break
             try:
                 messages = self.test_obj["getMessagesFunc"](begin_time)
                 found = str(messages).count(cluster)
                 assert found > 1, f"expected to have at least 1 messages, found {found}"
                 Logger.logger.info(f"number of messages found: {found}")
+
+                if not found_system_health:
+                    self.assert_system_health_message_sent(messages, cluster, "healthy")
+                    Logger.logger.info("System health message found")
+                    found_system_health = True
+                    break
 
                 if not found_security_risk:
                     self.assert_security_risks_message_sent(messages, cluster)
@@ -363,7 +391,41 @@ class WorkflowsTeamsNotifications(Workflows):
             ]
         }
         return workflow_body
-
+    
+    def build_system_health_workflow_body(self, name, channel_name, channel_guid, cluster, category, cluster_status, webhook_url, guid=None):
+        workflow_body = {
+            "guid": guid,
+            "updatedTime": "",
+            "updatedBy": "",
+            "enabled": True,
+            "name": name,
+            "scope": [
+                {
+                    "cluster": cluster,
+                }
+            ],
+            "conditions": [
+                {
+                    "category": category,
+                    "parameters": {
+                        "clusterStatus": cluster_status
+                    }
+                }
+            ],
+            "notifications": [
+                {
+                    "provider": "teams",
+                    "teamsChannels": [
+                        {
+                            "guid": channel_guid,
+                            "name": channel_name,
+                            "webhookURL": webhook_url
+                        }
+                    ]
+                }
+            ]
+        }
+        return workflow_body
     
     def validate_workflow(self, expected_name, expected_teams_channel):
         workflows = self.backend.get_workflows()
