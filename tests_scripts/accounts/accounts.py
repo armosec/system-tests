@@ -87,9 +87,9 @@ class Accounts(base_test.BaseTest):
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
-    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name, validate_apis=True)->str:
+    def connect_cspm_new_account(self, region, account_id, arn, external_id, cloud_account_name, validate_apis=True)->str:
         self.cleanup_existing_aws_cloud_accounts(account_id)
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
         account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , ACCOUNT_STATUS_CONNECTED)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
@@ -134,7 +134,7 @@ class Accounts(base_test.BaseTest):
 
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=True)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region,external_id="", expect_failure=True)
         return cloud_account_guid
 
 
@@ -312,6 +312,27 @@ class Accounts(base_test.BaseTest):
         expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=armo-security-readonly\u0026templateUrl={parsed_cspm_template}"
         assert stack_link == expected_link,  f"failed to get cspm link, link is {stack_link}, expected link is {expected_link}"
         return stack_link
+    
+    def get_and_validate_cspm_link_with_external_id(self, region) -> Tuple[str, str]:
+        """
+        Get and validate cspm link.
+        Returns tuple of (stack_link, external_id) strings.
+        """
+        tenant = self.backend.get_selected_tenant()
+        expected_template_url = os.environ.get("CSPM_TEMPLATE_URL_EXTERNAL_ID")
+        parsed_cspm_template = quote(expected_template_url, safe='')
+        response = self.backend.get_cspm_link(region=region, external_id=True)
+        
+        # Since we're requesting with external_id=True, we expect the external ID to be included
+        external_id = response["externalID"]
+        assert external_id != "", f"failed to get cspm external id, external id is {external_id}"
+        
+        # Build expected link including the external ID parameter
+        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}&param_ExternalID={external_id}&stackName=armo-security-readonly&templateUrl={parsed_cspm_template}"
+        
+        assert response["stackLink"] == expected_link, f"failed to get cspm link, link is {response['stackLink']}, expected link is {expected_link}"
+        
+        return response["stackLink"], response["externalID"]
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
@@ -321,7 +342,7 @@ class Accounts(base_test.BaseTest):
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
         return stack_link
     
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ,expect_failure:bool=False):
         """
         Create and validate cloud account.
         """
@@ -331,7 +352,8 @@ class Accounts(base_test.BaseTest):
                 "name": cloud_account_name,
                 "cspmConfig": {
                     "crossAccountsRoleARN": arn,
-                    "stackRegion": region
+                    "stackRegion": region,
+                    "externalID" :external_id  
                 },
             }
         
