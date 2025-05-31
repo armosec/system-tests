@@ -396,7 +396,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,account_status :str):
+    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str):
         """
         Validate accounts cloud list.
         """
@@ -414,10 +414,10 @@ class Accounts(base_test.BaseTest):
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"response not in {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["accountStatus"] == account_status, f"accountStatus is not {account_status} but {res['response'][0]['accountStatus']}"
         assert "features" in res["response"][0], f"features not in {res['response'][0]}"
         assert CSPM_FEATURE_NAME in res["response"][0]["features"], f"cspm not in {res['response'][0]['features']}"
         assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
+        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status}"
         assert "config" in res["response"][0]["features"][CSPM_FEATURE_NAME], f"config not in {res['response'][0]['features']['cspm']}"
         assert "crossAccountsRoleARN" in res["response"][0]["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {res['response'][0]['features']['cspm']['config']}"
         assert res["response"][0]["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
@@ -953,7 +953,7 @@ class Accounts(base_test.BaseTest):
                              cloud_account_guid=cloud_account_guid,
                              arn=test_arn,
                              scan_status=CSPM_SCAN_STATE_FAILED,
-                             account_status = ACCOUNT_STATUS_DISCONNECTED)
+                             feature_status = ACCOUNT_STATUS_DISCONNECTED)
         Logger.logger.info("Scan failed, disconnecting account")
 
         body = {
