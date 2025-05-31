@@ -38,9 +38,9 @@ PROVIDER_GCP = "gcp"
 CADR_FEATURE_NAME = "cadr"
 CSPM_FEATURE_NAME = "cspm"
 
-ACCOUNT_STATUS_CONNECTED = "Connected"
-ACCOUNT_STATUS_PARTIALLY_CONNECTED = "Partially connected"
-ACCOUNT_STATUS_DISCONNECTED = "Disconnected"
+FEATURE_STATUS_CONNECTED = "Connected"
+FEATURE_STATUS_DISCONNECTED = "Disconnected"
+FEATURE_STATUS_PENDING = "Pending"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
@@ -91,7 +91,7 @@ class Accounts(base_test.BaseTest):
         self.cleanup_existing_aws_cloud_accounts(account_id)
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , ACCOUNT_STATUS_CONNECTED)
+        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
 
         if validate_apis:
@@ -209,13 +209,15 @@ class Accounts(base_test.BaseTest):
         assert "features" in res["response"][0], f"features not in {res['response'][0]}"
         assert CADR_FEATURE_NAME in res["response"][0]["features"], f"cadr not in {res['response'][0]['features']}"
 
+        # at first before first message is received the CADR status is pending
+        assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING}"
 
         Logger.logger.info('Verify cadr is connected - happens when "StackReady" message is received')
         self.wait_for_report(self.verify_cadr_status, 
                                 timeout=180,
                                 sleep_interval=10,
                                  cloud_account_guid=cloud_account_guid,
-                                 expected_status=ACCOUNT_STATUS_CONNECTED)
+                                 expected_status=FEATURE_STATUS_CONNECTED)
         
     
         Logger.logger.info('Verify cadr is disconnected - happens when "StackReady" message is expired, for system test is after 15 seconds')
@@ -223,7 +225,7 @@ class Accounts(base_test.BaseTest):
                                 timeout=180,
                                 sleep_interval=10,
                                  cloud_account_guid=cloud_account_guid,
-                                 expected_status=ACCOUNT_STATUS_PARTIALLY_CONNECTED)
+                                 expected_status=FEATURE_STATUS_DISCONNECTED)
 
 
         return cloud_account_guid
@@ -241,14 +243,14 @@ class Accounts(base_test.BaseTest):
         
         expected_feature_connected = False
 
-        if expected_status == ACCOUNT_STATUS_CONNECTED:
+        if expected_status == FEATURE_STATUS_CONNECTED:
             expected_feature_connected = True
         
         res = self.backend.get_cloud_accounts(body=body)
 
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["accountStatus"] == expected_status, f"accountStatus is not {expected_status} but {res['response'][0]['accountStatus']}"
+        assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['response'][0]['features'][CADR_FEATURE_NAME]['featureStatus']}"
         assert res["response"][0]["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['response'][0]['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
     
@@ -953,7 +955,7 @@ class Accounts(base_test.BaseTest):
                              cloud_account_guid=cloud_account_guid,
                              arn=test_arn,
                              scan_status=CSPM_SCAN_STATE_FAILED,
-                             feature_status = ACCOUNT_STATUS_DISCONNECTED)
+                             feature_status = FEATURE_STATUS_DISCONNECTED)
         Logger.logger.info("Scan failed, disconnecting account")
 
         body = {

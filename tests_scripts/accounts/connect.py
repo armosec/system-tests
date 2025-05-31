@@ -2,7 +2,7 @@
 
 import os
 from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,ACCOUNT_STATUS_CONNECTED
+from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
 from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, CSPM_FEATURE_NAME, extract_parameters_from_url
 import random
 from urllib.parse import parse_qs, quote, urlparse
@@ -105,7 +105,7 @@ class CloudConnect(Accounts):
                                 cloud_account_guid=cloud_account_guid,
                                 arn=test_arn,
                                 scan_status=CSPM_SCAN_STATE_COMPLETED,
-                                account_status=ACCOUNT_STATUS_CONNECTED)
+                                feature_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info("the account has been scan successfully")
 
             account = self.get_cloud_account(cloud_account_guid)
