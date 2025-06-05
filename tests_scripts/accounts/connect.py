@@ -153,7 +153,7 @@ class CloudConnect(Accounts):
         cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, self.bucket_name, log_location)
 
         Logger.logger.info('Stage 17: Connect cspm existing account')
-        self.connect_cspm_existing_account(cloud_account_guid, stack_region, test_arn)
+        self.connect_cspm_existing_account(cloud_account_guid, stack_region, test_arn, self.cspm_external_id)
 
         Logger.logger.info('Stage 18: Delete and validate feature cadr when cadr is first')
         self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)

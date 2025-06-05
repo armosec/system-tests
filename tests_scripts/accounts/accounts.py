@@ -102,14 +102,25 @@ class Accounts(base_test.BaseTest):
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
             return cloud_account_guid
 
-    def connect_cspm_existing_account(self, cloud_account_guid, region, arn, validate_apis=True)->str:
-        body = {
-                "guid": cloud_account_guid,
-                "cspmConfig": {
-                    "crossAccountsRoleARN": arn,
-                    "stackRegion": region
+    def connect_cspm_existing_account(self, cloud_account_guid:str, region:str, arn:str, external_id:str ="", validate_apis:bool=True)->str:
+        if external_id:
+            body = {
+                    "guid": cloud_account_guid,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                        "externalID" :external_id  
                 },
             }
+        else:
+            body = {
+                    "guid": cloud_account_guid,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                    },
+                }
+
         res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
         assert "Cloud account updated" in res, f"Cloud account was not updated"
 
@@ -345,20 +356,28 @@ class Accounts(base_test.BaseTest):
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
         return stack_link
     
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ,expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
         """
         Create and validate cloud account.
         """
 
-
-        body = {
-                "name": cloud_account_name,
-                "cspmConfig": {
-                    "crossAccountsRoleARN": arn,
-                    "stackRegion": region,
-                    "externalID" :external_id  
-                },
-            }
+        if external_id:
+            body = {
+                    "name": cloud_account_name,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                        "externalID" :external_id  
+                    },
+                }
+        else:
+            body = {
+                    "name": cloud_account_name,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                    },
+                }
         
         return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
 
