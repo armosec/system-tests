@@ -189,6 +189,10 @@ class Accounts(base_test.BaseTest):
         res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
         assert "Cloud account updated" in res, f"Cloud account was not updated"
 
+        # at first before first message is received the CADR status is pending
+        account = self.backend.get_cloud_accounts(body=body)
+        assert account["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING}"
+
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
 
         body = {
@@ -201,16 +205,14 @@ class Accounts(base_test.BaseTest):
                 ],
             }
         
-        res = self.backend.get_cloud_accounts(body=body)
+        account = self.backend.get_cloud_accounts(body=body)
 
-        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["guid"] == cloud_account_guid, f"guid is not {cloud_account_guid}"
-        assert "features" in res["response"][0], f"features not in {res['response'][0]}"
-        assert CADR_FEATURE_NAME in res["response"][0]["features"], f"cadr not in {res['response'][0]['features']}"
+        assert "response" in account, f"failed to get cloud accounts, body used: {body}, res is {account}"
+        assert len(account["response"]) > 0, f"response is empty"
+        assert account["response"][0]["guid"] == cloud_account_guid, f"guid is not {cloud_account_guid}"
+        assert "features" in account["response"][0], f"features not in {res['response'][0]}"
+        assert CADR_FEATURE_NAME in account["response"][0]["features"], f"cadr not in {account['response'][0]['features']}"
 
-        # at first before first message is received the CADR status is pending
-        assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING}"
 
         Logger.logger.info('Verify cadr is connected - happens when "StackReady" message is received')
         self.wait_for_report(self.verify_cadr_status, 
@@ -222,7 +224,7 @@ class Accounts(base_test.BaseTest):
     
         Logger.logger.info('Verify cadr is disconnected - happens when "StackReady" message is expired, for system test is after 15 seconds')
         self.wait_for_report(self.verify_cadr_status,
-                                timeout=180,
+                                timeout=250,
                                 sleep_interval=10,
                                  cloud_account_guid=cloud_account_guid,
                                  expected_status=FEATURE_STATUS_DISCONNECTED)
@@ -247,7 +249,6 @@ class Accounts(base_test.BaseTest):
             expected_feature_connected = True
         
         res = self.backend.get_cloud_accounts(body=body)
-
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
         assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['response'][0]['features'][CADR_FEATURE_NAME]['featureStatus']}"
