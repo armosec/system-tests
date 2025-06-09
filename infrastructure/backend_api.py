@@ -2882,8 +2882,10 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
-    def get_cspm_link(self, region):
+    def get_cspm_link(self, region : str, external_id : bool = False):
         url = API_ACCOUNTS_CSPM_LINK + "?region=" + region
+        if external_id:
+            url += "&withExternalID=" + str(external_id).lower()
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         if not 200 <= r.status_code < 300:
             raise Exception(
