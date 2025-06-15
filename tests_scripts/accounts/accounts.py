@@ -392,22 +392,24 @@ class Accounts(base_test.BaseTest):
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"response not in {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["accountStatus"] == account_status, f"accountStatus is not {account_status} but {res['response'][0]['accountStatus']}"
-        assert "features" in res["response"][0], f"features not in {res['response'][0]}"
-        assert CSPM_FEATURE_NAME in res["response"][0]["features"], f"cspm not in {res['response'][0]['features']}"
-        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
-        assert "config" in res["response"][0]["features"][CSPM_FEATURE_NAME], f"config not in {res['response'][0]['features']['cspm']}"
-        assert "crossAccountsRoleARN" in res["response"][0]["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {res['response'][0]['features']['cspm']['config']}"
-        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
-        assert res["response"][0]["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
+        account = res["response"][0]
+        Logger.logger.info(f"account is {account}")
+        assert account["accountStatus"] == account_status, f"accountStatus is not {account_status} but {account['accountStatus']}"
+        assert "features" in account, f"features not in {account}"
+        assert CSPM_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
+        assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
+        assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']}"
+        assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']}"
+        assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
+        assert account["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
 
         if scan_status== CSPM_SCAN_STATE_COMPLETED:
-            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
-            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+            assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+            assert account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
         elif scan_status==CSPM_SCAN_STATE_FAILED:
-            assert res["response"][0]["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+            assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
 
-        return res["response"][0]
+        return account
 
 
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
