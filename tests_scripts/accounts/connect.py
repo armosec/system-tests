@@ -1,6 +1,6 @@
 import os
 from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,ACCOUNT_STATUS_CONNECTED
+from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
 from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, CSPM_FEATURE_NAME, extract_parameters_from_url
 import random
 from urllib.parse import parse_qs, quote, urlparse
@@ -73,7 +73,8 @@ class CloudConnect(Accounts):
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifer_rand + "-cspm"
-        stack_link = self.get_and_validate_cspm_link(stack_region)
+        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(stack_region)
+        self.cspm_external_id = external_id       
         _, template_url, _, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")
         test_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
@@ -104,7 +105,7 @@ class CloudConnect(Accounts):
         cloud_account_guid = self.connect_cspm_bad_arn(stack_region, bad_arn, self.cspm_first_cloud_account_name)
 
         Logger.logger.info('Stage 4: Connect cspm new account')
-        cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name)
+        cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name, self.cspm_external_id)
 
         # Store CSPM config for later validation
         account = self.get_cloud_account(cloud_account_guid)
@@ -121,7 +122,7 @@ class CloudConnect(Accounts):
                                 cloud_account_guid=cloud_account_guid,
                                 arn=test_arn,
                                 scan_status=CSPM_SCAN_STATE_COMPLETED,
-                                account_status=ACCOUNT_STATUS_CONNECTED)
+                                feature_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info("the account has been scan successfully")
 
             account = self.get_cloud_account(cloud_account_guid)
@@ -184,7 +185,7 @@ class CloudConnect(Accounts):
 
         Logger.logger.info('Stage 15: Connect cspm to existing account')
         # we don't want to cleanup the accounts because we want to keep the account id for the next test + no need apis validation cuase we validate it in the first case
-        self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_second_cloud_account_name, validate_apis=False, is_to_cleanup_accounts=False)
+        self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_second_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
 
         Logger.logger.info('Stage 16: Validate both features exist and cadr unchanged')
         # Validate CADR config remains unchanged

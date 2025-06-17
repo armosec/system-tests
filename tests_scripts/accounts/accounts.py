@@ -38,9 +38,9 @@ PROVIDER_GCP = "gcp"
 CADR_FEATURE_NAME = "cadr"
 CSPM_FEATURE_NAME = "cspm"
 
-ACCOUNT_STATUS_CONNECTED = "Connected"
-ACCOUNT_STATUS_PARTIALLY_CONNECTED = "Partially connected"
-ACCOUNT_STATUS_DISCONNECTED = "Disconnected"
+FEATURE_STATUS_CONNECTED = "Connected"
+FEATURE_STATUS_DISCONNECTED = "Disconnected"
+FEATURE_STATUS_PENDING = "Pending"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
@@ -87,12 +87,12 @@ class Accounts(base_test.BaseTest):
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
-    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name, validate_apis=True, is_to_cleanup_accounts=True)->str:
+    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
             self.cleanup_existing_aws_cloud_accounts(account_id)
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , ACCOUNT_STATUS_CONNECTED)
+        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
 
         if validate_apis:
@@ -104,7 +104,7 @@ class Accounts(base_test.BaseTest):
             return cloud_account_guid
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=True)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region,external_id="", expect_failure=True)
         return cloud_account_guid
 
 
@@ -130,7 +130,11 @@ class Accounts(base_test.BaseTest):
     def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, validate_apis=True)->str:
         Logger.logger.info('Connect cadr new account')
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
-
+        
+        Logger.logger.info('Validate feature status Pending')
+        account = self.get_cloud_account(cloud_account_guid)
+        assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
+        
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
 
@@ -156,20 +160,18 @@ class Accounts(base_test.BaseTest):
                     }
                 ],
             }
-        
+
         expected_feature_connected = False
 
-        if expected_status == ACCOUNT_STATUS_CONNECTED:
+        if expected_status == FEATURE_STATUS_CONNECTED:
             expected_feature_connected = True
-        
-        res = self.backend.get_cloud_accounts(body=body)
 
+        res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["accountStatus"] == expected_status, f"accountStatus is not {expected_status} but {res['response'][0]['accountStatus']}"
+        assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['response'][0]['features'][CADR_FEATURE_NAME]['featureStatus']}"
         assert res["response"][0]["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['response'][0]['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
-    
 
 
     def create_cloudtrail(self, trail_name, bucket_name, kms_key_id=None):
@@ -230,6 +232,27 @@ class Accounts(base_test.BaseTest):
         expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=armo-security-readonly\u0026templateUrl={parsed_cspm_template}"
         assert stack_link == expected_link,  f"failed to get cspm link, link is {stack_link}, expected link is {expected_link}"
         return stack_link
+    
+    def get_and_validate_cspm_link_with_external_id(self, region) -> Tuple[str, str]:
+        """
+        Get and validate cspm link.
+        Returns tuple of (stack_link, external_id) strings.
+        """
+        tenant = self.backend.get_selected_tenant()
+        expected_template_url = os.environ.get("CSPM_TEMPLATE_URL_EXTERNAL_ID")
+        parsed_cspm_template = quote(expected_template_url, safe='')
+        response = self.backend.get_cspm_link(region=region, external_id=True)
+
+        # Since we're requesting with external_id=True, we expect the external ID to be included
+        external_id = response["externalID"]
+        assert external_id != "", f"failed to get cspm external id, external id is {external_id}"
+
+        # Build expected link including the external ID parameter
+        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}&param_ExternalID={external_id}&stackName=armo-security-readonly&templateUrl={parsed_cspm_template}"
+
+        assert response["stackLink"] == expected_link, f"failed to get cspm link, link is {response['stackLink']}, expected link is {expected_link}"
+
+        return response["stackLink"], response["externalID"]
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
@@ -239,22 +262,30 @@ class Accounts(base_test.BaseTest):
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
         return stack_link
     
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
         """
         Create and validate cloud account.
         """
 
+        if external_id:
+            body = {
+                    "name": cloud_account_name,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                        "externalID" :external_id  
+                    },
+                }
+        else:
+            body = {
+                    "name": cloud_account_name,
+                    "cspmConfig": {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                    },
+                }
 
-        body = {
-                "name": cloud_account_name,
-                "cspmConfig": {
-                    "crossAccountsRoleARN": arn,
-                    "stackRegion": region
-                },
-            }
-        
         return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
-
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name:str, trail_log_location:str, provider:str, region:str, expect_failure:bool=False):
         """
@@ -292,11 +323,10 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,account_status :str):
+    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str):
         """
         Validate accounts cloud list.
         """
-
         body = {
                 "pageSize": 100,
                 "pageNum": 0,
@@ -306,27 +336,23 @@ class Accounts(base_test.BaseTest):
                     }
                 ],
             }
-
-        res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"response not in {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        account = res["response"][0]
-        Logger.logger.info(f"account is {account}")
-        assert account["accountStatus"] == account_status, f"accountStatus is not {account_status} but {account['accountStatus']}"
+        acount_list = self.backend.get_cloud_accounts(body=body)
+        assert "response" in acount_list, f"response not in {acount_list}"
+        assert len(acount_list["response"]) > 0, f"response is empty"
+        account = acount_list["response"][0]
         assert "features" in account, f"features not in {account}"
         assert CSPM_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
         assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
+        assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status}"
         assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']}"
         assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']}"
         assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
         assert account["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
-
-        if scan_status== CSPM_SCAN_STATE_COMPLETED:
+        if scan_status==CSPM_SCAN_STATE_COMPLETED:
             assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
             assert account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
         elif scan_status==CSPM_SCAN_STATE_FAILED:
             assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
-
         return account
 
 
@@ -851,7 +877,7 @@ class Accounts(base_test.BaseTest):
                              cloud_account_guid=cloud_account_guid,
                              arn=test_arn,
                              scan_status=CSPM_SCAN_STATE_FAILED,
-                             account_status = ACCOUNT_STATUS_DISCONNECTED)
+                             feature_status = FEATURE_STATUS_DISCONNECTED)
         Logger.logger.info("Scan failed, disconnecting account")
 
         body = {
