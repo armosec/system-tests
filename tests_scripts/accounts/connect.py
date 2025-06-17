@@ -1,5 +1,3 @@
-
-
 import os
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,ACCOUNT_STATUS_CONNECTED
@@ -29,6 +27,16 @@ class CloudConnect(Accounts):
         self.skip_apis_validation = False
 
 
+    def validate_account_name_unchanged(self, cloud_account_guid, expected_name):
+        """Validate that the account name remains unchanged after operations.
+        
+        Args:
+            cloud_account_guid (str): The GUID of the cloud account to validate
+            expected_name (str): The expected name of the account
+        """
+        account = self.get_cloud_account(cloud_account_guid)
+        assert account["name"] == expected_name, f"Account name changed from {expected_name} to {account['name']}"
+
     def start(self):
         """
         Agenda:
@@ -36,18 +44,19 @@ class CloudConnect(Accounts):
         2. Create cspm stack
         3. Create bad arn cloud account with cspm
         4. Connect cspm new account
-        5. Connect cadr existing account
-        6. Delete and validate feature cspm when cspm is first
-        7. Delete and validate feature cadr when cspm is first
-        8. Delete and validate cloud account where cspm is first
-        9. Create bad log location cloud account with cadr
-        10. Connect cadr new account
-        11. Connect cspm existing account
-        12. Delete and validate feature cadr when cadr is first
-        13. Delete and validate feature cspm when cadr is first
-        14. Delete and validate cloud account where cadr is first
-        15. Validate aws regions
-        16. Validate aws regions details
+        5. Validate scan data
+        6. Connect cadr to existing account
+        7. Validate both features exist and cspm unchanged
+        8. Delete cspm feature and validate
+        9. Delete cadr feature and validate account deleted
+        10. Create bad log location cloud account with cadr
+        11. Connect cadr new account
+        12. Connect cspm to existing account
+        13. Validate both features exist and cadr unchanged
+        14. Delete cadr feature and validate
+        15. Delete cspm feature and validate account deleted
+        16. Validate aws regions
+        17. Validate aws regions details
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
@@ -56,18 +65,18 @@ class CloudConnect(Accounts):
         # generate random number for cloud account name for uniqueness
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
 
-
         Logger.logger.info('Stage 1: Init cloud formation manager')
         self.stack_manager = aws.CloudFormationManager(stack_region, 
                                                   aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
                                                   aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+        
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifer_rand + "-cspm"
         stack_link = self.get_and_validate_cspm_link(stack_region)
         _, template_url, _, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")
-        test_arn =  self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+        test_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
         Logger.logger.info(f"Created cspm stack {self.cspm_stack_name} with account id {account_id} and arn {test_arn}")
 
@@ -84,16 +93,24 @@ class CloudConnect(Accounts):
 
         # cspm cloud account name - first creating cspm and then cadr
         self.cspm_first_cloud_account_name = "systest-" + self.test_identifer_rand + "-cspm-first"
+        self.cadr_second_cloud_account_name = "systest-" + self.test_identifer_rand + "-cadr-second"
 
         # cadr cloud account name - first creating cadr and then cspm
         self.cadr_first_cloud_account_name = "systest-" + self.test_identifer_rand + "-cadr-first"
+        self.cspm_second_cloud_account_name = "systest-" + self.test_identifer_rand + "-cspm-second"
 
-
+        # First flow: CSPM first, then CADR
         Logger.logger.info('Stage 3: Create bad arn cloud account with cspm')
         cloud_account_guid = self.connect_cspm_bad_arn(stack_region, bad_arn, self.cspm_first_cloud_account_name)
 
         Logger.logger.info('Stage 4: Connect cspm new account')
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name)
+
+        # Store CSPM config for later validation
+        account = self.get_cloud_account(cloud_account_guid)
+        self.cspm_cloud_account_name = account["name"]
+
+        cspm_feature = account["features"][CSPM_FEATURE_NAME]
 
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
@@ -108,7 +125,9 @@ class CloudConnect(Accounts):
             Logger.logger.info("the account has been scan successfully")
 
             account = self.get_cloud_account(cloud_account_guid)
-            self.cspm_cloud_account_name = account["name"]
+            # Store CSPM config for later validation
+            cspm_feature = account["features"][CSPM_FEATURE_NAME]
+
             last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info("extracted last success scan id from created account")
 
@@ -123,51 +142,69 @@ class CloudConnect(Accounts):
             Logger.logger.info('Stage 8: accept the risk')
             self.accept_cspm_risk(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
+           
+        Logger.logger.info('Stage 7: Connect cadr to existing account')
+        self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, self.bucket_name, log_location)
+        Logger.logger.info("cadr has been connected successfully")
 
-        Logger.logger.info('Stage 9: Connect cadr existing account')
-        self.connect_cadr_existing_account(stack_region, self.cadr_stack_name_second, cloud_account_guid, log_location)
+        Logger.logger.info('Stage 8: Validate both features exist and cspm unchanged')
+        # Validate CSPM config remains unchanged
+        self.validate_features_unchanged(cloud_account_guid, CSPM_FEATURE_NAME, cspm_feature)
+        
+        # Validate account name remains unchanged
+        self.validate_account_name_unchanged(cloud_account_guid, self.cspm_cloud_account_name)
 
         if not self.skip_apis_validation:
-            Logger.logger.info('Stage 10: disconnect the cspm account')
+            Logger.logger.info('Stage 9: disconnect the cspm account')
             self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
             self.tested_stacks.remove(self.cspm_stack_name)
 
-            Logger.logger.info('Stage 11: return the cspm stack after disconnect')
+            Logger.logger.info('Stage 10: return the cspm stack after disconnect')
             new_arn =self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
             assert new_arn == test_arn ,f"excepted the arns to be the same but got old:{test_arn} and new:{new_arn}"
-
-        Logger.logger.info('Stage 12: Delete and validate feature cspm when cspm is first')
+            
+        Logger.logger.info('Stage 11: Delete cspm feature and validate')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
 
-        Logger.logger.info('Stage 13: Delete and validate feature cadr when cspm is first')
+        Logger.logger.info('Stage 12: Delete cadr feature and validate account deleted')
         self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
-
-        Logger.logger.info('Stage 14: Delete and validate cloud account where cspm is first')
         self.delete_and_validate_cloud_account(cloud_account_guid)
 
-        Logger.logger.info('Stage 15: Create bad log location cloud account with cadr')
+        # Second flow: CADR first, then CSPM
+        Logger.logger.info('Stage 13: Create bad log location cloud account with cadr')
         cloud_account_guid = self.connect_cadr_bad_log_location(stack_region, self.cadr_first_cloud_account_name, bad_log_location)
 
-        Logger.logger.info('Stage 16: Connect cadr new account')
+        Logger.logger.info('Stage 14: Connect cadr new account')
         cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, self.bucket_name, log_location)
 
-        Logger.logger.info('Stage 17: Connect cspm existing account')
-        self.connect_cspm_existing_account(cloud_account_guid, stack_region, test_arn)
+        # Store CADR config for later validation
+        account = self.get_cloud_account(cloud_account_guid)
+        cadr_feature = account["features"][CADR_FEATURE_NAME]
+        self.cadr_cloud_account_name = account["name"]
 
-        Logger.logger.info('Stage 18: Delete and validate feature cadr when cadr is first')
+        Logger.logger.info('Stage 15: Connect cspm to existing account')
+        # we don't want to cleanup the accounts because we want to keep the account id for the next test + no need apis validation cuase we validate it in the first case
+        self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_second_cloud_account_name, validate_apis=False, is_to_cleanup_accounts=False)
+
+        Logger.logger.info('Stage 16: Validate both features exist and cadr unchanged')
+        # Validate CADR config remains unchanged
+        self.validate_features_unchanged(cloud_account_guid, CADR_FEATURE_NAME, cadr_feature)
+        
+        # Validate account name remains unchanged
+        self.validate_account_name_unchanged(cloud_account_guid, self.cadr_cloud_account_name)
+
+        Logger.logger.info('Stage 17: Delete cadr feature and validate')
         self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
-        Logger.logger.info('Stage 19: Delete and validate feature cspm when cadr is first')
+        Logger.logger.info('Stage 18: Delete cspm feature and validate account deleted')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
-
-        Logger.logger.info('Stage 20: Delete and validate cloud account where cadr is first')
         self.delete_and_validate_cloud_account(cloud_account_guid)
 
-        Logger.logger.info('Stage 21: Validate aws regions')
+        Logger.logger.info('Stage 19: Validate aws regions')
         res = self.backend.get_aws_regions()
         assert len(res) > 0, f"failed to get aws regions, res is {res}"
 
-        Logger.logger.info('Stage 22: Validate aws regions details')
+        Logger.logger.info('Stage 20: Validate aws regions details')
         res = self.backend.get_aws_regions_details()
         assert len(res) > 0, f"failed to get aws regions details, res is {res}"
 

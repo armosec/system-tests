@@ -87,8 +87,9 @@ class Accounts(base_test.BaseTest):
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
-    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name, validate_apis=True)->str:
-        self.cleanup_existing_aws_cloud_accounts(account_id)
+    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name, validate_apis=True, is_to_cleanup_accounts=True)->str:
+        if is_to_cleanup_accounts:   
+            self.cleanup_existing_aws_cloud_accounts(account_id)
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=False)
         Logger.logger.info('Validate accounts cloud with cspm list')
         account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , ACCOUNT_STATUS_CONNECTED)
@@ -101,37 +102,6 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info('Edit name and validate cloud account with cspm')
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
             return cloud_account_guid
-
-    def connect_cspm_existing_account(self, cloud_account_guid, region, arn, validate_apis=True)->str:
-        body = {
-                "guid": cloud_account_guid,
-                "cspmConfig": {
-                    "crossAccountsRoleARN": arn,
-                    "stackRegion": region
-                },
-            }
-        res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
-        assert "Cloud account updated" in res, f"Cloud account was not updated"
-
-        body = {
-                "pageSize": 1,
-                "pageNum": 1,
-                "innerFilters": [
-                    {
-                        "guid": cloud_account_guid
-                    }
-                ],
-            }
-
-        res = self.backend.get_cloud_accounts(body=body)
-
-        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["guid"] == cloud_account_guid, f"guid is not {cloud_account_guid}"
-
-
-        return cloud_account_guid
-
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, expect_failure=True)
@@ -175,58 +145,6 @@ class Accounts(base_test.BaseTest):
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         _ =  self.create_stack(stack_name, template_url, parameters)
-    
-
-    def connect_cadr_existing_account(self, region, stack_name, cloud_account_guid, trail_log_location, validate_apis=True)->str:
-        
-        body = {
-                "guid": cloud_account_guid,
-                "cadrConfig": {
-                    "trailLogLocation": trail_log_location,
-                    "stackRegion": region
-                },
-            }
-        res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
-        assert "Cloud account updated" in res, f"Cloud account was not updated"
-
-        self.create_stack_cadr(region, stack_name, cloud_account_guid)
-
-        body = {
-                "pageSize": 1,
-                "pageNum": 1,
-                "innerFilters": [
-                    {
-                        "guid": cloud_account_guid
-                    }
-                ],
-            }
-        
-        res = self.backend.get_cloud_accounts(body=body)
-
-        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["guid"] == cloud_account_guid, f"guid is not {cloud_account_guid}"
-        assert "features" in res["response"][0], f"features not in {res['response'][0]}"
-        assert CADR_FEATURE_NAME in res["response"][0]["features"], f"cadr not in {res['response'][0]['features']}"
-
-
-        Logger.logger.info('Verify cadr is connected - happens when "StackReady" message is received')
-        self.wait_for_report(self.verify_cadr_status, 
-                                timeout=180,
-                                sleep_interval=10,
-                                 cloud_account_guid=cloud_account_guid,
-                                 expected_status=ACCOUNT_STATUS_CONNECTED)
-        
-    
-        Logger.logger.info('Verify cadr is disconnected - happens when "StackReady" message is expired, for system test is after 15 seconds')
-        self.wait_for_report(self.verify_cadr_status,
-                                timeout=180,
-                                sleep_interval=10,
-                                 cloud_account_guid=cloud_account_guid,
-                                 expected_status=ACCOUNT_STATUS_PARTIALLY_CONNECTED)
-
-
-        return cloud_account_guid
     
     def verify_cadr_status(self, cloud_account_guid, expected_status):
         body = {
@@ -953,6 +871,40 @@ class Accounts(base_test.BaseTest):
         assert account["features"][CSPM_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanState']}"
 
         Logger.logger.info("the account has been successfully disconnected")
+
+    def validate_features_unchanged(self, cloud_account_guid: str, feature_name: str, expected_feature: dict):
+        """
+        Validate that a feature's structure remains unchanged when adding a new feature.
+        
+        Args:
+            cloud_account_guid (str): The GUID of the cloud account
+            feature_name (str): The name of the feature to validate (CSPM_FEATURE_NAME or CADR_FEATURE_NAME)
+            expected_feature (dict): The expected feature structure
+        """
+        body = {
+            "pageSize": 1,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "guid": cloud_account_guid
+                }
+            ]
+        }
+
+        res = self.backend.get_cloud_accounts(body=body)
+        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
+        assert len(res["response"]) > 0, f"response is empty"
+        account = res["response"][0]
+        
+        # Validate feature exists and has correct structure
+        assert feature_name in account["features"], f"{feature_name} not in {account['features']}"
+        feature = account["features"][feature_name]
+        assert "config" in feature, f"config not in {feature}"  # This is the new field
+        
+        # Compare each config field
+        for key, value in expected_feature.items():
+            assert key in feature, f"{key} not in {feature}"
+            assert feature[key] == value, f"Expected {key}: {value}, got: {feature[key]}"
 
 def extract_parameters_from_url(url):
     parsed_url = urlparse(url)
