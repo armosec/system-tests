@@ -77,17 +77,24 @@ class BaseTest(object):
     def failed(self):
         self.test_failed = True
 
-    def create_tenant_name(self, prefix: str) -> str:
+    def create_tenant_name(self, suffix: str) -> str:
         epoch = time.time()
-        prefix = "auto_systest_" + prefix
+        if hasattr(self.test_obj, 'get_name'):
+            raw_name = self.test_obj.get_name()
+            function_name = (raw_name[:10] if len(raw_name) >= 10 else raw_name.ljust(10, '_'))
+        else:
+            function_name = "unknown__"
+        if suffix:
+            prefix = f"auto_systest_{function_name}_{suffix}"
+        else:
+            prefix = f"auto_systest_{function_name}"
         name = "%s_%d" % (prefix, epoch)
         return name
 
-    def create_new_tenant(self, prefix=None) -> int:
+    def create_new_tenant(self, suffix=None) -> int:
         Logger.logger.info(f"creating new test tenant")
-        # prefix = self.__class__.__name__ if prefix is None else prefix + self.__class__.__name__
-        prefix = prefix if prefix is not None else ""
-        tenantName = self.create_tenant_name(prefix)
+        suffix = suffix if suffix is not None else ""
+        tenantName = self.create_tenant_name(suffix)
         test_tenant_id, test_tenant_access_key = self.backend.create_tenant(tenantName)
         self.backend.set_access_key(test_tenant_access_key)
         Logger.logger.info(f"created tenant name '{tenantName}' with tenant id {test_tenant_id}")
