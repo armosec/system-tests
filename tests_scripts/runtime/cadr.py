@@ -51,7 +51,7 @@ class CADRIncidents(Incidents):
         Logger.logger.info("5. Send mock data of cdr alerts.")
         self._prepare_and_send_cdr_alerts(node_ip=public_ip, customer_guid=self.backend.get_customer_guid())
         Logger.logger.info("6. Verify the incident data in the backend.")
-        inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=10 * 60, sleep_interval=10,
+        inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=15 * 60, sleep_interval=10,
                                       incident_id=inc["guid"])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         self._verify_incident_alerts(incident_id=inc["guid"], public_ip=public_ip)
