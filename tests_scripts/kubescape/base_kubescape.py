@@ -159,7 +159,7 @@ class BaseKubescape(BaseK8S):
         if "account" in kwargs:
             command.extend(["--account", self.backend.get_customer_guid()])
             env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
-        command.extend(["--server", self.api_url])
+            command.extend(["--server", self.api_url])
 
         Logger.logger.info(" ".join(command))
         status_code, res = TestUtil.run_command(command_args=command,
@@ -237,8 +237,7 @@ class BaseKubescape(BaseK8S):
             command.extend(["--account", self.backend.get_customer_guid()])
             # set the access key with env var until it will be supported as a flag
             env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
-
-        command.extend(["--server", self.api_url])
+            command.extend(["--server", self.api_url])
 
         # first check if artifacts are passed to function
         if "use_artifacts" in kwargs and kwargs['use_artifacts'] != "":
