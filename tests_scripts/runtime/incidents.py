@@ -41,7 +41,7 @@ class Incidents(BaseHelm):
             "nodeAgent.config.hostMalwareSensor": "enable",
             "nodeAgent.config.hostNetworkSensor": "enable",
             "nodeAgent.image.repository": "quay.io/armosec/node-agent",
-            "nodeAgent.image.tag": "v0.0.139",
+            "nodeAgent.image.tag": "v0.0.158",
             "logger.level": "debug",
             "imagePullSecret.password": os.environ.get("NA_IMAGE_PULL_SECRET_PASSWORD", ""),
             "imagePullSecret.server": "quay.io",
@@ -427,6 +427,7 @@ class Incidents(BaseHelm):
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):
         Logger.logger.info("Get incidents list")
         filters_dict = {
+            "isDismissed": "false",
             "designators.attributes.cluster": cluster,
             "designators.attributes.namespace": namespace,
         }
@@ -438,7 +439,11 @@ class Incidents(BaseHelm):
         response = self.backend.get_incidents(filters=filters_dict)
         incs = response['response']
         assert len(incs) > 0, f"Failed to get incidents list {json.dumps(incs)}"
-        return incs
+        
+        full_incidents = []
+        for incident in incs:
+            full_incidents.append(self.backend.get_incident(incident.get("guid")))
+        return full_incidents
 
     def cleanup(self, **kwargs):
         return super().cleanup(**kwargs)

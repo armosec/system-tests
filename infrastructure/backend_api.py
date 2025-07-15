@@ -5,7 +5,7 @@ import time
 import traceback
 from datetime import datetime, timezone, timedelta
 import inspect
-from typing import Dict, List
+from typing import Dict, List, Optional
 import dateutil.parser
 import requests
 import websocket
@@ -127,6 +127,7 @@ API_RUNTIME_POLICIES_UNIQUEVALUES = "/api/v1/uniqueValues/runtimeIncidentPolicy"
 
 API_RUNTIME_EXCEPTION = "/api/v1/runtime/exceptions"
 API_RUNTIME_EXCEPTION_NEW = API_RUNTIME_EXCEPTION + "/new"
+API_RUNTIME_EXCEPTION_LIST = API_RUNTIME_EXCEPTION + "/list"
 
 
 API_SECCOMP_LIST = "/api/v1/seccomp/list"
@@ -3307,26 +3308,34 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "") -> dict:
+    def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "", advanced_scopes: Optional[List[Dict]] = None) -> dict:
         """
         Create a new runtime exception
         Args:
             policy_ids: List of policy IDs to create exception for
             resources: List of resources to apply the exception to
             reason: Reason for the exception
+            advanced_scopes: Optional advanced scopes for the exception
         Returns:
             Response from the API
         Example:
             "resources":[{"designatorType":"Attribute",
             "attributes":{"cluster":"do-fra1-k8s-1-32-1-do-0-fra1-amit-demo",
             "namespace":"systest-ns-mli2","name":"redis-sleep","kind":"Deployment"}}]
+            "advancedScopes":[{"entity": "process.name",
+            "condition": "in",
+            "values": "python, firefox"}]
         """
         payload = {
             "policyIDs": policy_ids,
             "reason": reason,
             "policyType": "runtimeIncidentExceptionPolicy",
-            "resources": resources
+            "resources": resources,
+            "createdBy": "shanyl@armosec.io"
         }
+        if advanced_scopes:
+            payload["advancedScopes"] = advanced_scopes
+            
         response = self.post(f"{API_RUNTIME_EXCEPTION_NEW}", json=payload)
         assert 200 <= response.status_code < 300, f"Failed to create runtime exception, got {response.status_code}"
         return response.json()
@@ -3356,6 +3365,22 @@ class ControlPanelAPI(object):
             params.update(filters)
         response = self.get(f"{API_RUNTIME_EXCEPTION}", params=params)
         assert 200 <= response.status_code < 300, f"Failed to get runtime exceptions, got {response.status_code}"
+        return response.json()
+
+    def list_runtime_exceptions(self, filters: List[Dict] = [{}]) -> requests.Response:
+        """
+        Get list of runtime exceptions
+        Args:
+            filters: Optional filters (inner filters) to apply to the request
+        Returns:
+            Response from the API containing list of exceptions
+        """
+        payload = {
+            "innerFilters": filters
+        }
+
+        response = self.post(f"{API_RUNTIME_EXCEPTION_LIST}", json=payload)
+        assert 200 <= response.status_code < 300, f"Failed to get list of runtime exceptions, got {response.status_code}"
         return response.json()
 
     def get_helm(self):
