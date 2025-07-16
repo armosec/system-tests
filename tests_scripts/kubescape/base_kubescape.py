@@ -125,7 +125,21 @@ class BaseKubescape(BaseK8S):
                 TestUtil.sleep(50, "Waiting for aggregation to end")
 
             self.cluster_deleted = self.delete_cluster_from_backend()
-        super().cleanup(**kwargs)
+        
+        # Force delete tenant regardless of delete_test_tenant setting
+        if hasattr(self, 'test_tenant_id') and self.test_tenant_id:
+            try:
+                response = self.backend.delete_tenant(self.test_tenant_id)
+                if response.status_code == 200:
+                    Logger.logger.info(f"Successfully deleted test tenant {self.test_tenant_id}")
+                    self.test_tenant_id = ""
+                else:
+                    Logger.logger.warning(f"Failed to delete test tenant {self.test_tenant_id}, status: {response.status_code} - continuing with test cleanup")
+                    
+            except Exception as e:
+                Logger.logger.warning(f"Exception deleting test tenant {self.test_tenant_id}: {e} - continuing with test cleanup")
+        
+        result = super().cleanup(**kwargs)
         return statics.SUCCESS, ""
 
     def get_default_results_file(self):
