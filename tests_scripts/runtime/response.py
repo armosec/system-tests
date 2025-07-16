@@ -200,7 +200,8 @@ class IncidentResponse(Incidents):
 
         for wlid in wlid_to_namespace:
             self.wait_for_report(self.verify_application_profiles, wlids=[wlid], namespace=wlid_to_namespace[wlid])
-        time.sleep(30)
+        
+        time.sleep(60) # wait for application profiles to be created in cache
         
         for wlid in wlid_to_namespace:
             self.exec_pod(wlid=wlid, command="cat /etc/hosts")
