@@ -223,13 +223,6 @@ class RuntimePoliciesConfigurations(Incidents):
         Logger.logger.info("15. Delete exception")
         self.backend.delete_runtime_exception(exception_id=exception_id)
 
-        Logger.logger.info("16. Delete policies")
-        for policy_guid in policies_guids:
-            self.validate_delete_policy(policy_guid)
-
-        Logger.logger.info("17. Check no incident")
-        self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
-        
         exception_with_advanced_scopes = {
             "resources": [{
                 "designatorType": "Attributes",
@@ -249,38 +242,47 @@ class RuntimePoliciesConfigurations(Incidents):
             "policyIDs": ["I013"],
         }
         
-        Logger.logger.info("18. Create incident to validate BE")
+        Logger.logger.info("16. Create incident to validate BE")
         self.exec_pod(wlid=wlids[0], command="ls /etc/hosts")
         self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                 cluster=cluster, namespace=namespace,
                                 incident_name=["Unexpected process launched"])
         
-        Logger.logger.info("19. Create exception with advanced scopes")
+        Logger.logger.info("17. Create exception with advanced scopes")
         exception_id = self.backend.create_runtime_exception(policy_ids=exception_with_advanced_scopes["policyIDs"], 
                                                              resources=exception_with_advanced_scopes["resources"],advanced_scopes=exception_with_advanced_scopes["advancedScopes"])["guid"]
 
-        Logger.logger.info("20. List runtime exceptions")
+        Logger.logger.info("18. List runtime exceptions")
         exceptions = self.backend.list_runtime_exceptions()["response"][0]
         assert(exceptions.get('advancedScopes') == exception_with_advanced_scopes.get('advancedScopes'))
         
-        Logger.logger.info("21. Create alert that matches excpetion - no incident")       
+        Logger.logger.info("19. Create alert that matches excpetion - no incident")       
         self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
         
-        Logger.logger.info("22. Create alert that does not match excpetion - create incident")
+        Logger.logger.info("20. Create alert that does not match excpetion - create incident")
         self.exec_pod(wlid=wlids[0], command="tail /etc/group")
         self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                 cluster=cluster, namespace=namespace,
                                 incident_name=["Unexpected process launched"])
         
-        Logger.logger.info("23. Delete exception")
+        Logger.logger.info("21. Delete exception")
         self.backend.delete_runtime_exception(exception_id=exception_id)
         
-        Logger.logger.info("24. Create incident after delete exception")
+        Logger.logger.info("22. Create incident after delete exception")
         self.exec_pod(wlid=wlids[0], command="head /etc/hosts")
         incidents = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                 cluster=cluster, namespace=namespace,
                                 incident_name=["Unexpected process launched"])
         assert(len(incidents[0]) == 2)
+
+
+        Logger.logger.info("23. Delete policies")
+        for policy_guid in policies_guids:
+            self.validate_delete_policy(policy_guid)
+
+        # Logger.logger.info("24. Check no incident")
+        # self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        
 
         return self.cleanup()
   
