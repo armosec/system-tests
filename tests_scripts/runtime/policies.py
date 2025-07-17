@@ -2,6 +2,7 @@
 
 import json
 import random
+import time
 
 
 from configurations.system.tests_cases.structures import TestConfiguration
@@ -270,10 +271,9 @@ class RuntimePoliciesConfigurations(Incidents):
         
         Logger.logger.info("22. Create incident after delete exception")
         self.exec_pod(wlid=wlids[0], command="head /etc/hosts")
-        incidents = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
-                                cluster=cluster, namespace=namespace,
-                                incident_name=["Unexpected process launched"])
-        assert(len(incidents[0]) == 2)
+        self.wait_for_specific_incident_count_with_report(cluster=cluster, namespace=namespace,
+                                                                      incident_name=["Unexpected process launched"],
+                                                                      expected_count=2, timeout=120)
 
 
         Logger.logger.info("23. Delete policies")
@@ -298,6 +298,35 @@ class RuntimePoliciesConfigurations(Incidents):
         if not exception_occured:
             raise Exception("Exception not created")
         
+    def wait_for_specific_incident_count_with_report(self, cluster: str, namespace: str, incident_name: list, expected_count: int, timeout: int = 120):
+        """
+        Wait for a specific number of incidents using wait_for_report pattern.
+        
+        :param cluster: Cluster name
+        :param namespace: Namespace name
+        :param incident_name: List of incident names to look for
+        :param expected_count: Expected number of incidents
+        :param timeout: Total timeout in seconds
+        :return: List of incidents
+        """
+        start_time = time.time()
+        
+        while time.time() - start_time < timeout:
+            try:
+                incidents = self.wait_for_report(self.verify_incident_in_backend_list, timeout=30, sleep_interval=10,
+                                                cluster=cluster, namespace=namespace,
+                                                incident_name=incident_name)
+                if len(incidents[0]) == expected_count:
+                    Logger.logger.info(f"Found {expected_count} incidents as expected")
+                    return incidents[0]
+                else:
+                    Logger.logger.info(f"Found {len(incidents[0])} incidents, expecting {expected_count}. Waiting...")
+            except Exception as e:
+                Logger.logger.warning(f"Error checking incidents: {e}")
+            
+            time.sleep(10)
+        
+        raise Exception(f"Timeout waiting for {expected_count} incidents after {timeout} seconds")
         
     def cleanup(self, **kwargs):
         for guid in self.tested_webhook_guid:
