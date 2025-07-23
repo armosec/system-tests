@@ -128,13 +128,13 @@ class Accounts(base_test.BaseTest):
         self.tested_stacks.append(stack_name)
 
 
-    def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location)->str:
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
+    def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location ,kms_key )->str:
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, kms_key, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
-    def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, validate_apis=True)->str:
+    def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, kms_key, validate_apis=True)->str:
         Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location,kms_key, PROVIDER_AWS, region=region, expect_failure=False)
         
         Logger.logger.info('Validate feature status Pending')
         account = self.get_cloud_account(cloud_account_guid)
@@ -293,7 +293,7 @@ class Accounts(base_test.BaseTest):
 
         return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
             
-    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name:str, trail_log_location:str, provider:str, region:str, expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name:str, trail_log_location:str, kms_key:str, provider:str, region:str, expect_failure:bool=False):
         """
         Create and validate cloud account.
         """
@@ -302,7 +302,8 @@ class Accounts(base_test.BaseTest):
                 "name": cloud_account_name,
                 "cadrConfig": {
                     "trailLogLocation": trail_log_location,
-                    "stackRegion": region
+                    "stackRegion": region,
+                    "kmsKey": kms_key
                 },
             }
         
