@@ -128,7 +128,7 @@ class Accounts(base_test.BaseTest):
         self.tested_stacks.append(stack_name)
 
 
-    def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location)->str:
+    def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location )->str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
@@ -302,7 +302,7 @@ class Accounts(base_test.BaseTest):
                 "name": cloud_account_name,
                 "cadrConfig": {
                     "trailLogLocation": trail_log_location,
-                    "stackRegion": region
+                    "stackRegion": region,
                 },
             }
         
@@ -416,6 +416,14 @@ class Accounts(base_test.BaseTest):
         """
         Delete and validate feature.
         """
+        account = self.get_cloud_account(guid)
+        assert account is not None, f"Cloud account with guid {guid} was not found"
+        assert feature_name in account["features"], f"'{feature_name}' feature was not found in {account['features']}"
+        
+        accountNeedToBeDeleted = False
+        #check if it is last feature - features is a dict
+        if len(list(account["features"].keys())) == 1:
+            accountNeedToBeDeleted = True
 
         res = self.backend.delete_accounts_feature(account_guid=guid, feature_name=feature_name)
         assert "Feature deleted" in res, f"Feature {feature_name} for cloud account with guid {guid} was not deleted"
@@ -432,32 +440,12 @@ class Accounts(base_test.BaseTest):
 
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"response not in {res}, request: {body}"
-        assert len(res["response"]) > 0, f"response is empty, request: {body}"
-        assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
+        if accountNeedToBeDeleted:
+            assert len(res["response"]) == 0, f"response is not empty, request: {body}"
+        else:
+            assert len(res["response"]) > 0, f"response is empty, request: {body}"
+            assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
 
-    def delete_and_validate_cloud_account(self, guid:str):
-        """
-        Delete and validate cloud account.
-        """
-
-        res = self.backend.delete_cloud_account(guid=guid)
-        assert "Cloud account deleted" in res, f"Cloud account with guid {guid} was not deleted"
-
-        body = {
-                        "pageSize": 100,
-                        "pageNum": 0,
-                        "innerFilters": [
-                            {
-                                "guid": guid
-                            }
-                        ],
-                    }
-
-        res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"response not in {res}, request: {body}"
-        assert len(res["response"]) == 0, f"response is not empty, request: {body}"
-
-        self.test_cloud_accounts_guids.remove(guid)
 
     def validate_scan_data(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str, with_accepted_resources: bool = False, with_jira: bool = False):
         """
