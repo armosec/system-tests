@@ -91,10 +91,11 @@ class Accounts(base_test.BaseTest):
         if is_to_cleanup_accounts:   
             self.cleanup_existing_aws_cloud_accounts(account_id)
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
+        Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
         account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
-
+        Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm uniquevalues')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
