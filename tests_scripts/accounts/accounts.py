@@ -89,7 +89,9 @@ class Accounts(base_test.BaseTest):
 
     def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
+            Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_aws_cloud_accounts(account_id)
+        Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
@@ -99,18 +101,20 @@ class Accounts(base_test.BaseTest):
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm uniquevalues')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
-
             Logger.logger.info('Edit name and validate cloud account with cspm')
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
-            return cloud_account_guid
+        return cloud_account_guid
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
+        Logger.logger.info(f"Attempting to connect CSPM with bad ARN: {arn} for account: {cloud_account_name}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region,external_id="", expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad ARN: {cloud_account_guid}")
         return cloud_account_guid
 
 
 
     def create_stack(self, stack_name, template_url, parameters):
+        Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         stack_id =  self.stack_manager.create_stack(template_url, parameters, stack_name)
         assert stack_id, f"failed to create stack {stack_name}"
         Logger.logger.info(f"Stack creation initiated for: {stack_name}, stack id is {stack_id}")
@@ -129,7 +133,7 @@ class Accounts(base_test.BaseTest):
         return cloud_account_guid
 
     def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, validate_apis=True)->str:
-        Logger.logger.info('Connect cadr new account')
+        Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
         Logger.logger.info('Validate feature status Pending')
@@ -138,7 +142,7 @@ class Accounts(base_test.BaseTest):
         
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
-
+        Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
         return cloud_account_guid
 
 
@@ -195,8 +199,9 @@ class Accounts(base_test.BaseTest):
         """
         Cleanup existing aws cloud accounts.
         """
-
+        Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id: {account_id}")
         if not account_id:
+            Logger.logger.error("account_id is required for cleanup_existing_aws_cloud_accounts")
             raise Exception("account_id is required")
 
         body = {
@@ -378,14 +383,11 @@ class Accounts(base_test.BaseTest):
         res = self.backend.get_cloud_accounts_uniquevalues(body=unique_values_body)
         assert "fields" in res, f"failed to get fields for cloud accounts unique values, body used: {unique_values_body}, res is {res}"
         assert len(res["fields"]) > 0, f"response is empty for name {cloud_account_name}, and request {unique_values_body}, res is {res}"
-        assert len(res["fields"]["name"]) == 1, f"response is empty"
-        assert res["fields"]["name"][0] == cloud_account_name, f"name is not {cloud_account_name}"
+        assert len(res["fields"]["name"]) == 1, f"response is empty for name {cloud_account_name}, and request {unique_values_body}, res is {res}"
+        assert res["fields"]["name"][0] == cloud_account_name, f"name is not {cloud_account_name}, request: {unique_values_body}, res: {res}"
 
     def update_and_validate_cloud_account(self, guid:str, cloud_account_name:str, arn:str):
-        """
-        Update and validate cloud account.
-        """
-
+        Logger.logger.info(f"Updating cloud account {guid} to new name '{cloud_account_name}'")
         body = {
         "guid": guid,
         "name": cloud_account_name,
@@ -393,7 +395,7 @@ class Accounts(base_test.BaseTest):
 
         res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
         assert "Cloud account updated" in res, f"Cloud account with guid {guid} was not updated"
-
+        Logger.logger.info(f"Cloud account {guid} updated, validating update...")
         body = {
                         "pageSize": 100,
                         "pageNum": 0,
@@ -408,6 +410,7 @@ class Accounts(base_test.BaseTest):
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
         assert res["response"][0]["name"] == cloud_account_name, f"failed to update cloud account, name is not {cloud_account_name}"
+        Logger.logger.info(f"Cloud account {guid} name successfully updated to '{cloud_account_name}'")
 
     def delete_and_validate_feature(self, guid:str, feature_name:str):
         """
@@ -428,9 +431,9 @@ class Accounts(base_test.BaseTest):
                     }
 
         res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"response not in {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}"
+        assert "response" in res, f"response not in {res}, request: {body}"
+        assert len(res["response"]) > 0, f"response is empty, request: {body}"
+        assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
 
     def delete_and_validate_cloud_account(self, guid:str):
         """
@@ -451,8 +454,8 @@ class Accounts(base_test.BaseTest):
                     }
 
         res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"response not in {res}"
-        assert len(res["response"]) == 0, f"response is not empty"
+        assert "response" in res, f"response not in {res}, request: {body}"
+        assert len(res["response"]) == 0, f"response is not empty, request: {body}"
 
         self.test_cloud_accounts_guids.remove(guid)
 

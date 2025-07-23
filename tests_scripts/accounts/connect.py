@@ -34,8 +34,10 @@ class CloudConnect(Accounts):
             cloud_account_guid (str): The GUID of the cloud account to validate
             expected_name (str): The expected name of the account
         """
+        Logger.logger.info(f"Validating account name for GUID {cloud_account_guid}, expecting '{expected_name}'")
         account = self.get_cloud_account(cloud_account_guid)
         assert account["name"] == expected_name, f"Account name changed from {expected_name} to {account['name']}"
+        Logger.logger.info(f"Account name for GUID {cloud_account_guid} is unchanged and matches '{expected_name}'")
 
     def start(self):
         """
@@ -215,15 +217,19 @@ class CloudConnect(Accounts):
 
         if self.stack_manager:
             for stack_name in self.tested_stacks:
+                Logger.logger.info(f"Deleting stack: {stack_name}")
                 self.stack_manager.delete_stack(stack_name)
 
             for cloud_trail_name in self.tested_cloud_trails:
+                Logger.logger.info(f"Deleting cloudtrail: {cloud_trail_name}")
                 self.stack_manager.delete_cloudtrail(cloud_trail_name)
 
             for stack_name in self.tested_stacks:
+                Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
                 self.stack_manager.delete_stack_log_groups(stack_name )
 
         for cloud_account_guid in self.test_cloud_accounts_guids:
+            Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
             self.backend.delete_cloud_account(cloud_account_guid)
 
 
