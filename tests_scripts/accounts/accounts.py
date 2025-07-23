@@ -377,7 +377,7 @@ class Accounts(base_test.BaseTest):
         
         res = self.backend.get_cloud_accounts_uniquevalues(body=unique_values_body)
         assert "fields" in res, f"failed to get fields for cloud accounts unique values, body used: {unique_values_body}, res is {res}"
-        assert len(res["fields"]) > 0, f"response is empty"
+        assert len(res["fields"]) > 0, f"response is empty for name {cloud_account_name}, and request {unique_values_body}, res is {res}"
         assert len(res["fields"]["name"]) == 1, f"response is empty"
         assert res["fields"]["name"][0] == cloud_account_name, f"name is not {cloud_account_name}"
 
