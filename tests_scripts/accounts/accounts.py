@@ -348,17 +348,18 @@ class Accounts(base_test.BaseTest):
         account = acount_list["response"][0]
         assert "features" in account, f"features not in {account}"
         assert CSPM_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status}"
-        assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status}"
-        assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']}"
-        assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']}"
-        assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn}"
+        assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][CSPM_FEATURE_NAME]['scanState']}"
+        assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][CSPM_FEATURE_NAME]['featureStatus']}"
+        assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
+        assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
+        assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][CSPM_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
         assert account["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
         if scan_status==CSPM_SCAN_STATE_COMPLETED:
             assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
             assert account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
         elif scan_status==CSPM_SCAN_STATE_FAILED:
             assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+        Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return account
 
 
