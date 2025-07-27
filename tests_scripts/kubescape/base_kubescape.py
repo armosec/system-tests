@@ -126,18 +126,19 @@ class BaseKubescape(BaseK8S):
 
             self.cluster_deleted = self.delete_cluster_from_backend()
         
-        # Force delete tenant regardless of delete_test_tenant setting
-        if hasattr(self, 'test_tenant_id') and self.test_tenant_id:
-            try:
-                response = self.backend.delete_tenant(self.test_tenant_id)
-                if response.status_code == 200:
-                    Logger.logger.info(f"Successfully deleted test tenant {self.test_tenant_id}")
-                    self.test_tenant_id = ""
-                else:
-                    Logger.logger.warning(f"Failed to delete test tenant {self.test_tenant_id}, status: {response.status_code} - continuing with test cleanup")
-                    
-            except Exception as e:
-                Logger.logger.warning(f"Exception deleting test tenant {self.test_tenant_id}: {e} - continuing with test cleanup")
+        # Delete all tracked tenants
+        if hasattr(self, 'created_tenant_ids') and self.created_tenant_ids:
+            for tenant_id in self.created_tenant_ids[:]:  # Use slice copy to avoid modification during iteration
+                try:
+                    response = self.backend.delete_tenant(tenant_id)
+                    if response.status_code == 200:
+                        Logger.logger.info(f"Successfully deleted test tenant {tenant_id}")
+                        self.created_tenant_ids.remove(tenant_id)
+                    else:
+                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id}, status: {response.status_code} - continuing with test cleanup")
+                        
+                except Exception as e:
+                    Logger.logger.warning(f"Exception deleting test tenant {tenant_id}: {e} - continuing with test cleanup")
         
         result = super().cleanup(**kwargs)
         return statics.SUCCESS, ""
@@ -243,6 +244,9 @@ class BaseKubescape(BaseK8S):
         if "keep_local" in kwargs:
             command.append("--keep-local")
 
+        # Track the current selected tenant before scan
+        current_tenant_id = self.backend.get_selected_tenant()
+
         env = {}
         if "submit" in kwargs:
             command.append("--submit")
@@ -285,6 +289,13 @@ class BaseKubescape(BaseK8S):
                                                 stderr=TestUtil.get_arg_from_dict(kwargs, "stderr", None),
                                                 stdout=TestUtil.get_arg_from_dict(kwargs, "stdout", None))
         assert status_code == 0, res
+
+        # After scan, check if a new tenant was created
+        new_tenant_id = self.backend.get_selected_tenant()
+        if new_tenant_id != current_tenant_id:
+            Logger.logger.info(f"New tenant created during scan: {new_tenant_id}")
+            self.track_tenant_creation(new_tenant_id)
+
         return res
 
     def get_repository_posture_repositories(self, repository_owner: str, repository_name: str, repository_branch: str):
