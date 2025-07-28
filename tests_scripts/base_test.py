@@ -55,7 +55,9 @@ class BaseTest(object):
         self.leave_redis_data: bool = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "leave_redis_data", False)
         self.test_summery_data = {}
 
+        # Track all tenants created during this test
         self.test_tenant_id = ""
+        self.created_tenant_ids = []  # Track all tenants created during test
 
         # defines when to delete tenant. Only applied if self.create_test_tenant is True
         self.delete_test_tenant = TestUtil.get_arg_from_dict(self.test_driver.kwargs, "delete_test_tenant", DELETE_TEST_TENANT_DEFAULT)
@@ -66,6 +68,7 @@ class BaseTest(object):
         if self.create_test_tenant:
             Logger.logger.info(f"create_test_tenant is True")
             self.test_tenant_id = self.create_new_tenant()
+            self.created_tenant_ids.append(self.test_tenant_id)
 
         self.test_failed = False
 
@@ -101,29 +104,44 @@ class BaseTest(object):
         self.backend.select_tenant(test_tenant_id)
         return test_tenant_id
 
+    def track_tenant_creation(self, tenant_id: str):
+        """Track a tenant that was created during the test for cleanup"""
+        if tenant_id and tenant_id not in self.created_tenant_ids:
+            self.created_tenant_ids.append(tenant_id)
+            Logger.logger.info(f"Tracking tenant {tenant_id} for cleanup")
+
     def delete_tenants(self):
-        if self.test_tenant_id == "":
-            Logger.logger.info(f"test_tenant_id is empty or was deleted, not deleting")
-            return
+        # Delete all tracked tenants
+        for tenant_id in self.created_tenant_ids[:]:  # Use slice copy to avoid modification during iteration
+            if tenant_id == "":
+                Logger.logger.info(f"tenant_id is empty, skipping deletion")
+                continue
 
-        # skip delete if delete_test_tenant is NEVER
-        if self.delete_test_tenant == DELETE_TEST_TENANT_NEVER:
-            Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_NEVER}', not deleting")
-            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
-            return 
-    
-        # skip delete if delete_test_tenant is TEST_PASSED and test failed
-        if self.delete_test_tenant == DELETE_TEST_TENANT_TEST_PASSED and self.test_failed:
-            Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_TEST_PASSED}' and test failed, not deleting")
-            Logger.logger.info(f"test_tenant_id is '{self.test_tenant_id}'")
-            return
+            # skip delete if delete_test_tenant is NEVER
+            if self.delete_test_tenant == DELETE_TEST_TENANT_NEVER:
+                Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_NEVER}', not deleting")
+                Logger.logger.info(f"tenant_id is '{tenant_id}'")
+                continue 
+        
+            # skip delete if delete_test_tenant is TEST_PASSED and test failed
+            if self.delete_test_tenant == DELETE_TEST_TENANT_TEST_PASSED and self.test_failed:
+                Logger.logger.info(f"'delete_test_tenant' arg is '{DELETE_TEST_TENANT_TEST_PASSED}' and test failed, not deleting")
+                Logger.logger.info(f"tenant_id is '{tenant_id}'")
+                continue
 
-        response = self.backend.delete_tenant(self.test_tenant_id)
-        #if response.status_code != client.OK:
-        #    Logger.logger.error(f"delete tenant failed {self.test_tenant_id}")
-        #else:
-        Logger.logger.info(f"deleted tenant {self.test_tenant_id}")
-        self.test_tenant_id = ""
+            try:
+                response = self.backend.delete_tenant(tenant_id)
+                if response.status_code == 200:
+                    Logger.logger.info(f"deleted tenant {tenant_id}")
+                    self.created_tenant_ids.remove(tenant_id)
+                else:
+                    Logger.logger.warning(f"Failed to delete tenant {tenant_id}, status: {response.status_code}")
+            except Exception as e:
+                Logger.logger.warning(f"Exception deleting tenant {tenant_id}: {e}")
+
+        # Clear the main test_tenant_id if it was the only one
+        if self.test_tenant_id in self.created_tenant_ids:
+            self.test_tenant_id = ""
 
     def create_ks_exceptions(self, cluster_name: str, exceptions_file):
         if not exceptions_file:
