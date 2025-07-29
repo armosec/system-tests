@@ -58,7 +58,7 @@ class KubescapeTests(object):
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanComplianceScore,
             policy_scope='framework',
-            policy_name='nsa,mitre,cis-v1.23-t1.0.1',
+            policy_name='nsa,mitre,cis-v1.10.0',
             submit=True,
             account=True
         )
