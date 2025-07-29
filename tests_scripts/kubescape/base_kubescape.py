@@ -252,7 +252,10 @@ class BaseKubescape(BaseK8S):
             command.append("--submit")
             account_id = kwargs["account"] if "account" in kwargs else self.backend.get_customer_guid()
             assert account_id, "missing account ID, the report will not be submitted"
-            command.extend(["--account", self.backend.get_customer_guid()])
+            # Use the selected tenant ID if available, otherwise fall back to customer GUID
+            tenant_id = self.backend.get_selected_tenant()
+            account_to_use = tenant_id if tenant_id else self.backend.get_customer_guid()
+            command.extend(["--account", account_to_use])
             # set the access key with env var until it will be supported as a flag
             env = {"KS_ACCESS_KEY": self.backend.get_access_key()} if self.backend.get_access_key() != "" else {}
             command.extend(["--server", self.api_url])
