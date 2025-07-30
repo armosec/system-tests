@@ -2908,7 +2908,7 @@ class ControlPanelAPI(object):
         params = {"customerGUID": self.selected_tenant_id}
         body = {
             "guid": account_guid,
-            "featureName": feature_name
+            "featureNames": [feature_name]
         }
         r = self.delete(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
