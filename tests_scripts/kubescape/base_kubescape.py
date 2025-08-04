@@ -136,6 +136,11 @@ class BaseKubescape(BaseK8S):
                         self.created_tenant_ids.remove(tenant_id)
                     else:
                         error_details = {
+                            'customer_guid': self.backend.get_customer_guid(),
+                            'access_key': self.backend.get_access_key(),
+                            'client_id': self.backend.get_client_id(),
+                            'secret_key': self.backend.get_secret_key(),
+                            'selected_tenant_id': self.backend.get_selected_tenant(),
                             'status_code': response.status_code,
                             'reason': response.reason if hasattr(response, 'reason') else 'Unknown',
                             'response_text': response.text if hasattr(response, 'text') else 'No response text',
