@@ -135,7 +135,13 @@ class BaseKubescape(BaseK8S):
                         Logger.logger.info(f"Successfully deleted test tenant {tenant_id}")
                         self.created_tenant_ids.remove(tenant_id)
                     else:
-                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id}, status: {response.status_code} - continuing with test cleanup")
+                        error_details = {
+                            'status_code': response.status_code,
+                            'reason': response.reason if hasattr(response, 'reason') else 'Unknown',
+                            'response_text': response.text if hasattr(response, 'text') else 'No response text',
+                            'headers': dict(response.headers) if hasattr(response, 'headers') else {}
+                        }
+                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id} - Status: {error_details['status_code']} {error_details['reason']}, Response: {error_details['response_text']}, Headers: {error_details['headers']} - continuing with test cleanup")
                         
                 except Exception as e:
                     Logger.logger.warning(f"Exception deleting test tenant {tenant_id}: {e} - continuing with test cleanup")
