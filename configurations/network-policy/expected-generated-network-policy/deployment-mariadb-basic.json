@@ -35,6 +35,21 @@
         {
           "from": [
             {
+              "from": [
+                {
+                  "ipBlock": {
+                    "cidr": "10.244.0.93/32"
+                  }
+                }
+              ],
+              "ports": [
+                {
+                  "port": 3306,
+                  "protocol": "TCP"
+                }
+              ]
+            },
+            {
               "podSelector": {
                 "matchLabels": {
                   "app": "wikijs"
