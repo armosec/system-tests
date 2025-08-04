@@ -14,8 +14,8 @@
       "kubescape.io/workload-name": "wikijs"
     },
     "annotations": {
-      "kubescape.io/completion": "complete",
-      "kubescape.io/status": "ready"
+      "kubescape.io/completion": "partial",
+      "kubescape.io/status": "completed"
     }
   },
   "spec": {
