@@ -135,18 +135,7 @@ class BaseKubescape(BaseK8S):
                         Logger.logger.info(f"Successfully deleted test tenant {tenant_id}")
                         self.created_tenant_ids.remove(tenant_id)
                     else:
-                        error_details = {
-                            'customer_guid': self.backend.get_customer_guid(),
-                            'access_key': self.backend.get_access_key(),
-                            'client_id': self.backend.get_client_id(),
-                            'secret_key': self.backend.get_secret_key(),
-                            'selected_tenant_id': self.backend.get_selected_tenant(),
-                            'status_code': response.status_code,
-                            'reason': response.reason if hasattr(response, 'reason') else 'Unknown',
-                            'response_text': response.text if hasattr(response, 'text') else 'No response text',
-                            'headers': dict(response.headers) if hasattr(response, 'headers') else {}
-                        }
-                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id} - Status: {error_details['status_code']} {error_details['reason']}, Response: {error_details['response_text']}, Headers: {error_details['headers']} - continuing with test cleanup")
+                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id} - Status: {response.status_code} {response.reason}, Response: {response.text}, Headers: {response.headers} - continuing with test cleanup")
                         
                 except Exception as e:
                     Logger.logger.warning(f"Exception deleting test tenant {tenant_id}: {e} - continuing with test cleanup")
