@@ -279,6 +279,7 @@ HELM_SYNC_SBOM_DISABLED = "disable"
 # relevancy feature
 HELM_NETWORK_POLICY_FEATURE = "capabilities.networkPolicyService"
 HELM_NODE_AGENT_LEARNING_PERIOD = "nodeAgent.config.learningPeriod"
+HELM_NODE_AGENT_MAX_LEARNING_PERIOD = "nodeAgent.config.maxLearningPeriod"
 HELM_NODE_AGENT_UPDATE_PERIOD = "nodeAgent.config.updatePeriod"
 HELM_RELEVANCY_FEATURE = "capabilities.relevancy"
 HELM_RELEVANCY_FEATURE_ENABLED = "enable"
