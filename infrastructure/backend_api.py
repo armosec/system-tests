@@ -145,10 +145,18 @@ API_WEBHOOKS_TEST_MESSAGE = "/api/v1/notifications/webhooks/testMessage"
 API_ACCOUNTS = "/api/v1/accounts"
 API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
-API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
-APT_ACCOUNTS_AWS_REGIONS_DETAILS = "/api/v1/accounts/aws/regionsdetails"
-API_ACCOUNTS_CSPM_LINK = "/api/v1/accounts/aws/cspmstack"
-API_ACCOUNTS_CADR_LINK = "/api/v1/accounts/aws/cadrstack"
+BASE_API_ACCOUNTS_AWS = "/api/v1/accounts/aws"
+API_ACCOUNTS_AWS_REGIONS = BASE_API_ACCOUNTS_AWS + "/regions"
+APT_ACCOUNTS_AWS_REGIONS_DETAILS = BASE_API_ACCOUNTS_AWS + "/regionsdetails"
+API_ACCOUNTS_CSPM_LINK = BASE_API_ACCOUNTS_AWS + "/cspmstack"
+API_ACCOUNTS_CADR_LINK = BASE_API_ACCOUNTS_AWS + "/cadrstack"
+
+BASE_API_ACCOUNTS_AWS_ORG = BASE_API_ACCOUNTS_AWS + "/org"
+API_ACCOUNTS_CADR_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cadrstack"
+API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmmembers"
+API_ACCOUNTS_CSPM_ADMIN_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmadmin"
+
+
 API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
 API_UNIQUEVALUES_ACCOUNTS_KUBERNETES = "/api/v1/uniqueValues/accounts/kubernetes"
@@ -2893,7 +2901,23 @@ class ControlPanelAPI(object):
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+    
+    def get_cspm_members_org_link(self, region, org_guid , feature_names : List[str], generate_external_id : bool = False):
+        url = API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK + "?region=" + region + "&orgGUID=" + org_guid +"&generateExternalID=" + str(generate_external_id).lower()
+        body = {
+            "featureNames" : feature_names
+        }
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body  )
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing CSPM org link. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
+    def get_cspm_admin_org_link(self, region, org_guid):
+        #TODO: implement
+        return
+       
     def get_cadr_link(self, region, cloud_account_guid):
         url = API_ACCOUNTS_CADR_LINK + "?region=" + region + "&cloudAccountGUID=" + cloud_account_guid
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
@@ -2902,6 +2926,16 @@ class ControlPanelAPI(object):
                 'Error accessing CADR link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+
+    def get_cadr_org_link(self, region, org_guid):
+        url = API_ACCOUNTS_CADR_ORG_LINK + "?region=" + region + "&orgGUID=" + org_guid
+        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing CADR org link. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
 
     def delete_accounts_feature(self, account_guid, feature_name):
         url = API_ACCOUNTS_DELETE_FEATURE
