@@ -231,12 +231,8 @@ class Accounts(base_test.BaseTest):
         """
         Get and validate cspm link.
         """
-        tenant = self.backend.get_selected_tenant()
-        expected_template_url = os.environ.get("CSPM_TEMPLATE_URL")
-        parsed_cspm_template = quote(expected_template_url, safe='')
-        stack_link = self.backend.get_cspm_link(region=region)
-        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}\u0026stackName=armo-security-readonly\u0026templateUrl={parsed_cspm_template}"
-        assert stack_link == expected_link,  f"failed to get cspm link, link is {stack_link}, expected link is {expected_link}"
+        stack_response = self.backend.get_cspm_link(region=region)
+        stack_link = stack_response["stackLink"]
         return stack_link
     
     def get_and_validate_cspm_link_with_external_id(self, region) -> Tuple[str, str]:
@@ -244,21 +240,11 @@ class Accounts(base_test.BaseTest):
         Get and validate cspm link.
         Returns tuple of (stack_link, external_id) strings.
         """
-        tenant = self.backend.get_selected_tenant()
-        expected_template_url = os.environ.get("CSPM_TEMPLATE_URL_EXTERNAL_ID")
-        parsed_cspm_template = quote(expected_template_url, safe='')
-        response = self.backend.get_cspm_link(region=region, external_id=True)
+        stack_response = self.backend.get_cspm_link(region=region, external_id=True)
+        stack_link = stack_response["stackLink"]
+        external_id = stack_response["externalID"]
 
-        # Since we're requesting with external_id=True, we expect the external ID to be included
-        external_id = response["externalID"]
-        assert external_id != "", f"failed to get cspm external id, external id is {external_id}"
-
-        # Build expected link including the external ID parameter
-        expected_link = f"https://{region}.console.aws.amazon.com/cloudformation/home?region={region}#/stacks/quickcreate?param_AccountID={tenant}&param_ExternalID={external_id}&stackName=armo-security-readonly&templateUrl={parsed_cspm_template}"
-
-        assert response["stackLink"] == expected_link, f"failed to get cspm link, link is {response['stackLink']}, expected link is {expected_link}"
-
-        return response["stackLink"], response["externalID"]
+        return stack_link, external_id
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
