@@ -227,13 +227,6 @@ class Accounts(base_test.BaseTest):
 
         return res
 
-    def get_and_validate_cspm_link(self, region) -> str:
-        """
-        Get and validate cspm link.
-        """
-        stack_response = self.backend.get_cspm_link(region=region)
-        stack_link = stack_response["stackLink"]
-        return stack_link
     
     def get_and_validate_cspm_link_with_external_id(self, region) -> Tuple[str, str]:
         """
