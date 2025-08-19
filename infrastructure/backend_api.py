@@ -147,7 +147,7 @@ API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
 API_ACCOUNTS_AWS_REGIONS = "/api/v1/accounts/aws/regions"
 APT_ACCOUNTS_AWS_REGIONS_DETAILS = "/api/v1/accounts/aws/regionsdetails"
-API_ACCOUNTS_CSPM_LINK = "/api/v1/accounts/aws/cspmstack"
+API_ACCOUNTS_CSPM_LINK = "/api/v1/accounts/aws/cspmfeatures"
 API_ACCOUNTS_CADR_LINK = "/api/v1/accounts/aws/cadrstack"
 API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
 API_UNIQUEVALUES_ACCOUNTS_CLOUD= "/api/v1/uniqueValues/accounts/cloud"
@@ -2884,10 +2884,11 @@ class ControlPanelAPI(object):
         return r.json()
     
     def get_cspm_link(self, region : str, external_id : bool = False):
-        url = API_ACCOUNTS_CSPM_LINK + "?region=" + region
-        if external_id:
-            url += "&withExternalID=" + str(external_id).lower()
-        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        url = API_ACCOUNTS_CSPM_LINK
+        body = {
+            "featureNames": ["cspm"]    
+        }
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id, "region": region, "withExternalID": external_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
