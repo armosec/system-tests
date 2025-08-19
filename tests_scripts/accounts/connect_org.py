@@ -51,6 +51,9 @@ class CloudOrganization(Accounts):
         16. delete vulnScan and validate feature is delted(update stack as well)
         17. update stack and add vuln feature and validate it is connected
         18. udate stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
+
+        //vulnscan tests
+        TODO: eran need to add his cases
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
