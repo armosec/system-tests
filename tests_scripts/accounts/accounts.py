@@ -233,9 +233,9 @@ class Accounts(base_test.BaseTest):
         Get and validate cspm link.
         Returns tuple of (stack_link, external_id) strings.
         """
-        stack_response = self.backend.get_cspm_link(region=region, external_id=True)
-        stack_link = stack_response["stackLink"]
-        external_id = stack_response["externalID"]
+        data = self.backend.get_cspm_link(region=region, external_id="true")
+        stack_link = data["stackLink"]
+        external_id = data["externalID"]
 
         return stack_link, external_id
 
