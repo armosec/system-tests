@@ -134,7 +134,20 @@ def get_tickets_from_jira_channel(before_test):
     token = get_env("JIRA_API_TOKEN")
     email = get_env("JIRA_EMAIL")
     project_id = get_env("JIRA_PROJECT_ID")
-    server = f"https://{get_env('JIRA_SITE_NAME')}.atlassian.net"
+    site_name = get_env('JIRA_SITE_NAME')
+    
+    # Debug logging for authentication values
+    Logger.logger.debug(f"Jira authentication - Email: {email}, Token: {'***' if token else 'None'}, Site: {site_name}, Project: {project_id}")
+    
+    if not all([token, email, site_name, project_id]):
+        missing_vars = []
+        if not token: missing_vars.append("JIRA_API_TOKEN")
+        if not email: missing_vars.append("JIRA_EMAIL") 
+        if not site_name: missing_vars.append("JIRA_SITE_NAME")
+        if not project_id: missing_vars.append("JIRA_PROJECT_ID")
+        raise Exception(f"Missing required Jira environment variables: {', '.join(missing_vars)}")
+    
+    server = f"https://{site_name}.atlassian.net"
 
 
     # Calculate 5 minutes before the given timestamp
@@ -144,7 +157,8 @@ def get_tickets_from_jira_channel(before_test):
     formatted_date = time.strftime('%Y-%m-%d %H:%M', time.gmtime(before_test_minus_5))
 
 
-    url = f"{server}/rest/api/3/search"
+    # Use the new enhanced search API endpoint as recommended by Jira
+    url = f"{server}/rest/api/latest/search/jql"
 
     auth = HTTPBasicAuth(email, token)
 
@@ -154,27 +168,41 @@ def get_tickets_from_jira_channel(before_test):
 
     headers = {
         "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": f"Basic {base64.b64encode(f'{email}:{token}'.encode()).decode()}",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        "Content-Type": "application/json"
     }
 
     # JQL to fetch issues updated before the specified time
     jql = f'project = "{project_id}" AND created > "{formatted_date}"'
 
+    # The new API expects POST with JQL in body, and fields/limit in query params
     params = {
-        "jql": jql,
         "maxResults": 100,  # Adjust this to control the number of issues per page
         "fields": "summary,created,description",  # Specify the fields you want to retrieve
         "startAt": 0
+    }
+    
+    body = {
+        "jql": jql
     }
 
     all_issues = []
 
     while True:
-        response = requests.get(url, headers=headers, auth=auth, params=params)
+        response = requests.post(url, headers=headers, auth=auth, params=params, json=body)
 
-        assert response.status_code == 200, f"Failed to fetch issues from Jira. params: {params}, response: {response.text}, error: {response.status_code}"
+        if response.status_code != 200:
+            error_msg = f"Failed to fetch issues from Jira. Status: {response.status_code}"
+            try:
+                error_data = response.json()
+                if "errorMessages" in error_data:
+                    error_msg += f", Errors: {error_data['errorMessages']}"
+                if "errors" in error_data:
+                    error_msg += f", Details: {error_data['errors']}"
+            except:
+                error_msg += f", Response: {response.text}"
+            
+            Logger.logger.error(f"{error_msg}. URL: {url}, params: {params}, body: {body}")
+            raise Exception(error_msg)
 
         data = response.json()
         all_issues.extend(data.get("issues", []))

@@ -112,7 +112,11 @@ class WorkflowsJiraNotifications(Workflows):
                 break
             try:
                 issues = self.test_obj["getMessagesFunc"](begin_time)
-                assert len(issues) > 0, "No messages found in the channel"
+                Logger.logger.debug(f"Retrieved {len(issues) if issues else 0} issues from Jira")
+                if issues:
+                    Logger.logger.debug(f"First issue structure: {issues[0] if len(issues) > 0 else 'No issues'}")
+                
+                assert issues and len(issues) > 0, f"No messages found in the channel. Issues: {issues}"
                 if not found_sr:
                     r = self.backend.get_security_risks_list(cluster_name=cluster_name, namespace=self.namespace, security_risk_ids=[SECURITY_RISKS_ID])
                     r = r.text
@@ -177,13 +181,22 @@ class WorkflowsJiraNotifications(Workflows):
     def assert_vulnerability_jira_ticket_created(self, issues, response, cluster, cves=[]):
         assert response, "No vulnerabilities found in the response"
         assert issues, "No messages found in the channel"
+        
+        Logger.logger.debug(f"Checking {len(issues)} issues for CVE {cves} in cluster {cluster}")
+        if issues and len(issues) > 0:
+            Logger.logger.debug(f"Issue structure example: {issues[0]}")
 
         for cve in cves:
 
             # Check if CVE exists in Jira issues
-            jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"] and cluster in extract_text_from_adf(issue["fields"]["description"])), None)
-            assert jira_issue, f"No vulnerability with CVE {cve} and cluster {cluster} found in Jira issues."
-            Logger.logger.info(f"Found vulnerability with CVE {cve} and cluster {cluster} in Jira issues")
+            try:
+                jira_issue = next((issue for issue in issues if cve in issue.get("fields", {}).get("summary", "") and cluster in extract_text_from_adf(issue.get("fields", {}).get("description", ""))), None)
+                assert jira_issue, f"No vulnerability with CVE {cve} and cluster {cluster} found in Jira issues."
+                Logger.logger.info(f"Found vulnerability with CVE {cve} and cluster {cluster} in Jira issues")
+            except (KeyError, TypeError) as e:
+                Logger.logger.error(f"Error accessing issue fields: {e}")
+                Logger.logger.error(f"Issues structure: {issues}")
+                raise Exception(f"Invalid issue structure when looking for CVE {cve}. Issue fields missing or malformed.")
 
             # # Check if CVE exists in Jira issues
             # jira_issue = next((issue for issue in issues if cve in issue["fields"]["summary"]), None)
