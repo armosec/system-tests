@@ -2892,10 +2892,11 @@ class ControlPanelAPI(object):
         return r.json()
     
     def get_cspm_link(self, region : str, external_id : bool = False):
-        url = API_ACCOUNTS_CSPM_LINK + "?region=" + region
-        if external_id:
-            url += "&withExternalID=" + str(external_id).lower()
-        r = self.get(url, params={"customerGUID": self.selected_tenant_id})
+        url = API_ACCOUNTS_CSPM_LINK
+        body = {
+            "featureNames": ["cspm"]    
+        }
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id, "region": region, "withExternalID": external_id}, json=body)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (

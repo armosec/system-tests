@@ -212,11 +212,13 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
         self.apply_directory(path=self.test_obj[("config_maps", None)], namespace=namespace)
         Logger.logger.info('apply secrets')
         self.apply_directory(path=self.test_obj[("secrets", None)], namespace=namespace)
+
         Logger.logger.info('1. Apply workloads')
         workload_objs: list = self.apply_directory(path=self.test_obj["deployments"], namespace=namespace)
         self.verify_all_pods_are_running(namespace=namespace, workload=workload_objs, timeout=180)
 
         helm_kwargs = self.test_obj.get_arg("helm_kwargs")
+
         Logger.logger.info('2. Install armo helm-chart')
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=helm_kwargs)
@@ -232,11 +234,12 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
             self.restart_pods(namespace=namespace, name=pod_name)
         Logger.logger.info(f"restarted pods successfully")
 
-        duration_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_LEARNING_PERIOD][:-1]
-        TestUtil.sleep(10 * int(duration_in_seconds), "wait for node-agent learning period", "info")
+        update_period_in_seconds = helm_kwargs[statics.HELM_NODE_AGENT_UPDATE_PERIOD][:-1]
+        TestUtil.sleep(6 * int(update_period_in_seconds), "wait for node-agent update period", "info")
 
         expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_network_neighborhood"])
+
         expected_generated_network_policy_list = TestUtil.load_objs_from_json_files(
             self.test_obj["expected_generated_network_policies"])
 
@@ -246,7 +249,7 @@ class NetworkPolicyPodRestarted(BaseNetworkPolicy):
                                                                                       expected_generated_network_policy_list=expected_generated_network_policy_list)
 
         Logger.logger.info("5. Validating backend expected network neighborhood and generated network policies")
-        self.wait_for_report(timeout=240,
+        self.wait_for_report(timeout=120,
                              sleep_interval=5,
                              report_type=self.validate_expected_backend_results,
                              cluster=cluster,
