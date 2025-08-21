@@ -29,28 +29,38 @@ class CloudOrganization(Accounts):
         """
         Agenda:
         1. Init cloud formation manager
+
+        //cadr tests
         3. Create cadr org stack
         4. Connect cadr new organization
         5. validate cadr is connected and data
-        5. Create cspm org stack
-        6. Connect cspm to existing organization(without scanning,without window)
-        7. delete cspm feature and validate org and account deleted
-        8. conenct single account (without scanning)
-        9. connect cspm to existing organization again(without scanning) - validate single is under the new organization
-        11. update cspm org stackset to impact more accounts and validted the syncing windwo is working
-        12. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
-        13. exclude one account valdiated it marked as excluded
-        14. update name and exclude list and validated the changes
+        6. conenct single cadr - validate block
+        7. delete cadr org and validate is deleted
+        8. conenct single cadr 
+        9. conenct org cadr - validate merging
+        10. exclude one account and validate it is excluded
+        11. include one account and validate it is included
 
-        //connection error 
-        15.break aws admin role and sync the org - validate the error is shown and the org is not connected
-        16. fix aws admin role and sync the org - validate the org is connected
+        //cspm tests
+        12. Create cspm org stack
+        13. Connect cspm to existing organization(without scanning,without window)
+        14. delete cspm feature and validate org and account deleted
+        15. conenct single account (without scanning)
+        16. connect cspm to existing organization again(without scanning) - validate single is under the new organization
+        17. update cspm org stackset to impact more accounts and validted the syncing windwo is working
+        18. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
+        19. exclude one account valdiated it marked as excluded
+        20. update name and exclude list and validated the changes
+
+        //cspm connection error 
+        21.break aws admin role and sync the org - validate the error is shown and the org is not connected
+        22. fix aws admin role and sync the org - validate the org is connected
         
-        //cspm more than 1 feature
-        15. connect compliance and vulnScan
-        16. delete vulnScan and validate feature is delted(update stack as well)
-        17. update stack and add vuln feature and validate it is connected
-        18. udate stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
+        //cspm more than 1 feature - combined
+        23. connect compliance and vulnScan
+        24. delete vulnScan and validate feature is delted(update stack as well)
+        25. update stack and add vuln feature and validate it is connected
+        26. udate stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
 
         //vulnscan tests
         TODO: eran need to add his cases
