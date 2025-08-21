@@ -111,7 +111,7 @@ class WorkflowsJiraNotifications(Workflows):
                 self.unlink_issues(response_vuln)
                 break
             try:
-                issues = self.test_obj["getMessagesFunc"](begin_time)
+                issues = self.test_obj["getMessagesFunc"](begin_time, cluster=cluster_name)
                 Logger.logger.debug(f"Retrieved {len(issues) if issues else 0} issues from Jira")
                 if issues:
                     Logger.logger.debug(f"First issue structure: {issues[0] if len(issues) > 0 else 'No issues'}")
