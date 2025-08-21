@@ -144,7 +144,8 @@ def get_tickets_from_jira_channel(before_test):
     formatted_date = time.strftime('%Y-%m-%d %H:%M', time.gmtime(before_test_minus_5))
 
 
-    url = f"{server}/rest/api/3/search"
+    # Use the new enhanced search API endpoint as recommended by Jira
+    url = f"{server}/rest/api/latest/search/jql"
 
     auth = HTTPBasicAuth(email, token)
 
@@ -162,17 +163,21 @@ def get_tickets_from_jira_channel(before_test):
     # JQL to fetch issues updated before the specified time
     jql = f'project = "{project_id}" AND created > "{formatted_date}"'
 
+    # The new API expects POST with JQL in body, and fields/limit in query params
     params = {
-        "jql": jql,
         "maxResults": 100,  # Adjust this to control the number of issues per page
         "fields": "summary,created,description",  # Specify the fields you want to retrieve
         "startAt": 0
+    }
+    
+    body = {
+        "jql": jql
     }
 
     all_issues = []
 
     while True:
-        response = requests.get(url, headers=headers, auth=auth, params=params)
+        response = requests.post(url, headers=headers, auth=auth, params=params, json=body)
 
         assert response.status_code == 200, f"Failed to fetch issues from Jira. params: {params}, response: {response.text}, error: {response.status_code}"
 
