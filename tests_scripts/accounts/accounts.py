@@ -50,6 +50,7 @@ class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
         self.test_cloud_accounts_guids = []
+        self.test_cloud_org_guids = []
         self.tested_stacks = []
         self.tested_cloud_trails = []
         self.stack_manager: aws.CloudFormationManager
@@ -60,6 +61,9 @@ class Accounts(base_test.BaseTest):
         for guid in self.test_cloud_accounts_guids:
             self.backend.delete_cloud_account(guid=guid)
             Logger.logger.info(f"Deleted cloud account with guid {guid}")
+        for guid in self.test_cloud_org_guids:
+            #TODO: implement the org deletion
+            pass
         return super().cleanup(**kwargs)
 
     def setup_jira_config(self, site_name=DEFAULT_JIRA_SITE_NAME):
@@ -149,6 +153,23 @@ class Accounts(base_test.BaseTest):
     def create_stack_cadr(self, region, stack_name, cloud_account_guid)->str:
         Logger.logger.info('Get and validate cadr link')
         stack_link = self.get_and_validate_cadr_link(region, cloud_account_guid)
+
+        _, template_url, region, parameters = extract_parameters_from_url(stack_link)
+
+        Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
+        _ =  self.create_stack(stack_name, template_url, parameters)
+
+    def connect_cadr_new_organization(self, region, stack_name, org_guid, validate_apis=True)->str:
+        #TODO: implement the org creation
+
+        self.create_stack_cadr_org(region, stack_name, org_guid)
+        self.test_cloud_org_guids.append(org_guid)
+        Logger.logger.info(f"CADR account {org_guid} connected and stack created.")
+        return
+    
+    def create_stack_cadr_org(self, region, stack_name, org_guid)->str:
+        Logger.logger.info('Get and validate cadr link')
+        stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
 
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
@@ -245,6 +266,14 @@ class Accounts(base_test.BaseTest):
         """
 
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
+        return stack_link
+
+    def get_and_validate_cadr_org_link(self, region, org_guid) -> str:
+        """
+        Get and validate cspm link.
+        """
+
+        stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
         return stack_link
     
     def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
