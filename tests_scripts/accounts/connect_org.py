@@ -84,12 +84,8 @@ class CloudOrganization(Accounts):
         self.cloud_trail_name = ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT
         log_location, kms_key = self.stack_manager.get_cloudtrail_details(self.cloud_trail_name)
 
-        Logger.logger.info('Stage 3: Create cspm org stack')
-        self.cspm_org_stack_name = "systest-" + self.test_identifer_rand + "-cspm-org"
-        self.stack_manager.create_stack(self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name)
-
-        Logger.logger.info('Stage 4: Connect cadr new organization')
-        self.stack_manager.create_stack(self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name)
+        Logger.logger.info('Stage 3: Connect cadr new organization')
+        self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, log_location)
 
 
         return self.cleanup()

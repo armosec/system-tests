@@ -147,12 +147,12 @@ API_ACCOUNTS_CLOUD_LIST = "/api/v1/accounts/cloud/list"
 API_ACCOUNTS_KUBERNETES_LIST = "/api/v1/accounts/kubernetes/list"
 BASE_API_ACCOUNTS_AWS = "/api/v1/accounts/aws"
 API_ACCOUNTS_AWS_REGIONS = BASE_API_ACCOUNTS_AWS + "/regions"
-APT_ACCOUNTS_AWS_REGIONS_DETAILS = BASE_API_ACCOUNTS_AWS + "/regionsdetails"
+API_ACCOUNTS_AWS_REGIONS_DETAILS = BASE_API_ACCOUNTS_AWS + "/regionsdetails"
 API_ACCOUNTS_CSPM_LINK = BASE_API_ACCOUNTS_AWS + "/cspmfeatures"
 API_ACCOUNTS_CADR_LINK = BASE_API_ACCOUNTS_AWS + "/cadrstack"
 
-BASE_API_ACCOUNTS_AWS_ORG = BASE_API_ACCOUNTS_AWS + "/org"
-API_ACCOUNTS_CADR_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cadrstack"
+BASE_API_ACCOUNTS_AWS_ORG = BASE_API_ACCOUNTS_AWS + "/orgstacks"
+API_ACCOUNTS_CADR_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cadr"
 API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmmembers"
 API_ACCOUNTS_CSPM_ADMIN_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmadmin"
 
@@ -173,6 +173,11 @@ API_CLOUD_COMPLIANCE_EXCEPTIONS = API_CLOUD_COMPLIANCE_BASE+"exceptions"
 API_CLOUD_COMPLIANCE_EXCEPTIONS_NEW = API_CLOUD_COMPLIANCE_EXCEPTIONS+"/new"
 API_CLOUD_COMPLIANCE_EXCEPTIONS_LIST = API_CLOUD_COMPLIANCE_EXCEPTIONS+"/list"
 API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
+
+BASE_API_ORGANIZATIONS = API_ACCOUNTS + "/cloud/organizations"
+API_ORGANIZATIONS_LIST = BASE_API_ORGANIZATIONS + "/list"
+BASE_API_ORGANIZATIONS_AWS = BASE_API_ORGANIZATIONS + "/aws"
+API_CREATE_CADR_ORGANIZATION = BASE_API_ORGANIZATIONS_AWS + "/connectcadr"
 
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
@@ -2966,6 +2971,21 @@ class ControlPanelAPI(object):
                 'Error accessing cloud accounts. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+    
+    def get_cloud_orgs(self,  body=None, **kwargs):
+        url = API_ORGANIZATIONS_LIST
+        if body is None:
+            body = {"pageSize": 150, "pageNum": 1}
+
+        params = {"customerGUID": self.selected_tenant_id}
+        if kwargs:
+            params.update(**kwargs)
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing cloud orgs. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
 
     def get_kubernetes_accounts(self,  body=None, **kwargs):
         url = API_ACCOUNTS_KUBERNETES_LIST
@@ -3017,6 +3037,16 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error creating cloud account. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def create_cloud_org_with_cadr(self, body):
+        url = API_CREATE_CADR_ORGANIZATION
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating cloud org. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 

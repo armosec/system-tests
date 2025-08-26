@@ -85,6 +85,22 @@ class Accounts(base_test.BaseTest):
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
+    
+    def get_cloud_org(self, cloud_org_guid):
+        body = {
+                "pageSize": 1,
+                "pageNum": 1,
+                "innerFilters": [
+                    {
+                        "guid": cloud_org_guid
+                    }
+                ],
+            }
+
+        res = self.backend.get_cloud_orgs(body=body)
+        assert "response" in res, f"failed to get cloud orgs, body used: {body}, res is {res}"
+        assert len(res["response"]) > 0, f"response is empty"
+        return res["response"][0]
 
     def create_stack_cspm(self, stack_name, template_url, parameters)->str:
         self.create_stack(stack_name, template_url, parameters)
@@ -159,16 +175,21 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         _ =  self.create_stack(stack_name, template_url, parameters)
 
-    def connect_cadr_new_organization(self, region, stack_name, org_guid, validate_apis=True)->str:
-        #TODO: implement the org creation
+    def connect_cadr_new_organization(self, region, stack_name, log_location)->str:
+        Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
+        org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
+
+        Logger.logger.info('Validate feature status Pending')
+        org = self.get_cloud_account(org_guid)
+        assert org["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {org['features'][CADR_FEATURE_NAME]['featureStatus']}"
 
         self.create_stack_cadr_org(region, stack_name, org_guid)
         self.test_cloud_org_guids.append(org_guid)
         Logger.logger.info(f"CADR account {org_guid} connected and stack created.")
-        return
+        return org_guid
     
     def create_stack_cadr_org(self, region, stack_name, org_guid)->str:
-        Logger.logger.info('Get and validate cadr link')
+        Logger.logger.info('Get and validate cadr org link')
         stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
 
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
@@ -262,7 +283,7 @@ class Accounts(base_test.BaseTest):
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
-        Get and validate cspm link.
+        Get and validate cadr link.
         """
 
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
@@ -270,7 +291,7 @@ class Accounts(base_test.BaseTest):
 
     def get_and_validate_cadr_org_link(self, region, org_guid) -> str:
         """
-        Get and validate cspm link.
+        Get and validate cadr org link.
         """
 
         stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
@@ -327,6 +348,40 @@ class Accounts(base_test.BaseTest):
         except Exception as e:
             if not expect_failure:
                 Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
+            failed = True
+        
+        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
+
+        if not expect_failure:
+            assert "guid" in res, f"guid not in {res}"
+            return res["guid"]
+        
+        return None
+    
+    def create_and_validate_cloud_org_with_cadr(self, trail_log_location:str, region:str, expect_failure:bool=False):
+        """
+        Create and validate cloud org with cadr.
+        """
+
+        body = {
+                "trailLogLocation": trail_log_location,
+                "stackRegion": region,
+            }
+
+        return self.create_and_validate_cloud_org(body=body, feature_name=CADR_FEATURE_NAME, expect_failure=expect_failure)
+
+    def create_and_validate_cloud_org(self, body, feature_name:str, expect_failure:bool=False)->str:
+        """
+        Create and validate cloud org.
+        """
+
+        failed = False
+        try:
+            if feature_name == CADR_FEATURE_NAME:
+                res = self.backend.create_cloud_org_with_cadr(body=body)
+        except Exception as e:
+            if not expect_failure:
+                Logger.logger.error(f"failed to create cloud org, body used: {body}, error is {e}")
             failed = True
         
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
