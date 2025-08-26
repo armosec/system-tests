@@ -1,7 +1,7 @@
 import os
 import datetime
 from dateutil import parser
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict
 
 from infrastructure import aws
 from systest_utils import Logger, statics
@@ -86,7 +86,9 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
-    def create_stack_cspm(self, stack_name, template_url, parameters)->str:
+    def create_stack_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
+        generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
         self.create_stack(stack_name, template_url, parameters)
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
@@ -933,7 +935,7 @@ class Accounts(base_test.BaseTest):
             assert key in feature, f"{key} not in {feature}"
             assert feature[key] == value, f"Expected {key}: {value}, got: {feature[key]}"
 
-def extract_parameters_from_url(url):
+def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
 
     # Parse query parameters from the query and fragment (after #)
