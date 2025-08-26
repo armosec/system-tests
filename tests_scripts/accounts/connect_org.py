@@ -8,10 +8,10 @@ from infrastructure import aws
 
 
 # static cloudtrail and bucket names that are expected to be existed in the test account
-ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "system-test-organization-connect-dont-delete"
+ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "trail-system-test-organization-connect-dont-delete"
 ORGANIZATION_BUCKET_NAME_SYSTEM_TEST = "system-test-organization-bucket-armo"
 
-REGION_SYSTEM_TEST = "us-east-1"
+REGION_SYSTEM_TEST = "us-east-2"
 
 
 
@@ -83,10 +83,6 @@ class CloudOrganization(Accounts):
         self.bucket_name = ORGANIZATION_BUCKET_NAME_SYSTEM_TEST
         self.cloud_trail_name = ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT
         log_location, kms_key = self.stack_manager.get_cloudtrail_details(self.cloud_trail_name)
-
-        Logger.logger.info('Stage 3: Create cspm org stack')
-        self.cspm_org_stack_name = "systest-" + self.test_identifer_rand + "-cspm-org"
-        self.stack_manager.create_stack(self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name)
 
         Logger.logger.info('Stage 4: Connect cadr new organization')
         self.stack_manager.create_stack(self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name)
