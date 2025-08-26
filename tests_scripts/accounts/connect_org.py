@@ -8,10 +8,10 @@ from infrastructure import aws
 
 
 # static cloudtrail and bucket names that are expected to be existed in the test account
-ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "system-test-organization-connect-dont-delete"
+ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "trail-system-test-organization-connect-dont-delete"
 ORGANIZATION_BUCKET_NAME_SYSTEM_TEST = "system-test-organization-bucket-armo"
 
-REGION_SYSTEM_TEST = "us-east-1"
+REGION_SYSTEM_TEST = "us-east-2"
 
 
 
