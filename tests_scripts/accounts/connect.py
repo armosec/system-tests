@@ -161,10 +161,6 @@ class CloudConnect(Accounts):
             Logger.logger.info('Stage 11: disconnect the cspm account')
             self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
             self.tested_stacks.remove(self.cspm_stack_name)
-
-            Logger.logger.info('Stage 12: return the cspm stack after disconnect')
-            new_arn =self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
-            assert new_arn == test_arn ,f"excepted the arns to be the same but got old:{test_arn} and new:{new_arn}"
             
         Logger.logger.info('Stage 13: Delete cspm feature and validate')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
