@@ -161,6 +161,10 @@ class CloudConnect(Accounts):
             Logger.logger.info('Stage 11: disconnect the cspm account')
             self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
             self.tested_stacks.remove(self.cspm_stack_name)
+
+            Logger.logger.info('Stage 12: Recreate cspm stack for Stage 17')
+            new_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+            test_arn = new_arn #update the test arn to the new arn - it is changed though time format in role name
             
         Logger.logger.info('Stage 13: Delete cspm feature and validate')
         self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
