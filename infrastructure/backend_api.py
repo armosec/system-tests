@@ -178,6 +178,7 @@ BASE_API_ORGANIZATIONS = API_ACCOUNTS + "/cloud/organizations"
 API_ORGANIZATIONS_LIST = BASE_API_ORGANIZATIONS + "/list"
 BASE_API_ORGANIZATIONS_AWS = BASE_API_ORGANIZATIONS + "/aws"
 API_CREATE_CADR_ORGANIZATION = BASE_API_ORGANIZATIONS_AWS + "/connectcadr"
+API_ORGANIZATION_DELETE_FEATURE = BASE_API_ORGANIZATIONS + "/feature"
 
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
@@ -2933,7 +2934,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
-    def get_cadr_org_link(self, region, org_guid):
+    def get_cadr_org_link(self, region: str, org_guid: str):
         url = API_ACCOUNTS_CADR_ORG_LINK + "?region=" + region + "&orgGUID=" + org_guid
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         if not 200 <= r.status_code < 300:
@@ -2954,6 +2955,20 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error deleting account feature. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def delete_org_feature(self, org_guid, feature_name):
+        url = API_ORGANIZATION_DELETE_FEATURE
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "guid": org_guid,
+            "featureNames": [feature_name]
+        }
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting org feature. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 
@@ -3064,6 +3079,23 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error deleting cloud account. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def delete_cloud_organization(self, guid):
+        url = BASE_API_ORGANIZATIONS
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "innerFilters": [
+                {
+                    "guid": guid
+                }
+            ]
+        }
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting cloud organization. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 

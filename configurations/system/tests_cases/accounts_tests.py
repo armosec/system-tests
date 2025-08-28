@@ -21,3 +21,12 @@ class AccountsTests(object):
             test_obj=CloudConnect,
             issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
         )
+
+    @staticmethod
+    def cloud_organization_aws():
+        from tests_scripts.accounts.connect_org import CloudOrganization
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudOrganization,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )

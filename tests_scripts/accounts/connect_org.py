@@ -1,7 +1,8 @@
 import os
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, CSPM_FEATURE_NAME, extract_parameters_from_url
+from tests_scripts.accounts.accounts import PROVIDER_AWS, CADR_FEATURE_NAME
+from tests_scripts.accounts.accounts import CloudEntityTypes
 import random
 from urllib.parse import parse_qs, quote, urlparse
 from infrastructure import aws
@@ -10,6 +11,8 @@ from infrastructure import aws
 # static cloudtrail and bucket names that are expected to be existed in the test account
 ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "trail-system-test-organization-connect-dont-delete"
 ORGANIZATION_BUCKET_NAME_SYSTEM_TEST = "system-test-organization-bucket-armo"
+ORGANIZATION_TRAIL_LOG_LOCATION = "system-test-organization-bucket-armo/AWSLogs/o-63kbjphubt/930002936888"
+ACCOUNT_TRAIL_LOG_LOCATION = "system-test-organization-bucket-armo/AWSLogs/930002936888"
 
 REGION_SYSTEM_TEST = "us-east-2"
 
@@ -31,24 +34,23 @@ class CloudOrganization(Accounts):
         1. Init cloud formation manager
 
         //cadr tests
-        3. Create cadr org stack
-        4. Connect cadr new organization
-        5. validate cadr is connected and data
-        6. conenct single cadr - validate block
-        7. delete cadr org and validate is deleted
-        8. conenct single cadr 
-        9. conenct org cadr - validate merging
-        10. exclude one account and validate it is excluded
-        11. include one account and validate it is included
+        2. Connect cadr new organization
+        3. Validate cadr is connected
+        4. Connect single cadr - validate block
+        5. Delete cadr org and validate is deleted
+        6. Connect single cadr
+        7. Connect org cadr - validate merging
+        8. Exclude one account and validate it is excluded
+        9. include one account and validate it is included
 
         //cspm tests
-        12. Create cspm org stack
-        13. Connect cspm to existing organization(without scanning,without window)
-        14. delete cspm feature and validate org and account deleted
-        15. conenct single account (without scanning)
-        16. connect cspm to existing organization again(without scanning) - validate single is under the new organization
-        17. update cspm org stackset to impact more accounts and validted the syncing windwo is working
-        18. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
+        10. Create cspm org stack
+        11. Connect cspm to existing organization(without scanning,without window)
+        12. delete cspm feature and validate org and account deleted
+        13. conenct single account (without scanning)
+        14. connect cspm to existing organization again(without scanning) - validate single is under the new organization
+        15. update cspm org stackset to impact more accounts and validted the syncing windwo is working
+        16. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
         19. exclude one account valdiated it marked as excluded
         20. update name and exclude list and validated the changes
 
@@ -70,23 +72,36 @@ class CloudOrganization(Accounts):
 
         stack_region = REGION_SYSTEM_TEST
         # generate random number for cloud account name for uniqueness
-        self.test_identifer_rand = str(random.randint(10000000, 99999999))
+        self.test_identifier_rand = str(random.randint(10000000, 99999999))
+        self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"
+        self.cadr_account_stack_name = "systest-" + self.test_identifier_rand + "-cadr-single"
+        self.org_log_location = ORGANIZATION_TRAIL_LOG_LOCATION
+        self.account_log_location = ACCOUNT_TRAIL_LOG_LOCATION
 
         Logger.logger.info('Stage 1: Init cloud formation manager')
         self.stack_manager = aws.CloudFormationManager(stack_region, 
                                                   aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
                                                   aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+        Logger.logger.info(f"CloudFormationManager initiated in region {stack_region}")
+
+        Logger.logger.info('Stage 2: Connect cadr new organization')
+        org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
+        Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")
         
-        # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
-        Logger.logger.info('Stage 2: Create cadr org stack')
-        #TODO: add static org trail and buckt int he test account
-        self.bucket_name = ORGANIZATION_BUCKET_NAME_SYSTEM_TEST
-        self.cloud_trail_name = ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT
-        log_location, kms_key = self.stack_manager.get_cloudtrail_details(self.cloud_trail_name)
-
-        Logger.logger.info('Stage 3: Connect cadr new organization')
-        self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, log_location)
-
+        Logger.logger.info('Stage 3: Validate cadr is connected')
+        self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
+                             guid=org_guid, cloud_entity_type=CloudEntityTypes.ORGANIZATION, 
+                             expected_status=FEATURE_STATUS_CONNECTED)
+        Logger.logger.info(f"CADR organization {org_guid} is connected successfully")
+        
+        Logger.logger.info('Stage 4: Connect single cadr - validate block')
+        self.create_and_validate_cloud_account_with_cadr("test_block", self.account_log_location, PROVIDER_AWS, stack_region, expect_failure=True)
+        Logger.logger.info("connect CADR single account blocked successfully")
+        
+        Logger.logger.info('Stage 5: Delete cadr org and validate is deleted')
+        self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
+        Logger.logger.info("Delete cadr successfully")
+        
 
         return self.cleanup()
 
@@ -97,17 +112,13 @@ class CloudOrganization(Accounts):
                 Logger.logger.info(f"Deleting stack: {stack_name}")
                 self.stack_manager.delete_stack(stack_name)
 
-            for cloud_trail_name in self.tested_cloud_trails:
-                Logger.logger.info(f"Deleting cloudtrail: {cloud_trail_name}")
-                self.stack_manager.delete_cloudtrail(cloud_trail_name)
-
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
-                self.stack_manager.delete_stack_log_groups(stack_name )
+                self.stack_manager.delete_stack_log_groups(stack_name)
 
-        for cloud_account_guid in self.test_cloud_accounts_guids:
-            Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
-            self.backend.delete_cloud_account(cloud_account_guid)
+        for cloud_org_guid in self.test_cloud_orgs_guids:
+            Logger.logger.info(f"Deleting cloud organization: {cloud_org_guid}")
+            self.backend.delete_cloud_organization(cloud_org_guid)
 
 
         return super().cleanup(**kwargs)
