@@ -68,9 +68,13 @@ class CloudConnect(Accounts):
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
 
         Logger.logger.info('Stage 1: Init cloud formation manager')
+        aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+    
+        
         self.stack_manager = aws.CloudFormationManager(stack_region, 
-                                                  aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
-                                                  aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+                                                  aws_access_key_id=aws_access_key_id, 
+                                                  aws_secret_access_key=aws_secret_access_key)
         
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
