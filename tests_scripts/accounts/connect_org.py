@@ -39,30 +39,31 @@ class CloudOrganization(Accounts):
         4. Connect single cadr - validate block
         5. Delete cadr org and validate is deleted
         6. Connect single cadr
-        7. Connect org cadr - validate merging
-        8. Exclude one account and validate it is excluded
-        9. include one account and validate it is included
+        7. Validate cadr is connected
+        8. Connect org cadr - validate merging
+        9. Exclude one account and validate it is excluded
+        10. include one account and validate it is included
 
         //cspm tests
-        10. Create cspm org stack
-        11. Connect cspm to existing organization(without scanning,without window)
-        12. delete cspm feature and validate org and account deleted
-        13. conenct single account (without scanning)
-        14. connect cspm to existing organization again(without scanning) - validate single is under the new organization
-        15. update cspm org stackset to impact more accounts and validted the syncing windwo is working
-        16. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
-        19. exclude one account valdiated it marked as excluded
-        20. update name and exclude list and validated the changes
+        11. Create cspm org stack
+        12. Connect cspm to existing organization(without scanning,without window)
+        13. delete cspm feature and validate org and account deleted
+        14. connect single account (without scanning)
+        15. connect cspm to existing organization again(without scanning) - validate single is under the new organization
+        16. update cspm org stackset to impact more accounts and validted the syncing windwo is working
+        17. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
+        18. exclude one account valdiated it marked as excluded
+        19. update name and exclude list and validated the changes
 
         //cspm connection error 
-        21.break aws admin role and sync the org - validate the error is shown and the org is not connected
-        22. fix aws admin role and sync the org - validate the org is connected
+        20. break aws admin role and sync the org - validate the error is shown and the org is not connected
+        21. fix aws admin role and sync the org - validate the org is connected
         
         //cspm more than 1 feature - combined
-        23. connect compliance and vulnScan
-        24. delete vulnScan and validate feature is delted(update stack as well)
-        25. update stack and add vuln feature and validate it is connected
-        26. udate stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
+        22. connect compliance and vulnScan
+        23. delete vulnScan and validate feature is delted(update stack as well)
+        24. update stack and add vuln feature and validate it is connected
+        25. update stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
 
         //vulnscan tests
         TODO: eran need to add his cases
@@ -100,8 +101,23 @@ class CloudOrganization(Accounts):
         
         Logger.logger.info('Stage 5: Delete cadr org and validate is deleted')
         self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
+        self.stack_manager.delete_stack(self.cadr_org_stack_name)
         Logger.logger.info("Delete cadr successfully")
         
+        Logger.logger.info('Stage 6: Connect single cadr')
+        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_account_stack_name, "merge-account", self.account_log_location)
+        Logger.logger.info(f"CADR account created successfully with guid {account_guid}")
+        
+        Logger.logger.info('Stage 7: Validate cadr is connected')
+        self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
+                             guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
+                             expected_status=FEATURE_STATUS_CONNECTED)
+        Logger.logger.info(f"CADR account {account_guid} is connected successfully")
+        
+        Logger.logger.info('Stage 8: Connect org cadr - validate merging')
+        org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
+        self.validate_feature_deleted(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
+        Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
 
         return self.cleanup()
 

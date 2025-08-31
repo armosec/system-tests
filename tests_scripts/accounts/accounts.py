@@ -475,18 +475,9 @@ class Accounts(base_test.BaseTest):
         if len(list(account["features"].keys())) == 1:
             accountNeedToBeDeleted = True
 
-        res = self.backend.delete_accounts_feature(account_guid=guid, feature_name=feature_name)
-
-        body = self.build_get_cloud_entity_by_guid_request(guid, page_size=100, page_num=0)
-
-        res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"response not in {res}, request: {body}"
-        if accountNeedToBeDeleted:
-            assert len(res["response"]) == 0, f"response is not empty, request: {body}"
-        else:
-            assert len(res["response"]) > 0, f"response is empty, request: {body}"
-            assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
-
+        self.backend.delete_accounts_feature(account_guid=guid, feature_name=feature_name)
+        self.validate_feature_deleted(guid, feature_name, accountNeedToBeDeleted, CloudEntityTypes.ACCOUNT)
+        
     def delete_and_validate_org_feature(self, guid: str, feature_name: str):
         """
         Delete and validate org feature.
@@ -500,15 +491,22 @@ class Accounts(base_test.BaseTest):
         if len(list(org["features"].keys())) == 1:
             orgNeedToBeDeleted = True
 
-        res = self.backend.delete_org_feature(org_guid=guid, feature_name=feature_name)
+        self.backend.delete_org_feature(org_guid=guid, feature_name=feature_name)
+        self.validate_feature_deleted(guid, feature_name, orgNeedToBeDeleted, CloudEntityTypes.ORGANIZATION)
 
+    def validate_feature_deleted(self, guid: str, feature_name: str, NeedsToBeDeleted: bool, cloud_entity_type: CloudEntityTypes):
         body = self.build_get_cloud_entity_by_guid_request(guid, page_size=100, page_num=0)
 
-        res = self.backend.get_cloud_orgs(body=body)
+        if cloud_entity_type == CloudEntityTypes.ACCOUNT:
+            res = self.backend.get_cloud_accounts(body=body)
+        else:  
+            res = self.backend.get_cloud_orgs(body=body)
+            
         assert "response" in res, f"response not in {res}, request: {body}"
-        if orgNeedToBeDeleted:
+        if NeedsToBeDeleted:
             assert len(res["response"]) == 0, f"response is not empty, request: {body}"
-            self.test_cloud_orgs_guids.remove(guid)
+            if guid in self.test_cloud_accounts_guids: self.test_cloud_accounts_guids.remove(guid)
+            if guid in self.test_cloud_orgs_guids: self.test_cloud_orgs_guids.remove(guid)
         else:
             assert len(res["response"]) > 0, f"response is empty, request: {body}"
             assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
