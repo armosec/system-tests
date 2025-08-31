@@ -134,7 +134,6 @@ class CloudOrganization(Accounts):
 
         #compliance tests
 
-
         return self.cleanup()
 
     def cleanup(self, **kwargs):

@@ -10,54 +10,98 @@ import re
 from typing import List, Tuple, Any, Dict
 
 
-
-
 class CloudFormationManager:
     def __init__(self, region: str, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
         self.region = region
-        self.cloudformation = boto3.client(
-            "cloudformation",
-            region_name=self.region,
+        self.base_session = boto3.Session(
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
-            aws_session_token=aws_session_token
+            aws_session_token=aws_session_token,
+            region_name=region
         )
+        
+        # Initialize clients
+        self._init_clients()
+    
+    def _init_clients(self):
+        """Initialize all AWS service clients"""
+        self.cloudformation = self.base_session.client("cloudformation")
+        self.cloudtrail = self.base_session.client("cloudtrail")
+        self.s3 = self.base_session.client("s3")
+        self.logs = self.base_session.client("logs")
+        self.sts = self.base_session.client("sts")
 
-        self.cloudtrail = boto3.client(
-            "cloudtrail",
-            region_name=self.region,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            aws_session_token=aws_session_token
-        )
+    def assume_role_in_account(self, target_account_id: str, role_name: str = "OrganizationAccountAccessRole", session_name: str = "CrossAccountSession"):
+        """
+        Assume a role in a target account and return new manager instance
+        
+        Args:
+            target_account_id: The 12-digit account ID to assume role in
+            role_name: The role name to assume (default: OrganizationAccountAccessRole)
+            session_name: A unique session name for this assumption
+        
+        Returns:
+            New CloudFormationManager instance with assumed role credentials
+        """
+        try:
+            # Construct the role ARN
+            role_arn = f"arn:aws:iam::{target_account_id}:role/{role_name}"
+            
+            # Assume the role
+            response = self.sts.assume_role(
+                RoleArn=role_arn,
+                RoleSessionName=session_name,
+                DurationSeconds=3600  # 1 hour (adjust as needed)
+            )
+            
+            # Extract temporary credentials
+            credentials = response['Credentials']
+            
+            # Create new manager instance with assumed role credentials
+            return CloudFormationManager(
+                region=self.region,
+                aws_access_key_id=credentials['AccessKeyId'],
+                aws_secret_access_key=credentials['SecretAccessKey'],
+                aws_session_token=credentials['SessionToken']
+            )
+            
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'AccessDenied':
+                Logger.logger.error(f"Access denied when assuming role {role_arn}. Check if the role exists and trusts your management account.")
+                raise Exception(f"Access denied when assuming role {role_arn}. Check if the role exists and trusts your management account.")
+            elif error_code == 'InvalidParameterValue':
+                Logger.logger.error(f"Invalid role ARN: {role_arn}. Check the account ID and role name.")
+                raise Exception(f"Invalid role ARN: {role_arn}. Check the account ID and role name.")
+            else:
+                Logger.logger.error(f"Failed to assume role: {e}")
+                raise Exception(f"Failed to assume role: {e}")
 
-        self.s3 = boto3.client(
-            "s3",
-            region_name=self.region,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            aws_session_token=aws_session_token
-        )
-
-        # Add logs client during initialization
-        self.logs = boto3.client(
-            "logs",
-            region_name=self.region,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            aws_session_token=aws_session_token
-        )
-
+    def list_organization_accounts(self):
+        """
+        List all accounts in the organization (requires organizations permissions)
+        """
+        try:
+            org_client = self.base_session.client('organizations')
+            response = org_client.list_accounts()
+            return response['Accounts']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                Logger.logger.error("Access denied to Organizations API. Make sure you're using management account credentials.")
+                raise Exception("Access denied to Organizations API. Make sure you're using management account credentials.")
+            else:
+                Logger.logger.error(f"Failed to list organization accounts: {e}")
+                raise Exception(f"Failed to list organization accounts: {e}")
 
     def get_account_id(self):
-        sts_client = boto3.client("sts")
-        account_id = sts_client.get_caller_identity()["Account"]
-        return account_id
-
-
+        try:
+            account_id = self.sts.get_caller_identity()["Account"]
+            return account_id
+        except ClientError as e:
+            Logger.logger.error(f"Failed to get account ID: {e}")
+            return None
 
     def create_stack(self, template_url: str, parameters: List[Dict[str, str]], stack_name: str = None):
-
         try:
             # Create the stack
             response = self.cloudformation.create_stack(
@@ -147,7 +191,6 @@ class CloudFormationManager:
             Logger.logger.error(f"An error occurred while deleting the stack: {e}")
             raise e
     
-
     def create_cloudtrail(self, trail_name, s3_bucket_name=None):
         try:
             # Get AWS Account ID dynamically
@@ -217,8 +260,6 @@ class CloudFormationManager:
         except ClientError as e:
             Logger.logger.error(f"An error occurred while creating CloudTrail: {e}")
             return None
-
-    
         
     def get_cloudtrail_details(self, trail_name):
         try:
@@ -234,10 +275,6 @@ class CloudFormationManager:
             Logger.logger.error(f"An error occurred while retrieving CloudTrail details: {e}")
             return None, None
 
-        except ClientError as e:
-            Logger.logger.error(f"An error occurred while retrieving CloudTrail details: {e}")
-            return None, None
-    
     def delete_cloudtrail(self, trail_name):
         try:
             self.cloudtrail.delete_trail(Name=trail_name)
@@ -261,7 +298,6 @@ class CloudFormationManager:
     def delete_stack_log_groups(self, stack_name):
         """Delete log groups associated with a particular stack"""
         try:
-
             # Define log group patterns to delete
             log_group_patterns = [
                 f"/aws/lambda/{stack_name}-log-processing-function",
@@ -280,7 +316,6 @@ class CloudFormationManager:
 
         except Exception as e:
             Logger.logger.error(f"An error occurred while deleting log groups for stack {stack_name}: {e}")
-
 
 
 def extract_account_id(arn):
@@ -303,7 +338,3 @@ def extract_account_id_from_traillog_arn(arn):
     """
     match = re.search(r"arn:aws:cloudtrail:\w+-\w+-\d+:(\d+):", arn)
     return match.group(1) if match else None
-
-
-    
-    
