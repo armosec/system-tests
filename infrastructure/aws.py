@@ -7,11 +7,13 @@ import time
 from urllib.parse import urlparse, parse_qs
 from systest_utils import Logger
 import re
+from typing import List, Tuple, Any, Dict
+
 
 
 
 class CloudFormationManager:
-    def __init__(self, region, aws_access_key_id, aws_secret_access_key, aws_session_token=None):
+    def __init__(self, region: str, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
         self.region = region
         self.cloudformation = boto3.client(
             "cloudformation",
@@ -54,7 +56,7 @@ class CloudFormationManager:
 
 
 
-    def create_stack(self, template_url, parameters, stack_name=None):
+    def create_stack(self, template_url: str, parameters: List[Dict[str, str]], stack_name: str = None):
 
         try:
             # Create the stack

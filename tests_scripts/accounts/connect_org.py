@@ -113,6 +113,7 @@ class CloudOrganization(Accounts):
         Logger.logger.info('Stage 5: Delete cadr org and validate is deleted')
         self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
         self.stack_manager.delete_stack(self.cadr_org_stack_name)
+        self.tested_stacks.remove(self.cadr_org_stack_name)
         Logger.logger.info("Delete cadr successfully")
         
         Logger.logger.info('Stage 6: Connect single cadr')
@@ -127,7 +128,7 @@ class CloudOrganization(Accounts):
         
         Logger.logger.info('Stage 8: Connect org cadr - validate merging')
         org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
-        self.validate_feature_deleted(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
+        self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
         Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
 
 

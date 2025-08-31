@@ -151,10 +151,10 @@ API_ACCOUNTS_AWS_REGIONS_DETAILS = BASE_API_ACCOUNTS_AWS + "/regionsdetails"
 API_ACCOUNTS_CSPM_LINK = BASE_API_ACCOUNTS_AWS + "/cspmfeatures"
 API_ACCOUNTS_CADR_LINK = BASE_API_ACCOUNTS_AWS + "/cadrstack"
 
-BASE_API_ACCOUNTS_AWS_ORG = BASE_API_ACCOUNTS_AWS + "/orgstacks"
-API_ACCOUNTS_CADR_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cadr"
-API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmmembers"
-API_ACCOUNTS_CSPM_ADMIN_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORG + "/cspmadmin"
+BASE_API_ACCOUNTS_AWS_ORGSTACKS = BASE_API_ACCOUNTS_AWS + "/orgstacks"
+API_ACCOUNTS_CADR_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORGSTACKS + "/cadr"
+API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORGSTACKS + "/cspmmembers"
+API_ACCOUNTS_CSPM_ADMIN_ORG_LINK = BASE_API_ACCOUNTS_AWS_ORGSTACKS + "/cspmadmin"
 
 
 API_ACCOUNTS_DELETE_FEATURE = "/api/v1/accounts/feature"
@@ -2958,7 +2958,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
-    def delete_org_feature(self, org_guid, feature_name):
+    def delete_org_feature(self, org_guid: str, feature_name: str):
         url = API_ORGANIZATION_DELETE_FEATURE
         params = {"customerGUID": self.selected_tenant_id}
         body = {
@@ -3082,7 +3082,7 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
-    def delete_cloud_organization(self, guid):
+    def delete_cloud_organization(self, guid: str):
         url = BASE_API_ORGANIZATIONS
         params = {"customerGUID": self.selected_tenant_id}
         body = {
@@ -3123,7 +3123,7 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_aws_regions_details(self):
-        url = APT_ACCOUNTS_AWS_REGIONS_DETAILS
+        url = API_ACCOUNTS_AWS_REGIONS_DETAILS
         r = self.get(url, params={"customerGUID": self.selected_tenant_id})
         if not 200 <= r.status_code < 300:
             raise Exception(
