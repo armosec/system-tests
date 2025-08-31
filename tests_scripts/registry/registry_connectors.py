@@ -37,7 +37,6 @@ class RegistryChecker(BaseHelm):
         self.cluster = None
 
     def start(self):
-        return statics.SUCCESS, ""
         Logger.logger.info('Stage 1: Install kubescape with helm-chart')
         self.cluster, _ = self.setup(apply_services=False)
         self.install_kubescape()
