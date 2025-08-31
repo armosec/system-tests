@@ -151,7 +151,7 @@ class CloudConnect(Accounts):
             Logger.logger.info("risk has been accepted successfully")
            
         Logger.logger.info('Stage 9: Connect cadr to existing account')
-        self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, self.bucket_name, log_location)
+        self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, log_location)
         Logger.logger.info("cadr has been connected successfully")
 
         Logger.logger.info('Stage 10: Validate both features exist and cspm unchanged')
@@ -171,17 +171,17 @@ class CloudConnect(Accounts):
             test_arn = new_arn #update the test arn to the new arn - it is changed though time format in role name
             
         Logger.logger.info('Stage 13: Delete cspm feature and validate')
-        self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, CSPM_FEATURE_NAME)
 
         Logger.logger.info('Stage 14: Delete cadr feature and validate account deleted')
-        self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
         # Second flow: CADR first, then CSPM
         Logger.logger.info('Stage 15: Create bad log location cloud account with cadr')
         cloud_account_guid = self.connect_cadr_bad_log_location(stack_region, self.cadr_first_cloud_account_name, bad_log_location)
 
         Logger.logger.info('Stage 16: Connect cadr new account')
-        cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, self.bucket_name, log_location)
+        cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, log_location)
 
         # Store CADR config for later validation
         account = self.get_cloud_account(cloud_account_guid)
@@ -200,10 +200,10 @@ class CloudConnect(Accounts):
         self.validate_account_name(cloud_account_guid, self.cspm_second_cloud_account_name)
 
         Logger.logger.info('Stage 19: Delete cadr feature and validate')
-        self.delete_and_validate_feature(cloud_account_guid, CADR_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
         Logger.logger.info('Stage 20: Delete cspm feature and validate account deleted')
-        self.delete_and_validate_feature(cloud_account_guid, CSPM_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, CSPM_FEATURE_NAME)
 
         Logger.logger.info('Stage 21: Validate aws regions')
         res = self.backend.get_aws_regions()

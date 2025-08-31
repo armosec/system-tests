@@ -1,6 +1,7 @@
 import os
 import datetime
 from dateutil import parser
+from enum import Enum
 from typing import List, Tuple, Any, Dict
 
 from infrastructure import aws
@@ -45,12 +46,15 @@ CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
 
+class CloudEntityTypes(Enum):
+    ACCOUNT = "account"
+    ORGANIZATION = "organization"
 
 class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
         self.test_cloud_accounts_guids = []
-        self.test_cloud_org_guids = []
+        self.test_cloud_orgs_guids = []
         self.tested_stacks = []
         self.tested_cloud_trails = []
         self.stack_manager: aws.CloudFormationManager
@@ -61,28 +65,39 @@ class Accounts(base_test.BaseTest):
         for guid in self.test_cloud_accounts_guids:
             self.backend.delete_cloud_account(guid=guid)
             Logger.logger.info(f"Deleted cloud account with guid {guid}")
-        for guid in self.test_cloud_org_guids:
-            #TODO: implement the org deletion
-            pass
+        for guid in self.test_cloud_orgs_guids:
+            self.backend.delete_cloud_organization(guid=guid)
+            Logger.logger.info(f"Deleted cloud organization with guid {guid}")
         return super().cleanup(**kwargs)
+    
+    def build_get_cloud_entity_by_guid_request(self, guid: str) -> Dict:
+        body = {
+                "pageSize": 1,
+                "pageNum": 1,
+                "innerFilters": [
+                    {
+                        "guid": guid
+                    }
+                ],
+            }
+            
+        return body
 
     def setup_jira_config(self, site_name=DEFAULT_JIRA_SITE_NAME):
         """Setup Jira configuration using the standalone function."""
         self.site, self.project, self.issueType, self.jiraCollaborationGUID = setup_jira_config(self.backend, site_name)
 
     def get_cloud_account(self, cloud_account_guid):
-        body = {
-                "pageSize": 1,
-                "pageNum": 1,
-                "innerFilters": [
-                    {
-                        "guid": cloud_account_guid
-                    }
-                ],
-            }
-
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
+        assert len(res["response"]) > 0, f"response is empty"
+        return res["response"][0]
+    
+    def get_cloud_org(self, cloud_org_guid: str):
+        body = self.build_get_cloud_entity_by_guid_request(cloud_org_guid)
+        res = self.backend.get_cloud_orgs(body=body)
+        assert "response" in res, f"failed to get cloud orgs, body used: {body}, res is {res}"
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
@@ -126,7 +141,7 @@ class Accounts(base_test.BaseTest):
 
 
 
-    def create_stack(self, stack_name, template_url, parameters):
+    def create_stack(self, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
         Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         stack_id =  self.stack_manager.create_stack(template_url, parameters, stack_name)
         assert stack_id, f"failed to create stack {stack_name}"
@@ -141,11 +156,11 @@ class Accounts(base_test.BaseTest):
         self.tested_stacks.append(stack_name)
 
 
-    def connect_cadr_bad_log_location(self, region, cloud_account_name, trail_log_location )->str:
+    def connect_cadr_bad_log_location(self, region: str, cloud_account_name: str, trail_log_location: str) -> str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
-    def connect_cadr_new_account(self, region, stack_name, cloud_account_name, bucket_name, log_location, validate_apis=True)->str:
+    def connect_cadr_new_account(self, region: str, stack_name: str, cloud_account_name: str, log_location: str, validate_apis: bool = True) ->     str:
         Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
@@ -159,7 +174,7 @@ class Accounts(base_test.BaseTest):
         return cloud_account_guid
 
 
-    def create_stack_cadr(self, region, stack_name, cloud_account_guid)->str:
+    def create_stack_cadr(self, region: str, stack_name: str, cloud_account_guid: str) -> str:
         Logger.logger.info('Get and validate cadr link')
         stack_link = self.get_and_validate_cadr_link(region, cloud_account_guid)
 
@@ -168,44 +183,43 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         _ =  self.create_stack(stack_name, template_url, parameters)
 
-    def connect_cadr_new_organization(self, region, stack_name, org_guid, validate_apis=True)->str:
-        #TODO: implement the org creation
+    def connect_cadr_new_organization(self, region: str, stack_name: str, log_location: str) -> str:
+        Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
+        org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
+        self.test_cloud_orgs_guids.append(org_guid)
 
+        Logger.logger.info('Validate feature status Pending')
+        assert self.verify_cadr_status(org_guid, CloudEntityTypes.ORGANIZATION, FEATURE_STATUS_PENDING)
+       
         self.create_stack_cadr_org(region, stack_name, org_guid)
-        self.test_cloud_org_guids.append(org_guid)
-        Logger.logger.info(f"CADR account {org_guid} connected and stack created.")
-        return
+        Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
+        return org_guid
     
-    def create_stack_cadr_org(self, region, stack_name, org_guid)->str:
-        Logger.logger.info('Get and validate cadr link')
+    def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
+        Logger.logger.info('Get and validate cadr org link')
         stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
 
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         _ =  self.create_stack(stack_name, template_url, parameters)
-    
-    def verify_cadr_status(self, cloud_account_guid, expected_status):
-        body = {
-                "pageSize": 1,
-                "pageNum": 1,
-                "innerFilters": [
-                    {
-                        "guid": cloud_account_guid
-                    }
-                ],
-            }
 
+    def verify_cadr_status(self, guid: str, cloud_entity_type: CloudEntityTypes, expected_status: str) -> bool:
         expected_feature_connected = False
 
         if expected_status == FEATURE_STATUS_CONNECTED:
             expected_feature_connected = True
 
-        res = self.backend.get_cloud_accounts(body=body)
-        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
-        assert len(res["response"]) > 0, f"response is empty"
-        assert res["response"][0]["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['response'][0]['features'][CADR_FEATURE_NAME]['featureStatus']}"
-        assert res["response"][0]["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['response'][0]['features'][CADR_FEATURE_NAME]['isConnected']}"
+        if cloud_entity_type == CloudEntityTypes.ACCOUNT:
+            res = self.get_cloud_account(guid)
+        else:
+            res = self.get_cloud_org(guid)
+            
+        assert res["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['features'][CADR_FEATURE_NAME]['featureStatus']}"
+        if expected_status == FEATURE_STATUS_PENDING:
+            assert "isConnected" not in res["features"][CADR_FEATURE_NAME], f"isConnected should not be in {res['features'][CADR_FEATURE_NAME]} when status is {FEATURE_STATUS_PENDING}"
+            return True
+        assert res["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
 
 
@@ -271,15 +285,15 @@ class Accounts(base_test.BaseTest):
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
-        Get and validate cspm link.
+        Get and validate cadr link.
         """
 
         stack_link = self.backend.get_cadr_link(region=region, cloud_account_guid=cloud_account_guid)
         return stack_link
 
-    def get_and_validate_cadr_org_link(self, region, org_guid) -> str:
+    def get_and_validate_cadr_org_link(self, region: str, org_guid: str) -> str:
         """
-        Get and validate cspm link.
+        Get and validate cadr org link.
         """
 
         stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
@@ -310,7 +324,7 @@ class Accounts(base_test.BaseTest):
 
         return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
             
-    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name:str, trail_log_location:str, provider:str, region:str, expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, provider: str, region: str, expect_failure: bool=False) -> str:
         """
         Create and validate cloud account.
         """
@@ -345,20 +359,39 @@ class Accounts(base_test.BaseTest):
             return res["guid"]
         
         return None
+    
+    def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
+        """
+        Create and validate cloud org with cadr.
+        """
+
+        body = {
+                "trailLogLocation": trail_log_location,
+                "stackRegion": region,
+            }
+
+        failed = False
+        try:
+            res = self.backend.create_cloud_org_with_cadr(body=body)
+        except Exception as e:
+            if not expect_failure:
+                Logger.logger.error(f"failed to create cloud org, body used: {body}, error is {e}")
+            failed = True
+        
+        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
+
+        if not expect_failure:
+            assert "guid" in res, f"guid not in {res}"
+            return res["guid"]
+        
+        return None
 
     def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str):
         """
         Validate accounts cloud list.
         """
-        body = {
-                "pageSize": 100,
-                "pageNum": 0,
-                "innerFilters": [
-                    {
-                        "guid": cloud_account_guid
-                    }
-                ],
-            }
+        
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         acount_list = self.backend.get_cloud_accounts(body=body)
         assert "response" in acount_list, f"response not in {acount_list}"
         assert len(acount_list["response"]) > 0, f"response is empty"
@@ -430,7 +463,7 @@ class Accounts(base_test.BaseTest):
         assert res["response"][0]["name"] == cloud_account_name, f"failed to update cloud account, name is not {cloud_account_name}"
         Logger.logger.info(f"Cloud account {guid} name successfully updated to '{cloud_account_name}'")
 
-    def delete_and_validate_feature(self, guid:str, feature_name:str):
+    def delete_and_validate_account_feature(self, guid:str, feature_name:str):
         """
         Delete and validate feature.
         """
@@ -443,23 +476,38 @@ class Accounts(base_test.BaseTest):
         if len(list(account["features"].keys())) == 1:
             accountNeedToBeDeleted = True
 
-        res = self.backend.delete_accounts_feature(account_guid=guid, feature_name=feature_name)
-        assert "Feature deleted" in res, f"Feature {feature_name} for cloud account with guid {guid} was not deleted"
+        self.backend.delete_accounts_feature(account_guid=guid, feature_name=feature_name)
+        self.validate_feature_deleted_from_entity(guid, feature_name, accountNeedToBeDeleted, CloudEntityTypes.ACCOUNT)
+        
+    def delete_and_validate_org_feature(self, guid: str, feature_name: str):
+        """
+        Delete and validate org feature.
+        """
+        org = self.get_cloud_org(guid)
+        assert org is not None, f"Cloud org with guid {guid} was not found"
+        assert feature_name in org["features"], f"'{feature_name}' feature was not found in {org['features']}"
+        
+        orgNeedToBeDeleted = False
+        #check if it is last feature - features is a dict
+        if len(list(org["features"].keys())) == 1:
+            orgNeedToBeDeleted = True
 
-        body = {
-                        "pageSize": 100,
-                        "pageNum": 0,
-                        "innerFilters": [
-                            {
-                                "guid": guid
-                            }
-                        ],
-                    }
+        self.backend.delete_org_feature(org_guid=guid, feature_name=feature_name)
+        self.validate_feature_deleted_from_entity(guid, feature_name, orgNeedToBeDeleted, CloudEntityTypes.ORGANIZATION)
 
-        res = self.backend.get_cloud_accounts(body=body)
+    def validate_feature_deleted_from_entity(self, guid: str, feature_name: str, NeedsToBeDeleted: bool, cloud_entity_type: CloudEntityTypes):
+        body = self.build_get_cloud_entity_by_guid_request(guid)
+
+        if cloud_entity_type == CloudEntityTypes.ACCOUNT:
+            res = self.backend.get_cloud_accounts(body=body)
+        else:  
+            res = self.backend.get_cloud_orgs(body=body)
+            
         assert "response" in res, f"response not in {res}, request: {body}"
-        if accountNeedToBeDeleted:
+        if NeedsToBeDeleted:
             assert len(res["response"]) == 0, f"response is not empty, request: {body}"
+            if guid in self.test_cloud_accounts_guids: self.test_cloud_accounts_guids.remove(guid)
+            if guid in self.test_cloud_orgs_guids: self.test_cloud_orgs_guids.remove(guid)
         else:
             assert len(res["response"]) > 0, f"response is empty, request: {body}"
             assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
@@ -890,15 +938,7 @@ class Accounts(base_test.BaseTest):
                              feature_status = FEATURE_STATUS_DISCONNECTED)
         Logger.logger.info("Scan failed, disconnecting account")
 
-        body = {
-            "pageSize": 150,
-            "pageNum": 1,
-            "innerFilters": [
-                {
-                    "guid": cloud_account_guid
-                }
-            ]
-        }
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
         assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
         account= res["response"][0]
@@ -917,15 +957,7 @@ class Accounts(base_test.BaseTest):
             feature_name (str): The name of the feature to validate (CSPM_FEATURE_NAME or CADR_FEATURE_NAME)
             expected_feature (dict): The expected feature structure
         """
-        body = {
-            "pageSize": 1,
-            "pageNum": 1,
-            "innerFilters": [
-                {
-                    "guid": cloud_account_guid
-                }
-            ]
-        }
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
 
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
