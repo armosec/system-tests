@@ -68,9 +68,13 @@ class CloudConnect(Accounts):
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
 
         Logger.logger.info('Stage 1: Init cloud formation manager')
+        aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+    
+        
         self.stack_manager = aws.CloudFormationManager(stack_region, 
-                                                  aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
-                                                  aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+                                                  aws_access_key_id=aws_access_key_id, 
+                                                  aws_secret_access_key=aws_secret_access_key)
         
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
@@ -162,9 +166,9 @@ class CloudConnect(Accounts):
             self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
             self.tested_stacks.remove(self.cspm_stack_name)
 
-            Logger.logger.info('Stage 12: return the cspm stack after disconnect')
-            new_arn =self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
-            assert new_arn == test_arn ,f"excepted the arns to be the same but got old:{test_arn} and new:{new_arn}"
+            Logger.logger.info('Stage 12: Recreate cspm stack for Stage 17')
+            new_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+            test_arn = new_arn #update the test arn to the new arn - it is changed though time format in role name
             
         Logger.logger.info('Stage 13: Delete cspm feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, CSPM_FEATURE_NAME)

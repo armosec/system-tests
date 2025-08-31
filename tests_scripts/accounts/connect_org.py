@@ -25,7 +25,8 @@ class CloudOrganization(Accounts):
         self.stack_manager = None
         self.cspm_org_stack_name = None
         self.cadr_org_stack_name = None
-
+        self.compliance_org_stack_name = None
+        
         self.skip_apis_validation = False
 
     def start(self):
@@ -44,20 +45,20 @@ class CloudOrganization(Accounts):
         9. Exclude one account and validate it is excluded
         10. include one account and validate it is included
 
-        //cspm tests
-        11. Create cspm org stack
-        12. Connect cspm to existing organization(without scanning,without window)
-        13. delete cspm feature and validate org and account deleted
-        14. connect single account (without scanning)
-        15. connect cspm to existing organization again(without scanning) - validate single is under the new organization
-        16. update cspm org stackset to impact more accounts and validted the syncing windwo is working
-        17. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
-        18. exclude one account valdiated it marked as excluded
-        19. update name and exclude list and validated the changes
+        //compliance tests
+        12. Create compliance org stack
+        13. Connect compliance to existing organization(without scanning,without window)
+        14. delete compliance feature and validate org and account deleted
+        15. conenct single account (without scanning)
+        16. connect compliance to existing organization again(without scanning) - validate single is under the new organization
+        17. update compliance org stackset to impact more accounts and validted the syncing windwo is working
+        18. update compliance org stackset after end of window to make sure the window is closed and no new accounts are added
+        19. exclude one account valdiated it marked as excluded
+        20. update name and exclude list and validated the changes
 
-        //cspm connection error 
-        20. break aws admin role and sync the org - validate the error is shown and the org is not connected
-        21. fix aws admin role and sync the org - validate the org is connected
+        //compliance connection error 
+        21.break aws admin role and sync the org - validate the error is shown and the org is not connected
+        22. fix aws admin role and sync the org - validate the org is connected
         
         //cspm more than 1 feature - combined
         22. connect compliance and vulnScan
@@ -80,14 +81,22 @@ class CloudOrganization(Accounts):
         self.account_log_location = ACCOUNT_TRAIL_LOG_LOCATION
 
         Logger.logger.info('Stage 1: Init cloud formation manager')
+        aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+        if not aws_access_key_id:
+            raise Exception("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS is not set")
+        if not aws_secret_access_key:
+            raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
+        
+
         self.stack_manager = aws.CloudFormationManager(stack_region, 
-                                                  aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
-                                                  aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+                                                  aws_access_key_id=aws_access_key_id,
+                                                  aws_secret_access_key=aws_secret_access_key)
         Logger.logger.info(f"CloudFormationManager initiated in region {stack_region}")
 
         Logger.logger.info('Stage 2: Connect cadr new organization')
         org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
-        Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")
+        Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")                                                  
         
         Logger.logger.info('Stage 3: Validate cadr is connected')
         self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
@@ -119,6 +128,10 @@ class CloudOrganization(Accounts):
         self.validate_feature_deleted(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
         Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
 
+
+        #compliance tests
+
+
         return self.cleanup()
 
     def cleanup(self, **kwargs):
@@ -138,3 +151,5 @@ class CloudOrganization(Accounts):
 
 
         return super().cleanup(**kwargs)
+
+

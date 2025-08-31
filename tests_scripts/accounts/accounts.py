@@ -1,8 +1,8 @@
 import os
 import datetime
 from dateutil import parser
-from typing import List, Tuple, Dict
 from enum import Enum
+from typing import List, Tuple, Any, Dict
 
 from infrastructure import aws
 from systest_utils import Logger, statics
@@ -101,10 +101,16 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
-    def create_stack_cspm(self, stack_name, template_url, parameters)->str:
+    def create_stack_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
+        generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
         self.create_stack(stack_name, template_url, parameters)
         test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
         return test_arn
+
+    def create_stackset_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
+        #IDO: need to make thsi fucn crerwate stckset and return the stackset arn
+        pass
 
     def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
@@ -123,6 +129,9 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info('Edit name and validate cloud account with cspm')
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
         return cloud_account_guid
+
+    def connect_cspm_new_organization(self, region, arn, cloud_account_name,external_id, validate_apis=True)->str: 
+        pass
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
         Logger.logger.info(f"Attempting to connect CSPM with bad ARN: {arn} for account: {cloud_account_name}")
@@ -973,7 +982,7 @@ class Accounts(base_test.BaseTest):
             assert key in feature, f"{key} not in {feature}"
             assert feature[key] == value, f"Expected {key}: {value}, got: {feature[key]}"
 
-def extract_parameters_from_url(url):
+def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
 
     # Parse query parameters from the query and fragment (after #)
