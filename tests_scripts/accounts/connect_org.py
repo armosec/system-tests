@@ -22,7 +22,8 @@ class CloudOrganization(Accounts):
         self.stack_manager = None
         self.cspm_org_stack_name = None
         self.cadr_org_stack_name = None
-
+        self.compliance_org_stack_name = None
+        
         self.skip_apis_validation = False
 
     def start(self):
@@ -41,18 +42,18 @@ class CloudOrganization(Accounts):
         10. exclude one account and validate it is excluded
         11. include one account and validate it is included
 
-        //cspm tests
-        12. Create cspm org stack
-        13. Connect cspm to existing organization(without scanning,without window)
-        14. delete cspm feature and validate org and account deleted
+        //compliance tests
+        12. Create compliance org stack
+        13. Connect compliance to existing organization(without scanning,without window)
+        14. delete compliance feature and validate org and account deleted
         15. conenct single account (without scanning)
-        16. connect cspm to existing organization again(without scanning) - validate single is under the new organization
-        17. update cspm org stackset to impact more accounts and validted the syncing windwo is working
-        18. update cspm org stackset after end of window to make sure the window is closed and no new accounts are added
+        16. connect compliance to existing organization again(without scanning) - validate single is under the new organization
+        17. update compliance org stackset to impact more accounts and validted the syncing windwo is working
+        18. update compliance org stackset after end of window to make sure the window is closed and no new accounts are added
         19. exclude one account valdiated it marked as excluded
         20. update name and exclude list and validated the changes
 
-        //cspm connection error 
+        //compliance connection error 
         21.break aws admin role and sync the org - validate the error is shown and the org is not connected
         22. fix aws admin role and sync the org - validate the org is connected
         
@@ -73,9 +74,17 @@ class CloudOrganization(Accounts):
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
 
         Logger.logger.info('Stage 1: Init cloud formation manager')
+        aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+        if not aws_access_key_id:
+            raise Exception("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS is not set")
+        if not aws_secret_access_key:
+            raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
+        
+
         self.stack_manager = aws.CloudFormationManager(stack_region, 
-                                                  aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS"), 
-                                                  aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS"))
+                                                  aws_access_key_id=aws_access_key_id, 
+                                                  aws_secret_access_key=aws_secret_access_key)
         
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cadr org stack')
@@ -86,6 +95,10 @@ class CloudOrganization(Accounts):
 
         Logger.logger.info('Stage 4: Connect cadr new organization')
         self.stack_manager.create_stack(self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name, self.cadr_org_stack_name)
+
+
+
+        #compliance tests
 
 
         return self.cleanup()
@@ -111,3 +124,5 @@ class CloudOrganization(Accounts):
 
 
         return super().cleanup(**kwargs)
+
+
