@@ -10,7 +10,7 @@ import re
 from typing import List, Tuple, Any, Dict
 
 
-class CloudFormationManager:
+class AwsManager:
     def __init__(self, region: str, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
         self.region = region
         self.base_session = boto3.Session(
@@ -30,6 +30,7 @@ class CloudFormationManager:
         self.s3 = self.base_session.client("s3")
         self.logs = self.base_session.client("logs")
         self.sts = self.base_session.client("sts")
+        self.iam = self.base_session.client('iam')
 
     def assume_role_in_account(self, target_account_id: str, role_name: str = "OrganizationAccountAccessRole", session_name: str = "CrossAccountSession"):
         """
@@ -58,7 +59,7 @@ class CloudFormationManager:
             credentials = response['Credentials']
             
             # Create new manager instance with assumed role credentials
-            return CloudFormationManager(
+            return AwsManager(
                 region=self.region,
                 aws_access_key_id=credentials['AccessKeyId'],
                 aws_secret_access_key=credentials['SecretAccessKey'],
@@ -316,6 +317,22 @@ class CloudFormationManager:
 
         except Exception as e:
             Logger.logger.error(f"An error occurred while deleting log groups for stack {stack_name}: {e}")
+    
+    def create_user(self, user_name: str):
+        try:
+            self.iam.create_user(UserName=user_name)
+            Logger.logger.info(f"IAM user {user_name} created successfully.")
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while creating IAM user: {e}")
+            raise Exception(f"An error occurred while creating IAM user: {e}")
+    
+    def delete_user(self, user_name: str):
+        try:
+            self.iam.delete_user(UserName=user_name)
+            Logger.logger.info(f"IAM user {user_name} deleted successfully.")
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while deleting IAM user: {e}")
+            raise Exception(f"An error occurred while deleting IAM user: {e}")
 
 
 def extract_account_id(arn):
@@ -338,77 +355,5 @@ def extract_account_id_from_traillog_arn(arn):
     """
     match = re.search(r"arn:aws:cloudtrail:\w+-\w+-\d+:(\d+):", arn)
     return match.group(1) if match else None
-
-class IAMManager:
-    def __init__(self, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
-        self.base_session = boto3.Session(
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            aws_session_token=aws_session_token
-        )
-        self.iam = self.base_session.client('iam')
-        self.sts = self.base_session.client("sts")
-    
-    def assume_role_in_account(self, target_account_id: str, role_name: str = "OrganizationAccountAccessRole", session_name: str = "CrossAccountSession") -> "IAMManager":
-        """
-        Assume a role in a target account and return new IAM manager instance
-        
-        Args:
-            target_account_id: The 12-digit account ID to assume role in
-            role_name: The role name to assume (default: OrganizationAccountAccessRole)
-            session_name: A unique session name for this assumption
-        
-        Returns:
-            New IAMManager instance with assumed role credentials
-        """
-        try:
-            # Construct the role ARN
-            role_arn = f"arn:aws:iam::{target_account_id}:role/{role_name}"
-
-            # Assume the role
-            response = self.sts.assume_role(
-                RoleArn=role_arn,
-                RoleSessionName=session_name,
-                DurationSeconds=3600  # 1 hour (adjust as needed)
-            )
-
-            # Extract temporary credentials
-            credentials = response['Credentials']
-
-            # Create new manager instance with assumed role credentials
-            return IAMManager(
-                aws_access_key_id=credentials['AccessKeyId'],
-                aws_secret_access_key=credentials['SecretAccessKey'],
-                aws_session_token=credentials['SessionToken']
-            )
-
-        except ClientError as e:
-            error_code = e.response['Error']['Code']
-            if error_code == 'AccessDenied':
-                Logger.logger.error(f"Access denied when assuming role {role_arn}. Check if the role exists and trusts your management account.")
-                raise Exception(f"Access denied when assuming role {role_arn}. Check if the role exists and trusts your management account.")
-            elif error_code == 'InvalidParameterValue':
-                Logger.logger.error(f"Invalid role ARN: {role_arn}. Check the account ID and role name.")
-                raise Exception(f"Invalid role ARN: {role_arn}. Check the account ID and role name.")
-            else:
-                Logger.logger.error(f"Failed to assume role: {e}")
-                raise Exception(f"Failed to assume role: {e}")
-
-    
-    def create_user(self, user_name: str):
-        try:
-            self.iam.create_user(UserName=user_name)
-            Logger.logger.info(f"IAM user {user_name} created successfully.")
-        except ClientError as e:
-            Logger.logger.error(f"An error occurred while creating IAM user: {e}")
-            raise Exception(f"An error occurred while creating IAM user: {e}")
-    
-    def delete_user(self, user_name: str):
-        try:
-            self.iam.delete_user(UserName=user_name)
-            Logger.logger.info(f"IAM user {user_name} deleted successfully.")
-        except ClientError as e:
-            Logger.logger.error(f"An error occurred while deleting IAM user: {e}")
-            raise Exception(f"An error occurred while deleting IAM user: {e}")
 
     

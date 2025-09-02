@@ -65,8 +65,7 @@ class Accounts(base_test.BaseTest):
         self.test_runtime_policies = []
         self.tested_stacks = []
         self.tested_cloud_trails = []
-        self.stack_manager: aws.CloudFormationManager
-        self.global_iam_manager: aws.IAMManager
+        self.aws_manager: aws.AwsManager
 
 
 
@@ -114,7 +113,7 @@ class Accounts(base_test.BaseTest):
         generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
         self.create_stack(stack_name, template_url, parameters)
-        test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
+        test_arn =  self.aws_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
     def create_stackset_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
@@ -152,14 +151,14 @@ class Accounts(base_test.BaseTest):
 
     def create_stack(self, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
         Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        stack_id =  self.stack_manager.create_stack(template_url, parameters, stack_name)
+        stack_id =  self.aws_manager.create_stack(template_url, parameters, stack_name)
         assert stack_id, f"failed to create stack {stack_name}"
         Logger.logger.info(f"Stack creation initiated for: {stack_name}, stack id is {stack_id}")
         try:
-            self.stack_manager.wait_for_stack_creation(stack_name)
+            self.aws_manager.wait_for_stack_creation(stack_name)
         except Exception as e:
             Logger.logger.error(f"An error occurred while waiting for stack creation: {e}")
-            failuer_reason = self.stack_manager.get_stack_failure_reason(stack_name)
+            failuer_reason = self.aws_manager.get_stack_failure_reason(stack_name)
             Logger.logger.error(f"Stack failure reason: {failuer_reason}")
             raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
         self.tested_stacks.append(stack_name)
@@ -235,13 +234,13 @@ class Accounts(base_test.BaseTest):
     def create_cloudtrail(self, trail_name, bucket_name, kms_key_id=None):
 
         # have to clean up since there is a limit of 5 trails per region
-        self.stack_manager.delete_all_cloudtrails("systest-cloud-trail")
+        self.aws_manager.delete_all_cloudtrails("systest-cloud-trail")
 
-        trail_arn = self.stack_manager.create_cloudtrail(trail_name, bucket_name)
+        trail_arn = self.aws_manager.create_cloudtrail(trail_name, bucket_name)
         Logger.logger.info(f"Created CloudTrail with ARN: {trail_arn}, cloud_trail_name is {trail_name}, bucket_name is {bucket_name}")
        
 
-        log_location, kms_key = self.stack_manager.get_cloudtrail_details(trail_name)
+        log_location, kms_key = self.aws_manager.get_cloudtrail_details(trail_name)
         Logger.logger.info(f"CloudTrail details retrieved: Log Location: {log_location}, KMS Key: {kms_key}")
 
         self.tested_cloud_trails.append(trail_arn)
@@ -934,7 +933,7 @@ class Accounts(base_test.BaseTest):
         )
 
     def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str , test_arn: str):
-        self.stack_manager.delete_stack(stack_name)
+        self.aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
         self.backend.cspm_scan_now(cloud_account_guid)
         Logger.logger.info("Waiting for scan to complete with failed status")

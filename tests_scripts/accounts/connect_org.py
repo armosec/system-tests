@@ -25,7 +25,7 @@ class CloudOrganization(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
 
-        self.stack_manager = None
+        self.aws_manager = None
         self.cspm_org_stack_name = None
         self.cadr_org_stack_name = None
         self.compliance_org_stack_name = None
@@ -37,7 +37,7 @@ class CloudOrganization(Accounts):
     def start(self):
         """
         Agenda:
-        1. Init cloud formation manager and IAM manager
+        1. Init AwsManager
 
         //cadr tests
         2. Connect cadr new organization
@@ -76,7 +76,7 @@ class CloudOrganization(Accounts):
         TODO: eran need to add his cases
         """
         
-        return statics.SUCCESS, ""
+        #return statics.SUCCESS, ""
     
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -90,7 +90,7 @@ class CloudOrganization(Accounts):
         self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr-org"
         self.aws_user = "systest-" + self.test_identifier_rand + "-user-org"
 
-        Logger.logger.info('Stage 1: Init cloud formation manager and IAM manager')
+        Logger.logger.info('Stage 1: Init AwsManager')
         aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
         if not aws_access_key_id:
@@ -99,16 +99,12 @@ class CloudOrganization(Accounts):
             raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
         
 
-        self.stack_manager = aws.CloudFormationManager(stack_region, 
+        self.aws_manager = aws.AwsManager(stack_region, 
                                                   aws_access_key_id=aws_access_key_id,
                                                   aws_secret_access_key=aws_secret_access_key)
-        Logger.logger.info(f"CloudFormationManager initiated in region {stack_region}")
+        Logger.logger.info(f"AwsManager initiated in region {stack_region}")
         
-        self.global_iam_manager = aws.IAMManager(aws_access_key_id=aws_access_key_id, 
-                                          aws_secret_access_key=aws_secret_access_key)
-        Logger.logger.info(f"IAMManager initiated")
-        
-        self.exclude_account_iam_manager = self.global_iam_manager.assume_role_in_account(EXCLUDE_ACCOUNT_ID)
+        self.exclude_account_aws_manager = self.aws_manager.assume_role_in_account(EXCLUDE_ACCOUNT_ID)
 
         Logger.logger.info('Stage 2: Connect cadr new organization')
         org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
@@ -123,7 +119,7 @@ class CloudOrganization(Accounts):
         Logger.logger.info('Stage 4: Validate alert with orgID is created')
         self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
         time.sleep(180) # wait for the sensor stack to be active
-        self.global_iam_manager.create_user(self.aws_user)
+        self.aws_manager.create_user(self.aws_user)
         self.test_global_aws_users.append(self.aws_user)
         self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
                              filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
@@ -133,7 +129,7 @@ class CloudOrganization(Accounts):
         Logger.logger.info('Stage 5: Exclude one account and validate it is excluded')
         self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.EXCLUDE, [EXCLUDE_ACCOUNT_ID])
         aws_user_excluded = self.aws_user + "-excluded"
-        self.exclude_account_iam_manager.create_user(aws_user_excluded)
+        self.exclude_account_aws_manager.create_user(aws_user_excluded)
         self.test_exclude_account_users.append(aws_user_excluded)
         time.sleep(420) # wait to make sure incident were not created
         self.get_incidents(filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
@@ -144,7 +140,7 @@ class CloudOrganization(Accounts):
         Logger.logger.info('Stage 6: Include one account and validate it is included')
         self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.INCLUDE, [EXCLUDE_ACCOUNT_ID])
         aws_user_included = self.aws_user + "-included"
-        self.exclude_account_iam_manager.create_user(aws_user_included)
+        self.exclude_account_aws_manager.create_user(aws_user_included)
         self.test_exclude_account_users.append(aws_user_included)
         self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
                              filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
@@ -158,7 +154,7 @@ class CloudOrganization(Accounts):
         
         Logger.logger.info('Stage 8: Delete cadr org and validate is deleted')
         self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
-        self.stack_manager.delete_stack(self.cadr_org_stack_name)
+        self.aws_manager.delete_stack(self.cadr_org_stack_name)
         self.tested_stacks.remove(self.cadr_org_stack_name)
         Logger.logger.info("Delete cadr successfully")
         
@@ -184,14 +180,14 @@ class CloudOrganization(Accounts):
 
     def cleanup(self, **kwargs):
 
-        if self.stack_manager:
+        if self.aws_manager:
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting stack: {stack_name}")
-                self.stack_manager.delete_stack(stack_name)
+                self.aws_manager.delete_stack(stack_name)
 
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
-                self.stack_manager.delete_stack_log_groups(stack_name)
+                self.aws_manager.delete_stack_log_groups(stack_name)
 
         for cloud_org_guid in self.test_cloud_orgs_guids:
             Logger.logger.info(f"Deleting cloud organization: {cloud_org_guid}")
@@ -203,11 +199,11 @@ class CloudOrganization(Accounts):
             
         for aws_user in self.test_global_aws_users:
             Logger.logger.info(f"Deleting aws user: {aws_user}")
-            self.global_iam_manager.delete_user(aws_user)
+            self.aws_manager.delete_user(aws_user)
         
         for aws_user in self.test_exclude_account_users:
             Logger.logger.info(f"Deleting aws user: {aws_user}")
-            self.exclude_account_iam_manager.delete_user(aws_user)
+            self.exclude_account_aws_manager.delete_user(aws_user)
 
 
         return super().cleanup(**kwargs)
