@@ -20,7 +20,7 @@ class CloudConnect(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
 
-        self.stack_manager = None
+        self.aws_manager = None
         self.cspm_stack_name = None
         self.cadr_stack_name = None
 
@@ -42,7 +42,7 @@ class CloudConnect(Accounts):
     def start(self):
         """
         Agenda:
-        1. Init cloud formation manager
+        1. Init AwsManager
         2. Create cspm stack
         3. Create bad arn cloud account with cspm
         4. Connect cspm new account
@@ -67,12 +67,12 @@ class CloudConnect(Accounts):
         # generate random number for cloud account name for uniqueness
         self.test_identifer_rand = str(random.randint(10000000, 99999999))
 
-        Logger.logger.info('Stage 1: Init cloud formation manager')
+        Logger.logger.info('Stage 1: Init AwsManager')
         aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
     
         
-        self.stack_manager = aws.CloudFormationManager(stack_region, 
+        self.aws_manager = aws.AwsManager(stack_region, 
                                                   aws_access_key_id=aws_access_key_id, 
                                                   aws_secret_access_key=aws_secret_access_key)
         
@@ -93,7 +93,7 @@ class CloudConnect(Accounts):
 
         self.bucket_name = BUCKET_NAME_SYSTEM_TEST
         self.cloud_trail_name = CLOUDTRAIL_SYSTEM_TEST_CONNECT
-        log_location, kms_key = self.stack_manager.get_cloudtrail_details(self.cloud_trail_name)
+        log_location, kms_key = self.aws_manager.get_cloudtrail_details(self.cloud_trail_name)
 
         bad_arn = "arn:aws:iam::12345678:role/armo-scan-role-cross-with_customer-12345678"
         bad_log_location = "arn:aws:cloudtrail:us-east-1:123456789012:trail/my-trail"
@@ -217,18 +217,18 @@ class CloudConnect(Accounts):
 
     def cleanup(self, **kwargs):
 
-        if self.stack_manager:
+        if self.aws_manager:
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting stack: {stack_name}")
-                self.stack_manager.delete_stack(stack_name)
+                self.aws_manager.delete_stack(stack_name)
 
             for cloud_trail_name in self.tested_cloud_trails:
                 Logger.logger.info(f"Deleting cloudtrail: {cloud_trail_name}")
-                self.stack_manager.delete_cloudtrail(cloud_trail_name)
+                self.aws_manager.delete_cloudtrail(cloud_trail_name)
 
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
-                self.stack_manager.delete_stack_log_groups(stack_name )
+                self.aws_manager.delete_stack_log_groups(stack_name )
 
         for cloud_account_guid in self.test_cloud_accounts_guids:
             Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")

@@ -10,7 +10,7 @@ import re
 from typing import List, Tuple, Any, Dict
 
 
-class CloudFormationManager:
+class AwsManager:
     def __init__(self, region: str, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
         self.region = region
         self.base_session = boto3.Session(
@@ -30,6 +30,7 @@ class CloudFormationManager:
         self.s3 = self.base_session.client("s3")
         self.logs = self.base_session.client("logs")
         self.sts = self.base_session.client("sts")
+        self.iam = self.base_session.client('iam')
 
     def assume_role_in_account(self, target_account_id: str, role_name: str = "OrganizationAccountAccessRole", session_name: str = "CrossAccountSession"):
         """
@@ -58,7 +59,7 @@ class CloudFormationManager:
             credentials = response['Credentials']
             
             # Create new manager instance with assumed role credentials
-            return CloudFormationManager(
+            return AwsManager(
                 region=self.region,
                 aws_access_key_id=credentials['AccessKeyId'],
                 aws_secret_access_key=credentials['SecretAccessKey'],
@@ -316,6 +317,22 @@ class CloudFormationManager:
 
         except Exception as e:
             Logger.logger.error(f"An error occurred while deleting log groups for stack {stack_name}: {e}")
+    
+    def create_user(self, user_name: str):
+        try:
+            self.iam.create_user(UserName=user_name)
+            Logger.logger.info(f"IAM user {user_name} created successfully.")
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while creating IAM user: {e}")
+            raise Exception(f"An error occurred while creating IAM user: {e}")
+    
+    def delete_user(self, user_name: str):
+        try:
+            self.iam.delete_user(UserName=user_name)
+            Logger.logger.info(f"IAM user {user_name} deleted successfully.")
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while deleting IAM user: {e}")
+            raise Exception(f"An error occurred while deleting IAM user: {e}")
 
 
 def extract_account_id(arn):
@@ -338,3 +355,5 @@ def extract_account_id_from_traillog_arn(arn):
     """
     match = re.search(r"arn:aws:cloudtrail:\w+-\w+-\d+:(\d+):", arn)
     return match.group(1) if match else None
+
+    
