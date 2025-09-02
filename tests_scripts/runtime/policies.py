@@ -3,6 +3,7 @@
 import json
 import random
 import time
+from typing import Any, Dict
 
 
 from configurations.system.tests_cases.structures import TestConfiguration
@@ -393,7 +394,7 @@ class RuntimePoliciesConfigurations(Incidents):
         return incident_rulesets["response"]
 
 
-    def validate_new_policy(self, body):
+    def validate_new_policy(self, body: Dict[str, Any]) -> str:
         res = self.backend.new_runtime_policy(body)
         new_runtime_policy_no_scope_res = json.loads(res.text)
         assert new_runtime_policy_no_scope_res == POLICY_CREATED_RESPONSE, f"failed to create new runtime policy, got {new_runtime_policy_no_scope_res}"
@@ -488,14 +489,7 @@ class RuntimePoliciesConfigurations(Incidents):
         return incident_policies[0]
 
     def validate_delete_policy(self, guid):
-        body = {
-            "innerFilters": [
-                {
-                    "guid": guid,
-                }
-            ]
-        }
-        res = self.backend.delete_runtime_policies(body)
+        res = self.backend.delete_runtime_policies(guid)
         delete_runtime_policy_no_scope_res = json.loads(res.text)
         assert delete_runtime_policy_no_scope_res == POLICY_DELETED_RESPONSE, f"failed to delete new runtime policy, got {delete_runtime_policy_no_scope_res}"
 

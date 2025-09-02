@@ -180,6 +180,8 @@ BASE_API_ORGANIZATIONS_AWS = BASE_API_ORGANIZATIONS + "/aws"
 API_CREATE_CADR_ORGANIZATION = BASE_API_ORGANIZATIONS_AWS + "/connectcadr"
 API_ORGANIZATION_DELETE_FEATURE = BASE_API_ORGANIZATIONS + "/feature"
 
+API_ORGANIZATIONS_UPDATE = BASE_API_ORGANIZATIONS + "/update"
+API_ORGANIZATIONS_EXCLUDE_ACCOUNTS = API_ORGANIZATIONS_UPDATE + "/excludeaccounts"
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
 
@@ -2535,8 +2537,15 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r
 
-    def delete_runtime_policies(self, body):
+    def delete_runtime_policies(self, policy_guid):
         params = {"customerGUID": self.selected_tenant_id}
+        body = {
+                "innerFilters": [
+                    {
+                        "guid": policy_guid,
+                    }
+                ]
+            }
 
         Logger.logger.info("delete_runtime_policies body: %s" % body)
         r = self.delete(API_RUNTIME_POLICIES, params=params, json=body)
@@ -2593,7 +2602,7 @@ class ControlPanelAPI(object):
             "enabled": true,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
             "ruleSetType": "Custom",
-            "IncidentTypeIDs":["I001","I002"],
+            "incidentTypeIDs":["I001","I002"],
             "notifications": [],
             "actions": []
         }
@@ -3109,6 +3118,16 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error updating cloud account. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def update_org_exclude_accounts(self, body):
+        url = API_ORGANIZATIONS_EXCLUDE_ACCOUNTS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating org exclude accounts. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 
