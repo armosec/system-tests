@@ -52,7 +52,7 @@ def set_backends():
 
     # development frontEgg
     backends.append(Backend(name='development',
-                            dashboard='https://eggdashbe-dev.armosec.io',
+                            dashboard='https://api-dev.armosec.io',
                             api_url="api-dev.armosec.io",
                             auth_url='https://eggauth-dev.armosec.io',
                             event_receiver_server="https://report-ks.eudev3.cyberarmorsoft.com",
@@ -62,7 +62,7 @@ def set_backends():
 
     # staging frontEgg
     backends.append(Backend(name='staging',
-                            dashboard='https://eggdashbe-stage.armosec.io',
+                            dashboard='https://api-stage.armosec.io',
                             api_url="api-stage.armosec.io",
                             auth_url='https://eggauth-stage.armosec.io',
                             event_receiver_server="https://report-ks.eustage2.cyberarmorsoft.com",
