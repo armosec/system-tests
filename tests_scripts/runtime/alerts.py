@@ -161,14 +161,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
 
     def cleanup(self):
         for policy_guid in self.test_policy_guids:
-            body = {
-                "innerFilters": [
-                    {
-                        "guid": policy_guid,
-                    }
-                ]
-            }
-            self.backend.delete_runtime_policies(body)
+            self.backend.delete_runtime_policies(policy_guid)
         return super().cleanup()
 
 

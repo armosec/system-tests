@@ -1,5 +1,6 @@
 import os
 import datetime
+import json
 from dateutil import parser
 from enum import Enum
 from typing import List, Tuple, Any, Dict
@@ -9,6 +10,7 @@ from systest_utils import Logger, statics
 from urllib.parse import parse_qs, quote, urlparse
 from tests_scripts import base_test
 from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
+from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
 from .cspm_test_models import (
     SeverityCount,
     ComplianceAccountResponse,
@@ -50,14 +52,20 @@ class CloudEntityTypes(Enum):
     ACCOUNT = "account"
     ORGANIZATION = "organization"
 
+class ExclusionActions(Enum):
+    INCLUDE = "include"
+    EXCLUDE = "exclude"
+    OVERRIDE = "override"
+
 class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
         self.test_cloud_accounts_guids = []
         self.test_cloud_orgs_guids = []
+        self.test_runtime_policies = []
         self.tested_stacks = []
         self.tested_cloud_trails = []
-        self.stack_manager: aws.CloudFormationManager
+        self.aws_manager: aws.AwsManager
 
 
 
@@ -105,7 +113,7 @@ class Accounts(base_test.BaseTest):
         generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
         self.create_stack(stack_name, template_url, parameters)
-        test_arn =  self.stack_manager.get_stack_output_role_arn(stack_name)
+        test_arn =  self.aws_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
     def create_stackset_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
@@ -143,14 +151,14 @@ class Accounts(base_test.BaseTest):
 
     def create_stack(self, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
         Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        stack_id =  self.stack_manager.create_stack(template_url, parameters, stack_name)
+        stack_id =  self.aws_manager.create_stack(template_url, parameters, stack_name)
         assert stack_id, f"failed to create stack {stack_name}"
         Logger.logger.info(f"Stack creation initiated for: {stack_name}, stack id is {stack_id}")
         try:
-            self.stack_manager.wait_for_stack_creation(stack_name)
+            self.aws_manager.wait_for_stack_creation(stack_name)
         except Exception as e:
             Logger.logger.error(f"An error occurred while waiting for stack creation: {e}")
-            failuer_reason = self.stack_manager.get_stack_failure_reason(stack_name)
+            failuer_reason = self.aws_manager.get_stack_failure_reason(stack_name)
             Logger.logger.error(f"Stack failure reason: {failuer_reason}")
             raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
         self.tested_stacks.append(stack_name)
@@ -226,13 +234,13 @@ class Accounts(base_test.BaseTest):
     def create_cloudtrail(self, trail_name, bucket_name, kms_key_id=None):
 
         # have to clean up since there is a limit of 5 trails per region
-        self.stack_manager.delete_all_cloudtrails("systest-cloud-trail")
+        self.aws_manager.delete_all_cloudtrails("systest-cloud-trail")
 
-        trail_arn = self.stack_manager.create_cloudtrail(trail_name, bucket_name)
+        trail_arn = self.aws_manager.create_cloudtrail(trail_name, bucket_name)
         Logger.logger.info(f"Created CloudTrail with ARN: {trail_arn}, cloud_trail_name is {trail_name}, bucket_name is {bucket_name}")
        
 
-        log_location, kms_key = self.stack_manager.get_cloudtrail_details(trail_name)
+        log_location, kms_key = self.aws_manager.get_cloudtrail_details(trail_name)
         Logger.logger.info(f"CloudTrail details retrieved: Log Location: {log_location}, KMS Key: {kms_key}")
 
         self.tested_cloud_trails.append(trail_arn)
@@ -925,7 +933,7 @@ class Accounts(base_test.BaseTest):
         )
 
     def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str , test_arn: str):
-        self.stack_manager.delete_stack(stack_name)
+        self.aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
         self.backend.cspm_scan_now(cloud_account_guid)
         Logger.logger.info("Waiting for scan to complete with failed status")
@@ -973,6 +981,62 @@ class Accounts(base_test.BaseTest):
         for key, value in expected_feature.items():
             assert key in feature, f"{key} not in {feature}"
             assert feature[key] == value, f"Expected {key}: {value}, got: {feature[key]}"
+    
+    def create_aws_cdr_runtime_policy(self, policy_name: str, incident_type_ids: List[str]):
+        runtime_policy_body =  {    
+            "name": policy_name,   
+            "enabled": True,
+            "scope": {"designators":[{"cloudProvider": "aws", "service": "CDR", "region": "*/*", "accountID": "*/*"}]},
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
+        }
+        policy_guid = self.validate_new_policy(runtime_policy_body)
+        self.test_runtime_policies.append(policy_guid)
+    
+    def validate_new_policy(self, body: Dict[str, Any]) -> str:
+        res = self.backend.new_runtime_policy(body)
+        new_runtime_policy_no_scope_res = json.loads(res.text)
+        assert new_runtime_policy_no_scope_res == POLICY_CREATED_RESPONSE, f"failed to create new runtime policy, got {new_runtime_policy_no_scope_res}"
+
+        new_generated_runtime_policy_body =  {
+            "pageSize": 50,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "name": body["name"],
+                }
+            ]
+        }
+
+        res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
+        incident_policies = json.loads(res.text)["response"]
+        props_to_check = ["name", "enabled", "scope", "ruleSetType", "incidentTypeIDs"]
+        assert len(incident_policies)  > 0, f"failed to get new runtime policy, expected more than 1 but got {len(incident_policies)}, got result {incident_policies}"
+
+        Logger.logger.info(f"New policy created: {json.dumps(incident_policies[0], indent=4)}")
+
+        for prop in props_to_check:
+            assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
+        
+        guid = incident_policies[0]["guid"]
+        return guid
+    
+    def get_incidents(self, filters: Dict[str, Any], expect_incidents: bool = True):
+        incidents = self.backend.get_incidents(filters)
+        if expect_incidents:
+            assert len(incidents["response"]) > 0, f"failed to get incidents"
+            return incidents["response"]
+        assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
+        return None
+    
+    def update_org_exclude_accounts(self, org_guid: str, feature_names: List[str], action: ExclusionActions, accounts: List[str]):
+        body = {
+            "orgGUID": org_guid,
+            "featureNames": feature_names,
+            "action": action.value,
+            "accounts": accounts
+        }
+        self.backend.update_org_exclude_accounts(body)
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
