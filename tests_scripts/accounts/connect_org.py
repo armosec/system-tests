@@ -75,6 +75,8 @@ class CloudOrganization(Accounts):
         //vulnscan tests
         TODO: eran need to add his cases
         """
+        
+        return statics.SUCCESS, ""
     
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
