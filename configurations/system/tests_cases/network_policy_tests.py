@@ -31,6 +31,7 @@ class NetworkPolicyTests(object):
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          "storage.forceVirtualCrds": "true",
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD: '3m',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
                          }
         )
@@ -68,6 +69,7 @@ class NetworkPolicyTests(object):
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          "storage.forceVirtualCrds": "true",
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD: '3m',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
                          }
         )
