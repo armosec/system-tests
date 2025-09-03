@@ -31,24 +31,10 @@
       "namespace": "systest-ns-pjqm"
     },
     "spec": {
+      "egress": [],
       "ingress": [
         {
           "from": [
-            {
-              "from": [
-                {
-                  "ipBlock": {
-                    "cidr": "10.244.0.93/32"
-                  }
-                }
-              ],
-              "ports": [
-                {
-                  "port": 3306,
-                  "protocol": "TCP"
-                }
-              ]
-            },
             {
               "podSelector": {
                 "matchLabels": {
@@ -71,7 +57,8 @@
         }
       },
       "policyTypes": [
-        "Ingress"
+        "Ingress",
+        "Egress"
       ]
     }
   }

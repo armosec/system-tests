@@ -50,26 +50,6 @@
         {
           "ports": [
             {
-              "port": 443,
-              "protocol": "TCP"
-            }
-          ],
-          "to": [
-            {
-              "ipBlock": {
-                "cidr": "108.177.120.100/32"
-              }
-            },
-            {
-              "ipBlock": {
-                "cidr": "208.80.154.224/32"
-              }
-            }
-          ]
-        },
-        {
-          "ports": [
-            {
               "port": 53,
               "protocol": "UDP"
             }
@@ -107,12 +87,14 @@
           ]
         }
       ],
+      "ingress": [],
       "podSelector": {
         "matchLabels": {
           "app": "wikijs"
         }
       },
       "policyTypes": [
+        "Ingress",
         "Egress"
       ]
     }
