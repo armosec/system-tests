@@ -49,7 +49,7 @@ class NetworkPolicy(BaseNetworkPolicy):
         self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://google.com", repeat=10)
         self.run_exec_cmd(namespace=namespace, pod_name=pod_name, cmd="curl https://wikipedia.org", repeat=10)
 
-        duration_in_minutes = int(helm_kwargs[statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD][:-1])
+        duration_in_minutes = int(helm_kwargs[statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD][:-1]) + 2
         TestUtil.sleep(60 * duration_in_minutes, "wait for node-agent learning period", "info")
 
         expected_network_neighborhood_list = TestUtil.load_objs_from_json_files(
