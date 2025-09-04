@@ -40,6 +40,8 @@ PROVIDER_GCP = "gcp"
 
 CADR_FEATURE_NAME = "cadr"
 CSPM_FEATURE_NAME = "cspm"
+VULNSCAN_FEATURE_NAME = "vulnScan"
+
 
 FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
@@ -119,6 +121,18 @@ class Accounts(base_test.BaseTest):
     def create_stackset_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
         #IDO: need to make thsi fucn crerwate stckset and return the stackset arn
         pass
+
+    def connect_cspm_vulnscan_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str: 
+        if is_to_cleanup_accounts:
+            Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
+            self.cleanup_existing_aws_cloud_accounts(account_id)
+        Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_vulnscan(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
+        Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
+        Logger.logger.info('Validate accounts cloud with cspm list')
+        self.test_cloud_accounts_guids.append(cloud_account_guid)
+        Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
+        return cloud_account_guid
 
     def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
@@ -290,6 +304,15 @@ class Accounts(base_test.BaseTest):
         external_id = data["externalID"]
 
         return stack_link, external_id
+    
+    def get_and_validate_vulnscan_link_with_external_id(self, region) -> Tuple[str, str]:
+        """
+        Get and validate vulnscan link.
+        """
+        data = self.backend.get_vulnscan_link(region=region, external_id="true")
+        stack_link = data["stackLink"]
+        external_id = data["externalID"]
+        return stack_link, external_id
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
@@ -306,6 +329,22 @@ class Accounts(base_test.BaseTest):
 
         stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
         return stack_link
+    
+    def create_and_validate_cloud_account_with_cspm_vulnscan(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
+        """
+        Create and validate cloud account.
+        """
+
+        body = {
+            "name": cloud_account_name,
+            "vulnerabilityScanConfig": {
+                "crossAccountsRoleARN": arn,
+                "stackRegion": region,
+                "externalID" :external_id  
+            },
+        }
+
+        return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)  
     
     def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
         """
