@@ -30,3 +30,12 @@ class AccountsTests(object):
             test_obj=CloudOrganization,
             issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
         )
+    
+    @staticmethod
+    def cloud_vulnscan_aws():
+        from tests_scripts.accounts.vulnscan import CloudVulnScan
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudVulnScan,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )
