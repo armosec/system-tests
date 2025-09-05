@@ -112,7 +112,7 @@ class Accounts(base_test.BaseTest):
         return res["response"][0]
 
     def create_stack_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
-        generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
         self.create_stack(stack_name, template_url, parameters)
         test_arn =  self.aws_manager.get_stack_output_role_arn(stack_name)
