@@ -57,12 +57,17 @@ class ExclusionActions(Enum):
     EXCLUDE = "exclude"
     OVERRIDE = "override"
 
+CDR_ALERT_USER_IDENTITY_PATH = "cdrevent.eventdata.awscloudtrail.useridentity"
+CDR_ALERT_ACCOUNT_ID_PATH = CDR_ALERT_USER_IDENTITY_PATH + ".accountid"
+CDR_ALERT_ORG_ID_PATH = CDR_ALERT_USER_IDENTITY_PATH + ".orgid"
+
 class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
         self.test_cloud_accounts_guids = []
         self.test_cloud_orgs_guids = []
         self.test_runtime_policies = []
+        self.test_global_aws_users = []
         self.tested_stacks = []
         self.tested_cloud_trails = []
         self.aws_manager: aws.AwsManager

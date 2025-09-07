@@ -2,7 +2,7 @@ import os
 import time
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import PROVIDER_AWS, CADR_FEATURE_NAME
+from tests_scripts.accounts.accounts import PROVIDER_AWS, CADR_FEATURE_NAME, CDR_ALERT_ORG_ID_PATH
 from tests_scripts.accounts.accounts import CloudEntityTypes, ExclusionActions
 import random
 from urllib.parse import parse_qs, quote, urlparse
@@ -29,7 +29,6 @@ class CloudOrganization(Accounts):
         self.cspm_org_stack_name = None
         self.cadr_org_stack_name = None
         self.compliance_org_stack_name = None
-        self.test_global_aws_users = []
         self.test_exclude_account_users = []
         
         self.skip_apis_validation = False
@@ -76,7 +75,6 @@ class CloudOrganization(Accounts):
         TODO: eran need to add his cases
         """
 
-        return statics.SUCCESS, ""
     
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -122,7 +120,7 @@ class CloudOrganization(Accounts):
         self.aws_manager.create_user(self.aws_user)
         self.test_global_aws_users.append(self.aws_user)
         self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
-                             filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+                             filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                       "message": self.aws_user + "|like"},
                              expect_incidents=True)
         
@@ -132,7 +130,7 @@ class CloudOrganization(Accounts):
         self.exclude_account_aws_manager.create_user(aws_user_excluded)
         self.test_exclude_account_users.append(aws_user_excluded)
         time.sleep(420) # wait to make sure incident were not created
-        self.get_incidents(filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+        self.get_incidents(filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                     "message": aws_user_excluded + "|like"},
                              expect_incidents=False)
         Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is excluded successfully")
@@ -143,7 +141,7 @@ class CloudOrganization(Accounts):
         self.exclude_account_aws_manager.create_user(aws_user_included)
         self.test_exclude_account_users.append(aws_user_included)
         self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
-                             filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+                             filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                       "message": aws_user_included + "|like"},
                              expect_incidents=True)
         Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is included successfully")
