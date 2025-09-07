@@ -7,6 +7,7 @@ from .accounts import extract_parameters_from_url
 from typing import List
 from .connect import REGION_SYSTEM_TEST
 from .accounts import VULNSCAN_FEATURE_NAME
+from systest_utils import statics
 
 
 
