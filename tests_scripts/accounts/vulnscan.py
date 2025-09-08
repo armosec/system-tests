@@ -7,7 +7,6 @@ from .accounts import extract_parameters_from_url
 from typing import List
 from .connect import REGION_SYSTEM_TEST
 from .accounts import VULNSCAN_FEATURE_NAME
-from systest_utils import statics
 
 
 
@@ -46,8 +45,6 @@ class CloudVulnScan(Accounts):
         13. Delete cspm vulnscan feature and validate
        
         """
-
-        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
