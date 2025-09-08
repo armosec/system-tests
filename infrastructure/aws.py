@@ -31,6 +31,7 @@ class AwsManager:
         self.logs = self.base_session.client("logs")
         self.sts = self.base_session.client("sts")
         self.iam = self.base_session.client('iam')
+        self.ec2 = self.base_session.client('ec2')
 
     def assume_role_in_account(self, target_account_id: str, role_name: str = "OrganizationAccountAccessRole", session_name: str = "CrossAccountSession"):
         """
@@ -333,6 +334,55 @@ class AwsManager:
         except ClientError as e:
             Logger.logger.error(f"An error occurred while deleting IAM user: {e}")
             raise Exception(f"An error occurred while deleting IAM user: {e}")
+
+    def check_snapshot_by_tags(self, tags: Dict[str, str], owner_ids: List[str] = None) -> str:
+        """
+        Check if a snapshot exists with specific tags and return its ID
+        
+        Args:
+            tags: Dictionary of tag key-value pairs to filter by
+            owner_ids: List of AWS account IDs to filter snapshots by owner (optional)
+                      If None, defaults to 'self' (current account)
+        
+        Returns:
+            Snapshot ID if found, empty string if not found
+        """
+        try:
+            # Build filters for tags
+            filters = []
+            for key, value in tags.items():
+                filters.append({
+                    'Name': f'tag:{key}',
+                    'Values': [value]
+                })
+            
+            # Set default owner to current account if not specified
+            if owner_ids is None:
+                account_id = self.get_account_id()
+                if account_id:
+                    owner_ids = [account_id]
+                else:
+                    owner_ids = ['self']
+            
+            # Get snapshots with the specified filters
+            response = self.ec2.describe_snapshots(
+                Filters=filters,
+                OwnerIds=owner_ids
+            )
+            
+            snapshots = response.get('Snapshots', [])
+            
+            if snapshots:
+                snapshot_id = snapshots[0].get('SnapshotId', '')
+                Logger.logger.info(f"Found snapshot with specified tags: {snapshot_id}")
+                return snapshot_id
+            else:
+                Logger.logger.info("No snapshots found with the specified tags")
+                return ""
+            
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while checking for snapshots: {e}")
+            return ""
 
 
 def extract_account_id(arn):
