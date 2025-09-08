@@ -47,6 +47,7 @@ class CloudVulnScan(Accounts):
         11. Validate hosts components
         12. Validate hosts components uniquevalues
         13. Delete cspm vulnscan feature and validate
+        14. Validate snapshots deleted
        
         """
 
