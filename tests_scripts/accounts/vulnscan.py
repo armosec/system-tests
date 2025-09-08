@@ -4,7 +4,7 @@ import os
 import random
 from infrastructure import aws
 from .accounts import extract_parameters_from_url
-from typing import List
+from typing import List, Tuple
 from .connect import REGION_SYSTEM_TEST
 from .accounts import VULNSCAN_FEATURE_NAME
 
@@ -167,7 +167,7 @@ class CloudVulnScan(Accounts):
         Logger.logger.info(f"Number of Hosts found: {len(response)}")
         for host in response:
             instance_hashes.append(host["instanceHash"])
-            instance_scan_ids.append(host["instanceScanID"])
+            instance_scan_ids.append(host["instanceScanId"])
         
         return instance_hashes, instance_scan_ids
     
