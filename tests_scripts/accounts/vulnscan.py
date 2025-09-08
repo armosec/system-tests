@@ -4,7 +4,7 @@ import os
 import random
 from infrastructure import aws
 from .accounts import extract_parameters_from_url
-from typing import List
+from typing import List, Tuple
 from .connect import REGION_SYSTEM_TEST
 from .accounts import VULNSCAN_FEATURE_NAME
 
@@ -12,6 +12,10 @@ from .accounts import VULNSCAN_FEATURE_NAME
 
 expected_instances_ids = ["i-035d6cba3ed6fa6cf", "i-0424907c0f6cd8c46", "i-075afeac250be212c"]
 test_aws_account_id = "371864305487"
+
+SMAPSHOT_TAG_NAME = "armo:secure:vulnscan:instance-scan-id"
+
+
 
 
 
@@ -43,6 +47,7 @@ class CloudVulnScan(Accounts):
         11. Validate hosts components
         12. Validate hosts components uniquevalues
         13. Delete cspm vulnscan feature and validate
+        14. Validate snapshots deleted
        
         """
 
@@ -79,13 +84,19 @@ class CloudVulnScan(Accounts):
         self.test_cloud_accounts_guids.append(cloud_account_guid)
 
         Logger.logger.info('Stage 4: Wait for cspm vulnscan scan to complete successfully')
-        instance_hashes, _ = self.wait_for_report(
+        result, _ = self.wait_for_report(
             self.validate_hosts_list,
             timeout=840,
             sleep_interval=20,
             cloud_account_guid=cloud_account_guid,
             expected_instances_ids=expected_instances_ids
         )
+
+        instance_hashes = result[0]
+        instance_scan_ids = result[1]
+
+        Logger.logger.info(f"Instance scan ids: {instance_scan_ids}")
+        Logger.logger.info(f"Instance hashes: {instance_hashes}")
 
         Logger.logger.info('Stage 5: Validate hosts list filters')
         self.validate_hosts_list_filters(cloud_account_guid, expected_instances_ids)
@@ -114,14 +125,31 @@ class CloudVulnScan(Accounts):
         Logger.logger.info('Stage 13: Delete cspm vulnscan feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, VULNSCAN_FEATURE_NAME)
 
+        Logger.logger.info('Stage 14: Validate snapshots deleted')
+        self.validate_snapshots_deleted(instance_scan_ids)
+
 
         return self.cleanup()
 
     def cleanup(self, **kwargs):
+        if self.cspm_vulnscan_stack_name is not None:
+            self.aws_manager.delete_stack(self.cspm_vulnscan_stack_name)
+            Logger.logger.info(f"Deleted stack {self.cspm_vulnscan_stack_name}")
         return super().cleanup(**kwargs)
+
+    def validate_snapshots_deleted(self, instance_scan_ids: List[str]):
+        for instance_scan_id in instance_scan_ids:
+            tag = {
+                SMAPSHOT_TAG_NAME: instance_scan_id
+            }
+            snapshot_id = self.aws_manager.check_snapshot_by_tags(tag)
+            assert snapshot_id == "", f"Snapshot {instance_scan_id} not deleted"
+        Logger.logger.info(f"All snapshots deleted for instance scan ids {instance_scan_ids}")
+
     
-    def validate_hosts_list(self, cloud_account_guid: str, expected_instances_ids: List[str]) -> List[str]:
+    def validate_hosts_list(self, cloud_account_guid: str, expected_instances_ids: List[str]) -> Tuple[List[str], List[str]]:
         instance_hashes = []
+        instance_scan_ids = []
         body = {
             "pageSize": 50,
             "pageNum": 1,
@@ -140,8 +168,9 @@ class CloudVulnScan(Accounts):
         Logger.logger.info(f"Number of Hosts found: {len(response)}")
         for host in response:
             instance_hashes.append(host["instanceHash"])
+            instance_scan_ids.append(host["instanceScanId"])
         
-        return instance_hashes
+        return instance_hashes, instance_scan_ids
     
     def validate_host_scan(self, instance_hashes: List[str]) -> List[str]:
         # scan now only scans failed hosts - since we don't simulate such in test we just check that the endpoint is working
