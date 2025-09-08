@@ -118,6 +118,9 @@ class CloudVulnScan(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
+        if self.cspm_vulnscan_stack_name is not None:
+            self.aws_manager.delete_stack(self.cspm_vulnscan_stack_name)
+            Logger.logger.info(f"Deleted stack {self.cspm_vulnscan_stack_name}")
         return super().cleanup(**kwargs)
     
     def validate_hosts_list(self, cloud_account_guid: str, expected_instances_ids: List[str]) -> List[str]:
