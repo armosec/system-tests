@@ -1231,7 +1231,8 @@
     "target_repositories": [
       "cadashboardbe",
       "event-ingester-service-dummy",
-      "vulnerability-scanner"
+      "vulnerability-scanner",
+      "cloud-account-vuln-scan"
     ],
     "description": "Checks cloud accounts vulnerability scanning",
     "skip_on_environment": "production,production-us",
