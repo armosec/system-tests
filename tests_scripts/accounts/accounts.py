@@ -1,9 +1,10 @@
 import os
 import datetime
 import json
+import uuid
 from dateutil import parser
 from enum import Enum
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Union
 
 from infrastructure import aws
 from systest_utils import Logger, statics
@@ -11,6 +12,8 @@ from urllib.parse import parse_qs, quote, urlparse
 from tests_scripts import base_test
 from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
 from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
+from pydantic import BaseModel
+from tests_scripts.models import SyncCloudOrganizationRequest
 from .cspm_test_models import (
     SeverityCount,
     ComplianceAccountResponse,
@@ -31,6 +34,56 @@ from .cspm_test_models import (
 )
 
 
+class AwsStackResponse(BaseModel):
+    """Response model for AWS stack operations."""
+    stackLink: str
+    externalID: str
+
+
+class AwsMembersStackResponse(BaseModel):
+    """Response model for AWS members stack operations."""
+    s3TemplatePath: str
+    externalID: str
+
+
+class AWSOrgCreateCloudOrganizationAdminRequest(BaseModel):
+    """Request model for creating AWS cloud organization with admin."""
+    orgGUID: Union[str, None] = None
+    stackRegion: str
+    adminRoleArn: str
+    adminRoleExternalID: Union[str, None] = None
+    withoutScan: bool = False
+
+
+class CreateOrUpdateCloudOrganizationResponse(BaseModel):
+    """Response model for creating or updating cloud organization."""
+    guid: str
+
+
+class ConnectCloudOrganizationMembersRequest(BaseModel):
+    """Request model for connecting cloud organization members."""
+    orgGUID: str
+    features: List[str]
+    memberRoleArn: Union[str, None] = None
+    memberRoleExternalID: str
+    stackRegion: str
+    skipScan: bool = False
+
+
+class UpdateCloudOrganizationMetadataRequest(BaseModel):
+    """Request model for updating cloud organization metadata."""
+    orgGUID: str
+    newName: Union[str, None] = None
+    featureNames: List[str] = []
+    excludeAccounts: Union[List[str], None] = None
+    
+    def model_validate(self, data):
+        """Custom validation to match Go struct validation logic."""
+        # Validate that excludeAccounts and featureNames are set together
+        if (self.excludeAccounts is None) != (len(self.featureNames) == 0):
+            raise ValueError("excludeAccounts and featureNames must be set together")
+        return super().model_validate(data)
+
 
 SCAN_TIME_WINDOW = 2000
 
@@ -39,7 +92,9 @@ PROVIDER_AZURE = "azure"
 PROVIDER_GCP = "gcp"
 
 CADR_FEATURE_NAME = "cadr"
-CSPM_FEATURE_NAME = "cspm"
+COMPLIANCE_FEATURE_NAME = "cspm"
+VULN_SCAN_FEATURE_NAME = "vuln-scan"
+
 
 FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
@@ -47,6 +102,10 @@ FEATURE_STATUS_PENDING = "Pending"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
+
+CSPM_STATUS_HEALTHY = "healthy"
+CSPM_STATUS_DEGRADED = "degraded"
+CSPM_STATUS_DISCONNECTED = "disconnected"
 
 class CloudEntityTypes(Enum):
     ACCOUNT = "account"
@@ -64,8 +123,10 @@ class Accounts(base_test.BaseTest):
         self.test_cloud_orgs_guids = []
         self.test_runtime_policies = []
         self.tested_stacks = []
+        self.tested_stacksets = []
         self.tested_cloud_trails = []
         self.aws_manager: aws.AwsManager
+        self.delegated_admin_aws_manager: aws.AwsManager
 
 
 
@@ -90,6 +151,18 @@ class Accounts(base_test.BaseTest):
             }
             
         return body
+    
+    def build_get_cloud_aws_org_by_accountID_request(self, accountID: str) -> Dict:
+        body = {
+            "pageSize": 1,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "providerInfo.accountID": accountID
+                }
+            ]
+        }
+        return body
 
     def setup_jira_config(self, site_name=DEFAULT_JIRA_SITE_NAME):
         """Setup Jira configuration using the standalone function."""
@@ -109,37 +182,45 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
-    def create_stack_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
+    def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
         generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
-        self.create_stack(stack_name, template_url, parameters)
-        test_arn =  self.aws_manager.get_stack_output_role_arn(stack_name)
+        self.create_stack(aws_manager, stack_name, template_url, parameters)
+        test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
         return test_arn
 
-    def create_stackset_cspm(self, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
-        #IDO: need to make thsi fucn crerwate stckset and return the stackset arn
-        pass
 
-    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str:
+    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_aws_cloud_accounts(account_id)
         Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
+        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skip_scan=skip_scan)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm uniquevalues')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
             Logger.logger.info('Edit name and validate cloud account with cspm')
-            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + " updated", arn)
+            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", arn)
         return cloud_account_guid
+    
+    def connect_cspm_single_account_suppose_to_be_blocked(self, region:str, arn:str,external_id:str)->bool:
+        Logger.logger.info(f"Creating and validating CSPM cloud account: need-to-block, ARN: {arn}, region: {region}, external_id: {external_id}")
+        try:
+            cloud_account_guid = self.create_and_validate_cloud_account_with_cspm("need-to-block", arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=True)
+            if cloud_account_guid:
+                return False
+            else:
+                return True
+        except Exception as e:
+            Logger.logger.info(f"Expected error: {e}")
+            return True
+        
 
-    def connect_cspm_new_organization(self, region, arn, cloud_account_name,external_id, validate_apis=True)->str: 
-        pass
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
         Logger.logger.info(f"Attempting to connect CSPM with bad ARN: {arn} for account: {cloud_account_name}")
@@ -149,20 +230,153 @@ class Accounts(base_test.BaseTest):
 
 
 
-    def create_stack(self, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
+    def create_stack(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
         Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        stack_id =  self.aws_manager.create_stack(template_url, parameters, stack_name)
+        stack_id =  aws_manager.create_stack(template_url, parameters, stack_name)
         assert stack_id, f"failed to create stack {stack_name}"
         Logger.logger.info(f"Stack creation initiated for: {stack_name}, stack id is {stack_id}")
         try:
-            self.aws_manager.wait_for_stack_creation(stack_name)
+            aws_manager.wait_for_stack_creation(stack_name)
         except Exception as e:
             Logger.logger.error(f"An error occurred while waiting for stack creation: {e}")
-            failuer_reason = self.aws_manager.get_stack_failure_reason(stack_name)
+            failuer_reason = aws_manager.get_stack_failure_reason(stack_name)
             Logger.logger.error(f"Stack failure reason: {failuer_reason}")
             raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
         self.tested_stacks.append(stack_name)
+    
+    def create_stackset(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]], ou_id: str = None) -> str:
+        stack_id =  aws_manager.create_stackset(template_url, parameters, stack_name, ou_id)
+        assert stack_id, f"failed to create stackset {stack_name}"
+        Logger.logger.info(f"Stackset creation initiated for: {stack_name}, stack id is {stack_id}")
+        try:
+            aws_manager.wait_for_stackset_creation(stack_name)
+        except Exception as e:
+            Logger.logger.error(f"An error occurred while waiting for stackset creation: {e}")
+            failuer_reason = aws_manager.get_stackset_failure_reason(stack_name)
+            Logger.logger.error(f"Stackset failure reason: {failuer_reason}")
+            raise Exception(f"failed to create stackset {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
+        self.tested_stacks.append(stack_name)
 
+    def _test_delegated_admin_permissions(self, aws_manager: aws.AwsManager) -> bool:
+        """
+        Test if the delegated admin role has all necessary permissions for StackSet creation.
+        Returns True if all tests pass, False otherwise.
+        """
+        Logger.logger.info("Testing delegated admin permissions before StackSet creation...")
+        
+        try:
+            # Test if we can list OUs
+            ous = aws_manager.organizations.list_organizational_units_for_parent(
+                ParentId='r-fo1t'  # Root OU ID
+            )
+            Logger.logger.info(f"✅ Can list OUs: {len(ous.get('OrganizationalUnits', []))}")
+        except Exception as e:
+            Logger.logger.error(f"❌ Cannot list OUs: {e}")
+            return False
+        
+        try:
+            # Test if we can list accounts
+            accounts = aws_manager.organizations.list_accounts()
+            Logger.logger.info(f"✅ Can list accounts: {len(accounts.get('Accounts', []))}")
+        except Exception as e:
+            Logger.logger.error(f"❌ Cannot list accounts: {e}")
+            return False
+        
+        try:
+            # Test if we can describe the organization
+            org = aws_manager.organizations.describe_organization()
+            Logger.logger.info(f"✅ Can describe organization: {org.get('Organization', {}).get('Id', 'N/A')}")
+        except Exception as e:
+            Logger.logger.error(f"❌ Cannot describe organization: {e}")
+            return False
+        
+        try:
+            # Test if we can list StackSets
+            stacksets = aws_manager.cloudformation.list_stack_sets()
+            Logger.logger.info(f"✅ Can list StackSets: {len(stacksets.get('Summaries', []))}")
+        except Exception as e:
+            Logger.logger.error(f"❌ Cannot list StackSets: {e}")
+            return False
+        
+        try:
+            # Test if we can describe CloudFormation account limits
+            limits = aws_manager.cloudformation.describe_account_limits()
+            Logger.logger.info(f"✅ Can describe CloudFormation account limits")
+        except Exception as e:
+            Logger.logger.error(f"❌ Cannot describe CloudFormation account limits: {e}")
+            return False
+        
+        Logger.logger.info("✅ All delegated admin permission tests passed")
+        return True
+        
+    def connect_cspm_features_to_org(self, aws_manager: aws.AwsManager, stack_name: str, region: str, features: List[str], org_guid: str,
+                                 organizational_unit_ids: List[str] = None,
+                                 account_ids: List[str] = None,skip_wait: bool = False)->(str,str,str):
+        """
+        Create and deploy a StackSet for Armo Compliance capabilities.
+        """
+        # Test permissions right before StackSet creation
+        if not self._test_delegated_admin_permissions(aws_manager):
+            raise Exception("Delegated admin permission tests failed - cannot proceed with StackSet creation")
+        
+        aws_response = self.get_org_memebers_stack_link(region=region, stack_name=stack_name, features=features)
+        external_id = aws_response.externalID
+
+        generted_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        
+        parameters = [
+            {
+                'ParameterKey': 'ExternalID',   
+                'ParameterValue': external_id
+            },
+            {
+                'ParameterKey': 'RoleName',
+                'ParameterValue': generted_role_name
+            }
+        ]
+        
+        # Call the new wrapper function that handles both creation and deployment
+        final_status, operation_id = aws_manager.create_and_deploy_stackset(
+            stackset_name=stack_name,
+            template_url=aws_response.s3TemplatePath,
+            parameters=parameters,
+            regions=[region],  # The new function expects a list of regions
+            organizational_unit_ids=organizational_unit_ids,
+            account_ids=account_ids,
+            skip_wait=skip_wait
+        )
+
+    
+        if final_status != 'SUCCEEDED' and final_status != 'SKIPPED':
+            raise Exception(f"StackSet deployment failed: {final_status}")
+
+        # This part remains the same
+        body = ConnectCloudOrganizationMembersRequest(
+            orgGUID=org_guid,
+            features=features,
+            memberRoleExternalID=external_id,
+            stackRegion=region,
+            memberRoleArn=generted_role_name
+        ).model_dump()
+        res = self.backend.create_cloud_org_connect_members(body=body)
+        assert "guid" in res, f"guid not in {res}"
+        return generted_role_name, external_id, operation_id
+
+    def connect_cspm_features_to_org_exisitng_stackset(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
+        """
+        Create and deploy a StackSet for Armo Compliance capabilities.
+        """
+    
+        # This part remains the same
+        body = ConnectCloudOrganizationMembersRequest(
+            orgGUID=org_guid,
+            features=features,
+            memberRoleExternalID=member_role_external_id,
+            stackRegion=region,
+            memberRoleArn=member_role_arn
+        ).model_dump()
+        res = self.backend.create_cloud_org_connect_members(body=body)
+        assert "guid" in res, f"guid not in {res}"
 
     def connect_cadr_bad_log_location(self, region: str, cloud_account_name: str, trail_log_location: str) -> str:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
@@ -189,7 +403,7 @@ class Accounts(base_test.BaseTest):
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ =  self.create_stack(stack_name, template_url, parameters)
+        _ =  self.create_stack(self.aws_manager, stack_name, template_url, parameters)
 
     def connect_cadr_new_organization(self, region: str, stack_name: str, log_location: str) -> str:
         Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
@@ -203,6 +417,48 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
         return org_guid
     
+    def connect_cspm_new_organizatin(self,aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
+        Logger.logger.info(f"Connecting new cspm org")
+        awsResponse = self.get_org_admin_stack_link(region, stack_name, external_id)
+        external_id = awsResponse.externalID
+        _, template_url, region, parameters = extract_parameters_from_url(awsResponse.stackLink)
+        self.create_stack(aws_manager, stack_name, template_url, parameters)
+        test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
+        body = AWSOrgCreateCloudOrganizationAdminRequest(
+            stackRegion=region,
+            adminRoleArn=test_arn,
+            adminRoleExternalID=external_id,
+            withoutScan=True
+        )
+        res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
+        assert "guid" in res, f"guid not in {res}"
+        return CreateOrUpdateCloudOrganizationResponse(guid=res["guid"])
+
+    def connect_existing_cspm_organization(self,region: str,test_arn: str, external_id: Union[str, None] = None ,org_guid: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
+        if org_guid is not None:
+            #for updating existing org entity - for reconecting org
+            body = AWSOrgCreateCloudOrganizationAdminRequest(
+                stackRegion=region,
+                adminRoleArn=test_arn,
+                adminRoleExternalID=external_id,
+                withoutScan=True,
+                orgGUID=org_guid
+            )
+        else:
+            body = AWSOrgCreateCloudOrganizationAdminRequest(
+                stackRegion=region,
+                adminRoleArn=test_arn,
+                adminRoleExternalID=external_id,
+                withoutScan=True
+            )
+        
+        res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
+        assert "guid" in res, f"guid not in {res}"
+        return CreateOrUpdateCloudOrganizationResponse(guid=res["guid"])
+    
+    
+
+
     def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
         Logger.logger.info('Get and validate cadr org link')
         stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
@@ -210,7 +466,7 @@ class Accounts(base_test.BaseTest):
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ =  self.create_stack(stack_name, template_url, parameters)
+        _ =  self.create_stack(self.aws_manager, stack_name, template_url, parameters)
 
     def verify_cadr_status(self, guid: str, cloud_entity_type: CloudEntityTypes, expected_status: str) -> bool:
         expected_feature_connected = False
@@ -279,17 +535,36 @@ class Accounts(base_test.BaseTest):
 
         return res
 
+    def get_org_admin_stack_link(self, region: str, stack_name: str, external_id: Union[str, None] = None) -> AwsStackResponse:
+        # Always send a body, but externalID is optional
+        body = {}
+        if external_id is not None and external_id != "":
+            body["externalID"] = external_id
+        
+        data = self.backend.get_cspm_admin_org_link(region, stack_name, body)
+        return AwsStackResponse(
+            stackLink=data["stackLink"],
+            externalID=data.get("externalID", "")
+        )
     
-    def get_and_validate_cspm_link_with_external_id(self, region) -> Tuple[str, str]:
+    def get_org_memebers_stack_link(self, region: str, stack_name: str, features: List[str]) -> AwsMembersStackResponse:
+        data = self.backend.get_cspm_members_org_link(region, stack_name, features)
+        return AwsMembersStackResponse(
+            s3TemplatePath=data["s3TemplatePath"],
+            externalID=data["externalID"]
+        )
+
+    
+    def get_and_validate_cspm_link_with_external_id(self, region: str) -> AwsStackResponse:
         """
         Get and validate cspm link.
-        Returns tuple of (stack_link, external_id) strings.
+        Returns AwsStackResponse with stackLink and externalID.
         """
         data = self.backend.get_cspm_link(region=region, external_id="true")
-        stack_link = data["stackLink"]
-        external_id = data["externalID"]
-
-        return stack_link, external_id
+        return AwsStackResponse(
+            stackLink=data["stackLink"],
+            externalID=data["externalID"]
+        )
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """
@@ -307,7 +582,7 @@ class Accounts(base_test.BaseTest):
         stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
         return stack_link
     
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", skip_scan: bool = False, expect_failure:bool=False):
         """
         Create and validate cloud account.
         """
@@ -320,6 +595,7 @@ class Accounts(base_test.BaseTest):
                         "stackRegion": region,
                         "externalID" :external_id  
                     },
+                    "skipScan": skip_scan,
                 }
         else:
             body = {
@@ -328,6 +604,7 @@ class Accounts(base_test.BaseTest):
                         "crossAccountsRoleARN": arn,
                         "stackRegion": region,
                     },
+                    "skipScan": skip_scan,
                 }
 
         return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
@@ -394,7 +671,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str):
+    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skip_scan: bool = False):
         """
         Validate accounts cloud list.
         """
@@ -405,18 +682,19 @@ class Accounts(base_test.BaseTest):
         assert len(acount_list["response"]) > 0, f"response is empty"
         account = acount_list["response"][0]
         assert "features" in account, f"features not in {account}"
-        assert CSPM_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][CSPM_FEATURE_NAME]['scanState']}"
-        assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][CSPM_FEATURE_NAME]['featureStatus']}"
-        assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
-        assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
-        assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][CSPM_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
-        assert account["features"][CSPM_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
-        if scan_status==CSPM_SCAN_STATE_COMPLETED:
-            assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
-            assert account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
-        elif scan_status==CSPM_SCAN_STATE_FAILED:
-            assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
+        assert account["features"][COMPLIANCE_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['featureStatus']}"
+        assert "config" in account["features"][COMPLIANCE_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
+        assert "crossAccountsRoleARN" in account["features"][COMPLIANCE_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
+        assert account["features"][COMPLIANCE_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
+        if not skip_scan:
+            assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
+            assert account["features"][COMPLIANCE_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
+            if scan_status==CSPM_SCAN_STATE_COMPLETED:
+                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+            elif scan_status==CSPM_SCAN_STATE_FAILED:
+                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return account
 
@@ -950,9 +1228,9 @@ class Accounts(base_test.BaseTest):
         res = self.backend.get_cloud_accounts(body=body)
         assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
         account= res["response"][0]
-        assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] is not None, f"Expected lastTimeScanFail to be set, got: {account['features'][CSPM_FEATURE_NAME]['lastTimeScanFail']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanFailureReason"] is not None, f"Expected scanFailureReason to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanFailureReason']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanState']}"
+        assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanFailed"] is not None, f"Expected lastTimeScanFail to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['lastTimeScanFail']}"
+        assert account["features"][COMPLIANCE_FEATURE_NAME]["scanFailureReason"] is not None, f"Expected scanFailureReason to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['scanFailureReason']}"
+        assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
 
         Logger.logger.info("the account has been successfully disconnected")
 
@@ -1029,7 +1307,68 @@ class Accounts(base_test.BaseTest):
         assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
         return None
     
-    def update_org_exclude_accounts(self, org_guid: str, feature_names: List[str], action: ExclusionActions, accounts: List[str]):
+    def validate_org_status(self, org_guid: str, expected_status: str):
+        org = self.get_cloud_org(org_guid)
+        assert org["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['cspmSpecificData']['cspmStatus']}"
+
+    def validate_admin_status(self, org_guid: str, expected_status: str):
+        org = self.get_cloud_org(org_guid)
+        assert org["orgScanData"]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['orgScanData']['featureStatus']}"
+
+    def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
+        missing_accounts = []
+        unmanaged_accounts = []
+        
+        # Collect all results first
+        for account_id in account_ids:
+            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if len(res["response"]) == 0:
+                missing_accounts.append(account_id)
+                continue
+                
+            account = res["response"][0]
+            managed_by_org = account["features"][feature_name]["managedByOrg"]
+            
+            if managed_by_org != org_guid:
+                unmanaged_accounts.append(account_id)
+        
+        # Assert after collecting all results
+        assert len(missing_accounts) == 0, f"Missing accounts: {missing_accounts}"
+        assert len(unmanaged_accounts) == 0, f"Unmanaged accounts: {unmanaged_accounts}"
+
+    def validate_account_feature_is_excluded(self, cloud_account_guid: str, feature_name: str, is_excluded: bool):
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        res = self.backend.get_cloud_accounts(body=body)
+        assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
+        account= res["response"][0]
+        
+        # Handle case where feature doesn't exist or is false
+        feature_data = account["features"][feature_name]
+        actual_excluded = feature_data.get("excluded", False)
+        
+        assert actual_excluded == is_excluded, f"Expected isExcluded: {is_excluded}, got: {actual_excluded}"
+        return 
+    
+    def vlaidte_account_feautre_is_managed(self, cloud_account_guid: str, feature_name: str, is_managed: str = None):
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        res = self.backend.get_cloud_accounts(body=body)
+        assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
+        account= res["response"][0]
+          
+        if is_managed is not None:
+            # Check if feature exists and has isManaged field
+            if feature_name not in account["features"]:
+                assert False, f"Feature {feature_name} does not exist"
+            feature_data = account["features"][feature_name]
+            actual_is_managed = feature_data.get("managedByOrg")
+            assert actual_is_managed == is_managed, f"Expected managedByOrg: {is_managed}, got: {actual_is_managed}"
+        else:
+            feature_data = account["features"][feature_name]
+            assert "managedByOrg" not in feature_data, f"Expected managedByOrg field to not exist, but it exists with value: {feature_data.get('isManaged')}"
+    
+    def org_exclude_accounts_by_feature(self, org_guid: str, feature_names: List[str], action: ExclusionActions, accounts: List[str]):
         body = {
             "orgGUID": org_guid,
             "featureNames": feature_names,
@@ -1038,6 +1377,48 @@ class Accounts(base_test.BaseTest):
         }
         self.backend.update_org_exclude_accounts(body)
 
+    
+    def update_org_metadata_and_validate(self, metadata: UpdateCloudOrganizationMetadataRequest):
+        """Update cloud organization metadata using the proper request model."""
+        body = metadata.model_dump()
+        self.backend.update_org_metadata(body)
+        org = self.get_cloud_org(metadata.orgGUID)
+        if metadata.newName is not None:
+            assert org["name"] == metadata.newName, f"Expected name: {metadata.newName}, got: {org['name']}"
+        if metadata.excludeAccounts is not None:
+               for feature_name in metadata.featureNames:
+                   org["features"][feature_name]["accountExcludeList"]["excludeAccountIDs"] = metadata.excludeAccounts
+    
+    def update_and_validate_admin_external_id(self, aws_manager: aws.AwsManager, org_guid: str, admin_role_arn: str):
+        new_external_id = str(uuid.uuid4())
+        old_external_id = aws_manager.get_role_external_id(admin_role_arn)
+        assert old_external_id is not None, f"Old external id is not found"
+        assert old_external_id != new_external_id, f"New external id is the same as the old one"
+        aws_manager.update_role_external_id(admin_role_arn, new_external_id)
+        self.backend.sync_org_now(SyncCloudOrganizationRequest(orgGUID=org_guid, withoutScan=True))
+        self.validate_admin_status(org_guid, FEATURE_STATUS_DISCONNECTED)
+        self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
+
+        aws_manager.update_role_external_id(admin_role_arn, old_external_id)
+        self.connect_existing_cspm_organization(aws_manager.region, admin_role_arn, old_external_id, org_guid)
+        self.validate_admin_status(org_guid, FEATURE_STATUS_CONNECTED)
+        self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
+    
+    def update_and_validate_member_external_id(self, aws_manager: aws.AwsManager, org_guid: str, account_guid: str, member_role_arn: str):
+        new_external_id = str(uuid.uuid4())
+        old_external_id = aws_manager.get_role_external_id(member_role_arn)
+        assert old_external_id is not None, f"Old external id is not found"
+        assert old_external_id != new_external_id, f"New external id is the same as the old one"
+        aws_manager.update_role_external_id(member_role_arn, new_external_id)
+        self.backend.cspm_scan_now(account_guid)
+        self.validate_admin_status(org_guid, FEATURE_STATUS_DISCONNECTED)
+        self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
+
+        aws_manager.update_role_external_id(member_role_arn, old_external_id)
+        self.connect_existing_cspm_organization(aws_manager.region, member_role_arn, old_external_id, org_guid)       
+        self.validate_admin_status(org_guid, FEATURE_STATUS_CONNECTED)
+        self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
+                   
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
 
