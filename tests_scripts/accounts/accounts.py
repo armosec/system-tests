@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+import time
 import uuid
 from dateutil import parser
 from enum import Enum
@@ -99,6 +100,7 @@ VULN_SCAN_FEATURE_NAME = "vuln-scan"
 FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
 FEATURE_STATUS_PENDING = "Pending"
+FEATURE_STATUS_PARTIALLY_CONNECTED = "Partially connected"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
@@ -362,7 +364,7 @@ class Accounts(base_test.BaseTest):
         assert "guid" in res, f"guid not in {res}"
         return generted_role_name, external_id, operation_id
 
-    def connect_cspm_features_to_org_exisitng_stackset(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
+    def connect_cspm_features_to_org_existing_stack_set(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
         """
         Create and deploy a StackSet for Armo Compliance capabilities.
         """
@@ -417,7 +419,7 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
         return org_guid
     
-    def connect_cspm_new_organizatin(self,aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
+    def connect_cspm_new_organization(self,aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
         Logger.logger.info(f"Connecting new cspm org")
         awsResponse = self.get_org_admin_stack_link(region, stack_name, external_id)
         external_id = awsResponse.externalID
@@ -455,9 +457,6 @@ class Accounts(base_test.BaseTest):
         res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
         assert "guid" in res, f"guid not in {res}"
         return CreateOrUpdateCloudOrganizationResponse(guid=res["guid"])
-    
-    
-
 
     def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
         Logger.logger.info('Get and validate cadr org link')
@@ -644,6 +643,38 @@ class Accounts(base_test.BaseTest):
             return res["guid"]
         
         return None
+    
+    def reconnect_cloud_account_cspm_feature(self, cloud_account_guid: str, feature_name: str, arn: str, region: str, external_id: str , skip_scan: bool = False):
+        config_name = ""
+        if feature_name == COMPLIANCE_FEATURE_NAME:
+            config_name = "cspmConfig"
+        elif feature_name == VULN_SCAN_FEATURE_NAME:
+            config_name = "vulnerabilityScanConfig"
+        else:
+            raise Exception(f"Invalid feature name: {feature_name}")
+        
+        if external_id:
+            body = {
+                    "guid": cloud_account_guid,
+                    config_name: {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                        "externalID" :external_id  
+                    },
+                    "skipScan": skip_scan,
+                }
+        else:
+            body = {
+                    "guid": cloud_account_guid,
+                    config_name: {
+                        "crossAccountsRoleARN": arn,
+                        "stackRegion": region,
+                    },
+                    "skipScan": skip_scan,
+                }
+        updated_cloud_account_guid = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
+        assert updated_cloud_account_guid == cloud_account_guid, f"{updated_cloud_account_guid} is not {cloud_account_guid}"
+        return cloud_account_guid
     
     def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
         """
@@ -1298,6 +1329,7 @@ class Accounts(base_test.BaseTest):
         
         guid = incident_policies[0]["guid"]
         return guid
+
     
     def get_incidents(self, filters: Dict[str, Any], expect_incidents: bool = True):
         incidents = self.backend.get_incidents(filters)
@@ -1306,10 +1338,18 @@ class Accounts(base_test.BaseTest):
             return incidents["response"]
         assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
         return None
-    
+
+    def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
+        account = self.get_cloud_account(cloud_account_guid)
+        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
+
     def validate_org_status(self, org_guid: str, expected_status: str):
         org = self.get_cloud_org(org_guid)
         assert org["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['cspmSpecificData']['cspmStatus']}"
+
+    def validate_org_feature_status(self, org_guid: str, feature_name: str, expected_status: str):
+        org = self.get_cloud_org(org_guid)
+        assert org["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['features'][feature_name]['featureStatus']}"
 
     def validate_admin_status(self, org_guid: str, expected_status: str):
         org = self.get_cloud_org(org_guid)
@@ -1389,36 +1429,63 @@ class Accounts(base_test.BaseTest):
                for feature_name in metadata.featureNames:
                    org["features"][feature_name]["accountExcludeList"]["excludeAccountIDs"] = metadata.excludeAccounts
     
+    def update_role_external_id(self, aws_manager: aws.AwsManager, role_arn: str, new_external_id: str) -> bool:
+        if aws_manager.update_role_external_id(role_arn, new_external_id):
+            def check_external_id():
+                current_external_id = aws_manager.get_role_external_id_by_arn(role_arn)
+                return current_external_id == new_external_id
+            
+            self.wait_for_report(check_external_id, timeout=30, sleep_interval=5)
+            return True
+        
+        return False
+    
     def update_and_validate_admin_external_id(self, aws_manager: aws.AwsManager, org_guid: str, admin_role_arn: str):
         new_external_id = str(uuid.uuid4())
-        old_external_id = aws_manager.get_role_external_id(admin_role_arn)
+        old_external_id = aws_manager.get_role_external_id_by_arn(admin_role_arn)
         assert old_external_id is not None, f"Old external id is not found"
         assert old_external_id != new_external_id, f"New external id is the same as the old one"
-        aws_manager.update_role_external_id(admin_role_arn, new_external_id)
+        update_result = self.update_role_external_id(aws_manager, admin_role_arn, new_external_id)
+        assert update_result, f"Failed to update role {admin_role_arn} external id {new_external_id}"
         self.backend.sync_org_now(SyncCloudOrganizationRequest(orgGUID=org_guid, withoutScan=True))
-        self.validate_admin_status(org_guid, FEATURE_STATUS_DISCONNECTED)
+        self.wait_for_report(self.validate_admin_status, timeout=90, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_DISCONNECTED)
         self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
 
-        aws_manager.update_role_external_id(admin_role_arn, old_external_id)
+        update_result = self.update_role_external_id(aws_manager, admin_role_arn, old_external_id)
+        assert update_result, f"Failed to update role {admin_role_arn} external id {old_external_id}"
         self.connect_existing_cspm_organization(aws_manager.region, admin_role_arn, old_external_id, org_guid)
-        self.validate_admin_status(org_guid, FEATURE_STATUS_CONNECTED)
+        self.wait_for_report(self.validate_admin_status, timeout=90, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_CONNECTED)
         self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
     
-    def update_and_validate_member_external_id(self, aws_manager: aws.AwsManager, org_guid: str, account_guid: str, member_role_arn: str):
-        new_external_id = str(uuid.uuid4())
-        old_external_id = aws_manager.get_role_external_id(member_role_arn)
-        assert old_external_id is not None, f"Old external id is not found"
-        assert old_external_id != new_external_id, f"New external id is the same as the old one"
-        aws_manager.update_role_external_id(member_role_arn, new_external_id)
-        self.backend.cspm_scan_now(account_guid)
-        self.validate_admin_status(org_guid, FEATURE_STATUS_DISCONNECTED)
-        self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
+    def update_and_validate_member_external_id(self, aws_manager: aws.AwsManager, org_guid: str, account_guid: str ,feature_name: str):
+        cloud_account = self.get_cloud_account(account_guid)
+        feature = cloud_account["features"][feature_name]
+        if feature_name == COMPLIANCE_FEATURE_NAME:
+            role_arn = feature["config"]["crossAccountsRoleARN"]
+            new_external_id = str(uuid.uuid4())
+            old_external_id = aws_manager.get_role_external_id_by_arn(role_arn)
+            assert old_external_id is not None, f"Old external id is not found"
+            assert old_external_id != new_external_id, f"New external id is the same as the old one"
+            update_result = self.update_role_external_id(aws_manager, role_arn, new_external_id)
+            assert update_result, f"Failed to update role {role_arn} external id {new_external_id}"
 
-        aws_manager.update_role_external_id(member_role_arn, old_external_id)
-        self.connect_existing_cspm_organization(aws_manager.region, member_role_arn, old_external_id, org_guid)       
-        self.validate_admin_status(org_guid, FEATURE_STATUS_CONNECTED)
-        self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
-                   
+            self.backend.cspm_scan_now(account_guid)
+            self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, expected_status=FEATURE_STATUS_DISCONNECTED)
+            self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
+            self.validate_org_feature_status(org_guid, feature_name, FEATURE_STATUS_PARTIALLY_CONNECTED)
+
+            update_result = self.update_role_external_id(aws_manager, role_arn, old_external_id)
+            assert update_result, f"Failed to update role {role_arn} external id {old_external_id}"
+
+            self.reconnect_cloud_account_cspm_feature(account_guid, COMPLIANCE_FEATURE_NAME, role_arn, aws_manager.region, old_external_id ,skip_scan=True)
+            self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_CONNECTED)
+            self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
+            self.validate_org_feature_status(org_guid, COMPLIANCE_FEATURE_NAME, FEATURE_STATUS_CONNECTED)
+
+        elif feature_name == VULN_SCAN_FEATURE_NAME:
+            Logger.logger.info(f"there is no scan now capability to vuln scan")
+        return
+
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
 

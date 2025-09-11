@@ -108,7 +108,7 @@ class CloudOrganization(Accounts):
         delagted_admin_account_id = "515497298766"
         single_account_id = "617632154863"
         expected_account_ids = [single_account_id,delagted_admin_account_id,"897545368193"]
-        complaince_test_region = "us-east-1"
+        compliance_test_region = "us-east-1"
         initial_OU = "ou-fo1t-hbdw5p8g"
         aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
@@ -118,7 +118,7 @@ class CloudOrganization(Accounts):
             raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
         
 
-        self.aws_manager = aws.AwsManager(complaince_test_region, 
+        self.aws_manager = aws.AwsManager(compliance_test_region, 
                                                 aws_access_key_id=aws_access_key_id,
                                                 aws_secret_access_key=aws_secret_access_key)
         
@@ -137,12 +137,12 @@ class CloudOrganization(Accounts):
         
         Logger.logger.info(f"Account {current_account} is properly delegated")
         
-        Logger.logger.info(f"AwsManager initiated in region {complaince_test_region}")
+        Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
 
         Logger.logger.info('connection Stage 1: Connect CSPM org')
         discovery_stack_name = "systest-" + self.test_identifier_rand + "-discovery-org"
         self.compliance_org_stack_name.append(discovery_stack_name)
-        existing_admin_response = self.connect_cspm_new_organizatin(delegated_admin_aws_manager, discovery_stack_name, complaince_test_region)
+        existing_admin_response = self.connect_cspm_new_organization(delegated_admin_aws_manager, discovery_stack_name, compliance_test_region)
         test_org_guid = existing_admin_response.guid
         self.test_cloud_orgs_guids.append(test_org_guid)
         org = self.get_cloud_org(test_org_guid)
@@ -151,21 +151,21 @@ class CloudOrganization(Accounts):
         admin_external_id = org["orgScanData"]["scanConfig"]["adminRoleExternalID"]
     
         Logger.logger.info('connection Stage 1.1: try connect again to the same CSPM org')
-        existing_admin_response = self.connect_existing_cspm_organization(complaince_test_region, admin_role_arn, admin_external_id)
+        existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)
         second_org_guid = existing_admin_response.guid
         assert test_org_guid == second_org_guid, f"new_org_guid {test_org_guid} is not equal to second_org_guid {second_org_guid}"
 
         Logger.logger.info('connection Stage 2: Connect compliance to existing organization(without scanning)')
         features = [COMPLIANCE_FEATURE_NAME]
-        complince_stackset_name = "systest-" + self.test_identifier_rand + "-complince-org"
-        member_role_arn, member_role_external_id, stackset_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, complince_stackset_name, complaince_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
-        self.compliance_org_stack_set_info.append((complince_stackset_name, stackset_operation_id))
+        compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-complince-org"
+        member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
+        self.compliance_org_stack_set_info.append((compliance_stack_set_name, stack_set_operation_id))
 
         self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
         timeout=300, org_guid=test_org_guid, account_ids=expected_account_ids, 
         feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 4: conenct single account (without scanning) - blocked')
+        Logger.logger.info('connection Stage 4: connect single account (without scanning) - blocked')
         cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm-single"
         stack_response = self.get_and_validate_cspm_link_with_external_id(stack_region)
         self.cspm_external_id = stack_response.externalID       
@@ -181,37 +181,37 @@ class CloudOrganization(Accounts):
         self.delete_and_validate_org_feature(test_org_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info('connection Stage 6: connect single account (without scanning)')
-        single_complince_account_name = "single-compliance-account"
-        cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, single_compliance_role_arn, single_complince_account_name, self.cspm_external_id,skip_scan=True)
-        self.test_cloud_accounts_guids.append(cloud_account_guid)
-        self.validate_account_feature_is_excluded(cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
+        single_compliance_account_name = "single-compliance-account"
+        single_cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, single_compliance_role_arn, single_compliance_account_name, self.cspm_external_id,skip_scan=True)
+        self.test_cloud_accounts_guids.append(single_cloud_account_guid)
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
         Logger.logger.info('connection Stage 7: connect compliance to existing organization again(without scanning) - validate single is under the new organization')
-        existing_admin_response = self.connect_existing_cspm_organization(complaince_test_region, admin_role_arn, admin_external_id)       
+        existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)       
         test_org_guid = existing_admin_response.guid
         self.test_cloud_orgs_guids.append(test_org_guid)
-        self.connect_cspm_features_to_org_exisitng_stackset(test_org_guid, member_role_arn, member_role_external_id, complaince_test_region, features)
+        self.connect_cspm_features_to_org_existing_stack_set(test_org_guid, member_role_name, member_role_external_id, compliance_test_region, features)
         self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
         timeout=120, org_guid=test_org_guid, account_ids=expected_account_ids, 
         feature_name=COMPLIANCE_FEATURE_NAME)        
         self.validate_org_status(test_org_guid, CSPM_STATUS_HEALTHY)
         
-        Logger.logger.info('connection Stage 8: exclude one account, valdiated it marked as excluded')
+        Logger.logger.info('connection Stage 8: exclude one account, validated it marked as excluded')
         self.org_exclude_accounts_by_feature(test_org_guid, [COMPLIANCE_FEATURE_NAME], ExclusionActions.EXCLUDE, [single_account_id])
-        self.validate_account_feature_is_excluded(cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
 
         Logger.logger.info('connection Stage 9: update name and exclude list and validated the changes')
         new_name = f"updated-{test_org_guid}"
         metadata = UpdateCloudOrganizationMetadataRequest(orgGUID=test_org_guid, newName=new_name, featureNames=[COMPLIANCE_FEATURE_NAME], excludeAccounts=["111111111111","222222222222","333333333333"])
         self.update_org_metadata_and_validate(metadata)
         Logger.logger.info(f"Updated org {test_org_guid} name to {new_name} and we updated the exclude list - removing the account {single_account_id} from the list")
-        self.validate_account_feature_is_excluded(cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
         Logger.logger.info('connection Stage 10: update admin connection and validate org status is degraded')
         self.update_and_validate_admin_external_id(self.delegated_admin_aws_manager, test_org_guid, admin_role_arn)
 
         Logger.logger.info('connection Stage 11: update member connection and validate org status is degraded')
-        self.update_and_validate_member_external_id(self.single_account_aws_manager, test_org_guid, cloud_account_guid, member_role_arn)
+        self.update_and_validate_member_external_id(self.single_account_aws_manager, test_org_guid, single_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info('connection Stage 11: connect single vuln - success')
 

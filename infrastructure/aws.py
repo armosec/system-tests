@@ -1038,11 +1038,11 @@ class AwsManager:
             Logger.logger.info(f"Updating external ID for role {role_arn} to {new_external_id}")
             
             # Extract role name from ARN
-            role_name = role_arn.split('/')[-1]
-            Logger.logger.info(f"Extracted role name: {role_name}")
+            split_role_name = role_arn.split('/')[-1]
+            Logger.logger.info(f"Extracted role name: {split_role_name}")
             
             # Step 1: Get the current trust policy
-            response = self.iam.get_role(RoleName=role_name)
+            response = self.iam.get_role(RoleName=split_role_name)
             role = response['Role']
             
             import json
@@ -1078,7 +1078,7 @@ class AwsManager:
             
             # Step 3: Update the role's trust policy
             self.iam.update_assume_role_policy(
-                RoleName=role_name,
+                RoleName=split_role_name,
                 PolicyDocument=json.dumps(trust_policy)
             )
             
@@ -1094,7 +1094,7 @@ class AwsManager:
             Logger.logger.error(f"Unexpected error updating role {role_arn}: {e}")
             return False
 
-    def get_role_external_id(self, role_arn: str) -> str:
+    def get_role_external_id_by_arn(self, role_arn: str) -> str:
         """
         Get the current external ID from an IAM role's trust policy.
         
@@ -1106,10 +1106,10 @@ class AwsManager:
         """
         try:
             # Extract role name from ARN
-            role_name = role_arn.split('/')[-1]
-            Logger.logger.info(f"Extracted role name from ARN {role_arn}: {role_name}")
+            split_role_name = role_arn.split('/')[-1]
+            Logger.logger.info(f"Extracted role name from ARN {role_arn}: {split_role_name}")
             
-            response = self.iam.get_role(RoleName=role_name)
+            response = self.iam.get_role(RoleName=split_role_name)
             role = response['Role']
             
             import json
