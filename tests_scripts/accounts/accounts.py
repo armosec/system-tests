@@ -52,7 +52,7 @@ class AWSOrgCreateCloudOrganizationAdminRequest(BaseModel):
     stackRegion: str
     adminRoleArn: str
     adminRoleExternalID: Union[str, None] = None
-    withoutScan: bool = False
+    skipScan: bool = False
 
 
 class CreateOrUpdateCloudOrganizationResponse(BaseModel):
@@ -88,7 +88,7 @@ class UpdateCloudOrganizationMetadataRequest(BaseModel):
 class SyncCloudOrganizationRequest(BaseModel):
     """Request model for syncing cloud organization."""
     orgGUID: str
-    withoutScan: bool = False
+    skipScan: bool = False
 
 
 SCAN_TIME_WINDOW = 2000
@@ -452,7 +452,7 @@ class Accounts(base_test.BaseTest):
             stackRegion=region,
             adminRoleArn=test_arn,
             adminRoleExternalID=external_id,
-            withoutScan=True
+            skipScan=True
         )
         res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
         assert "guid" in res, f"guid not in {res}"
@@ -465,7 +465,7 @@ class Accounts(base_test.BaseTest):
                 stackRegion=region,
                 adminRoleArn=test_arn,
                 adminRoleExternalID=external_id,
-                withoutScan=True,
+                skipScan=True,
                 orgGUID=org_guid
             )
         else:
@@ -473,7 +473,7 @@ class Accounts(base_test.BaseTest):
                 stackRegion=region,
                 adminRoleArn=test_arn,
                 adminRoleExternalID=external_id,
-                withoutScan=True
+                skipScan=True
             )
         
         res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
@@ -1495,7 +1495,7 @@ class Accounts(base_test.BaseTest):
         assert old_external_id != new_external_id, f"New external id is the same as the old one"
         update_result = self.update_role_external_id(aws_manager, admin_role_arn, new_external_id)
         assert update_result, f"Failed to update role {admin_role_arn} external id {new_external_id}"
-        self.backend.sync_org_now(SyncCloudOrganizationRequest(orgGUID=org_guid, withoutScan=True))
+        self.backend.sync_org_now(SyncCloudOrganizationRequest(orgGUID=org_guid, skipScan=True))
         self.wait_for_report(self.validate_admin_status, timeout=90, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_DISCONNECTED)
         self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
 

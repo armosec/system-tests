@@ -3502,7 +3502,7 @@ class ControlPanelAPI(object):
         Sync organization now with the given request
         
         Args:
-            sync_request: SyncCloudOrganizationRequest object containing orgGUID and withoutScan
+            sync_request: SyncCloudOrganizationRequest object containing orgGUID and skipScan
         """
         url = API_ORGANIZATIONS_SYNC_NOW
         
