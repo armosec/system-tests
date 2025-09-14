@@ -324,7 +324,7 @@ class Accounts(base_test.BaseTest):
         aws_response = self.get_org_memebers_stack_link(region=region, stack_name=stack_name, features=features)
         external_id = aws_response.externalID
 
-        generted_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        generated_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
         
         parameters = [
             {
@@ -333,7 +333,7 @@ class Accounts(base_test.BaseTest):
             },
             {
                 'ParameterKey': 'RoleName',
-                'ParameterValue': generted_role_name
+                'ParameterValue': generated_role_name
             }
         ]
         
@@ -358,11 +358,11 @@ class Accounts(base_test.BaseTest):
             features=features,
             memberRoleExternalID=external_id,
             stackRegion=region,
-            memberRoleArn=generted_role_name
+            memberRoleArn=generated_role_name
         ).model_dump()
         res = self.backend.create_cloud_org_connect_members(body=body)
         assert "guid" in res, f"guid not in {res}"
-        return generted_role_name, external_id, operation_id
+        return generated_role_name, external_id, operation_id
 
     def connect_cspm_features_to_org_existing_stack_set(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
         """
@@ -1453,7 +1453,7 @@ class Accounts(base_test.BaseTest):
 
         update_result = self.update_role_external_id(aws_manager, admin_role_arn, old_external_id)
         assert update_result, f"Failed to update role {admin_role_arn} external id {old_external_id}"
-        self.connect_existing_cspm_organization(aws_manager.region, admin_role_arn, old_external_id, org_guid)
+        self.wait_for_report(self.connect_existing_cspm_organization, timeout=90, sleep_interval=10 ,region=aws_manager.region, test_arn=admin_role_arn, external_id=old_external_id, org_guid=org_guid)
         self.wait_for_report(self.validate_admin_status, timeout=90, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_CONNECTED)
         self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
     
@@ -1468,6 +1468,7 @@ class Accounts(base_test.BaseTest):
             assert old_external_id != new_external_id, f"New external id is the same as the old one"
             update_result = self.update_role_external_id(aws_manager, role_arn, new_external_id)
             assert update_result, f"Failed to update role {role_arn} external id {new_external_id}"
+            time.sleep(10)
 
             self.backend.cspm_scan_now(account_guid)
             self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, expected_status=FEATURE_STATUS_DISCONNECTED)
@@ -1477,7 +1478,7 @@ class Accounts(base_test.BaseTest):
             update_result = self.update_role_external_id(aws_manager, role_arn, old_external_id)
             assert update_result, f"Failed to update role {role_arn} external id {old_external_id}"
 
-            self.reconnect_cloud_account_cspm_feature(account_guid, COMPLIANCE_FEATURE_NAME, role_arn, aws_manager.region, old_external_id ,skip_scan=True)
+            self.wait_for_report(self.reconnect_cloud_account_cspm_feature,timeout=90, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, arn=role_arn, region=aws_manager.region, external_id=old_external_id ,skip_scan=True)
             self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_CONNECTED)
             self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
             self.validate_org_feature_status(org_guid, COMPLIANCE_FEATURE_NAME, FEATURE_STATUS_CONNECTED)

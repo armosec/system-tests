@@ -107,7 +107,8 @@ class CloudOrganization(Accounts):
         Logger.logger.info('connection Stage 0: Init AwsManager')
         delagted_admin_account_id = "515497298766"
         single_account_id = "617632154863"
-        expected_account_ids = [single_account_id,delagted_admin_account_id,"897545368193"]
+        member_account_id = "897545368193"
+        expected_account_ids = [single_account_id,delagted_admin_account_id,member_account_id]
         compliance_test_region = "us-east-1"
         initial_OU = "ou-fo1t-hbdw5p8g"
         aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
@@ -157,7 +158,7 @@ class CloudOrganization(Accounts):
 
         Logger.logger.info('connection Stage 2: Connect compliance to existing organization(without scanning)')
         features = [COMPLIANCE_FEATURE_NAME]
-        compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-complince-org"
+        compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-compliance-org"
         member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
         self.compliance_org_stack_set_info.append((compliance_stack_set_name, stack_set_operation_id))
 
@@ -211,7 +212,12 @@ class CloudOrganization(Accounts):
         self.update_and_validate_admin_external_id(self.delegated_admin_aws_manager, test_org_guid, admin_role_arn)
 
         Logger.logger.info('connection Stage 11: update member connection and validate org status is degraded')
-        self.update_and_validate_member_external_id(self.single_account_aws_manager, test_org_guid, single_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
+        member_account_manager = self.aws_manager.assume_role_in_account(member_account_id)
+        body = self.build_get_cloud_aws_org_by_accountID_request(member_account_id)
+        res = self.backend.get_cloud_accounts(body=body)
+        assert len(res["response"]) == 1, f"Expected 1 account, got {len(res['response'])}"
+        member_cloud_account_guid = res["response"][0]["guid"]
+        self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info('connection Stage 11: connect single vuln - success')
 
