@@ -14,7 +14,6 @@ from tests_scripts import base_test
 from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
 from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
 from pydantic import BaseModel
-from tests_scripts.models import SyncCloudOrganizationRequest
 from .cspm_test_models import (
     SeverityCount,
     ComplianceAccountResponse,
@@ -84,6 +83,12 @@ class UpdateCloudOrganizationMetadataRequest(BaseModel):
         if (self.excludeAccounts is None) != (len(self.featureNames) == 0):
             raise ValueError("excludeAccounts and featureNames must be set together")
         return super().model_validate(data)
+
+
+class SyncCloudOrganizationRequest(BaseModel):
+    """Request model for syncing cloud organization."""
+    orgGUID: str
+    withoutScan: bool = False
 
 
 SCAN_TIME_WINDOW = 2000

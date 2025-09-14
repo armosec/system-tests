@@ -17,7 +17,7 @@ from systest_utils.wlid import Wlid
 
 import json
 from infrastructure.api_login import *
-from tests_scripts.models import SyncCloudOrganizationRequest
+from tests_scripts.accounts.accounts import SyncCloudOrganizationRequest
 
 
 class NotExistingCustomer(Exception):
