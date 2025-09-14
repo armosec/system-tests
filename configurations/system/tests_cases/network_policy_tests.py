@@ -31,6 +31,7 @@ class NetworkPolicyTests(object):
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          "storage.forceVirtualCrds": "true",
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD: '3m',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
                          }
         )
@@ -68,6 +69,7 @@ class NetworkPolicyTests(object):
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          "storage.forceVirtualCrds": "true",
                          statics.HELM_NODE_AGENT_LEARNING_PERIOD: '30s',
+                         statics.HELM_NODE_AGENT_MAX_LEARNING_PERIOD: '3m',
                          statics.HELM_NODE_AGENT_UPDATE_PERIOD: '10s'
                          }
         )
@@ -83,14 +85,12 @@ class NetworkPolicyTests(object):
             deployments=join(statics.DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_obj=NetworkPolicyPodRestarted,
             expected_network_neighborhood=[
-                "configurations/network-policy/expected-network-neighborhood/deployment-wikijs-basic.json",
-                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb-basic.json",
-                "configurations/network-policy/expected-network-neighborhood/deployment-nginx-basic.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-mariadb.json",
+                "configurations/network-policy/expected-network-neighborhood/deployment-nginx.json",
                 ],
             expected_generated_network_policies=[
-                "configurations/network-policy/expected-generated-network-policy/deployment-wikijs-basic.json",
-                "configurations/network-policy/expected-generated-network-policy/deployment-mariadb-basic.json",
-                "configurations/network-policy/expected-generated-network-policy/deployment-nginx-basic.json",
+                "configurations/network-policy/expected-generated-network-policy/deployment-mariadb.json",
+                "configurations/network-policy/expected-generated-network-policy/deployment-nginx.json",
             ],
             helm_kwargs={statics.HELM_NETWORK_POLICY_FEATURE: statics.HELM_RELEVANCY_FEATURE_ENABLED,
                          "storage.forceVirtualCrds": "true",

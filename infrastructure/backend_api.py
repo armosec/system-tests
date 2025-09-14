@@ -59,9 +59,13 @@ API_VULNERABILITY_UNIQUE_VALUES_SUMMARY = "/api/v1/uniqueValues/vulnerability/sc
 
 API_VULNERABILITY_V2_WORKLOAD = "/api/v1/vulnerability_v2/workload"
 API_VULNERABILITY_V2 = "/api/v1/vulnerability_v2/vulnerability"
+API_VULNERABILITY_V2_UNIQUEVALUES = "/api/v1/uniqueValues/vulnerability_v2/vulnerability"
 API_VULNERABILITY_V2_IMAGE = "/api/v1/vulnerability_v2/image"
 API_VULNERABILITY_V2_COMPONENT = "/api/v1/vulnerability_v2/component"
+API_VULNERABILITY_V2_HOST = "/api/v1/vulnerability_v2/host"
+API_VULNERABILITY_V2_HOST_UNIQUEVALUES = "/api/v1/uniqueValues/vulnerability_v2/host"
 API_VULNERABILITY_V2_COMPONENT_UNIQUEVALUES =  "/api/v1/uniqueValues/vulnerability_v2/component"
+API_VULNERABILITY_V2_HOST_SCAN = "/api/v1/vulnerability_v2/host/scan"
 
 API_INTEGRATIONS = "/api/v1/integrations"
 
@@ -2167,6 +2171,12 @@ class ControlPanelAPI(object):
         if not enrich_tickets:
             params = {"enrichTickets": "false"}
         return self.post_list_request(API_VULNERABILITY_V2, body, expected_results, params=params)
+    
+    def get_vuln_v2_vulnerabilities_uniquevalues(self, body: dict):
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(API_VULNERABILITY_V2_UNIQUEVALUES, params=params, json=body, timeout=60)
+        Logger.logger.info(r.text)
+        return r.json()
 
     def get_vuln_v2_details(self, body: dict):
         return self.post_details_request(API_VULNERABILITY_V2, body)
@@ -2199,6 +2209,27 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get get_vuln_v2_component_uniquevalues "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+    
+    def get_vuln_v2_hosts(self, body: dict, expected_results: int = 0, scope: str = None, enrich_tickets=False):
+        params = {}
+        if scope:
+            params["scope"] = scope
+        if not enrich_tickets:
+            params["enrichTickets"] = "false"
+        return self.post_list_request(API_VULNERABILITY_V2_HOST, body, expected_results, params=params)
+    
+    
+    def get_vuln_v2_host_uniquevalues(self, body: dict):
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(API_VULNERABILITY_V2_HOST_UNIQUEVALUES, params=params, json=body, timeout=60)
+        Logger.logger.info(r.text)
+        return r.json()
+    
+    def get_vuln_v2_host_details(self, body: dict):
+        return self.post_details_request(API_VULNERABILITY_V2_HOST, body)
+    
+    def get_vuln_v2_host_scan(self, body: dict):
+        return self.post(API_VULNERABILITY_V2_HOST_SCAN, params={"customerGUID": self.selected_tenant_id}, json=body, timeout=60)
 
     def get_posture_resources_highlights(self, body: dict):
         r = self.post(API_POSTURE_RESOURCES + '/highlights',
@@ -2913,10 +2944,10 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
-    def get_cspm_link(self, region : str, external_id : bool = False):
+    def get_cspm_single_link(self, feature_name : List[str], region : str, external_id : bool = False ):
         url = API_ACCOUNTS_CSPM_LINK
         body = {
-            "featureNames": ["cspm"]    
+            "featureNames": feature_name    
         }
         r = self.post(url, params={"customerGUID": self.selected_tenant_id, "region": region, "withExternalID": external_id}, json=body)
         if not 200 <= r.status_code < 300:
@@ -2924,7 +2955,7 @@ class ControlPanelAPI(object):
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
+
     def get_cspm_members_org_link(self, region, org_guid , feature_names : List[str], generate_external_id : bool = True):
         url = API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK + "?region=" + region + "&orgGUID=" + org_guid +"&generateExternalID=" + str(generate_external_id).lower()
         body = {

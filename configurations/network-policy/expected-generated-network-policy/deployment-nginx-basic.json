@@ -31,13 +31,38 @@
       "namespace": "systest-ns-pjqm"
     },
     "spec": {
-      "egress": [],
+      "egress": [
+        {
+          "ports": [
+            {
+              "port": 53,
+              "protocol": "UDP"
+            }
+          ],
+          "to": [
+            {
+              "namespaceSelector": {
+                "matchLabels": {
+                  "kubernetes.io/metadata.name": "kube-system"
+                }
+              },
+              "podSelector": {
+                "matchLabels": {
+                  "k8s-app": "kube-dns"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "ingress": [],
       "podSelector": {
         "matchLabels": {
           "app": "nginx"
         }
       },
       "policyTypes": [
+        "Ingress",
         "Egress"
       ]
     }

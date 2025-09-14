@@ -72,12 +72,14 @@
           ]
         }
       ],
+      "ingress": [],
       "podSelector": {
         "matchLabels": {
           "app": "wikijs"
         }
       },
       "policyTypes": [
+        "Ingress",
         "Egress"
       ]
     }

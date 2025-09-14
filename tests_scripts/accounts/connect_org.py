@@ -1,10 +1,10 @@
 import os
 import time
 from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import Accounts ,FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import PROVIDER_AWS, CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME
+from tests_scripts.accounts.accounts import PROVIDER_AWS, CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME ,CDR_ALERT_ORG_ID_PATH
 from tests_scripts.accounts.accounts import CloudEntityTypes, ExclusionActions, UpdateCloudOrganizationMetadataRequest
 from tests_scripts.accounts.accounts import extract_parameters_from_url
+from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
 import random
 from urllib.parse import parse_qs, quote, urlparse
 from infrastructure import aws
@@ -100,8 +100,6 @@ class CloudOrganization(Accounts):
                                                 aws_access_key_id=aws_access_key_id,
                                                 aws_secret_access_key=aws_secret_access_key)
         Logger.logger.info(f"AwsManager initiated in region {stack_region}")
-
-        
 
         #compliance tests
         Logger.logger.info('connection Stage 0: Init AwsManager')
@@ -225,7 +223,6 @@ class CloudOrganization(Accounts):
 
         Logger.logger.info('connection Stage 12: try to connect single account vuln - blocked')
 
-
         if not self.skip_cadr_test_part:
             self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"
             self.cadr_account_stack_name = "systest-" + self.test_identifier_rand + "-cadr-single"
@@ -234,19 +231,18 @@ class CloudOrganization(Accounts):
             self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr-org"
             self.aws_user = "systest-" + self.test_identifier_rand + "-user-org"
 
-          
-            
             self.exclude_account_aws_manager = self.aws_manager.assume_role_in_account(EXCLUDE_ACCOUNT_ID)
 
+
             Logger.logger.info('Stage 2: Connect cadr new organization')
-            test_org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
-            Logger.logger.info(f"CADR organization created successfully with guid {test_org_guid}")                                                  
+            org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
+            Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")                                                  
             
             Logger.logger.info('Stage 3: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
-                                guid=test_org_guid, cloud_entity_type=CloudEntityTypes.ORGANIZATION, 
+                                guid=org_guid, cloud_entity_type=CloudEntityTypes.ORGANIZATION, 
                                 expected_status=FEATURE_STATUS_CONNECTED)
-            Logger.logger.info(f"CADR organization {test_org_guid} is connected successfully")
+            Logger.logger.info(f"CADR organization {org_guid} is connected successfully")
             
             Logger.logger.info('Stage 4: Validate alert with orgID is created')
             self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
@@ -254,28 +250,28 @@ class CloudOrganization(Accounts):
             self.aws_manager.create_user(self.aws_user)
             self.test_global_aws_users.append(self.aws_user)
             self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
-                                filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+                                filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                         "message": self.aws_user + "|like"},
                                 expect_incidents=True)
             
             Logger.logger.info('Stage 5: Exclude one account and validate it is excluded')
-            self.org_exclude_accounts_by_feature(test_org_guid, [CADR_FEATURE_NAME], ExclusionActions.EXCLUDE, [EXCLUDE_ACCOUNT_ID])
+            self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.EXCLUDE, [EXCLUDE_ACCOUNT_ID])
             aws_user_excluded = self.aws_user + "-excluded"
             self.exclude_account_aws_manager.create_user(aws_user_excluded)
             self.test_exclude_account_users.append(aws_user_excluded)
             time.sleep(420) # wait to make sure incident were not created
-            self.get_incidents(filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+            self.get_incidents(filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                         "message": aws_user_excluded + "|like"},
                                 expect_incidents=False)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is excluded successfully")
             
             Logger.logger.info('Stage 6: Include one account and validate it is included')
-            self.org_exclude_accounts_by_feature(test_org_guid, [CADR_FEATURE_NAME], ExclusionActions.INCLUDE, [EXCLUDE_ACCOUNT_ID])
+            self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.INCLUDE, [EXCLUDE_ACCOUNT_ID])
             aws_user_included = self.aws_user + "-included"
             self.exclude_account_aws_manager.create_user(aws_user_included)
             self.test_exclude_account_users.append(aws_user_included)
             self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
-                                filters={"cdrevent.eventdata.awscloudtrail.useridentity.orgid": ORG_ID,
+                                filters={CDR_ALERT_ORG_ID_PATH: ORG_ID,
                                         "message": aws_user_included + "|like"},
                                 expect_incidents=True)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is included successfully")
@@ -285,7 +281,7 @@ class CloudOrganization(Accounts):
             Logger.logger.info("connect CADR single account blocked successfully")
             
             Logger.logger.info('Stage 8: Delete cadr org and validate is deleted')
-            self.delete_and_validate_org_feature(test_org_guid, CADR_FEATURE_NAME)
+            self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
             self.aws_manager.delete_stack(self.cadr_org_stack_name)
             self.tested_stacks.remove(self.cadr_org_stack_name)
             Logger.logger.info("Delete cadr successfully")
@@ -301,9 +297,10 @@ class CloudOrganization(Accounts):
             Logger.logger.info(f"CADR account {account_guid} is connected successfully")
             
             Logger.logger.info('Stage 11: Connect org cadr - validate merging')
-            test_org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
+            org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
             self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
-            Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {test_org_guid} successfully")
+            Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
+            
 
         return self.cleanup()
 

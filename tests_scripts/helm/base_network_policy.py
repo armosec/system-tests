@@ -412,7 +412,7 @@ class BaseNetworkPolicy(BaseHelm):
                 verified_entries += 1
                 break
 
-        assert verified_entries == len(expected_network_policy_entries), f"in validate_network_policy_entry: verified_entries is not equal, actual: {verified_entries}, expected: {len(expected_network_policy_entries)}"
+        assert verified_entries == len(expected_network_policy_entries), f"in validate_network_policy_entry: verified_entries is not equal, actual: {actual_network_policy_entries}, expected: {expected_network_policy_entries}"
 
 
     def verify_network_policy_entries(self, expected_entries, actual_entries):

@@ -1224,6 +1224,20 @@
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io"
   },
+  "cloud_vulnscan_aws": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "vulnerability-scanner",
+      "cloud-account-vuln-scan"
+    ],
+    "description": "Checks cloud accounts vulnerability scanning",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io"
+  },
   "kdr_response_by_user": {
   "target": [
     "In cluster",
