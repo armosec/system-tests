@@ -30,65 +30,17 @@ from .cspm_test_models import (
     get_expected_rules_response,
     get_expected_resources_under_check_response,
     get_expected_resource_summaries_response,
-    get_expected_only_check_under_control_response
+    get_expected_only_check_under_control_response,
+    AwsStackResponse,
+    AwsMembersStackResponse,
+    AWSOrgCreateCloudOrganizationAdminRequest,
+    CreateOrUpdateCloudOrganizationResponse,
+    ConnectCloudOrganizationMembersRequest,
+    UpdateCloudOrganizationMetadataRequest,
+    SyncCloudOrganizationRequest
 )
 
 
-class AwsStackResponse(BaseModel):
-    """Response model for AWS stack operations."""
-    stackLink: str
-    externalID: str
-
-
-class AwsMembersStackResponse(BaseModel):
-    """Response model for AWS members stack operations."""
-    s3TemplatePath: str
-    externalID: str
-
-
-class AWSOrgCreateCloudOrganizationAdminRequest(BaseModel):
-    """Request model for creating AWS cloud organization with admin."""
-    orgGUID: Union[str, None] = None
-    stackRegion: str
-    adminRoleArn: str
-    adminRoleExternalID: Union[str, None] = None
-    skipScan: bool = False
-
-
-class CreateOrUpdateCloudOrganizationResponse(BaseModel):
-    """Response model for creating or updating cloud organization."""
-    guid: str
-
-
-class ConnectCloudOrganizationMembersRequest(BaseModel):
-    """Request model for connecting cloud organization members."""
-    orgGUID: str
-    features: List[str]
-    memberRoleArn: Union[str, None] = None
-    memberRoleExternalID: str
-    stackRegion: str
-    skipScan: bool = False
-
-
-class UpdateCloudOrganizationMetadataRequest(BaseModel):
-    """Request model for updating cloud organization metadata."""
-    orgGUID: str
-    newName: Union[str, None] = None
-    featureNames: List[str] = []
-    excludeAccounts: Union[List[str], None] = None
-    
-    def model_validate(self, data):
-        """Custom validation to match Go struct validation logic."""
-        # Validate that excludeAccounts and featureNames are set together
-        if (self.excludeAccounts is None) != (len(self.featureNames) == 0):
-            raise ValueError("excludeAccounts and featureNames must be set together")
-        return super().model_validate(data)
-
-
-class SyncCloudOrganizationRequest(BaseModel):
-    """Request model for syncing cloud organization."""
-    orgGUID: str
-    skipScan: bool = False
 
 
 SCAN_TIME_WINDOW = 2000
@@ -180,7 +132,7 @@ class Accounts(base_test.BaseTest):
         """Setup Jira configuration using the standalone function."""
         self.site, self.project, self.issueType, self.jiraCollaborationGUID = setup_jira_config(self.backend, site_name)
 
-    def get_cloud_account(self, cloud_account_guid):
+    def get_cloud_account_by_guid(self, cloud_account_guid):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
@@ -411,7 +363,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
         Logger.logger.info('Validate feature status Pending')
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
         
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
@@ -496,7 +448,7 @@ class Accounts(base_test.BaseTest):
             expected_feature_connected = True
 
         if cloud_entity_type == CloudEntityTypes.ACCOUNT:
-            res = self.get_cloud_account(guid)
+            res = self.get_cloud_account_by_guid(guid)
         else:
             res = self.get_cloud_org(guid)
             
@@ -832,7 +784,7 @@ class Accounts(base_test.BaseTest):
         """
         Delete and validate feature.
         """
-        account = self.get_cloud_account(guid)
+        account = self.get_cloud_account_by_guid(guid)
         assert account is not None, f"Cloud account with guid {guid} was not found"
         assert feature_name in account["features"], f"'{feature_name}' feature was not found in {account['features']}"
         
@@ -1388,7 +1340,7 @@ class Accounts(base_test.BaseTest):
         return None
 
     def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
 
     def validate_org_status(self, org_guid: str, expected_status: str):
@@ -1506,7 +1458,7 @@ class Accounts(base_test.BaseTest):
         self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
     
     def update_and_validate_member_external_id(self, aws_manager: aws.AwsManager, org_guid: str, account_guid: str ,feature_name: str):
-        cloud_account = self.get_cloud_account(account_guid)
+        cloud_account = self.get_cloud_account_by_guid(account_guid)
         feature = cloud_account["features"][feature_name]
         if feature_name == COMPLIANCE_FEATURE_NAME:
             role_arn = feature["config"]["crossAccountsRoleARN"]
@@ -1518,7 +1470,7 @@ class Accounts(base_test.BaseTest):
             assert update_result, f"Failed to update role {role_arn} external id {new_external_id}"
             time.sleep(10)
 
-            self.backend.cspm_scan_now(account_guid)
+            self.backend.cspm_scan_now(cloud_account_guid=account_guid, with_error=True)
             self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, expected_status=FEATURE_STATUS_DISCONNECTED)
             self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
             self.validate_org_feature_status(org_guid, feature_name, FEATURE_STATUS_PARTIALLY_CONNECTED)

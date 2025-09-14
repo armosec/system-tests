@@ -37,7 +37,7 @@ class CloudConnect(Accounts):
             expected_name (str): The expected name of the account
         """
         Logger.logger.info(f"Validating account name for GUID {cloud_account_guid}, expecting '{expected_name}'")
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["name"] == expected_name, f"Account name changed from {expected_name} to {account['name']}"
         Logger.logger.info(f"Account name for GUID {cloud_account_guid} is unchanged and matches '{expected_name}'")
 
@@ -123,7 +123,7 @@ class CloudConnect(Accounts):
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_first_cloud_account_name, self.cspm_external_id)
 
         # Store CSPM config for later validation
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         self.cspm_cloud_account_name = account["name"]
 
         cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
@@ -140,7 +140,7 @@ class CloudConnect(Accounts):
                                 feature_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info("the account has been scan successfully")
 
-            account = self.get_cloud_account(cloud_account_guid)
+            account = self.get_cloud_account_by_guid(cloud_account_guid)
             # Store CSPM config for later validation
             cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
 
@@ -214,7 +214,7 @@ class CloudConnect(Accounts):
         cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, log_location)
 
         # Store CADR config for later validation
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         cadr_feature = account["features"][CADR_FEATURE_NAME]
         self.cadr_cloud_account_name = account["name"]
 

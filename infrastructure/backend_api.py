@@ -17,7 +17,7 @@ from systest_utils.wlid import Wlid
 
 import json
 from infrastructure.api_login import *
-from tests_scripts.accounts.accounts import SyncCloudOrganizationRequest
+from tests_scripts.accounts.cspm_test_models import SyncCloudOrganizationRequest
 
 
 class NotExistingCustomer(Exception):
@@ -3471,12 +3471,14 @@ class ControlPanelAPI(object):
             payload=payload
         )
 
-    def cspm_scan_now(self, cloud_account_guid: str) -> requests.Response:
+    def cspm_scan_now(self, cloud_account_guid: str, with_error: bool = False) -> requests.Response:
         """
         Trigger an immediate CSPM scan for a specific cloud account.
 
         Args:
             cloud_account_guid (str): The GUID of the cloud account to scan
+            with_error (bool): If True, expect an error and return the error response.
+                              If False, expect success and raise exception on error.
 
         Returns:
             requests.Response: The response from the API
@@ -3491,18 +3493,30 @@ class ControlPanelAPI(object):
         }
 
         r = self.post(API_CLOUD_COMPLIANCE_SCAN_NOW, params=params, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error triggering CSPM scan. Request: scan now "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
+        
+        if with_error:
+            # We expect an error, so if status code is good (2xx), raise exception
+            if 200 <= r.status_code < 300:
+                raise Exception(
+                    "Expected an error but got success. Customer: \"%s\" (code: %d, message: %s)" % (
+                        self.customer, r.status_code, r.text))
+            return r
+        else:
+            # We expect success, so raise exception if status code is not 2xx
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error triggering CSPM scan. Customer: "%s" (code: %d, message: %s)' % (
+                        self.customer, r.status_code, r.text))
+            return r
 
-    def sync_org_now(self, sync_request: SyncCloudOrganizationRequest):
+    def sync_org_now(self, sync_request: SyncCloudOrganizationRequest, with_error: bool = False):
         """
         Sync organization now with the given request
         
         Args:
             sync_request: SyncCloudOrganizationRequest object containing orgGUID and skipScan
+            with_error (bool): If True, expect an error and return the error response.
+                              If False, expect success and raise exception on error.
         """
         url = API_ORGANIZATIONS_SYNC_NOW
         
@@ -3510,11 +3524,21 @@ class ControlPanelAPI(object):
         body = sync_request.model_dump()
         
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error syncing org. Request: sync org now "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
+        
+        if with_error:
+            # We expect an error, so if status code is good (2xx), raise exception
+            if 200 <= r.status_code < 300:
+                raise Exception(
+                    "Expected an error but got success. Customer: \"%s\" (code: %d, message: %s)" % (
+                        self.customer, r.status_code, r.text))
+            return r
+        else:
+            # We expect success, so raise exception if status code is not 2xx
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error syncing org. Request: sync org now "%s" (code: %d, message: %s)' % (
+                        self.customer, r.status_code, r.text))
+            return r
 
     def create_runtime_exception(self, policy_ids: List[str], resources: List[Dict], reason: str = "", advanced_scopes: Optional[List[Dict]] = None) -> dict:
         """
