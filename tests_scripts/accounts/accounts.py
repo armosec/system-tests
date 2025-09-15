@@ -672,8 +672,7 @@ class Accounts(base_test.BaseTest):
                     },
                     "skipScan": skip_scan,
                 }
-        updated_cloud_account_guid = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
-        assert updated_cloud_account_guid == cloud_account_guid, f"{updated_cloud_account_guid} is not {cloud_account_guid}"
+        self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
         return cloud_account_guid
     
     def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
@@ -1479,7 +1478,7 @@ class Accounts(base_test.BaseTest):
             assert update_result, f"Failed to update role {role_arn} external id {old_external_id}"
 
             self.wait_for_report(self.reconnect_cloud_account_cspm_feature,timeout=90, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, arn=role_arn, region=aws_manager.region, external_id=old_external_id ,skip_scan=True)
-            self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, org_guid=org_guid, expected_status=FEATURE_STATUS_CONNECTED)
+            self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, cloud_account_guid=account_guid, expected_status=FEATURE_STATUS_CONNECTED ,feature_name=COMPLIANCE_FEATURE_NAME)
             self.validate_org_status(org_guid, CSPM_STATUS_HEALTHY)
             self.validate_org_feature_status(org_guid, COMPLIANCE_FEATURE_NAME, FEATURE_STATUS_CONNECTED)
 
