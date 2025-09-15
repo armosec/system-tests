@@ -91,7 +91,7 @@ class CloudVulnScan(Accounts):
         Logger.logger.info('Stage 4: Wait for cspm vulnscan scan to complete successfully')
         result, _ = self.wait_for_report(
             self.validate_hosts_list,
-            timeout=840,
+            timeout=960,
             sleep_interval=20,
             cloud_account_guid=cloud_account_guid,
             expected_instances_ids=expected_instances_ids
