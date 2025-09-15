@@ -224,6 +224,81 @@ class AwsManager:
             Logger.logger.error(f"An error occurred: {e}")
             return None
 
+    def update_stack(self, stack_name: str, template_url: str = None, parameters: List[Dict[str, str]] = None, 
+                     capabilities: List[str] = None, wait_for_completion: bool = True):
+        """
+        Update a CloudFormation stack with a new template and/or parameters.
+        
+        Args:
+            stack_name: Name of the stack to update
+            template_url: URL of the new template (optional)
+            parameters: List of parameter dictionaries (optional)
+            capabilities: List of capabilities required (optional)
+            wait_for_completion: Whether to wait for update to complete (default: True)
+        
+        Returns:
+            Stack ID if successful, None otherwise
+        """
+        try:
+            # Prepare update parameters
+            update_params = {
+                'StackName': stack_name
+            }
+            
+            if template_url:
+                update_params['TemplateURL'] = template_url
+            
+            if parameters:
+                update_params['Parameters'] = parameters
+            
+            if capabilities:
+                update_params['Capabilities'] = capabilities
+            else:
+                # Default to IAM capabilities if not specified
+                update_params['Capabilities'] = ["CAPABILITY_NAMED_IAM"]
+            
+            # Update the stack
+            response = self.cloudformation.update_stack(**update_params)
+            stack_id = response["StackId"]
+            Logger.logger.info(f"Stack update initiated for: {stack_name}")
+            
+            if wait_for_completion:
+                self.wait_for_stack_update(stack_name)
+            
+            return stack_id
+
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'ValidationError' and 'No updates are to be performed' in str(e):
+                Logger.logger.info(f"No updates needed for stack {stack_name}")
+                return stack_id if 'stack_id' in locals() else None
+            else:
+                Logger.logger.error(f"An error occurred during stack update: {e}")
+                return None
+
+    def wait_for_stack_update(self, stack_name: str, delay=15, max_attempts=80):
+        """
+        Wait for a stack update to complete.
+        
+        Args:
+            stack_name: Name of the stack being updated
+            delay: Polling interval in seconds (default: 15)
+            max_attempts: Maximum number of attempts (default: 80)
+        """
+        try:
+            Logger.logger.info(f"Waiting for stack {stack_name} update to complete...")
+            waiter = self.cloudformation.get_waiter("stack_update_complete")
+            waiter.wait(StackName=stack_name,
+                        WaiterConfig={
+                            "Delay": delay,
+                            "MaxAttempts": max_attempts
+                        })
+            Logger.logger.info(f"Stack {stack_name} updated successfully.")
+
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while waiting for stack update: {e}")
+            raise e
+
     def delete_stack(self, stack_name: str):
         try:
             # Delete the stack

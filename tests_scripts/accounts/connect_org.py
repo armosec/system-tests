@@ -185,6 +185,9 @@ class CloudOrganization(Accounts):
         self.test_cloud_accounts_guids.append(single_cloud_account_guid)
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
+        Logger.logger.info('connection Stage 7: update stack add vuln feature')
+        self.add_cspm_feature_to_single_account(aws_manager=self.single_account_aws_manager, cloud_account_guid=single_cloud_account_guid, stack_name=cspm_stack_name, region=stack_region, feature_name=VULN_SCAN_FEATURE_NAME)
+
         Logger.logger.info('connection Stage 7: connect compliance to existing organization again(without scanning) - validate single is under the new organization')
         existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)       
         test_org_guid = existing_admin_response.guid
@@ -217,11 +220,10 @@ class CloudOrganization(Accounts):
         member_cloud_account_guid = res["response"][0]["guid"]
         self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 11: connect single vuln - success')
 
         Logger.logger.info('connection Stage 12: update the stackset - add vuln connection')
 
-        Logger.logger.info('connection Stage 12: try to connect single account vuln - blocked')
+        Logger.logger.info('connection Stage 13: try to connect single account vuln - blocked')
 
         if not self.skip_cadr_test_part:
             self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"

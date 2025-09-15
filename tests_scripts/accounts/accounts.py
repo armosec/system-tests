@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+from re import T
 import time
 import uuid
 from dateutil import parser
@@ -183,6 +184,132 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info('Edit name and validate cloud account with cspm')
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", arn)
         return cloud_account_guid
+    
+    def add_cspm_feature_to_single_account(self, aws_manager: aws.AwsManager, stack_name: str,
+                                         cloud_account_guid: str, feature_name: str, 
+                                         skip_scan: bool = True) -> str:
+        """
+        Add a CSPM feature to a single account by updating the existing stack with a new template
+        that supports both CSPM and VulnScan features, then creating a new cloud account with the feature.
+        
+        Args:
+            aws_manager: AWS manager instance
+            stack_name: Name of the existing stack to update
+            region: AWS region
+            cloud_account_guid: GUID of the existing cloud account (for comparison)
+            feature_name: Name of the feature to add (COMPLIANCE_FEATURE_NAME or VULN_SCAN_FEATURE_NAME)
+            cloud_account_name: Name of the cloud account (optional, will be fetched if not provided)
+            skip_scan: Whether to skip the initial scan
+            
+        Returns:
+            The new cloud account GUID
+        """
+        Logger.logger.info(f"Adding {feature_name} feature to account {cloud_account_guid}")
+        
+        # Step 1: Get existing account details for comparison
+        existing_account = self.get_cloud_account_by_guid(cloud_account_guid)
+        existing_arn = None
+        existing_external_id = None
+        existing_region = None
+        
+        # Extract existing configuration from the account
+        if COMPLIANCE_FEATURE_NAME in existing_account["features"]:
+            existing_config = existing_account["features"][COMPLIANCE_FEATURE_NAME]["config"]
+            existing_arn = existing_config["crossAccountsRoleARN"]
+            existing_external_id = existing_config.get("externalID", "")
+            existing_region = existing_config["stackRegion"]
+        elif VULN_SCAN_FEATURE_NAME in existing_account["features"]:
+            existing_config = existing_account["features"][VULN_SCAN_FEATURE_NAME]["config"]
+            existing_arn = existing_config["crossAccountsRoleARN"]
+            existing_external_id = existing_config.get("externalID", "")
+            existing_region = existing_config["stackRegion"]
+        
+        Logger.logger.info(f"Existing ARN: {existing_arn}")
+        Logger.logger.info(f"Existing External ID: {existing_external_id}")
+        Logger.logger.info(f"Existing Region: {existing_region}")
+        
+        # Step 2: Get template link with both CSPM and VulnScan features
+        Logger.logger.info("Getting template link with both CSPM and VulnScan features")
+        features = [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME]
+        data = self.backend.get_cspm_single_link(feature_name=features, region=existing_region, external_id="true")
+        
+        
+        # Extract template URL only (no parameters needed for template-only update)
+        _, template_url, _, _ = extract_parameters_from_url(data.stackLink)
+        
+        Logger.logger.info(f"Updating stack {stack_name} with new template {template_url} (template only)")
+        Logger.logger.info(f"Template supports features: {features}")
+        
+        # Step 3: Update the existing stack with the new template only (no parameters)
+        try:
+            stack_id = aws_manager.update_stack(
+                stack_name=stack_name,
+                template_url=template_url,
+                parameters=None,  # No parameters - template only update
+                wait_for_completion=True
+            )
+            Logger.logger.info(f"Stack {stack_name} updated successfully with stack ID: {stack_id}")
+        except Exception as e:
+            Logger.logger.error(f"Failed to update stack {stack_name}: {e}")
+            raise Exception(f"Failed to update stack {stack_name}: {e}")
+        
+        # Step 4: Get the updated role ARN from the stack
+        new_arn = aws_manager.get_stack_output_role_arn(stack_name)
+        if not new_arn:
+            raise Exception(f"Failed to get role ARN from updated stack {stack_name}")
+        
+        Logger.logger.info(f"New role ARN from updated stack: {new_arn}")
+        
+        # Step 5: Compare ARN, external_id, and region
+        if existing_arn and new_arn != existing_arn:
+            raise Exception(f"ARN mismatch: existing={existing_arn}, new={new_arn}")
+                   
+        # Step 6: Get cloud account name if not provided
+        if not cloud_account_name:
+            cloud_account_name = existing_account["name"]
+            Logger.logger.info(f"Using existing cloud account name: {cloud_account_name}")
+        
+        # Step 7: Create new cloud account with the feature based on feature type
+        Logger.logger.info(f"Creating new cloud account with {feature_name} feature: {cloud_account_name}")
+        
+        if feature_name == COMPLIANCE_FEATURE_NAME:
+            # Use CSPM configuration
+        
+            body = {
+                "name": cloud_account_name,
+                "cspmConfig": {
+                    "crossAccountsRoleARN": new_arn,
+                    "stackRegion": existing_region,
+                    "externalID": existing_external_id
+                },
+                "skipScan": skip_scan,
+            }
+        elif feature_name == VULN_SCAN_FEATURE_NAME:
+            # Use VulnScan configuration
+            body = {
+                "name": cloud_account_name,
+                "vulnerabilityScanConfig": {
+                    "crossAccountsRoleARN": new_arn,
+                    "stackRegion": existing_region,
+                    "externalID": existing_external_id
+                },
+            }
+        else:
+            raise Exception(f"Unsupported feature name: {feature_name}")
+        
+        # Create the new cloud account with the feature
+        try:
+            res = self.backend.create_cloud_account(body=body, provider=PROVIDER_AWS)
+            new_cloud_account_guid = res["guid"]
+            assert new_cloud_account_guid == cloud_account_guid, f"{new_cloud_account_guid} is not {cloud_account_guid}"
+            Logger.logger.info(f"Successfully updated cloud account with {feature_name} feature")            
+
+        except Exception as e:
+            Logger.logger.error(f"Failed to create cloud account with {feature_name} feature: {e}")
+            raise Exception(f"Failed to create cloud account with {feature_name} feature: {e}")
+        
+        self.validate_account_status(cloud_account_guid, CSPM_STATUS_HEALTHY)
+        return new_cloud_account_guid
     
     def connect_cspm_single_account_suppose_to_be_blocked(self, region:str, arn:str,external_id:str)->bool:
         Logger.logger.info(f"Creating and validating CSPM cloud account: need-to-block, ARN: {arn}, region: {region}, external_id: {external_id}")
@@ -1341,6 +1468,10 @@ class Accounts(base_test.BaseTest):
     def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
+
+    def validate_account_status(self, cloud_account_guid: str, expected_status: str):
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
 
     def validate_org_status(self, org_guid: str, expected_status: str):
         org = self.get_cloud_org(org_guid)
