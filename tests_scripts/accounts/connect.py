@@ -126,10 +126,30 @@ class CloudConnect(Accounts):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         self.cspm_cloud_account_name = account["name"]
 
-        cspm_feature = account["features"][CSPM_FEATURE_NAME]
-
+        Logger.logger.info('Stage 5: Connect cadr to existing account')
+        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, log_location)
+        Logger.logger.info("cadr has been connected successfully")
+        
+        Logger.logger.info('Stage 6: Validate cadr status is connected')
+        self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
+                             guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
+                             expected_status=FEATURE_STATUS_CONNECTED)
+        Logger.logger.info(f"CADR account {account_guid} is connected successfully")
+        
+        Logger.logger.info('Stage 7: Validate alert with accountID is created')
+        self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr"
+        self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
+        time.sleep(180) # wait for the sensor stack to be active
+        self.aws_user = "systest-" + self.test_identifier_rand + "-user"
+        self.aws_manager.create_user(self.aws_user)
+        self.test_global_aws_users.append(self.aws_user)
+        self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=700,
+                             filters={CDR_ALERT_ACCOUNT_ID_PATH: account_id,
+                                      "message": self.aws_user + "|like"},
+                             expect_incidents=True)
+        
         if not self.skip_apis_validation:
-            Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
+            Logger.logger.info('Stage 8: Wait for cspm scan to complete successfully')
             # wait for success
             self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance,
                                 timeout=1600,
@@ -147,39 +167,17 @@ class CloudConnect(Accounts):
             last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info("extracted last success scan id from created account")
 
-            Logger.logger.info('Stage 6: Validate all scan results')
+            Logger.logger.info('Stage 9: Validate all scan results')
             self.validate_scan_data(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
-            Logger.logger.info('Stage 7: Create Jira issue for resource')
+            Logger.logger.info('Stage 10: Create Jira issue for resource')
             self.create_jira_issue_for_cspm(last_success_scan_id)
             Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info('Stage 8: accept the risk')
+            Logger.logger.info('Stage 11: accept the risk')
             self.accept_cspm_risk(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
-           
-        Logger.logger.info('Stage 9: Connect cadr to existing account')
-        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, log_location)
-        Logger.logger.info("cadr has been connected successfully")
-        
-        Logger.logger.info('Stage 10: Validate cadr status is connected')
-        self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
-                             guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
-                             expected_status=FEATURE_STATUS_CONNECTED)
-        Logger.logger.info(f"CADR account {account_guid} is connected successfully")
-        
-        Logger.logger.info('Stage 11: Validate alert with accountID is created')
-        self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr"
-        self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
-        time.sleep(180) # wait for the sensor stack to be active
-        self.aws_user = "systest-" + self.test_identifier_rand + "-user"
-        self.aws_manager.create_user(self.aws_user)
-        self.test_global_aws_users.append(self.aws_user)
-        self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=700,
-                             filters={CDR_ALERT_ACCOUNT_ID_PATH: account_id,
-                                      "message": self.aws_user + "|like"},
-                             expect_incidents=True)
 
         Logger.logger.info('Stage 12: Validate both features exist and cspm unchanged')
         # Validate CSPM config remains unchanged
