@@ -1362,7 +1362,7 @@ class Accounts(base_test.BaseTest):
     def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str , test_arn: str):
         self.aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
-        self.backend.cspm_scan_now(cloud_account_guid)
+        self.backend.cspm_scan_now(cloud_account_guid, with_error=True)
         Logger.logger.info("Waiting for scan to complete with failed status")
         self.wait_for_report(self.validate_accounts_cloud_list_cspm,
                              timeout=120,
