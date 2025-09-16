@@ -46,6 +46,11 @@ VULNSCAN_FEATURE_NAME = "vulnScan"
 FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
 FEATURE_STATUS_PENDING = "Pending"
+
+CSPM_STATUS_HEALTHY = "healthy"
+CSPM_STATUS_DEGRADED = "degraded"
+CSPM_STATUS_DISCONNECTED = "disconnected"
+
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
@@ -102,7 +107,7 @@ class Accounts(base_test.BaseTest):
         """Setup Jira configuration using the standalone function."""
         self.site, self.project, self.issueType, self.jiraCollaborationGUID = setup_jira_config(self.backend, site_name)
 
-    def get_cloud_account(self, cloud_account_guid):
+    def get_cloud_account_by_guid(self, cloud_account_guid):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
         assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
@@ -147,7 +152,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
+        account = self.validate_accounts_cloud_list_cspm_compliance(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
@@ -192,7 +197,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
         Logger.logger.info('Validate feature status Pending')
-        account = self.get_cloud_account(cloud_account_guid)
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
         
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
@@ -238,7 +243,7 @@ class Accounts(base_test.BaseTest):
             expected_feature_connected = True
 
         if cloud_entity_type == CloudEntityTypes.ACCOUNT:
-            res = self.get_cloud_account(guid)
+            res = self.get_cloud_account_by_guid(guid)
         else:
             res = self.get_cloud_org(guid)
             
@@ -438,7 +443,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str):
+    def validate_accounts_cloud_list_cspm_compliance(self, cloud_account_guid:str, arn:str ,scan_status: str = None,feature_status :str = None):
         """
         Validate accounts cloud list.
         """
@@ -450,8 +455,10 @@ class Accounts(base_test.BaseTest):
         account = acount_list["response"][0]
         assert "features" in account, f"features not in {account}"
         assert CSPM_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][CSPM_FEATURE_NAME]['scanState']}"
-        assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][CSPM_FEATURE_NAME]['featureStatus']}"
+        if scan_status:
+            assert account["features"][CSPM_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][CSPM_FEATURE_NAME]['scanState']}"
+        if feature_status:
+            assert account["features"][CSPM_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][CSPM_FEATURE_NAME]['featureStatus']}"
         assert "config" in account["features"][CSPM_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
         assert "crossAccountsRoleARN" in account["features"][CSPM_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][CSPM_FEATURE_NAME]['config']}"
         assert account["features"][CSPM_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][CSPM_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
@@ -519,7 +526,7 @@ class Accounts(base_test.BaseTest):
         """
         Delete and validate feature.
         """
-        account = self.get_cloud_account(guid)
+        account = self.get_cloud_account_by_guid(guid)
         assert account is not None, f"Cloud account with guid {guid} was not found"
         assert feature_name in account["features"], f"'{feature_name}' feature was not found in {account['features']}"
         
@@ -980,24 +987,14 @@ class Accounts(base_test.BaseTest):
         self.aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
         self.backend.cspm_scan_now(cloud_account_guid, with_error=True)
-        Logger.logger.info("Waiting for scan to complete with failed status")
-        self.wait_for_report(self.validate_accounts_cloud_list_cspm,
-                             timeout=120,
-                             sleep_interval=10,
-                             cloud_account_guid=cloud_account_guid,
-                             arn=test_arn,
-                             scan_status=CSPM_SCAN_STATE_FAILED,
-                             feature_status = FEATURE_STATUS_DISCONNECTED)
-        Logger.logger.info("Scan failed, disconnecting account")
-
-        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
-        res = self.backend.get_cloud_accounts(body=body)
-        assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
-        account= res["response"][0]
-        assert account["features"][CSPM_FEATURE_NAME]["lastTimeScanFailed"] is not None, f"Expected lastTimeScanFail to be set, got: {account['features'][CSPM_FEATURE_NAME]['lastTimeScanFail']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanFailureReason"] is not None, f"Expected scanFailureReason to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanFailureReason']}"
-        assert account["features"][CSPM_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][CSPM_FEATURE_NAME]['scanState']}"
-
+        Logger.logger.info("Waiting for account to be disconnected")
+        self.wait_for_report(self.validate_account_feature_status,
+        timeout=10,sleep_interval=2,
+        cloud_account_guid=cloud_account_guid,
+        feature_name=CSPM_FEATURE_NAME,
+        expected_status=FEATURE_STATUS_DISCONNECTED)
+        Logger.logger.info("the account has been successfully disconnected")
+        self.validate_account__cspm_status(cloud_account_guid, CSPM_STATUS_DISCONNECTED)
         Logger.logger.info("the account has been successfully disconnected")
 
     def validate_features_unchanged(self, cloud_account_guid: str, feature_name: str, expected_feature: dict):
@@ -1081,6 +1078,15 @@ class Accounts(base_test.BaseTest):
             "accounts": accounts
         }
         self.backend.update_org_exclude_accounts(body)
+    
+    def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
+
+    def validate_account__cspm_status(self, cloud_account_guid: str, expected_status: str):
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
+
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
