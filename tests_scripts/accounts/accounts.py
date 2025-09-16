@@ -231,11 +231,11 @@ class Accounts(base_test.BaseTest):
         # Step 2: Get template link with both CSPM and VulnScan features
         Logger.logger.info("Getting template link with both CSPM and VulnScan features")
         features = [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME]
-        data = self.backend.get_cspm_single_link(feature_name=features, region=existing_region, external_id="true")
+        stack_response = self.get_and_validate_cspm_link_with_external_id(features=features, region=existing_region)
         
         
         # Extract template URL only (no parameters needed for template-only update)
-        _, template_url, _, _ = extract_parameters_from_url(data.stackLink)
+        _, template_url, _, _ = extract_parameters_from_url(stack_response.stackLink)
         
         Logger.logger.info(f"Updating stack {stack_name} with new template {template_url} (template only)")
         Logger.logger.info(f"Template supports features: {features}")
@@ -655,26 +655,18 @@ class Accounts(base_test.BaseTest):
         )
 
     
-    def get_and_validate_cspm_link_with_external_id(self, region: str) -> AwsStackResponse:
+    def get_and_validate_cspm_link_with_external_id(self, region: str ,features: List[str]) -> AwsStackResponse:
         """
         Get and validate cspm link.
         Returns AwsStackResponse with stackLink and externalID.
         """
-        data = self.backend.get_cspm_single_link(feature_name=[COMPLIANCE_FEATURE_NAME], region=region, external_id="true")
+        data = self.backend.get_cspm_single_link(feature_name=features, region=region, external_id="true")
 
         return AwsStackResponse(
             stackLink=data["stackLink"],
             externalID=data["externalID"]
         )
 
-    def get_and_validate_vulnscan_link_with_external_id(self, region) -> Tuple[str, str]:
-        """
-        Get and validate vulnscan link.
-        """
-        data = self.backend.get_cspm_single_link(feature_name=[VULN_SCAN_FEATURE_NAME], region=region, external_id="true")
-        stack_link = data["stackLink"]
-        external_id = data["externalID"]
-        return stack_link, external_id
 
     def get_and_validate_cadr_link(self, region, cloud_account_guid) -> str:
         """

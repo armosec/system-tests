@@ -88,7 +88,7 @@ class CloudConnect(Accounts):
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm"
-        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(stack_region)
+        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
         self.cspm_external_id = external_id       
         _, template_url, _, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")

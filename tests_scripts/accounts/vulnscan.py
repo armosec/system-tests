@@ -73,7 +73,7 @@ class CloudVulnScan(Accounts):
         
         Logger.logger.info('Stage 2: Create cspm vulnscan stack') 
         self.cspm_vulnscan_stack_name = "systest-" + self.test_identifer_rand + "-cspm-vulnscan"
-        stack_link, external_id = self.get_and_validate_vulnscan_link_with_external_id(stack_region) 
+        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(features=[VULN_SCAN_FEATURE_NAME], region=stack_region) 
         self.cspm_vulnscan_external_id = external_id       
         _, template_url, _, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack {self.cspm_vulnscan_stack_name} with template {template_url} and parameters {parameters}")
