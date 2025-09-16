@@ -42,40 +42,40 @@ class CloudOrganization(Accounts):
         """
         Agenda:
         1. Init AwsManager
-
+        2. Setup AWS managers and validate permissions
 
         //compliance tests
-        12. Create compliance org stack
-        13. Connect compliance to existing organization(without scanning,without window)
-        14. conenct single account (without scanning) - blocked
-        14. delete compliance feature and validate org and account deleted
-        15. conenct single account (without scanning)
-        16. connect compliance to existing organization again(without scanning) - validate single is under the new organization
-        17. exclude one account, valdiated it marked as excluded
-        18. update name and exclude list and validated the changes
+        3. Create compliance org stack
+        4. Try connect again to the same CSPM org
+        5. Connect compliance to existing organization(without scanning)
+        6. Connect single account (without scanning) - blocked
+        7. Delete compliance feature and validate org and account deleted
+        8. Connect single account (without scanning)
+        9. Update single account stack add vuln feature
+        10. Connect compliance to existing organization again(without scanning) - validate single is under the new organization
+        11. Exclude one account, validated it marked as excluded
+        12. Update name and exclude list and validated the changes
 
         //compliance connection error 
-        19.break aws admin role and sync the org - validate the error is shown and the org is not connected
-        20.fix aws admin role and sync the org - validate the org is connected
+        13. Break aws admin role and sync the org - validate the error is shown and the org is not connected
+        14. Fix aws admin role and sync the org - validate the org is connected
         
         //cspm more than 1 feature - combined
-        21. connect compliance and vulnScan
-        22. delete vulnScan and validate feature is delted(update stack as well)
-        23. update stack and add vuln feature and validate it is connected
-        24. update stackset and org add vuln feature and validate it is connected - validated all accounts have vuln as well udner the org
-
+        15. Update the stackset - add vuln connection
+        16. Exclude one account and validate it is excluded in both features
+        17. Delete vulnScan and validate feature is deleted
 
         //cadr tests
-        25. Connect cadr new organization
+        18. Connect cadr new organization
+        19. Validate cadr status is connected
+        20. Validate alert with orgID is created
+        21. Exclude one account and validate it is excluded
+        22. Include one account and validate it is included
+        23. Connect single cadr - validate block
+        24. Delete cadr org and validate is deleted
+        25. Connect single cadr
         26. Validate cadr status is connected
-        27. Validate alert with orgID is created
-        27. Exclude one account and validate it is excluded
-        28. Include one account and validate it is included
-        29. Connect single cadr - validate block
-        30. Delete cadr org and validate is deleted
-        31. Connect single cadr
-        32. Validate cadr status is connected
-        11. Connect org cadr - validate merging
+        27. Connect org cadr - validate merging
         """
 
         # return statics.SUCCESS, ""
@@ -95,37 +95,26 @@ class CloudOrganization(Accounts):
         if not aws_secret_access_key:
             raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
         
-
-        self.aws_manager = aws.AwsManager(stack_region, 
-                                                aws_access_key_id=aws_access_key_id,
-                                                aws_secret_access_key=aws_secret_access_key)
-        Logger.logger.info(f"AwsManager initiated in region {stack_region}")
-
-        #compliance tests
-        Logger.logger.info('connection Stage 0: Init AwsManager')
-        delagted_admin_account_id = "515497298766"
-        single_account_id = "617632154863"
-        member_account_id = "897545368193"
-        expected_account_ids = [single_account_id,delagted_admin_account_id,member_account_id]
+        # Initialize AWS manager for compliance tests
         compliance_test_region = "us-east-1"
-        initial_OU = "ou-fo1t-hbdw5p8g"
-        aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
-        aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
-        if not aws_access_key_id:
-            raise Exception("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS is not set")
-        if not aws_secret_access_key:
-            raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
-        
-
         self.aws_manager = aws.AwsManager(compliance_test_region, 
                                                 aws_access_key_id=aws_access_key_id,
                                                 aws_secret_access_key=aws_secret_access_key)
+        Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
+
+        #compliance tests
+        Logger.logger.info('Stage 2: Setup AWS managers and validate permissions')
+        delegated_admin_account_id = "515497298766"
+        single_account_id = "617632154863"
+        member_account_id = "897545368193"
+        expected_account_ids = [single_account_id, delegated_admin_account_id, member_account_id]
+        initial_OU = "ou-fo1t-hbdw5p8g"
         
         single_account_aws_manager = self.aws_manager.assume_role_in_account(single_account_id)
         self.single_account_aws_manager = single_account_aws_manager
         
         
-        delegated_admin_aws_manager = self.aws_manager.assume_role_in_account(delagted_admin_account_id)
+        delegated_admin_aws_manager = self.aws_manager.assume_role_in_account(delegated_admin_account_id)
         self.delegated_admin_aws_manager = delegated_admin_aws_manager
         if not self.delegated_admin_aws_manager.verify_trusted_access_enabled():
             raise Exception("Trusted access is not enabled for StackSets")
@@ -138,23 +127,23 @@ class CloudOrganization(Accounts):
         
         Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
 
-        Logger.logger.info('connection Stage 1: Connect CSPM org')
+        Logger.logger.info('Stage 3: Connect CSPM org')
         discovery_stack_name = "systest-" + self.test_identifier_rand + "-discovery-org"
         self.compliance_org_stack_name.append(discovery_stack_name)
         existing_admin_response = self.connect_cspm_new_organization(delegated_admin_aws_manager, discovery_stack_name, compliance_test_region)
         test_org_guid = existing_admin_response.guid
         self.test_cloud_orgs_guids.append(test_org_guid)
-        org = self.get_cloud_org(test_org_guid)
+        org = self.get_cloud_org_by_guid(test_org_guid)
         assert org is not None, f"org is not found"
         admin_role_arn = org["orgScanData"]["scanConfig"]["adminRoleArn"]
         admin_external_id = org["orgScanData"]["scanConfig"]["adminRoleExternalID"]
     
-        Logger.logger.info('connection Stage 1.1: try connect again to the same CSPM org')
+        Logger.logger.info('Stage 4: Try connect again to the same CSPM org')
         existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)
         second_org_guid = existing_admin_response.guid
         assert test_org_guid == second_org_guid, f"new_org_guid {test_org_guid} is not equal to second_org_guid {second_org_guid}"
 
-        Logger.logger.info('connection Stage 2: Connect compliance to existing organization(without scanning)')
+        Logger.logger.info('Stage 5: Connect compliance to existing organization(without scanning)')
         features = [COMPLIANCE_FEATURE_NAME]
         compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-compliance-org"
         member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
@@ -164,7 +153,7 @@ class CloudOrganization(Accounts):
         timeout=300, org_guid=test_org_guid, account_ids=expected_account_ids, 
         feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 4: connect single account (without scanning) - blocked')
+        Logger.logger.info('Stage 6: Connect single account (without scanning) - blocked')
         cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm-single"
         stack_response = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
         self.cspm_external_id = stack_response.externalID       
@@ -176,19 +165,19 @@ class CloudOrganization(Accounts):
         is_blocked = self.connect_cspm_single_account_suppose_to_be_blocked(stack_region, single_compliance_role_arn, self.cspm_external_id)
         assert is_blocked, "connect compliance single account blocked successfully"
 
-        Logger.logger.info('connection Stage 5: delete compliance feature and validate org and account deleted')
+        Logger.logger.info('Stage 7: Delete compliance feature and validate org and account deleted')
         self.delete_and_validate_org_feature(test_org_guid, COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 6: connect single account (without scanning)')
+        Logger.logger.info('Stage 8: Connect single account (without scanning)')
         single_compliance_account_name = "single-compliance-account"
         single_cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, single_compliance_role_arn, single_compliance_account_name, self.cspm_external_id,skip_scan=True)
         self.test_cloud_accounts_guids.append(single_cloud_account_guid)
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
-        Logger.logger.info('connection Stage 7: update single account stack add vuln feature')
+        Logger.logger.info('Stage 9: Update single account stack add vuln feature')
         self.add_cspm_feature_to_single_account(aws_manager=self.single_account_aws_manager, cloud_account_guid=single_cloud_account_guid, stack_name=cspm_stack_name, feature_name=VULN_SCAN_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 7: connect compliance to existing organization again(without scanning) - validate single is under the new organization and vuln feature no')
+        Logger.logger.info('Stage 10: Connect compliance to existing organization again(without scanning) - validate single is under the new organization and vuln feature no')
         existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)       
         test_org_guid = existing_admin_response.guid
         self.test_cloud_orgs_guids.append(test_org_guid)
@@ -199,21 +188,21 @@ class CloudOrganization(Accounts):
         self.validate_account_feature_managed_by_org(single_account_id, VULN_SCAN_FEATURE_NAME, None)
         self.validate_org_status(test_org_guid, CSPM_STATUS_HEALTHY)
         
-        Logger.logger.info('connection Stage 8: exclude one account, validated it marked as excluded')
+        Logger.logger.info('Stage 11: Exclude one account, validated it marked as excluded')
         self.org_exclude_accounts_by_feature(test_org_guid, [COMPLIANCE_FEATURE_NAME], ExclusionActions.EXCLUDE, [single_account_id])
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
 
-        Logger.logger.info('connection Stage 9: update name and exclude list and validated the changes')
+        Logger.logger.info('Stage 12: Update name and exclude list and validated the changes')
         new_name = f"updated-{test_org_guid}"
         metadata = UpdateCloudOrganizationMetadataRequest(orgGUID=test_org_guid, newName=new_name, featureNames=[COMPLIANCE_FEATURE_NAME], excludeAccounts=["111111111111","222222222222","333333333333"])
         self.update_org_metadata_and_validate(metadata)
         Logger.logger.info(f"Updated org {test_org_guid} name to {new_name} and we updated the exclude list - removing the account {single_account_id} from the list")
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
-        Logger.logger.info('connection Stage 10: update admin connection and validate org status is degraded')
+        Logger.logger.info('Stage 13: Update admin connection and validate org status is degraded')
         self.update_and_validate_admin_external_id(self.delegated_admin_aws_manager, test_org_guid, admin_role_arn)
 
-        Logger.logger.info('connection Stage 11: update member connection and validate org status is degraded')
+        Logger.logger.info('Stage 14: Update member connection and validate org status is degraded')
         member_account_manager = self.aws_manager.assume_role_in_account(member_account_id)
         body = self.build_get_cloud_aws_org_by_accountID_request(member_account_id)
         res = self.backend.get_cloud_accounts(body=body)
@@ -221,9 +210,39 @@ class CloudOrganization(Accounts):
         member_cloud_account_guid = res["response"][0]["guid"]
         self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 12: update the stackset - add vuln connection')
+        Logger.logger.info('Stage 15: Update the stackset - add vuln connection')
+        # Add vulnerability scan feature to the organization
+        self.add_cspm_feature_to_organization(
+            aws_manager=self.delegated_admin_aws_manager,
+            stackset_name=compliance_stack_set_name,
+            org_guid=test_org_guid,
+            new_feature_name=VULN_SCAN_FEATURE_NAME,
+            existing_accounts=expected_account_ids,
+            with_wait=False,
+        )
+        Logger.logger.info('Stage 16: Exclude one account and validate it is excluded in both features')
+        self.org_exclude_accounts_by_feature(test_org_guid, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME], ExclusionActions.EXCLUDE, [single_account_id])
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, VULN_SCAN_FEATURE_NAME, True)
 
-        Logger.logger.info('connection Stage 13: try to connect single account vuln - blocked')
+        Logger.logger.info('Stage 17: Delete vulnScan and validate feature is deleted')
+        self.delete_and_validate_org_feature(test_org_guid, VULN_SCAN_FEATURE_NAME)
+        #validate that org accounts have only compliance feature
+        self.wait_for_report(self.validate_org_accounts_have_all_features, sleep_interval=30, timeout=120, org_guid=test_org_guid, 
+        account_ids=expected_account_ids, expected_features=[COMPLIANCE_FEATURE_NAME])
+        
+        # Use the new comprehensive validation function
+        self.wait_for_report(self.validate_org_feature_deletion_complete, sleep_interval=30, timeout=120, 
+                           org_guid=test_org_guid, deleted_feature=VULN_SCAN_FEATURE_NAME, 
+                           expected_features=[COMPLIANCE_FEATURE_NAME], account_ids=expected_account_ids)
+        
+        self.delete_and_validate_org_feature(test_org_guid, COMPLIANCE_FEATURE_NAME)
+        
+        # Validate that no accounts are managed by this org anymore
+        self.wait_for_report(self.validate_no_accounts_managed_by_org, sleep_interval=30, timeout=120, 
+                           org_guid=test_org_guid, account_ids=expected_account_ids)
+        
+
 
         if not self.skip_cadr_test_part:
             self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"
@@ -236,17 +255,17 @@ class CloudOrganization(Accounts):
             self.exclude_account_aws_manager = self.aws_manager.assume_role_in_account(EXCLUDE_ACCOUNT_ID)
 
 
-            Logger.logger.info('Stage 2: Connect cadr new organization')
+            Logger.logger.info('Stage 18: Connect cadr new organization')
             org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
             Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")                                                  
             
-            Logger.logger.info('Stage 3: Validate cadr status is connected')
+            Logger.logger.info('Stage 19: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
                                 guid=org_guid, cloud_entity_type=CloudEntityTypes.ORGANIZATION, 
                                 expected_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info(f"CADR organization {org_guid} is connected successfully")
             
-            Logger.logger.info('Stage 4: Validate alert with orgID is created')
+            Logger.logger.info('Stage 20: Validate alert with orgID is created')
             self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
             time.sleep(180) # wait for the sensor stack to be active
             self.aws_manager.create_user(self.aws_user)
@@ -256,7 +275,7 @@ class CloudOrganization(Accounts):
                                         "message": self.aws_user + "|like"},
                                 expect_incidents=True)
             
-            Logger.logger.info('Stage 5: Exclude one account and validate it is excluded')
+            Logger.logger.info('Stage 21: Exclude one account and validate it is excluded')
             self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.EXCLUDE, [EXCLUDE_ACCOUNT_ID])
             aws_user_excluded = self.aws_user + "-excluded"
             self.exclude_account_aws_manager.create_user(aws_user_excluded)
@@ -267,7 +286,7 @@ class CloudOrganization(Accounts):
                                 expect_incidents=False)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is excluded successfully")
             
-            Logger.logger.info('Stage 6: Include one account and validate it is included')
+            Logger.logger.info('Stage 22: Include one account and validate it is included')
             self.update_org_exclude_accounts(org_guid, [CADR_FEATURE_NAME], ExclusionActions.INCLUDE, [EXCLUDE_ACCOUNT_ID])
             aws_user_included = self.aws_user + "-included"
             self.exclude_account_aws_manager.create_user(aws_user_included)
@@ -278,27 +297,27 @@ class CloudOrganization(Accounts):
                                 expect_incidents=True)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is included successfully")
             
-            Logger.logger.info('Stage 7: Connect single cadr - validate block')
+            Logger.logger.info('Stage 23: Connect single cadr - validate block')
             self.create_and_validate_cloud_account_with_cadr("test_block", self.account_log_location, PROVIDER_AWS, stack_region, expect_failure=True)
             Logger.logger.info("connect CADR single account blocked successfully")
             
-            Logger.logger.info('Stage 8: Delete cadr org and validate is deleted')
+            Logger.logger.info('Stage 24: Delete cadr org and validate is deleted')
             self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
             self.aws_manager.delete_stack(self.cadr_org_stack_name)
             self.tested_stacks.remove(self.cadr_org_stack_name)
             Logger.logger.info("Delete cadr successfully")
             
-            Logger.logger.info('Stage 9: Connect single cadr')
+            Logger.logger.info('Stage 25: Connect single cadr')
             account_guid = self.connect_cadr_new_account(stack_region, self.cadr_account_stack_name, "merge-account", self.account_log_location)
             Logger.logger.info(f"CADR account created successfully with guid {account_guid}")
             
-            Logger.logger.info('Stage 10: Validate cadr status is connected')
+            Logger.logger.info('Stage 26: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
                                 guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
                                 expected_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info(f"CADR account {account_guid} is connected successfully")
             
-            Logger.logger.info('Stage 11: Connect org cadr - validate merging')
+            Logger.logger.info('Stage 27: Connect org cadr - validate merging')
             org_guid = self.connect_cadr_new_organization(stack_region, self.cadr_org_stack_name, self.org_log_location)
             self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
             Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
@@ -339,7 +358,8 @@ class CloudOrganization(Accounts):
         
         for aws_user in self.test_exclude_account_users:
             Logger.logger.info(f"Deleting aws user: {aws_user}")
-            self.exclude_account_aws_manager.delete_user(aws_user)
+            if hasattr(self, 'exclude_account_aws_manager') and self.exclude_account_aws_manager:
+                self.exclude_account_aws_manager.delete_user(aws_user)
 
 
         return super().cleanup(**kwargs)
@@ -391,75 +411,3 @@ class CloudOrganization(Accounts):
         return success
 
 
- # Helper functions for testing StackSet functionality
-def create_armo_vulnscan_stackset(aws_manager: aws.AwsManager, stackset_name: str, external_id: str, 
-                                    organizational_unit_ids: List[str] = None, 
-                                    account_ids: List[str] = None,
-                                    regions: List[str] = None):
-    """
-    Create a StackSet for Armo VulnScan capabilities
-    
-    Args:
-        stackset_name: Name for the StackSet
-        external_id: External ID for secure cross-account role assumption
-        organizational_unit_ids: List of OU IDs to deploy to
-        account_ids: List of account IDs to deploy to
-        regions: List of regions to deploy to
-    
-    Returns:
-        StackSet ID if successful, None otherwise
-    """
-    # Template URL for Armo VulnScan template
-    template_url = "https://s3.amazonaws.com/armo-templates/armo-vulnscan-role.yaml"
-    
-    parameters = [
-        {
-            'ParameterKey': 'ExternalID',
-            'ParameterValue': external_id
-        }
-    ]
-    
-    return aws_manager.create_stackset(
-        template_url=template_url,
-        parameters=parameters,
-        stackset_name=stackset_name,
-        organizational_unit_ids=organizational_unit_ids,
-        account_ids=account_ids,
-        regions=regions
-    )
-
-def create_armo_combined_stackset(aws_manager: aws.AwsManager, stackset_name: str, external_id: str,
-                                    organizational_unit_ids: List[str] = None,
-                                    account_ids: List[str] = None,
-                                    regions: List[str] = None):
-    """
-    Create a StackSet for Armo Combined Compliance and VulnScan capabilities
-    
-    Args:
-        stackset_name: Name for the StackSet
-        external_id: External ID for secure cross-account role assumption
-        organizational_unit_ids: List of OU IDs to deploy to
-        account_ids: List of account IDs to deploy to
-        regions: List of regions to deploy to
-    
-    Returns:
-        StackSet ID if successful, None otherwise
-    """
-    # Template URL for Armo Combined template
-    template_url = "https://s3.amazonaws.com/armo-templates/armo-combined-role.yaml"
-    
-    parameters = [
-        {
-            'ParameterKey': 'ExternalID',
-            'ParameterValue': external_id
-        }
-    ]
-    
-    return aws_manager.create_stackset(
-        template_url=template_url,
-        parameters=parameters,
-        stackset_name=stackset_name,
-        organizational_unit_ids=organizational_unit_ids,
-        account_ids=account_ids,
-        regions=regions
-    )

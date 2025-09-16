@@ -64,24 +64,6 @@ class AwsManager:
                 Logger.logger.error(f"Failed to assume role: {e}")
                 raise Exception(f"Failed to assume role: {e}")
 
-    def list_organization_accounts(self):
-        """
-        List all accounts in the organization (requires organizations permissions)
-        """
-        try:
-            paginator = self.organizations.get_paginator('list_accounts')
-            accounts = []
-            for page in paginator.paginate():
-                accounts.extend(page['Accounts'])
-            return accounts
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'AccessDenied':
-                Logger.logger.error("Access denied to Organizations API. Make sure you're using management account credentials.")
-                raise Exception("Access denied to Organizations API. Make sure you're using management account credentials.")
-            else:
-                Logger.logger.error(f"Failed to list organization accounts: {e}")
-                raise Exception(f"Failed to list organization accounts: {e}")
-
     def get_account_id(self):
         try:
             account_id = self.sts.get_caller_identity()["Account"]
@@ -100,25 +82,6 @@ class AwsManager:
         except ClientError as e:
             Logger.logger.error(f"Failed to get caller identity: {e}")
             return None
-
-    def get_all_delegated_admins(self):
-        """
-        Get all delegated administrators for CloudFormation StackSets
-        """
-        try:
-            response = self.organizations.list_delegated_administrators(
-                ServicePrincipal='member.org.stacksets.cloudformation.amazonaws.com'
-            )
-            
-            admins = response.get('DelegatedAdministrators', [])
-            Logger.logger.info(f"Found {len(admins)} delegated admins for CloudFormation StackSets")
-            for admin in admins:
-                Logger.logger.info(f"  - Account: {admin['Id']}, Name: {admin.get('Name', 'N/A')}")
-            return admins
-            
-        except ClientError as e:
-            Logger.logger.error(f"Failed to list delegated admins: {e}")
-            return []
 
     def verify_trusted_access_enabled(self):
         """Verify trusted access is enabled for StackSets."""
@@ -469,7 +432,7 @@ class AwsManager:
                 'StackSetName': stackset_name,
                 'TemplateURL': template_url,
                 'Parameters': parameters,
-                'Capabilities': ['CAPABILITY_NAMED_IAM'],
+                'Capabilities': ['CAPABILITY_NAMED_IAM','CAPABILITY_IAM'],
                 'PermissionModel': 'SERVICE_MANAGED',
                 'CallAs': 'DELEGATED_ADMIN',  # CRITICAL: This was missing!
                 'AutoDeployment': {           # CRITICAL: This was missing!
@@ -588,29 +551,65 @@ class AwsManager:
                          regions: List[str] = None, operation_preferences: Dict = None):
         """
         Update a CloudFormation StackSet configuration.
+        According to AWS docs, when updating a StackSet with template changes, we need to specify
+        regions and deployment targets to update all stack instances.
         """
         try:
             update_params = {
                 'StackSetName': stackset_name,
-                'CallAs': 'DELEGATED_ADMIN'
+                'CallAs': 'DELEGATED_ADMIN',
+                'Capabilities': ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM']  # Required for IAM resources
             }
-            if template_url: update_params['TemplateURL'] = template_url
-            if parameters: update_params['Parameters'] = parameters
-            if regions: update_params['Regions'] = regions
-            if operation_preferences: update_params['OperationPreferences'] = operation_preferences
             
-            if organizational_unit_ids or account_ids:
-                deployment_targets = {}
-                if organizational_unit_ids: deployment_targets['OrganizationalUnitIds'] = organizational_unit_ids
-                if account_ids: deployment_targets['Accounts'] = account_ids
-                update_params['DeploymentTargets'] = deployment_targets
+            # Add template URL if provided
+            if template_url: 
+                update_params['TemplateURL'] = template_url
+                Logger.logger.info(f"Updating StackSet {stackset_name} with new template: {template_url}")
+            
+            # Add parameters if provided
+            if parameters: 
+                update_params['Parameters'] = parameters
+                Logger.logger.info(f"Updating StackSet {stackset_name} with parameters: {parameters}")
+            
+            # Add operation preferences if provided
+            if operation_preferences: 
+                update_params['OperationPreferences'] = operation_preferences
+            
+            # According to AWS docs, when template changes are made, we need to specify
+            # regions and deployment targets to update all stack instances
+            if template_url and (regions or organizational_unit_ids or account_ids):
+                if regions:
+                    update_params['Regions'] = regions
+                    Logger.logger.info(f"Updating StackSet {stackset_name} in regions: {regions}")
+                
+                # Add deployment targets if provided
+                if organizational_unit_ids or account_ids:
+                    deployment_targets = {}
+                    if organizational_unit_ids: 
+                        deployment_targets['OrganizationalUnitIds'] = organizational_unit_ids
+                        Logger.logger.info(f"Updating StackSet {stackset_name} for OUs: {organizational_unit_ids}")
+                    # Only add accounts if they are explicitly provided and OUs are not used
+                    # This prevents mixing OU and account targets which can cause issues
+                    if account_ids and not organizational_unit_ids: 
+                        deployment_targets['Accounts'] = account_ids
+                        Logger.logger.info(f"Updating StackSet {stackset_name} for accounts: {account_ids}")
+                    elif account_ids and organizational_unit_ids:
+                        Logger.logger.warning(f"Both OUs and accounts specified. Using only OUs: {organizational_unit_ids}")
+                    
+                    update_params['DeploymentTargets'] = deployment_targets
+            elif template_url:
+                # If template is updated but no regions/targets specified, update all instances
+                Logger.logger.info(f"Updating all stack instances for StackSet {stackset_name}")
 
+            Logger.logger.info(f"StackSet update parameters: {update_params}")
             response = self.cloudformation.update_stack_set(**update_params)
             
             Logger.logger.info(f"StackSet update initiated for: {stackset_name}")
             return response.get("OperationId")
         except ClientError as e:
             Logger.logger.error(f"An error occurred during StackSet update: {e}")
+            Logger.logger.error(f"Error code: {e.response['Error']['Code']}")
+            Logger.logger.error(f"Error message: {e.response['Error']['Message']}")
             return None
     
     def delete_stacksets_by_names(self, stackset_names: List[str]) -> bool:
@@ -876,7 +875,35 @@ class AwsManager:
                     Logger.logger.info(f"StackSet operation {operation_id} completed successfully.")
                     return status
                 elif status in ['FAILED', 'STOPPED']:
-                    Logger.logger.error(f"StackSet operation {operation_id} finished with status: {status} , status reason: {response['StackSetOperation']['StatusReason']}")
+                    status_reason = response['StackSetOperation'].get('StatusReason', 'No reason provided')
+                    Logger.logger.error(f"StackSet operation {operation_id} finished with status: {status}")
+                    Logger.logger.error(f"Status reason: {status_reason}")
+                    
+                    # Get detailed error information from stack instances
+                    try:
+                        instances_response = self.cloudformation.list_stack_instances(
+                            StackSetName=stackset_name,
+                            CallAs='DELEGATED_ADMIN'
+                        )
+                        
+                        failed_instances = []
+                        for instance in instances_response.get('Summaries', []):
+                            if instance.get('Status') in ['FAILED', 'OUTDATED']:
+                                failed_instances.append({
+                                    'Account': instance.get('Account'),
+                                    'Region': instance.get('Region'),
+                                    'Status': instance.get('Status'),
+                                    'StatusReason': instance.get('StatusReason', 'No reason provided')
+                                })
+                        
+                        if failed_instances:
+                            Logger.logger.error(f"Failed stack instances ({len(failed_instances)}):")
+                            for instance in failed_instances:
+                                Logger.logger.error(f"  Account: {instance['Account']}, Region: {instance['Region']}, Status: {instance['Status']}")
+                                Logger.logger.error(f"  Reason: {instance['StatusReason']}")
+                    except Exception as e:
+                        Logger.logger.error(f"Could not get detailed instance errors: {e}")
+                    
                     return status
                 
                 Logger.logger.info(f"StackSet operation status is '{status}'. Waiting... (attempt {attempt + 1}/{max_attempts})")
@@ -916,28 +943,6 @@ class AwsManager:
             Logger.logger.error(f"Error describing StackSet {stackset_name}: {e}")
             return None
     
-    def update_stackset_external_id(self, stackset_name: str, new_external_id: str):
-        """
-        Update the External ID parameter for an existing StackSet
-        
-        Args:
-            stackset_name: Name of the StackSet to update
-            new_external_id: New External ID value
-        
-        Returns:
-            Operation ID if successful, None otherwise
-        """
-        parameters = [
-            {
-                'ParameterKey': 'ExternalID',
-                'ParameterValue': new_external_id
-            }
-        ]
-        
-        return self.update_stackset(
-            stackset_name=stackset_name,
-            parameters=parameters
-        )
 
     def list_stack_instances(self, stackset_name: str):
         """
@@ -1056,6 +1061,42 @@ class AwsManager:
             Logger.logger.error(f"❌ Unexpected error getting StackSet info: {e}")
             return None
 
+    def get_stackset_parameters(self, stackset_name: str):
+        """
+        Get the current parameters from an existing StackSet.
+        
+        Args:
+            stackset_name: Name of the StackSet
+        
+        Returns:
+            List of parameter dictionaries if found, None otherwise
+        """
+        try:
+            Logger.logger.info(f"Getting parameters from StackSet: {stackset_name}")
+            
+            response = self.cloudformation.describe_stack_set(
+                StackSetName=stackset_name,
+                CallAs='DELEGATED_ADMIN'
+            )
+            
+            stackset = response.get('StackSet', {})
+            parameters = stackset.get('Parameters', [])
+            
+            Logger.logger.info(f"Retrieved {len(parameters)} parameters from StackSet {stackset_name}")
+            for param in parameters:
+                param_key = param.get('ParameterKey', 'Unknown')
+                param_value = param.get('ParameterValue', 'Unknown')
+                # Mask sensitive values
+                if 'password' in param_key.lower() or 'secret' in param_key.lower() or 'key' in param_key.lower():
+                    param_value = '***MASKED***'
+                Logger.logger.info(f"  - {param_key}: {param_value}")
+            
+            return parameters
+            
+        except ClientError as e:
+            Logger.logger.error(f"An error occurred while getting StackSet parameters: {e}")
+            return None
+
     def get_stackset_operations_summary(self, stackset_name: str, max_results: int = 5):
         """
         Get a summary of recent StackSet operations.
@@ -1098,7 +1139,186 @@ class AwsManager:
         except Exception as e:
             Logger.logger.error(f"❌ Unexpected error getting operations: {e}")
             return []
+
+    def get_stackset_instance_errors(self, stackset_name: str):
+        """
+        Get detailed error information from failed stack instances.
+        
+        Args:
+            stackset_name: Name of the StackSet
+        
+        Returns:
+            List of failed instance details
+        """
+        try:
+            Logger.logger.info(f"Getting error details for StackSet instances: {stackset_name}")
+            
+            instances_response = self.cloudformation.list_stack_instances(
+                StackSetName=stackset_name,
+                CallAs='DELEGATED_ADMIN'
+            )
+            
+            failed_instances = []
+            for instance in instances_response.get('Summaries', []):
+                if instance.get('Status') in ['FAILED', 'OUTDATED']:
+                    failed_instances.append({
+                        'Account': instance.get('Account'),
+                        'Region': instance.get('Region'),
+                        'Status': instance.get('Status'),
+                        'StatusReason': instance.get('StatusReason', 'No reason provided'),
+                        'StackInstanceStatus': instance.get('StackInstanceStatus', {}),
+                        'DriftStatus': instance.get('DriftStatus', 'UNKNOWN')
+                    })
+            
+            if failed_instances:
+                Logger.logger.error(f"Found {len(failed_instances)} failed/outdated instances:")
+                for instance in failed_instances:
+                    Logger.logger.error(f"  Account: {instance['Account']}, Region: {instance['Region']}")
+                    Logger.logger.error(f"  Status: {instance['Status']}, Drift: {instance['DriftStatus']}")
+                    Logger.logger.error(f"  Reason: {instance['StatusReason']}")
+                    
+                    # Get detailed stack events for this instance
+                    try:
+                        stack_name = f"{stackset_name}-{instance['Account']}-{instance['Region']}"
+                        events_response = self.cloudformation.describe_stack_events(StackName=stack_name)
+                        
+                        failed_events = []
+                        for event in events_response.get('StackEvents', []):
+                            if event.get('ResourceStatus') in ['CREATE_FAILED', 'UPDATE_FAILED', 'DELETE_FAILED']:
+                                failed_events.append({
+                                    'ResourceType': event.get('ResourceType'),
+                                    'ResourceStatus': event.get('ResourceStatus'),
+                                    'ResourceStatusReason': event.get('ResourceStatusReason', 'No reason provided'),
+                                    'Timestamp': event.get('Timestamp')
+                                })
+                        
+                        if failed_events:
+                            Logger.logger.error(f"  Failed stack events for {stack_name}:")
+                            for event in failed_events[:5]:  # Show first 5 failed events
+                                Logger.logger.error(f"    {event['ResourceType']}: {event['ResourceStatus']}")
+                                Logger.logger.error(f"    Reason: {event['ResourceStatusReason']}")
+                                Logger.logger.error(f"    Time: {event['Timestamp']}")
+                    except Exception as e:
+                        Logger.logger.warning(f"Could not get stack events for {stack_name}: {e}")
+            
+            return failed_instances
+            
+        except Exception as e:
+            Logger.logger.error(f"Error getting stack instance errors: {e}")
+            return []
+
+    def get_stackset_role_arn(self, stackset_name: str, role_output_key: str = "ArmoRoleArn"):
+        """
+        Get the role ARN from a StackSet by checking its stack instances.
+        
+        Args:
+            stackset_name: Name of the StackSet
+            role_output_key: The output key for the role ARN (default: "ArmoRoleArn")
+        
+        Returns:
+            Role ARN if found, None otherwise
+        """
+        try:
+            Logger.logger.info(f"🔍 Getting role ARN from StackSet: {stackset_name}")
+            
+            # Get stack instances
+            instances = self.list_stack_instances(stackset_name)
+            if not instances:
+                Logger.logger.warning(f"No stack instances found for StackSet: {stackset_name}")
+                return None
+            
+            # Get the first instance to check the role ARN
+            first_instance = instances[0]
+            account_id = first_instance['Account']
+            region = first_instance['Region']
+            
+            Logger.logger.info(f"Checking role ARN in account {account_id}, region {region}")
+            
+            # Get the stack details for this instance
+            stack_name = f"{stackset_name}-{account_id}-{region}"
+            
+            try:
+                response = self.cloudformation.describe_stacks(StackName=stack_name)
+                stacks = response.get("Stacks", [])
+                
+                if not stacks:
+                    Logger.logger.warning(f"No stacks found for instance: {stack_name}")
+                    return None
+                
+                outputs = stacks[0].get("Outputs", [])
+                for output in outputs:
+                    if output.get("OutputKey") == role_output_key:
+                        role_arn = output.get("OutputValue")
+                        Logger.logger.info(f"Found role ARN: {role_arn}")
+                        return role_arn
+                
+                Logger.logger.warning(f"Role ARN not found in stack outputs for: {stack_name}")
+                return None
+                
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ValidationError':
+                    Logger.logger.warning(f"Stack {stack_name} not found or not accessible")
+                    return None
+                else:
+                    Logger.logger.error(f"Error getting stack details: {e}")
+                    return None
+            
+        except Exception as e:
+            Logger.logger.error(f"Unexpected error getting role ARN from StackSet: {e}")
+            return None
     
+    def _get_role_trust_policy(self, role_arn: str) -> dict:
+        """
+        Helper function to get and parse the trust policy for a role.
+        
+        Args:
+            role_arn: The ARN of the IAM role
+        
+        Returns:
+            dict: The parsed trust policy, or None if error
+        """
+        try:
+            # Extract role name from ARN
+            split_role_name = role_arn.split('/')[-1]
+            Logger.logger.info(f"Extracted role name from ARN {role_arn}: {split_role_name}")
+            
+            response = self.iam.get_role(RoleName=split_role_name)
+            role = response['Role']
+            
+            import json
+            
+            # Handle both dict and URL-encoded string formats
+            assume_role_policy = role['AssumeRolePolicyDocument']
+            if isinstance(assume_role_policy, dict):
+                return assume_role_policy
+            else:
+                # If it's a string, it might be URL-encoded
+                import urllib.parse
+                current_policy = urllib.parse.unquote(assume_role_policy)
+                return json.loads(current_policy)
+            
+        except Exception as e:
+            Logger.logger.error(f"Error getting trust policy for role {role_arn}: {e}")
+            return None
+
+    def _find_external_id_in_policy(self, trust_policy: dict) -> str:
+        """
+        Helper function to find external ID in trust policy.
+        
+        Args:
+            trust_policy: The parsed trust policy
+        
+        Returns:
+            str: The external ID if found, None otherwise
+        """
+        for statement in trust_policy.get('Statement', []):
+            condition = statement.get('Condition', {})
+            string_equals = condition.get('StringEquals', {})
+            
+            if 'sts:ExternalId' in string_equals:
+                return string_equals['sts:ExternalId']
+        return None
+
     def update_role_external_id(self, role_arn: str, new_external_id: str) -> bool:
         """
         Update the External ID in an IAM role's trust policy directly.
@@ -1113,29 +1333,14 @@ class AwsManager:
         try:
             Logger.logger.info(f"Updating external ID for role {role_arn} to {new_external_id}")
             
-            # Extract role name from ARN
-            split_role_name = role_arn.split('/')[-1]
-            Logger.logger.info(f"Extracted role name: {split_role_name}")
-            
-            # Step 1: Get the current trust policy
-            response = self.iam.get_role(RoleName=split_role_name)
-            role = response['Role']
-            
-            import json
-            
-            # Handle both dict and URL-encoded string formats
-            assume_role_policy = role['AssumeRolePolicyDocument']
-            if isinstance(assume_role_policy, dict):
-                trust_policy = assume_role_policy
-            else:
-                # If it's a string, it might be URL-encoded
-                import urllib.parse
-                current_policy = urllib.parse.unquote(assume_role_policy)
-                trust_policy = json.loads(current_policy)
+            # Get the current trust policy
+            trust_policy = self._get_role_trust_policy(role_arn)
+            if not trust_policy:
+                return False
             
             Logger.logger.info(f"Current trust policy: {json.dumps(trust_policy, indent=2)}")
             
-            # Step 2: Update the external ID in the trust policy
+            # Update the external ID in the trust policy
             updated = False
             for statement in trust_policy.get('Statement', []):
                 condition = statement.get('Condition', {})
@@ -1152,7 +1357,8 @@ class AwsManager:
                 Logger.logger.warning(f"No sts:ExternalId found in trust policy for role {role_arn}")
                 return False
             
-            # Step 3: Update the role's trust policy
+            # Update the role's trust policy
+            split_role_name = role_arn.split('/')[-1]
             self.iam.update_assume_role_policy(
                 RoleName=split_role_name,
                 PolicyDocument=json.dumps(trust_policy)
@@ -1181,37 +1387,17 @@ class AwsManager:
             str: The external ID if found, None otherwise
         """
         try:
-            # Extract role name from ARN
-            split_role_name = role_arn.split('/')[-1]
-            Logger.logger.info(f"Extracted role name from ARN {role_arn}: {split_role_name}")
+            trust_policy = self._get_role_trust_policy(role_arn)
+            if not trust_policy:
+                return None
             
-            response = self.iam.get_role(RoleName=split_role_name)
-            role = response['Role']
-            
-            import json
-            
-            # Handle both dict and URL-encoded string formats
-            assume_role_policy = role['AssumeRolePolicyDocument']
-            if isinstance(assume_role_policy, dict):
-                trust_policy = assume_role_policy
+            external_id = self._find_external_id_in_policy(trust_policy)
+            if external_id:
+                Logger.logger.info(f"Found external ID for role {role_arn}: {external_id}")
+                return external_id
             else:
-                # If it's a string, it might be URL-encoded
-                import urllib.parse
-                current_policy = urllib.parse.unquote(assume_role_policy)
-                trust_policy = json.loads(current_policy)
-            
-            # Look for sts:ExternalId in the trust policy
-            for statement in trust_policy.get('Statement', []):
-                condition = statement.get('Condition', {})
-                string_equals = condition.get('StringEquals', {})
-                
-                if 'sts:ExternalId' in string_equals:
-                    external_id = string_equals['sts:ExternalId']
-                    Logger.logger.info(f"Found external ID for role {role_arn}: {external_id}")
-                    return external_id
-            
-            Logger.logger.warning(f"No external ID found in trust policy for role {role_arn}")
-            return None
+                Logger.logger.warning(f"No external ID found in trust policy for role {role_arn}")
+                return None
             
         except Exception as e:
             Logger.logger.error(f"Error getting external ID for role {role_arn}: {e}")

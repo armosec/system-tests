@@ -140,7 +140,7 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
     
-    def get_cloud_org(self, cloud_org_guid: str):
+    def get_cloud_org_by_guid(self, cloud_org_guid: str):
         body = self.build_get_cloud_entity_by_guid_request(cloud_org_guid)
         res = self.backend.get_cloud_orgs(body=body)
         assert "response" in res, f"failed to get cloud orgs, body used: {body}, res is {res}"
@@ -185,6 +185,161 @@ class Accounts(base_test.BaseTest):
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", arn)
         return cloud_account_guid
     
+    def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,
+                                        org_guid: str, new_feature_name: str ,with_wait: bool = True ,existing_accounts: List[str] = None) -> str:
+        """
+        Add a CSPM feature to an organization by updating the existing StackSet with a new template
+        that supports both CSPM and VulnScan features, then connecting the feature to the organization.
+        
+        Args:
+            aws_manager: AWS manager instance
+            stackset_name: Name of the existing StackSet to update
+            org_guid: GUID of the organization
+            new_feature_name: Name of the feature to add (COMPLIANCE_FEATURE_NAME or VULN_SCAN_FEATURE_NAME)
+            with_wait: Whether to wait for the update to complete
+            existing_accounts: List of existing accounts to validate
+        Returns:
+            The organization GUID
+        """
+        Logger.logger.info(f"Adding {new_feature_name} feature to organization {org_guid}")
+        
+        # Step 1: Get existing organization details and StackSet configuration
+        existing_org = self.get_cloud_org_by_guid(org_guid)
+        
+        # Extract existing configuration from whichever feature already exists
+        existing_cspm_config = None
+        existing_region = None
+        existing_member_role_arn = None
+        existing_member_external_id = None
+        existing_feature_name = None
+        
+        features = [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME]
+
+
+        # Find the first existing feature to get configuration from
+        existing_features = existing_org.get("features", {})
+        for feature_name in features:
+            if feature_name in existing_features:
+                existing_cspm_config = existing_features[feature_name]["config"]
+                existing_region = existing_cspm_config["stackRegion"]
+                existing_member_role_arn = existing_cspm_config["memberAccountRoleName"]
+                existing_member_external_id = existing_cspm_config["memberAccountExternalID"]
+                existing_feature_name = feature_name
+                break
+        
+        if not existing_cspm_config:
+            raise Exception(f"No existing CSPM features found in organization {org_guid}. Expected one of: {[COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME]}")
+        
+        Logger.logger.info(f"Using configuration from existing feature: {existing_feature_name}")
+        Logger.logger.info(f"Existing Region: {existing_region}")
+        Logger.logger.info(f"Existing Member Role ARN: {existing_member_role_arn}")
+        Logger.logger.info(f"Existing Member External ID: {existing_member_external_id}")
+        
+        # Step 2: Get StackSet configuration (regions, parameters, OUs, etc.)
+        stackset_info = aws_manager._get_stackset_deployment_info(stackset_name)
+        if not stackset_info:
+            raise Exception(f"Could not get StackSet deployment info for {stackset_name}")
+        
+        existing_regions = stackset_info.get('regions', [existing_region])
+        existing_ous = stackset_info.get('organizational_unit_ids', [])
+        existing_accounts = stackset_info.get('accounts', [])
+        
+        # Get existing parameters from the StackSet
+        existing_parameters = aws_manager.get_stackset_parameters(stackset_name)
+        if not existing_parameters:
+            raise Exception(f"Could not get existing parameters from StackSet {stackset_name}")
+        
+        Logger.logger.info(f"StackSet Regions: {existing_regions}")
+        Logger.logger.info(f"StackSet OUs: {existing_ous}")
+        Logger.logger.info(f"StackSet Accounts: {existing_accounts}")
+        Logger.logger.info(f"StackSet Existing Parameters: {existing_parameters}")
+        
+        # Step 3: Get template link with both CSPM and VulnScan features
+        Logger.logger.info("Getting template link with both CSPM and VulnScan features for organization")
+        aws_response = self.get_org_members_stack_link(region=existing_region, stack_name=stackset_name, features=features)
+        
+        # Extract template URL
+        template_url = aws_response.s3TemplatePath
+        
+        Logger.logger.info(f"Updating StackSet {stackset_name} with new template {template_url}")
+        Logger.logger.info(f"Template supports features: {features}")
+        
+        # Step 4: Update the existing StackSet using the new template
+        # According to AWS docs, we need to specify regions and deployment targets
+        try:
+            # Prepare update parameters based on existing StackSet configuration
+            update_params = {
+                'stackset_name': stackset_name,
+                'template_url': template_url,
+                'regions': existing_regions
+            }
+            
+            # Add deployment targets - only use OUs, not specific accounts
+            # This ensures new accounts added to the OU will automatically get the stack
+            if existing_ous:
+                update_params['organizational_unit_ids'] = existing_ous
+                Logger.logger.info(f"Using only OUs for deployment targets: {existing_ous}")
+            else:
+                Logger.logger.warning("No OUs found in StackSet configuration")
+            
+            update_params['parameters'] = existing_parameters
+            Logger.logger.info(f"StackSet update parameters: {len(existing_parameters)} parameters")
+            
+            # Update the StackSet with the new template
+            operation_id = aws_manager.update_stack_set(**update_params)
+            
+            if operation_id and with_wait:
+                Logger.logger.info(f"StackSet {stackset_name} update initiated with operation ID: {operation_id}")
+                
+                # Wait for the update to complete
+                final_status = aws_manager.wait_for_stackset_operation(stackset_name, operation_id)
+                
+                if final_status == 'SUCCEEDED':
+                    Logger.logger.info(f"StackSet {stackset_name} updated successfully")
+                else:
+                    # Get detailed error information
+                    aws_manager.get_stackset_instance_errors(stackset_name)
+                    raise Exception(f"StackSet update failed with status: {final_status}")
+            else:
+                raise Exception("Failed to initiate StackSet update")
+                
+        except Exception as e:
+            Logger.logger.error(f"Failed to update StackSet {stackset_name}: {e}")
+            raise
+        
+        # Step 5: Connect the new feature to the organization
+        Logger.logger.info(f"Connecting {new_feature_name} feature to organization {org_guid}")
+        
+        
+        # Connect ONLY the new feature to the organization
+        body = ConnectCloudOrganizationMembersRequest(
+            orgGUID=org_guid,
+            features=features,  # Only the new feature
+            memberRoleExternalID=existing_member_external_id,
+            stackRegion=existing_region,
+            memberRoleArn=existing_member_role_arn
+        ).model_dump()
+        
+        try:
+            res = self.backend.create_cloud_org_connect_members(body=body)
+            assert "guid" in res, f"guid not in {res}"
+            Logger.logger.info(f"Successfully connected {new_feature_name} feature to organization {org_guid}")
+        except Exception as e:
+            Logger.logger.error(f"Failed to connect {new_feature_name} feature to organization: {e}")
+            raise
+
+        # Validate that all accounts under the organization now have both features
+        self.wait_for_report(
+            self.validate_org_accounts_have_all_features,
+            sleep_interval=30,
+            timeout=120,
+            org_guid=org_guid,
+            account_ids=existing_accounts,
+            expected_features=features
+        )
+        
+        return org_guid
+
     def add_cspm_feature_to_single_account(self, aws_manager: aws.AwsManager, stack_name: str,
                                          cloud_account_guid: str, feature_name: str,
                                          skip_scan: bool = True) -> str:
@@ -419,7 +574,7 @@ class Accounts(base_test.BaseTest):
         if not self._test_delegated_admin_permissions(aws_manager):
             raise Exception("Delegated admin permission tests failed - cannot proceed with StackSet creation")
         
-        aws_response = self.get_org_memebers_stack_link(region=region, stack_name=stack_name, features=features)
+        aws_response = self.get_org_members_stack_link(region=region, stack_name=stack_name, features=features)
         external_id = aws_response.externalID
 
         generated_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
@@ -574,7 +729,7 @@ class Accounts(base_test.BaseTest):
         if cloud_entity_type == CloudEntityTypes.ACCOUNT:
             res = self.get_cloud_account_by_guid(guid)
         else:
-            res = self.get_cloud_org(guid)
+            res = self.get_cloud_org_by_guid(guid)
             
         assert res["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['features'][CADR_FEATURE_NAME]['featureStatus']}"
         if expected_status == FEATURE_STATUS_PENDING:
@@ -644,7 +799,7 @@ class Accounts(base_test.BaseTest):
             externalID=data.get("externalID", "")
         )
     
-    def get_org_memebers_stack_link(self, region: str, stack_name: str, features: List[str]) -> AwsMembersStackResponse:
+    def get_org_members_stack_link(self, region: str, stack_name: str, features: List[str]) -> AwsMembersStackResponse:
         data = self.backend.get_cspm_members_org_link(region, stack_name, features)
         return AwsMembersStackResponse(
             s3TemplatePath=data["s3TemplatePath"],
@@ -681,63 +836,66 @@ class Accounts(base_test.BaseTest):
         stack_link = self.backend.get_cadr_org_link(region=region, org_guid=org_guid)
         return stack_link
     
-    def create_and_validate_cloud_account_with_cspm_vulnscan(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", expect_failure:bool=False):
+    def create_and_validate_cloud_account_with_feature(self, cloud_account_name: str, provider: str, feature_config: dict, 
+                                                      skip_scan: bool = False, expect_failure: bool = False) -> str:
         """
-        Create and validate cloud account.
+        Create and validate cloud account with specified feature configuration.
+        
+        Args:
+            cloud_account_name: Name of the cloud account
+            provider: Cloud provider (e.g., PROVIDER_AWS)
+            feature_config: Dictionary containing feature configuration
+            skip_scan: Whether to skip initial scan (for CSPM features)
+            expect_failure: Whether to expect the creation to fail
+            
+        Returns:
+            Cloud account GUID if successful, None if failed
         """
-
         body = {
             "name": cloud_account_name,
+            **feature_config
+        }
+        
+        if skip_scan and any(key in feature_config for key in ["cspmConfig", "vulnerabilityScanConfig"]):
+            body["skipScan"] = skip_scan
+
+        return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
+
+    def create_and_validate_cloud_account_with_cspm_vulnscan(self, cloud_account_name: str, arn: str, provider: str, 
+                                                           region: str, external_id: str = "", expect_failure: bool = False):
+        """Create and validate cloud account with vulnerability scan feature."""
+        feature_config = {
             "vulnerabilityScanConfig": {
                 "crossAccountsRoleARN": arn,
                 "stackRegion": region,
-                "externalID" :external_id  
-            },
-        }
-
-        return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)  
-    
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name:str, arn:str, provider:str, region:str, external_id:str ="", skip_scan: bool = False, expect_failure:bool=False):
-        """
-        Create and validate cloud account.
-        """
-
-        if external_id:
-            body = {
-                    "name": cloud_account_name,
-                    "cspmConfig": {
-                        "crossAccountsRoleARN": arn,
-                        "stackRegion": region,
-                        "externalID" :external_id  
-                    },
-                    "skipScan": skip_scan,
-                }
-        else:
-            body = {
-                    "name": cloud_account_name,
-                    "cspmConfig": {
-                        "crossAccountsRoleARN": arn,
-                        "stackRegion": region,
-                    },
-                    "skipScan": skip_scan,
-                }
-
-        return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
-            
-    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, provider: str, region: str, expect_failure: bool=False) -> str:
-        """
-        Create and validate cloud account.
-        """
-
-        body = {
-                "name": cloud_account_name,
-                "cadrConfig": {
-                    "trailLogLocation": trail_log_location,
-                    "stackRegion": region,
-                },
+                "externalID": external_id  
             }
-        
-        return self.create_and_validate_cloud_account(body=body, provider=provider, expect_failure=expect_failure)
+        }
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, expect_failure=expect_failure)
+    
+    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name: str, arn: str, provider: str, 
+                                                   region: str, external_id: str = "", skip_scan: bool = False, expect_failure: bool = False):
+        """Create and validate cloud account with CSPM feature."""
+        cspm_config = {
+            "crossAccountsRoleARN": arn,
+            "stackRegion": region,
+        }
+        if external_id:
+            cspm_config["externalID"] = external_id
+            
+        feature_config = {"cspmConfig": cspm_config}
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
+            
+    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
+                                                   provider: str, region: str, expect_failure: bool = False) -> str:
+        """Create and validate cloud account with CADR feature."""
+        feature_config = {
+            "cadrConfig": {
+                "trailLogLocation": trail_log_location,
+                "stackRegion": region,
+            }
+        }
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, expect_failure=expect_failure)
     
     def create_and_validate_cloud_account(self, body, provider, expect_failure:bool=False)->str:
         """
@@ -915,7 +1073,7 @@ class Accounts(base_test.BaseTest):
         """
         Delete and validate org feature.
         """
-        org = self.get_cloud_org(guid)
+        org = self.get_cloud_org_by_guid(guid)
         assert org is not None, f"Cloud org with guid {guid} was not found"
         assert feature_name in org["features"], f"'{feature_name}' feature was not found in {org['features']}"
         
@@ -1454,15 +1612,38 @@ class Accounts(base_test.BaseTest):
         assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
         return None
 
+    def validate_entity_status(self, entity_guid: str, status_path: str, expected_status: str, entity_type: str = "account"):
+        """
+        Generic function to validate status of accounts or organizations.
+        
+        Args:
+            entity_guid: GUID of the account or organization
+            status_path: JSON path to the status field (e.g., "cspmSpecificData.cspmStatus")
+            expected_status: Expected status value
+            entity_type: Type of entity ("account" or "org")
+        """
+        if entity_type == "account":
+            entity = self.get_cloud_account_by_guid(entity_guid)
+        else:
+            entity = self.get_cloud_org_by_guid(entity_guid)
+        
+        # Navigate through the status path
+        current = entity
+        for key in status_path.split('.'):
+            current = current[key]
+        
+        assert current == expected_status, f"Expected status: {expected_status}, got: {current}"
+
     def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
+        """Validate account feature status."""
+        self.validate_entity_status(cloud_account_guid, f"features.{feature_name}.featureStatus", expected_status, "account")
 
     def validate_account_status(self, cloud_account_guid: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
+        """Validate account CSPM status."""
+        self.validate_entity_status(cloud_account_guid, "cspmSpecificData.cspmStatus", expected_status, "account")
    
     def validate_account_feature_managed_by_org(self, account_id: str, feature_name: str, org_guid: str = None):
+        """Validate if account feature is managed by organization."""
         body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
         res = self.backend.get_cloud_accounts(body=body)
             
@@ -1476,16 +1657,16 @@ class Accounts(base_test.BaseTest):
             assert "managedByOrg" not in account["features"][feature_name] or account["features"][feature_name]["managedByOrg"] is None, f"Expected managedByOrg field to not exist, but it exists with value: {account['features'][feature_name].get('managedByOrg')}"
     
     def validate_org_status(self, org_guid: str, expected_status: str):
-        org = self.get_cloud_org(org_guid)
-        assert org["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['cspmSpecificData']['cspmStatus']}"
+        """Validate organization CSPM status."""
+        self.validate_entity_status(org_guid, "cspmSpecificData.cspmStatus", expected_status, "org")
 
     def validate_org_feature_status(self, org_guid: str, feature_name: str, expected_status: str):
-        org = self.get_cloud_org(org_guid)
-        assert org["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['features'][feature_name]['featureStatus']}"
+        """Validate organization feature status."""
+        self.validate_entity_status(org_guid, f"features.{feature_name}.featureStatus", expected_status, "org")
 
     def validate_admin_status(self, org_guid: str, expected_status: str):
-        org = self.get_cloud_org(org_guid)
-        assert org["orgScanData"]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['orgScanData']['featureStatus']}"
+        """Validate organization admin status."""
+        self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
 
     def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
         missing_accounts = []
@@ -1509,6 +1690,176 @@ class Accounts(base_test.BaseTest):
         # Assert after collecting all results
         assert len(missing_accounts) == 0, f"Missing accounts: {missing_accounts}"
         assert len(unmanaged_accounts) == 0, f"Unmanaged accounts: {unmanaged_accounts}"
+
+    def validate_org_accounts_have_all_features(self, org_guid: str, account_ids: List[str], expected_features: List[str]):
+        """
+        Validate that all accounts under the organization have all expected features.
+        
+        Args:
+            org_guid: GUID of the organization
+            account_ids: List of account IDs to validate
+            expected_features: List of feature names that should be present
+        """
+        Logger.logger.info(f"Validating that all accounts under org {org_guid} have features: {expected_features}")
+        
+        missing_accounts = []
+        accounts_missing_features = []
+        accounts_not_managed_by_org = []
+        
+        # Collect all results first
+        for account_id in account_ids:
+            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if len(res["response"]) == 0:
+                missing_accounts.append(account_id)
+                continue
+                
+            account = res["response"][0]
+            account_features = account.get("features", {})
+            
+            # Check if account has all expected features
+            missing_features = []
+            for feature_name in expected_features:
+                if feature_name not in account_features:
+                    missing_features.append(feature_name)
+                else:
+                    # Check if the feature is managed by the organization
+                    feature_data = account_features[feature_name]
+                    managed_by_org = feature_data.get("managedByOrg")
+                    if managed_by_org != org_guid:
+                        accounts_not_managed_by_org.append(f"{account_id}:{feature_name}")
+            
+            if missing_features:
+                accounts_missing_features.append(f"{account_id}:{missing_features}")
+        
+        # Assert after collecting all results
+        assert len(missing_accounts) == 0, f"Missing accounts: {missing_accounts}"
+        assert len(accounts_missing_features) == 0, f"Accounts missing features: {accounts_missing_features}"
+        assert len(accounts_not_managed_by_org) == 0, f"Accounts not managed by org: {accounts_not_managed_by_org}"
+        
+        Logger.logger.info(f"✅ All {len(account_ids)} accounts under org {org_guid} have all expected features: {expected_features}")
+
+    def validate_org_feature_deletion_complete(self, org_guid: str, deleted_feature: str, expected_features: List[str], expected_account_ids: List[str]):
+        """
+        Comprehensive validation that an organization feature deletion worked correctly.
+        Validates that:
+        1. The deleted feature is completely removed from all accounts
+        2. All accounts have only the expected features
+        3. All features are managed by the same organization
+        4. No accounts are missing or have unexpected features
+        
+        Args:
+            org_guid: GUID of the organization
+            deleted_feature: Name of the feature that was deleted
+            expected_features: List of feature names that should remain
+            account_ids: List of account IDs to validate
+        """
+        Logger.logger.info(f"Validating complete feature deletion for org {org_guid}: deleted '{deleted_feature}', expected features: {expected_features}")
+        
+        missing_accounts = []
+        accounts_with_deleted_feature = []
+        accounts_missing_expected_features = []
+        accounts_with_unexpected_features = []
+        accounts_not_managed_by_org = []
+        
+        # Collect all validation results first
+        for account_id in expected_account_ids:
+            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if len(res["response"]) == 0:
+                missing_accounts.append(account_id)
+                continue
+                
+            account = res["response"][0]
+            account_features = account.get("features", {})
+            
+            # Check if deleted feature still exists (should not)
+            if deleted_feature in account_features:
+                accounts_with_deleted_feature.append(account_id)
+            
+            # Check for unexpected features (features not in expected list)
+            unexpected_features = []
+            for feature_name in account_features.keys():
+                if feature_name not in expected_features:
+                    unexpected_features.append(feature_name)
+            
+            if unexpected_features:
+                accounts_with_unexpected_features.append(f"{account_id}:{unexpected_features}")
+            
+            # Check if account has all expected features and they're managed by the org
+            missing_features = []
+            for feature_name in expected_features:
+                if feature_name not in account_features:
+                    missing_features.append(feature_name)
+                else:
+                    # Check if the feature is managed by the organization
+                    feature_data = account_features[feature_name]
+                    managed_by_org = feature_data.get("managedByOrg")
+                    if managed_by_org != org_guid:
+                        accounts_not_managed_by_org.append(f"{account_id}:{feature_name}")
+            
+            if missing_features:
+                accounts_missing_expected_features.append(f"{account_id}:{missing_features}")
+        
+        # Assert after collecting all results
+        assert len(missing_accounts) == 0, f"Missing accounts: {missing_accounts}"
+        assert len(accounts_with_deleted_feature) == 0, f"Accounts still have deleted feature '{deleted_feature}': {accounts_with_deleted_feature}"
+        assert len(accounts_missing_expected_features) == 0, f"Accounts missing expected features: {accounts_missing_expected_features}"
+        assert len(accounts_with_unexpected_features) == 0, f"Accounts have unexpected features: {accounts_with_unexpected_features}"
+        assert len(accounts_not_managed_by_org) == 0, f"Accounts not managed by org: {accounts_not_managed_by_org}"
+        
+        Logger.logger.info(f"✅ Feature deletion validation complete for org {org_guid}:")
+        Logger.logger.info(f"   - Deleted feature '{deleted_feature}' successfully removed from all accounts")
+        Logger.logger.info(f"   - All {len(expected_account_ids)} accounts have only expected features: {expected_features}")
+        Logger.logger.info(f"   - All features are managed by the same organization")
+
+    def validate_no_accounts_managed_by_org(self, org_guid: str, expected_account_ids: List[str]):
+        """
+        Validates that no accounts are managed by the specified organization anymore.
+        This is useful after deleting all features from an organization to ensure
+        complete disconnection.
+        
+        Args:
+            org_guid: GUID of the organization
+            account_ids: List of account IDs to check
+        """
+        Logger.logger.info(f"Validating that no accounts are managed by org {org_guid} anymore")
+        
+        accounts_still_managed = []
+        accounts_with_features = []
+        
+        # Check each account to ensure no features are managed by the org
+        for account_id in expected_account_ids:
+            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if len(res["response"]) == 0:
+                # Account not found - this is expected if it was completely removed
+                continue
+                
+            account = res["response"][0]
+            account_features = account.get("features", {})
+            
+            # Check if any features are still managed by this org
+            for feature_name, feature_data in account_features.items():
+                managed_by_org = feature_data.get("managedByOrg")
+                if managed_by_org == org_guid:
+                    accounts_still_managed.append(f"{account_id}:{feature_name}")
+            
+            # Also track accounts that still have any features (for debugging)
+            if account_features:
+                accounts_with_features.append(f"{account_id}:{list(account_features.keys())}")
+        
+        # Assert that no accounts are still managed by the org
+        assert len(accounts_still_managed) == 0, f"Accounts still managed by org {org_guid}: {accounts_still_managed}"
+        
+        Logger.logger.info(f"✅ No accounts are managed by org {org_guid} anymore")
+        if accounts_with_features:
+            Logger.logger.info(f"   - Found {len(accounts_with_features)} accounts with features, but none managed by org {org_guid}")
+        else:
+            Logger.logger.info(f"   - All {len(expected_account_ids)} accounts have been completely disconnected")
 
     def validate_account_feature_is_excluded(self, cloud_account_guid: str, feature_name: str, is_excluded: bool):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
@@ -1554,7 +1905,7 @@ class Accounts(base_test.BaseTest):
         """Update cloud organization metadata using the proper request model."""
         body = metadata.model_dump()
         self.backend.update_org_metadata(body)
-        org = self.get_cloud_org(metadata.orgGUID)
+        org = self.get_cloud_org_by_guid(metadata.orgGUID)
         if metadata.newName is not None:
             assert org["name"] == metadata.newName, f"Expected name: {metadata.newName}, got: {org['name']}"
         if metadata.excludeAccounts is not None:
