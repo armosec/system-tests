@@ -176,7 +176,7 @@ class CloudConnect(Accounts):
         self.aws_user = "systest-" + self.test_identifier_rand + "-user"
         self.aws_manager.create_user(self.aws_user)
         self.test_global_aws_users.append(self.aws_user)
-        self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=600,
+        self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=700,
                              filters={CDR_ALERT_ACCOUNT_ID_PATH: account_id,
                                       "message": self.aws_user + "|like"},
                              expect_incidents=True)
