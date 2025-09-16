@@ -147,9 +147,9 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
-    def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str:
-        generted_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
-        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generted_role_name})
+    def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str :
+        generated_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
         return test_arn
@@ -186,7 +186,7 @@ class Accounts(base_test.BaseTest):
         return cloud_account_guid
     
     def add_cspm_feature_to_single_account(self, aws_manager: aws.AwsManager, stack_name: str,
-                                         cloud_account_guid: str, feature_name: str, 
+                                         cloud_account_guid: str, feature_name: str,
                                          skip_scan: bool = True) -> str:
         """
         Add a CSPM feature to a single account by updating the existing stack with a new template
@@ -240,18 +240,22 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"Updating stack {stack_name} with new template {template_url} (template only)")
         Logger.logger.info(f"Template supports features: {features}")
         
-        # Step 3: Update the existing stack with the new template only (no parameters)
+        # Step 3: Update the existing stack using the new CloudFormationManager
         try:
-            stack_id = aws_manager.update_stack(
+            # The new function is called here.
+            # We explicitly pass capabilities, as security templates almost always create IAM roles.
+            # 'use_previous_parameters' is true by default, achieving the "template only" update.
+            aws_manager.update_stack(
                 stack_name=stack_name,
                 template_url=template_url,
-                parameters=None,  # No parameters - template only update
+                capabilities=["CAPABILITY_IAM","CAPABILITY_NAMED_IAM"],  # Acknowledge IAM resource creation
                 wait_for_completion=True
             )
-            Logger.logger.info(f"Stack {stack_name} updated successfully with stack ID: {stack_id}")
+            # The new update_stack doesn't return an ID, so the log message is simplified.
+            Logger.logger.info(f"Stack {stack_name} updated successfully.")
         except Exception as e:
             Logger.logger.error(f"Failed to update stack {stack_name}: {e}")
-            raise Exception(f"Failed to update stack {stack_name}: {e}")
+            raise
         
         # Step 4: Get the updated role ARN from the stack
         new_arn = aws_manager.get_stack_output_role_arn(stack_name)
@@ -263,20 +267,14 @@ class Accounts(base_test.BaseTest):
         # Step 5: Compare ARN, external_id, and region
         if existing_arn and new_arn != existing_arn:
             raise Exception(f"ARN mismatch: existing={existing_arn}, new={new_arn}")
-                   
-        # Step 6: Get cloud account name if not provided
-        if not cloud_account_name:
-            cloud_account_name = existing_account["name"]
-            Logger.logger.info(f"Using existing cloud account name: {cloud_account_name}")
         
         # Step 7: Create new cloud account with the feature based on feature type
-        Logger.logger.info(f"Creating new cloud account with {feature_name} feature: {cloud_account_name}")
-        
+        Logger.logger.info(f"updating {feature_name} feature for {cloud_account_guid}")
+    
         if feature_name == COMPLIANCE_FEATURE_NAME:
             # Use CSPM configuration
         
             body = {
-                "name": cloud_account_name,
                 "cspmConfig": {
                     "crossAccountsRoleARN": new_arn,
                     "stackRegion": existing_region,
@@ -287,7 +285,6 @@ class Accounts(base_test.BaseTest):
         elif feature_name == VULN_SCAN_FEATURE_NAME:
             # Use VulnScan configuration
             body = {
-                "name": cloud_account_name,
                 "vulnerabilityScanConfig": {
                     "crossAccountsRoleARN": new_arn,
                     "stackRegion": existing_region,
@@ -1464,7 +1461,20 @@ class Accounts(base_test.BaseTest):
     def validate_account_status(self, cloud_account_guid: str, expected_status: str):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
-
+   
+    def validate_account_feature_managed_by_org(self, account_id: str, feature_name: str, org_guid: str = None):
+        body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+        res = self.backend.get_cloud_accounts(body=body)
+            
+        if len(res["response"]) == 0:
+            assert False, f"Account {account_id} not found"
+        account = res["response"][0]
+        
+        if org_guid is not None:
+            assert account["features"][feature_name]["managedByOrg"] == org_guid, f"Expected status: {org_guid}, got: {account['features'][feature_name]['managedByOrg']}"
+        else:
+            assert "managedByOrg" not in account["features"][feature_name] or account["features"][feature_name]["managedByOrg"] is None, f"Expected managedByOrg field to not exist, but it exists with value: {account['features'][feature_name].get('managedByOrg')}"
+    
     def validate_org_status(self, org_guid: str, expected_status: str):
         org = self.get_cloud_org(org_guid)
         assert org["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {org['cspmSpecificData']['cspmStatus']}"

@@ -188,14 +188,15 @@ class CloudOrganization(Accounts):
         Logger.logger.info('connection Stage 7: update single account stack add vuln feature')
         self.add_cspm_feature_to_single_account(aws_manager=self.single_account_aws_manager, cloud_account_guid=single_cloud_account_guid, stack_name=cspm_stack_name, feature_name=VULN_SCAN_FEATURE_NAME)
 
-        Logger.logger.info('connection Stage 7: connect compliance to existing organization again(without scanning) - validate single is under the new organization')
+        Logger.logger.info('connection Stage 7: connect compliance to existing organization again(without scanning) - validate single is under the new organization and vuln feature no')
         existing_admin_response = self.connect_existing_cspm_organization(compliance_test_region, admin_role_arn, admin_external_id)       
         test_org_guid = existing_admin_response.guid
         self.test_cloud_orgs_guids.append(test_org_guid)
         self.connect_cspm_features_to_org_existing_stack_set(test_org_guid, member_role_name, member_role_external_id, compliance_test_region, features)
         self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
         timeout=120, org_guid=test_org_guid, account_ids=expected_account_ids, 
-        feature_name=COMPLIANCE_FEATURE_NAME)        
+        feature_name=COMPLIANCE_FEATURE_NAME)
+        self.validate_account_feature_managed_by_org(single_account_id, VULN_SCAN_FEATURE_NAME, None)
         self.validate_org_status(test_org_guid, CSPM_STATUS_HEALTHY)
         
         Logger.logger.info('connection Stage 8: exclude one account, validated it marked as excluded')
