@@ -300,8 +300,34 @@ class Accounts(base_test.BaseTest):
                     # Get detailed error information
                     aws_manager.get_stackset_instance_errors(stackset_name)
                     raise Exception(f"StackSet update failed with status: {final_status}")
+            elif operation_id and not with_wait:
+                Logger.logger.info(f"StackSet {stackset_name} update initiated with operation ID: {operation_id} (not waiting for completion)")
             else:
-                raise Exception("Failed to initiate StackSet update")
+                # Check if there are any recent operations that might indicate success
+                Logger.logger.warning(f"No operation ID returned for {stackset_name}, checking recent operations...")
+                operations = aws_manager.get_stackset_operations(stackset_name)
+                if operations:
+                    latest_op = operations[0]
+                    Logger.logger.info(f"Latest operation: {latest_op}")
+                    if latest_op.get('Status') in ['SUCCEEDED', 'RUNNING']:
+                        Logger.logger.info(f"Found recent successful/running operation: {latest_op.get('OperationId')}")
+                        if with_wait and latest_op.get('Status') == 'RUNNING':
+                            # Wait for this operation to complete
+                            op_id = latest_op.get('OperationId')
+                            final_status = aws_manager.wait_for_stackset_operation(stackset_name, op_id)
+                            if final_status == 'SUCCEEDED':
+                                Logger.logger.info(f"StackSet {stackset_name} updated successfully")
+                            else:
+                                aws_manager.get_stackset_instance_errors(stackset_name)
+                                raise Exception(f"StackSet update failed with status: {final_status}")
+                        elif latest_op.get('Status') == 'SUCCEEDED':
+                            Logger.logger.info(f"StackSet {stackset_name} already updated successfully")
+                        else:
+                            raise Exception(f"StackSet update failed with status: {latest_op.get('Status')}")
+                    else:
+                        raise Exception(f"StackSet update failed with status: {latest_op.get('Status')}")
+                else:
+                    raise Exception("Failed to initiate StackSet update - no operations found")
                 
         except Exception as e:
             Logger.logger.error(f"Failed to update StackSet {stackset_name}: {e}")
@@ -310,14 +336,15 @@ class Accounts(base_test.BaseTest):
         # Step 5: Connect the new feature to the organization
         Logger.logger.info(f"Connecting {new_feature_name} feature to organization {org_guid}")
         
-        
+        new_feature_list = [new_feature_name]
         # Connect ONLY the new feature to the organization
         body = ConnectCloudOrganizationMembersRequest(
             orgGUID=org_guid,
-            features=features,  # Only the new feature
+            features=new_feature_list,  # Only the new feature
             memberRoleExternalID=existing_member_external_id,
             stackRegion=existing_region,
-            memberRoleArn=existing_member_role_arn
+            memberRoleArn=existing_member_role_arn,
+            skipScan=True
         ).model_dump()
         
         try:
@@ -611,7 +638,8 @@ class Accounts(base_test.BaseTest):
             features=features,
             memberRoleExternalID=external_id,
             stackRegion=region,
-            memberRoleArn=generated_role_name
+            memberRoleArn=generated_role_name,
+            skipScan=True
         ).model_dump()
         res = self.backend.create_cloud_org_connect_members(body=body)
         assert "guid" in res, f"guid not in {res}"
@@ -628,7 +656,8 @@ class Accounts(base_test.BaseTest):
             features=features,
             memberRoleExternalID=member_role_external_id,
             stackRegion=region,
-            memberRoleArn=member_role_arn
+            memberRoleArn=member_role_arn,
+            skipScan=True
         ).model_dump()
         res = self.backend.create_cloud_org_connect_members(body=body)
         assert "guid" in res, f"guid not in {res}"

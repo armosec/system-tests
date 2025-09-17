@@ -393,9 +393,21 @@ class CloudOrganization(Accounts):
                 elif final_status == 'TIMED_OUT':
                     Logger.logger.warning(f"Operation {operation_id} timed out, proceeding with cleanup")
                 else:
-                    Logger.logger.warning(f"peration {operation_id} status: {final_status}, proceeding with cleanup")
+                    Logger.logger.warning(f"Operation {operation_id} status: {final_status}, proceeding with cleanup")
             else:
-                Logger.logger.info(f"No operation ID for StackSet {stackset_name}, proceeding with cleanup")
+                Logger.logger.info(f"No operation ID for StackSet {stackset_name}, checking for any running operations...")
+                # Check if there are any running operations we missed
+                operations = aws_manager.get_stackset_operations(stackset_name)
+                running_ops = [op for op in operations if op.get('Status') == 'RUNNING']
+                if running_ops:
+                    Logger.logger.warning(f"Found {len(running_ops)} running operations for {stackset_name}")
+                    for op in running_ops:
+                        op_id = op.get('OperationId')
+                        Logger.logger.info(f"Stopping running operation {op_id}")
+                        aws_manager.stop_stack_set_operation(stackset_name, op_id)
+                        # Wait a bit for the stop to take effect
+                        import time
+                        time.sleep(5)
         
         # Extract stackset names for deletion
         stackset_names = [name for name, _ in stackset_info]

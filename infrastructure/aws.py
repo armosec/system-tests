@@ -604,13 +604,71 @@ class AwsManager:
             Logger.logger.info(f"StackSet update parameters: {update_params}")
             response = self.cloudformation.update_stack_set(**update_params)
             
+            operation_id = response.get("OperationId")
             Logger.logger.info(f"StackSet update initiated for: {stackset_name}")
-            return response.get("OperationId")
+            Logger.logger.info(f"Operation ID: {operation_id}")
+            Logger.logger.info(f"Full response: {response}")
+            
+            if not operation_id:
+                Logger.logger.warning(f"No OperationId returned from update_stack_set for {stackset_name}")
+                Logger.logger.warning(f"Response: {response}")
+                # Check if the update was actually successful by listing operations
+                try:
+                    operations = self.cloudformation.list_stack_set_operations(StackSetName=stackset_name)
+                    if operations.get('Summaries'):
+                        latest_op = operations['Summaries'][0]
+                        Logger.logger.info(f"Latest operation: {latest_op}")
+                        if latest_op.get('Status') in ['RUNNING', 'SUCCEEDED']:
+                            operation_id = latest_op.get('OperationId')
+                            Logger.logger.info(f"Using latest operation ID: {operation_id}")
+                except Exception as list_e:
+                    Logger.logger.error(f"Failed to list operations: {list_e}")
+            
+            return operation_id
         except ClientError as e:
             Logger.logger.error(f"An error occurred during StackSet update: {e}")
             Logger.logger.error(f"Error code: {e.response['Error']['Code']}")
             Logger.logger.error(f"Error message: {e.response['Error']['Message']}")
+            Logger.logger.error(f"Full error response: {e.response}")
             return None
+    
+    def stop_stack_set_operation(self, stackset_name: str, operation_id: str) -> bool:
+        """
+        Stop a running StackSet operation.
+        Returns True if successful, False otherwise.
+        """
+        try:
+            Logger.logger.info(f"Stopping operation {operation_id} on StackSet {stackset_name}")
+            response = self.cloudformation.stop_stack_set_operation(
+                StackSetName=stackset_name,
+                OperationId=operation_id,
+                CallAs='DELEGATED_ADMIN'
+            )
+            Logger.logger.info(f"Stop operation initiated for {operation_id}")
+            return True
+        except ClientError as e:
+            Logger.logger.error(f"Failed to stop operation {operation_id}: {e}")
+            Logger.logger.error(f"Error code: {e.response['Error']['Code']}")
+            Logger.logger.error(f"Error message: {e.response['Error']['Message']}")
+            return False
+        except Exception as e:
+            Logger.logger.error(f"Unexpected error stopping operation {operation_id}: {e}")
+            return False
+    
+    def get_stackset_operations(self, stackset_name: str) -> List[dict]:
+        """
+        Get all operations for a StackSet.
+        Returns a list of operation summaries.
+        """
+        try:
+            response = self.cloudformation.list_stack_set_operations(
+                StackSetName=stackset_name,
+                CallAs='DELEGATED_ADMIN'
+            )
+            return response.get('Summaries', [])
+        except ClientError as e:
+            Logger.logger.error(f"Failed to list operations for {stackset_name}: {e}")
+            return []
     
     def delete_stacksets_by_names(self, stackset_names: List[str]) -> bool:
         """
@@ -625,12 +683,116 @@ class AwsManager:
             Logger.logger.info(f"Processing StackSet: {stackset_name}")
             success = self.delete_stackset_with_discovery(stackset_name)
             if not success:
-                all_successful = False
-                Logger.logger.error(f"❌ Failed to delete StackSet: {stackset_name}")
+                Logger.logger.warning(f"Standard deletion failed for {stackset_name}, attempting force cleanup...")
+                # Try force cleanup as fallback
+                force_success = self.force_delete_stackset(stackset_name)
+                if force_success:
+                    Logger.logger.info(f"✅ Force cleanup successful for {stackset_name}")
+                    success = True
+                else:
+                    all_successful = False
+                    Logger.logger.error(f"❌ Failed to delete StackSet: {stackset_name}")
             else:
                 Logger.logger.info(f"✅ Successfully deleted StackSet: {stackset_name}")
         
         return all_successful
+
+    def force_delete_stackset(self, stackset_name: str) -> bool:
+        """
+        Force delete a StackSet by stopping all operations and then deleting.
+        This is a more aggressive approach for cleanup.
+        """
+        try:
+            Logger.logger.info(f"🔨 Force deleting StackSet: {stackset_name}")
+            
+            # First, stop all running operations
+            operations = self.get_stackset_operations(stackset_name)
+            running_ops = [op for op in operations if op.get('Status') == 'RUNNING']
+            
+            if running_ops:
+                Logger.logger.info(f"Found {len(running_ops)} running operations, stopping them...")
+                for op in running_ops:
+                    op_id = op.get('OperationId')
+                    Logger.logger.info(f"Stopping operation: {op_id}")
+                    self.stop_stack_set_operation(stackset_name, op_id)
+                
+                # Wait for operations to stop
+                import time
+                time.sleep(15)
+            
+            # Try to delete the StackSet directly (this will fail if there are still instances)
+            try:
+                Logger.logger.info(f"Attempting direct StackSet deletion...")
+                self.cloudformation.delete_stack_set(
+                    StackSetName=stackset_name,
+                    CallAs='DELEGATED_ADMIN'
+                )
+                Logger.logger.info(f"✅ StackSet {stackset_name} deleted directly")
+                return True
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'StackSetNotEmptyException':
+                    Logger.logger.info("StackSet has instances, trying to delete them first...")
+                    # Get stack instances and delete them
+                    try:
+                        instances_response = self.cloudformation.list_stack_instances(
+                            StackSetName=stackset_name,
+                            CallAs='DELEGATED_ADMIN'
+                        )
+                        instances = instances_response.get('Summaries', [])
+                        
+                        if instances:
+                            Logger.logger.info(f"Found {len(instances)} stack instances to delete")
+                            # Group by region and accounts
+                            regions = list(set([inst['Region'] for inst in instances]))
+                            accounts = list(set([inst['Account'] for inst in instances]))
+                            
+                            # Delete all instances
+                            delete_params = {
+                                'StackSetName': stackset_name,
+                                'Regions': regions,
+                                'RetainStacks': False,
+                                'CallAs': 'DELEGATED_ADMIN',
+                                'DeploymentTargets': {
+                                    'Accounts': accounts
+                                }
+                            }
+                            
+                            result = self.cloudformation.delete_stack_instances(**delete_params)
+                            operation_id = result.get("OperationId")
+                            
+                            if operation_id:
+                                Logger.logger.info(f"Deleting instances with operation: {operation_id}")
+                                final_status = self.wait_for_stackset_operation(stackset_name, operation_id)
+                                
+                                if final_status == 'SUCCEEDED':
+                                    Logger.logger.info("Stack instances deleted successfully")
+                                    # Now try to delete the StackSet again
+                                    self.cloudformation.delete_stack_set(
+                                        StackSetName=stackset_name,
+                                        CallAs='DELEGATED_ADMIN'
+                                    )
+                                    Logger.logger.info(f"✅ StackSet {stackset_name} deleted after instance cleanup")
+                                    return True
+                                else:
+                                    Logger.logger.error(f"Failed to delete instances: {final_status}")
+                                    return False
+                            else:
+                                Logger.logger.error("No operation ID returned for instance deletion")
+                                return False
+                        else:
+                            Logger.logger.info("No stack instances found")
+                            return True
+                            
+                    except ClientError as instance_e:
+                        Logger.logger.error(f"Failed to delete stack instances: {instance_e}")
+                        return False
+                else:
+                    Logger.logger.error(f"Failed to delete StackSet: {e}")
+                    return False
+            
+        except Exception as e:
+            Logger.logger.error(f"Unexpected error in force delete: {e}")
+            return False
 
     def delete_stackset_with_discovery(self, stackset_name: str) -> bool:
         """
@@ -789,10 +951,94 @@ class AwsManager:
                 return False
             
         except ClientError as e:
+            error_code = e.response['Error']['Code']
+            error_message = e.response['Error']['Message']
+            
             Logger.logger.error(f"AWS error deleting stack instances: {e}")
-            Logger.logger.error(f"Error code: {e.response['Error']['Code']}")
-            Logger.logger.error(f"Error message: {e.response['Error']['Message']}")
-            return False
+            Logger.logger.error(f"Error code: {error_code}")
+            Logger.logger.error(f"Error message: {error_message}")
+            
+            # Handle operation in progress exception
+            if error_code == 'OperationInProgressException':
+                Logger.logger.warning("Another operation is in progress. Attempting to stop it...")
+                # Extract operation ID from error message
+                import re
+                operation_match = re.search(r'is in progress: ([a-f0-9-]+)', error_message)
+                if operation_match:
+                    conflicting_op_id = operation_match.group(1)
+                    Logger.logger.info(f"Stopping conflicting operation: {conflicting_op_id}")
+                    if self.stop_stack_set_operation(stackset_name, conflicting_op_id):
+                        Logger.logger.info("Conflicting operation stopped. Waiting for it to complete...")
+                        # Wait for the stop operation to actually complete
+                        import time
+                        max_wait_time = 60  # Wait up to 60 seconds
+                        wait_interval = 5   # Check every 5 seconds
+                        waited_time = 0
+                        
+                        while waited_time < max_wait_time:
+                            time.sleep(wait_interval)
+                            waited_time += wait_interval
+                            
+                            # Check if the operation is still running
+                            try:
+                                operations = self.get_stackset_operations(stackset_name)
+                                conflicting_op = next((op for op in operations if op.get('OperationId') == conflicting_op_id), None)
+                                
+                                if not conflicting_op:
+                                    Logger.logger.warning(f"Operation {conflicting_op_id} not found in operations list")
+                                    break
+                                
+                                status = conflicting_op.get('Status')
+                                Logger.logger.info(f"Operation {conflicting_op_id} status: {status}")
+                                
+                                if status in ['STOPPED', 'SUCCEEDED', 'FAILED']:
+                                    Logger.logger.info(f"Operation {conflicting_op_id} completed with status: {status}")
+                                    break
+                                elif status == 'RUNNING':
+                                    Logger.logger.info(f"Operation {conflicting_op_id} still running, waiting... ({waited_time}s)")
+                                else:
+                                    Logger.logger.warning(f"Operation {conflicting_op_id} in unexpected status: {status}")
+                                    break
+                                    
+                            except Exception as check_e:
+                                Logger.logger.error(f"Error checking operation status: {check_e}")
+                                break
+                        
+                        if waited_time >= max_wait_time:
+                            Logger.logger.warning(f"Timeout waiting for operation {conflicting_op_id} to stop")
+                        
+                        # Now retry the deletion
+                        Logger.logger.info("Retrying deletion after operation stop...")
+                        try:
+                            result = self.cloudformation.delete_stack_instances(**delete_params)
+                            operation_id = result.get("OperationId")
+                            if operation_id:
+                                Logger.logger.info(f"Retry successful, operation ID: {operation_id}")
+                                result = self.wait_for_stackset_operation(stackset_name, operation_id)
+                                if result == 'SUCCEEDED':
+                                    Logger.logger.info("Stack instances deleted successfully on retry")
+                                    return True
+                                else:
+                                    Logger.logger.error(f"Stack instances deletion failed on retry: {result}")
+                                    return False
+                        except ClientError as retry_e:
+                            retry_error_code = retry_e.response['Error']['Code']
+                            if retry_error_code == 'OperationInProgressException':
+                                Logger.logger.error("Operation still in progress after stop attempt. Manual cleanup may be required.")
+                                Logger.logger.error(f"StackSet: {stackset_name}")
+                                Logger.logger.error(f"Conflicting operation: {conflicting_op_id}")
+                                return False
+                            else:
+                                Logger.logger.error(f"Retry failed with different error: {retry_e}")
+                                return False
+                    else:
+                        Logger.logger.error("Failed to stop conflicting operation")
+                        return False
+                else:
+                    Logger.logger.error("Could not extract operation ID from error message")
+                    return False
+            else:
+                return False
         except Exception as e:
             Logger.logger.error(f"Unexpected error deleting stack instances: {e}")
             return False
