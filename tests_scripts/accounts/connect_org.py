@@ -210,7 +210,7 @@ class CloudOrganization(Accounts):
         member_cloud_account_guid = res["response"][0]["guid"]
         self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('Stage 15: Update the stackset - add vuln connection')
+        Logger.logger.info('Stage 15: Update the stack set - add vuln connection')
         # Add vulnerability scan feature to the organization
         self.add_cspm_feature_to_organization(
             aws_manager=self.delegated_admin_aws_manager,
