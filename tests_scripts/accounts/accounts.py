@@ -59,13 +59,14 @@ FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
 FEATURE_STATUS_PENDING = "Pending"
 FEATURE_STATUS_PARTIALLY_CONNECTED = "Partially connected"
-CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
-CSPM_SCAN_STATE_COMPLETED = "Completed"
-CSPM_SCAN_STATE_FAILED = "Failed"
 
 CSPM_STATUS_HEALTHY = "healthy"
 CSPM_STATUS_DEGRADED = "degraded"
 CSPM_STATUS_DISCONNECTED = "disconnected"
+
+CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
+CSPM_SCAN_STATE_COMPLETED = "Completed"
+CSPM_SCAN_STATE_FAILED = "Failed"
 
 class CloudEntityTypes(Enum):
     ACCOUNT = "account"
@@ -1928,6 +1929,15 @@ class Accounts(base_test.BaseTest):
             "accounts": accounts
         }
         self.backend.update_org_exclude_accounts(body)
+    
+    def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
+
+    def validate_account__cspm_status(self, cloud_account_guid: str, expected_status: str):
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
+
 
     
     def update_org_metadata_and_validate(self, metadata: UpdateCloudOrganizationMetadataRequest):
