@@ -1906,7 +1906,7 @@ class Accounts(base_test.BaseTest):
         assert actual_excluded == is_excluded, f"Expected isExcluded: {is_excluded}, got: {actual_excluded}"
         return 
     
-    def vlaidte_account_feautre_is_managed(self, cloud_account_guid: str, feature_name: str, is_managed: str = None):
+    def validate_account_feature_is_managed(self, cloud_account_guid: str, feature_name: str, is_managed: str = None):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
         assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
