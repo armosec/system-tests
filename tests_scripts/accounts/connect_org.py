@@ -35,8 +35,7 @@ class CloudOrganization(Accounts):
         self.test_global_aws_users = []
         self.test_exclude_account_users = []
         
-        self.skip_apis_validation = False
-        self.skip_cadr_test_part = True
+        self.skip_cadr_test_part = False
 
     def start(self):
         """
@@ -225,22 +224,23 @@ class CloudOrganization(Accounts):
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
         self.validate_account_feature_is_excluded(single_cloud_account_guid, VULN_SCAN_FEATURE_NAME, True)
 
-        Logger.logger.info('Stage 17: Delete vulnScan and validate feature is deleted')
+        Logger.logger.info('Stage 17: Include back the account and validate it is included in both features')
+        self.org_exclude_accounts_by_feature(test_org_guid, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME], ExclusionActions.INCLUDE, [single_account_id])
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
+        self.validate_account_feature_is_excluded(single_cloud_account_guid, VULN_SCAN_FEATURE_NAME, False)
+        
+        Logger.logger.info('Stage 18: Delete vulnScan and validate feature is deleted')
         self.delete_and_validate_org_feature(test_org_guid, VULN_SCAN_FEATURE_NAME)
         #validate that org accounts have only compliance feature
-        self.wait_for_report(self.validate_org_accounts_have_all_features, sleep_interval=30, timeout=120, org_guid=test_org_guid, 
-        account_ids=expected_account_ids, expected_features=[COMPLIANCE_FEATURE_NAME])
-        
-        # Use the new comprehensive validation function
-        self.wait_for_report(self.validate_org_feature_deletion_complete, sleep_interval=30, timeout=120, 
+        self.wait_for_report(self.validate_org_feature_deletion_complete, sleep_interval=5, timeout=30, 
                            org_guid=test_org_guid, deleted_feature=VULN_SCAN_FEATURE_NAME, 
-                           expected_features=[COMPLIANCE_FEATURE_NAME], account_ids=expected_account_ids)
+                           expected_features=[COMPLIANCE_FEATURE_NAME], expected_account_ids=expected_account_ids)
         
         self.delete_and_validate_org_feature(test_org_guid, COMPLIANCE_FEATURE_NAME)
         
         # Validate that no accounts are managed by this org anymore
-        self.wait_for_report(self.validate_no_accounts_managed_by_org, sleep_interval=30, timeout=120, 
-                           org_guid=test_org_guid, account_ids=expected_account_ids)
+        self.wait_for_report(self.validate_no_accounts_managed_by_org, sleep_interval=5, timeout=30, 
+                           org_guid=test_org_guid, expected_account_ids=expected_account_ids)
         
 
 

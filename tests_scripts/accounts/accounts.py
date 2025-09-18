@@ -707,6 +707,8 @@ class Accounts(base_test.BaseTest):
         awsResponse = self.get_org_admin_stack_link(region, stack_name, external_id)
         external_id = awsResponse.externalID
         _, template_url, region, parameters = extract_parameters_from_url(awsResponse.stackLink)
+        generated_role_name = "armo-discovery-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
         body = AWSOrgCreateCloudOrganizationAdminRequest(
