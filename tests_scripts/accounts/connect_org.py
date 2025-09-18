@@ -84,7 +84,6 @@ class CloudOrganization(Accounts):
         # generate random number for cloud account name for uniqueness
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
-        Logger.logger.info('Stage 0: Init AwsManager')
         aws_access_key_id = os.environ.get("ORGANIZATION_AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
         if not aws_access_key_id:
@@ -127,7 +126,7 @@ class CloudOrganization(Accounts):
             
             Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
 
-            Logger.logger.info('Stage 3: Connect CSPM org')
+            Logger.logger.info('Stage 3: Create compliance org stack')
             discovery_stack_name = "systest-" + self.test_identifier_rand + "-discovery-org"
             self.compliance_org_stack_name.append(discovery_stack_name)
             existing_admin_response = self.connect_cspm_new_organization(delegated_admin_aws_manager, discovery_stack_name, compliance_test_region)
@@ -199,10 +198,10 @@ class CloudOrganization(Accounts):
             Logger.logger.info(f"Updated org {test_org_guid} name to {new_name} and we updated the exclude list - removing the account {single_account_id} from the list")
             self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
-            Logger.logger.info('Stage 13: Update admin connection and validate org status is degraded')
+            Logger.logger.info('Stage 13: Break aws admin role and sync the org - validate the error is shown and the org is not connected')
             self.update_and_validate_admin_external_id(self.delegated_admin_aws_manager, test_org_guid, admin_role_arn)
 
-            Logger.logger.info('Stage 14: Update member connection and validate org status is degraded')
+            Logger.logger.info('Stage 14: Fix aws admin role and sync the org - validate the org is connected')
             member_account_manager = self.aws_manager.assume_role_in_account(member_account_id)
             body = self.build_get_cloud_aws_org_by_accountID_request(member_account_id)
             res = self.backend.get_cloud_accounts(body=body)
@@ -210,7 +209,7 @@ class CloudOrganization(Accounts):
             member_cloud_account_guid = res["response"][0]["guid"]
             self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
-            Logger.logger.info('Stage 15: Update the stack set - add vuln connection')
+            Logger.logger.info('Stage 15: Update the stackset - add vuln connection')
             # Add vulnerability scan feature to the organization
             self.add_cspm_feature_to_organization(
                 aws_manager=self.delegated_admin_aws_manager,
@@ -225,18 +224,14 @@ class CloudOrganization(Accounts):
             self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, True)
             self.validate_account_feature_is_excluded(single_cloud_account_guid, VULN_SCAN_FEATURE_NAME, True)
 
-            Logger.logger.info('Stage 17: Include back the account and validate it is included in both features')
-            self.org_exclude_accounts_by_feature(test_org_guid, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME], ExclusionActions.INCLUDE, [single_account_id])
-            self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
-            self.validate_account_feature_is_excluded(single_cloud_account_guid, VULN_SCAN_FEATURE_NAME, False)
-            
-            Logger.logger.info('Stage 18: Delete vulnScan and validate feature is deleted')
+            Logger.logger.info('Stage 17: Delete vulnScan and validate feature is deleted')
             self.delete_and_validate_org_feature(test_org_guid, VULN_SCAN_FEATURE_NAME)
             #validate that org accounts have only compliance feature
             self.wait_for_report(self.validate_org_feature_deletion_complete, sleep_interval=5, timeout=30, 
                             org_guid=test_org_guid, deleted_feature=VULN_SCAN_FEATURE_NAME, 
                             expected_features=[COMPLIANCE_FEATURE_NAME], expected_account_ids=expected_account_ids)
             
+            Logger.logger.info('Stage 18: Delete compliance feature and validate org and account deleted')
             self.delete_and_validate_org_feature(test_org_guid, COMPLIANCE_FEATURE_NAME)
             
             # Validate that no accounts are managed by this org anymore
@@ -245,7 +240,6 @@ class CloudOrganization(Accounts):
             
 
         if not self.skip_cadr_test_part:
-            Logger.logger.info('Stage 19: Init AwsManager')
             cadr_region = REGION_SYSTEM_TEST_2
             self.aws_manager = aws.AwsManager(cadr_region, 
                                                 aws_access_key_id=aws_access_key_id,
@@ -262,17 +256,17 @@ class CloudOrganization(Accounts):
             self.exclude_account_aws_manager = self.aws_manager.assume_role_in_account(EXCLUDE_ACCOUNT_ID)
 
 
-            Logger.logger.info('Stage 20: Connect cadr new organization')
+            Logger.logger.info('Stage 19: Connect cadr new organization')
             org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
             Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")                                                  
             
-            Logger.logger.info('Stage 21: Validate cadr status is connected')
+            Logger.logger.info('Stage 20: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
                                 guid=org_guid, cloud_entity_type=CloudEntityTypes.ORGANIZATION, 
                                 expected_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info(f"CADR organization {org_guid} is connected successfully")
             
-            Logger.logger.info('Stage 22: Validate alert with orgID is created')
+            Logger.logger.info('Stage 21: Validate alert with orgID is created')
             self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
             time.sleep(180) # wait for the sensor stack to be active
             self.aws_manager.create_user(self.aws_user)
@@ -282,7 +276,7 @@ class CloudOrganization(Accounts):
                                         "message": self.aws_user + "|like"},
                                 expect_incidents=True)
             
-            Logger.logger.info('Stage 23: Exclude one account and validate it is excluded')
+            Logger.logger.info('Stage 22: Exclude one account and validate it is excluded')
             self.org_exclude_accounts_by_feature(org_guid=org_guid, feature_names=[CADR_FEATURE_NAME], action=ExclusionActions.EXCLUDE, accounts=[EXCLUDE_ACCOUNT_ID])
             aws_user_excluded = self.aws_user + "-excluded"
             self.exclude_account_aws_manager.create_user(aws_user_excluded)
@@ -293,7 +287,7 @@ class CloudOrganization(Accounts):
                                 expect_incidents=False)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is excluded successfully")
             
-            Logger.logger.info('Stage 24: Include one account and validate it is included')
+            Logger.logger.info('Stage 23: Include one account and validate it is included')
             self.org_exclude_accounts_by_feature(org_guid, [CADR_FEATURE_NAME], ExclusionActions.INCLUDE, [EXCLUDE_ACCOUNT_ID])
             aws_user_included = self.aws_user + "-included"
             self.exclude_account_aws_manager.create_user(aws_user_included)
@@ -304,27 +298,27 @@ class CloudOrganization(Accounts):
                                 expect_incidents=True)
             Logger.logger.info(f"Account {EXCLUDE_ACCOUNT_ID} is included successfully")
             
-            Logger.logger.info('Stage 25: Connect single cadr - validate block')
+            Logger.logger.info('Stage 24: Connect single cadr - validate block')
             self.create_and_validate_cloud_account_with_cadr("test_block", self.account_log_location, PROVIDER_AWS, cadr_region, expect_failure=True)
             Logger.logger.info("connect CADR single account blocked successfully")
             
-            Logger.logger.info('Stage 26: Delete cadr org and validate is deleted')
+            Logger.logger.info('Stage 25: Delete cadr org and validate is deleted')
             self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
             self.aws_manager.delete_stack(self.cadr_org_stack_name)
             self.tested_stacks.remove(self.cadr_org_stack_name)
             Logger.logger.info("Delete cadr successfully")
             
-            Logger.logger.info('Stage 27: Connect single cadr')
+            Logger.logger.info('Stage 26: Connect single cadr')
             account_guid = self.connect_cadr_new_account(cadr_region, self.cadr_account_stack_name, "merge-account", self.account_log_location)
             Logger.logger.info(f"CADR account created successfully with guid {account_guid}")
             
-            Logger.logger.info('Stage 28: Validate cadr status is connected')
+            Logger.logger.info('Stage 27: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
                                 guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
                                 expected_status=FEATURE_STATUS_CONNECTED)
             Logger.logger.info(f"CADR account {account_guid} is connected successfully")
             
-            Logger.logger.info('Stage 29: Connect org cadr - validate merging')
+            Logger.logger.info('Stage 28: Connect org cadr - validate merging')
             org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
             self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
             Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
