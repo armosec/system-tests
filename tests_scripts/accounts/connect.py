@@ -200,8 +200,6 @@ class CloudConnect(Accounts):
         Logger.logger.info('Stage 13: Delete cspm feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
             
-        Logger.logger.info('Stage 15: Delete cspm feature and validate')
-        self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info('Stage 16: Delete cadr feature and validate account deleted')
         self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
