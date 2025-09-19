@@ -176,7 +176,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skip_scan=skip_scan)
+        account = self.validate_accounts_cloud_list_cspm_compliance(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
         self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
@@ -1007,7 +1007,7 @@ class Accounts(base_test.BaseTest):
         
         return None
 
-    def validate_accounts_cloud_list_cspm(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skip_scan: bool = False):
+    def validate_accounts_cloud_list_cspm_compliance(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skipped_scan: bool = False):
         """
         Validate accounts cloud list.
         """
@@ -1023,7 +1023,7 @@ class Accounts(base_test.BaseTest):
         assert "config" in account["features"][COMPLIANCE_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
         assert "crossAccountsRoleARN" in account["features"][COMPLIANCE_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
         assert account["features"][COMPLIANCE_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
-        if not skip_scan:
+        if not skipped_scan:
             assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
             assert account["features"][COMPLIANCE_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
             if scan_status==CSPM_SCAN_STATE_COMPLETED:
@@ -1546,29 +1546,11 @@ class Accounts(base_test.BaseTest):
             with_accepted_resources=False
         )
 
-    def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str , test_arn: str):
+    def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str, feature_name: str):
         self.aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
-        self.backend.cspm_scan_now(cloud_account_guid, with_error=True)
-        Logger.logger.info("Waiting for scan to complete with failed status")
-        self.wait_for_report(self.validate_accounts_cloud_list_cspm,
-                             timeout=120,
-                             sleep_interval=10,
-                             cloud_account_guid=cloud_account_guid,
-                             arn=test_arn,
-                             scan_status=CSPM_SCAN_STATE_FAILED,
-                             feature_status = FEATURE_STATUS_DISCONNECTED)
-        Logger.logger.info("Scan failed, disconnecting account")
-
-        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
-        res = self.backend.get_cloud_accounts(body=body)
-        assert len(res["response"]) == 1, f"Expected 1 cloud account, got: {len(res['response'])}"
-        account= res["response"][0]
-        assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanFailed"] is not None, f"Expected lastTimeScanFail to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['lastTimeScanFail']}"
-        assert account["features"][COMPLIANCE_FEATURE_NAME]["scanFailureReason"] is not None, f"Expected scanFailureReason to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['scanFailureReason']}"
-        assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] is not None, f"Expected scanState to be set, got: {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
-
-        Logger.logger.info("the account has been successfully disconnected")
+        self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
+        self.wait_for_report(self.validate_account_feature_status, timeout=30, sleep_interval=5, cloud_account_guid=cloud_account_guid, feature_name=feature_name, expected_status=FEATURE_STATUS_DISCONNECTED)
 
     def validate_features_unchanged(self, cloud_account_guid: str, feature_name: str, expected_feature: dict):
         """

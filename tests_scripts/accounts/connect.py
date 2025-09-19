@@ -88,9 +88,9 @@ class CloudConnect(Accounts):
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm"
-        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
-        self.cspm_external_id = external_id       
-        _, template_url, _, parameters = extract_parameters_from_url(stack_link)
+        aws_stack_response = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
+        self.cspm_external_id = aws_stack_response.externalID       
+        _, template_url, _, parameters = extract_parameters_from_url(aws_stack_response.stackLink)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")
         test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
@@ -190,7 +190,7 @@ class CloudConnect(Accounts):
 
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 13: disconnect the cspm account')
-            self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
+            self.disconnect_cspm_account_without_deleting_cloud_account(stack_name=self.cspm_stack_name,cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
             self.tested_stacks.remove(self.cspm_stack_name)
 
             Logger.logger.info('Stage 12: Recreate cspm stack for Stage 17')
