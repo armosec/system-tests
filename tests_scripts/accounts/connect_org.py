@@ -91,7 +91,8 @@ class CloudOrganization(Accounts):
         if not aws_secret_access_key:
             raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
         
- 
+
+        #CADR phase 1 - connection
 
         #compliance tests
         if not self.skip_org_connection_tests:
@@ -239,6 +240,7 @@ class CloudOrganization(Accounts):
                             org_guid=test_org_guid, expected_account_ids=expected_account_ids)
             
 
+        #cadr phase 2 - data validation
         if not self.skip_cadr_test_part:
             cadr_region = REGION_SYSTEM_TEST_2
             self.aws_manager = aws.AwsManager(cadr_region, 
@@ -258,7 +260,9 @@ class CloudOrganization(Accounts):
 
             Logger.logger.info('Stage 19: Connect cadr new organization')
             org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
-            Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")                                                  
+            Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")
+        
+            #wait for aws things to be created instead of timeout                                                
             
             Logger.logger.info('Stage 20: Validate cadr status is connected')
             self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
@@ -268,7 +272,12 @@ class CloudOrganization(Accounts):
             
             Logger.logger.info('Stage 21: Validate alert with orgID is created')
             self.create_aws_cdr_runtime_policy(self.runtime_policy_name, ["I082"])
+
+
             time.sleep(180) # wait for the sensor stack to be active
+
+            #instead of of happy + exclude+include - we will exclude account then trigger 2 events for the excluded one and a good one and see after X(420/750?)
+            # that one event will not be there and one will be there(we are going to wait same time for both checks)
             self.aws_manager.create_user(self.aws_user)
             self.test_global_aws_users.append(self.aws_user)
             self.wait_for_report(self.get_incidents, sleep_interval=15, timeout=750,
@@ -319,6 +328,7 @@ class CloudOrganization(Accounts):
             Logger.logger.info(f"CADR account {account_guid} is connected successfully")
             
             Logger.logger.info('Stage 28: Connect org cadr - validate merging')
+            #remove the create stack from the connect cadr new organization
             org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
             self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
             Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")

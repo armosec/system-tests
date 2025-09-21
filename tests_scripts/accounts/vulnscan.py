@@ -73,11 +73,11 @@ class CloudVulnScan(Accounts):
         
         Logger.logger.info('Stage 2: Create cspm vulnscan stack') 
         self.cspm_vulnscan_stack_name = "systest-" + self.test_identifer_rand + "-cspm-vulnscan"
-        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(features=[VULN_SCAN_FEATURE_NAME], region=stack_region) 
-        self.cspm_vulnscan_external_id = external_id       
-        _, template_url, _, parameters = extract_parameters_from_url(stack_link)
+        aws_stack_response = self.get_and_validate_cspm_link_with_external_id(features=[VULN_SCAN_FEATURE_NAME], region=stack_region) 
+        self.cspm_vulnscan_external_id = aws_stack_response.externalID       
+        _, template_url, _, parameters = extract_parameters_from_url(aws_stack_response.stackLink)
         Logger.logger.info(f"Creating stack {self.cspm_vulnscan_stack_name} with template {template_url} and parameters {parameters}")
-        test_arn = self.create_stack_cspm(self.cspm_vulnscan_stack_name, template_url, parameters)
+        test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_vulnscan_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
         Logger.logger.info(f"Created cspm stack {self.cspm_vulnscan_stack_name} with account id {account_id} and arn {test_arn}")
 
