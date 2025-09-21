@@ -16,8 +16,6 @@ CLOUDTRAIL_SYSTEM_TEST_CONNECT = "system-test-connect-dont-delete"
 BUCKET_NAME_SYSTEM_TEST = "system-test-bucket-armo"
 REGION_SYSTEM_TEST = "us-east-1"
 
-
-
 class CloudConnect(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
