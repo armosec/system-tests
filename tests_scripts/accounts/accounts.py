@@ -180,7 +180,7 @@ class Accounts(base_test.BaseTest):
         self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
-            Logger.logger.info('Validate accounts cloud with cspm uniquevalues')
+            Logger.logger.info('Validate accounts cloud with cspm unique values')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
             Logger.logger.info('Edit name and validate cloud account with cspm')
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", arn)
@@ -1922,8 +1922,12 @@ class Accounts(base_test.BaseTest):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
 
+    def validate_no_account(self,cloud_account_guid: str):
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        res = self.backend.get_cloud_accounts(body=body)
+        assert "response" in res, f"failed to get cloud accounts, body used: {body}, res is {res}"
+        assert len(res["response"]) == 0, f"response is not empty"
 
-    
     def update_org_metadata_and_validate(self, metadata: UpdateCloudOrganizationMetadataRequest):
         """Update cloud organization metadata using the proper request model."""
         body = metadata.model_dump()
@@ -1992,6 +1996,7 @@ class Accounts(base_test.BaseTest):
         elif feature_name == VULN_SCAN_FEATURE_NAME:
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
+        
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)

@@ -307,20 +307,16 @@ class CloudOrganization(Accounts):
             Logger.logger.info("Delete cadr successfully")
             
             Logger.logger.info('Stage 26: Connect single cadr')
-            account_guid = self.connect_cadr_new_account(cadr_region, self.cadr_account_stack_name, "merge-account", self.account_log_location)
-            Logger.logger.info(f"CADR account created successfully with guid {account_guid}")
-            
-            Logger.logger.info('Stage 27: Validate cadr status is connected')
-            self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
-                                guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
-                                expected_status=FEATURE_STATUS_CONNECTED)
-            Logger.logger.info(f"CADR account {account_guid} is connected successfully")
-            
-            Logger.logger.info('Stage 28: Connect org cadr - validate merging')
+            merged_account_guid =self.create_and_validate_cloud_account_with_cadr(cloud_account_name="merge-account", trail_log_location=self.account_log_location, provider=PROVIDER_AWS, region=cadr_region, expect_failure=False)   
+            Logger.logger.info(f"CADR account created successfully with guid {merged_account_guid}")
+                        
+            Logger.logger.info('Stage 27: Connect org cadr - validate merging')
             org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=self.org_log_location, region=cadr_region, expect_failure=False)
+            self.validate_no_account(merged_account_guid)
+            Logger.logger.info(f"the account merged into the org {org_guid}")
             self.test_cloud_orgs_guids.append(org_guid)
-            self.validate_feature_deleted_from_entity(account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
-            Logger.logger.info(f"Merged cadr feature of account {account_guid} into the new org {org_guid} successfully")
+            self.validate_feature_deleted_from_entity(merged_account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
+            Logger.logger.info(f"Merged cadr feature of account {merged_account_guid} into the new org {org_guid} successfully")
             
 
         return self.cleanup()
