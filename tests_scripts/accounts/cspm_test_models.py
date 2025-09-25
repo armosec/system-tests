@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -264,3 +264,61 @@ def validate_timestamp_within_window(timestamp: datetime, window_minutes: int = 
     now = datetime.now(datetime.timezone.utc)
     window = now - datetime.timedelta(minutes=window_minutes)
     return window <= timestamp <= now
+
+
+# Request and Response Models
+class AwsStackResponse(BaseModel):
+    """Response model for AWS stack operations."""
+    stackLink: str
+    externalID: str
+
+
+class AwsMembersStackResponse(BaseModel):
+    """Response model for AWS members stack operations."""
+    s3TemplatePath: str
+    externalID: str
+
+
+class AWSOrgCreateCloudOrganizationAdminRequest(BaseModel):
+    """Request model for creating AWS cloud organization with admin."""
+    orgGUID: Union[str, None] = None
+    stackRegion: str
+    adminRoleArn: str
+    adminRoleExternalID: Union[str, None] = None
+    skipScan: bool = False
+
+
+class CreateOrUpdateCloudOrganizationResponse(BaseModel):
+    """Response model for creating or updating cloud organization."""
+    guid: str
+
+
+class ConnectCloudOrganizationMembersRequest(BaseModel):
+    """Request model for connecting cloud organization members."""
+    orgGUID: str
+    features: List[str]
+    memberRoleArn: Union[str, None] = None
+    memberRoleExternalID: str
+    stackRegion: str
+    skipScan: bool = False
+
+
+class UpdateCloudOrganizationMetadataRequest(BaseModel):
+    """Request model for updating cloud organization metadata."""
+    orgGUID: str
+    newName: Union[str, None] = None
+    featureNames: List[str] = []
+    excludeAccounts: Union[List[str], None] = None
+    
+    def model_validate(self, data):
+        """Custom validation to match Go struct validation logic."""
+        # Validate that excludeAccounts and featureNames are set together
+        if (self.excludeAccounts is None) != (len(self.featureNames) == 0):
+            raise ValueError("excludeAccounts and featureNames must be set together")
+        return super().model_validate(data)
+
+
+class SyncCloudOrganizationRequest(BaseModel):
+    """Request model for syncing cloud organization."""
+    orgGUID: str
+    skipScan: bool = False

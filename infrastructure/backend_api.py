@@ -17,6 +17,7 @@ from systest_utils.wlid import Wlid
 
 import json
 from infrastructure.api_login import *
+from tests_scripts.accounts.cspm_test_models import SyncCloudOrganizationRequest
 
 
 class NotExistingCustomer(Exception):
@@ -180,12 +181,18 @@ API_CLOUD_COMPLIANCE_SCAN_NOW = API_CLOUD_COMPLIANCE_BASE+"scanNow"
 
 BASE_API_ORGANIZATIONS = API_ACCOUNTS + "/cloud/organizations"
 API_ORGANIZATIONS_LIST = BASE_API_ORGANIZATIONS + "/list"
+API_ORGANIZATIONS_SYNC_NOW = BASE_API_ORGANIZATIONS + "/syncorg"
 BASE_API_ORGANIZATIONS_AWS = BASE_API_ORGANIZATIONS + "/aws"
 API_CREATE_CADR_ORGANIZATION = BASE_API_ORGANIZATIONS_AWS + "/connectcadr"
+API_CREATE_CLOUD_ORG_WITH_ADMIN_ROLE = BASE_API_ORGANIZATIONS_AWS + "/createadmin"
+API_ORG_CONNECT_MEMBERS = BASE_API_ORGANIZATIONS_AWS + "/connectmembers"
+
 API_ORGANIZATION_DELETE_FEATURE = BASE_API_ORGANIZATIONS + "/feature"
+
 
 API_ORGANIZATIONS_UPDATE = BASE_API_ORGANIZATIONS + "/update"
 API_ORGANIZATIONS_EXCLUDE_ACCOUNTS = API_ORGANIZATIONS_UPDATE + "/excludeaccounts"
+API_ORGANIZATIONS_METADATA = API_ORGANIZATIONS_UPDATE + "/metadata"
 
 API_COMMAND_HELM = "/api/v1/commands/helm"
 
@@ -2937,10 +2944,10 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
-    def get_cspm_link(self, region : str, external_id : bool = False):
+    def get_cspm_single_link(self, feature_name : List[str], region : str, external_id : bool = False ):
         url = API_ACCOUNTS_CSPM_LINK
         body = {
-            "featureNames": ["cspm"]    
+            "featureNames": feature_name    
         }
         r = self.post(url, params={"customerGUID": self.selected_tenant_id, "region": region, "withExternalID": external_id}, json=body)
         if not 200 <= r.status_code < 300:
@@ -2948,20 +2955,8 @@ class ControlPanelAPI(object):
                 'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
-    
-    def get_vulnscan_link(self, region : str, external_id : bool = False):
-        url = API_ACCOUNTS_CSPM_LINK
-        body = {
-            "featureNames": ["vulnScan"]    
-        }
-        r = self.post(url, params={"customerGUID": self.selected_tenant_id, "region": region, "withExternalID": external_id}, json=body)
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing CSPM link. Customer: "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r.json()
-    
-    def get_cspm_members_org_link(self, region, org_guid , feature_names : List[str], generate_external_id : bool = False):
+
+    def get_cspm_members_org_link(self, region, org_guid , feature_names : List[str], generate_external_id : bool = True):
         url = API_ACCOUNTS_CSPMM_MEMBERS_ORG_LINK + "?region=" + region + "&orgGUID=" + org_guid +"&generateExternalID=" + str(generate_external_id).lower()
         body = {
             "featureNames" : feature_names
@@ -2973,9 +2968,14 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
-    def get_cspm_admin_org_link(self, region, org_guid):
-        #TODO: implement
-        return
+    def get_cspm_admin_org_link(self, region:str, stack_name:str,body:dict=None):
+        url = API_ACCOUNTS_CSPM_ADMIN_ORG_LINK + "?region=" + region + "&stackName=" + stack_name
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing CSPM org link. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
        
     def get_cadr_link(self, region, cloud_account_guid):
         url = API_ACCOUNTS_CADR_LINK + "?region=" + region + "&cloudAccountGUID=" + cloud_account_guid
@@ -3117,6 +3117,26 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
 
+    def create_cloud_org_with_admin(self, body):
+        url = API_CREATE_CLOUD_ORG_WITH_ADMIN_ROLE
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating cloud org with admin role. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def create_cloud_org_connect_members(self, body):
+        url = API_ORG_CONNECT_MEMBERS
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating cloud org connect members. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
     def delete_cloud_account(self, guid):
         url = API_ACCOUNTS
         params = {"customerGUID": self.selected_tenant_id}
@@ -3171,6 +3191,16 @@ class ControlPanelAPI(object):
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error updating org exclude accounts. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def update_org_metadata(self, body):
+        url = API_ORGANIZATIONS_METADATA
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating org metadata. Customer: "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
 
@@ -3476,6 +3506,37 @@ class ControlPanelAPI(object):
             if not 200 <= r.status_code < 300:
                 raise Exception(
                     'Error triggering CSPM scan. Customer: "%s" (code: %d, message: %s)' % (
+                        self.customer, r.status_code, r.text))
+            return r
+
+    def sync_org_now(self, sync_request: SyncCloudOrganizationRequest, with_error: bool = False):
+        """
+        Sync organization now with the given request
+        
+        Args:
+            sync_request: SyncCloudOrganizationRequest object containing orgGUID and skipScan
+            with_error (bool): If True, expect an error and return the error response.
+                              If False, expect success and raise exception on error.
+        """
+        url = API_ORGANIZATIONS_SYNC_NOW
+        
+        # Use the Pydantic model to create the request body
+        body = sync_request.model_dump()
+        
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        
+        if with_error:
+            # We expect an error, so if status code is good (2xx), raise exception
+            if 200 <= r.status_code < 300:
+                raise Exception(
+                    "Expected an error but got success. Customer: \"%s\" (code: %d, message: %s)" % (
+                        self.customer, r.status_code, r.text))
+            return r
+        else:
+            # We expect success, so raise exception if status code is not 2xx
+            if not 200 <= r.status_code < 300:
+                raise Exception(
+                    'Error syncing org. Request: sync org now "%s" (code: %d, message: %s)' % (
                         self.customer, r.status_code, r.text))
             return r
 
