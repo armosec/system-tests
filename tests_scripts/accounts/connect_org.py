@@ -102,9 +102,6 @@ class CloudOrganization(Accounts):
             Logger.logger.info(f"AwsManager initiated in region {cadr_region}")
 
             self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"
-            self.tested_stacks.append(self.cadr_org_stack_name)
-            self.cadr_account_stack_name = "systest-" + self.test_identifier_rand + "-cadr-single"
-            self.tested_stacks.append(self.cadr_account_stack_name)
             self.org_log_location = ORGANIZATION_TRAIL_LOG_LOCATION
             self.account_log_location = ACCOUNT_TRAIL_LOG_LOCATION
             self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr-org"
@@ -324,8 +321,14 @@ class CloudOrganization(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-
-        if self.aws_manager:
+        if self.tested_stack_refs:
+            for ref in self.tested_stack_refs:
+                Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
+                ref.manager.delete_stack(ref.stack_name)
+            for ref in self.tested_stack_refs:
+                Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
+                ref.manager.delete_stack_log_groups(ref.stack_name)
+        elif self.aws_manager:
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting stack: {stack_name}")
                 self.aws_manager.delete_stack(stack_name)
