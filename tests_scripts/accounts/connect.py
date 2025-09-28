@@ -2,7 +2,7 @@ import os
 import time
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, CSPM_FEATURE_NAME, extract_parameters_from_url
+from tests_scripts.accounts.accounts import CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME, extract_parameters_from_url
 from tests_scripts.accounts.accounts import CloudEntityTypes, CDR_ALERT_ACCOUNT_ID_PATH
 import random
 from urllib.parse import parse_qs, quote, urlparse
@@ -15,8 +15,6 @@ from infrastructure import aws
 CLOUDTRAIL_SYSTEM_TEST_CONNECT = "system-test-connect-dont-delete"
 BUCKET_NAME_SYSTEM_TEST = "system-test-bucket-armo"
 REGION_SYSTEM_TEST = "us-east-1"
-
-
 
 class CloudConnect(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -88,11 +86,11 @@ class CloudConnect(Accounts):
         # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm"
-        stack_link, external_id = self.get_and_validate_cspm_link_with_external_id(stack_region)
-        self.cspm_external_id = external_id       
-        _, template_url, _, parameters = extract_parameters_from_url(stack_link)
+        aws_stack_response = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
+        self.cspm_external_id = aws_stack_response.externalID       
+        _, template_url, _, parameters = extract_parameters_from_url(aws_stack_response.stackLink)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")
-        test_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+        test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
         Logger.logger.info(f"Created cspm stack {self.cspm_stack_name} with account id {account_id} and arn {test_arn}")
 
@@ -125,6 +123,8 @@ class CloudConnect(Accounts):
         # Store CSPM config for later validation
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         self.cspm_cloud_account_name = account["name"]
+
+        cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
 
         Logger.logger.info('Stage 5: Connect cadr to existing account')
         account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, log_location)
@@ -162,9 +162,9 @@ class CloudConnect(Accounts):
 
             account = self.get_cloud_account_by_guid(cloud_account_guid)
             # Store CSPM config for later validation
-            cspm_feature = account["features"][CSPM_FEATURE_NAME]
+            cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
 
-            last_success_scan_id = account["features"][CSPM_FEATURE_NAME]["lastSuccessScanID"]
+            last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info("extracted last success scan id from created account")
 
             Logger.logger.info('Stage 9: Validate all scan results')
@@ -181,22 +181,23 @@ class CloudConnect(Accounts):
 
         Logger.logger.info('Stage 12: Validate both features exist and cspm unchanged')
         # Validate CSPM config remains unchanged
-        self.validate_features_unchanged(cloud_account_guid, CSPM_FEATURE_NAME, cspm_feature)
+        self.validate_features_unchanged(cloud_account_guid, COMPLIANCE_FEATURE_NAME, cspm_feature)
         
         # Validate account name changed to cadr second cloud account name
         self.validate_account_name(cloud_account_guid, self.cadr_second_cloud_account_name)
 
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 13: disconnect the cspm account')
-            self.disconnect_cspm_account_without_deleting_cloud_account(self.cspm_stack_name,cloud_account_guid ,test_arn)
+            self.disconnect_cspm_account_without_deleting_cloud_account(stack_name=self.cspm_stack_name,cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
             self.tested_stacks.remove(self.cspm_stack_name)
 
-            Logger.logger.info('Stage 14: Recreate cspm stack for Stage 17')
-            new_arn = self.create_stack_cspm(self.cspm_stack_name, template_url, parameters)
+            Logger.logger.info('Stage 12: Recreate cspm stack for Stage 17')
+            new_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
             test_arn = new_arn #update the test arn to the new arn - it is changed though time format in role name
             
-        Logger.logger.info('Stage 15: Delete cspm feature and validate')
-        self.delete_and_validate_account_feature(cloud_account_guid, CSPM_FEATURE_NAME)
+        Logger.logger.info('Stage 13: Delete cspm feature and validate')
+        self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
+            
 
         Logger.logger.info('Stage 16: Delete cadr feature and validate account deleted')
         self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
@@ -228,7 +229,7 @@ class CloudConnect(Accounts):
         self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
         Logger.logger.info('Stage 22: Delete cspm feature and validate account deleted')
-        self.delete_and_validate_account_feature(cloud_account_guid, CSPM_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info('Stage 23: Validate aws regions')
         res = self.backend.get_aws_regions()

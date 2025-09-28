@@ -6,7 +6,7 @@ from infrastructure import aws
 from .accounts import extract_parameters_from_url
 from typing import List, Tuple
 from .connect import REGION_SYSTEM_TEST
-from .accounts import VULNSCAN_FEATURE_NAME
+from .accounts import VULN_SCAN_FEATURE_NAME
 from systest_utils import statics
 
 
@@ -73,11 +73,11 @@ class CloudVulnScan(Accounts):
         
         Logger.logger.info('Stage 2: Create cspm vulnscan stack') 
         self.cspm_vulnscan_stack_name = "systest-" + self.test_identifer_rand + "-cspm-vulnscan"
-        stack_link, external_id = self.get_and_validate_vulnscan_link_with_external_id(stack_region) 
-        self.cspm_vulnscan_external_id = external_id       
-        _, template_url, _, parameters = extract_parameters_from_url(stack_link)
+        aws_stack_response = self.get_and_validate_cspm_link_with_external_id(features=[VULN_SCAN_FEATURE_NAME], region=stack_region) 
+        self.cspm_vulnscan_external_id = aws_stack_response.externalID       
+        _, template_url, _, parameters = extract_parameters_from_url(aws_stack_response.stackLink)
         Logger.logger.info(f"Creating stack {self.cspm_vulnscan_stack_name} with template {template_url} and parameters {parameters}")
-        test_arn = self.create_stack_cspm(self.cspm_vulnscan_stack_name, template_url, parameters)
+        test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_vulnscan_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
         Logger.logger.info(f"Created cspm stack {self.cspm_vulnscan_stack_name} with account id {account_id} and arn {test_arn}")
 
@@ -128,7 +128,7 @@ class CloudVulnScan(Accounts):
         self.validate_hosts_components_uniquevalues(cloud_account_guid, test_aws_account_id) 
 
         Logger.logger.info('Stage 13: Delete cspm vulnscan feature and validate')
-        self.delete_and_validate_account_feature(cloud_account_guid, VULNSCAN_FEATURE_NAME)
+        self.delete_and_validate_account_feature(cloud_account_guid, VULN_SCAN_FEATURE_NAME)
 
         Logger.logger.info('Stage 14: Validate snapshots deleted')
         self.validate_snapshots_deleted(instance_scan_ids)
