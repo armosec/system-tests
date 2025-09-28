@@ -81,6 +81,15 @@ CDR_ALERT_USER_IDENTITY_PATH = "cdrevent.eventdata.awscloudtrail.useridentity"
 CDR_ALERT_ACCOUNT_ID_PATH = CDR_ALERT_USER_IDENTITY_PATH + ".accountid"
 CDR_ALERT_ORG_ID_PATH = CDR_ALERT_USER_IDENTITY_PATH + ".orgid"
 
+from dataclasses import dataclass
+from typing import List, Dict, Any, Union
+
+@dataclass
+class StackRef:
+    manager: aws.AwsManager
+    stack_name: str
+    region: str
+
 class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
@@ -89,6 +98,7 @@ class Accounts(base_test.BaseTest):
         self.test_runtime_policies = []
         self.test_global_aws_users = []
         self.tested_stacks = []
+        self.tested_stack_refs: List[StackRef] = []
         self.tested_stacksets = []
         self.tested_cloud_trails = []
         self.aws_manager: aws.AwsManager
@@ -525,7 +535,10 @@ class Accounts(base_test.BaseTest):
             failuer_reason = aws_manager.get_stack_failure_reason(stack_name)
             Logger.logger.error(f"Stack failure reason: {failuer_reason}")
             raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
+        # Track by name for backward compatibility
         self.tested_stacks.append(stack_name)
+        # Track with region-aware reference for accurate cleanup
+        self.tested_stack_refs.append(StackRef(manager=aws_manager, stack_name=stack_name, region=aws_manager.region))
     
     def create_stackset(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]], ou_id: str = None) -> str:
         stack_id =  aws_manager.create_stackset(template_url, parameters, stack_name, ou_id)

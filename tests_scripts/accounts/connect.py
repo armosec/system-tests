@@ -242,8 +242,14 @@ class CloudConnect(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-
-        if self.aws_manager:
+        if self.tested_stack_refs:
+            for ref in self.tested_stack_refs:
+                Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
+                ref.manager.delete_stack(ref.stack_name)
+            for ref in self.tested_stack_refs:
+                Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
+                ref.manager.delete_stack_log_groups(ref.stack_name)
+        elif self.aws_manager:
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting stack: {stack_name}")
                 self.aws_manager.delete_stack(stack_name)
@@ -251,7 +257,6 @@ class CloudConnect(Accounts):
             for cloud_trail_name in self.tested_cloud_trails:
                 Logger.logger.info(f"Deleting cloudtrail: {cloud_trail_name}")
                 self.aws_manager.delete_cloudtrail(cloud_trail_name)
-
             for stack_name in self.tested_stacks:
                 Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
                 self.aws_manager.delete_stack_log_groups(stack_name )
