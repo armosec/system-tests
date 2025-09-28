@@ -102,7 +102,9 @@ class CloudOrganization(Accounts):
             Logger.logger.info(f"AwsManager initiated in region {cadr_region}")
 
             self.cadr_org_stack_name = "systest-" + self.test_identifier_rand + "-cadr-org"
+            self.tested_stacks.append(self.cadr_org_stack_name)
             self.cadr_account_stack_name = "systest-" + self.test_identifier_rand + "-cadr-single"
+            self.tested_stacks.append(self.cadr_account_stack_name)
             self.org_log_location = ORGANIZATION_TRAIL_LOG_LOCATION
             self.account_log_location = ACCOUNT_TRAIL_LOG_LOCATION
             self.runtime_policy_name = "systest-" + self.test_identifier_rand + "-cadr-org"
