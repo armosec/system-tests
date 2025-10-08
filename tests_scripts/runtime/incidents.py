@@ -9,6 +9,13 @@ from tests_scripts.helm.base_helm import BaseHelm
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
 
+class IncidentStatuses:
+    OPEN = "Open"
+    INVESTIGATING = "Investigating"
+    DISMISSED = "Dismissed"
+    RESOLVED = "Resolved"
+    
+
 class Incidents(BaseHelm):
     """
         check incidents page.
@@ -112,12 +119,12 @@ class Incidents(BaseHelm):
         #self.check_raw_alerts_overtime()
         #self.check_raw_alerts_list()
 
-        self.resolve_incident(inc)
-        self.check_incident_resolved(inc)
-        self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
+        self.backend.change_incident_status(IncidentStatuses.INVESTIGATING, incident_guids=[inc['guid']])
+        self.check_incident_status_changed(inc['guid'], IncidentStatuses.INVESTIGATING)
 
-        self.resolve_incident_false_positive(inc)
-        self.check_incident_resolved_false_positive(inc)
+        self.backend.change_incident_status(IncidentStatuses.RESOLVED, inner_filters=[{"name": expected_incident_name}], mark_as_false_positive=True)
+        self.check_incident_status_changed(inc['guid'], IncidentStatuses.RESOLVED, mark_as_false_positive=True)
+        #self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
 
     def wait_for_incident(self, cluster: str, namespace: str, 
@@ -126,7 +133,9 @@ class Incidents(BaseHelm):
         Execute command in pod and wait for incident to be completed
         """
         time.sleep(sleep_after_cmd)
-        return self.verify_incident_completed(cluster, namespace, expected_incident_name)
+        inc = self.verify_incident_completed(cluster, namespace, expected_incident_name)
+        assert inc['status'] == "Open", f"Incident status is not Open {json.dumps(inc)}"
+        return inc
 
     def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
@@ -264,42 +273,25 @@ class Incidents(BaseHelm):
                                             0) > 0, f"Failed to get raw alerts over time count {json.dumps(resp)}"
         Logger.logger.info(f"Got raw alerts over time {json.dumps(resp)}")
 
-    def resolve_incident(self, incident):
-        Logger.logger.info("Resolve incident")
-        _ = self.backend.resolve_incident(incident_id=incident['guid'], resolution="Suspicious")
-
-    def resolve_incident_false_positive(self, incident):
-        Logger.logger.info("Resolve incident false positive")
-        _ = self.backend.resolve_incident(incident_id=incident['guid'], resolution="FalsePositive")
-
-    def check_incident_resolved(self, incident):
-        Logger.logger.info("Check resolved incident")
+    def check_incident_status_changed(self, incident_guid: str, status: IncidentStatuses, mark_as_false_positive: bool = False):
+        Logger.logger.info("Check incident status changed")
         Logger.logger.info("Get incidents list")
         filters_dict = {
-            "guid": incident['guid']
+            "guid": incident_guid
         }
         response = self.backend.get_incidents(filters=filters_dict)
         incs = response['response']
-        assert len(incs) == 1, f"Failed to get incident list for guid '{incident['guid']}' {json.dumps(incs)}"
-        assert incs[0]["isDismissed"], f"Failed to get resolved incident {json.dumps(incs)}"
-        assert incs[0].get("markedAsFalsePositive", False) is False, f"markedAsFalsePositive==true {json.dumps(incs)}"
-        # assert incs[0].get("resolvedBy", "") != "", f"resolvedBy==None {json.dumps(incs)}" // not working with API keys?
-        assert incs[0].get("resolvedAt", "") != "", f"resolvedAt==None {json.dumps(incs)}"
-
-        Logger.logger.info(f"Got resolved incident {json.dumps(incs)}")
-
-    def check_incident_resolved_false_positive(self, incident):
-        Logger.logger.info("Check resolved incident false positive")
-        Logger.logger.info("Get incidents list")
-        filters_dict = {
-            "guid": incident['guid']
-        }
-        response = self.backend.get_incidents(filters=filters_dict)
-        incs = response['response']
-        assert len(incs) == 1, f"Failed to get incident list for guid '{incident['guid']}' {json.dumps(incs)}"
-        assert incs[0]["isDismissed"], f"Failed to get resolved incident false positive {json.dumps(incs)}"
-        assert incs[0].get("markedAsFalsePositive", False), f"markedAsFalsePositive==false {json.dumps(incs)}"
-        Logger.logger.info(f"Got resolved incident false positive {json.dumps(incs)}")
+        assert len(incs) == 1, f"Failed to get incident list for guid '{incident_guid}' {json.dumps(incs)}"
+        assert incs[0]["markedAsFalsePositive"] == mark_as_false_positive, f"markedAsFalsePositive is not {mark_as_false_positive}, {json.dumps(incs)}"
+        assert incs[0]["status"] == status, f"status is different than {status}, {json.dumps(incs)}"
+        assert incs[0].get("statusChangedAt", "") != "", f"statusChangedAt==None {json.dumps(incs)}"
+        
+        if status == IncidentStatuses.RESOLVED:
+            assert incs[0]["isDismissed"], f"Failed to get resolved incident {json.dumps(incs)}"
+            assert incs[0].get("resolvedAt", "") != "", f"resolvedAt==None {json.dumps(incs)}"
+            # assert incs[0].get("resolvedBy", "") != "", f"resolvedBy==None {json.dumps(incs)}" // not working with API keys?
+        
+        Logger.logger.info(f"Incident status changed sucessfully {json.dumps(incs)}")
 
     def check_alerts_of_incident(self, incident):
         Logger.logger.info("Get alerts of incident")
@@ -419,7 +411,7 @@ class Incidents(BaseHelm):
         assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
         Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
 
-    def verify_incident_status_completed(self, incident_id):
+    def verify_incident_status_completed(self, incident_id: str):
         response = self.backend.get_incident(incident_id)
         assert response['attributes']['incidentStatus'] == "completed", f"Not completed incident {json.dumps(response)}"
         return response

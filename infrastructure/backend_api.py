@@ -704,10 +704,26 @@ class ControlPanelAPI(object):
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
-
+    
     def resolve_incident(self, incident_id: str, resolution: str):
         url = "/api/v1/runtime/incidents/" + incident_id + "/resolve"
         r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json={"Reason": resolution})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+    
+    def change_incident_status(self, status: str, incident_guids: List[str] = None, inner_filters: List[Dict[str, str]] = None, mark_as_false_positive: bool = False):
+        url = API_RUNTIME_INCIDENTS + "/changeStatus"
+        body = {
+            "status": status,
+        }
+        if incident_guids is not None:
+            body["incidentsGuids"] = incident_guids
+        if inner_filters is not None:
+            body["innerFilters"] = inner_filters
+        if mark_as_false_positive:
+            body["markedAsFalsePositive"] = True
+            
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=body)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
