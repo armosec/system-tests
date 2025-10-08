@@ -704,15 +704,15 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
     
-    def change_incident_status(self, status: str, incident_guids: List[str] = None, subgroups: Dict[str, List[str]] = None, mark_as_false_positive: bool = False):
+    def change_incident_status(self, status: str, incident_guids: List[str] = None, inner_filters: List[Dict[str, str]] = None, mark_as_false_positive: bool = False):
         url = API_RUNTIME_INCIDENTS + "/changeStatus"
         body = {
             "status": status,
         }
         if incident_guids is not None:
             body["incidentsGuids"] = incident_guids
-        if subgroups is not None:
-            body["subGroups"] = subgroups
+        if inner_filters is not None:
+            body["innerFilters"] = inner_filters
         if mark_as_false_positive:
             body["markedAsFalsePositive"] = True
             
