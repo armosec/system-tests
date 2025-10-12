@@ -1723,8 +1723,9 @@ class Accounts(base_test.BaseTest):
                 continue
                 
             account = res["response"][0]
-            managed_by_org = account["features"][feature_name]["managedByOrg"]
-            
+            managed_by_org_feature = account["features"][feature_name]
+            managed_by_org = managed_by_org_feature.get("managedByOrg",None)
+            assert managed_by_org is not None, f"managedByOrg is not found in {managed_by_org_feature}"
             if managed_by_org != org_guid:
                 unmanaged_accounts.append(account_id)
         
