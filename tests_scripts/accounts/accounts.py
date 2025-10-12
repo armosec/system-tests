@@ -104,7 +104,21 @@ class Accounts(base_test.BaseTest):
         self.aws_manager: aws.AwsManager
         self.delegated_admin_aws_manager: aws.AwsManager
 
-
+    def generate_timestamped_role_name(self, prefix: str) -> str:
+        """
+        Generate a timestamped role name with milliseconds precision.
+        
+        Args:
+            prefix: The prefix for the role name
+            
+        Returns:
+            A string in format: {prefix}-{YYYYMMDDHHMMSS}{mmm}
+            where {mmm} is 3-digit milliseconds
+        """
+        now = datetime.datetime.now()
+        timestamp = now.strftime("%Y%m%d%H%M%S")
+        milliseconds = str(now.microsecond // 1000).zfill(3)
+        return f"{prefix}-{timestamp}{milliseconds}"
 
     def cleanup(self, **kwargs):
         for guid in self.test_cloud_accounts_guids:
@@ -159,7 +173,7 @@ class Accounts(base_test.BaseTest):
         return res["response"][0]
 
     def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str :
-        generated_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        generated_role_name = self.generate_timestamped_role_name(role_prefix="armo-scan-role")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
@@ -618,7 +632,7 @@ class Accounts(base_test.BaseTest):
         aws_response = self.get_org_members_stack_link(region=region, stack_name=stack_name, features=features)
         external_id = aws_response.externalID
 
-        generated_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        generated_role_name = self.generate_timestamped_role_name(role_prefix="armo-org-member-role")
         
         parameters = [
             {
@@ -720,7 +734,7 @@ class Accounts(base_test.BaseTest):
         awsResponse = self.get_org_admin_stack_link(region, stack_name, external_id)
         external_id = awsResponse.externalID
         _, template_url, region, parameters = extract_parameters_from_url(awsResponse.stackLink)
-        generated_role_name = "armo-discovery-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
+        generated_role_name = self.generate_timestamped_role_name(role_prefix="armo-discovery-role")
         parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
