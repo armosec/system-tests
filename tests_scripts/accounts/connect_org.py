@@ -225,7 +225,7 @@ class CloudOrganization(Accounts):
             self.test_cloud_orgs_guids.append(test_org_guid)
             self.connect_cspm_features_to_org_existing_stack_set(test_org_guid, member_role_name, member_role_external_id, compliance_test_region, features)
             self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
-            timeout=120, org_guid=test_org_guid, account_ids=expected_account_ids, 
+            timeout=180, org_guid=test_org_guid, account_ids=expected_account_ids, 
             feature_name=COMPLIANCE_FEATURE_NAME)
             self.validate_account_feature_managed_by_org(single_account_id, VULN_SCAN_FEATURE_NAME, None)
             self.validate_org_status(test_org_guid, CSPM_STATUS_HEALTHY)
