@@ -158,9 +158,8 @@ class Accounts(base_test.BaseTest):
         assert len(res["response"]) > 0, f"response is empty"
         return res["response"][0]
 
-    def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]]) -> str :
-        generated_role_name = "armo-scan-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
-        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
+    def create_stack_cspm(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str,role_name: str, parameters: List[Dict[str, Any]]) -> str :
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
         return test_arn
@@ -605,9 +604,9 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info("✅ All delegated admin permission tests passed")
         return True
         
-    def connect_cspm_features_to_org(self, aws_manager: aws.AwsManager, stack_name: str, region: str, features: List[str], org_guid: str,
+    def connect_cspm_features_to_org(self, aws_manager: aws.AwsManager, stack_name: str, region: str, features: List[str], org_guid: str, member_role_name: str,
                                  organizational_unit_ids: List[str] = None,
-                                 account_ids: List[str] = None,skip_wait: bool = False)->(str,str,str):
+                                 account_ids: List[str] = None,skip_wait: bool = False)->(str,str):
         """
         Create and deploy a StackSet for Armo Compliance capabilities.
         """
@@ -618,7 +617,6 @@ class Accounts(base_test.BaseTest):
         aws_response = self.get_org_members_stack_link(region=region, stack_name=stack_name, features=features)
         external_id = aws_response.externalID
 
-        generated_role_name = "armo-org-member-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
         
         parameters = [
             {
@@ -627,7 +625,7 @@ class Accounts(base_test.BaseTest):
             },
             {
                 'ParameterKey': 'RoleName',
-                'ParameterValue': generated_role_name
+                'ParameterValue': member_role_name
             }
         ]
         
@@ -652,12 +650,12 @@ class Accounts(base_test.BaseTest):
             features=features,
             memberRoleExternalID=external_id,
             stackRegion=region,
-            memberRoleArn=generated_role_name,
+            memberRoleArn=member_role_name,
             skipScan=True
         ).model_dump()
         res = self.backend.create_cloud_org_connect_members(body=body)
         assert "guid" in res, f"guid not in {res}"
-        return generated_role_name, external_id, operation_id
+        return external_id, operation_id
 
     def connect_cspm_features_to_org_existing_stack_set(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
         """
@@ -715,13 +713,12 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
         return org_guid
     
-    def connect_cspm_new_organization(self,aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
+    def connect_cspm_new_organization(self,aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None, admin_role_name: str = "") -> CreateOrUpdateCloudOrganizationResponse:
         Logger.logger.info(f"Connecting new cspm org")
         awsResponse = self.get_org_admin_stack_link(region, stack_name, external_id)
         external_id = awsResponse.externalID
         _, template_url, region, parameters = extract_parameters_from_url(awsResponse.stackLink)
-        generated_role_name = "armo-discovery-role-" + datetime.datetime.now().strftime("%Y%m%d%H%M")
-        parameters.append({"ParameterKey": "RoleName", "ParameterValue": generated_role_name})
+        parameters.append({"ParameterKey": "RoleName", "ParameterValue": admin_role_name})
         self.create_stack(aws_manager, stack_name, template_url, parameters)
         test_arn =  aws_manager.get_stack_output_role_arn(stack_name)
         body = AWSOrgCreateCloudOrganizationAdminRequest(
