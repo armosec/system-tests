@@ -104,7 +104,7 @@ class Accounts(base_test.BaseTest):
         self.aws_manager: aws.AwsManager
         self.delegated_admin_aws_manager: aws.AwsManager
 
-    def generate_timestamped_role_name(self, prefix: str) -> str:
+    def generate_timestamped_role_name(self, role_prefix: str) -> str:
         """
         Generate a timestamped role name with milliseconds precision.
         
@@ -118,7 +118,7 @@ class Accounts(base_test.BaseTest):
         now = datetime.datetime.now()
         timestamp = now.strftime("%Y%m%d%H%M%S")
         milliseconds = str(now.microsecond // 1000).zfill(3)
-        return f"{prefix}-{timestamp}{milliseconds}"
+        return f"{role_prefix}-{timestamp}{milliseconds}"
 
     def cleanup(self, **kwargs):
         for guid in self.test_cloud_accounts_guids:
