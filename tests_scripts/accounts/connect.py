@@ -1,5 +1,4 @@
 import os
-from re import T
 import time
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
@@ -92,8 +91,7 @@ class CloudConnect(Accounts):
         self.cspm_external_id = aws_stack_response.externalID       
         _, template_url, _, parameters = extract_parameters_from_url(aws_stack_response.stackLink)
         Logger.logger.info(f"Creating stack {self.cspm_stack_name} with template {template_url} and parameters {parameters}")
-        scan_role_name = "armo-scan-role-" + self.test_identifier_rand
-        test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, scan_role_name, parameters)
+        test_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
         account_id = aws.extract_account_id(test_arn)
         Logger.logger.info(f"Created cspm stack {self.cspm_stack_name} with account id {account_id} and arn {test_arn}")
 

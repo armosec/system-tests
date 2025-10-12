@@ -172,8 +172,7 @@ class CloudOrganization(Accounts):
             Logger.logger.info('Stage 6: Create compliance org stack')
             discovery_stack_name = "systest-" + self.test_identifier_rand + "-discovery-org"
             self.compliance_org_stack_name.append(discovery_stack_name)
-            admin_role_name = "armo-org-admin-role-" + self.test_identifier_rand
-            existing_admin_response = self.connect_cspm_new_organization(delegated_admin_aws_manager, discovery_stack_name, compliance_test_region, admin_role_name=admin_role_name)
+            existing_admin_response = self.connect_cspm_new_organization(delegated_admin_aws_manager, discovery_stack_name, compliance_test_region)
             test_org_guid = existing_admin_response.guid
             self.test_cloud_orgs_guids.append(test_org_guid)
             org = self.get_cloud_org_by_guid(test_org_guid)
@@ -189,8 +188,7 @@ class CloudOrganization(Accounts):
             Logger.logger.info('Stage 8: Connect compliance to existing organization(without scanning)')
             features = [COMPLIANCE_FEATURE_NAME]
             compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-compliance-org"
-            member_role_name = "armo-org-member-role-" + self.test_identifier_rand
-            member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid, member_role_name=member_role_name, organizational_unit_ids=[initial_OU],skip_wait=True)
+            member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
             self.compliance_org_stack_set_info.append((compliance_stack_set_name, stack_set_operation_id))
 
             self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
@@ -203,8 +201,7 @@ class CloudOrganization(Accounts):
             self.cspm_external_id = stack_response.externalID       
             _, template_url, _, parameters = extract_parameters_from_url(stack_response.stackLink)
             Logger.logger.info(f"Creating stack {cspm_stack_name} with template {template_url} and parameters {parameters}")
-            single_compliance_role_name = "armo-org-member-role-" + self.test_identifier_rand
-            single_compliance_role_arn = self.create_stack_cspm(self.single_account_aws_manager, cspm_stack_name, template_url, single_compliance_role_name, parameters)
+            single_compliance_role_arn = self.create_stack_cspm(self.single_account_aws_manager, cspm_stack_name, template_url, parameters)
             account_id = aws.extract_account_id(single_compliance_role_arn)
             Logger.logger.info(f"Created cspm stack {cspm_stack_name} with account id {account_id} and arn {single_compliance_role_arn}")
             is_blocked = self.connect_cspm_single_account_suppose_to_be_blocked(compliance_test_region, single_compliance_role_arn, self.cspm_external_id)
