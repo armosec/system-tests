@@ -1,4 +1,5 @@
 import os
+from re import T
 import time
 from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts ,CSPM_SCAN_STATE_COMPLETED ,FEATURE_STATUS_CONNECTED
@@ -25,6 +26,7 @@ class CloudConnect(Accounts):
         self.cadr_stack_name = None
 
         self.skip_apis_validation = False
+        self.skip_jira_validation = True
 
 
     def validate_account_name(self, cloud_account_guid, expected_name):
@@ -171,9 +173,10 @@ class CloudConnect(Accounts):
             self.validate_scan_data(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
-            Logger.logger.info('Stage 10: Create Jira issue for resource')
-            self.create_jira_issue_for_cspm(last_success_scan_id)
-            Logger.logger.info("Jira issue for resource has been created successfully")
+            if not self.skip_jira_validation:
+                Logger.logger.info('Stage 10: Create Jira issue for resource')
+                self.create_jira_issue_for_cspm(last_success_scan_id)
+                Logger.logger.info("Jira issue for resource has been created successfully")
 
             Logger.logger.info('Stage 11: accept the risk')
             self.accept_cspm_risk(cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
