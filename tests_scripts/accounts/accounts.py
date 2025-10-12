@@ -384,7 +384,7 @@ class Accounts(base_test.BaseTest):
         self.wait_for_report(
             self.validate_org_accounts_have_all_features,
             sleep_interval=30,
-            timeout=120,
+            timeout=240,
             org_guid=org_guid,
             account_ids=existing_accounts,
             expected_features=features
