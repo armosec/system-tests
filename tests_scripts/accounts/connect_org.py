@@ -344,8 +344,26 @@ class CloudOrganization(Accounts):
                 self.delegated_admin_aws_manager.delete_stack(stack_name)
             Logger.logger.info(f"Cleaning up stacksets: {[name for name, _ in self.compliance_org_stack_set_info]}")
             self.cleanup_stacksets(self.compliance_org_stack_set_info)
+        
+        for cloud_account_guid in self.test_cloud_accounts_guids:
+            try:
+                remaining_account = self.get_cloud_account_by_guid(cloud_account_guid)
+                if remaining_account:
+                    Logger.logger.info(f"Remaining cloud account before deletion: {remaining_account}")
+            except Exception as e:
+                Logger.logger.info(f"Cloud account {cloud_account_guid} not found before deletion: {str(e)}")
+            
+            Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
+            self.backend.delete_cloud_account(cloud_account_guid)
 
         for cloud_org_guid in self.test_cloud_orgs_guids:
+            try:
+                remaining_org = self.get_cloud_org_by_guid(cloud_org_guid)
+                if remaining_org:
+                    Logger.logger.info(f"Remaining cloud organization before deletion: {remaining_org}")
+            except Exception as e:
+                Logger.logger.info(f"Cloud organization {cloud_org_guid} not found before deletion: {str(e)}")
+            
             Logger.logger.info(f"Deleting cloud organization: {cloud_org_guid}")
             self.backend.delete_cloud_organization(cloud_org_guid)
         

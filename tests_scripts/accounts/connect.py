@@ -264,10 +264,24 @@ class CloudConnect(Accounts):
                 self.aws_manager.delete_stack_log_groups(stack_name )
 
         for cloud_account_guid in self.test_cloud_accounts_guids:
+            try:
+                remaining_account = self.get_cloud_account_by_guid(cloud_account_guid)
+                if remaining_account:
+                    Logger.logger.info(f"Remaining cloud account before deletion: {remaining_account}")
+            except Exception as e:
+                Logger.logger.info(f"Cloud account {cloud_account_guid} not found before deletion: {str(e)}")
+            
             Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
             self.backend.delete_cloud_account(cloud_account_guid)
         
         for policy_guid in self.test_runtime_policies:
+            try:
+                remaining_policy = self.backend.get_runtime_policies(policy_guid)
+                if remaining_policy:
+                    Logger.logger.info(f"Remaining runtime policy before deletion: {remaining_policy}")
+            except Exception as e:
+                Logger.logger.info(f"Runtime policy {policy_guid} not found before deletion: {str(e)}")
+            
             Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
             self.backend.delete_runtime_policies(policy_guid)
             
