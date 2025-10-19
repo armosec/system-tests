@@ -275,13 +275,6 @@ class CloudConnect(Accounts):
             self.backend.delete_cloud_account(cloud_account_guid)
         
         for policy_guid in self.test_runtime_policies:
-            try:
-                remaining_policy = self.backend.get_runtime_policies(policy_guid)
-                if remaining_policy:
-                    Logger.logger.info(f"Remaining runtime policy before deletion: {remaining_policy}")
-            except Exception as e:
-                Logger.logger.info(f"Runtime policy {policy_guid} not found before deletion: {str(e)}")
-            
             Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
             self.backend.delete_runtime_policies(policy_guid)
             
