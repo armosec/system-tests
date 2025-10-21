@@ -25,7 +25,7 @@ class CloudConnect(Accounts):
         self.cadr_stack_name = None
 
         self.skip_apis_validation = False
-        self.skip_jira_validation = True
+        self.skip_jira_validation = False
 
 
     def validate_account_name(self, cloud_account_guid, expected_name):
