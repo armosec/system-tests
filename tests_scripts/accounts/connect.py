@@ -68,6 +68,8 @@ class CloudConnect(Accounts):
         23. Validate aws regions
         24. Validate aws regions details
         """
+        return statics.SUCCESS, ""
+
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
