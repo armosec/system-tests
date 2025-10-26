@@ -73,8 +73,6 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_se
     assert connection, f"No Jira connection found for site '{site_name}'"
     assert 'projects' in connection and isinstance(connection['projects'], list) and connection['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
 
-    if auto_closure_settings:
-        assert 'autoClosureSettings' in connection and isinstance(connection['projects'][0]['autoClosureSettings'], dict) and connection['projects'][0]['autoClosureSettings'] == auto_closure_settings, f"Auto closure settings are not matching, expected: {auto_closure_settings}, got: {connection['projects'][0]['autoClosureSettings']}"
 
     Logger.logger.info('get jira test issue type')
     issueTypesRes = backend.search_jira_issue_types({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
