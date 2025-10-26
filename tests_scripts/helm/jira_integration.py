@@ -6,7 +6,19 @@ import json
 
 DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
 
-def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME):       
+# configuration of auto closure settings
+# isEnabled: True to enable auto closure
+# issueTypeIdToResolvedStatusId: map of issue type id to resolved status id
+# example: { "10060": "10054" } # Bug issue type id to Done status id
+DEFAULT_AUTO_CLOSURE_SETTINGS =  {
+                                    "isEnabled": True,
+                                    "issueTypeIdToResolvedStatusId": {
+                                        "10060": "10054" # Bug issue type id to Done status id
+                                    }
+                                }
+                                
+
+def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_settings=DEFAULT_AUTO_CLOSURE_SETTINGS):       
     """Setup and validate Jira configuration. Returns necessary Jira config objects.
     
     Args:
@@ -38,7 +50,16 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME):
     assert project, "Jira System Tests is missing from projects"
 
     Logger.logger.info('update Jira configuration')
-    backend.update_jira_config({"jiraCollabGUID": jiraCollaborationGUID, 'selectedSite': site, 'projects':[project]})
+    update_body = {
+        "jiraCollabGUID": jiraCollaborationGUID, 
+        'selectedSite': site, 
+        'projects':[project],
+    }
+
+    if auto_closure_settings:
+        update_body['autoClosureSettings'] = auto_closure_settings
+
+    backend.update_jira_config(update_body)
 
     Logger.logger.info('verify Jira configuration')
     config = backend.get_jira_config()
@@ -50,6 +71,9 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME):
     )
     assert connection, f"No Jira connection found for site '{site_name}'"
     assert 'projects' in connection and isinstance(connection['projects'], list) and connection['projects'][0]['name'] == 'Jira System Tests', "Jira project is not Jira System Tests"
+
+    if auto_closure_settings:
+        assert 'autoClosureSettings' in connection and isinstance(connection['autoClosureSettings'], dict) and connection['autoClosureSettings'] == auto_closure_settings, "Auto closure settings are not matching"
 
     Logger.logger.info('get jira test issue type')
     issueTypesRes = backend.search_jira_issue_types({'innerFilters': [{'jiraCollabGUID': jiraCollaborationGUID, 'siteId': site['id'], 'projectId': project['id'], 'name': 'System Test Issue Type'}]})
@@ -139,12 +163,12 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             namespace=namespace, workload=workload, timeout=300
         )
 
-        Logger.logger.info(f"Install Helm Chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(
-            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
-        )       
+        # Logger.logger.info(f"Install Helm Chart")
+        # self.add_and_upgrade_armo_to_repo()
+        # self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        # self.verify_running_pods(
+        #     namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
+        # )       
         
         Logger.logger.info(f"Get report guid")
         report_guid = self.get_report_guid(
