@@ -50,15 +50,16 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_se
     assert project, "Jira System Tests is missing from projects"
 
     Logger.logger.info('update Jira configuration')
+    if auto_closure_settings:
+        project['autoClosureSettings'] = auto_closure_settings
+
     update_body = {
         "jiraCollabGUID": jiraCollaborationGUID, 
         'selectedSite': site, 
         'projects':[project],
     }
 
-    if auto_closure_settings:
-        update_body['autoClosureSettings'] = auto_closure_settings
-
+    
     backend.update_jira_config(update_body)
 
     Logger.logger.info('verify Jira configuration')
