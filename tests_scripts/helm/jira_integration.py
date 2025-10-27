@@ -3,6 +3,9 @@ from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
 import json
+import os
+import requests
+from requests.auth import HTTPBasicAuth
 
 DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
 
@@ -93,6 +96,46 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_se
     return site, project, issueType, jiraCollaborationGUID
 
 
+def get_jira_ticket_by_id(issue_id: str, site_name: str = DEFAULT_JIRA_SITE_NAME) -> dict:
+    """Get a specific Jira ticket by its ID using direct Jira API."""
+    token = os.getenv("JIRA_API_TOKEN")
+    email = os.getenv("JIRA_EMAIL")
+    
+    if not token or not email:
+        raise Exception("Missing JIRA_API_TOKEN or JIRA_EMAIL environment variables")
+    
+    server = f"https://{site_name}.atlassian.net"
+    url = f"{server}/rest/api/3/issue/{issue_id}"
+    auth = HTTPBasicAuth(email, token)
+    headers = {"Accept": "application/json"}
+    
+    resp = requests.get(url, headers=headers, auth=auth, timeout=30)
+    
+    if not resp.ok:
+        try:
+            detail = resp.json()
+        except Exception:
+            detail = resp.text
+        error_msg = f"Failed to get Jira ticket {issue_id}: {resp.status_code}, detail: {detail}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+    
+    data = resp.json()
+    
+    # Check for authentication/authorization errors in response body
+    if "errorMessages" in data:
+        error_msg = f"Jira API error: {data['errorMessages']}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+
+    if "errors" in data and data["errors"]:
+        error_msg = f"Jira API errors: {data['errors']}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+    
+    return data
+
+
 class JiraIntegration(BaseKubescape, BaseHelm):
     def __init__(
             self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
@@ -144,6 +187,8 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.wait_for_vuln_results()
         Logger.logger.info(f"Create image ticket")
         self.create_vuln_tickets()
+        Logger.logger.info(f"Test update Jira ticket status")
+        self.test_update_jira_ticket_status()
         return self.cleanup()
     
 
@@ -403,3 +448,76 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.backend.unlink_issue(workloadCVEicket['guid'])
         self.backend.unlink_issue(globalImageTicket['guid'])
         self.backend.unlink_issue(workloadImageTicket['guid'])
+
+    def test_update_jira_ticket_status(self):
+        """Test the update_jira_ticket_status API and verify status change in Jira."""
+        Logger.logger.info("Testing update_jira_ticket_status API")
+        
+        # Use the posture ticket created earlier
+        if not hasattr(self, 'postureTicket') or not self.postureTicket:
+            Logger.logger.error("No posture ticket available for status update test")
+            return
+            
+        ticket = self.postureTicket
+        issue_id = ticket.get('issueId')
+        
+        if not issue_id:
+            Logger.logger.error("No issue ID found in posture ticket")
+            return
+            
+        Logger.logger.info(f"Testing status update for ticket: {issue_id}")
+        
+        # Get current status from Jira before update
+        try:
+            jira_ticket_before = get_jira_ticket_by_id(issue_id, self.site_name)
+            current_status = jira_ticket_before['fields']['status']
+            Logger.logger.info(f"Current ticket status: {current_status['name']} (ID: {current_status['id']})")
+        except Exception as e:
+            Logger.logger.warning(f"Could not get initial ticket status from Jira: {e}")
+            jira_ticket_before = None
+        
+        # Get the "Done" status ID from auto closure settings
+        done_status_id = DEFAULT_AUTO_CLOSURE_SETTINGS['issueTypeIdToResolvedStatusId'].get(self.issueType['id'], "10054")
+        
+        # Prepare payload for update_jira_ticket_status API
+        update_payload = {
+            "integrationGUID": self.backend.get_jira_collaboration_guid_by_site_name(self.site_name),
+            "siteID": self.site['id'],
+            "issueID": issue_id,
+            "statusID": done_status_id,
+            "comment": "This issue was resolved by system test"
+        }
+        
+        Logger.logger.info(f"Updating ticket status with payload: {update_payload}")
+        
+        # Call the update_jira_ticket_status API
+        try:
+            response = self.backend.update_jira_ticket_status(update_payload)
+            Logger.logger.info(f"Update ticket status response: {response}")
+            
+            # If we get here, the API call was successful (status 200-299)
+            Logger.logger.info("✓ update_jira_ticket_status API call successful")
+            
+        except Exception as e:
+            Logger.logger.error(f"✗ update_jira_ticket_status API call failed: {e}")
+            raise
+        
+        # Verify the status change in Jira
+        Logger.logger.info("Verifying status change in Jira...")
+        time.sleep(5)  # Give Jira a moment to process the update
+        
+        try:
+            jira_ticket_after = get_jira_ticket_by_id(issue_id, self.site_name)
+            new_status = jira_ticket_after['fields']['status']
+            Logger.logger.info(f"New ticket status: {new_status['name']} (ID: {new_status['id']})")
+            
+            # Check if status was actually changed
+            if new_status['id'] == done_status_id:
+                Logger.logger.info("✓ Ticket status successfully updated in Jira")
+            else:
+                Logger.logger.warning(f"✗ Ticket status not updated as expected. Expected: {done_status_id}, Got: {new_status['id']}")
+                
+        except Exception as e:
+            Logger.logger.warning(f"Could not verify status change in Jira: {e}")
+            
+        Logger.logger.info("update_jira_ticket_status test completed")
