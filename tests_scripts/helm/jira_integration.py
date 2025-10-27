@@ -420,11 +420,11 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         ticket = self.postureTicket
         Logger.logger.info(f"DEBUG: Full ticket structure for status update: {ticket}")
         
-        # Try different possible field names for the issue ID
-        issue_id = ticket.get('issueId') or ticket.get('issueID') or ticket.get('id') or ticket.get('key')
+        # Get the Jira issue ID from linkTitle field (e.g., "ETNP-18")
+        issue_id = ticket.get('linkTitle')
         
         if not issue_id:
-            Logger.logger.error(f"No issue ID found in posture ticket. Available keys: {list(ticket.keys())}")
+            Logger.logger.error(f"No issue ID found in posture ticket linkTitle field. Available keys: {list(ticket.keys())}")
             return
             
         Logger.logger.info(f"Testing status update for ticket: {issue_id}")
