@@ -13,7 +13,8 @@ DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
 DEFAULT_AUTO_CLOSURE_SETTINGS =  {
                                     "isEnabled": True,
                                     "issueTypeIdToResolvedStatusId": {
-                                        "10060": "10054" # Bug issue type id to Done status id
+                                        "10060": "10054", # Bug issue type id to Done status id
+                                        "10102": "10054" # System tests issue type id to Done status id
                                     }
                                 }
                                 
