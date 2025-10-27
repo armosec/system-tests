@@ -187,6 +187,18 @@ def get_tickets_from_jira_channel(
             raise Exception(error_msg)
 
         data = resp.json()
+        
+        # Check for authentication/authorization errors in response body
+        if "errorMessages" in data:
+            error_msg = f"Jira API error: {data['errorMessages']}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+
+        if "errors" in data and data["errors"]:
+            error_msg = f"Jira API errors: {data['errors']}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+        
         issues = data.get("issues", [])
         all_issues.extend(issues)
 
