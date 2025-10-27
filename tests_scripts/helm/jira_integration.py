@@ -2,10 +2,8 @@ import time
 from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
+from ..workflows.utils import get_jira_ticket_by_id
 import json
-import os
-import requests
-from requests.auth import HTTPBasicAuth
 
 DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
 
@@ -94,46 +92,6 @@ def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_se
         field['topValues'] = None
 
     return site, project, issueType, jiraCollaborationGUID
-
-
-def get_jira_ticket_by_id(issue_id: str, site_name: str = DEFAULT_JIRA_SITE_NAME) -> dict:
-    """Get a specific Jira ticket by its ID using direct Jira API."""
-    token = os.getenv("JIRA_API_TOKEN")
-    email = os.getenv("JIRA_EMAIL")
-    
-    if not token or not email:
-        raise Exception("Missing JIRA_API_TOKEN or JIRA_EMAIL environment variables")
-    
-    server = f"https://{site_name}.atlassian.net"
-    url = f"{server}/rest/api/3/issue/{issue_id}"
-    auth = HTTPBasicAuth(email, token)
-    headers = {"Accept": "application/json"}
-    
-    resp = requests.get(url, headers=headers, auth=auth, timeout=30)
-    
-    if not resp.ok:
-        try:
-            detail = resp.json()
-        except Exception:
-            detail = resp.text
-        error_msg = f"Failed to get Jira ticket {issue_id}: {resp.status_code}, detail: {detail}"
-        Logger.logger.error(error_msg)
-        raise Exception(error_msg)
-    
-    data = resp.json()
-    
-    # Check for authentication/authorization errors in response body
-    if "errorMessages" in data:
-        error_msg = f"Jira API error: {data['errorMessages']}"
-        Logger.logger.error(error_msg)
-        raise Exception(error_msg)
-
-    if "errors" in data and data["errors"]:
-        error_msg = f"Jira API errors: {data['errors']}"
-        Logger.logger.error(error_msg)
-        raise Exception(error_msg)
-    
-    return data
 
 
 class JiraIntegration(BaseKubescape, BaseHelm):
@@ -254,6 +212,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['fields']['summary'] = f"Jira System Test control Issue cluster:{self.cluster} namespace:{self.namespace} resource:{resourceHash}"
         ticket = self.create_jira_issue(issue)
         self.postureTicket = ticket
+        Logger.logger.info(f"DEBUG: Posture ticket structure: {ticket}")
         assert ticket['owner']['resourceHash'] == resourceHash, "Resource hash is not matching"
         assert ticket['subjects'][0]['controlID'] == controlId, "Control id is not matching"
 
@@ -459,10 +418,13 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             return
             
         ticket = self.postureTicket
-        issue_id = ticket.get('issueId')
+        Logger.logger.info(f"DEBUG: Full ticket structure for status update: {ticket}")
+        
+        # Try different possible field names for the issue ID
+        issue_id = ticket.get('issueId') or ticket.get('issueID') or ticket.get('id') or ticket.get('key')
         
         if not issue_id:
-            Logger.logger.error("No issue ID found in posture ticket")
+            Logger.logger.error(f"No issue ID found in posture ticket. Available keys: {list(ticket.keys())}")
             return
             
         Logger.logger.info(f"Testing status update for ticket: {issue_id}")
