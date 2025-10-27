@@ -414,8 +414,9 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         
         # Use the posture ticket created earlier
         if not hasattr(self, 'postureTicket') or not self.postureTicket:
-            Logger.logger.error("No posture ticket available for status update test")
-            return
+            error_msg = "No posture ticket available for status update test"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
             
         ticket = self.postureTicket
         Logger.logger.info(f"DEBUG: Full ticket structure for status update: {ticket}")
@@ -424,8 +425,9 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue_id = ticket.get('linkTitle')
         
         if not issue_id:
-            Logger.logger.error(f"No issue ID found in posture ticket linkTitle field. Available keys: {list(ticket.keys())}")
-            return
+            error_msg = f"No issue ID found in posture ticket linkTitle field. Available keys: {list(ticket.keys())}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
             
         Logger.logger.info(f"Testing status update for ticket: {issue_id}")
         
@@ -464,22 +466,43 @@ class JiraIntegration(BaseKubescape, BaseHelm):
             Logger.logger.error(f"✗ update_jira_ticket_status API call failed: {e}")
             raise
         
-        # Verify the status change in Jira
+        # Verify the status change in Jira with retry logic
         Logger.logger.info("Verifying status change in Jira...")
-        time.sleep(5)  # Give Jira a moment to process the update
+        max_retries = 20
+        sleep_interval = 3
         
-        try:
-            jira_ticket_after = get_jira_ticket_by_id(issue_id, self.site_name)
-            new_status = jira_ticket_after['fields']['status']
-            Logger.logger.info(f"New ticket status: {new_status['name']} (ID: {new_status['id']})")
-            
-            # Check if status was actually changed
-            if new_status['id'] == done_status_id:
-                Logger.logger.info("✓ Ticket status successfully updated in Jira")
-            else:
-                Logger.logger.warning(f"✗ Ticket status not updated as expected. Expected: {done_status_id}, Got: {new_status['id']}")
+        for attempt in range(1, max_retries + 1):
+            try:
+                Logger.logger.info(f"Checking status change attempt {attempt}/{max_retries}")
+                jira_ticket_after = get_jira_ticket_by_id(issue_id, self.site_name)
+                new_status = jira_ticket_after['fields']['status']
+                Logger.logger.info(f"Current ticket status: {new_status['name']} (ID: {new_status['id']})")
                 
-        except Exception as e:
-            Logger.logger.warning(f"Could not verify status change in Jira: {e}")
+                # Check if status was actually changed
+                if new_status['id'] == done_status_id:
+                    Logger.logger.info(f"✓ Ticket status successfully updated in Jira after {attempt} attempts")
+                    break
+                else:
+                    if attempt == max_retries:
+                        # Last attempt failed
+                        error_msg = f"✗ Ticket status not updated after {max_retries} attempts. Expected: {done_status_id}, Got: {new_status['id']}"
+                        Logger.logger.error(error_msg)
+                        raise Exception(error_msg)
+                    else:
+                        Logger.logger.info(f"Status not yet updated (attempt {attempt}/{max_retries}), waiting {sleep_interval} seconds...")
+                        time.sleep(sleep_interval)
+                        
+            except Exception as e:
+                if "Ticket status not updated after" in str(e):
+                    # Re-raise our own assertion error
+                    raise
+                elif attempt == max_retries:
+                    # Last attempt and got an error
+                    error_msg = f"Could not verify status change in Jira after {max_retries} attempts: {e}"
+                    Logger.logger.error(error_msg)
+                    raise Exception(error_msg)
+                else:
+                    Logger.logger.warning(f"Error checking status (attempt {attempt}/{max_retries}): {e}, retrying in {sleep_interval} seconds...")
+                    time.sleep(sleep_interval)
             
-        Logger.logger.info("update_jira_ticket_status test completed")
+        Logger.logger.info("✓ update_jira_ticket_status test completed successfully")
