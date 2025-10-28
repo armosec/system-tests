@@ -79,7 +79,7 @@ class CloudOrganization(Accounts):
         28. Connect org cadr - validate merging
         """
 
-        # return statics.SUCCESS, ""
+        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
