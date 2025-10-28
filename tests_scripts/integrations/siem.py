@@ -16,6 +16,7 @@ class SIEMIntegrations(BaseIntegrations):
 
     def __init__(self, test_obj=None, backend=None, test_driver=None):
         super().__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
+        self.integration_guids = {}
 
     def start(self):
         
@@ -33,6 +34,7 @@ class SIEMIntegrations(BaseIntegrations):
         Logger.logger.info('Stage 2: Get Webhook SIEM integration')
         webhook_integration = self.get_siem_integration_by_name(name=self.webhook_integration_name, provider=Providers.WEBHOOK)
         assert webhook_integration, f"SIEM integration: {self.webhook_integration_name} not found"
+        self.integration_guids[webhook_integration["guid"]] = Providers.WEBHOOK
         Logger.logger.info(f'Successfully retrieved SIEM integration: {self.webhook_integration_name}')
         
         Logger.logger.info('Stage 3: Validate test message status is failed due to invalid webhook URL')
@@ -69,6 +71,7 @@ class SIEMIntegrations(BaseIntegrations):
         Logger.logger.info('Stage 8: Get Microsoft Sentinel SIEM integration')
         microsoftsentinel_integration = self.get_siem_integration_by_name(name=self.microsoftsentinel_integration_name, provider=Providers.MICROSOFT_SENTINEL)
         assert microsoftsentinel_integration, f"SIEM integration: {self.microsoftsentinel_integration_name} not found"
+        self.integration_guids[microsoftsentinel_integration["guid"]] = Providers.MICROSOFT_SENTINEL
         Logger.logger.info(f'Successfully retrieved SIEM integration: {self.microsoftsentinel_integration_name}')
         
         Logger.logger.info('Stage 9: Validate test message status is failed due to invalid configuration')
@@ -97,6 +100,13 @@ class SIEMIntegrations(BaseIntegrations):
 
         
         return self.cleanup()
+    
+    def cleanup(self, **kwargs):
+        for guid, provider in self.integration_guids.items():
+            self.backend.delete_siem_integration(provider=provider, guid=guid)
+            Logger.logger.info(f'Successfully deleted {provider} SIEM integration with guid: {guid}')
+
+        return super().cleanup(**kwargs)
     
     def create_siem_integration(self, name: str, provider: Providers, configuration: dict):
         body = {
