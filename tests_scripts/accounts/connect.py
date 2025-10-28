@@ -25,7 +25,7 @@ class CloudConnect(Accounts):
         self.cadr_stack_name = None
 
         self.skip_apis_validation = False
-        self.skip_jira_validation = True
+        self.skip_jira_validation = False
 
 
     def validate_account_name(self, cloud_account_guid, expected_name):
@@ -264,6 +264,13 @@ class CloudConnect(Accounts):
                 self.aws_manager.delete_stack_log_groups(stack_name )
 
         for cloud_account_guid in self.test_cloud_accounts_guids:
+            try:
+                remaining_account = self.get_cloud_account_by_guid(cloud_account_guid)
+                if remaining_account:
+                    Logger.logger.info(f"Remaining cloud account before deletion: {remaining_account}")
+            except Exception as e:
+                Logger.logger.info(f"Cloud account {cloud_account_guid} not found before deletion: {str(e)}")
+            
             Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
             self.backend.delete_cloud_account(cloud_account_guid)
         

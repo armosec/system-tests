@@ -187,6 +187,18 @@ def get_tickets_from_jira_channel(
             raise Exception(error_msg)
 
         data = resp.json()
+        
+        # Check for authentication/authorization errors in response body
+        if "errorMessages" in data:
+            error_msg = f"Jira API error: {data['errorMessages']}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+
+        if "errors" in data and data["errors"]:
+            error_msg = f"Jira API errors: {data['errors']}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+        
         issues = data.get("issues", [])
         all_issues.extend(issues)
 
@@ -199,6 +211,46 @@ def get_tickets_from_jira_channel(
 
     Logger.logger.info(f"Successfully retrieved {len(all_issues)} issues")
     return all_issues
+
+
+def get_jira_ticket_by_id(issue_id: str, site_name: str = "cyberarmor-io") -> Dict[str, Any]:
+    """Get a specific Jira ticket by its ID using direct Jira API."""
+    token = get_env("JIRA_API_TOKEN")
+    email = get_env("JIRA_EMAIL")
+    
+    if not token or not email:
+        raise Exception("Missing JIRA_API_TOKEN or JIRA_EMAIL environment variables")
+    
+    server = f"https://{site_name}.atlassian.net"
+    url = f"{server}/rest/api/3/issue/{issue_id}"
+    auth = HTTPBasicAuth(email, token)
+    headers = {"Accept": "application/json"}
+    
+    resp = requests.get(url, headers=headers, auth=auth, timeout=30)
+    
+    if not resp.ok:
+        try:
+            detail = resp.json()
+        except Exception:
+            detail = resp.text
+        error_msg = f"Failed to get Jira ticket {issue_id}: {resp.status_code}, detail: {detail}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+    
+    data = resp.json()
+    
+    # Check for authentication/authorization errors in response body
+    if "errorMessages" in data:
+        error_msg = f"Jira API error: {data['errorMessages']}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+
+    if "errors" in data and data["errors"]:
+        error_msg = f"Jira API errors: {data['errors']}"
+        Logger.logger.error(error_msg)
+        raise Exception(error_msg)
+    
+    return data
     
 def enrich_slack_alert_channel(data):
     data["channel"]["context"]["channel"]["id"] = get_env("SLACK_CHANNEL_ID")

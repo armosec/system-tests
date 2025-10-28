@@ -46,7 +46,6 @@ class WorkflowsJiraNotifications(Workflows):
         6. Assert jira ticket was created
         7. Cleanup
         """
-        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
         self.cluster, self.namespace = self.setup(apply_services=False)
@@ -89,7 +88,7 @@ class WorkflowsJiraNotifications(Workflows):
         return super().cleanup(**kwargs)
     
     
-    def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=20, sleep_time=20):
+    def assert_jira_tickets_was_created(self, begin_time, cluster_name, attempts=30, sleep_time=20):
        
         vuln_body = {
             "innerFilters": [

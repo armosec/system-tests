@@ -2700,6 +2700,15 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
+    def update_jira_ticket_status(self, body: dict):
+        url = API_INTEGRATIONS + "/jira/issueV2/updateStatus"
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update_jira_ticket_status "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
     def get_jira_collaboration_guid_by_site_name(self, site_name: str):
         config = self.get_jira_config()
         jira_connections = config.get("jiraConnections", [])
