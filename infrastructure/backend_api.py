@@ -3673,11 +3673,11 @@ class ControlPanelAPI(object):
                     provider, self.customer, r.status_code, r.text))
         return r.json()
     
-    def delete_siem_integration(self, provider: str, integration_guid: str):
+    def delete_siem_integration(self, provider: str, guid: str):
         url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
         params = {"customerGUID": self.selected_tenant_id}
         body = {
-            "guid" : integration_guid
+            "guid": guid
         }
         r = self.delete(url, params=params, json=body)
         if not 200 <= r.status_code < 300:
