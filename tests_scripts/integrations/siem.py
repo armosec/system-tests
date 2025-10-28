@@ -21,6 +21,7 @@ class SIEMIntegrations(BaseIntegrations):
         
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
         self.webhook_integration_name = "systest-" + self.test_identifier_rand + "-webhook-integration"
+        self.microsoftsentinel_integration_name = "systest-" + self.test_identifier_rand + "-microsoftsentinel-integration"
         
         Logger.logger.info('Stage 1: Create Webhook SIEM integration')
         self.create_siem_integration(name=self.webhook_integration_name,
@@ -55,6 +56,45 @@ class SIEMIntegrations(BaseIntegrations):
         Logger.logger.info('Step 6: Delete Webhook SIEM integration')
         self.backend.delete_siem_integration(provider=Providers.WEBHOOK, guid=webhook_integration["guid"])
         Logger.logger.info(f'Successfully deleted SIEM integration: {self.webhook_integration_name}')
+        
+        Logger.logger.info('Stage 7: Create Microsoft Sentinel SIEM integration')
+        self.create_siem_integration(name=self.microsoftsentinel_integration_name,
+                                     provider=Providers.MICROSOFT_SENTINEL,
+                                     configuration={
+                                         "workSpaceID": "1234567",
+                                         "primaryKey": "14rwetge6253456"
+                                     })  # on purpose invalid data for testing
+        Logger.logger.info(f'Successfully created SIEM integration: {self.microsoftsentinel_integration_name}')
+
+        Logger.logger.info('Stage 8: Get Microsoft Sentinel SIEM integration')
+        microsoftsentinel_integration = self.get_siem_integration_by_name(name=self.microsoftsentinel_integration_name, provider=Providers.MICROSOFT_SENTINEL)
+        assert microsoftsentinel_integration, f"SIEM integration: {self.microsoftsentinel_integration_name} not found"
+        Logger.logger.info(f'Successfully retrieved SIEM integration: {self.microsoftsentinel_integration_name}')
+        
+        Logger.logger.info('Stage 9: Validate test message status is failed due to invalid configuration')
+        self.validate_test_message_status(provider=Providers.MICROSOFT_SENTINEL,
+                                          guid=microsoftsentinel_integration["guid"],
+                                          expected_status=TestMessageStatus.FAILURE)
+
+        Logger.logger.info('Stage 10: Update Microsoft Sentinel SIEM integration with valid configuration')
+        self.update_siem_integration(guid=microsoftsentinel_integration["guid"],
+                                     name=self.microsoftsentinel_integration_name,
+                                     provider=Providers.MICROSOFT_SENTINEL,
+                                     configuration={
+                                            "workSpaceID": "bc9f01bf-e280-4f62-8097-e4176c9c2aa6",
+                                            "primaryKey": "mf8xHWtclxGIEqW4WQamOm9iiSQ3SSoKZ3E6ssI54/F002F9TNeLo2ToeV0RNwjjym4/cD8gDkUTULyruhVndQ=="
+                                        })
+        Logger.logger.info(f'Successfully updated SIEM integration: {self.microsoftsentinel_integration_name}')
+
+        Logger.logger.info('Stage 11: Validate test message status is successful due to valid configuration')
+        self.validate_test_message_status(provider=Providers.MICROSOFT_SENTINEL,
+                                          guid=microsoftsentinel_integration["guid"],
+                                          expected_status=TestMessageStatus.SUCCESS)
+
+        Logger.logger.info('Step 12: Delete Microsoft Sentinel SIEM integration')
+        self.backend.delete_siem_integration(provider=Providers.MICROSOFT_SENTINEL, guid=microsoftsentinel_integration["guid"])
+        Logger.logger.info(f'Successfully deleted SIEM integration: {self.microsoftsentinel_integration_name}')
+
         
         return self.cleanup()
     
