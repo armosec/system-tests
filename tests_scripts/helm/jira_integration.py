@@ -2,6 +2,7 @@ import time
 from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
 from systest_utils import statics, Logger, TestUtil
+from ..workflows.utils import get_jira_ticket_by_id
 import json
 
 DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
@@ -144,6 +145,8 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.wait_for_vuln_results()
         Logger.logger.info(f"Create image ticket")
         self.create_vuln_tickets()
+        Logger.logger.info(f"Test update Jira ticket status")
+        self.test_update_jira_ticket_status()
         return self.cleanup()
     
 
@@ -209,6 +212,7 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         issue['fields']['summary'] = f"Jira System Test control Issue cluster:{self.cluster} namespace:{self.namespace} resource:{resourceHash}"
         ticket = self.create_jira_issue(issue)
         self.postureTicket = ticket
+        Logger.logger.info(f"DEBUG: Posture ticket structure: {ticket}")
         assert ticket['owner']['resourceHash'] == resourceHash, "Resource hash is not matching"
         assert ticket['subjects'][0]['controlID'] == controlId, "Control id is not matching"
 
@@ -403,3 +407,102 @@ class JiraIntegration(BaseKubescape, BaseHelm):
         self.backend.unlink_issue(workloadCVEicket['guid'])
         self.backend.unlink_issue(globalImageTicket['guid'])
         self.backend.unlink_issue(workloadImageTicket['guid'])
+
+    def test_update_jira_ticket_status(self):
+        """Test the update_jira_ticket_status API and verify status change in Jira."""
+        Logger.logger.info("Testing update_jira_ticket_status API")
+        
+        # Use the posture ticket created earlier
+        if not hasattr(self, 'postureTicket') or not self.postureTicket:
+            error_msg = "No posture ticket available for status update test"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+            
+        ticket = self.postureTicket
+        Logger.logger.info(f"DEBUG: Full ticket structure for status update: {ticket}")
+        
+        # Get the Jira issue ID from linkTitle field (e.g., "ETNP-18")
+        issue_id = ticket.get('linkTitle')
+        
+        if not issue_id:
+            error_msg = f"No issue ID found in posture ticket linkTitle field. Available keys: {list(ticket.keys())}"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+            
+        Logger.logger.info(f"Testing status update for ticket: {issue_id}")
+        
+        # Get current status from Jira before update
+        try:
+            jira_ticket_before = get_jira_ticket_by_id(issue_id, self.site_name)
+            current_status = jira_ticket_before['fields']['status']
+            Logger.logger.info(f"Current ticket status: {current_status['name']} (ID: {current_status['id']})")
+        except Exception as e:
+            Logger.logger.warning(f"Could not get initial ticket status from Jira: {e}")
+            jira_ticket_before = None
+        
+        # Get the "Done" status ID from auto closure settings
+        done_status_id = DEFAULT_AUTO_CLOSURE_SETTINGS['issueTypeIdToResolvedStatusId'].get(self.issueType['id'], "10054")
+        
+        # Prepare payload for update_jira_ticket_status API
+        update_payload = {
+            "integrationGUID": self.backend.get_jira_collaboration_guid_by_site_name(self.site_name),
+            "siteID": self.site['id'],
+            "issueID": issue_id,
+            "statusID": done_status_id,
+            "comment": "This issue was resolved by system test"
+        }
+        
+        Logger.logger.info(f"Updating ticket status with payload: {update_payload}")
+        
+        # Call the update_jira_ticket_status API
+        try:
+            response = self.backend.update_jira_ticket_status(update_payload)
+            Logger.logger.info(f"Update ticket status response: {response}")
+            
+            # If we get here, the API call was successful (status 200-299)
+            Logger.logger.info("✓ update_jira_ticket_status API call successful")
+            
+        except Exception as e:
+            Logger.logger.error(f"✗ update_jira_ticket_status API call failed: {e}")
+            raise
+        
+        # Verify the status change in Jira with retry logic
+        Logger.logger.info("Verifying status change in Jira...")
+        max_retries = 20
+        sleep_interval = 3
+        
+        for attempt in range(1, max_retries + 1):
+            try:
+                Logger.logger.info(f"Checking status change attempt {attempt}/{max_retries}")
+                jira_ticket_after = get_jira_ticket_by_id(issue_id, self.site_name)
+                new_status = jira_ticket_after['fields']['status']
+                Logger.logger.info(f"Current ticket status: {new_status['name']} (ID: {new_status['id']})")
+                
+                # Check if status was actually changed
+                if new_status['id'] == done_status_id:
+                    Logger.logger.info(f"✓ Ticket status successfully updated in Jira after {attempt} attempts")
+                    break
+                else:
+                    if attempt == max_retries:
+                        # Last attempt failed
+                        error_msg = f"✗ Ticket status not updated after {max_retries} attempts. Expected: {done_status_id}, Got: {new_status['id']}"
+                        Logger.logger.error(error_msg)
+                        raise Exception(error_msg)
+                    else:
+                        Logger.logger.info(f"Status not yet updated (attempt {attempt}/{max_retries}), waiting {sleep_interval} seconds...")
+                        time.sleep(sleep_interval)
+                        
+            except Exception as e:
+                if "Ticket status not updated after" in str(e):
+                    # Re-raise our own assertion error
+                    raise
+                elif attempt == max_retries:
+                    # Last attempt and got an error
+                    error_msg = f"Could not verify status change in Jira after {max_retries} attempts: {e}"
+                    Logger.logger.error(error_msg)
+                    raise Exception(error_msg)
+                else:
+                    Logger.logger.warning(f"Error checking status (attempt {attempt}/{max_retries}): {e}, retrying in {sleep_interval} seconds...")
+                    time.sleep(sleep_interval)
+            
+        Logger.logger.info("✓ update_jira_ticket_status test completed successfully")
