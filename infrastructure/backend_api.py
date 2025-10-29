@@ -194,6 +194,8 @@ API_ORGANIZATIONS_UPDATE = BASE_API_ORGANIZATIONS + "/update"
 API_ORGANIZATIONS_EXCLUDE_ACCOUNTS = API_ORGANIZATIONS_UPDATE + "/excludeaccounts"
 API_ORGANIZATIONS_METADATA = API_ORGANIZATIONS_UPDATE + "/metadata"
 
+API_SIEM_INTEGRATIONS_BASE = "/api/v1/siem/{provider}"
+
 API_COMMAND_HELM = "/api/v1/commands/helm"
 
 POST_CDR_ALERTS = "/cloud/v1/cdrAlert"
@@ -3649,6 +3651,49 @@ class ControlPanelAPI(object):
                 'Error accessing dashboard. Request: get helm "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         return r.json()
+    
+    def create_siem_integration(self, provider: str, body: dict):
+        url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.post(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error creating %s SIEM integration. Customer: "%s" (code: %d, message: %s)' % (
+                    provider, self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def get_siem_integrations(self, provider: str):
+        url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(url, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing %s SIEM integrations. Customer: "%s" (code: %d, message: %s)' % (
+                    provider, self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def update_siem_integration(self, provider: str, body: dict):
+        url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.put(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error updating %s SIEM integration. Customer: "%s" (code: %d, message: %s)' % (
+                    provider, self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def delete_siem_integration(self, provider: str, guid: str):
+        url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
+        params = {"customerGUID": self.selected_tenant_id}
+        body = {
+            "guid": guid
+        }
+        r = self.delete(url, params=params, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting %s SIEM integration. Customer: "%s" (code: %d, message: %s)' % (
+                    provider, self.customer, r.status_code, r.text))
+
 
 class Solution(object):
     """docstring for Solution"""

@@ -1285,5 +1285,18 @@
     "description": "testing cadr incident presented",
     "skip_on_environment": "",
     "owner": "afekb@armosec.io"
+  },
+  "siem_integrations": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks SIEM integrations",
+    "skip_on_environment": "",
+    "owner": "shanyl@armosec.io",
+    "skip_cluster": true
   }
 }
