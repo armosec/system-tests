@@ -1,3 +1,4 @@
+import os
 import random
 from systest_utils import Logger
 from tests_scripts.integrations.base_integrations import BaseIntegrations
@@ -20,6 +21,17 @@ class SIEMIntegrations(BaseIntegrations):
 
     def start(self):
         
+        webhook_url = os.environ.get("SIEM_WEBHOOK_URL")
+        workspaceID = os.environ.get("SIEM_MICROSOFT_SENTINEL_WORKSPACEID")
+        primary_key = os.environ.get("SIEM_MICROSOFT_SENTINEL_PRIMARY_KEY")
+        
+        if not webhook_url:
+            raise Exception("SIEM_WEBHOOK_URL environment variable is not set")
+        if not workspaceID:
+            raise Exception("SIEM_MICROSOFT_SENTINEL_WORKSPACEID environment variable is not set")
+        if not primary_key:
+            raise Exception("SIEM_MICROSOFT_SENTINEL_PRIMARY_KEY environment variable is not set")
+
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
         self.webhook_integration_name = "systest-" + self.test_identifier_rand + "-webhook-integration"
         self.microsoftsentinel_integration_name = "systest-" + self.test_identifier_rand + "-microsoftsentinel-integration"
@@ -47,7 +59,7 @@ class SIEMIntegrations(BaseIntegrations):
                                      name=self.webhook_integration_name,
                                      provider=Providers.WEBHOOK,
                                      configuration={
-                                          "webhookURL": "https://cyberarmorio.webhook.office.com/webhookb2/c26291b4-0240-49e7-a165-1d568d3d1013@50a70646-52e3-4e46-911e-6ca1b46afba3/IncomingWebhook/6d902cfccbc04d9a91f4b7d784ce3663/6bc28457-1839-4890-b633-82cc56c77deb/V2Vo5ro2YapZc7Q6ONj50TQFq3jtTrs_tATypBRI1Vse41"})
+                                          "webhookURL": webhook_url})
         Logger.logger.info(f'Successfully updated SIEM integration: {self.webhook_integration_name}')
 
         Logger.logger.info('Stage 5: Validate test message status is successful due to valid webhook URL')
@@ -84,8 +96,8 @@ class SIEMIntegrations(BaseIntegrations):
                                      name=self.microsoftsentinel_integration_name,
                                      provider=Providers.MICROSOFT_SENTINEL,
                                      configuration={
-                                            "workSpaceID": "bc9f01bf-e280-4f62-8097-e4176c9c2aa6",
-                                            "primaryKey": "mf8xHWtclxGIEqW4WQamOm9iiSQ3SSoKZ3E6ssI54/F002F9TNeLo2ToeV0RNwjjym4/cD8gDkUTULyruhVndQ=="
+                                            "workSpaceID": workspaceID,
+                                            "primaryKey": primary_key
                                         })
         Logger.logger.info(f'Successfully updated SIEM integration: {self.microsoftsentinel_integration_name}')
 

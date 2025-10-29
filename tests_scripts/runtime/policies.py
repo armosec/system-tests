@@ -14,7 +14,7 @@ from tests_scripts.workflows.utils import WEBHOOK_NAME
 
 UPDATE_EXPECTED_RUNTIME_POLICIES = False
 
-EXPECTED_RUNTIME_RULSETS_PATH = "configurations/expected-result/kdr/runtime_rulesets.json"
+EXPECTED_RUNTIME_RULESETS_PATH = "configurations/expected-result/kdr/runtime_rulesets.json"
 EXPECTED_RUNTIME_POLICIES_PATH = "configurations/expected-result/kdr/runtime_policies_default.json"
 EXPECTED_UNIQUEVALUES_PATH = "configurations/expected-result/kdr/runtime_policies_unique_values.json"
 
@@ -81,7 +81,7 @@ class RuntimePoliciesConfigurations(Incidents):
         policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
+            TestUtil.save_expected_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
@@ -107,7 +107,7 @@ class RuntimePoliciesConfigurations(Incidents):
         unique_values = json.loads(res.text)
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
+            TestUtil.save_expected_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
 
         expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
         TestUtil.compare_jsons(expected_unique_values, unique_values, [])
@@ -163,19 +163,19 @@ class RuntimePoliciesConfigurations(Incidents):
             "actions": []
         }
 
-        notifcations_teams = [
+        notifications_teams = [
             {
                 "provider": "teams",
                 "teamsWebhookURL" : get_env("CHANNEL_WEBHOOK")
             }
         ]
 
-        update_runtime_policy_body["notifications"]  = notifcations_teams
+        update_runtime_policy_body["notifications"]  = notifications_teams
 
         
         Logger.logger.info("8. update runtime policy with teams")
         update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
-        self.validate_notifications(notifcations_teams, update_runtime_policy_body_res)
+        self.validate_notifications(notifications_teams, update_runtime_policy_body_res)
 
 
         notifications_slack = [
@@ -258,10 +258,10 @@ class RuntimePoliciesConfigurations(Incidents):
         exceptions = self.backend.list_runtime_exceptions()["response"][0]
         assert(exceptions.get('advancedScopes') == exception_with_advanced_scopes.get('advancedScopes'))
         
-        Logger.logger.info("19. Create alert that matches excpetion - no incident")       
+        Logger.logger.info("19. Create alert that matches exception - no incident")       
         self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
         
-        Logger.logger.info("20. Create alert that does not match excpetion - create incident")
+        Logger.logger.info("20. Create alert that does not match exception - create incident")
         self.exec_pod(wlid=wlids[0], command="tail /etc/group")
         self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                 cluster=cluster, namespace=namespace,
@@ -288,15 +288,15 @@ class RuntimePoliciesConfigurations(Incidents):
         return self.cleanup()
   
     def ensure_no_incident(self, wlid: str, cluster: str, namespace: str, expected_incident_name: str):
-        exception_occured = False
+        exception_occurred = False
         self.exec_pod(wlid=wlid, command="cat /etc/hosts")
         try:
             self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
                                 cluster=cluster, namespace=namespace,
                                 incident_name=[expected_incident_name])
         except Exception:
-            exception_occured = True
-        if not exception_occured:
+            exception_occurred = True
+        if not exception_occurred:
             raise Exception("Exception not created")
         
     def wait_for_specific_incident_count_with_report(self, cluster: str, namespace: str, incident_name: list, expected_count: int, timeout: int = 120):
@@ -387,7 +387,7 @@ class RuntimePoliciesConfigurations(Incidents):
         incident_rulesets = json.loads(res.text)
 
         if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expceted_json(incident_rulesets, EXPECTED_RUNTIME_RULSETS_PATH)
+            TestUtil.save_expected_json(incident_rulesets, EXPECTED_RUNTIME_RULSETS_PATH)
         
         assert len(incident_rulesets["response"]) > 0, "no incident rulesets found"  
         

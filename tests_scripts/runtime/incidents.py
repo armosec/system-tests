@@ -119,11 +119,11 @@ class Incidents(BaseHelm):
         #self.check_raw_alerts_overtime()
         #self.check_raw_alerts_list()
 
-        #self.backend.change_incident_status(IncidentStatuses.INVESTIGATING, incident_guids=[inc['guid']])
-        #self.check_incident_status_changed(inc['guid'], IncidentStatuses.INVESTIGATING)
+        self.backend.change_incident_status(IncidentStatuses.INVESTIGATING, incident_guids=[inc['guid']])
+        self.check_incident_status_changed(inc['guid'], IncidentStatuses.INVESTIGATING)
 
-        #self.backend.change_incident_status(IncidentStatuses.RESOLVED, inner_filters=[{"name": expected_incident_name}], mark_as_false_positive=True)
-        #self.check_incident_status_changed(inc['guid'], IncidentStatuses.RESOLVED, mark_as_false_positive=True)
+        self.backend.change_incident_status(IncidentStatuses.RESOLVED, inner_filters=[{"name": expected_incident_name}], mark_as_false_positive=True)
+        self.check_incident_status_changed(inc['guid'], IncidentStatuses.RESOLVED, mark_as_false_positive=True)
         #self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
 
@@ -134,7 +134,7 @@ class Incidents(BaseHelm):
         """
         time.sleep(sleep_after_cmd)
         inc = self.verify_incident_completed(cluster, namespace, expected_incident_name)
-        assert inc['status'] == "Open", f"Incident status is not Open {json.dumps(inc)}"
+        assert inc['status'] == IncidentStatuses.OPEN, f"Incident status is not Open {json.dumps(inc)}"
         return inc
 
     def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
@@ -286,12 +286,7 @@ class Incidents(BaseHelm):
         assert incs[0]["status"] == status, f"status is different than {status}, {json.dumps(incs)}"
         assert incs[0].get("statusChangedAt", "") != "", f"statusChangedAt==None {json.dumps(incs)}"
         
-        if status == IncidentStatuses.RESOLVED:
-            assert incs[0]["isDismissed"], f"Failed to get resolved incident {json.dumps(incs)}"
-            assert incs[0].get("resolvedAt", "") != "", f"resolvedAt==None {json.dumps(incs)}"
-            # assert incs[0].get("resolvedBy", "") != "", f"resolvedBy==None {json.dumps(incs)}" // not working with API keys?
-        
-        Logger.logger.info(f"Incident status changed sucessfully {json.dumps(incs)}")
+        Logger.logger.info(f"Incident status changed successfully {json.dumps(incs)}")
 
     def check_alerts_of_incident(self, incident):
         Logger.logger.info("Get alerts of incident")
@@ -360,7 +355,7 @@ class Incidents(BaseHelm):
         unique_values_req = {
             "fields": {"clusterName": "", "containerName": "", "name": "",
                        "podName": "", "workloadKind": "", "workloadName": "",
-                       "incidentSeverity": "", "mitreTactic": "", "isDismissed": "", "incidentCategory": "",
+                       "incidentSeverity": "", "mitreTactic": "", "incidentCategory": "",
                        "nodeName": ""},
             "innerFilters": [{"guid": incident['guid']}],
             "pageSize": 100,
@@ -371,7 +366,7 @@ class Incidents(BaseHelm):
         assert unique_values is not None, f"Failed to get unique values of incident {json.dumps(incident)}"
         expected_values_for_sensitive_fa = {'fields': {'clusterName': [incident["clusterName"]], 'containerName': ['redis'],
                                       'incidentCategory': ['Anomaly'], 'incidentSeverity': ['Medium'],
-                                      'isDismissed': ['false'], 'mitreTactic': ['TA0006'],
+                                      'mitreTactic': ['TA0006'],
                                       'name': ['Unexpected Sensitive File Access'], 'nodeName': [incident["nodeName"]],
                                       "podName": [incident["podName"]],
                                       'workloadKind': ['Deployment'],
@@ -380,7 +375,6 @@ class Incidents(BaseHelm):
                                            'containerName': [{'key': 'redis', 'count': 1}],
                                            'incidentCategory': [{'key': 'Anomaly', 'count': 1}],
                                            'incidentSeverity': [{'key': 'Medium', 'count': 1}],
-                                           'isDismissed': [{'key': 'false', 'count': 1}],
                                            'mitreTactic': [{'key': 'TA0006', 'count': 1}],
                                            'name': [{'key': 'Unexpected Sensitive File Access', 'count': 1}],
                                            'nodeName': [{'key': incident["nodeName"], 'count': 1}],
@@ -389,7 +383,7 @@ class Incidents(BaseHelm):
                                            'workloadName': [{'key': 'redis-sleep', 'count': 1}]}}
         expected_values_unexpected_process = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
                                       "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"],
-                                      "isDismissed": ["false"], "mitreTactic": ["TA0002"],
+                                      "mitreTactic": ["TA0002"],
                                       "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
                                       "podName": [incident["podName"]],
                                       "workloadKind": ["Deployment"],
@@ -398,7 +392,6 @@ class Incidents(BaseHelm):
                                            "containerName": [{"key": "redis", "count": 1}],
                                            "incidentCategory": [{"key": "Anomaly", "count": 1}],
                                            "incidentSeverity": [{"key": "Medium", "count": 1}],
-                                           "isDismissed": [{"key": "false", "count": 1}],
                                            "mitreTactic": [{"key": "TA0002", "count": 1}],
                                            "name": [{"key": "Unexpected process launched", "count": 1}],
                                            "nodeName": [{"key": incident["nodeName"], "count": 1}],
@@ -419,7 +412,7 @@ class Incidents(BaseHelm):
     def verify_incident_in_backend_list(self, cluster, namespace, incident_name = None):
         Logger.logger.info("Get incidents list")
         filters_dict = {
-            "isDismissed": "false",
+            "status": IncidentStatuses.OPEN,
             "designators.attributes.cluster": cluster,
             "designators.attributes.namespace": namespace,
         }
