@@ -378,7 +378,7 @@ class TestUtil(object):
         return [func for func in dir(class_name) if callable(getattr(class_name, func)) and not func.startswith("_")]
 
     @staticmethod
-    def save_expceted_json(expected_json, path):
+    def save_expected_json(expected_json, path):
         with open(path, 'w') as f:
             json.dump(expected_json, f, indent=4)
 
