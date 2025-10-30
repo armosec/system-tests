@@ -97,10 +97,7 @@ class Accounts(base_test.BaseTest):
         self.test_cloud_orgs_guids = []
         self.test_runtime_policies = []
         self.test_global_aws_users = []
-        self.tested_stacks = []
         self.tested_stack_refs: List[StackRef] = []
-        self.tested_stacksets = []
-        self.tested_cloud_trails = []
         self.aws_manager: aws.AwsManager
         self.delegated_admin_aws_manager: aws.AwsManager
 
@@ -549,23 +546,8 @@ class Accounts(base_test.BaseTest):
             failuer_reason = aws_manager.get_stack_failure_reason(stack_name)
             Logger.logger.error(f"Stack failure reason: {failuer_reason}")
             raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
-        # Track by name for backward compatibility
-        self.tested_stacks.append(stack_name)
         # Track with region-aware reference for accurate cleanup
         self.tested_stack_refs.append(StackRef(manager=aws_manager, stack_name=stack_name, region=aws_manager.region))
-    
-    def create_stackset(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, Any]], ou_id: str = None) -> str:
-        stack_id =  aws_manager.create_stackset(template_url, parameters, stack_name, ou_id)
-        assert stack_id, f"failed to create stackset {stack_name}"
-        Logger.logger.info(f"Stackset creation initiated for: {stack_name}, stack id is {stack_id}")
-        try:
-            aws_manager.wait_for_stackset_creation(stack_name)
-        except Exception as e:
-            Logger.logger.error(f"An error occurred while waiting for stackset creation: {e}")
-            failuer_reason = aws_manager.get_stackset_failure_reason(stack_name)
-            Logger.logger.error(f"Stackset failure reason: {failuer_reason}")
-            raise Exception(f"failed to create stackset {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
-        self.tested_stacks.append(stack_name)
 
     def _test_delegated_admin_permissions(self, aws_manager: aws.AwsManager) -> bool:
         """
@@ -796,22 +778,6 @@ class Accounts(base_test.BaseTest):
             return True
         assert res["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
-
-
-    def create_cloudtrail(self, trail_name, bucket_name, kms_key_id=None):
-
-        # have to clean up since there is a limit of 5 trails per region
-        self.aws_manager.delete_all_cloudtrails("systest-cloud-trail")
-
-        trail_arn = self.aws_manager.create_cloudtrail(trail_name, bucket_name)
-        Logger.logger.info(f"Created CloudTrail with ARN: {trail_arn}, cloud_trail_name is {trail_name}, bucket_name is {bucket_name}")
-       
-
-        log_location, kms_key = self.aws_manager.get_cloudtrail_details(trail_name)
-        Logger.logger.info(f"CloudTrail details retrieved: Log Location: {log_location}, KMS Key: {kms_key}")
-
-        self.tested_cloud_trails.append(trail_arn)
-        return log_location, kms_key
 
 
     def cleanup_existing_aws_cloud_accounts(self, account_id):

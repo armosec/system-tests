@@ -22,7 +22,6 @@ class CloudConnect(Accounts):
 
         self.aws_manager = None
         self.cspm_stack_name = None
-        self.cadr_stack_name = None
 
         self.skip_apis_validation = False
         self.skip_jira_validation = False
@@ -191,7 +190,6 @@ class CloudConnect(Accounts):
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 13: disconnect the cspm account')
             self.disconnect_cspm_account_without_deleting_cloud_account(stack_name=self.cspm_stack_name,cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
-            self.tested_stacks.remove(self.cspm_stack_name)
 
             Logger.logger.info('Stage 12: Recreate cspm stack for Stage 17')
             new_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
@@ -251,17 +249,6 @@ class CloudConnect(Accounts):
             for ref in self.tested_stack_refs:
                 Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
                 ref.manager.delete_stack_log_groups(ref.stack_name)
-        elif self.aws_manager:
-            for stack_name in self.tested_stacks:
-                Logger.logger.info(f"Deleting stack: {stack_name}")
-                self.aws_manager.delete_stack(stack_name)
-
-            for cloud_trail_name in self.tested_cloud_trails:
-                Logger.logger.info(f"Deleting cloudtrail: {cloud_trail_name}")
-                self.aws_manager.delete_cloudtrail(cloud_trail_name)
-            for stack_name in self.tested_stacks:
-                Logger.logger.info(f"Deleting log groups for stack: {stack_name}")
-                self.aws_manager.delete_stack_log_groups(stack_name )
 
         for cloud_account_guid in self.test_cloud_accounts_guids:
             try:
