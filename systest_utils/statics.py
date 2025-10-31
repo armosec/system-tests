@@ -3,7 +3,7 @@ import os
 
 # test webhook
 
-ARMO_TEST_WEBHOOK_API = "/api/v1/notifications/webhooks/testWebhook"
+ARMO_TEST_WEBHOOK_API = "/api/v1/systemTestSiemWebhook"
 
 # seccomp workloads statuses
 
