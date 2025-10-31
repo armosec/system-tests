@@ -3652,6 +3652,27 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         return r.json()
     
+    def get_test_webhook_messages(self, url: str):
+        """Get test webhook messages from the test webhook endpoint"""
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.get(url, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing test webhook messages. Request: get test webhook messages "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    def delete_all_siem_events(self, url: str):
+        """Delete all SIEM events from the test webhook endpoint"""
+        params = {"customerGUID": self.selected_tenant_id}
+        r = self.delete(url, params=params)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error deleting all SIEM events. Request: delete all SIEM events "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+    
+    
     def create_siem_integration(self, provider: str, body: dict):
         url = API_SIEM_INTEGRATIONS_BASE.format(provider=provider)
         params = {"customerGUID": self.selected_tenant_id}
