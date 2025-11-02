@@ -196,13 +196,32 @@ class CloudOrganizationCSPM(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
+        # Delete all stacks with error handling to ensure we attempt all deletions
         if self.tested_stack_refs:
             for ref in self.tested_stack_refs:
-                Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
-                ref.manager.delete_stack(ref.stack_name)
+                try:
+                    Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
+                    ref.manager.delete_stack(ref.stack_name)
+                    Logger.logger.info(f"Successfully deleted stack: {ref.stack_name}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete stack {ref.stack_name} in region {ref.region}: {e}")
+            
+            # Delete log groups for all stacks with error handling
+            for ref in self.tested_stack_refs:
+                try:
+                    Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
+                    ref.manager.delete_stack_log_groups(ref.stack_name)
+                    Logger.logger.info(f"Successfully deleted log groups for stack: {ref.stack_name}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete log groups for stack {ref.stack_name} in region {ref.region}: {e}")
         
-        Logger.logger.info(f"Cleaning up stacksets: {[name for name, _ in self.compliance_org_stack_set_info]}")
-        self.cleanup_stacksets(self.compliance_org_stack_set_info)
+        # Cleanup stacksets with error handling
+        if self.compliance_org_stack_set_info:
+            Logger.logger.info(f"Cleaning up stacksets: {[name for name, _ in self.compliance_org_stack_set_info]}")
+            try:
+                self.cleanup_stacksets(self.compliance_org_stack_set_info)
+            except Exception as e:
+                Logger.logger.error(f"Failed to cleanup stacksets: {e}")
         
         return super().cleanup(**kwargs)
     
@@ -214,54 +233,75 @@ class CloudOrganizationCSPM(Accounts):
         Args:
             stackset_info: List of tuples (stackset_name, operation_id)
         """
+        if not stackset_info:
+            Logger.logger.info("No StackSets to clean up")
+            return True
+        
         Logger.logger.info(f"🧹 Starting cleanup of {len(stackset_info)} StackSets")
+        
+        if not self.delegated_admin_aws_manager:
+            Logger.logger.error("delegated_admin_aws_manager is not initialized, cannot cleanup StackSets")
+            return False
+        
         aws_manager = self.delegated_admin_aws_manager
         
         # Add organizations client if not already present
         if not hasattr(self, 'organizations'):
             self.organizations = aws_manager.organizations
         
-        # Wait for any in-progress operations to complete
+        # Wait for any in-progress operations to complete with error handling
         Logger.logger.info(f"⏳ Checking for {len(stackset_info)} in-progress operations")
         for stackset_name, operation_id in stackset_info:
-            if operation_id is not None:
-                Logger.logger.info(f"Waiting for operation {operation_id} on StackSet {stackset_name} to complete...")
-                final_status = aws_manager.wait_for_stackset_operation(stackset_name, operation_id)
-                
-                if final_status == 'SUCCEEDED':
-                    Logger.logger.info(f"Operation {operation_id} completed successfully")
-                elif final_status in ['FAILED', 'STOPPED']:
-                    Logger.logger.warning(f"Operation {operation_id} finished with status: {final_status}")
-                elif final_status == 'TIMED_OUT':
-                    Logger.logger.warning(f"Operation {operation_id} timed out, proceeding with cleanup")
+            try:
+                if operation_id is not None:
+                    Logger.logger.info(f"Waiting for operation {operation_id} on StackSet {stackset_name} to complete...")
+                    final_status = aws_manager.wait_for_stackset_operation(stackset_name, operation_id)
+                    
+                    if final_status == 'SUCCEEDED':
+                        Logger.logger.info(f"Operation {operation_id} completed successfully")
+                    elif final_status in ['FAILED', 'STOPPED']:
+                        Logger.logger.warning(f"Operation {operation_id} finished with status: {final_status}")
+                    elif final_status == 'TIMED_OUT':
+                        Logger.logger.warning(f"Operation {operation_id} timed out, proceeding with cleanup")
+                    else:
+                        Logger.logger.warning(f"Operation {operation_id} status: {final_status}, proceeding with cleanup")
                 else:
-                    Logger.logger.warning(f"Operation {operation_id} status: {final_status}, proceeding with cleanup")
-            else:
-                Logger.logger.info(f"No operation ID for StackSet {stackset_name}, checking for any running operations...")
-                # Check if there are any running operations we missed
-                operations = aws_manager.get_stackset_operations(stackset_name)
-                running_ops = [op for op in operations if op.get('Status') == 'RUNNING']
-                if running_ops:
-                    Logger.logger.warning(f"Found {len(running_ops)} running operations for {stackset_name}")
-                    for op in running_ops:
-                        op_id = op.get('OperationId')
-                        Logger.logger.info(f"Stopping running operation {op_id}")
-                        aws_manager.stop_stack_set_operation(stackset_name, op_id)
-                        # Wait a bit for the stop to take effect
-                        import time
-                        time.sleep(5)
+                    Logger.logger.info(f"No operation ID for StackSet {stackset_name}, checking for any running operations...")
+                    # Check if there are any running operations we missed
+                    try:
+                        operations = aws_manager.get_stackset_operations(stackset_name)
+                        running_ops = [op for op in operations if op.get('Status') == 'RUNNING']
+                        if running_ops:
+                            Logger.logger.warning(f"Found {len(running_ops)} running operations for {stackset_name}")
+                            for op in running_ops:
+                                op_id = op.get('OperationId')
+                                Logger.logger.info(f"Stopping running operation {op_id}")
+                                try:
+                                    aws_manager.stop_stack_set_operation(stackset_name, op_id)
+                                    # Wait a bit for the stop to take effect
+                                    time.sleep(5)
+                                except Exception as e:
+                                    Logger.logger.error(f"Failed to stop operation {op_id} for StackSet {stackset_name}: {e}")
+                    except Exception as e:
+                        Logger.logger.warning(f"Failed to check operations for StackSet {stackset_name}: {e}, proceeding with cleanup")
+            except Exception as e:
+                Logger.logger.error(f"Error while waiting for StackSet {stackset_name} operation {operation_id}: {e}, proceeding with cleanup")
         
         # Extract stackset names for deletion
         stackset_names = [name for name, _ in stackset_info]
         
-        # Now proceed with deletion
-        success = aws_manager.delete_stacksets_by_names(stackset_names)
-        
-        if success:
-            Logger.logger.info("✅ All StackSets cleaned up successfully")
-        else:
-            Logger.logger.error("❌ Some StackSets failed to clean up")
-        
-        return success
+        # Now proceed with deletion with error handling
+        try:
+            success = aws_manager.delete_stacksets_by_names(stackset_names)
+            
+            if success:
+                Logger.logger.info("✅ All StackSets cleaned up successfully")
+            else:
+                Logger.logger.error("❌ Some StackSets failed to clean up")
+            
+            return success
+        except Exception as e:
+            Logger.logger.error(f"❌ Exception during StackSet cleanup: {e}")
+            return False
 
 
