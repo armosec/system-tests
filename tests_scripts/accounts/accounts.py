@@ -90,6 +90,12 @@ class StackRef:
     stack_name: str
     region: str
 
+@dataclass
+class StackSetRef:
+    aws_manager: aws.AwsManager
+    stackset_name: str
+    operation_id: str = None
+
 class Accounts(base_test.BaseTest):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
@@ -98,6 +104,7 @@ class Accounts(base_test.BaseTest):
         self.test_runtime_policies = []
         self.test_global_aws_users = []
         self.tested_stack_refs: List[StackRef] = []
+        self.tested_stackset_refs: List[StackSetRef] = []
         self.aws_manager: aws.AwsManager
         self.delegated_admin_aws_manager: aws.AwsManager
 
@@ -118,13 +125,135 @@ class Accounts(base_test.BaseTest):
         return f"{role_prefix}-{timestamp}{milliseconds}"
 
     def cleanup(self, **kwargs):
+        # Delete all tracked stacks with error handling
+        if self.tested_stack_refs:
+            for ref in self.tested_stack_refs:
+                try:
+                    Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
+                    ref.manager.delete_stack(ref.stack_name)
+                    Logger.logger.info(f"Successfully deleted stack: {ref.stack_name}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete stack {ref.stack_name} in region {ref.region}: {e}")
+            
+            # Delete log groups for all stacks
+            for ref in self.tested_stack_refs:
+                try:
+                    Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
+                    ref.manager.delete_stack_log_groups(ref.stack_name)
+                    Logger.logger.info(f"Successfully deleted log groups for stack: {ref.stack_name}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete log groups for stack {ref.stack_name} in region {ref.region}: {e}")
+        
+        # Delete all tracked StackSets with error handling
+        if self.tested_stackset_refs:
+            Logger.logger.info(f"Cleaning up {len(self.tested_stackset_refs)} StackSets")
+            self._cleanup_stacksets(self.tested_stackset_refs)
+        
+        # Delete all tracked cloud accounts with error handling
         for guid in self.test_cloud_accounts_guids:
-            self.backend.delete_cloud_account(guid=guid)
-            Logger.logger.info(f"Deleted cloud account with guid {guid}")
+            try:
+                Logger.logger.info(f"Deleting cloud account with guid {guid}")
+                self.backend.delete_cloud_account(guid=guid)
+                Logger.logger.info(f"Successfully deleted cloud account with guid {guid}")
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete cloud account with guid {guid}: {e}")
+        
+        # Delete all tracked cloud organizations with error handling
         for guid in self.test_cloud_orgs_guids:
-            self.backend.delete_cloud_organization(guid=guid)
-            Logger.logger.info(f"Deleted cloud organization with guid {guid}")
+            try:
+                Logger.logger.info(f"Deleting cloud organization with guid {guid}")
+                self.backend.delete_cloud_organization(guid=guid)
+                Logger.logger.info(f"Successfully deleted cloud organization with guid {guid}")
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete cloud organization with guid {guid}: {e}")
+        
         return super().cleanup(**kwargs)
+    
+    def _cleanup_stacksets(self, stackset_refs: List[StackSetRef]):
+        """
+        Enhanced cleanup method for StackSets.
+        Waits for any in-progress operations to complete before deleting.
+        
+        Args:
+            stackset_refs: List of StackSetRef objects
+        """
+        if not stackset_refs:
+            Logger.logger.info("No StackSets to clean up")
+            return
+        
+        Logger.logger.info(f"🧹 Starting cleanup of {len(stackset_refs)} StackSets")
+        
+        # Wait for any in-progress operations to complete with error handling
+        Logger.logger.info(f"⏳ Checking for {len(stackset_refs)} in-progress operations")
+        for ref in stackset_refs:
+            try:
+                aws_manager = ref.aws_manager
+                if not aws_manager:
+                    Logger.logger.warning(f"No AWS manager for StackSet {ref.stackset_name}, skipping")
+                    continue
+                
+                if ref.operation_id is not None:
+                    Logger.logger.info(f"Waiting for operation {ref.operation_id} on StackSet {ref.stackset_name} to complete...")
+                    final_status = aws_manager.wait_for_stackset_operation(ref.stackset_name, ref.operation_id)
+                    
+                    if final_status == 'SUCCEEDED':
+                        Logger.logger.info(f"Operation {ref.operation_id} completed successfully")
+                    elif final_status in ['FAILED', 'STOPPED']:
+                        Logger.logger.warning(f"Operation {ref.operation_id} finished with status: {final_status}")
+                    elif final_status == 'TIMED_OUT':
+                        Logger.logger.warning(f"Operation {ref.operation_id} timed out, proceeding with cleanup")
+                    else:
+                        Logger.logger.warning(f"Operation {ref.operation_id} status: {final_status}, proceeding with cleanup")
+                else:
+                    Logger.logger.info(f"No operation ID for StackSet {ref.stackset_name}, checking for any running operations...")
+                    # Check if there are any running operations we missed
+                    try:
+                        operations = aws_manager.get_stackset_operations(ref.stackset_name)
+                        running_ops = [op for op in operations if op.get('Status') == 'RUNNING']
+                        if running_ops:
+                            Logger.logger.warning(f"Found {len(running_ops)} running operations for {ref.stackset_name}")
+                            for op in running_ops:
+                                op_id = op.get('OperationId')
+                                Logger.logger.info(f"Stopping running operation {op_id}")
+                                try:
+                                    aws_manager.stop_stack_set_operation(ref.stackset_name, op_id)
+                                    # Wait a bit for the stop to take effect
+                                    import time
+                                    time.sleep(5)
+                                except Exception as e:
+                                    Logger.logger.error(f"Failed to stop operation {op_id} for StackSet {ref.stackset_name}: {e}")
+                    except Exception as e:
+                        Logger.logger.warning(f"Failed to check operations for StackSet {ref.stackset_name}: {e}, proceeding with cleanup")
+            except Exception as e:
+                Logger.logger.error(f"Error while waiting for StackSet {ref.stackset_name} operation {ref.operation_id}: {e}, proceeding with cleanup")
+        
+        # Extract stackset names for deletion, grouped by AWS manager
+        stacksets_by_manager = {}
+        for ref in stackset_refs:
+            if ref.aws_manager:
+                manager_key = id(ref.aws_manager)  # Use object ID as key
+                if manager_key not in stacksets_by_manager:
+                    stacksets_by_manager[manager_key] = (ref.aws_manager, [])
+                stacksets_by_manager[manager_key][1].append(ref.stackset_name)
+        
+        # Now proceed with deletion with error handling
+        all_success = True
+        for aws_manager, stackset_names in stacksets_by_manager.values():
+            try:
+                Logger.logger.info(f"Deleting {len(stackset_names)} StackSets")
+                success = aws_manager.delete_stacksets_by_names(stackset_names)
+                
+                if success:
+                    Logger.logger.info(f"✅ Successfully deleted {len(stackset_names)} StackSets")
+                else:
+                    Logger.logger.error(f"❌ Some StackSets failed to clean up: {stackset_names}")
+                    all_success = False
+            except Exception as e:
+                Logger.logger.error(f"❌ Exception during StackSet cleanup: {e}")
+                all_success = False
+        
+        if all_success:
+            Logger.logger.info("✅ All StackSets cleaned up successfully")
     
     def build_get_cloud_entity_by_guid_request(self, guid: str) -> Dict:
         body = {
@@ -185,7 +314,6 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_vulnscan(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return cloud_account_guid
 
@@ -198,7 +326,6 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
         account = self.validate_accounts_cloud_list_cspm_compliance(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
-        self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm unique values')
@@ -309,6 +436,17 @@ class Accounts(base_test.BaseTest):
             
             # Update the StackSet with the new template
             operation_id = aws_manager.update_stack_set(**update_params)
+            
+            # Track StackSet for cleanup if not already tracked (it may already be tracked from initial creation)
+            if not any(ref.stackset_name == stackset_name for ref in self.tested_stackset_refs):
+                stackset_ref = StackSetRef(aws_manager=aws_manager, stackset_name=stackset_name, operation_id=operation_id)
+                self.tested_stackset_refs.append(stackset_ref)
+            else:
+                # Update the operation_id if it changed
+                for ref in self.tested_stackset_refs:
+                    if ref.stackset_name == stackset_name and operation_id:
+                        ref.operation_id = operation_id
+                        break
             
             if operation_id and with_wait:
                 Logger.logger.info(f"StackSet {stackset_name} update initiated with operation ID: {operation_id}")
@@ -498,11 +636,14 @@ class Accounts(base_test.BaseTest):
         else:
             raise Exception(f"Unsupported feature name: {feature_name}")
         
-        # Create the new cloud account with the feature
+        # Create/update the cloud account with the feature
         try:
             res = self.backend.create_cloud_account(body=body, provider=PROVIDER_AWS)
             new_cloud_account_guid = res["guid"]
             assert new_cloud_account_guid == cloud_account_guid, f"{new_cloud_account_guid} is not {cloud_account_guid}"
+            # Track for cleanup if not already tracked
+            if new_cloud_account_guid not in self.test_cloud_accounts_guids:
+                self.test_cloud_accounts_guids.append(new_cloud_account_guid)
             Logger.logger.info(f"Successfully updated cloud account with {feature_name} feature")            
 
         except Exception as e:
@@ -653,6 +794,11 @@ class Accounts(base_test.BaseTest):
         ).model_dump()
         res = self.backend.create_cloud_org_connect_members(body=body)
         assert "guid" in res, f"guid not in {res}"
+        # Track StackSet for cleanup
+        stackset_ref = StackSetRef(aws_manager=aws_manager, stackset_name=stack_name, operation_id=operation_id)
+        # Check if already tracked to avoid duplicates
+        if not any(ref.stackset_name == stack_name for ref in self.tested_stackset_refs):
+            self.tested_stackset_refs.append(stackset_ref)
         return generated_role_name, external_id, operation_id
 
     def connect_cspm_features_to_org_existing_stack_set(self, org_guid: str,member_role_arn: str,member_role_external_id: str,region: str, features: List[str]):        
@@ -685,7 +831,6 @@ class Accounts(base_test.BaseTest):
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
         
         self.create_stack_cadr(region, stack_name, cloud_account_guid)
-        self.test_cloud_accounts_guids.append(cloud_account_guid)
         Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
         return cloud_account_guid
 
@@ -702,7 +847,6 @@ class Accounts(base_test.BaseTest):
     def connect_cadr_new_organization(self, region: str, stack_name: str, log_location: str) -> str:
         Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
         org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
-        self.test_cloud_orgs_guids.append(org_guid)
 
         Logger.logger.info('Validate feature status Pending')
         assert self.verify_cadr_status(org_guid, CloudEntityTypes.ORGANIZATION, FEATURE_STATUS_PENDING)
@@ -728,7 +872,11 @@ class Accounts(base_test.BaseTest):
         )
         res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
         assert "guid" in res, f"guid not in {res}"
-        return CreateOrUpdateCloudOrganizationResponse(guid=res["guid"])
+        org_guid = res["guid"]
+        # Track org for cleanup
+        if org_guid not in self.test_cloud_orgs_guids:
+            self.test_cloud_orgs_guids.append(org_guid)
+        return CreateOrUpdateCloudOrganizationResponse(guid=org_guid)
 
     def connect_existing_cspm_organization(self,region: str,test_arn: str, external_id: Union[str, None] = None ,org_guid: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
         if org_guid is not None:
@@ -750,7 +898,11 @@ class Accounts(base_test.BaseTest):
         
         res = self.backend.create_cloud_org_with_admin(body=body.model_dump())
         assert "guid" in res, f"guid not in {res}"
-        return CreateOrUpdateCloudOrganizationResponse(guid=res["guid"])
+        returned_org_guid = res["guid"]
+        # Track org for cleanup (may be new or existing)
+        if returned_org_guid not in self.test_cloud_orgs_guids:
+            self.test_cloud_orgs_guids.append(returned_org_guid)
+        return CreateOrUpdateCloudOrganizationResponse(guid=returned_org_guid)
 
     def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
         Logger.logger.info('Get and validate cadr org link')
@@ -925,11 +1077,19 @@ class Accounts(base_test.BaseTest):
     def create_and_validate_cloud_account(self, body, provider, expect_failure:bool=False)->str:
         """
         Create and validate cloud account.
+        Automatically tracks created accounts for cleanup if a GUID is returned.
         """
 
         failed = False
+        account_guid = None
+        
         try:
             res = self.backend.create_cloud_account(body=body, provider=provider)
+            if "guid" in res:
+                account_guid = res["guid"]
+                # If we got a GUID, track it for cleanup regardless of expect_failure
+                if account_guid not in self.test_cloud_accounts_guids:
+                    self.test_cloud_accounts_guids.append(account_guid)
         except Exception as e:
             if not expect_failure:
                 Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
@@ -938,10 +1098,10 @@ class Accounts(base_test.BaseTest):
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
 
         if not expect_failure:
-            assert "guid" in res, f"guid not in {res}"
-            return res["guid"]
+            assert account_guid is not None, f"guid not found in response, body used: {body}"
+            return account_guid
         
-        return None
+        return account_guid  # Returns None if failed, or GUID if it was created despite failure
     
     def reconnect_cloud_account_cspm_feature(self, cloud_account_guid: str, feature_name: str, arn: str, region: str, external_id: str , skip_scan: bool = False):
         config_name = ""
@@ -985,8 +1145,14 @@ class Accounts(base_test.BaseTest):
             }
 
         failed = False
+        org_guid = None
         try:
             res = self.backend.create_cloud_org_with_cadr(body=body)
+            if "guid" in res:
+                org_guid = res["guid"]
+                # Track org for cleanup if created
+                if org_guid not in self.test_cloud_orgs_guids:
+                    self.test_cloud_orgs_guids.append(org_guid)
         except Exception as e:
             if not expect_failure:
                 Logger.logger.error(f"failed to create cloud org, body used: {body}, error is {e}")
@@ -995,10 +1161,10 @@ class Accounts(base_test.BaseTest):
         assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
 
         if not expect_failure:
-            assert "guid" in res, f"guid not in {res}"
-            return res["guid"]
+            assert org_guid is not None, f"guid not found in response, body used: {body}"
+            return org_guid
         
-        return None
+        return org_guid  # Returns None if failed, or GUID if it was created despite failure
 
     def validate_accounts_cloud_list_cspm_compliance(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skipped_scan: bool = False):
         """

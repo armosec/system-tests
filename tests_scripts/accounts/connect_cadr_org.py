@@ -106,7 +106,6 @@ class CloudOrganizationCADR(Accounts):
         
         Logger.logger.info('Stage 7: Delete cadr org and validate is deleted')
         self.delete_and_validate_org_feature(org_guid, CADR_FEATURE_NAME)
-        self.aws_manager.delete_stack(self.cadr_org_stack_name)
         Logger.logger.info("Delete cadr successfully")
         
         Logger.logger.info('Stage 8: Connect single cadr')
@@ -117,7 +116,6 @@ class CloudOrganizationCADR(Accounts):
         org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=self.org_log_location, region=cadr_region, expect_failure=False)
         self.validate_no_account(merged_account_guid)
         Logger.logger.info(f"the account merged into the org {org_guid}")
-        self.test_cloud_orgs_guids.append(org_guid)
         self.validate_feature_deleted_from_entity(merged_account_guid, CADR_FEATURE_NAME, True, CloudEntityTypes.ACCOUNT)
         Logger.logger.info(f"Merged cadr feature of account {merged_account_guid} into the new org {org_guid} successfully")
             
@@ -125,29 +123,29 @@ class CloudOrganizationCADR(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-        if self.tested_stack_refs:
-            for ref in self.tested_stack_refs:
-                Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
-                ref.manager.delete_stack(ref.stack_name)
-            for ref in self.tested_stack_refs:
-                Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
-                ref.manager.delete_stack_log_groups(ref.stack_name)
-
-        # Let base Accounts.cleanup handle deletion of cloud accounts and organizations
+        # Base Accounts.cleanup handles all stacks, stacksets, accounts, and organizations automatically
         
         for policy_guid in self.test_runtime_policies:
-            Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
-            self.backend.delete_runtime_policies(policy_guid)
+            try:
+                Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
+                self.backend.delete_runtime_policies(policy_guid)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete runtime policy {policy_guid}: {e}")
             
         for aws_user in self.test_global_aws_users:
-            Logger.logger.info(f"Deleting aws user: {aws_user}")
-            self.aws_manager.delete_user(aws_user)
+            try:
+                Logger.logger.info(f"Deleting aws user: {aws_user}")
+                self.aws_manager.delete_user(aws_user)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete aws user {aws_user}: {e}")
         
         for aws_user in self.test_exclude_account_users:
-            Logger.logger.info(f"Deleting aws user: {aws_user}")
-            if hasattr(self, 'exclude_account_aws_manager') and self.exclude_account_aws_manager:
-                self.exclude_account_aws_manager.delete_user(aws_user)
-
+            try:
+                Logger.logger.info(f"Deleting aws user: {aws_user}")
+                if hasattr(self, 'exclude_account_aws_manager') and self.exclude_account_aws_manager:
+                    self.exclude_account_aws_manager.delete_user(aws_user)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete aws user {aws_user}: {e}")
 
         return super().cleanup(**kwargs)
 
