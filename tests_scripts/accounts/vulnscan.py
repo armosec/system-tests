@@ -86,7 +86,7 @@ class CloudVulnScan(Accounts):
 
         Logger.logger.info('Stage 3: Connect cspm vulnscan new account') 
         cloud_account_guid = self.connect_cspm_vulnscan_new_account(stack_region, account_id, test_arn, self.cspm_vulnscan_cloud_account_name, self.cspm_vulnscan_external_id)
-        self.test_cloud_accounts_guids.append(cloud_account_guid)
+        # Note: account is already tracked automatically by create_and_validate_cloud_account
 
         Logger.logger.info('Stage 4: Wait for cspm vulnscan scan to complete successfully')
         result, _ = self.wait_for_report(
@@ -137,9 +137,8 @@ class CloudVulnScan(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-        if self.cspm_vulnscan_stack_name is not None:
-            self.aws_manager.delete_stack(self.cspm_vulnscan_stack_name)
-            Logger.logger.info(f"Deleted stack {self.cspm_vulnscan_stack_name}")
+        # Stack cleanup is handled automatically by base cleanup via tested_stack_refs
+        # (created via create_stack_cspm -> create_stack)
         return super().cleanup(**kwargs)
 
     def validate_snapshots_deleted(self, instance_scan_ids: List[str]):

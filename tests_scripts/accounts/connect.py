@@ -242,32 +242,21 @@ class CloudConnect(Accounts):
         return self.cleanup()
 
     def cleanup(self, **kwargs):
-        if self.tested_stack_refs:
-            for ref in self.tested_stack_refs:
-                Logger.logger.info(f"Deleting stack: {ref.stack_name} (region={ref.region})")
-                ref.manager.delete_stack(ref.stack_name)
-            for ref in self.tested_stack_refs:
-                Logger.logger.info(f"Deleting log groups for stack: {ref.stack_name} (region={ref.region})")
-                ref.manager.delete_stack_log_groups(ref.stack_name)
-
-        for cloud_account_guid in self.test_cloud_accounts_guids:
-            try:
-                remaining_account = self.get_cloud_account_by_guid(cloud_account_guid)
-                if remaining_account:
-                    Logger.logger.info(f"Remaining cloud account before deletion: {remaining_account}")
-            except Exception as e:
-                Logger.logger.info(f"Cloud account {cloud_account_guid} not found before deletion: {str(e)}")
-            
-            Logger.logger.info(f"Deleting cloud account: {cloud_account_guid}")
-            self.backend.delete_cloud_account(cloud_account_guid)
+        # Base Accounts.cleanup handles all stacks, stacksets, accounts, and organizations automatically
         
+        # Handle runtime policies and AWS users specific to this test
         for policy_guid in self.test_runtime_policies:
-            Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
-            self.backend.delete_runtime_policies(policy_guid)
+            try:
+                Logger.logger.info(f"Deleting runtime policy: {policy_guid}")
+                self.backend.delete_runtime_policies(policy_guid)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete runtime policy {policy_guid}: {e}")
             
         for aws_user in self.test_global_aws_users:
-            Logger.logger.info(f"Deleting aws user: {aws_user}")
-            self.aws_manager.delete_user(aws_user)
-
+            try:
+                Logger.logger.info(f"Deleting aws user: {aws_user}")
+                self.aws_manager.delete_user(aws_user)
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete aws user {aws_user}: {e}")
 
         return super().cleanup(**kwargs)
