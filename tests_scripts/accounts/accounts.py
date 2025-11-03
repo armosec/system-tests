@@ -1184,6 +1184,7 @@ class Accounts(base_test.BaseTest):
         assert account["features"][COMPLIANCE_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
         if not skipped_scan:
             assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
+            assert "nextScanTime" in account["features"][COMPLIANCE_FEATURE_NAME], f"nextScanTime key is missing from account features. Available keys: {list(account['features'][COMPLIANCE_FEATURE_NAME].keys())}"
             assert account["features"][COMPLIANCE_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
             if scan_status==CSPM_SCAN_STATE_COMPLETED:
                 assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
