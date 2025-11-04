@@ -160,7 +160,7 @@ class Accounts(base_test.BaseTest):
         
         # Delete all tracked cloud organizations with error handling
         for guid in self.test_cloud_orgs_guids:
-            Logger.logger.debug("kwargs in cleanup:", kwargs)
+            Logger.logger.debug(f"kwargs in cleanup: {kwargs}")
             feature_name = kwargs.get('feature_name')
             if feature_name:
                 try:
