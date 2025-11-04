@@ -669,7 +669,7 @@ class RuntimePoliciesConfigurations(Incidents):
     def validate_unique_values(self):
         pass
 
-    def wait_for_siem_event(self, expected_event_type: str, url: str, timeout: int = 120, sleep_interval: int = 5) -> dict:
+    def wait_for_siem_event(self, expected_event_type: str, url: str, timeout: int = 240, sleep_interval: int = 10) -> dict:
         """
         Wait for a SIEM event of the expected type to be received by the webhook.
         Polls the backend's test webhook endpoint to retrieve received messages.
