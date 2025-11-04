@@ -189,7 +189,7 @@ class CloudOrganizationCSPM(Accounts):
                         org_guid=test_org_guid, expected_account_ids=expected_account_ids)
             
 
-        return self.cleanup()
+        return self.cleanup(feature_name=COMPLIANCE_FEATURE_NAME)
 
     def cleanup(self, **kwargs):
         # Base Accounts.cleanup handles all stacks, stacksets, accounts, and organizations automatically

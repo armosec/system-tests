@@ -160,12 +160,21 @@ class Accounts(base_test.BaseTest):
         
         # Delete all tracked cloud organizations with error handling
         for guid in self.test_cloud_orgs_guids:
-            try:
-                Logger.logger.info(f"Deleting cloud organization with guid {guid}")
-                self.backend.delete_cloud_organization(guid=guid)
-                Logger.logger.info(f"Successfully deleted cloud organization with guid {guid}")
-            except Exception as e:
-                Logger.logger.error(f"Failed to delete cloud organization with guid {guid}: {e}")
+            feature_name = kwargs.get('feature_name')
+            if feature_name:
+                try:
+                    Logger.logger.info(f"Deleting feature {feature_name} from cloud organization with guid {guid}")
+                    self.delete_and_validate_org_feature(guid, feature_name)
+                    Logger.logger.info(f"Successfully deleted feature {feature_name} from cloud organization with guid {guid}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete feature {feature_name} from cloud organization with guid {guid}: {e}")
+            else:
+                try:
+                    Logger.logger.info(f"Deleting cloud organization with guid {guid}")
+                    self.backend.delete_cloud_organization(guid=guid)
+                    Logger.logger.info(f"Successfully deleted cloud organization with guid {guid}")
+                except Exception as e:
+                    Logger.logger.error(f"Failed to delete cloud organization with guid {guid}: {e}")
         
         return super().cleanup(**kwargs)
     

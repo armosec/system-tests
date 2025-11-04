@@ -120,7 +120,7 @@ class CloudOrganizationCADR(Accounts):
         Logger.logger.info(f"Merged cadr feature of account {merged_account_guid} into the new org {org_guid} successfully")
             
 
-        return self.cleanup()
+        return self.cleanup(feature_name=CADR_FEATURE_NAME)
 
     def cleanup(self, **kwargs):
         # Base Accounts.cleanup handles all stacks, stacksets, accounts, and organizations automatically
