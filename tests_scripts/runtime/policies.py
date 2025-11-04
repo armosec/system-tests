@@ -349,8 +349,6 @@ class RuntimePoliciesConfigurations(Incidents):
             
         Logger.logger.info("27. Delete SIEM integration")
         self.backend.delete_siem_integration(provider=Providers.WEBHOOK, guid=siem_integration_guid)
-        Logger.logger.info("27. Delete all SIEM events")
-        self.backend.delete_all_siem_events(url=siem_test_webhook_url)
 
         # Logger.logger.info("24. Check no incident")
         # self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
