@@ -74,6 +74,8 @@ class TestDriver(object):
         test_obj = tests.get_test(self.test_name)
         test_class_obj = test_obj.test_obj(test_driver=self, backend=backend, test_obj=test_obj)
         start = time.time()
+        cleanup_called = False
+        
         try:
             status, summary = test_class_obj.start()
         except Exception as ex:
@@ -82,18 +84,32 @@ class TestDriver(object):
             _, _, tb = sys.exc_info()
             function_name = tb.tb_frame.f_code.co_name
 
+            Logger.logger.error(f"Test '{self.test_name}' failed with exception in function '{function_name}': {ex}")
+            
             if function_name != "cleanup":
+                Logger.logger.info(f"Attempting cleanup for failed test '{self.test_name}'")
                 try:
                     _, _ = test_class_obj.cleanup()
-                except Exception as e:
-                    Logger.logger.info("Failed to cleanup test", e)
-                    Logger.logger.error("error: {}".format(traceback.print_exc()))
+                    cleanup_called = True
+                    Logger.logger.info(f"Cleanup completed successfully for test '{self.test_name}'")
+                except Exception as cleanup_ex:
+                    Logger.logger.error(f"Cleanup failed for test '{self.test_name}': {cleanup_ex}")
+                    Logger.logger.error("Cleanup error traceback: {}".format(traceback.print_exc()))
             else:
-                Logger.logger.info("Failed to cleanup test")
+                Logger.logger.warning(f"Test '{self.test_name}' failed during cleanup itself")
             summary = ex
-            Logger.logger.error("error: {}".format(traceback.print_exc()))
+            Logger.logger.error("Test error traceback: {}".format(traceback.print_exc()))
         finally:
-            Logger.logger.info('time: {}'.format(systests_utilities.TestUtil.get_time(start, time.time())))
+            # GLOBAL SAFETY NET: Always attempt cleanup if it hasn't been called yet
+            if not cleanup_called and hasattr(test_class_obj, 'cleanup'):
+                Logger.logger.info(f"Final safety cleanup attempt for test '{self.test_name}'")
+                try:
+                    test_class_obj.cleanup()
+                    Logger.logger.info(f"Final safety cleanup completed for test '{self.test_name}'")
+                except Exception as final_cleanup_ex:
+                    Logger.logger.error(f"Final safety cleanup failed for test '{self.test_name}': {final_cleanup_ex}")
+            
+            Logger.logger.info('Test {} completed in: {}'.format(self.test_name, systests_utilities.TestUtil.get_time(start, time.time())))
         return status, summary
 
     def clear(self):

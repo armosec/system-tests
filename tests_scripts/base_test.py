@@ -71,10 +71,18 @@ class BaseTest(object):
             self.created_tenant_ids.append(self.test_tenant_id)
 
         self.test_failed = False
+        self._cleanup_called = False
 
 
 
     def __del__(self):
+        # Final safety net - ensure cleanup is called even if test framework fails
+        if not self._cleanup_called:
+            Logger.logger.warning(f"Test destructor called without cleanup - attempting emergency cleanup")
+            try:
+                self._emergency_cleanup()
+            except Exception as e:
+                Logger.logger.error(f"Emergency cleanup failed in destructor: {e}")
         Logger.logger.info(f"test summarize: {json.dumps(self.test_summery_data, indent=4)}")
 
     def failed(self):
@@ -289,9 +297,29 @@ class BaseTest(object):
         raise Exception(
             f"{report_type.__func__.__name__}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
 
+    def _emergency_cleanup(self):
+        """Emergency cleanup called from destructor as last resort"""
+        Logger.logger.warning("Emergency cleanup - this should not normally happen")
+        try:
+            self.delete_tenants()
+        except Exception as e:
+            Logger.logger.error(f"Emergency cleanup failed: {e}")
+
     def cleanup(self, wlid: str = None, display_wt: bool = False):
-        self.delete_tenants()
-        return statics.SUCCESS, ""
+        """Enhanced cleanup with tracking to prevent duplicates"""
+        if self._cleanup_called:
+            Logger.logger.info("Cleanup already called, skipping")
+            return statics.SUCCESS, ""
+        
+        self._cleanup_called = True
+        Logger.logger.info(f"Starting cleanup for test: {self.test_driver.test_name}")
+        
+        try:
+            self.delete_tenants()
+            return statics.SUCCESS, ""
+        except Exception as e:
+            Logger.logger.error(f"Cleanup failed: {e}")
+            return statics.FAILURE, f"Cleanup failed: {e}"
 
     def validate_microservice_is_inactive(self, wlid, tries_num=5):
         for i in range(tries_num):
