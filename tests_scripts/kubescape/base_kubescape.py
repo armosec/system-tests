@@ -118,30 +118,34 @@ class BaseKubescape(BaseK8S):
             return self.config(stdout=f, **kwargs)
 
     def cleanup(self, **kwargs):
-        self.delete_kubescape_config_file(**kwargs)
+        """Enhanced BaseKubescape cleanup with error handling"""
+        Logger.logger.info(f"Starting BaseKubescape cleanup")
+        
+        # 1. Delete kubescape config file
+        try:
+            self.delete_kubescape_config_file(**kwargs)
+        except Exception as e:
+            Logger.logger.error(f"Failed to delete kubescape config file: {e}")
+        
+        # 2. Delete cluster from backend (most important for preventing resource leaks)
         if self.remove_cluster_from_backend and not self.cluster_deleted:
+            try:
+                if not hasattr(self, "wait_for_agg_to_end") or self.wait_for_agg_to_end:
+                    TestUtil.sleep(50, "Waiting for aggregation to end")
 
-            if not hasattr(self, "wait_for_agg_to_end") or self.wait_for_agg_to_end:
-                TestUtil.sleep(50, "Waiting for aggregation to end")
-
-            self.cluster_deleted = self.delete_cluster_from_backend()
+                Logger.logger.info("Deleting cluster from backend")
+                self.cluster_deleted = self.delete_cluster_from_backend()
+            except Exception as e:
+                Logger.logger.error(f"Failed to delete cluster from backend: {e}")
         
-        # Delete all tracked tenants
-        if hasattr(self, 'created_tenant_ids') and self.created_tenant_ids:
-            for tenant_id in self.created_tenant_ids[:]:  # Use slice copy to avoid modification during iteration
-                try:
-                    response = self.backend.delete_tenant(tenant_id)
-                    if response.status_code == 200:
-                        Logger.logger.info(f"Successfully deleted test tenant {tenant_id}")
-                        self.created_tenant_ids.remove(tenant_id)
-                    else:
-                        Logger.logger.warning(f"Failed to delete test tenant {tenant_id} - Status: {response.status_code} {response.reason}, Response: {response.text}, Headers: {response.headers} - continuing with test cleanup")
-                        
-                except Exception as e:
-                    Logger.logger.warning(f"Exception deleting test tenant {tenant_id}: {e} - continuing with test cleanup")
+        # 3. Call parent cleanup (handles tenant deletion)
+        try:
+            result = super().cleanup(**kwargs)
+        except Exception as e:
+            Logger.logger.error(f"Parent cleanup failed: {e}")
+            result = (statics.FAILURE, f"Parent cleanup failed: {e}")
         
-        result = super().cleanup(**kwargs)
-        return statics.SUCCESS, ""
+        return result
 
     def get_default_results_file(self):
         return os.path.join(self.test_driver.temp_dir, "results.json")
