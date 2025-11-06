@@ -350,13 +350,13 @@ class RuntimePoliciesConfigurations(Incidents):
         Logger.logger.info("27. Delete SIEM integration")
         self.backend.delete_siem_integration(provider=Providers.WEBHOOK, guid=siem_integration_guid)
 
-        Logger.logger.info("24. Check no incident")
-        self.ensure_no_incident(wlid=wlids[0], cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
-        
-
         return self.cleanup()
   
     def ensure_no_incident(self, wlid: str, cluster: str, namespace: str, expected_incident_name: str):
+        """
+        Verify that no incident is created (e.g., when an exception should prevent it).
+        If an incident is found, raises an exception indicating the exception/rule is not working as expected.
+        """
         exception_occurred = False
         self.exec_pod(wlid=wlid, command="cat /etc/hosts")
         try:
@@ -366,7 +366,7 @@ class RuntimePoliciesConfigurations(Incidents):
         except Exception:
             exception_occurred = True
         if not exception_occurred:
-            raise Exception("Exception not created")
+            raise Exception(f"Incident '{expected_incident_name}' was created when it should have been prevented (exception/rule may not be working correctly)")
         
     def wait_for_specific_incident_count_with_report(self, cluster: str, namespace: str, incident_name: list, expected_count: int, timeout: int = 120):
         """
