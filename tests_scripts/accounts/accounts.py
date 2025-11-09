@@ -1361,6 +1361,7 @@ class Accounts(base_test.BaseTest):
         }
 
         framework_over_time_resp = self.backend.get_cloud_compliance_framework_over_time(body=body)
+        assert len(framework_over_time_resp["response"]) > 0, f"framework_over_time response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {framework_over_time_resp}"
         framework_over_time = ComplianceFrameworkOverTime(**framework_over_time_resp["response"][0])
 
         self._validate_framework_over_time(framework_over_time, cloud_account_guid, last_success_scan_id)
@@ -1398,7 +1399,7 @@ class Accounts(base_test.BaseTest):
             framework_names.add(framework.frameworkName)
             assert framework.frameworkName in FRAMEWORKS_CONFIG
             assert framework.complianceScore > 0
-            # assert len(framework.cords) == 1
+            assert len(framework.cords) > 0, f"framework.cords is empty for framework {framework.frameworkName}. This may indicate the backend hasn't fully processed the scan data yet."
 
             cord = framework.cords[0]
             assert cord.reportGUID == last_success_scan_id
@@ -1435,6 +1436,7 @@ class Accounts(base_test.BaseTest):
             body["innerFilters"][0]["tickets"] = "|exists"
 
         control_resp = self.backend.get_cloud_compliance_controls(body=body, with_rules=False)
+        assert len(control_resp["response"]) > 0, f"control response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {control_resp}"
         control = ComplianceControl(**control_resp["response"][0])
 
         assert control.reportGUID == last_success_scan_id , f"Expected reportGUID: {last_success_scan_id}, got: {control.reportGUID}"
@@ -1467,6 +1469,7 @@ class Accounts(base_test.BaseTest):
 
 
         check_resp = self.backend.get_cloud_compliance_rules(body=body)
+        assert len(check_resp["response"]) > 0, f"rules response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {check_resp}"
         rule = ComplianceRuleSummary(**check_resp["response"][0])
 
         expected_response = get_expected_rules_response(with_accepted_resources)
@@ -1559,6 +1562,7 @@ class Accounts(base_test.BaseTest):
             
 
         control_with_checks_resp = self.backend.get_cloud_compliance_controls(with_rules=True,body=body)
+        assert len(control_with_checks_resp["response"]) > 0, f"control_with_checks response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {control_with_checks_resp}"
         control_with_checks = ComplianceControlWithChecks(**control_with_checks_resp["response"][0])
         assert control_with_checks.reportGUID == last_success_scan_id, f"Expected reportGUID: {last_success_scan_id}, got: {control_with_checks.ComplianceControl.reportGUID}"
         assert control_with_checks.cloudControlName == DEFAULT_TEST_CONFIG["control_name"], f"Expected control name: {DEFAULT_TEST_CONFIG['control_name']}, got: {control_with_checks.ComplianceControl.name}"
