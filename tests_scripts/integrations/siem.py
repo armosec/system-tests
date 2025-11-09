@@ -20,7 +20,7 @@ class SIEMIntegrations(BaseIntegrations):
         self.integration_guids = {}
 
     def start(self):
-        
+
         webhook_url = os.environ.get("SIEM_WEBHOOK_URL")
         workspaceID = os.environ.get("SIEM_MICROSOFT_SENTINEL_WORKSPACEID")
         primary_key = os.environ.get("SIEM_MICROSOFT_SENTINEL_PRIMARY_KEY")
