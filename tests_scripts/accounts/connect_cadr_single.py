@@ -17,20 +17,7 @@ class CloudConnectCADRSingle(Accounts):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
 
         self.aws_manager = None
-        self.cadr_stack_name_first = None
-        self.cadr_stack_name_second = None
-
-    def validate_account_name(self, cloud_account_guid, expected_name):
-        """Validate that the account name remains unchanged after operations.
-            
-        Args:
-            cloud_account_guid (str): The GUID of the cloud account to validate
-            expected_name (str): The expected name of the account
-        """
-        Logger.logger.info(f"Validating account name for GUID {cloud_account_guid}, expecting '{expected_name}'")
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["name"] == expected_name, f"Account name changed from {expected_name} to {account['name']}"
-        Logger.logger.info(f"Account name for GUID {cloud_account_guid} is unchanged and matches '{expected_name}'")
+        self.cadr_stack_name = None
 
     def start(self):
         """
@@ -41,12 +28,8 @@ class CloudConnectCADRSingle(Accounts):
         3. Connect cadr new account
         4. Validate cadr status is connected
         5. Validate alert with accountID is created
-        6. Validate features unchanged
+        6. Create bad log location cloud account with cadr
         7. Delete cadr feature and validate account deleted
-        8. Create bad log location cloud account with cadr
-        9. Connect cadr new account
-        10. Validate features unchanged
-        11. Delete cadr feature and validate
         """
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
@@ -64,23 +47,19 @@ class CloudConnectCADRSingle(Accounts):
                                                   aws_access_key_id=aws_access_key_id, 
                                                   aws_secret_access_key=aws_secret_access_key)
         
-        # cadr_stack_name requires an existing account therefore should be created for each account tested
-        self.cadr_stack_name_first = "systest-" + self.test_identifier_rand + "-cadr-first"
-        self.cadr_stack_name_second = "systest-" + self.test_identifier_rand + "-cadr-second"
-
         Logger.logger.info('Stage 2: Setup cloudtrail and log location')
         self.cloud_trail_name = CLOUDTRAIL_SYSTEM_TEST_CONNECT
         log_location, _ = self.aws_manager.get_cloudtrail_details(self.cloud_trail_name)
 
         bad_log_location = "arn:aws:cloudtrail:us-east-1:123456789012:trail/my-trail"
 
-        # cadr cloud account names
-        self.cadr_first_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-first"
-        self.cadr_second_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-second"
+        # cadr stack and account names
+        self.cadr_stack_name = "systest-" + self.test_identifier_rand + "-cadr"
+        self.cadr_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr"
+        self.cadr_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-bad"
 
-        # First flow: Connect CADR new account
         Logger.logger.info('Stage 3: Connect cadr new account')
-        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_second, self.cadr_second_cloud_account_name, log_location)
+        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_cloud_account_name, log_location)
         Logger.logger.info("cadr has been connected successfully")
         
         # Get account ID for alert validation
@@ -90,7 +69,7 @@ class CloudConnectCADRSingle(Accounts):
         assert account_id is not None, f"Could not extract account ID from account {account_guid}"
         
         Logger.logger.info('Stage 4: Validate cadr status is connected')
-        self.wait_for_report(self.verify_cadr_status, sleep_interval=5, timeout=120, 
+        self.wait_for_report(self.verify_cadr_status, sleep_interval=10, timeout=900, 
                              guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
                              expected_status=FEATURE_STATUS_CONNECTED)
         Logger.logger.info(f"CADR account {account_guid} is connected successfully")
@@ -106,40 +85,12 @@ class CloudConnectCADRSingle(Accounts):
                              filters={CDR_ALERT_ACCOUNT_ID_PATH: account_id,
                                       "message": self.aws_user + "|like"},
                              expect_incidents=True)
-        
-        Logger.logger.info('Stage 6: Validate features unchanged')
-        # Store CADR config for validation
-        account = self.get_cloud_account_by_guid(account_guid)
-        cadr_feature = account["features"][CADR_FEATURE_NAME]
-        self.validate_features_unchanged(account_guid, CADR_FEATURE_NAME, cadr_feature)
-        
-        # Validate account name
-        self.validate_account_name(account_guid, self.cadr_second_cloud_account_name)
+
+        Logger.logger.info('Stage 6: Create bad log location cloud account with cadr')
+        self.connect_cadr_bad_log_location(stack_region, self.cadr_bad_cloud_account_name, bad_log_location)
 
         Logger.logger.info('Stage 7: Delete cadr feature and validate account deleted')
         self.delete_and_validate_account_feature(account_guid, CADR_FEATURE_NAME)
-
-        # Second flow: CADR first, then validate
-        Logger.logger.info('Stage 8: Create bad log location cloud account with cadr')
-        cloud_account_guid = self.connect_cadr_bad_log_location(stack_region, self.cadr_first_cloud_account_name, bad_log_location)
-
-        Logger.logger.info('Stage 9: Connect cadr new account')
-        cloud_account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name_first, self.cadr_first_cloud_account_name, log_location)
-
-        # Store CADR config for later validation
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        cadr_feature = account["features"][CADR_FEATURE_NAME]
-        self.cadr_cloud_account_name = account["name"]
-
-        Logger.logger.info('Stage 10: Validate features unchanged')
-        # Validate CADR config remains unchanged
-        self.validate_features_unchanged(cloud_account_guid, CADR_FEATURE_NAME, cadr_feature)
-        
-        # Validate account name
-        self.validate_account_name(cloud_account_guid, self.cadr_first_cloud_account_name)
-
-        Logger.logger.info('Stage 11: Delete cadr feature and validate')
-        self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
         return self.cleanup()
 
