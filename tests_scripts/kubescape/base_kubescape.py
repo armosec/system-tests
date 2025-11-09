@@ -823,14 +823,16 @@ class BaseKubescape(BaseK8S):
         report_guid = self.get_report_guid(cluster_name=cluster_name, framework_name=framework_name,
                                            old_report_guid=old_report_guid)
 
+        # self.compare_framework_data(cli_result, framework_name, report_guid)
+        self.compare_controls_data(cli_result, framework_name, report_guid)
+        self.compare_resources_data(cli_result, framework_name, report_guid)
+        
         # "security" framework is excluded from postureClusters report, therefore skipping tests using APIS that depends on this report.
         if framework_name not in statics.SECURITY_FRAMEWORKS:
             self.compare_top_controls_data(cli_result=cli_result, cluster_name=cluster_name, report_guid=report_guid,
                                            framework_name=framework_name)
 
-        # self.compare_framework_data(cli_result, framework_name, report_guid)
-        self.compare_controls_data(cli_result, framework_name, report_guid)
-        self.compare_resources_data(cli_result, framework_name, report_guid)
+
 
     def get_posture_control_by_id(self, framework_name: str, report_guid: str, control_id: str):
         be_controls = self.get_posture_controls(framework_name=framework_name, report_guid=report_guid)
