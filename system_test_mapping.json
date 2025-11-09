@@ -1216,7 +1216,7 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
-    "customer_name": "cspm_account"
+    "customer_name": "SECOND_CUSTOMER"
   },
   "cloud_organization_aws_cspm": {
     "target": [
@@ -1230,7 +1230,7 @@
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
-    "customer_name": "cspm_account"
+    "customer_name": "SECOND_CUSTOMER"
 
   },
   "cloud_organization_aws_cadr": {
