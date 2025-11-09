@@ -23,6 +23,24 @@ class AccountsTests(object):
         )
 
     @staticmethod
+    def cloud_connect_aws_cspm_single():
+        from tests_scripts.accounts.connect_cspm_single import CloudConnectCSPMSingle
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudConnectCSPMSingle,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )
+
+    @staticmethod
+    def cloud_connect_aws_cadr_single():
+        from tests_scripts.accounts.connect_cadr_single import CloudConnectCADRSingle
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudConnectCADRSingle,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )
+
+    @staticmethod
     def cloud_organization_aws_cspm():
         from tests_scripts.accounts.connect_cspm_org import CloudOrganizationCSPM
         return KubescapeConfiguration(
