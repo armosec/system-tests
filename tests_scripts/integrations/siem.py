@@ -2,7 +2,6 @@ import os
 import random
 from systest_utils import Logger
 from tests_scripts.integrations.base_integrations import BaseIntegrations
-from systest_utils import statics
 
 class Providers:
     SUMO_LOGIC = "sumoLogic"
@@ -22,8 +21,6 @@ class SIEMIntegrations(BaseIntegrations):
 
     def start(self):
 
-        return statics.SUCCESS, ""
-        
         webhook_url = os.environ.get("SIEM_WEBHOOK_URL")
         workspaceID = os.environ.get("SIEM_MICROSOFT_SENTINEL_WORKSPACEID")
         primary_key = os.environ.get("SIEM_MICROSOFT_SENTINEL_PRIMARY_KEY")
