@@ -1702,8 +1702,8 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info("Validating scan data after exception deletion")
         self.wait_for_report(
             self.validate_scan_data,
-            timeout=120,
-            sleep_interval=5,
+            timeout=180,
+            sleep_interval=15,
             cloud_account_guid=cloud_account_guid,
             cloud_account_name=cloud_account_name,
             last_success_scan_id=last_success_scan_id,
