@@ -35,7 +35,7 @@ class CloudOrganizationCSPM(Accounts):
         """
         CSPM/Compliance-only organization test
         """
-
+        
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         # generate random number for cloud account name for uniqueness
