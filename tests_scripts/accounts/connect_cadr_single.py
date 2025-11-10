@@ -69,7 +69,7 @@ class CloudConnectCADRSingle(Accounts):
         assert account_id is not None, f"Could not extract account ID from account {account_guid}"
         
         Logger.logger.info('Stage 4: Validate cadr status is connected')
-        self.wait_for_report(self.verify_cadr_status, sleep_interval=10, timeout=900, 
+        self.wait_for_report(self.verify_cadr_status, sleep_interval=10, timeout=300, 
                              guid=account_guid, cloud_entity_type=CloudEntityTypes.ACCOUNT, 
                              expected_status=FEATURE_STATUS_CONNECTED)
         Logger.logger.info(f"CADR account {account_guid} is connected successfully")
