@@ -412,3 +412,30 @@ class WorkflowsLinearNotifications(Workflows):
                 if guid:
                     self.backend.unlink_issue(guid)
 
+    def validate_workflow(self, expected_name: str, expected_provider: str) -> str:
+        body = {
+            "pageSize": 150,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "name": expected_name,
+                }
+            ],
+            "orderBy": "updatedTime:desc",
+        }
+        workflows = self.backend.get_workflows(body=body)
+        assert workflows["total"]["value"] == 1, (
+            f"Expected total value to be equal to 1 for workflow {expected_name}, "
+            f"but got {workflows['total']['value']}"
+        )
+
+        workflow = workflows["response"][0]
+        assert workflow["name"] == expected_name, f"Expected name {expected_name} but got {workflow['name']}"
+        notification = workflow["notifications"][0]
+        assert (
+            notification["provider"] == expected_provider
+        ), f"Expected provider {expected_provider} but got {notification['provider']}"
+        identifiers = notification.get("linearTicketIdentifiers")
+        assert identifiers, "Expected Linear ticket identifiers to be present"
+        return workflow["guid"]
+
