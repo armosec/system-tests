@@ -1204,20 +1204,6 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "cloud_connect_aws": {
-    "target": [
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service"
-    ],
-    "description": "Checks cloud accounts connect",
-    "skip_on_environment": "",
-    "owner": "eranm@armosec.io",
-    "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
-  },
   "cloud_connect_aws_cspm_single": {
     "target": [
       "Backend"
@@ -1229,8 +1215,7 @@
     "description": "Checks cloud accounts connect with CSPM single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "skip_cluster": true
   },
   "cloud_connect_aws_cadr_single": {
     "target": [
@@ -1258,7 +1243,6 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER"
-
   },
   "cloud_organization_aws_cadr": {
     "target": [
