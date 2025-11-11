@@ -1,6 +1,7 @@
 # Cursor AI Rules
 
-> **Shared rules** are in `.cursor/shared-rules`.
-> The AI assistant reads both: shared rules + this repo-specific file.
+> **This file contains repo-specific rules for the `system-tests` repository.**
+> 
+> **Shared rules** are in `shared-rules/.cursor/rules`.
 
 # Add repo-specific rules below.
