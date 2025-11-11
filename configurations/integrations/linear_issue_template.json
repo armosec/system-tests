@@ -1,0 +1,18 @@
+{
+    "provider": "linear",
+    "collaborationGUID": "",
+    "linearFields": {
+        "workspaceId": "",
+        "teamId": ""
+    },
+    "siteID": "",
+    "projectID": "",
+    "fields": {
+        "teamId": "",
+        "title": "System tests Linear ticket",
+        "description": "System test automation ticket created by system-tests",
+        "priority": 2
+    },
+    "issueType": "clusterControl"
+}
+
