@@ -1313,6 +1313,22 @@
     "skip_on_environment": "",
     "owner": "afekb@armosec.io"
   },
+  "runtime_stress_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart",
+      "node-agent",
+      "cadashboardbe",
+      "event-ingester-service",
+      "synchronizer"
+    ],
+    "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "jonathang@armosec.io"
+  },
   "siem_integrations": {
     "target": [
       "Backend"
