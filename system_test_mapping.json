@@ -1192,6 +1192,19 @@
     "skip_on_environment": "production",
     "owner": "eranm@armosec.io"
   },
+  "linear_notifications_workflows": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service-dummy",
+      "cadashboardbe-dummy",
+      "event-ingester-service-dummy"
+    ],
+    "description": "Checks workflows linear notifications",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "eranm@armosec.io"
+  },
   "workflows_configurations": {
     "target": [
       "Backend"
