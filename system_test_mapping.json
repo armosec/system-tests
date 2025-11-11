@@ -1230,7 +1230,7 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io"
   },
-  "cloud_connect_aws": {
+  "cloud_connect_aws_cspm_single": {
     "target": [
       "Backend"
     ],
@@ -1238,11 +1238,23 @@
       "cadashboardbe",
       "event-ingester-service"
     ],
-    "description": "Checks cloud accounts connect",
+    "description": "Checks cloud accounts connect with CSPM single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "skip_cluster": true
+  },
+  "cloud_connect_aws_cadr_single": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks cloud accounts connect with CADR single account",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io",
+    "skip_cluster": true
   },
   "cloud_organization_aws_cspm": {
     "target": [
@@ -1257,7 +1269,6 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER"
-
   },
   "cloud_organization_aws_cadr": {
     "target": [
@@ -1327,6 +1338,22 @@
     "description": "testing cadr incident presented",
     "skip_on_environment": "",
     "owner": "afekb@armosec.io"
+  },
+  "runtime_stress_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart",
+      "node-agent",
+      "cadashboardbe",
+      "event-ingester-service",
+      "synchronizer"
+    ],
+    "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "jonathang@armosec.io"
   },
   "siem_integrations": {
     "target": [
