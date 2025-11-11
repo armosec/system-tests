@@ -1078,10 +1078,10 @@
     ],
     "target_repositories": [
       "cadashboardbe",
-      "config-service"
+      "event-ingester-service-dummy"
     ],
     "description": "testing linear integration",
-    "skip_on_environment": "custom",
+    "skip_on_environment": "development,staging,production,production-us,custom",
     "owner": "eranm@armosec.io",
     "customer_name": "SECOND_CUSTOMER"
   },
