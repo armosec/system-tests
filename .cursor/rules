@@ -1,0 +1,6 @@
+# Cursor AI Rules
+
+> **Shared rules** are in `.cursor/shared-rules`.
+> The AI assistant reads both: shared rules + this repo-specific file.
+
+# Add repo-specific rules below.

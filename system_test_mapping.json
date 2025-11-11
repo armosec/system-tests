@@ -1072,6 +1072,18 @@
     "skip_on_environment": "custom",
     "owner": "jonathang@armosec.io"
   },
+  "linear_integration": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "config-service"
+    ],
+    "description": "testing linear integration",
+    "skip_on_environment": "custom",
+    "owner": "eranm@armosec.io"
+  },
   "seccomp_profile_pod": {
     "target": [
       "In cluster",
