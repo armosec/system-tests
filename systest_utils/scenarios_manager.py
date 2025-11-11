@@ -460,7 +460,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
             
 
-        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace', 
+        ignore_keys = {'relation', 'lastUpdated', 'supportsSmartRemediation', 'ticketManager', 'namespace', 
                    'cursor', 'k8sResourceHash', 'cluster', 'attackChainID', 'firstSeen', 
                    'clusterShortName', 'lastTimeDetected', 'reportGUID', 'resourceID', 'isNew', 'exceptionPolicyGUID',
                    'riskFactorsCount', 'riskFactors', 'severityStats', 'criticalCount', 'highCount', 'mediumCount', 'lowCount',# vulnerability specific keys
