@@ -481,7 +481,7 @@ class SecurityRisksScenarioManager(ScenarioManager):
         
         :param result: content retrieved from backend.
         """
-        ignore_keys = {'tickets', 'relation', 'lastUpdated', 'supportsSmartRemediation', 'namespace',
+        ignore_keys = {'tickets', 'relation', 'lastUpdated', 'supportsSmartRemediation', 'ticketManager', 'namespace',
                    'clusterShortName', 'cursor', 'k8sResourceHash', 'cluster', 'clusterShortName'}
     
         if 'total' in result and 'total' in expected:
