@@ -386,12 +386,15 @@ class WorkflowsLinearNotifications(Workflows):
             if isinstance(value, str):
                 parts.append(value)
 
-        description_data = issue.get("descriptionData")
-        if description_data:
-            try:
-                parts.append(json.dumps(description_data))
-            except (TypeError, ValueError):
-                parts.append(str(description_data))
+        rich_description = issue.get("descriptionState") or issue.get("descriptionData")
+        if rich_description:
+            if isinstance(rich_description, str):
+                parts.append(rich_description)
+            else:
+                try:
+                    parts.append(json.dumps(rich_description))
+                except (TypeError, ValueError):
+                    parts.append(str(rich_description))
 
         return " ".join(parts)
 

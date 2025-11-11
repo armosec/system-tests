@@ -238,7 +238,7 @@ def get_tickets_from_linear_channel(
               identifier
               title
               description
-              descriptionData
+              descriptionState
               createdAt
               updatedAt
               url
