@@ -398,6 +398,21 @@ class WorkflowsLinearNotifications(Workflows):
 
         return " ".join(parts)
 
+    def unlink_issues(self, response):
+        """Unlink Linear issues from the response"""
+        if not response:
+            return 
+        
+        if "response" not in response:
+            return
+        
+        for item in response["response"]:  
+            if len(item.get("tickets", [])) > 0:
+                for ticket in item["tickets"]:
+                    guid = ticket.get("guid")
+                    if guid:
+                        self.backend.unlink_issue(guid)
+
     def _cleanup_linear_tickets(
         self,
         security_risks_response: Optional[Dict[str, Any]],
