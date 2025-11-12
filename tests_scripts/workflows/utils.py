@@ -1,9 +1,9 @@
 from slack_sdk import WebClient
 import requests
+import json
 from datetime import datetime
 from systest_utils import Logger
 import os
-import requests
 from requests.auth import HTTPBasicAuth
 from typing import Dict, Any, List, Optional
 import time
@@ -29,10 +29,12 @@ UPDATED_WORKFLOW_NAME = "system_test_workflow_updated"
 SECURITY_RISKS_WORKFLOW_NAME_TEAMS = "security_risks_workflow_teams_"
 SECURITY_RISKS_WORKFLOW_NAME_SLACK = "security_risks_workflow_slack_"
 SECURITY_RISKS_WORKFLOW_NAME_JIRA = "security_risks_workflow_jira_"
+SECURITY_RISKS_WORKFLOW_NAME_LINEAR = "security_risks_workflow_linear_"
 
 VULNERABILITIES_WORKFLOW_NAME_TEAMS = "vulnerabilities_workflow_teams_"
 VULNERABILITIES_WORKFLOW_NAME_SLACK = "vulnerabilities_workflow_slack_"
 VULNERABILITIES_WORKFLOW_NAME_JIRA = "vulnerabilities_workflow_jira_"
+VULNERABILITIES_WORKFLOW_NAME_LINEAR = "vulnerabilities_workflow_linear_"
 
 
 COMPLIANCE_WORKFLOW_NAME_TEAMS = "compliance_workflow_teams_"
@@ -45,6 +47,7 @@ SYSTEM_HEALTH_WORKFLOW_NAME_SLACK = "system_health_workflow_slack_"
 SLACK_CHANNEL_NAME = "system_tests_slack"
 TEAMS_CHANNEL_NAME = "system_tests_teams"
 JIRA_PROVIDER_NAME = "jira"
+LINEAR_PROVIDER_NAME = "linear"
 
 
 # expected responses
@@ -210,6 +213,108 @@ def get_tickets_from_jira_channel(
             break
 
     Logger.logger.info(f"Successfully retrieved {len(all_issues)} issues")
+    return all_issues
+
+
+def get_tickets_from_linear_channel(
+    before_test: int,
+    cluster: str,
+) -> List[Dict[str, Any]]:
+    api_key = get_env("LINEAR_API_KEY")
+    team_id = get_env("LINEAR_TEAM_ID")
+
+    missing = [name for name, val in [("LINEAR_API_KEY", api_key)] if not val]
+    if missing:
+        raise Exception(f"Missing required Linear environment variables: {', '.join(missing)}")
+
+    created_after = datetime.utcfromtimestamp(before_test - 5 * 60).replace(microsecond=0).isoformat() + "Z"
+    endpoint = os.getenv("LINEAR_GRAPHQL_ENDPOINT", "https://api.linear.app/graphql")
+
+    query = """
+        query Issues($filter: IssueFilter, $after: String) {
+          issues(first: 50, filter: $filter, after: $after) {
+            nodes {
+              id
+              identifier
+              title
+              description
+              descriptionState
+              createdAt
+              updatedAt
+              url
+              team { id name }
+              state { id name }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+    """
+
+    issue_filter: Dict[str, Any] = {"createdAt": {"gt": created_after}}
+    if team_id:
+        issue_filter["team"] = {"id": {"eq": team_id}}
+
+    all_issues: List[Dict[str, Any]] = []
+    after_cursor: Optional[str] = None
+
+    for attempt in range(10):
+        variables: Dict[str, Any] = {"filter": issue_filter}
+        if after_cursor:
+            variables["after"] = after_cursor
+
+        try:
+            response = requests.post(
+                endpoint,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": api_key,
+                },
+                json={"query": query, "variables": variables},
+                timeout=30,
+            )
+        except requests.RequestException as exc:
+            Logger.logger.error(f"Linear query failed on attempt {attempt + 1}: {exc}")
+            if attempt == 9:
+                raise
+            time.sleep(2 ** attempt * 0.5)
+            continue
+
+        if response.status_code == 429:
+            retry_after = int(response.headers.get("Retry-After", "5"))
+            sleep_for = max(1, min(retry_after, 60))
+            Logger.logger.warning(f"Linear rate limit hit, retrying after {sleep_for} seconds")
+            time.sleep(sleep_for)
+            if attempt == 9:
+                raise Exception("Exceeded retries while waiting for Linear rate limit")
+            continue
+
+        if not response.ok:
+            try:
+                detail = response.json()
+            except ValueError:
+                detail = response.text
+            raise Exception(f"Linear search failed: {response.status_code}, detail: {detail}")
+
+        data = response.json()
+        errors = data.get("errors")
+        if errors:
+            raise Exception(f"Linear GraphQL errors: {errors}")
+
+        issues = data.get("data", {}).get("issues", {})
+        nodes = issues.get("nodes", [])
+        all_issues.extend(nodes)
+
+        page_info = issues.get("pageInfo", {})
+        if page_info.get("hasNextPage"):
+            after_cursor = page_info.get("endCursor")
+            continue
+
+        break
+
+    Logger.logger.info(f"Successfully retrieved {len(all_issues)} Linear issues")
     return all_issues
 
 

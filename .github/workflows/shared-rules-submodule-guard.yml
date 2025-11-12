@@ -1,0 +1,62 @@
+name: shared-rules-submodule-guard
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-submodule:
+    name: Verify shared rules submodule
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository with submodules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN || secrets.SHARED_RULES_PAT || secrets.GH_SUBMODULE_TOKEN || github.token }}
+
+      - name: Locate shared rules submodule path
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          entry=$(git config -f .gitmodules --get-regexp '^submodule\..*\.url$' | awk '/armosec-ai-shared-rules/ {sub(/^submodule\./,"",$1); sub(/\.url$/,"",$1); print $1; exit}')
+          if [[ -z "$entry" ]]; then
+            echo "::error::Could not find an armosec-ai-shared-rules submodule entry in .gitmodules"
+            exit 1
+          fi
+
+          submodule_path=$(git config -f .gitmodules "submodule.${entry}.path")
+          if [[ -z "$submodule_path" ]]; then
+            echo "::error::Failed to resolve the path for submodule ${entry}"
+            exit 1
+          fi
+
+          echo "path=$submodule_path" >> "$GITHUB_OUTPUT"
+
+      - name: Run shared rules verification
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          submodule_path="${{ steps.locate.outputs.path }}"
+
+          if [[ -z "$submodule_path" ]]; then
+            echo "::error::Shared rules submodule path was not detected."
+            exit 1
+          fi
+
+          if [[ ! -x "$submodule_path/scripts/verify-shared-rules-submodule.sh" ]]; then
+            echo "::error::Expected verification script at ${submodule_path}/scripts/verify-shared-rules-submodule.sh."
+            echo "Make sure the shared rules submodule is updated to the latest version."
+            exit 1
+          fi
+
+          bash "$submodule_path/scripts/verify-shared-rules-submodule.sh"
+
