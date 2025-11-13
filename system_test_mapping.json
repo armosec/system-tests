@@ -1255,7 +1255,8 @@
     "description": "Checks cloud accounts connect with CADR single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "customer_name": "SECOND_CUSTOMER"
   },
   "cloud_organization_aws_cspm": {
     "target": [
