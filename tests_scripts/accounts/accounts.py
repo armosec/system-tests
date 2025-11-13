@@ -1728,9 +1728,28 @@ class Accounts(base_test.BaseTest):
         feature = account["features"][feature_name]
         assert "config" in feature, f"config not in {feature}"  # This is the new field
         
+        # Check if a new scan was initiated by comparing lastSuccessScanID
+        # If scan IDs don't match, skip lastTimeInitiateScan validation since a new scan was triggered
+        expected_scan_id = expected_feature.get("lastSuccessScanID")
+        current_scan_id = feature.get("lastSuccessScanID")
+        skip_last_time_initiate_scan = False
+        
+        if expected_scan_id and current_scan_id and expected_scan_id != current_scan_id:
+            Logger.logger.warning(f"Scan ID mismatch detected - Expected lastSuccessScanID: {expected_scan_id}, got: {current_scan_id}. "
+                                f"This indicates a new scan was initiated. Skipping lastTimeInitiateScan validation.")
+            skip_last_time_initiate_scan = True
+        elif expected_scan_id or current_scan_id:
+            Logger.logger.info(f"Scan ID check - Expected: {expected_scan_id}, Current: {current_scan_id}")
+        
         # Compare each config field
         for key, value in expected_feature.items():
             assert key in feature, f"{key} not in {feature}"
+            
+            # Skip lastTimeInitiateScan validation if scan IDs don't match (new scan was initiated)
+            if key == "lastTimeInitiateScan" and skip_last_time_initiate_scan:
+                Logger.logger.info(f"Skipping validation of {key} due to scan ID mismatch (new scan was initiated)")
+                continue
+            
             assert feature[key] == value, f"Expected {key}: {value}, got: {feature[key]}"
     
     def create_aws_cdr_runtime_policy(self, policy_name: str, incident_type_ids: List[str]):

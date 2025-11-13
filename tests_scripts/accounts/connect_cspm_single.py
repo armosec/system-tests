@@ -144,6 +144,12 @@ class CloudConnectCSPMSingle(Accounts):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
         
+        # Log CSPM scan info before CADR connection to investigate scan initiation
+        if "lastSuccessScanID" in cspm_feature:
+            Logger.logger.info(f"Before CADR connection - CSPM lastSuccessScanID: {cspm_feature.get('lastSuccessScanID')}")
+        if "lastTimeInitiateScan" in cspm_feature:
+            Logger.logger.info(f"Before CADR connection - CSPM lastTimeInitiateScan: {cspm_feature.get('lastTimeInitiateScan')}")
+        
         # Setup cloudtrail for CADR connection
         self.cloud_trail_name = "system-test-connect-dont-delete"
         log_location, _ = self.aws_manager.get_cloudtrail_details(self.cloud_trail_name)
@@ -158,6 +164,17 @@ class CloudConnectCSPMSingle(Accounts):
         Logger.logger.info("CADR has been connected successfully to existing CSPM account")
         # Verify it's the same account (CADR merges into existing account)
         assert account_guid_after_cadr == cloud_account_guid, f"Account GUID mismatch: {account_guid_after_cadr} != {cloud_account_guid}"
+        
+        # Log CSPM scan info after CADR connection to investigate scan initiation
+        account_after_cadr = self.get_cloud_account_by_guid(cloud_account_guid)
+        cspm_feature_after = account_after_cadr["features"][COMPLIANCE_FEATURE_NAME]
+        if "lastSuccessScanID" in cspm_feature_after:
+            Logger.logger.info(f"After CADR connection - CSPM lastSuccessScanID: {cspm_feature_after.get('lastSuccessScanID')}")
+        if "lastTimeInitiateScan" in cspm_feature_after:
+            Logger.logger.info(f"After CADR connection - CSPM lastTimeInitiateScan: {cspm_feature_after.get('lastTimeInitiateScan')}")
+        if "lastSuccessScanID" in cspm_feature and "lastSuccessScanID" in cspm_feature_after:
+            if cspm_feature.get("lastSuccessScanID") != cspm_feature_after.get("lastSuccessScanID"):
+                Logger.logger.warning(f"WARNING: Scan ID changed after CADR connection! Before: {cspm_feature.get('lastSuccessScanID')}, After: {cspm_feature_after.get('lastSuccessScanID')}")
 
         Logger.logger.info('Stage 16: Validate CSPM feature unchanged after CADR connection')
         # Validate CSPM config remains unchanged after CADR connection
