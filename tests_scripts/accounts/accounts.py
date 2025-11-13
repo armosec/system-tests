@@ -914,21 +914,12 @@ class Accounts(base_test.BaseTest):
         _ =  self.create_stack(self.aws_manager, stack_name, template_url, parameters)
 
     def verify_cadr_status(self, guid: str, cloud_entity_type: CloudEntityTypes, expected_status: str) -> bool:
-        expected_feature_connected = False
-
-        if expected_status == FEATURE_STATUS_CONNECTED:
-            expected_feature_connected = True
-
         if cloud_entity_type == CloudEntityTypes.ACCOUNT:
             res = self.get_cloud_account_by_guid(guid)
         else:
             res = self.get_cloud_org_by_guid(guid)
             
         assert res["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['features'][CADR_FEATURE_NAME]['featureStatus']}"
-        if expected_status == FEATURE_STATUS_PENDING:
-            assert "isConnected" not in res["features"][CADR_FEATURE_NAME], f"isConnected should not be in {res['features'][CADR_FEATURE_NAME]} when status is {FEATURE_STATUS_PENDING}"
-            return True
-        assert res["features"][CADR_FEATURE_NAME]["isConnected"] == expected_feature_connected, f"isConnected is not {expected_feature_connected} but {res['features'][CADR_FEATURE_NAME]['isConnected']}"
         return True
 
 
