@@ -1729,17 +1729,36 @@ class Accounts(base_test.BaseTest):
         assert "config" in feature, f"config not in {feature}"  # This is the new field
         
         # Check if a new scan was initiated by comparing lastSuccessScanID
-        # If scan IDs don't match, skip lastTimeInitiateScan validation since a new scan was triggered
         expected_scan_id = expected_feature.get("lastSuccessScanID")
         current_scan_id = feature.get("lastSuccessScanID")
+        expected_initiate_time = expected_feature.get("lastTimeInitiateScan")
+        current_initiate_time = feature.get("lastTimeInitiateScan")
         skip_last_time_initiate_scan = False
         
+        # Log scan information for debugging
+        Logger.logger.info(f"Scan validation check - lastSuccessScanID: Expected={expected_scan_id}, Current={current_scan_id}, "
+                          f"lastTimeInitiateScan: Expected={expected_initiate_time}, Current={current_initiate_time}")
+        
+        # Case 1: Both scan IDs exist and don't match → new scan initiated (OK, skip timestamp validation)
         if expected_scan_id and current_scan_id and expected_scan_id != current_scan_id:
             Logger.logger.warning(f"Scan ID mismatch detected - Expected lastSuccessScanID: {expected_scan_id}, got: {current_scan_id}. "
                                 f"This indicates a new scan was initiated. Skipping lastTimeInitiateScan validation.")
             skip_last_time_initiate_scan = True
-        elif expected_scan_id or current_scan_id:
-            Logger.logger.info(f"Scan ID check - Expected: {expected_scan_id}, Current: {current_scan_id}")
+        # Case 2: Both scan IDs exist and match, but timestamps differ → ERROR (should fail)
+        elif expected_scan_id and current_scan_id and expected_scan_id == current_scan_id:
+            if expected_initiate_time and current_initiate_time and expected_initiate_time != current_initiate_time:
+                Logger.logger.error(f"ERROR: Scan IDs match ({expected_scan_id}) but lastTimeInitiateScan changed - "
+                                  f"Expected: {expected_initiate_time}, got: {current_initiate_time}. "
+                                  f"This should not happen - same scan cannot have different initiation times.")
+                # Don't skip validation - let it fail to catch this issue
+                skip_last_time_initiate_scan = False
+        # Case 3: Scan IDs don't exist (or one is missing) but timestamps differ → likely new scan initiated (OK, skip timestamp validation)
+        elif not (expected_scan_id and current_scan_id):
+            if expected_initiate_time and current_initiate_time and expected_initiate_time != current_initiate_time:
+                Logger.logger.warning(f"lastTimeInitiateScan changed (Expected: {expected_initiate_time}, got: {current_initiate_time}) "
+                                    f"but scan IDs not available (Expected: {expected_scan_id}, Current: {current_scan_id}). "
+                                    f"Assuming new scan was initiated. Skipping lastTimeInitiateScan validation.")
+                skip_last_time_initiate_scan = True
         
         # Compare each config field
         for key, value in expected_feature.items():
