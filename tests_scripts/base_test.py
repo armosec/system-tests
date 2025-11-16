@@ -37,6 +37,8 @@ class BaseTest(object):
         self.test_started_at = datetime.now(timezone.utc).astimezone().isoformat()
         self.cluster_deleted = False
         self.wait_for_agg_to_end = False
+        # Ensure cleanup tracking attribute always exists, even if initialization fails later
+        self._cleanup_called = False
 
         # objects
         self.test_driver = test_driver
@@ -71,13 +73,12 @@ class BaseTest(object):
             self.created_tenant_ids.append(self.test_tenant_id)
 
         self.test_failed = False
-        self._cleanup_called = False
 
 
 
     def __del__(self):
         # Final safety net - ensure cleanup is called even if test framework fails
-        if not self._cleanup_called:
+        if not getattr(self, "_cleanup_called", True):
             Logger.logger.warning(f"Test destructor called without cleanup - attempting emergency cleanup")
             try:
                 self._emergency_cleanup()

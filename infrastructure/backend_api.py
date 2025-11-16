@@ -2694,6 +2694,48 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
+    def get_linear_config(self):
+        url = API_INTEGRATIONS + "/linear/configV2"
+        r = self.get_with_rate_limit(url, params={"customerGUID": self.selected_tenant_id})
+        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
+        return r.json()
+
+    def create_linear_issue(self, body: dict):
+        url = API_INTEGRATIONS + "/linear/issueV2"
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
+                    url, self.customer, r.status_code, r.text))
+        return r.json()
+
+    def update_linear_ticket_status(self, body: dict):
+        url = API_INTEGRATIONS + "/linear/issueV2/updateStatus"
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request: update_linear_ticket_status "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        return r.json()
+
+    def search_linear_field_values(self, collab_guid: str, field_id: str, team_id: str = None, query: str = None):
+        url = API_INTEGRATIONS + "/linear/issueTypesV2/fieldValues/search"
+        inner_filter = {
+            "collabGUID": collab_guid,
+            "fieldID": field_id,
+        }
+        if team_id:
+            inner_filter["teamID"] = f"{team_id}|eq"
+        if query:
+            inner_filter["query"] = f"{query}|like"
+        body = {"innerFilters": [inner_filter]}
+        r = self.post_with_ratelimit(url, params={"customerGUID": self.selected_tenant_id}, json=body)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
+                    url, self.customer, r.status_code, r.text))
+        return r.json()
+
     def get_jira_config(self):
         url = API_INTEGRATIONS + "/jira/configV2"
         r = self.get_with_rate_limit(url, params={"customerGUID": self.selected_tenant_id})

@@ -1072,6 +1072,19 @@
     "skip_on_environment": "custom",
     "owner": "jonathang@armosec.io"
   },
+  "linear_integration": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service-dummy"
+    ],
+    "description": "testing linear integration",
+    "skip_on_environment": "production,production-us,custom",
+    "owner": "eranm@armosec.io",
+    "customer_name": "SECOND_CUSTOMER"
+  },
   "seccomp_profile_pod": {
     "target": [
       "In cluster",
@@ -1177,6 +1190,20 @@
     ],
     "description": "Checks workflows jira notifications",
     "skip_on_environment": "production",
+    "owner": "eranm@armosec.io"
+  },
+  "linear_notifications_workflows": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "users-notification-service",
+      "cadashboardbe",
+      "event-ingester-service-dummy"
+    ],
+    "description": "Checks workflows linear notifications",
+    "skip_on_environment": "production,production-us",
+    "customer_name": "SECOND_CUSTOMER",
     "owner": "eranm@armosec.io"
   },
   "workflows_configurations": {
@@ -1313,6 +1340,22 @@
     "description": "testing cadr incident presented",
     "skip_on_environment": "",
     "owner": "afekb@armosec.io"
+  },
+  "runtime_stress_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "helm-chart",
+      "node-agent",
+      "cadashboardbe",
+      "event-ingester-service",
+      "synchronizer"
+    ],
+    "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "jonathang@armosec.io"
   },
   "siem_integrations": {
     "target": [
