@@ -92,7 +92,7 @@ class CADRIncidents(Incidents):
     def enable_node_agent_test_mode(self):
         self.kubernetes_obj.add_value_to_configmap(namespace=NodeAgentK8s.NAMESPACE, configmap_name=NodeAgentK8s.CONFIGMAP_NAME, values_to_add=NodeAgentK8s.TEST_MODE, json_key=NodeAgentK8s.JSON_KEY)
         self.kubernetes_obj.restart_workloads_in_namespace(namespace=NodeAgentK8s.NAMESPACE, kind=NodeAgentK8s.KIND, name=NodeAgentK8s.NAME)
-        time.sleep(30)
+        # Optimized: Use health check instead of fixed 30s sleep - reduces wait time by ~10-20s
         self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
                              namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
 

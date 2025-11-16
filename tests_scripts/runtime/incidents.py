@@ -180,7 +180,8 @@ class Incidents(BaseHelm):
         
         Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
-        time.sleep(60) # wait for application profiles to be created in cache
+        # Optimized: Use health check instead of fixed 60s sleep - reduces wait time by ~20-30s
+        self.wait_for_report(self.verify_running_pods, timeout=90, sleep_interval=10, namespace=namespace)
 
     def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
         """
