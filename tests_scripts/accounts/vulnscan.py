@@ -5,7 +5,6 @@ import random
 from infrastructure import aws
 from .accounts import extract_parameters_from_url
 from typing import List, Tuple
-from .connect import REGION_SYSTEM_TEST
 from .accounts import VULN_SCAN_FEATURE_NAME
 from systest_utils import statics
 
@@ -15,7 +14,7 @@ expected_instances_ids = ["i-035d6cba3ed6fa6cf", "i-0424907c0f6cd8c46", "i-075af
 test_aws_account_id = "371864305487"
 
 SMAPSHOT_TAG_NAME = "armo:secure:vulnscan:instance-scan-id"
-
+REGION_SYSTEM_TEST = "us-east-1"
 
 
 
