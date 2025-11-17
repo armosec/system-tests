@@ -363,6 +363,20 @@ class ControlPanelAPI(object):
         if self.test_run_id:
             self.auth["X-Test-Run-Id"] = self.test_run_id
 
+    def set_test_run_id(self, test_run_id: str):
+        """
+        Update the test_run_id and add it to the auth headers.
+        This is useful when a cluster is created in a test and we want to use the cluster name as the run ID.
+        """
+        self.test_run_id = test_run_id
+        if self.auth is None:
+            self.auth = {}
+        if self.test_run_id:
+            self.auth["X-Test-Run-Id"] = self.test_run_id
+        else:
+            # Remove X-Test-Run-Id header if test_run_id is None or empty
+            self.auth.pop("X-Test-Run-Id", None)
+
     ## ************** Tenants Backend APIs ************** ##
 
     def get_selected_tenant(self) -> str:
