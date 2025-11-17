@@ -116,6 +116,12 @@ def main():
     args = input_parser()
     setup_logger(level=args.logger_level, name=args.test_name)
 
+    # Generate test run ID for this test execution (must be done early)
+    test_run_id = str(uuid.uuid4())
+    Logger.logger.info("=" * 80)
+    Logger.logger.info(f"Test Run ID: {test_run_id}")
+    Logger.logger.info("=" * 80)
+
     # seed
     rand_seed = str(datetime.now())
     Logger.logger.info("Random seed is: {}".format(rand_seed))
@@ -144,11 +150,7 @@ def main():
     # set default timeout to 11 minutes
     socket.setdefaulttimeout(11 * 60)
 
-    # Generate test run ID for this test execution
-    test_run_id = str(uuid.uuid4())
-    Logger.logger.info(f"Test run ID: {test_run_id}")
-
-    # Add test_run_id to args
+    # Add test_run_id to args (already generated above)
     args_dict = vars(args)
     args_dict['test_run_id'] = test_run_id
 
