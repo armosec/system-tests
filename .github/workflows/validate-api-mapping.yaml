@@ -36,11 +36,11 @@ jobs:
         id: validate
         run: |
           # Make validation script executable
-          chmod +x validate_api_mapping.py
+          chmod +x scripts/validate_api_mapping.py
           
           # Run validation
           echo "::group::API Mapping Validation"
-          if python3 validate_api_mapping.py origin/${{ github.base_ref }} HEAD; then
+          if python3 scripts/validate_api_mapping.py origin/${{ github.base_ref }} HEAD; then
             echo "validation_passed=true" >> $GITHUB_OUTPUT
             echo "✅ Validation passed"
           else
@@ -68,7 +68,7 @@ jobs:
             
             1. **Regenerate the API mappings:**
                \`\`\`bash
-               python3 update_mapping_with_methods.py
+               python3 scripts/update_mapping_with_methods.py
                \`\`\`
             
             2. **Review the changes:**

@@ -37,6 +37,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_storage_disabled": {
@@ -77,6 +83,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_golang_dynamic": {
@@ -119,6 +131,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_java_and_python": {
@@ -161,6 +179,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_java": {
@@ -203,6 +227,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_golang": {
@@ -245,6 +275,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_python": {
@@ -287,6 +323,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_large_image": {
@@ -329,6 +371,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevant_data_is_appended": {
@@ -371,6 +419,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_enabled_stop_sniffing": {
@@ -413,6 +467,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "scan_with_exceptions": {
@@ -426,6 +486,10 @@
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
@@ -444,6 +508,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "attackchains_all": {
@@ -461,24 +529,41 @@
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
-        "path": "/api/v1/postureExceptionPolicy"
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
       },
       {
         "method": "DELETE",
-        "path": "/api/v1/repositoryPosture"
+        "path": "/api/v1/posture/scan"
       },
       {
         "method": "POST",
-        "path": "/api/v1/repositoryPosture/files"
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
       },
       {
         "method": "POST",
-        "path": "/api/v1/repositoryPosture/repositories"
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
       },
       {
         "method": "POST",
-        "path": "/api/v1/repositoryPosture/resources"
+        "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_multiple_containers": {
@@ -520,6 +605,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "vuln_scan_cve_exceptions": {
@@ -585,6 +676,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "scan_nsa": {
@@ -601,6 +698,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -616,6 +717,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_custom_framework_scanning_file_scope_testing": {
@@ -632,6 +737,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -647,6 +756,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_custom_framework_scanning_cluster_scope_testing": {
@@ -663,6 +776,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -678,6 +795,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
@@ -694,6 +815,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -709,6 +834,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_mitre": {
@@ -725,6 +854,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -740,6 +873,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_repository": {
@@ -756,6 +893,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -771,6 +912,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_local_file": {
@@ -787,6 +932,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -802,6 +951,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_local_glob_files": {
@@ -818,34 +971,7 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
-        "method": "DELETE",
-        "path": "/api/v1/repositoryPosture"
-      },
-      {
         "method": "POST",
-        "path": "/api/v1/repositoryPosture/files"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/repositoryPosture/repositories"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/repositoryPosture/resources"
-      }
-    ]
-  },
-  "scan_local_list_of_files": {
-    "target": [
-      "CLI"
-    ],
-    "target_repositories": [],
-    "description": "used by Kubescape",
-    "skip_on_environment": "",
-    "owner": "amirm@armosec.io",
-    "tested_dashboard_apis": [
-      {
-        "method": "DELETE",
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
@@ -864,6 +990,49 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
+  },
+  "scan_local_list_of_files": {
+    "target": [
+      "CLI"
+    ],
+    "target_repositories": [],
+    "description": "used by Kubescape",
+    "skip_on_environment": "",
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_nsa_and_submit_to_backend": {
@@ -883,6 +1052,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -898,6 +1071,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_mitre_and_submit_to_backend": {
@@ -917,6 +1094,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -932,6 +1113,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_local_repository_and_submit_to_backend": {
@@ -953,6 +1138,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -968,6 +1157,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_repository_from_url_and_submit_to_backend": {
@@ -989,6 +1182,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1004,6 +1201,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_with_exception_to_backend": {
@@ -1024,6 +1225,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1039,6 +1244,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_with_global_exception_to_backend": {
@@ -1059,6 +1268,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1074,6 +1287,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_with_custom_framework": {
@@ -1094,6 +1311,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1109,6 +1330,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_compliance_score": {
@@ -1129,6 +1354,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1144,6 +1373,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "scan_customer_configuration": {
@@ -1166,6 +1399,10 @@
         "path": "/api/v1/postureExceptionPolicy"
       },
       {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
@@ -1181,6 +1418,10 @@
         "method": "POST",
         "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "host_scanner": {
@@ -1198,56 +1439,32 @@
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
-        "path": "/api/v1/cluster"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/cluster"
+        "path": "/api/v1/postureExceptionPolicy"
       },
       {
         "method": "POST",
-        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+        "path": "/api/v1/postureExceptionPolicy"
       },
       {
         "method": "DELETE",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/repositoryPosture"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scan/v2/"
-      },
-      {
-        "method": "PUT",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/repositoryPosture/files"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+        "path": "/api/v1/repositoryPosture/repositories"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/component"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/image"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
+        "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "host_scanner_with_hostsensorrule": {
@@ -1264,56 +1481,32 @@
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
-        "path": "/api/v1/cluster"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/cluster"
+        "path": "/api/v1/postureExceptionPolicy"
       },
       {
         "method": "POST",
-        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+        "path": "/api/v1/postureExceptionPolicy"
       },
       {
         "method": "DELETE",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/repositoryPosture"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scan/v2/"
-      },
-      {
-        "method": "PUT",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/repositoryPosture/files"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+        "path": "/api/v1/repositoryPosture/repositories"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/component"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/image"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
+        "path": "/api/v1/repositoryPosture/resources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
     ]
   },
   "vuln_scan": {
@@ -1378,6 +1571,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "vuln_scan_proxy": {
@@ -1445,6 +1644,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "vuln_v2_views": {
@@ -1511,6 +1716,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "vuln_v2_views_kev": {
@@ -1577,6 +1788,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_ns_creation": {
@@ -1622,6 +1839,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_on_demand": {
@@ -1669,6 +1891,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_mitre_framework_on_demand": {
@@ -1716,6 +1943,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_nsa_and_mitre_framework_demand": {
@@ -1763,6 +1995,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_triggering_with_cron_job": {
@@ -1812,6 +2049,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_update_cronjob_schedule": {
@@ -1861,6 +2103,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_delete_cronjob": {
@@ -1910,6 +2157,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa": {
@@ -1958,6 +2210,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "smart_remediation_all_controls": {
@@ -1989,6 +2246,11 @@
         "method": "POST",
         "path": "/api/v1/posture/scan"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/smart_remediation.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "synchronizer": {
@@ -2020,6 +2282,11 @@
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "synchronizer_reconciliation": {
@@ -2051,6 +2318,11 @@
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "synchronizer_proxy": {
@@ -2082,6 +2354,11 @@
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "synchronizer_race_condition": {
@@ -2113,6 +2390,11 @@
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "synchronizer_kubescape_crds": {
@@ -2144,6 +2426,11 @@
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy": {
@@ -2182,6 +2469,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy_data_appended": {
@@ -2221,6 +2514,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy_pod_restarted": {
@@ -2260,6 +2559,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy_known_servers_cache": {
@@ -2293,6 +2598,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy_multiple_replicas": {
@@ -2332,6 +2643,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "network_policy_known_servers": {
@@ -2371,6 +2688,12 @@
         "method": "GET",
         "path": "/api/v1/networkpolicies/knownserverscache"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
@@ -2419,6 +2742,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "vuln_scan_triggering_with_cron_job": {
@@ -2462,7 +2790,37 @@
       {
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "stripe_checkout": {
@@ -2502,6 +2860,11 @@
         "method": "GET",
         "path": "/api/v1/tenants/tenantDetails"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/checkout.py"
     ]
   },
   "stripe_billing_portal": {
@@ -2541,6 +2904,11 @@
         "method": "GET",
         "path": "/api/v1/tenants/tenantDetails"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/portal.py"
     ]
   },
   "stripe_plans": {
@@ -2584,6 +2952,11 @@
         "method": "GET",
         "path": "/api/v1/tenants/tenantDetails"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/plans.py"
     ]
   },
   "stripe_webhook": {
@@ -2623,6 +2996,11 @@
         "method": "GET",
         "path": "/api/v1/tenants/tenantDetails"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/webhook.py"
     ]
   },
   "user_email_settings": {
@@ -2651,6 +3029,9 @@
         "method": "POST",
         "path": "/api/v1/notifications/unsubscribe"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/users_notifications/email_settings.py"
     ]
   },
   "user_alert_channels": {
@@ -2683,6 +3064,9 @@
         "method": "PUT",
         "path": "/api/v1/notifications/alertChannel"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/users_notifications/alert_channels.py"
     ]
   },
   "test_registry_scanning": {
@@ -2722,6 +3106,9 @@
         "method": "PUT",
         "path": "/api/v1/registry/management"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/registry/registry_connectors.py"
     ]
   },
   "relevantCVEs": {
@@ -2766,6 +3153,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "relevancy_fix_vuln": {
@@ -2810,6 +3203,12 @@
         "method": "POST",
         "path": "/api/v1/vulnerability/scanResultsSumSummary"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "securityrisks_all": {
@@ -2859,6 +3258,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "sr_r_0035_attack_chain": {
@@ -2908,6 +3312,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "sr_r_0005_control": {
@@ -2957,6 +3366,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "sr_r_0007_control_networkpolicy": {
@@ -3006,6 +3420,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "sr_r_0037_vulnerability": {
@@ -3055,6 +3474,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "sr_with_exceptions": {
@@ -3104,6 +3528,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "basic_incident_presented": {
@@ -3159,6 +3588,10 @@
         "method": "POST",
         "path": "/api/v1/uniqueValues/incidents"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/incidents.py"
     ]
   },
   "kdr_runtime_policies_configurations": {
@@ -3222,6 +3655,10 @@
         "method": "POST",
         "path": "/api/v1/uniqueValues/runtimeIncidentPolicy"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/policies.py"
     ]
   },
   "kdr_slack_alerts": {
@@ -3254,6 +3691,10 @@
         "method": "DELETE",
         "path": "/api/v1/runtime/policies"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/alerts.py",
+      "tests_scripts/runtime/base_runtime.py"
     ]
   },
   "kdr_teams_alerts": {
@@ -3286,6 +3727,10 @@
         "method": "DELETE",
         "path": "/api/v1/runtime/policies"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/alerts.py",
+      "tests_scripts/runtime/base_runtime.py"
     ]
   },
   "kdr_webhook_alerts": {
@@ -3298,24 +3743,8 @@
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "tested_dashboard_apis": [
-      {
-        "method": "GET",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidentsRuleSet"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/runtime/policies"
-      }
-    ]
+    "tested_dashboard_apis": [],
+    "test_implementation_files": []
   },
   "sr_ac_scan_status": {
     "target": [
@@ -3364,6 +3793,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "jira_integration": {
@@ -3466,6 +3900,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/jira_integration.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "linear_integration": {
@@ -3553,6 +3992,11 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/linear_integration.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "seccomp_profile_pod": {
@@ -3588,6 +4032,11 @@
         "method": "POST",
         "path": "/api/v1/seccomp/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "seccomp_profile_container": {
@@ -3623,6 +4072,11 @@
         "method": "POST",
         "path": "/api/v1/seccomp/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "seccomp_profile_workloads_list": {
@@ -3658,6 +4112,11 @@
         "method": "POST",
         "path": "/api/v1/seccomp/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "seccomp_profile_generate": {
@@ -3693,6 +4152,11 @@
         "method": "POST",
         "path": "/api/v1/seccomp/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "slack_notifications_workflows": {
@@ -3716,6 +4180,9 @@
         "method": "POST",
         "path": "/api/v1/workflows"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/slack_workflows.py"
     ]
   },
   "teams_notifications_workflows": {
@@ -3751,6 +4218,9 @@
         "method": "POST",
         "path": "/api/v1/workflows"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/teams_workflows.py"
     ]
   },
   "jira_notifications_workflows": {
@@ -3790,6 +4260,9 @@
         "method": "POST",
         "path": "/api/v1/workflows"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/jira_workflows.py"
     ]
   },
   "linear_notifications_workflows": {
@@ -3838,6 +4311,9 @@
         "method": "POST",
         "path": "/api/v1/workflows"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/linear_workflows.py"
     ]
   },
   "workflows_configurations": {
@@ -3869,6 +4345,9 @@
         "method": "POST",
         "path": "/api/v1/workflows"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/conf_workflows.py"
     ]
   },
   "clusters": {
@@ -3882,7 +4361,10 @@
     "description": "Checks accounts clusters",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "tested_dashboard_apis": []
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/accounts/clusters.py"
+    ]
   },
   "cloud_connect_aws_cspm_single": {
     "target": [
@@ -3898,69 +4380,16 @@
     "skip_cluster": true,
     "tested_dashboard_apis": [
       {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cadrstack"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cspmfeatures"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cadr"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
-      },
-      {
         "method": "GET",
         "path": "/api/v1/accounts/aws/regions"
       },
       {
         "method": "GET",
         "path": "/api/v1/accounts/aws/regionsdetails"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/accounts/feature"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/rules"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_single.py"
     ]
   },
   "cloud_connect_aws_cadr_single": {
@@ -3978,65 +4407,12 @@
     "customer_name": "SECOND_CUSTOMER",
     "tested_dashboard_apis": [
       {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cadrstack"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cspmfeatures"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cadr"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/accounts/feature"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/rules"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
         "method": "DELETE",
         "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cadr_single.py"
     ]
   },
   "cloud_organization_aws_cspm": {
@@ -4052,63 +4428,9 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
-    "tested_dashboard_apis": [
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cadrstack"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cspmfeatures"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cadr"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/accounts/feature"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/rules"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies/list"
-      }
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_org.py"
     ]
   },
   "cloud_organization_aws_cadr": {
@@ -4125,65 +4447,12 @@
     "skip_cluster": true,
     "tested_dashboard_apis": [
       {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cadrstack"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cspmfeatures"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cadr"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/accounts/feature"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/rules"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
         "method": "DELETE",
         "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies/list"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cadr_org.py"
     ]
   },
   "cloud_vulnscan_aws": {
@@ -4201,62 +4470,6 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cadrstack"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/cspmfeatures"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cadr"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/accounts/feature"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/cloudposture/rules"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/policies/list"
-      },
       {
         "method": "POST",
         "path": "/api/v1/uniqueValues/vulnerability_v2/component"
@@ -4289,6 +4502,9 @@
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/vulnerability"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/vulnscan.py"
     ]
   },
   "kdr_response_by_user": {
@@ -4313,6 +4529,10 @@
         "method": "POST",
         "path": "/api/v1/runtime/incidents"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/response.py"
     ]
   },
   "sbom_test": {
@@ -4337,49 +4557,34 @@
         "path": "/api/v1/cluster"
       },
       {
-        "method": "POST",
-        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
-      },
-      {
         "method": "DELETE",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/posture/scan"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/posture/scan"
       },
       {
         "method": "PUT",
-        "path": "/api/v1/vulnerability/scan/v2/"
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
       },
       {
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/component"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/image"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
   "cadr_incident_presented": {
@@ -4400,6 +4605,10 @@
         "method": "GET",
         "path": "/api/v1/runtime/incidents"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/cadr.py"
     ]
   },
   "runtime_stress_test": {
@@ -4417,7 +4626,11 @@
     "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
     "skip_on_environment": "staging,production,production-us",
     "owner": "jonathang@armosec.io",
-    "tested_dashboard_apis": []
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/stress_test.py"
+    ]
   },
   "siem_integrations": {
     "target": [
@@ -4444,6 +4657,9 @@
         "method": "PUT",
         "path": "/api/v1/siem/{provider}"
       }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/integrations/siem.py"
     ]
   }
 }

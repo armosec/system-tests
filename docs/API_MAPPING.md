@@ -70,7 +70,7 @@ A GitHub Actions workflow now automatically validates that:
 
 2. **Run the validation locally** (optional but recommended):
    ```bash
-   python3 validate_api_mapping.py
+   python3 scripts/validate_api_mapping.py
    ```
 
 3. **If validation fails**, the script will tell you exactly what to do:
@@ -85,7 +85,7 @@ A GitHub Actions workflow now automatically validates that:
 
 4. **Auto-update the mapping**:
    ```bash
-   python3 update_mapping_with_methods.py
+   python3 scripts/update_mapping_with_methods.py
    ```
 
 5. **Commit the changes**:
@@ -119,7 +119,8 @@ When reviewing PRs, you can now:
 
 | File | Purpose |
 |------|---------|
-| `validate_api_mapping.py` | PR validation script that checks API mapping accuracy |
+| `scripts/validate_api_mapping.py` | PR validation script that checks API mapping accuracy |
+| `scripts/update_mapping_with_methods.py` | Script to regenerate API mappings from test code |
 | `.github/workflows/validate-api-mapping.yaml` | GitHub Actions workflow for automated PR checks |
 
 ### Modified Files
@@ -136,6 +137,11 @@ When reviewing PRs, you can now:
   "stripe_checkout": {
     "target": ["Backend"],
     "owner": "eranm@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/payments/checkout.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/base_payment.py"
+    ],
     "tested_dashboard_apis": [
       { "method": "POST", "path": "/api/v1/admin/cancelSubscription" },
       { "method": "POST", "path": "/api/v1/admin/createSubscription" },
@@ -154,6 +160,11 @@ When reviewing PRs, you can now:
   "jira_integration": {
     "target": ["Backend"],
     "owner": "jonathang@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/helm/jira_integration.py",
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ],
     "tested_dashboard_apis": [
       { "method": "DELETE", "path": "/api/v1/cluster" },
       { "method": "GET", "path": "/api/v1/cluster" },
@@ -176,6 +187,10 @@ When reviewing PRs, you can now:
   "kdr_runtime_policies_configurations": {
     "target": ["In cluster", "Backend"],
     "owner": "jonathang@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/runtime/policies.py",
+      "tests_scripts/runtime/base_runtime.py"
+    ],
     "tested_dashboard_apis": [
       { "method": "POST", "path": "/api/v1/runtime/incidentTypes" },
       { "method": "POST", "path": "/api/v1/runtime/incidentsRuleSet" },
@@ -248,13 +263,13 @@ The mapping stays automatically synchronized through the PR workflow, but you ca
 
 ```bash
 # Regenerate all mappings
-python3 update_mapping_with_methods.py
+python3 scripts/update_mapping_with_methods.py
 
 # Validate current mappings
-python3 validate_api_mapping.py
+python3 scripts/validate_api_mapping.py
 
 # Validate against specific branches
-python3 validate_api_mapping.py origin/main HEAD
+python3 scripts/validate_api_mapping.py origin/main HEAD
 ```
 
 ### Adding New Tests
@@ -264,7 +279,7 @@ When creating new tests:
 1. Write your test in `tests_scripts/`
 2. Add test configuration in `configurations/system/tests_cases/`
 3. Add entry to `system_test_mapping.json` with basic info
-4. Run `python3 update_mapping_with_methods.py` to auto-populate APIs
+4. Run `python3 scripts/update_mapping_with_methods.py` to auto-populate APIs and implementation files
 5. Commit all changes together
 
 ## 📋 PR Workflow Example
@@ -286,7 +301,7 @@ Compares with system_test_mapping.json
 ↓
 Posts comment on PR with instructions
 ↓
-Developer runs: python3 update_mapping_with_methods.py
+Developer runs: python3 scripts/update_mapping_with_methods.py
 ↓
 Developer commits updated system_test_mapping.json
 ↓
@@ -325,11 +340,35 @@ Make sure you:
 2. Pushed your changes
 3. The file has valid JSON syntax
 
+## 📊 New Fields in system_test_mapping.json
+
+### test_implementation_files
+Lists all Python files that implement the test. Includes:
+- Main test file (e.g., `tests_scripts/helm/jira_integration.py`)
+- Base class files (e.g., `tests_scripts/helm/base_helm.py`)
+- Helper files that contain backend API calls
+
+**Benefits:**
+- No hardcoded mappings in validation scripts
+- Self-documenting test structure
+- Easy to maintain and update
+- Auto-detected by update script
+
+### tested_dashboard_apis
+Lists all backend API endpoints tested with HTTP methods:
+```json
+"tested_dashboard_apis": [
+  { "method": "POST", "path": "/api/v1/integrations" },
+  { "method": "GET", "path": "/api/v1/cluster" }
+]
+```
+
 ## 📞 Support
 
 For questions or issues:
 - Check `docs/TEST_INFRASTRUCTURE.md` for test infrastructure details
 - Review `infrastructure/backend_api.py` for API method definitions
+- Review `scripts/update_mapping_with_methods.py` for mapping logic
 - Contact the test infrastructure team
 
 ---
