@@ -162,6 +162,35 @@ def get_test_file_mapping_from_system_mapping(system_mapping: Dict) -> Dict[str,
             mappings[test_name] = relative_files
     return mappings
 
+def validate_implementation_files(system_mapping: Dict) -> List[Tuple[str, str, List[str]]]:
+    """
+    Validate that test_implementation_files are correct.
+    
+    Returns:
+        List of (test_name, issue_type, missing_files)
+    """
+    issues = []
+    
+    for test_name, test_config in system_mapping.items():
+        impl_files = test_config.get('test_implementation_files', [])
+        
+        if not impl_files:
+            # Test has no implementation files defined
+            issues.append((test_name, 'no_files', []))
+            continue
+        
+        # Check if files exist
+        missing_files = []
+        for file_path in impl_files:
+            full_path = Path('/workspace') / file_path
+            if not full_path.exists():
+                missing_files.append(file_path)
+        
+        if missing_files:
+            issues.append((test_name, 'missing_files', missing_files))
+    
+    return issues
+
 def validate_pr():
     """Main validation function."""
     print(f"\n{Colors.BOLD}{Colors.CYAN}{'='*70}{Colors.END}")
@@ -215,11 +244,26 @@ def validate_pr():
         print(f"   ... and {len(related_tests) - 10} more")
     print()
     
+    # First, validate implementation files for all tests (not just related ones)
+    print(f"{Colors.BLUE}🔍 Validating implementation files...{Colors.END}")
+    impl_file_issues = validate_implementation_files(system_mapping)
+    
+    # Filter to only related tests if there are changes
+    if related_tests:
+        impl_file_issues = [(name, type, files) for name, type, files in impl_file_issues 
+                           if name in related_tests]
+    
+    if impl_file_issues:
+        print(f"{Colors.YELLOW}⚠️  Found {len(impl_file_issues)} test(s) with implementation file issues{Colors.END}")
+    else:
+        print(f"{Colors.GREEN}✅ All implementation files valid{Colors.END}")
+    print()
+    
     # Validate each related test
-    issues = []
+    api_issues = []
     for test_name in sorted(related_tests):
         if test_name not in system_mapping:
-            issues.append((test_name, 'missing', None, None))
+            api_issues.append((test_name, 'missing', None, None))
             continue
         
         test_config = system_mapping[test_name]
@@ -233,55 +277,75 @@ def validate_pr():
         missing_apis, extra_apis = compare_api_lists(expected_apis, actual_apis)
         
         if missing_apis or extra_apis:
-            issues.append((test_name, 'mismatch', missing_apis, extra_apis))
+            api_issues.append((test_name, 'mismatch', missing_apis, extra_apis))
     
     # Report results
-    if not issues:
-        print(f"\n{Colors.GREEN}{Colors.BOLD}✅ All API mappings are correct!{Colors.END}\n")
+    if not impl_file_issues and not api_issues:
+        print(f"\n{Colors.GREEN}{Colors.BOLD}✅ All validations passed!{Colors.END}")
+        print(f"   • Implementation files: correct")
+        print(f"   • API mappings: correct\n")
         return 0
     
-    # Print issues
-    print(f"\n{Colors.RED}{Colors.BOLD}❌ Found {len(issues)} test(s) with incorrect API mappings:{Colors.END}\n")
-    
-    # Check if test has implementation files defined
-    tests_without_impl_files = []
-    for test_name in related_tests:
-        if test_name in system_mapping:
-            impl_files = system_mapping[test_name].get('test_implementation_files', [])
-            if not impl_files:
-                tests_without_impl_files.append(test_name)
-    
-    if tests_without_impl_files:
-        print(f"{Colors.YELLOW}⚠️  Warning: {len(tests_without_impl_files)} test(s) have no implementation files defined:{Colors.END}")
-        for test_name in tests_without_impl_files[:5]:
-            print(f"   • {test_name}")
-        if len(tests_without_impl_files) > 5:
-            print(f"   ... and {len(tests_without_impl_files) - 5} more")
-        print()
-    
-    for test_name, issue_type, missing, extra in issues:
-        print(f"{Colors.BOLD}Test: {test_name}{Colors.END}")
+    # Print implementation file issues first
+    if impl_file_issues:
+        print(f"\n{Colors.RED}{Colors.BOLD}❌ Implementation File Issues:{Colors.END}\n")
         
-        if issue_type == 'missing':
-            print(f"  {Colors.RED}❌ Test not found in system_test_mapping.json{Colors.END}")
-        else:
-            if missing:
-                print(f"  {Colors.RED}Missing APIs ({len(missing)}):{Colors.END}")
-                for api in missing:
-                    print(f"    • {api['method']:6} {api['path']}")
+        for test_name, issue_type, missing_files in impl_file_issues:
+            print(f"{Colors.BOLD}Test: {test_name}{Colors.END}")
             
-            if extra:
-                print(f"  {Colors.YELLOW}Extra APIs ({len(extra)}):{Colors.END}")
-                for api in extra:
-                    print(f"    • {api['method']:6} {api['path']}")
-        print()
+            if issue_type == 'no_files':
+                print(f"  {Colors.RED}❌ No implementation files defined{Colors.END}")
+                print(f"     The 'test_implementation_files' field is empty or missing")
+            
+            elif issue_type == 'missing_files':
+                print(f"  {Colors.RED}❌ Implementation files not found ({len(missing_files)}):{Colors.END}")
+                for file_path in missing_files:
+                    print(f"    • {file_path}")
+            
+            print()
+    
+    # Print API mapping issues
+    if api_issues:
+        print(f"\n{Colors.RED}{Colors.BOLD}❌ API Mapping Issues:{Colors.END}\n")
+        
+        for test_name, issue_type, missing, extra in api_issues:
+            print(f"{Colors.BOLD}Test: {test_name}{Colors.END}")
+            
+            if issue_type == 'missing':
+                print(f"  {Colors.RED}❌ Test not found in system_test_mapping.json{Colors.END}")
+            else:
+                if missing:
+                    print(f"  {Colors.RED}Missing APIs ({len(missing)}):{Colors.END}")
+                    for api in missing:
+                        print(f"    • {api['method']:6} {api['path']}")
+                
+                if extra:
+                    print(f"  {Colors.YELLOW}Extra APIs ({len(extra)}):{Colors.END}")
+                    for api in extra:
+                        print(f"    • {api['method']:6} {api['path']}")
+            print()
     
     # Print instructions
     print(f"{Colors.BOLD}{Colors.CYAN}{'='*70}{Colors.END}")
     print(f"{Colors.BOLD}📋 How to fix:{Colors.END}\n")
-    print(f"1. Run the update script to regenerate the API mappings:")
+    
+    if impl_file_issues:
+        print(f"{Colors.BOLD}For implementation file issues:{Colors.END}")
+        print(f"  • If files are missing: Check that file paths are correct")
+        print(f"  • If field is empty: Run the update script to auto-detect files")
+        print()
+    
+    if api_issues:
+        print(f"{Colors.BOLD}For API mapping issues:{Colors.END}")
+    
+    print(f"1. Run the update script to regenerate all mappings:")
     print(f"   {Colors.CYAN}python3 scripts/update_mapping_with_methods.py{Colors.END}\n")
-    print(f"2. Review the changes to ensure they're correct\n")
+    print(f"   This will:")
+    print(f"   • Auto-detect implementation files from test configurations")
+    print(f"   • Extract API calls from those files")
+    print(f"   • Update both fields in system_test_mapping.json\n")
+    print(f"2. Review the changes to ensure they're correct:\n")
+    print(f"   {Colors.CYAN}git diff system_test_mapping.json{Colors.END}\n")
     print(f"3. Commit the updated system_test_mapping.json file:\n")
     print(f"   {Colors.CYAN}git add system_test_mapping.json{Colors.END}")
     print(f"   {Colors.CYAN}git commit -m 'Update API mappings for modified tests'{Colors.END}\n")

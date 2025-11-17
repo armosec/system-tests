@@ -62,7 +62,12 @@ jobs:
             
             const comment = `## ❌ API Mapping Validation Failed
             
-            The tests you modified have API calls that don't match the mappings in \`system_test_mapping.json\`.
+            The validation found issues with the test mappings in \`system_test_mapping.json\`.
+            
+            This could be:
+            - ❌ API calls in code don't match \`tested_dashboard_apis\`
+            - ❌ Implementation files in \`test_implementation_files\` don't exist
+            - ❌ Implementation files field is empty or missing
             
             ### How to fix:
             
@@ -85,11 +90,15 @@ jobs:
             
             ### Why is this important?
             
-            The \`system_test_mapping.json\` file tracks which backend APIs each test validates. This helps with:
+            The \`system_test_mapping.json\` file tracks:
+            - \`test_implementation_files\`: Which Python files implement each test
+            - \`tested_dashboard_apis\`: Which backend APIs each test validates
+            
+            This helps with:
             - 📊 Test coverage visibility
-            - 🔍 Impact analysis when APIs change
-            - 🧪 Running relevant tests for API changes
-            - 📝 Documentation of test scope
+            - 🔍 Impact analysis when APIs or tests change
+            - 🧪 Running relevant tests for code changes
+            - 📝 Living documentation of test structure
             
             Please update the mapping and push your changes.`;
             

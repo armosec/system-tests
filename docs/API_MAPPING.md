@@ -60,6 +60,20 @@ A GitHub Actions workflow now automatically validates that:
 | 4 | `/api/v1/posture/scan` | POST | 23 |
 | 5 | `/api/v1/vulnerability/scanResultsSumSummary` | POST | 22 |
 
+## ✅ Validation Checks
+
+The PR workflow validates:
+
+1. **Implementation Files** (`test_implementation_files`)
+   - ✅ Field is not empty
+   - ✅ All listed files exist
+   - ✅ File paths are correct
+
+2. **API Mappings** (`tested_dashboard_apis`)
+   - ✅ All API calls in code are documented
+   - ✅ No extra APIs listed that aren't in code
+   - ✅ HTTP methods match actual usage
+
 ## 🚀 How to Use
 
 ### For Developers
@@ -75,7 +89,13 @@ A GitHub Actions workflow now automatically validates that:
 
 3. **If validation fails**, the script will tell you exactly what to do:
    ```bash
-   ❌ Found 3 test(s) with incorrect API mappings:
+   ❌ Implementation File Issues:
+   
+   Test: my_test
+     ❌ Implementation files not found (1):
+       • tests_scripts/helm/my_test.py
+   
+   ❌ API Mapping Issues:
    
    Test: jira_integration
      Missing APIs (2):
