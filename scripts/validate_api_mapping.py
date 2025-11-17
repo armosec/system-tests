@@ -13,6 +13,7 @@ import sys
 import json
 import re
 import subprocess
+import os
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 from collections import defaultdict
@@ -27,6 +28,28 @@ class Colors:
     CYAN = '\033[96m'
     BOLD = '\033[1m'
     END = '\033[0m'
+
+def get_repo_root():
+    """Get the repository root directory."""
+    # Try to find the repo root by looking for system_test_mapping.json
+    current_dir = Path(__file__).parent.parent  # Start from scripts/ parent
+    
+    # Check if we're in the repo root
+    if (current_dir / 'system_test_mapping.json').exists():
+        return current_dir
+    
+    # If not found, check if we're in a CI environment
+    workspace_path = Path('/workspace')
+    if workspace_path.exists() and (workspace_path / 'system_test_mapping.json').exists():
+        return workspace_path
+    
+    # Fallback to current working directory
+    cwd = Path.cwd()
+    if (cwd / 'system_test_mapping.json').exists():
+        return cwd
+    
+    # Last resort - use the directory containing this script's parent
+    return current_dir
 
 def load_json_file(path):
     """Load JSON file."""
@@ -108,7 +131,8 @@ def extract_api_calls_from_file(file_path: Path) -> Set[str]:
 
 def get_expected_apis_for_test(test_name: str, test_files: List[str], api_method_mapping: Dict) -> List[Dict]:
     """Get the expected API list for a test based on its implementation."""
-    tests_dir = Path('/workspace/tests_scripts')
+    repo_root = get_repo_root()
+    tests_dir = repo_root / 'tests_scripts'
     
     # Collect all API methods used
     api_methods = set()
@@ -181,8 +205,9 @@ def validate_implementation_files(system_mapping: Dict) -> List[Tuple[str, str, 
         
         # Check if files exist
         missing_files = []
+        repo_root = get_repo_root()
         for file_path in impl_files:
-            full_path = Path('/workspace') / file_path
+            full_path = repo_root / file_path
             if not full_path.exists():
                 missing_files.append(file_path)
         
@@ -198,16 +223,17 @@ def validate_pr():
     print(f"{Colors.BOLD}{Colors.CYAN}{'='*70}{Colors.END}\n")
     
     # Load data
-    system_mapping = load_json_file('/workspace/system_test_mapping.json')
+    repo_root = get_repo_root()
+    system_mapping = load_json_file(repo_root / 'system_test_mapping.json')
     
     # Check if api_method_mapping.json exists, if not use the mapping from update script
-    api_method_mapping_path = Path('/workspace/api_method_http_mapping.json')
+    api_method_mapping_path = repo_root / 'api_method_http_mapping.json'
     if api_method_mapping_path.exists():
         api_method_mapping = load_json_file(str(api_method_mapping_path))
     else:
         # Import from update script
         import sys
-        sys.path.insert(0, '/workspace/scripts')
+        sys.path.insert(0, str(repo_root / 'scripts'))
         from update_mapping_with_methods import get_api_method_mapping
         api_method_mapping = get_api_method_mapping()
     
