@@ -135,7 +135,19 @@ class BaseK8S(BaseDockerizeTest):
         if apply_config_map:
             self.apply_config_map(namespace=namespace, yaml_file=self.test_obj.get_arg("config_map"))
 
-        return self.get_cluster_name(), namespace
+        cluster_name = self.get_cluster_name()
+        
+        # If a cluster was created in the test, use its name as the run id since it is unique anyway
+        if self.backend and cluster_name:
+            old_test_run_id = self.backend.test_run_id
+            self.backend.set_test_run_id(cluster_name)
+            Logger.logger.info("=" * 80)
+            Logger.logger.info(f"Test Run ID updated to cluster name: {cluster_name}")
+            if old_test_run_id and old_test_run_id != cluster_name:
+                Logger.logger.info(f"Previous Test Run ID: {old_test_run_id}")
+            Logger.logger.info("=" * 80)
+
+        return cluster_name, namespace
 
     def __del__(self):
 

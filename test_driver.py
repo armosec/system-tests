@@ -31,6 +31,7 @@ class TestDriver(object):
         self.temp_dir = os.path.abspath(temp_dir)
         self.refresh = fresh
         self.duration = systests_utilities.TestUtil.get_arg_from_dict(kwargs, "duration", 3) * 60
+        self.test_run_id = kwargs.get("test_run_id", None)
 
         self.kwargs = self.parse_kwargs(kwargs)
 
@@ -47,7 +48,8 @@ class TestDriver(object):
                                     url=self.backend_obj.get_dashboard_url(),
                                     auth_url=self.backend_obj.get_auth_url(),
                                     login_method=self.backend_obj.get_login_method(),
-                                    customer_guid=self.backend_obj.get_customer_guid())
+                                    customer_guid=self.backend_obj.get_customer_guid(),
+                                    test_run_id=self.test_run_id)
 
         status = statics.FAILURE
         summary = ""
