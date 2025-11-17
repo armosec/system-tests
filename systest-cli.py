@@ -4,6 +4,7 @@ import json
 import os
 import socket
 import sys
+import uuid
 from datetime import datetime
 from logging import DEBUG, ERROR
 from random import seed
@@ -143,7 +144,15 @@ def main():
     # set default timeout to 11 minutes
     socket.setdefaulttimeout(11 * 60)
 
-    t = TestDriver(**vars(args))
+    # Generate test run ID for this test execution
+    test_run_id = str(uuid.uuid4())
+    Logger.logger.info(f"Test run ID: {test_run_id}")
+
+    # Add test_run_id to args
+    args_dict = vars(args)
+    args_dict['test_run_id'] = test_run_id
+
+    t = TestDriver(**args_dict)
     res = t.main()
     Logger.logger.debug('Logger file location: {}'.format(Logger.get_file_location()))
     exit(res)

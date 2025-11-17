@@ -224,7 +224,17 @@ def deco_cookie(func):
                 if "customerGUID" not in kwargs["params"]:
                     kwargs["params"]["customerGUID"] = ControlPanelAPIObj.selected_tenant_id
 
-        kwargs['headers'] = kwargs.get("headers", ControlPanelAPIObj.auth)
+        # Merge headers: start with default auth headers, then update with any explicitly provided headers
+        # This ensures X-Test-Run-Id and other default headers are always included
+        default_headers = ControlPanelAPIObj.auth.copy() if ControlPanelAPIObj.auth else {}
+        provided_headers = kwargs.get("headers", {})
+        if isinstance(provided_headers, dict):
+            # Merge provided headers into default headers (provided headers take precedence for conflicts)
+            merged_headers = {**default_headers, **provided_headers}
+        else:
+            # If headers is not a dict, use default
+            merged_headers = default_headers
+        kwargs['headers'] = merged_headers
 
         if "timeout" not in kwargs:
             kwargs["timeout"] = kwargs.get("timeout", 21)
@@ -278,10 +288,11 @@ class ControlPanelAPI(object):
     """
 
     def __init__(self, user_name, password, customer, client_id, secret_key, url, auth_url=None,
-                 login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None):
+                 login_method=LOGIN_METHOD_KEYCLOAK, customer_guid=None, test_run_id=None):
         self.server = url
         self.login_method = login_method
         self.customer_guid = customer_guid
+        self.test_run_id = test_run_id
 
         # Required for login_method == LOGIN_METHOD_KEYCLOAK
         self.username = user_name
@@ -348,6 +359,9 @@ class ControlPanelAPI(object):
         if self.auth is None:
             self.auth = {}
         self.auth["X-API-KEY"] = self.access_key
+        # Add X-Test-Run-Id header if test_run_id is provided
+        if self.test_run_id:
+            self.auth["X-Test-Run-Id"] = self.test_run_id
 
     ## ************** Tenants Backend APIs ************** ##
 
@@ -934,10 +948,11 @@ class ControlPanelAPI(object):
         return solutions
 
     def get_component_info(self, component):
+        headers = self.auth.copy() if self.auth else {}
         r = requests.get(self.server + "/component",
                          params={'componentguid': component.guid,
                                  'solguid': component.solution_guid},
-                         cookies=self.login_customer_cookie, verify=self.verify, timeout=20)
+                         cookies=self.login_customer_cookie, headers=headers, verify=self.verify, timeout=20)
 
         assert (200 <= r.status_code < 300), \
             'Error accessing dashboard! component guid: {com},  solution guid: {sol},\nError details- code: ' \
@@ -947,16 +962,18 @@ class ControlPanelAPI(object):
         return r.json()
 
     def get_service_info(self, session_id, service_id):
+        headers = self.auth.copy() if self.auth else {}
         r = requests.get(self.server + "/session", params={'sessionid': session_id},
-                         cookies=self.login_customer_cookie, verify=self.verify, timeout=20)
+                         cookies=self.login_customer_cookie, headers=headers, verify=self.verify, timeout=20)
         if r.status_code < 200 or 300 <= r.status_code:
             raise Exception('Error accessing dashboard. Request: session info "%s" (code: %d, message: %s)' % (
                 session_id, r.status_code, r.text))
         return r.json()
 
     def get_session_alerts(self, session_id):
+        headers = self.auth.copy() if self.auth else {}
         r = requests.get(self.server + "/alerts", params={'id': session_id},
-                         cookies=self.login_customer_cookie, verify=self.verify, timeout=20)
+                         cookies=self.login_customer_cookie, headers=headers, verify=self.verify, timeout=20)
         if r.status_code < 200 or 300 <= r.status_code:
             raise Exception('Error accessing dashboard. Request: session info "%s"  (code: %d, message: %s)' % (
                 session_id, r.status_code, r.text))
