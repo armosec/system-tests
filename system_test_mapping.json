@@ -9,10 +9,34 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_storage_disabled": {
@@ -25,10 +49,34 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_golang_dynamic": {
@@ -43,10 +91,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_java_and_python": {
@@ -61,10 +133,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_java": {
@@ -79,10 +175,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_golang": {
@@ -97,10 +217,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_python": {
@@ -115,10 +259,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_large_image": {
@@ -133,10 +301,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevant_data_is_appended": {
@@ -151,10 +343,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_enabled_stop_sniffing": {
@@ -169,10 +385,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "scan_with_exceptions": {
@@ -184,11 +424,26 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "attackchains_all": {
@@ -204,11 +459,26 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "relevancy_multiple_containers": {
@@ -222,10 +492,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "vuln_scan_cve_exceptions": {
@@ -239,14 +533,58 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "scan_nsa": {
@@ -258,11 +596,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_custom_framework_scanning_file_scope_testing": {
@@ -274,11 +627,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_custom_framework_scanning_cluster_scope_testing": {
@@ -290,11 +658,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
@@ -306,11 +689,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_mitre": {
@@ -322,11 +720,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_repository": {
@@ -338,11 +751,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_local_file": {
@@ -354,11 +782,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_local_glob_files": {
@@ -370,11 +813,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_local_list_of_files": {
@@ -386,11 +844,26 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_nsa_and_submit_to_backend": {
@@ -405,11 +878,26 @@
     "skip_on_environment": "",
     "owner": "idoh@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_mitre_and_submit_to_backend": {
@@ -424,11 +912,26 @@
     "skip_on_environment": "",
     "owner": "idoh@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_local_repository_and_submit_to_backend": {
@@ -445,11 +948,26 @@
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_repository_from_url_and_submit_to_backend": {
@@ -466,11 +984,26 @@
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_with_exception_to_backend": {
@@ -486,11 +1019,26 @@
     "skip_on_environment": "",
     "owner": "idoh@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_with_global_exception_to_backend": {
@@ -506,11 +1054,26 @@
     "skip_on_environment": "",
     "owner": "idoh@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_with_custom_framework": {
@@ -526,11 +1089,26 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_compliance_score": {
@@ -546,11 +1124,26 @@
     "skip_on_environment": "",
     "owner": "idoh@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "scan_customer_configuration": {
@@ -568,11 +1161,26 @@
     "skip_on_environment": "custom",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/postureExceptionPolicy",
-      "/api/v1/repositoryPosture",
-      "/api/v1/repositoryPosture/files",
-      "/api/v1/repositoryPosture/repositories",
-      "/api/v1/repositoryPosture/resources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
     ]
   },
   "host_scanner": {
@@ -588,14 +1196,58 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "host_scanner_with_hostsensorrule": {
@@ -610,14 +1262,58 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "vuln_scan": {
@@ -630,14 +1326,58 @@
     "skip_on_environment": "",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "vuln_scan_proxy": {
@@ -653,14 +1393,58 @@
     "skip_on_environment": "",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "vuln_v2_views": {
@@ -675,14 +1459,58 @@
     "skip_on_environment": "custom",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "vuln_v2_views_kev": {
@@ -697,14 +1525,58 @@
     "skip_on_environment": "custom",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "ks_microservice_ns_creation": {
@@ -718,11 +1590,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_on_demand": {
@@ -738,11 +1637,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_mitre_framework_on_demand": {
@@ -758,11 +1684,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_nsa_and_mitre_framework_demand": {
@@ -778,11 +1731,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_triggering_with_cron_job": {
@@ -800,11 +1780,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_update_cronjob_schedule": {
@@ -822,11 +1829,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_delete_cronjob": {
@@ -844,11 +1878,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa": {
@@ -865,11 +1926,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "smart_remediation_all_controls": {
@@ -889,8 +1977,18 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      }
     ]
   },
   "synchronizer": {
@@ -910,8 +2008,18 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/kubernetesresources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
     ]
   },
   "synchronizer_reconciliation": {
@@ -931,8 +2039,18 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/kubernetesresources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
     ]
   },
   "synchronizer_proxy": {
@@ -952,8 +2070,18 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/kubernetesresources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
     ]
   },
   "synchronizer_race_condition": {
@@ -973,8 +2101,18 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/kubernetesresources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
     ]
   },
   "synchronizer_kubescape_crds": {
@@ -994,8 +2132,18 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/kubernetesresources"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
     ]
   },
   "network_policy": {
@@ -1014,10 +2162,26 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "network_policy_data_appended": {
@@ -1037,10 +2201,26 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "network_policy_pod_restarted": {
@@ -1060,10 +2240,26 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "network_policy_known_servers_cache": {
@@ -1077,10 +2273,26 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "network_policy_multiple_replicas": {
@@ -1100,10 +2312,26 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "network_policy_known_servers": {
@@ -1123,10 +2351,26 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/networkpolicies",
-      "/api/v1/networkpolicies/generate",
-      "/api/v1/networkpolicies/knownserverscache"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
     ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
@@ -1143,11 +2387,38 @@
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "vuln_scan_triggering_with_cron_job": {
@@ -1164,10 +2435,34 @@
     "skip_on_environment": "",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "stripe_checkout": {
@@ -1183,12 +2478,30 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/admin/cancelSubscription",
-      "/api/v1/admin/createSubscription",
-      "/api/v1/admin/renewSubscription",
-      "/api/v1/tenants/stripe/checkout",
-      "/api/v1/tenants/stripe/portal",
-      "/api/v1/tenants/tenantDetails"
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
     ]
   },
   "stripe_billing_portal": {
@@ -1204,12 +2517,30 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/admin/cancelSubscription",
-      "/api/v1/admin/createSubscription",
-      "/api/v1/admin/renewSubscription",
-      "/api/v1/tenants/stripe/checkout",
-      "/api/v1/tenants/stripe/portal",
-      "/api/v1/tenants/tenantDetails"
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
     ]
   },
   "stripe_plans": {
@@ -1225,13 +2556,34 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/admin/cancelSubscription",
-      "/api/v1/admin/createSubscription",
-      "/api/v1/admin/renewSubscription",
-      "/api/v1/tenants/stripe/checkout",
-      "/api/v1/tenants/stripe/plans",
-      "/api/v1/tenants/stripe/portal",
-      "/api/v1/tenants/tenantDetails"
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/plans"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
     ]
   },
   "stripe_webhook": {
@@ -1247,12 +2599,30 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/admin/cancelSubscription",
-      "/api/v1/admin/createSubscription",
-      "/api/v1/admin/renewSubscription",
-      "/api/v1/tenants/stripe/checkout",
-      "/api/v1/tenants/stripe/portal",
-      "/api/v1/tenants/tenantDetails"
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
     ]
   },
   "user_email_settings": {
@@ -1269,7 +2639,18 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/notifications/unsubscribe"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/unsubscribe"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/unsubscribe"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/unsubscribe"
+      }
     ]
   },
   "user_alert_channels": {
@@ -1286,7 +2667,22 @@
     "skip_on_environment": "production,production-us",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/notifications/alertChannel"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/notifications/alertChannel"
+      }
     ]
   },
   "test_registry_scanning": {
@@ -1302,7 +2698,30 @@
     "skip_on_environment": "",
     "owner": "refaelm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/registry/management"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/registry/management"
+      }
     ]
   },
   "relevantCVEs": {
@@ -1319,10 +2738,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "relevancy_fix_vuln": {
@@ -1339,10 +2782,34 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
     ]
   },
   "securityrisks_all": {
@@ -1360,11 +2827,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "sr_r_0035_attack_chain": {
@@ -1382,11 +2876,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "sr_r_0005_control": {
@@ -1404,11 +2925,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "sr_r_0007_control_networkpolicy": {
@@ -1426,11 +2974,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "sr_r_0037_vulnerability": {
@@ -1448,11 +3023,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "sr_with_exceptions": {
@@ -1470,11 +3072,38 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "basic_incident_presented": {
@@ -1494,10 +3123,42 @@
     "skip_on_environment": "production,production-us",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/incidentsOvertime",
-      "/api/v1/runtime/incidentsPerSeverity",
-      "/api/v1/uniqueValues/incidents"
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsOvertime"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidentsPerSeverity"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/incidents"
+      }
     ]
   },
   "kdr_runtime_policies_configurations": {
@@ -1513,13 +3174,54 @@
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/notifications/webhooks",
-      "/api/v1/runtime/incidentTypes",
-      "/api/v1/runtime/incidentsRuleSet",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list",
-      "/api/v1/siem/{provider}",
-      "/api/v1/uniqueValues/runtimeIncidentPolicy"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentTypes"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/runtimeIncidentPolicy"
+      }
     ]
   },
   "kdr_slack_alerts": {
@@ -1536,9 +3238,22 @@
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/incidentsRuleSet",
-      "/api/v1/runtime/policies"
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
     ]
   },
   "kdr_teams_alerts": {
@@ -1555,9 +3270,22 @@
     "skip_on_environment": "",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/incidentsRuleSet",
-      "/api/v1/runtime/policies"
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
     ]
   },
   "kdr_webhook_alerts": {
@@ -1571,9 +3299,22 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/incidentsRuleSet",
-      "/api/v1/runtime/policies"
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
     ]
   },
   "sr_ac_scan_status": {
@@ -1591,11 +3332,38 @@
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/exceptions",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/component"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
     ]
   },
   "jira_integration": {
@@ -1610,18 +3378,94 @@
     "skip_on_environment": "custom",
     "owner": "jonathang@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/integrations",
-      "/api/v1/posture/clusters",
-      "/api/v1/posture/controls",
-      "/api/v1/posture/resources",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/list",
-      "/api/v1/securityrisks/resources",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/clusters"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "linear_integration": {
@@ -1637,18 +3481,78 @@
     "owner": "eranm@armosec.io",
     "customer_name": "SECOND_CUSTOMER",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/integrations",
-      "/api/v1/posture/clusters",
-      "/api/v1/posture/controls",
-      "/api/v1/posture/resources",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/list",
-      "/api/v1/securityrisks/resources",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/clusters"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "seccomp_profile_pod": {
@@ -1668,9 +3572,22 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/seccomp/generate",
-      "/api/v1/seccomp/list"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
     ]
   },
   "seccomp_profile_container": {
@@ -1690,9 +3607,22 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/seccomp/generate",
-      "/api/v1/seccomp/list"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
     ]
   },
   "seccomp_profile_workloads_list": {
@@ -1712,9 +3642,22 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/seccomp/generate",
-      "/api/v1/seccomp/list"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
     ]
   },
   "seccomp_profile_generate": {
@@ -1734,9 +3677,22 @@
     "skip_on_environment": "",
     "owner": "matthiasb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/seccomp/generate",
-      "/api/v1/seccomp/list"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
     ]
   },
   "slack_notifications_workflows": {
@@ -1752,8 +3708,14 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/posture/scan",
-      "/api/v1/workflows"
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
     ]
   },
   "teams_notifications_workflows": {
@@ -1769,9 +3731,26 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/notifications/teams",
-      "/api/v1/posture/scan",
-      "/api/v1/workflows"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
     ]
   },
   "jira_notifications_workflows": {
@@ -1787,11 +3766,30 @@
     "skip_on_environment": "production",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/integrations",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/list",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/workflows"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
     ]
   },
   "linear_notifications_workflows": {
@@ -1808,11 +3806,38 @@
     "customer_name": "SECOND_CUSTOMER",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/integrations",
-      "/api/v1/posture/scan",
-      "/api/v1/securityrisks/list",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/workflows"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
     ]
   },
   "workflows_configurations": {
@@ -1828,8 +3853,22 @@
     "skip_on_environment": "production,production-us",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/notifications/teams",
-      "/api/v1/workflows"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
     ]
   },
   "clusters": {
@@ -1843,21 +3882,7 @@
     "description": "Checks accounts clusters",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list"
-    ]
+    "tested_dashboard_apis": []
   },
   "cloud_connect_aws_cspm_single": {
     "target": [
@@ -1872,21 +3897,70 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/aws/regions",
-      "/api/v1/accounts/aws/regionsdetails",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list"
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cadrstack"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cspmfeatures"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cadr"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regions"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regionsdetails"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      }
     ]
   },
   "cloud_connect_aws_cadr_single": {
@@ -1903,19 +3977,66 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list"
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cadrstack"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cspmfeatures"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cadr"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      }
     ]
   },
   "cloud_organization_aws_cspm": {
@@ -1932,19 +4053,62 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list"
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cadrstack"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cspmfeatures"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cadr"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      }
     ]
   },
   "cloud_organization_aws_cadr": {
@@ -1960,19 +4124,66 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list"
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cadrstack"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cspmfeatures"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cadr"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      }
     ]
   },
   "cloud_vulnscan_aws": {
@@ -1990,26 +4201,94 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/accounts/aws/cadrstack",
-      "/api/v1/accounts/aws/cspmfeatures",
-      "/api/v1/accounts/aws/orgstacks/cadr",
-      "/api/v1/accounts/aws/orgstacks/cspmadmin",
-      "/api/v1/accounts/aws/orgstacks/cspmmembers",
-      "/api/v1/accounts/feature",
-      "/api/v1/cloudposture/controls",
-      "/api/v1/cloudposture/resources",
-      "/api/v1/cloudposture/rules",
-      "/api/v1/integrations",
-      "/api/v1/runtime/incidents",
-      "/api/v1/runtime/policies",
-      "/api/v1/runtime/policies/list",
-      "/api/v1/uniqueValues/vulnerability_v2/component",
-      "/api/v1/uniqueValues/vulnerability_v2/host",
-      "/api/v1/uniqueValues/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/host",
-      "/api/v1/vulnerability_v2/host/scan",
-      "/api/v1/vulnerability_v2/vulnerability"
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cadrstack"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/cspmfeatures"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cadr"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmadmin"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/aws/orgstacks/cspmmembers"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/host"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/host"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/host"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/host/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      }
     ]
   },
   "kdr_response_by_user": {
@@ -2026,7 +4305,14 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents"
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      }
     ]
   },
   "sbom_test": {
@@ -2042,14 +4328,58 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/cluster",
-      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability/scan/v2/",
-      "/api/v1/vulnerability/scanResultsSumSummary",
-      "/api/v1/vulnerability_v2/component",
-      "/api/v1/vulnerability_v2/image",
-      "/api/v1/vulnerability_v2/vulnerability",
-      "/api/v1/vulnerability_v2/workload"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
     ]
   },
   "cadr_incident_presented": {
@@ -2066,7 +4396,10 @@
     "skip_on_environment": "",
     "owner": "afekb@armosec.io",
     "tested_dashboard_apis": [
-      "/api/v1/runtime/incidents"
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      }
     ]
   },
   "runtime_stress_test": {
@@ -2099,7 +4432,18 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "tested_dashboard_apis": [
-      "/api/v1/siem/{provider}"
+      {
+        "method": "DELETE",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/siem/{provider}"
+      }
     ]
   }
 }
