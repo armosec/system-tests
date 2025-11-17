@@ -7,7 +7,13 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_storage_disabled": {
     "target": [
@@ -17,7 +23,13 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_golang_dynamic": {
     "target": [
@@ -29,7 +41,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_java_and_python": {
     "target": [
@@ -41,7 +59,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_java": {
     "target": [
@@ -53,7 +77,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_golang": {
     "target": [
@@ -65,7 +95,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_python": {
     "target": [
@@ -77,7 +113,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_large_image": {
     "target": [
@@ -89,7 +131,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevant_data_is_appended": {
     "target": [
@@ -101,7 +149,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_enabled_stop_sniffing": {
     "target": [
@@ -113,7 +167,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "scan_with_exceptions": {
     "target": [
@@ -122,7 +182,14 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "attackchains_all": {
     "target": [
@@ -135,7 +202,14 @@
     ],
     "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "relevancy_multiple_containers": {
     "target": [
@@ -146,7 +220,13 @@
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "vuln_scan_cve_exceptions": {
     "target": [
@@ -157,7 +237,17 @@
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "scan_nsa": {
     "target": [
@@ -166,7 +256,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_custom_framework_scanning_file_scope_testing": {
     "target": [
@@ -175,7 +272,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_custom_framework_scanning_cluster_scope_testing": {
     "target": [
@@ -184,7 +288,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
     "target": [
@@ -193,7 +304,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_mitre": {
     "target": [
@@ -202,7 +320,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_repository": {
     "target": [
@@ -211,7 +336,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_local_file": {
     "target": [
@@ -220,7 +352,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_local_glob_files": {
     "target": [
@@ -229,7 +368,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_local_list_of_files": {
     "target": [
@@ -238,7 +384,14 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_nsa_and_submit_to_backend": {
     "target": [
@@ -250,7 +403,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_mitre_and_submit_to_backend": {
     "target": [
@@ -262,7 +422,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_local_repository_and_submit_to_backend": {
     "target": [
@@ -276,7 +443,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_repository_from_url_and_submit_to_backend": {
     "target": [
@@ -290,7 +464,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_with_exception_to_backend": {
     "target": [
@@ -303,7 +484,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_with_global_exception_to_backend": {
     "target": [
@@ -316,7 +504,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_with_custom_framework": {
     "target": [
@@ -329,7 +524,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_compliance_score": {
     "target": [
@@ -342,7 +544,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "scan_customer_configuration": {
     "target": [
@@ -357,7 +566,14 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/postureExceptionPolicy",
+      "/api/v1/repositoryPosture",
+      "/api/v1/repositoryPosture/files",
+      "/api/v1/repositoryPosture/repositories",
+      "/api/v1/repositoryPosture/resources"
+    ]
   },
   "host_scanner": {
     "target": [
@@ -370,7 +586,17 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "host_scanner_with_hostsensorrule": {
     "target": [
@@ -382,7 +608,17 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "vuln_scan": {
     "target": [
@@ -392,7 +628,17 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "vuln_scan_proxy": {
     "target": [
@@ -405,7 +651,17 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "vuln_v2_views": {
     "target": [
@@ -417,7 +673,17 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "vuln_v2_views_kev": {
     "target": [
@@ -429,7 +695,17 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "ks_microservice_ns_creation": {
     "target": [
@@ -440,7 +716,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_on_demand": {
     "target": [
@@ -453,7 +736,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_mitre_framework_on_demand": {
     "target": [
@@ -466,7 +756,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_nsa_and_mitre_framework_demand": {
     "target": [
@@ -479,7 +776,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_triggering_with_cron_job": {
     "target": [
@@ -494,7 +798,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_update_cronjob_schedule": {
     "target": [
@@ -509,7 +820,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_delete_cronjob": {
     "target": [
@@ -524,7 +842,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa": {
     "target": [
@@ -538,7 +863,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "smart_remediation_all_controls": {
     "target": [
@@ -555,7 +887,11 @@
     ],
     "description": "Checks smart remediation for controls: C0016, C0017, C0034, C0045, C0046, C0048, C0057, C0074",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan"
+    ]
   },
   "synchronizer": {
     "target": [
@@ -572,7 +908,11 @@
     ],
     "description": "Checks synchronizer flow",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/kubernetesresources"
+    ]
   },
   "synchronizer_reconciliation": {
     "target": [
@@ -589,7 +929,11 @@
     ],
     "description": "Checks synchronizer reconciliation flow",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/kubernetesresources"
+    ]
   },
   "synchronizer_proxy": {
     "target": [
@@ -606,7 +950,11 @@
     ],
     "description": "Checks synchronizer proxy and disconnection",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/kubernetesresources"
+    ]
   },
   "synchronizer_race_condition": {
     "target": [
@@ -623,7 +971,11 @@
     ],
     "description": "Checks synchronizer race condition (multiple updates)",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/kubernetesresources"
+    ]
   },
   "synchronizer_kubescape_crds": {
     "target": [
@@ -640,7 +992,11 @@
     ],
     "description": "Checks synchronizer - kubescape CRDs",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/kubernetesresources"
+    ]
   },
   "network_policy": {
     "target": [
@@ -656,7 +1012,13 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "network_policy_data_appended": {
     "target": [
@@ -673,7 +1035,13 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected before and after data appended",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "network_policy_pod_restarted": {
     "target": [
@@ -690,7 +1058,13 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected before and after pod restarted",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "network_policy_known_servers_cache": {
     "target": [
@@ -701,7 +1075,13 @@
     ],
     "description": "Checks knownserverscache backend api endpoint returns 200",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "network_policy_multiple_replicas": {
     "target": [
@@ -718,7 +1098,13 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected with multiple replicas",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "network_policy_known_servers": {
     "target": [
@@ -735,7 +1121,13 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected with known servers",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/networkpolicies",
+      "/api/v1/networkpolicies/generate",
+      "/api/v1/networkpolicies/knownserverscache"
+    ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
     "target": [
@@ -749,7 +1141,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "vuln_scan_triggering_with_cron_job": {
     "target": [
@@ -763,7 +1162,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "stripe_checkout": {
     "target": [
@@ -776,7 +1181,15 @@
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/admin/cancelSubscription",
+      "/api/v1/admin/createSubscription",
+      "/api/v1/admin/renewSubscription",
+      "/api/v1/tenants/stripe/checkout",
+      "/api/v1/tenants/stripe/portal",
+      "/api/v1/tenants/tenantDetails"
+    ]
   },
   "stripe_billing_portal": {
     "target": [
@@ -789,7 +1202,15 @@
     "description": "",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/admin/cancelSubscription",
+      "/api/v1/admin/createSubscription",
+      "/api/v1/admin/renewSubscription",
+      "/api/v1/tenants/stripe/checkout",
+      "/api/v1/tenants/stripe/portal",
+      "/api/v1/tenants/tenantDetails"
+    ]
   },
   "stripe_plans": {
     "target": [
@@ -802,7 +1223,16 @@
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/admin/cancelSubscription",
+      "/api/v1/admin/createSubscription",
+      "/api/v1/admin/renewSubscription",
+      "/api/v1/tenants/stripe/checkout",
+      "/api/v1/tenants/stripe/plans",
+      "/api/v1/tenants/stripe/portal",
+      "/api/v1/tenants/tenantDetails"
+    ]
   },
   "stripe_webhook": {
     "target": [
@@ -815,7 +1245,15 @@
     "description": "",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/admin/cancelSubscription",
+      "/api/v1/admin/createSubscription",
+      "/api/v1/admin/renewSubscription",
+      "/api/v1/tenants/stripe/checkout",
+      "/api/v1/tenants/stripe/portal",
+      "/api/v1/tenants/tenantDetails"
+    ]
   },
   "user_email_settings": {
     "target": [
@@ -829,7 +1267,10 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/notifications/unsubscribe"
+    ]
   },
   "user_alert_channels": {
     "target": [
@@ -843,7 +1284,10 @@
     ],
     "description": "",
     "skip_on_environment": "production,production-us",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/notifications/alertChannel"
+    ]
   },
   "test_registry_scanning": {
     "target": [
@@ -856,7 +1300,10 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/registry/management"
+    ]
   },
   "relevantCVEs": {
     "target": [
@@ -870,7 +1317,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "relevancy_fix_vuln": {
     "target": [
@@ -884,7 +1337,13 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary"
+    ]
   },
   "securityrisks_all": {
     "target": [
@@ -899,7 +1358,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "sr_r_0035_attack_chain": {
     "target": [
@@ -914,7 +1380,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "sr_r_0005_control": {
     "target": [
@@ -929,7 +1402,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "sr_r_0007_control_networkpolicy": {
     "target": [
@@ -944,7 +1424,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "sr_r_0037_vulnerability": {
     "target": [
@@ -959,7 +1446,14 @@
     ],
     "description": "test security risk vulnerability type, R-0037",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "sr_with_exceptions": {
     "target": [
@@ -974,7 +1468,14 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "basic_incident_presented": {
     "target": [
@@ -991,7 +1492,13 @@
     ],
     "description": "testing basic incident presented",
     "skip_on_environment": "production,production-us",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/incidentsOvertime",
+      "/api/v1/runtime/incidentsPerSeverity",
+      "/api/v1/uniqueValues/incidents"
+    ]
   },
   "kdr_runtime_policies_configurations": {
     "target": [
@@ -1004,7 +1511,16 @@
     ],
     "description": "Test kdr runtime policy configurations - list, create, update, delete, unique values ",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/notifications/webhooks",
+      "/api/v1/runtime/incidentTypes",
+      "/api/v1/runtime/incidentsRuleSet",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list",
+      "/api/v1/siem/{provider}",
+      "/api/v1/uniqueValues/runtimeIncidentPolicy"
+    ]
   },
   "kdr_slack_alerts": {
     "target": [
@@ -1018,7 +1534,12 @@
     ],
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/incidentsRuleSet",
+      "/api/v1/runtime/policies"
+    ]
   },
   "kdr_teams_alerts": {
     "target": [
@@ -1032,7 +1553,12 @@
     ],
     "description": "Test kdr incidents is being sent to teams",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/incidentsRuleSet",
+      "/api/v1/runtime/policies"
+    ]
   },
   "kdr_webhook_alerts": {
     "target": [
@@ -1043,7 +1569,12 @@
     ],
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/incidentsRuleSet",
+      "/api/v1/runtime/policies"
+    ]
   },
   "sr_ac_scan_status": {
     "target": [
@@ -1058,7 +1589,14 @@
     ],
     "description": "",
     "skip_on_environment": "production,production-us,custom",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/exceptions",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/component"
+    ]
   },
   "jira_integration": {
     "target": [
@@ -1070,7 +1608,21 @@
     ],
     "description": "testing jira integration",
     "skip_on_environment": "custom",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/integrations",
+      "/api/v1/posture/clusters",
+      "/api/v1/posture/controls",
+      "/api/v1/posture/resources",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/list",
+      "/api/v1/securityrisks/resources",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "linear_integration": {
     "target": [
@@ -1083,7 +1635,21 @@
     "description": "testing linear integration",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/integrations",
+      "/api/v1/posture/clusters",
+      "/api/v1/posture/controls",
+      "/api/v1/posture/resources",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/list",
+      "/api/v1/securityrisks/resources",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "seccomp_profile_pod": {
     "target": [
@@ -1100,7 +1666,12 @@
     ],
     "description": "Checks seccomp profiles flow",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/seccomp/generate",
+      "/api/v1/seccomp/list"
+    ]
   },
   "seccomp_profile_container": {
     "target": [
@@ -1117,7 +1688,12 @@
     ],
     "description": "Checks seccomp profiles flow",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/seccomp/generate",
+      "/api/v1/seccomp/list"
+    ]
   },
   "seccomp_profile_workloads_list": {
     "target": [
@@ -1134,7 +1710,12 @@
     ],
     "description": "Checks seccomp workload list on backend",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/seccomp/generate",
+      "/api/v1/seccomp/list"
+    ]
   },
   "seccomp_profile_generate": {
     "target": [
@@ -1151,7 +1732,12 @@
     ],
     "description": "Checks seccomp profile generate on backend",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/seccomp/generate",
+      "/api/v1/seccomp/list"
+    ]
   },
   "slack_notifications_workflows": {
     "target": [
@@ -1164,7 +1750,11 @@
     ],
     "description": "Checks workflows slack notifications",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/posture/scan",
+      "/api/v1/workflows"
+    ]
   },
   "teams_notifications_workflows": {
     "target": [
@@ -1177,7 +1767,12 @@
     ],
     "description": "Checks workflows teams notifications",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/notifications/teams",
+      "/api/v1/posture/scan",
+      "/api/v1/workflows"
+    ]
   },
   "jira_notifications_workflows": {
     "target": [
@@ -1190,7 +1785,14 @@
     ],
     "description": "Checks workflows jira notifications",
     "skip_on_environment": "production",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/integrations",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/list",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/workflows"
+    ]
   },
   "linear_notifications_workflows": {
     "target": [
@@ -1204,7 +1806,14 @@
     "description": "Checks workflows linear notifications",
     "skip_on_environment": "production,production-us",
     "customer_name": "SECOND_CUSTOMER",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/integrations",
+      "/api/v1/posture/scan",
+      "/api/v1/securityrisks/list",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/workflows"
+    ]
   },
   "workflows_configurations": {
     "target": [
@@ -1217,7 +1826,11 @@
     ],
     "description": "Checks workflows configurations",
     "skip_on_environment": "production,production-us",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/notifications/teams",
+      "/api/v1/workflows"
+    ]
   },
   "clusters": {
     "target": [
@@ -1229,7 +1842,22 @@
     ],
     "description": "Checks accounts clusters",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list"
+    ]
   },
   "cloud_connect_aws_cspm_single": {
     "target": [
@@ -1242,7 +1870,24 @@
     "description": "Checks cloud accounts connect with CSPM single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/aws/regions",
+      "/api/v1/accounts/aws/regionsdetails",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list"
+    ]
   },
   "cloud_connect_aws_cadr_single": {
     "target": [
@@ -1256,7 +1901,22 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list"
+    ]
   },
   "cloud_organization_aws_cspm": {
     "target": [
@@ -1270,7 +1930,22 @@
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list"
+    ]
   },
   "cloud_organization_aws_cadr": {
     "target": [
@@ -1283,7 +1958,22 @@
     "description": "Checks cloud accounts organization with CADR",
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list"
+    ]
   },
   "cloud_vulnscan_aws": {
     "target": [
@@ -1298,23 +1988,48 @@
     "description": "Checks cloud accounts vulnerability scanning",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/accounts/aws/cadrstack",
+      "/api/v1/accounts/aws/cspmfeatures",
+      "/api/v1/accounts/aws/orgstacks/cadr",
+      "/api/v1/accounts/aws/orgstacks/cspmadmin",
+      "/api/v1/accounts/aws/orgstacks/cspmmembers",
+      "/api/v1/accounts/feature",
+      "/api/v1/cloudposture/controls",
+      "/api/v1/cloudposture/resources",
+      "/api/v1/cloudposture/rules",
+      "/api/v1/integrations",
+      "/api/v1/runtime/incidents",
+      "/api/v1/runtime/policies",
+      "/api/v1/runtime/policies/list",
+      "/api/v1/uniqueValues/vulnerability_v2/component",
+      "/api/v1/uniqueValues/vulnerability_v2/host",
+      "/api/v1/uniqueValues/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/host",
+      "/api/v1/vulnerability_v2/host/scan",
+      "/api/v1/vulnerability_v2/vulnerability"
+    ]
   },
   "kdr_response_by_user": {
-  "target": [
-    "In cluster",
-    "Backend"
-  ],
-  "target_repositories": [
-    "cadashboardbe",
-    "event-ingester-service",
-    "config-service"
-  ],
-  "description": "testing basic incident presented",
-  "skip_on_environment": "",
-  "owner": "eranm@armosec.io"
-},
-"sbom_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "testing basic incident presented",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents"
+    ]
+  },
+  "sbom_test": {
     "target": [
       "In cluster",
       "Backend"
@@ -1325,7 +2040,17 @@
     ],
     "description": "testing sbom",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/cluster",
+      "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability/scan/v2/",
+      "/api/v1/vulnerability/scanResultsSumSummary",
+      "/api/v1/vulnerability_v2/component",
+      "/api/v1/vulnerability_v2/image",
+      "/api/v1/vulnerability_v2/vulnerability",
+      "/api/v1/vulnerability_v2/workload"
+    ]
   },
   "cadr_incident_presented": {
     "target": [
@@ -1339,7 +2064,10 @@
     ],
     "description": "testing cadr incident presented",
     "skip_on_environment": "",
-    "owner": "afekb@armosec.io"
+    "owner": "afekb@armosec.io",
+    "tested_dashboard_apis": [
+      "/api/v1/runtime/incidents"
+    ]
   },
   "runtime_stress_test": {
     "target": [
@@ -1355,7 +2083,8 @@
     ],
     "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
     "skip_on_environment": "staging,production,production-us",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": []
   },
   "siem_integrations": {
     "target": [
@@ -1368,6 +2097,9 @@
     "description": "Checks SIEM integrations",
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      "/api/v1/siem/{provider}"
+    ]
   }
 }
