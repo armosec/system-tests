@@ -58,18 +58,20 @@ def get_target_repositories(test_mapping: Dict[str, Any], test_name: str) -> Lis
 def resolve_repo_commits(
     target_repos: List[str],
     workflow_commit: str,
-    commit_overrides: Optional[Dict[str, str]] = None
+    commit_overrides: Optional[Dict[str, str]] = None,
+    resolved_commits_file: Optional[str] = None
 ) -> Dict[str, str]:
     """
     Resolve git commits for each repository.
     
-    For now, uses the workflow commit for all repos. In Phase 6, this will
-    be enhanced to resolve actual commits from kubernetes-deployment.
+    Uses resolved commits from resolve_repo_commits.py if available,
+    otherwise falls back to workflow commit for all repos.
     
     Args:
         target_repos: List of repository names
-        workflow_commit: Default commit to use (from workflow)
-        commit_overrides: Optional dict mapping repo -> commit
+        workflow_commit: Default commit to use (from workflow, fallback)
+        commit_overrides: Optional dict mapping repo -> commit (highest priority)
+        resolved_commits_file: Path to resolved-repo-commits.json from resolve_repo_commits.py
     
     Returns:
         Dict mapping repo names to commit SHAs
@@ -77,9 +79,28 @@ def resolve_repo_commits(
     repo_commits = {}
     overrides = commit_overrides or {}
     
+    # Try to load resolved commits from Phase 6.3 script
+    resolved_commits = {}
+    if resolved_commits_file and os.path.exists(resolved_commits_file):
+        try:
+            with open(resolved_commits_file, 'r') as f:
+                resolved_data = json.load(f)
+                resolved_commits = resolved_data.get("resolved_commits", {})
+                print(f"   Loaded resolved commits from {resolved_commits_file}", file=sys.stderr)
+        except Exception as e:
+            print(f"   Warning: Could not load resolved commits: {e}", file=sys.stderr)
+    
     for repo in target_repos:
-        # Use override if provided, otherwise use workflow commit
-        repo_commits[repo] = overrides.get(repo, workflow_commit)
+        # Priority order:
+        # 1. Explicit override (highest priority)
+        # 2. Resolved commit from Phase 6.3 script
+        # 3. Workflow commit (fallback)
+        if repo in overrides:
+            repo_commits[repo] = overrides[repo]
+        elif repo in resolved_commits and resolved_commits[repo]:
+            repo_commits[repo] = resolved_commits[repo]
+        else:
+            repo_commits[repo] = workflow_commit
     
     return repo_commits
 
@@ -188,6 +209,10 @@ def main():
         help="JSON dict of repo->commit overrides (e.g., '{\"cadashboardbe\":\"abc123...\"}')"
     )
     parser.add_argument(
+        "--resolved-commits",
+        help="Path to resolved-repo-commits.json from resolve_repo_commits.py (Phase 6.3)"
+    )
+    parser.add_argument(
         "--repos",
         nargs="+",
         help="Explicit list of repositories (overrides test-name)"
@@ -231,7 +256,8 @@ def main():
     repo_commits = resolve_repo_commits(
         target_repos=target_repos,
         workflow_commit=args.workflow_commit,
-        commit_overrides=commit_overrides
+        commit_overrides=commit_overrides,
+        resolved_commits_file=args.resolved_commits
     )
     
     print(f"📦 Loading indexes for {len(repo_commits)} repositories:")
