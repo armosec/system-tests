@@ -3,6 +3,9 @@
 # GitHub API access
 requests>=2.31.0
 
-# Optional: For enhanced log parsing
-# pyyaml>=6.0
+# YAML parsing (for deployment manifests)
+pyyaml>=6.0
+
+# Optional: Kubernetes API access (if needed for live pod querying)
+# kubernetes>=29.0.0
 
