@@ -1,0 +1,8 @@
+# Test Failure Analyzer Dependencies
+
+# GitHub API access
+requests>=2.31.0
+
+# Optional: For enhanced log parsing
+# pyyaml>=6.0
+
