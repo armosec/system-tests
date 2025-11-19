@@ -108,7 +108,15 @@ def match_endpoint(
     
     # Try partial match (for nested paths)
     # This handles cases like /api/v1/posture/clusters matching /api/v1/posture
-    for endpoint in endpoints:
+    # IMPORTANT: Sort by path length (longest first) to match /api/v1/vulnerability_v2 
+    # before /api/v1/vulnerability
+    sorted_endpoints = sorted(
+        endpoints,
+        key=lambda e: len(normalize_path(e.get("fullPath", ""))),
+        reverse=True  # Longest paths first
+    )
+    
+    for endpoint in sorted_endpoints:
         endpoint_method = endpoint.get("method", "").upper()
         endpoint_full_path = normalize_path(endpoint.get("fullPath", ""))
         
