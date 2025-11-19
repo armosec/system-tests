@@ -620,10 +620,12 @@ def build_loki_queries(services: List[str], ids: Identifiers, cfg: Dict[str, Any
 
     q = []
     id_filters = []
-    if ids.customer_guid:
-        id_filters.append(f'|= "{ids.customer_guid}"')
-    if ids.cluster:
-        id_filters.append(f'|= "{ids.cluster}"')
+    # NOTE: customer_guid and cluster are no longer used as filters
+    # We rely on namespace filtering instead (configured per environment)
+    # if ids.customer_guid:
+    #     id_filters.append(f'|= "{ids.customer_guid}"')
+    # if ids.cluster:
+    #     id_filters.append(f'|= "{ids.cluster}"')
     id_filter_str = " ".join(id_filters)
 
     target_services = services or []
