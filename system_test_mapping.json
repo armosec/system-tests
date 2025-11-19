@@ -7,7 +7,43 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_storage_disabled": {
     "target": [
@@ -17,7 +53,43 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_golang_dynamic": {
     "target": [
@@ -29,7 +101,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_java_and_python": {
     "target": [
@@ -41,7 +149,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_java": {
     "target": [
@@ -53,7 +197,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_golang": {
     "target": [
@@ -65,7 +245,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_python": {
     "target": [
@@ -77,7 +293,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_large_image": {
     "target": [
@@ -89,7 +341,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevant_data_is_appended": {
     "target": [
@@ -101,7 +389,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_enabled_stop_sniffing": {
     "target": [
@@ -113,7 +437,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "scan_with_exceptions": {
     "target": [
@@ -122,7 +482,37 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "attackchains_all": {
     "target": [
@@ -135,7 +525,46 @@
     ],
     "description": "This test checks the scenario of fixing an AC by fixing the image without relevancy info with cronjob.",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_multiple_containers": {
     "target": [
@@ -146,7 +575,43 @@
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "vuln_scan_cve_exceptions": {
     "target": [
@@ -157,7 +622,59 @@
     ],
     "description": "checks public registry scan capabilities",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "scan_nsa": {
     "target": [
@@ -166,7 +683,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_custom_framework_scanning_file_scope_testing": {
     "target": [
@@ -175,7 +722,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_custom_framework_scanning_cluster_scope_testing": {
     "target": [
@@ -184,7 +761,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_custom_framework_scanning_cluster_and_file_scope_testing": {
     "target": [
@@ -193,7 +800,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_mitre": {
     "target": [
@@ -202,7 +839,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_repository": {
     "target": [
@@ -211,7 +878,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_local_file": {
     "target": [
@@ -220,7 +917,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_local_glob_files": {
     "target": [
@@ -229,7 +956,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_local_list_of_files": {
     "target": [
@@ -238,7 +995,37 @@
     "target_repositories": [],
     "description": "used by Kubescape",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_nsa_and_submit_to_backend": {
     "target": [
@@ -250,7 +1037,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_mitre_and_submit_to_backend": {
     "target": [
@@ -262,7 +1079,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_local_repository_and_submit_to_backend": {
     "target": [
@@ -276,7 +1123,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_repository_from_url_and_submit_to_backend": {
     "target": [
@@ -290,7 +1167,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_with_exception_to_backend": {
     "target": [
@@ -303,7 +1210,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_with_global_exception_to_backend": {
     "target": [
@@ -316,7 +1253,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_with_custom_framework": {
     "target": [
@@ -329,7 +1296,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_compliance_score": {
     "target": [
@@ -342,7 +1339,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "idoh@armosec.io"
+    "owner": "idoh@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "scan_customer_configuration": {
     "target": [
@@ -357,7 +1384,37 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "host_scanner": {
     "target": [
@@ -370,7 +1427,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "host_scanner_with_hostsensorrule": {
     "target": [
@@ -382,7 +1469,37 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ]
   },
   "vuln_scan": {
     "target": [
@@ -392,7 +1509,59 @@
     "target_repositories": [],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "vuln_scan_proxy": {
     "target": [
@@ -405,7 +1574,59 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "vuln_v2_views": {
     "target": [
@@ -417,7 +1638,59 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "vuln_v2_views_kev": {
     "target": [
@@ -429,7 +1702,59 @@
     ],
     "description": "",
     "skip_on_environment": "custom",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_ns_creation": {
     "target": [
@@ -440,7 +1765,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_on_demand": {
     "target": [
@@ -453,7 +1817,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_mitre_framework_on_demand": {
     "target": [
@@ -466,7 +1869,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_nsa_and_mitre_framework_demand": {
     "target": [
@@ -479,7 +1921,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_triggering_with_cron_job": {
     "target": [
@@ -494,7 +1975,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_update_cronjob_schedule": {
     "target": [
@@ -509,7 +2029,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_delete_cronjob": {
     "target": [
@@ -524,7 +2083,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa": {
     "target": [
@@ -538,7 +2136,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "smart_remediation_all_controls": {
     "target": [
@@ -555,7 +2192,26 @@
     ],
     "description": "Checks smart remediation for controls: C0016, C0017, C0034, C0045, C0046, C0048, C0057, C0074",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/smart_remediation.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "synchronizer": {
     "target": [
@@ -572,7 +2228,26 @@
     ],
     "description": "Checks synchronizer flow",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "synchronizer_reconciliation": {
     "target": [
@@ -589,7 +2264,26 @@
     ],
     "description": "Checks synchronizer reconciliation flow",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "synchronizer_proxy": {
     "target": [
@@ -606,7 +2300,26 @@
     ],
     "description": "Checks synchronizer proxy and disconnection",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "synchronizer_race_condition": {
     "target": [
@@ -623,7 +2336,26 @@
     ],
     "description": "Checks synchronizer race condition (multiple updates)",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "synchronizer_kubescape_crds": {
     "target": [
@@ -640,7 +2372,26 @@
     ],
     "description": "Checks synchronizer - kubescape CRDs",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/synchronizer.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy": {
     "target": [
@@ -656,7 +2407,35 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy_data_appended": {
     "target": [
@@ -673,7 +2452,35 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected before and after data appended",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy_pod_restarted": {
     "target": [
@@ -690,7 +2497,35 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected before and after pod restarted",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy_known_servers_cache": {
     "target": [
@@ -701,7 +2536,35 @@
     ],
     "description": "Checks knownserverscache backend api endpoint returns 200",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy_multiple_replicas": {
     "target": [
@@ -718,7 +2581,35 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected with multiple replicas",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "network_policy_known_servers": {
     "target": [
@@ -735,7 +2626,35 @@
     ],
     "description": "Checks network policies and network neighborhood in-cluster and backend match to expected with known servers",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/networkpolicies/generate"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/networkpolicies/knownserverscache"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_network_policy.py",
+      "tests_scripts/helm/network_policy.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "ks_microservice_create_2_cronjob_mitre_and_nsa_proxy": {
     "target": [
@@ -749,7 +2668,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "amirm@armosec.io"
+    "owner": "amirm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "vuln_scan_triggering_with_cron_job": {
     "target": [
@@ -763,7 +2721,59 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/vuln_scan.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "stripe_checkout": {
     "target": [
@@ -776,7 +2786,38 @@
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/checkout.py"
+    ]
   },
   "stripe_billing_portal": {
     "target": [
@@ -789,7 +2830,38 @@
     "description": "",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/portal.py"
+    ]
   },
   "stripe_plans": {
     "target": [
@@ -802,7 +2874,42 @@
     "description": "",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/plans"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/plans.py"
+    ]
   },
   "stripe_webhook": {
     "target": [
@@ -815,7 +2922,38 @@
     "description": "",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/cancelSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/createSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/admin/renewSubscription"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/tenants/stripe/checkout"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/stripe/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/tenants/tenantDetails"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/payments/base_payment.py",
+      "tests_scripts/payments/base_stripe.py",
+      "tests_scripts/payments/webhook.py"
+    ]
   },
   "user_email_settings": {
     "target": [
@@ -829,7 +2967,24 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/unsubscribe"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/unsubscribe"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/unsubscribe"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/users_notifications/email_settings.py"
+    ]
   },
   "user_alert_channels": {
     "target": [
@@ -843,7 +2998,28 @@
     ],
     "description": "",
     "skip_on_environment": "production,production-us",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/alertChannel"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/notifications/alertChannel"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/users_notifications/alert_channels.py"
+    ]
   },
   "test_registry_scanning": {
     "target": [
@@ -856,7 +3032,28 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "refaelm@armosec.io"
+    "owner": "refaelm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/registry/management"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/registry/management"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/registry/registry_connectors.py"
+    ]
   },
   "relevantCVEs": {
     "target": [
@@ -870,7 +3067,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "relevancy_fix_vuln": {
     "target": [
@@ -884,7 +3117,43 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability/scanResultsSumSummary"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/vulnerability/scan/v2/"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability/scanResultsSumSummary"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/base_vuln_scan.py",
+      "tests_scripts/helm/relevant_cve.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "securityrisks_all": {
     "target": [
@@ -899,7 +3168,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "sr_r_0035_attack_chain": {
     "target": [
@@ -914,7 +3222,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "sr_r_0005_control": {
     "target": [
@@ -929,7 +3276,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "sr_r_0007_control_networkpolicy": {
     "target": [
@@ -944,7 +3330,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "sr_r_0037_vulnerability": {
     "target": [
@@ -959,7 +3384,46 @@
     ],
     "description": "test security risk vulnerability type, R-0037",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "sr_with_exceptions": {
     "target": [
@@ -974,7 +3438,46 @@
     ],
     "description": "",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "basic_incident_presented": {
     "target": [
@@ -991,7 +3494,33 @@
     ],
     "description": "testing basic incident presented",
     "skip_on_environment": "production,production-us",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsOvertime"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidentsPerSeverity"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/incidents"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/incidents.py"
+    ]
   },
   "kdr_runtime_policies_configurations": {
     "target": [
@@ -1004,7 +3533,61 @@
     ],
     "description": "Test kdr runtime policy configurations - list, create, update, delete, unique values ",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentTypes"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/runtimeIncidentPolicy"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/policies.py"
+    ]
   },
   "kdr_slack_alerts": {
     "target": [
@@ -1018,7 +3601,29 @@
     ],
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/alerts.py",
+      "tests_scripts/runtime/base_runtime.py"
+    ]
   },
   "kdr_teams_alerts": {
     "target": [
@@ -1032,7 +3637,29 @@
     ],
     "description": "Test kdr incidents is being sent to teams",
     "skip_on_environment": "",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsRuleSet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/alerts.py",
+      "tests_scripts/runtime/base_runtime.py"
+    ]
   },
   "kdr_webhook_alerts": {
     "target": [
@@ -1043,7 +3670,9 @@
     ],
     "description": "Test kdr incidents is being sent to slack",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [],
+    "test_implementation_files": []
   },
   "sr_ac_scan_status": {
     "target": [
@@ -1058,7 +3687,46 @@
     ],
     "description": "",
     "skip_on_environment": "production,production-us,custom",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "jira_integration": {
     "target": [
@@ -1070,20 +3738,162 @@
     ],
     "description": "testing jira integration",
     "skip_on_environment": "custom",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/clusters"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/jira_integration.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "linear_integration": {
     "target": [
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
+      "cadashboardbe-dummy",
       "event-ingester-service-dummy"
     ],
     "description": "testing linear integration",
     "skip_on_environment": "production,production-us,custom",
     "owner": "eranm@armosec.io",
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/clusters"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/image"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/workload"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/linear_integration.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "seccomp_profile_pod": {
     "target": [
@@ -1100,7 +3910,30 @@
     ],
     "description": "Checks seccomp profiles flow",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "seccomp_profile_container": {
     "target": [
@@ -1117,7 +3950,30 @@
     ],
     "description": "Checks seccomp profiles flow",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "seccomp_profile_workloads_list": {
     "target": [
@@ -1134,7 +3990,30 @@
     ],
     "description": "Checks seccomp workload list on backend",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "seccomp_profile_generate": {
     "target": [
@@ -1151,7 +4030,30 @@
     ],
     "description": "Checks seccomp profile generate on backend",
     "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io"
+    "owner": "matthiasb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/seccomp/list"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/seccomp.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "slack_notifications_workflows": {
     "target": [
@@ -1164,7 +4066,20 @@
     ],
     "description": "Checks workflows slack notifications",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/slack_workflows.py"
+    ]
   },
   "teams_notifications_workflows": {
     "target": [
@@ -1177,7 +4092,32 @@
     ],
     "description": "Checks workflows teams notifications",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/teams_workflows.py"
+    ]
   },
   "jira_notifications_workflows": {
     "target": [
@@ -1190,7 +4130,36 @@
     ],
     "description": "Checks workflows jira notifications",
     "skip_on_environment": "production",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/jira_workflows.py"
+    ]
   },
   "linear_notifications_workflows": {
     "target": [
@@ -1204,7 +4173,40 @@
     "description": "Checks workflows linear notifications",
     "skip_on_environment": "production,production-us",
     "customer_name": "SECOND_CUSTOMER",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/securityrisks/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/linear_workflows.py"
+    ]
   },
   "workflows_configurations": {
     "target": [
@@ -1217,7 +4219,28 @@
     ],
     "description": "Checks workflows configurations",
     "skip_on_environment": "production,production-us",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/teams"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/workflows"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/workflows/conf_workflows.py"
+    ]
   },
   "clusters": {
     "target": [
@@ -1229,7 +4252,11 @@
     ],
     "description": "Checks accounts clusters",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/accounts/clusters.py"
+    ]
   },
   "cloud_connect_aws_cspm_single": {
     "target": [
@@ -1242,7 +4269,20 @@
     "description": "Checks cloud accounts connect with CSPM single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regions"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regionsdetails"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_single.py"
+    ]
   },
   "cloud_connect_aws_cadr_single": {
     "target": [
@@ -1256,7 +4296,16 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cadr_single.py"
+    ]
   },
   "cloud_organization_aws_cspm": {
     "target": [
@@ -1270,7 +4319,11 @@
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
-    "customer_name": "SECOND_CUSTOMER"
+    "customer_name": "SECOND_CUSTOMER",
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_org.py"
+    ]
   },
   "cloud_organization_aws_cadr": {
     "target": [
@@ -1283,7 +4336,16 @@
     "description": "Checks cloud accounts organization with CADR",
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cadr_org.py"
+    ]
   },
   "cloud_vulnscan_aws": {
     "target": [
@@ -1298,23 +4360,66 @@
     "description": "Checks cloud accounts vulnerability scanning",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/host"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/vulnerability"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/host"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/host/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/vulnerability"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/accounts/vulnscan.py"
+    ]
   },
   "kdr_response_by_user": {
-  "target": [
-    "In cluster",
-    "Backend"
-  ],
-  "target_repositories": [
-    "cadashboardbe",
-    "event-ingester-service",
-    "config-service"
-  ],
-  "description": "testing basic incident presented",
-  "skip_on_environment": "",
-  "owner": "eranm@armosec.io"
-},
-"sbom_test": {
+    "target": [
+      "In cluster",
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "testing basic incident presented",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/response.py"
+    ]
+  },
+  "sbom_test": {
     "target": [
       "In cluster",
       "Backend"
@@ -1325,7 +4430,46 @@
     ],
     "description": "testing sbom",
     "skip_on_environment": "",
-    "owner": "eranm@armosec.io"
+    "owner": "eranm@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/securityrisks/exceptions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/vulnerability_v2/component"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/vulnerability_v2/component"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/helm/base_helm.py",
+      "tests_scripts/helm/ks_microservice.py",
+      "tests_scripts/kubernetes/base_k8s.py"
+    ]
   },
   "cadr_incident_presented": {
     "target": [
@@ -1339,7 +4483,17 @@
     ],
     "description": "testing cadr incident presented",
     "skip_on_environment": "",
-    "owner": "afekb@armosec.io"
+    "owner": "afekb@armosec.io",
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/cadr.py"
+    ]
   },
   "runtime_stress_test": {
     "target": [
@@ -1355,7 +4509,12 @@
     ],
     "description": "Runtime stress test - Multi-namespace load testing (same tenant/cluster)",
     "skip_on_environment": "staging,production,production-us",
-    "owner": "jonathang@armosec.io"
+    "owner": "jonathang@armosec.io",
+    "tested_dashboard_apis": [],
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/stress_test.py"
+    ]
   },
   "siem_integrations": {
     "target": [
@@ -1368,6 +4527,23 @@
     "description": "Checks SIEM integrations",
     "skip_on_environment": "",
     "owner": "shanyl@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/siem/{provider}"
+      }
+    ],
+    "test_implementation_files": [
+      "tests_scripts/integrations/siem.py"
+    ]
   }
 }

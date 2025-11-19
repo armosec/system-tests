@@ -1,0 +1,49 @@
+github:
+  token: "${GITHUB_TOKEN}"
+  api_base_url: "https://api.github.com"
+  # Organization/repo resolution will be derived from run URL/ID
+
+loki:
+  base_url: "https://<your-loki-endpoint>"
+  # mode can be: auto | direct | grafana_proxy
+  # - auto: try direct (/loki/api/v1, then /api/v1). If 404 and grafana.* available, try Grafana datasource proxy.
+  # - direct: calls <base_url>/loki/api/v1/query_range (with fallback to /api/v1/query_range)
+  # - grafana_proxy: calls <grafana.url>/api/datasources/proxy/<datasource_id>/loki/api/v1/query_range
+  mode: "auto"
+  # Either basic auth or bearer token, prefer tokens via env
+  bearer_token: "${LOKI_TOKEN}"
+  grafana:
+    url: "https://<your-grafana-host>"
+    api_token: "${GRAFANA_TOKEN}"
+    datasource_id: 2
+  # Default label keys used across services
+  labels:
+    namespace: "namespace"
+    app: "app"
+    level: "level"
+  # Default level selector for errors/warnings
+  level_selector: 'level=~"error|warn"'
+  # Query templates per service (string templates; {customer_guid}, {cluster}, {namespace}, {app}, {level_selector}, {id_filters})
+  # Example uses the staging namespace; change as needed per environment.
+  templates:
+    event-ingester-service: '{{{namespace}="event-sourcing-be-stage", {level_selector}}} {id_filters}'
+    cadashboardbe: '{{{namespace}="event-sourcing-be-stage", {app}="ca-dashboard-be-egg", {level_selector}}} {id_filters}'
+    config-service: '{{{namespace}="event-sourcing-be-stage", {app}="config-service", {level_selector}}} {id_filters}'
+    users-notification-service: '{{{namespace}="event-sourcing-be-stage", {app}="ca-users-notification-service", {level_selector}}} {id_filters}'
+
+parser:
+  # Regex patterns to extract identifiers from logs
+  customer_guid_patterns:
+    - '(?i)customer\s*guid[^\da-f]*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})'
+    - '(?i)customer\s*guid[^\da-f]*([0-9a-f]{32})'
+    - '(?i)customer[-_ ]?guid[:=][ \t]*([0-9a-f-]{32,36})'
+    - '(?i)tenant[-_ ]?id[:=][ \t]*([0-9a-f-]{32,36})'
+  cluster_name_patterns:
+    - '(?i)clusterName[=:][ \t]*"?(?P<c>[A-Za-z0-9._-]{3,64})"?'
+    - '(?i)cluster[ \t]*name[=:][ \t]*"?(?P<c>[A-Za-z0-9._-]{3,64})"?'
+    - '(?i)cluster[:=][ \t]*([a-z0-9-_.]{3,64})'
+
+defaults:
+  time_padding: "10m"
+  mapping_path: "../../system_test_mapping.json"
+
