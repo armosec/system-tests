@@ -437,7 +437,7 @@ class ControlPanelAPI(object):
                         json={"customerName": tenantName, "userId": self.api_login.get_frontEgg_user_id()},
                         cookies=None, headers={"Authorization": f"Bearer {self.api_login.get_frontEgg_auth_user_id()}"})
         assert res.status_code in [client.CREATED, client.OK], f"Failed to create tenant {tenantName}: {res.text}"
-        json_response = res.json()
+        json_response = self.safe_json_parse(res)
         assert json_response.get("tenantId", {}) != {}, f"tenantId is empty: {res.text}"
         assert json_response.get("agentAccessKey", {}).get("value",
                                                            {}) != {}, f"agentAccessKey['value'] is empty: {res.text}"
@@ -1785,6 +1785,41 @@ class ControlPanelAPI(object):
         if not url.startswith("http://") and not url.startswith("https://"):
             url = self.server + url
         return requests.post(url, **args)
+
+    def safe_json_parse(self, response):
+        """
+        Safely parse JSON response that might contain extra data after the JSON.
+        This handles cases where the response has valid JSON followed by additional text.
+        """
+        try:
+            # First try normal JSON parsing
+            return response.json()
+        except json.JSONDecodeError as e:
+            # If normal parsing fails, try to extract just the JSON part
+            response_text = response.text
+            
+            # Find the first '{' and the last '}' to extract the JSON object
+            first_brace = response_text.find('{')
+            last_brace = response_text.rfind('}')
+            
+            if first_brace >= 0 and last_brace >= 0 and last_brace > first_brace:
+                json_part = response_text[first_brace:last_brace + 1]
+                try:
+                    return json.loads(json_part)
+                except json.JSONDecodeError:
+                    # If that fails too, raise the original error with more context
+                    raise json.JSONDecodeError(
+                        f"Failed to parse JSON response. Original error: {str(e)}. "
+                        f"Response text (first 500 chars): {response_text[:500]}",
+                        response_text, e.pos
+                    )
+            else:
+                # No braces found, raise original error with context
+                raise json.JSONDecodeError(
+                    f"Failed to parse JSON response. Original error: {str(e)}. "
+                    f"Response text (first 500 chars): {response_text[:500]}",
+                    response_text, e.pos
+                )
 
     def post_with_ratelimit(self, url, **args):
         # Extract optional parameters with defaults
