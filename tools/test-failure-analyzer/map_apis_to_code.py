@@ -57,6 +57,33 @@ def normalize_path(path: str) -> str:
     return path
 
 
+def is_generic_handler(endpoint: Dict[str, Any]) -> bool:
+    """
+    Check if an endpoint is a generic/documentation handler.
+    
+    Generic handlers should be avoided as they don't contain actual business logic.
+    """
+    file = endpoint.get("file", "").lower()
+    handler = endpoint.get("handler", "").lower()
+    package = endpoint.get("package", "").lower()
+    
+    # Check for documentation/swagger handlers
+    if "docs/" in file or file.startswith("docs/"):
+        return True
+    if "swagger" in file or "swagger" in handler:
+        return True
+    
+    # Check for generic ServeHTTP methods (usually routers, not handlers)
+    if handler == "servehttp" and package != "main":
+        return True
+    
+    # Check for test files (shouldn't be matched as handlers)
+    if "_test.go" in file:
+        return True
+    
+    return False
+
+
 def match_endpoint(
     api_method: str,
     api_path: str,
@@ -76,8 +103,11 @@ def match_endpoint(
     normalized_api_path = normalize_path(api_path)
     api_method_upper = api_method.upper()
     
-    # Try exact match first (method + path)
+    # Try exact match first (method + path) - excluding generic handlers
     for endpoint in endpoints:
+        if is_generic_handler(endpoint):
+            continue
+            
         endpoint_method = endpoint.get("method", "").upper()
         endpoint_full_path = normalize_path(endpoint.get("fullPath", ""))
         
@@ -92,6 +122,9 @@ def match_endpoint(
     
     # Try matching without prefix (some endpoints might have prefix in FullPath)
     for endpoint in endpoints:
+        if is_generic_handler(endpoint):
+            continue
+            
         endpoint_method = endpoint.get("method", "").upper()
         endpoint_path = normalize_path(endpoint.get("path", ""))
         endpoint_full_path = normalize_path(endpoint.get("fullPath", ""))
@@ -110,8 +143,10 @@ def match_endpoint(
     # This handles cases like /api/v1/posture/clusters matching /api/v1/posture
     # IMPORTANT: Sort by path length (longest first) to match /api/v1/vulnerability_v2 
     # before /api/v1/vulnerability
+    # Filter out generic handlers first
+    non_generic_endpoints = [e for e in endpoints if not is_generic_handler(e)]
     sorted_endpoints = sorted(
-        endpoints,
+        non_generic_endpoints,
         key=lambda e: len(normalize_path(e.get("fullPath", ""))),
         reverse=True  # Longest paths first
     )
@@ -127,19 +162,104 @@ def match_endpoint(
         
         if method_matches:
             # Check if api_path starts with endpoint_full_path (nested route)
-            # or endpoint_full_path starts with api_path (prefix route)
-            if normalized_api_path.startswith(endpoint_full_path) or endpoint_full_path.startswith(normalized_api_path):
-                return endpoint
+            # Only match if the endpoint is reasonably specific (not just /api/v1)
+            if normalized_api_path.startswith(endpoint_full_path):
+                # Require at least 3 path segments to avoid matching too generic routes
+                path_segments = endpoint_full_path.strip('/').split('/')
+                if len(path_segments) >= 3:  # e.g., api/v1/runtime (not just api/v1)
+                    return endpoint
     
-    # Last resort: match by path only (ignore method)
-    # This handles cases where endpoints are registered with "ANY" method
-    for endpoint in endpoints:
+    # Last resort: match by path only (ignore method) - but still avoid generic handlers
+    for endpoint in non_generic_endpoints:
         endpoint_full_path = normalize_path(endpoint.get("fullPath", ""))
         
         if endpoint_full_path == normalized_api_path:
             return endpoint
     
     return None
+
+
+def find_handler_by_api_path(
+    api_path: str,
+    chunks: List[Dict[str, Any]]
+) -> Optional[Dict[str, Any]]:
+    """
+    Search for a handler chunk by analyzing the API path.
+    
+    This is used as a fallback when endpoint matching fails.
+    For example, /api/v1/runtime/policies might be handled by:
+    - httphandlerv2/runtime/policies_handler.go
+    - httphandlerv2/runtime/handler.go (with method name like ListPolicies)
+    - repositories/runtimepolicies.go
+    
+    Args:
+        api_path: Full API path (e.g., /api/v1/runtime/policies)
+        chunks: List of CodeChunk from code index
+    
+    Returns:
+        Best matching chunk, or None if no good match found
+    """
+    # Extract path segments
+    segments = [s for s in api_path.split('/') if s]
+    
+    # Common patterns to look for
+    # Example: /api/v1/runtime/policies -> look for runtime, policies
+    search_terms = []
+    for seg in segments:
+        if seg not in ['api', 'v1', 'v2', 'v3']:  # Skip API version segments
+            search_terms.append(seg.lower())
+    
+    if not search_terms:
+        return None
+    
+    # Score each chunk based on how well it matches
+    scored_chunks = []
+    for chunk in chunks:
+        file = chunk.get("file", "").lower()
+        name = chunk.get("name", "").lower()
+        package = chunk.get("package", "").lower()
+        pattern = chunk.get("pattern", "").lower()
+        
+        # Skip test files
+        if "_test.go" in file:
+            continue
+        
+        # Skip generic handlers
+        if "docs/" in file or "swagger" in file:
+            continue
+        
+        score = 0
+        
+        # Check if chunk is marked as a handler
+        is_handler = "handler" in pattern or "handler" in name or "handler" in file
+        if is_handler:
+            score += 10
+        
+        # Check if file path contains search terms
+        for term in search_terms:
+            if term in file:
+                score += 5
+            if term in package:
+                score += 3
+            if term in name:
+                score += 4
+        
+        # Prefer files in httphandlerv2 or repositories
+        if "httphandlerv2/" in file:
+            score += 2
+        if "repositories/" in file:
+            score += 1
+        
+        # Only consider chunks with some relevance
+        if score > 5:
+            scored_chunks.append((score, chunk))
+    
+    if not scored_chunks:
+        return None
+    
+    # Return highest scoring chunk
+    scored_chunks.sort(key=lambda x: x[0], reverse=True)
+    return scored_chunks[0][1]
 
 
 def find_handler_chunk(
@@ -568,6 +688,18 @@ def map_apis_to_code(
                                 if len(api_mappings) < 3:
                                     print(f"      ✅ Found main handler (fallback): {handler_name} in package {handler_package}")
                                 break
+        
+        # Strategy 6 (FINAL FALLBACK): Use semantic search based on API path
+        # This finds handlers by analyzing file/package names for relevance
+        if not handler_chunk:
+            if len(api_mappings) < 3:
+                print(f"      Trying semantic search fallback for: {api_path}")
+            handler_chunk = find_handler_by_api_path(api_path, chunks)
+            if handler_chunk:
+                handler_name = handler_chunk.get("name", "")
+                handler_package = handler_chunk.get("package", "")
+                if len(api_mappings) < 3:
+                    print(f"      ✅ Found via semantic search: {handler_name} in {handler_chunk.get('file', '')}")
         
         if handler_chunk:
             matched_count += 1
