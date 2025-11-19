@@ -666,14 +666,6 @@
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
     ],
@@ -1561,14 +1553,6 @@
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
     ],
@@ -1631,14 +1615,6 @@
       {
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
       },
       {
         "method": "POST",
@@ -1706,14 +1682,6 @@
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
     ],
@@ -1775,14 +1743,6 @@
       {
         "method": "POST",
         "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
       },
       {
         "method": "POST",
@@ -2805,14 +2765,6 @@
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/vulnerability"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/vulnerability_v2/workload"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/vulnerability_v2/workload"
       }
     ],
@@ -3088,14 +3040,6 @@
       },
       {
         "method": "GET",
-        "path": "/api/v1/registry/management"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/registry/management"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/registry/management"
       },
       {
@@ -3557,18 +3501,6 @@
         "path": "/api/v1/runtime/incidents"
       },
       {
-        "method": "GET",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
-      {
         "method": "POST",
         "path": "/api/v1/runtime/incidents"
       },
@@ -3579,10 +3511,6 @@
       {
         "method": "GET",
         "path": "/api/v1/runtime/incidentsPerSeverity"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/uniqueValues/incidents"
       },
       {
         "method": "POST",
@@ -3829,31 +3757,7 @@
         "path": "/api/v1/integrations"
       },
       {
-        "method": "GET",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/integrations"
-      },
-      {
         "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "PUT",
         "path": "/api/v1/integrations"
       },
       {
@@ -3934,14 +3838,6 @@
       },
       {
         "method": "GET",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/integrations"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/integrations"
       },
       {
@@ -4288,10 +4184,6 @@
         "path": "/api/v1/integrations"
       },
       {
-        "method": "GET",
-        "path": "/api/v1/integrations"
-      },
-      {
         "method": "POST",
         "path": "/api/v1/integrations"
       },
@@ -4492,10 +4384,6 @@
       },
       {
         "method": "POST",
-        "path": "/api/v1/vulnerability_v2/host"
-      },
-      {
-        "method": "POST",
         "path": "/api/v1/vulnerability_v2/host/scan"
       },
       {
@@ -4521,10 +4409,6 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "tested_dashboard_apis": [
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
-      },
       {
         "method": "POST",
         "path": "/api/v1/runtime/incidents"

@@ -1,17 +1,23 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
 Update system_test_mapping.json with HTTP methods and test implementation files.
 This script scans test files, extracts API calls, and updates the mapping.
 
 Usage:
     python3 scripts/update_mapping_with_methods.py
+    
+Note: Uses system Python (/usr/bin/python3) to avoid output suppression issues with pyenv.
 """
 
 import json
 import re
 import ast
+import os
 from pathlib import Path
 from collections import defaultdict
+
+# Get the repository root (parent of scripts/)
+REPO_ROOT = Path(__file__).parent.parent.resolve()
 
 def load_json_file(path):
     """Load JSON file."""
@@ -46,7 +52,7 @@ def analyze_test_configuration_files():
     Analyze test configuration files to extract test name to implementation file mappings.
     Returns: {test_name: [implementation_file_paths]}
     """
-    config_dir = Path('/workspace/configurations/system/tests_cases')
+    config_dir = REPO_ROOT / 'configurations' / 'system' / 'tests_cases'
     test_to_files = {}
     
     for config_file in config_dir.glob('*.py'):
@@ -297,10 +303,11 @@ def update_system_mapping():
     config_mappings = analyze_test_configuration_files()
     
     print("📖 Loading system test mapping...")
-    system_mapping = load_json_file('/workspace/system_test_mapping.json')
+    mapping_file = REPO_ROOT / 'system_test_mapping.json'
+    system_mapping = load_json_file(str(mapping_file))
     api_method_mapping = get_api_method_mapping()
     
-    tests_dir = Path('/workspace/tests_scripts')
+    tests_dir = REPO_ROOT / 'tests_scripts'
     updated_count = 0
     tests_with_impl_files = 0
     tests_with_apis = 0
@@ -312,7 +319,7 @@ def update_system_mapping():
         # Add base class files if applicable
         all_files = set(impl_files)
         for impl_file in impl_files:
-            file_path = Path('/workspace') / impl_file
+            file_path = REPO_ROOT / impl_file
             base_files = find_base_classes(file_path)
             all_files.update(base_files)
         
@@ -329,16 +336,20 @@ def update_system_mapping():
         # Extract API calls from implementation files
         api_methods = set()
         for impl_file in impl_files_list:
-            file_path = Path('/workspace') / impl_file
+            file_path = REPO_ROOT / impl_file
             methods = extract_backend_api_calls(file_path)
             api_methods.update(methods)
         
         # Convert to API format with HTTP methods
         api_list = []
+        seen_apis = set()  # Track (method, path) to avoid duplicates
         for method_name in api_methods:
             if method_name in api_method_mapping:
                 api_info = api_method_mapping[method_name]
-                api_list.append(api_info)
+                api_key = (api_info['method'], api_info['path'])
+                if api_key not in seen_apis:
+                    seen_apis.add(api_key)
+                    api_list.append(api_info)
         
         # Sort for consistency
         api_list.sort(key=lambda x: (x['path'], x['method']))
@@ -351,7 +362,7 @@ def update_system_mapping():
         updated_count += 1
     
     # Save
-    save_json_file('/workspace/system_test_mapping.json', system_mapping)
+    save_json_file(str(mapping_file), system_mapping)
     
     print(f"\n✅ Update complete!")
     print(f"   • Total tests: {updated_count}")
@@ -380,12 +391,21 @@ def update_system_mapping():
                 break
 
 if __name__ == '__main__':
-    print("="*70)
-    print("  Updating System Test Mapping")
-    print("="*70)
-    print()
-    update_system_mapping()
-    print()
-    print("="*70)
-    print("✨ Done!")
-    print("="*70)
+    import sys
+    sys.stdout.write("="*70 + "\n")
+    sys.stdout.write("  Updating System Test Mapping\n")
+    sys.stdout.write("="*70 + "\n\n")
+    sys.stdout.flush()
+    
+    try:
+        update_system_mapping()
+    except Exception as e:
+        sys.stderr.write(f"ERROR: {e}\n")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+    
+    sys.stdout.write("\n" + "="*70 + "\n")
+    sys.stdout.write("✨ Done!\n")
+    sys.stdout.write("="*70 + "\n")
+    sys.stdout.flush()
