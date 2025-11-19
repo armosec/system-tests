@@ -1065,8 +1065,8 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe",
-      "config-service"
+      "cadashboardbe-dummy",
+      "config-service-dummy"
     ],
     "description": "testing jira integration",
     "skip_on_environment": "custom",
