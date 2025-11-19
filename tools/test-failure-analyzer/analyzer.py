@@ -886,28 +886,38 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
         st_root = Path(__file__).resolve().parents[2]
         for idx, fentry in enumerate(failures, start=1):
             tname = fentry.test.get("name") or ""
-            m = re.search(r"ST\s*\\(([^)]+)\\)", tname)
+            # Extract test name from ST() pattern or use the test name directly
+            m = re.search(r"ST\s*\(([^)]+)\)", tname)
             key = (m.group(1) if m else tname).strip()
             if not key:
                 continue
+            
+            # Create a subdirectory for this test to avoid filename conflicts
+            # Sanitize the key to create a safe directory name
+            key_safe = re.sub(r"[^A-Za-z0-9._-]+", "_", key)
+            test_dir = src_out / f"{idx:02d}_{key_safe}"
+            test_dir.mkdir(parents=True, exist_ok=True)
+            
             patterns = [f"**/*{key}*.py", f"**/*{key}*.go", f"**/*{key}*.yaml", f"**/*{key}*.yml", f"**/*{key}*.json"]
             matched = False
             for pat in patterns:
                 for p in st_root.glob(pat):
                     try:
                         if p.is_file():
-                            dst = src_out / f"{idx:02d}_{p.name}"
+                            dst = test_dir / p.name
                             if p.stat().st_size <= 524288:
                                 shutil.copy2(p, dst)
                             else:
-                                with open(dst.with_suffix(".path.txt"), "w") as outf:
+                                with open((test_dir / p.name).with_suffix(".path.txt"), "w") as outf:
                                     outf.write(str(p))
                             wrote_src = True
                             matched = True
                     except Exception:
                         continue
             if not matched:
-                with open(src_out / f"{idx:02d}_{key}.info.txt", "w") as outf:
+                # Ensure directory exists before writing
+                info_file = test_dir / "info.txt"
+                with open(info_file, "w") as outf:
                     outf.write(f"No matching source file found for key '{key}' under {st_root}.")
 
     # Optionally clone or link triggering repo and cadashboardbe
