@@ -1,0 +1,21 @@
+{
+  "cadashboardbe": {
+    "7e920e4d90e390f2d2f8736e8608ea4c8647a4bf": {
+      "index_path": "s3://code-indexes/cadashboardbe/7e920e4d90e390f2d2f8736e8608ea4c8647a4bf/code-index.json",
+      "index_url": "https://github.com/armosec/cadashboardbe/releases/download/index-7e920e4/code-index.json",
+      "created_at": "2024-11-18T08:29:00Z",
+      "build_time": "2024-11-18T08:29:00Z",
+      "branch": "main",
+      "tag": null
+    }
+  },
+  "event-ingester-service": {
+    "abc123def4567890123456789012345678901234": {
+      "index_path": "s3://code-indexes/event-ingester-service/abc123def4567890123456789012345678901234/code-index.json",
+      "created_at": "2024-11-18T09:00:00Z",
+      "build_time": "2024-11-18T09:00:00Z",
+      "branch": "main"
+    }
+  }
+}
+

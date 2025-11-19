@@ -1,73 +1,319 @@
-### Test Failure Analyzer (Phase 1 - MVP)
+# Test Failure Analyzer
 
-**Purpose**: Given a GitHub Actions run (shared-workflows), collect failing system tests, map them to relevant repos/services via `system_test_mapping.json`, extract identifiers (customer GUID, cluster), pull focused Grafana Loki logs, and generate a concise Markdown/JSON report.
+Automated test failure analysis using LLM-powered insights. This tool collects comprehensive context about test failures and structures it for AI analysis.
 
-#### Quick start
-1. Create config from example:
-   - `cp config.example.yaml config.yaml`
-2. Install deps:
-   - `python3 -m venv .venv && source .venv/bin/activate`
-   - `pip install -r requirements.txt`
-3. Run:
-   - `python analyzer.py --run-url https://github.com/armosec/shared-workflows/actions/runs/<RUN_ID> --output-dir ./artifacts`
-   - Optional verbose: add `--debug`
+## Quick Start
 
-Flags:
-- `--run-url` or `--run-id` (one required)
-- `--time-padding` default `10m` (accepted: e.g., `5m`, `15m`, `1h`)
-- `--mapping` path to `system_test_mapping.json` (default points to repo root)
-- `--output-dir` folder to place `report.md` and `report.json`
-- Optional overrides: `--customer-guid`, `--cluster`
-- Optional: `--debug` to print inferred service and query counts per failure
-- Optional: `--fetch-pr` to fetch PR info/files into `artifacts/context/pr.json`
-- Optional: `--bundle-tests` to write per-test section logs/meta into `artifacts/context/tests`
-- Optional: `--map-cadb` to generate a placeholder endpoint map json
-- Optional: `--fetch-loki` to create `artifacts/context/logs/excerpts.json` placeholder (Phase 2 will fetch real excerpts)
-- Optional: `--only-test "<mapping_key>"` to analyze only a specific test (use mapping key as in `system_test_mapping.json`), e.g. `--only-test basic_incident_presented`
+### Run a Full Analysis
 
-#### What the MVP does now
-- Downloads the run logs ZIP via GitHub API, parses all jobs, and focuses on Step 18 sections for system tests.
-- Extracts failing tests and their full Step 18 section content.
-- Infers the triggering service from `GITHUB_REPOSITORY` (repo basename). If not detected from logs, falls back to ZIP scan and run metadata. If still unknown, exits with error.
-- Forces analysis to that single service (plus `cadashboardbe` always) and generates Loki queries from config templates (namespace + app).
-- Extracts identifiers (customer GUID, clusterName) from logs.
-- Extracts time window (first/last ISO8601 in Step 18) and adds ±5 minutes padding; shows it under Loki queries for each failure.
-- Extracts error lines (e.g., `run_test: Test error`, `ERROR`, `Error:` and Tracebacks) and prints top lines under each failure.
-- Emits structured `report.json` and human `report.md`.
+```bash
+# Set up environment
+export GITHUB_TOKEN="your_token_here"
+export GITHUB_WORKSPACE="/path/to/workspace"
 
-#### Configuration
-See `config.example.yaml` for GitHub/Loki endpoints and auth. Environment-variable interpolation is supported for secrets (e.g., `${GITHUB_TOKEN}`).
+# Run analysis for a failed test
+./analyze_test_failure.sh \
+  --workflow-url "https://github.com/armosec/system-tests/actions/runs/12345" \
+  --test-name "test_user_authentication" \
+  --output-dir ./analysis-results
+```
 
-- Loki templates (used in Phase 1) must include both `{namespace}` and `{app}` label keys:
-  - Example:
-    - `event-ingester-service: '{{{namespace}="event-sourcing-be-stage", {app}="event-ingester-service", {level_selector}}} {id_filters}'`
-  - The analyzer renders templates even when the service is inferred from the workflow.
-  - No fallback services are used; analyzer fails if service cannot be detected.
+### Output
 
-#### Next steps (Phase 1)
-- [Done] GitHub logs fetch + test parsing + time window and errors.
-- [Optional] Add `--fetch-loki` to execute queries and embed top error excerpts.
-- [Optional] Enrich PR context (changed files/diffs) and test-to-handler mapping.
+The analyzer generates:
+- `llm-context.json` - Complete LLM-ready context
+- `report.json` - Analysis report
+- `report.md` - Human-readable report
+- Phase-specific outputs (api-map, call-chains, etc.)
 
-#### Notes
-- Mapping file: `system-tests/system_test_mapping.json` is the source of truth.
-- Tests with `"dummy"` in the name are skipped.
-- Time window for Loki is derived from Step 18 timestamps ± padding.
-- Analyzer always includes `cadashboardbe` logs alongside the triggering service for API-path failures.
+## Pipeline Phases
 
-#### Outputs
-- `artifacts/report.md`: human-readable summary per failing test:
-  - Repos, Services
-  - Identifiers
-  - Time window and Loki queries (with time window noted)
-  - Error lines
-- `artifacts/report.json`: machine-readable structure with all fields (including `loki.from_time` and `loki.to_time`).
-- `artifacts/context/` (for Cursor exploration):
-  - `summary.json`: run summary and counts
-  - `tests/*.json` and `tests/*.log`: per-failure meta and full Step 18 section text
-  - `logs/queries.json`: list of Loki queries with from/to
-  - `pr.json` (when `--fetch-pr`)
-  - `cadashboard_endpoints.json` (when `--map-cadb`)
-  - `logs/excerpts.json` (when `--fetch-loki`, placeholder in Phase 1)
+Each phase can be run independently:
 
+### Phase 1-2: Extract Test Metadata
+
+```bash
+# Extract run ID and test info
+python3 extract_test_run_id.py \
+  --workflow-url "https://github.com/armosec/system-tests/actions/runs/12345" \
+  --output test-run-info.json
+
+# Extract workflow commit
+python3 extract_workflow_commit.py \
+  --run-id "12345-1" \
+  --output workflow-commit.txt
+```
+
+### Phase 3: Load Code Indexes
+
+```bash
+# Find indexes for all relevant repos
+python3 find_indexes.py \
+  --registry index-registry.json \
+  --triggering-repo cadashboardbe \
+  --triggering-commit abc123def \
+  --output found-indexes.json
+
+# Load the indexes
+python3 load_multi_repo_indexes.py \
+  --found-indexes found-indexes.json \
+  --output loaded-indexes.json
+```
+
+### Phase 4: Extract Connected Context
+
+```bash
+# Get cross-repository dependencies
+python3 extract_connected_context.py \
+  --test-name test_user_authentication \
+  --triggering-repo cadashboardbe \
+  --repos-to-scan "authentication-service,event-ingester-service" \
+  --output connected-context.json
+```
+
+### Phase 5-6: Resolve Service Versions
+
+```bash
+# Extract running image tags
+python3 extract_image_tags.py \
+  --values-file /path/to/kubernetes/values.yaml \
+  --deployment-dir /path/to/kubernetes/deployment \
+  --output running-images.json
+
+# Map tags to commits
+python3 resolve_repo_commits.py \
+  --images running-images.json \
+  --workflow-commit abc123def \
+  --triggering-repo cadashboardbe \
+  --output resolved-repo-commits.json
+```
+
+### Phase 7: Build LLM Context
+
+```bash
+# Generate final LLM context
+python3 build_llm_context.py \
+  --test-file tests/test_auth.py \
+  --test-name test_user_authentication \
+  --error-log error.log \
+  --api-map api-code-map.json \
+  --call-chain test-call-chain.json \
+  --connected-context connected-context.json \
+  --resolved-commits resolved-repo-commits.json \
+  --code-index /path/to/code-index.json \
+  --output llm-context.json
+```
+
+## Configuration
+
+### index-registry.json
+
+Defines where to find code indexes:
+
+```json
+{
+  "version": "1.0",
+  "registries": {
+    "github-actions": {
+      "type": "github-artifacts",
+      "priority": 1
+    }
+  },
+  "repositories": [
+    {
+      "name": "cadashboardbe",
+      "repo_url": "https://github.com/armosec/cadashboardbe",
+      "index_workflow": "code-index-generation.yml"
+    }
+  ]
+}
+```
+
+### config.yaml
+
+General configuration:
+
+```yaml
+github:
+  api_url: https://api.github.com
+  org: armosec
+  
+repositories:
+  - name: cadashboardbe
+    type: go
+  - name: authentication-service
+    type: go
+```
+
+## Helper Scripts
+
+### Update Index Registry
+
+```bash
+# Add or update repository in registry
+python3 update_index_registry.py \
+  --registry index-registry.json \
+  --repo-name new-service \
+  --repo-url https://github.com/armosec/new-service \
+  --index-workflow code-index-generation.yml
+```
+
+### Validate Analysis
+
+```bash
+# Check that analysis is complete and valid
+python3 validate_analysis.py \
+  --llm-context llm-context.json \
+  --check-code-populated \
+  --min-chunks 5
+```
+
+## Debugging
+
+### Enable Verbose Logging
+
+```bash
+export DEBUG=1
+python3 build_llm_context.py ... 2>&1 | tee debug.log
+```
+
+### Inspect Intermediate Outputs
+
+```bash
+# Pretty-print JSON
+cat llm-context.json | jq '.'
+
+# Check chunk count
+cat llm-context.json | jq '.metadata.total_chunks'
+
+# List all chunks
+cat llm-context.json | jq '.code_chunks[] | {id, type, source}'
+
+# Find empty chunks
+cat llm-context.json | jq '.code_chunks[] | select(.code == "")'
+```
+
+### Common Issues
+
+**No code indexes found**
+- Check that `code-index-generation.yml` workflow ran
+- Verify artifact was uploaded
+- Check index-registry.json has correct repo name
+
+**Empty code chunks**
+- Verify code index was loaded: `cat loaded-indexes.json | jq`
+- Check chunk IDs match: compare IDs in api-map vs code-index
+- Ensure `--code-index` path is correct
+
+**Connected context missing**
+- Check that connected repos have indexes
+- Verify topic/endpoint patterns in tracer scripts
+- Check size limits aren't excluding chunks
+
+## Testing
+
+### Unit Tests
+
+```bash
+# Test individual scripts
+python3 test_extract_test_run_id.py
+python3 test_extract_workflow_commit.py
+
+# Test with sample data
+python3 build_llm_context.py \
+  --test-file samples/test_sample.py \
+  --test-name test_sample \
+  --error-log samples/error.log \
+  --api-map samples/api-map.json \
+  --code-index samples/code-index.json \
+  --output test-output.json
+```
+
+### Integration Tests
+
+```bash
+# Run full pipeline with test data
+bash test_full_pipeline.sh
+```
+
+## Extending
+
+### Add a New Context Source
+
+1. Create new extractor script:
+   ```python
+   # extract_new_context.py
+   def extract_new_context(test_name):
+       # Your logic here
+       return {"chunks": [...]}
+   ```
+
+2. Update `build_llm_context.py`:
+   ```python
+   # Add new argument
+   parser.add_argument('--new-context', type=str)
+   
+   # Load and merge
+   if args.new_context:
+       with open(args.new_context) as f:
+           new_context = json.load(f)
+       all_chunks.extend(new_context['chunks'])
+   ```
+
+3. Update documentation
+
+### Add Support for a New Language
+
+1. Update `indexgen` to parse the language
+2. Update chunk ID format in `build_llm_context.py`
+3. Update API mapping patterns
+4. Test with sample repos
+
+## Best Practices
+
+### When to Run Analysis
+- ✅ Flaky tests that fail intermittently
+- ✅ Regression tests that started failing after a code change
+- ✅ Integration tests involving multiple services
+- ❌ Known failures (e.g., missing infrastructure)
+- ❌ Test code issues (not application code issues)
+
+### Optimizing Context Size
+- Set `--max-lines-per-source` to limit code volume
+- Use `--priority-threshold` to exclude low-priority chunks
+- Enable `--error-keywords` to focus on error-related code
+- Exclude test setup/teardown code if not relevant
+
+### Maintaining Indexes
+- Indexes are auto-generated on push to main
+- Keep indexes for at least 30 days (retention-days in workflow)
+- Clean up old artifacts manually if storage is an issue
+- Re-run index generation if schema changes
+
+## Documentation
+
+- [Main Documentation](../../../armosec-ai-shared-rules/docs/test-failure-analysis/README.md)
+- [Architecture](../../../armosec-ai-shared-rules/docs/test-failure-analysis/ARCHITECTURE.md)
+- [Testing Guide](./TESTING_GUIDE.md)
+- [Phase 7 Details](./PHASE7_COMPLETE.md)
+
+## Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+Dependencies:
+- `requests` - GitHub API calls
+- `PyYAML` - Config file parsing
+- `python-dotenv` - Environment variable management
+- Standard library: `json`, `argparse`, `subprocess`, `pathlib`
+
+## Support
+
+For issues:
+1. Check [Common Issues](#common-issues)
+2. Review script help: `python3 script_name.py --help`
+3. Check main documentation
+4. Contact team in #test-automation
 

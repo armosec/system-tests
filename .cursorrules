@@ -1,0 +1,321 @@
+# Cursor Rules for system-tests
+
+## Repository Purpose
+This repository contains system-level integration tests and the test failure analyzer pipeline.
+
+## Code Standards
+
+### Python Test Code
+- Use pytest framework
+- Follow naming: `test_*.py` for test files, `test_*` for test functions
+- Add docstrings explaining what the test validates
+- Use descriptive assertion messages
+- Clean up resources in teardown/fixtures
+- Mark flaky tests with `@pytest.mark.flaky`
+
+### Test Failure Analyzer Scripts
+- Python 3.8+ with type hints
+- Follow the pipeline phase pattern (input JSON → process → output JSON)
+- Write logs to stderr, data to stdout
+- Include `--help` documentation
+- Handle missing files gracefully
+- Validate input data format
+
+## Test Failure Analyzer (`tools/test-failure-analyzer/`)
+
+### Pipeline Structure
+
+All analyzer scripts follow this pattern:
+1. Accept input via CLI arguments
+2. Read input files (JSON/text)
+3. Process/extract/transform data
+4. Write output files (JSON)
+5. Log progress to stderr
+6. Exit with appropriate code (0=success, non-zero=failure)
+
+### Adding a New Phase
+
+When adding a new pipeline phase:
+
+1. **Create the script:**
+   ```python
+   #!/usr/bin/env python3
+   # tools/test-failure-analyzer/extract_new_data.py
+   
+   import argparse
+   import json
+   import sys
+   
+   def extract_new_data(input_data):
+       """Extract new data from input."""
+       # Implementation
+       return {"data": [...]}
+   
+   def main():
+       parser = argparse.ArgumentParser(description='Extract new data')
+       parser.add_argument('--input', required=True)
+       parser.add_argument('--output', required=True)
+       args = parser.parse_args()
+       
+       with open(args.input) as f:
+           input_data = json.load(f)
+       
+       result = extract_new_data(input_data)
+       
+       with open(args.output, 'w') as f:
+           json.dump(result, f, indent=2)
+   
+   if __name__ == '__main__':
+       main()
+   ```
+
+2. **Update build_llm_context.py** to accept the new input
+
+3. **Update README.md** with the new phase
+
+4. **Add to TESTING_GUIDE.md** with test procedures
+
+5. **Update phase diagram** in main documentation
+
+### Documentation Updates Required
+
+**CRITICAL:** When modifying analyzer scripts, update:
+- [ ] `tools/test-failure-analyzer/README.md` - Usage instructions
+- [ ] `tools/test-failure-analyzer/TESTING_GUIDE.md` - Test procedures
+- [ ] `../../armosec-ai-shared-rules/docs/test-failure-analysis/README.md` - Main docs
+- [ ] Script's `--help` text
+- [ ] Example commands in docs
+
+### Configuration Files
+
+#### index-registry.json
+Lists all repositories with code indexes.
+
+**When to update:**
+- New repository needs test analysis
+- Repository URL changes
+- Index workflow name changes
+
+**How to update:**
+```bash
+python3 tools/test-failure-analyzer/update_index_registry.py \
+  --registry tools/test-failure-analyzer/index-registry.json \
+  --repo-name new-repo \
+  --repo-url https://github.com/armosec/new-repo \
+  --index-workflow code-index-generation.yml
+```
+
+#### config.yaml
+General configuration for GitHub, Loki, etc.
+
+**When to update:**
+- API endpoints change
+- New repository added
+- Authentication methods change
+
+### Testing Requirements
+
+Before committing changes to analyzer:
+- [ ] Test with real failure data (not just synthetic examples)
+- [ ] Verify output JSON is valid and complete
+- [ ] Check that downstream phases still work
+- [ ] Test error handling (missing files, malformed input)
+- [ ] Run full pipeline end-to-end
+- [ ] Check performance (should complete in < 5 minutes)
+
+### Running Tests
+
+```bash
+cd tools/test-failure-analyzer
+
+# Unit tests
+python3 test_extract_test_run_id.py
+python3 test_extract_workflow_commit.py
+
+# Integration test
+bash test_full_pipeline.sh
+
+# Validation
+python3 validate_analysis.py --llm-context llm-context.json
+```
+
+## Test Development
+
+### Writing Good System Tests
+
+```python
+def test_user_authentication_flow():
+    """
+    Test that users can authenticate and access protected resources.
+    
+    This test validates:
+    1. User can login with valid credentials
+    2. JWT token is returned
+    3. Token can be used to access protected endpoint
+    4. Invalid token returns 401
+    """
+    # Arrange
+    credentials = {"username": "test@example.com", "password": "secret"}
+    
+    # Act
+    response = api_client.post("/api/v1/login", json=credentials)
+    
+    # Assert
+    assert response.status_code == 200, f"Login failed: {response.text}"
+    assert "token" in response.json(), "Response missing token"
+    
+    token = response.json()["token"]
+    
+    # Test protected endpoint
+    headers = {"Authorization": f"Bearer {token}"}
+    protected = api_client.get("/api/v1/user/profile", headers=headers)
+    assert protected.status_code == 200, "Failed to access protected resource"
+```
+
+### Test Organization
+
+```
+tests/
+├── test_authentication.py      # Auth-related tests
+├── test_user_management.py     # User CRUD tests
+├── test_api_endpoints.py       # API contract tests
+└── fixtures/
+    ├── users.json              # Test data
+    └── conftest.py             # Shared fixtures
+```
+
+### API Mapping
+
+When writing tests that call APIs:
+1. The test → API mapping is auto-generated
+2. Validate mapping accuracy: `python3 scripts/validate_api_mapping.py`
+3. Update mapping when tests change: `python3 scripts/update_mapping_with_methods.py`
+
+## File Organization
+
+```
+system-tests/
+├── tools/
+│   └── test-failure-analyzer/
+│       ├── README.md                    # Analyzer documentation
+│       ├── TESTING_GUIDE.md            # Test procedures
+│       ├── config.yaml                 # Configuration
+│       ├── index-registry.json         # Index locations
+│       ├── requirements.txt            # Python dependencies
+│       ├── extract_*.py                # Phase scripts
+│       ├── map_*.py                    # Mapping scripts
+│       ├── trace_*.py                  # Tracing scripts
+│       ├── build_llm_context.py        # Main orchestrator
+│       └── artifacts/                  # Output directory (gitignored)
+├── tests/
+│   ├── test_*.py                       # Test files
+│   └── fixtures/                       # Test data
+├── scripts/
+│   ├── update_mapping_with_methods.py  # API mapping updater
+│   └── validate_api_mapping.py         # Mapping validator
+├── docs/
+│   └── API_MAPPING.md                  # API mapping documentation
+└── system_test_mapping.json            # Test → API mapping
+```
+
+## Commit Message Format
+
+```
+type(scope): Short description
+
+Examples:
+- feat(analyzer): Add Pulsar topic tracing
+- fix(tests): Fix flaky authentication test
+- docs(analyzer): Update phase 7 documentation
+- test(analyzer): Add unit tests for extract_call_chain
+```
+
+## Pull Request Checklist
+
+Before creating a PR:
+- [ ] Tests pass locally
+- [ ] API mapping is updated if tests changed
+- [ ] Documentation updated if analyzer changed
+- [ ] No sensitive data in test fixtures
+- [ ] Error messages are clear and actionable
+- [ ] Performance is acceptable
+
+## Debugging Failed Tests
+
+### Quick Checks
+```bash
+# Check test logs
+cat test-output.log
+
+# Validate LLM context
+cat llm-context.json | jq '.'
+
+# Check chunk count
+cat llm-context.json | jq '.metadata.total_chunks'
+
+# Find empty chunks (should be none)
+cat llm-context.json | jq '.code_chunks[] | select(.code == "")'
+```
+
+### Common Issues
+
+**Index not found**
+- Check workflow ran: `gh run list --repo armosec/cadashboardbe --workflow code-index-generation.yml`
+- Verify registry: `cat tools/test-failure-analyzer/index-registry.json`
+- Check artifact: `gh run download <run-id> --name code-index-latest`
+
+**Empty code in chunks**
+- Verify index loaded: `cat artifacts/loaded-indexes.json | jq`
+- Check chunk IDs match between api-map and index
+- Ensure `--code-index` path is correct
+
+**Connected context missing**
+- Check topic patterns in `trace_pulsar_topics.py`
+- Verify connected repos have indexes
+- Check size limits aren't excluding chunks
+
+## Maintenance
+
+### Weekly
+- [ ] Review failed test runs
+- [ ] Update flaky test tracking
+- [ ] Check analyzer workflow success rate
+
+### Monthly
+- [ ] Update API mappings for all tests
+- [ ] Review and update test documentation
+- [ ] Clean up old test data
+
+### When Adding New Services
+- [ ] Add service to index-registry.json
+- [ ] Update connected context tracers (if needed)
+- [ ] Add to config.yaml
+- [ ] Update documentation
+
+## Environment Variables
+
+```bash
+# Required for analyzer
+export GITHUB_TOKEN="ghp_..."
+export GITHUB_WORKSPACE="/path/to/workspace"
+
+# Optional
+export DEBUG=1                    # Enable verbose logging
+export LOKI_URL="https://..."     # Loki endpoint
+export S3_BUCKET="bucket-name"    # S3 index storage
+```
+
+## Related Documentation
+
+- [Main Documentation](https://github.com/armosec/armosec-ai-shared-rules/blob/main/docs/test-failure-analysis/README.md)
+- [Architecture](https://github.com/armosec/armosec-ai-shared-rules/blob/main/docs/test-failure-analysis/ARCHITECTURE.md)
+- [Code Indexing](../cadashboardbe/docs/CODE_INDEXING.md)
+
+## Support
+
+For issues:
+- Check README and TESTING_GUIDE first
+- Review script `--help` output
+- Check #test-automation Slack channel
+- Create issue with full error logs and context
+
