@@ -4513,7 +4513,7 @@
     "tested_dashboard_apis": [],
     "test_implementation_files": [
       "tests_scripts/runtime/base_runtime.py",
-      "tests_scripts/runtime/stress_test.py"
+      "tests_scripts/runtime/stress/stress_test.py"
     ]
   },
   "backend_stress_test": {
@@ -4528,7 +4528,12 @@
     "description": "Backend stress test - Direct HTTP alert simulation (no cluster required)",
     "skip_on_environment": "staging,production,production-us",
     "owner": "jonathang@armosec.io",
-    "skip_cluster": true
+    "skip_cluster": true,
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/stress/stress_backend_only.py"
+    ],
+    "tested_dashboard_apis": []
   },
   "siem_integrations": {
     "target": [
