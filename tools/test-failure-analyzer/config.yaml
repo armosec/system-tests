@@ -17,10 +17,11 @@ loki:
     namespace: "namespace"
     app: "app"
   templates:
+    # Query by namespace only to catch all services (API, workers, async processors)
     event-ingester-service: '{{namespace="event-sourcing-be-stage"}} {id_filters}'
-    cadashboardbe: '{{namespace="event-sourcing-be-stage", app="ca-dashboard-be-egg"}} {id_filters}'
-    config-service: '{{namespace="event-sourcing-be-stage", app="config-service"}} {id_filters}'
-    users-notification-service: '{{namespace="event-sourcing-be-stage", app="ca-users-notification-service"}} {id_filters}'
+    cadashboardbe: '{{namespace="event-sourcing-be-stage"}} {id_filters}'
+    config-service: '{{namespace="event-sourcing-be-stage"}} {id_filters}'
+    users-notification-service: '{{namespace="event-sourcing-be-stage"}} {id_filters}'
 
 parser:
   # Regex patterns to extract identifiers from logs
