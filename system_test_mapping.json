@@ -3912,7 +3912,7 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe-dummay",
+      "cadashboardbe-dummy",
       "event-ingester-service-dummy"
     ],
     "description": "testing linear integration",
