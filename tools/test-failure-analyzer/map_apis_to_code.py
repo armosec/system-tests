@@ -200,6 +200,127 @@ def find_handler_chunk(
     return None
 
 
+def deduplicate_apis(apis: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Remove duplicate API entries from the list.
+    
+    Two APIs are considered duplicates if they have the same method and path.
+    """
+    seen = set()
+    unique_apis = []
+    
+    for api in apis:
+        api_method = api.get("method", "").upper()
+        api_path = normalize_path(api.get("path", ""))
+        api_key = f"{api_method} {api_path}"
+        
+        if api_key not in seen:
+            seen.add(api_key)
+            unique_apis.append(api)
+    
+    return unique_apis
+
+
+def find_nested_handler(
+    path_segments: List[str],
+    chunks: List[Dict[str, Any]],
+    handler_packages: List[str] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Find handler for nested routes like /api/v1/vulnerability_v2/vulnerability.
+    
+    For vulnerability_v2/vulnerability:
+    1. First tries to find VulnerabilitiesV2Handler (main handler)
+    2. Then tries to find vulnerabilitiesHandler (nested handler)
+    3. Falls back to path-based matching
+    
+    Args:
+        path_segments: List of path segments (e.g., ['vulnerability_v2', 'vulnerability'])
+        chunks: List of code chunks
+        handler_packages: Optional list of packages to search in
+    
+    Returns:
+        Handler chunk if found, None otherwise
+    """
+    if not path_segments:
+        return None
+    
+    handler_packages = handler_packages or ["httphandlerv2", "httphandler", "bl"]
+    
+    # Strategy 1: For nested routes like vulnerability_v2/vulnerability
+    # Try to find the main handler first (VulnerabilitiesV2Handler)
+    if len(path_segments) >= 2:
+        # Extract the prefix (e.g., "vulnerability_v2")
+        prefix = path_segments[0]
+        nested = path_segments[1]
+        
+        # Convert prefix to handler name (vulnerability_v2 -> VulnerabilitiesV2Handler)
+        prefix_words = prefix.replace('-', '_').split('_')
+        # Check if last word is a version suffix (v2, v3, etc.)
+        if len(prefix_words) >= 2 and prefix_words[-1].lower().startswith('v') and prefix_words[-1][1:].isdigit():
+            # Handle version suffix separately (e.g., vulnerability_v2)
+            version_suffix = prefix_words[-1].upper()  # v2 -> V2
+            base_words = prefix_words[:-1]
+            base_capitalized = ''.join([w.capitalize() for w in base_words if w])
+            # Pluralize base word only (vulnerability -> Vulnerabilities)
+            if base_capitalized.endswith('y'):
+                base_capitalized = base_capitalized[:-1] + 'ies'
+            elif not base_capitalized.endswith('s'):
+                base_capitalized = base_capitalized + 's'
+            main_handler_name = base_capitalized + version_suffix + "Handler"
+        else:
+            # No version suffix, pluralize normally
+            prefix_capitalized = ''.join([w.capitalize() for w in prefix_words if w])
+            if prefix_capitalized.endswith('y'):
+                prefix_capitalized = prefix_capitalized[:-1] + 'ies'
+            elif not prefix_capitalized.endswith('s'):
+                prefix_capitalized = prefix_capitalized + 's'
+            main_handler_name = prefix_capitalized + "Handler"
+        
+        # Try to find main handler (e.g., VulnerabilitiesV2Handler)
+        for pkg in handler_packages:
+            handler_chunk = find_handler_chunk(main_handler_name, pkg, chunks)
+            if handler_chunk:
+                # Found main handler, now try to find nested handler
+                # For vulnerability_v2/vulnerability -> vulnerabilitiesHandler
+                nested_words = nested.replace('-', '_').split('_')
+                nested_capitalized = ''.join([w.capitalize() for w in nested_words if w])
+                # Handle pluralization
+                if nested_capitalized.endswith('y'):
+                    nested_capitalized = nested_capitalized[:-1] + 'ies'
+                elif not nested_capitalized.endswith('s'):
+                    nested_capitalized = nested_capitalized + 's'
+                # Nested handlers use lowercase first letter (e.g., vulnerabilitiesHandler)
+                nested_handler_name = nested_capitalized[0].lower() + nested_capitalized[1:] + "Handler"
+                
+                # Try to find nested handler (e.g., vulnerabilitiesHandler)
+                nested_handler = find_handler_chunk(nested_handler_name, pkg, chunks)
+                if nested_handler:
+                    return nested_handler
+                # If nested handler not found, return main handler
+                return handler_chunk
+    
+    # Strategy 2: Try last segment with pluralization
+    last_segment = path_segments[-1]
+    words = last_segment.replace('-', '_').split('_')
+    capitalized_words = [w.capitalize() for w in words if w]
+    potential_handler = ''.join(capitalized_words)
+    
+    # Handle pluralization
+    if potential_handler.endswith('y'):
+        potential_handler = potential_handler[:-1] + 'ies'
+    elif not potential_handler.endswith('s'):
+        potential_handler = potential_handler + 's'
+    potential_handler = potential_handler + "Handler"
+    
+    for pkg in handler_packages:
+        handler_chunk = find_handler_chunk(potential_handler, pkg, chunks)
+        if handler_chunk:
+            return handler_chunk
+    
+    return None
+
+
 def map_apis_to_code(
     test_name: str,
     test_mapping: Dict[str, Any],
@@ -226,6 +347,12 @@ def map_apis_to_code(
     if not tested_apis:
         print(f"Warning: No tested_dashboard_apis found for test '{test_name}'", file=sys.stderr)
         return {}
+    
+    # Deduplicate APIs
+    original_count = len(tested_apis)
+    tested_apis = deduplicate_apis(tested_apis)
+    if original_count != len(tested_apis):
+        print(f"📋 Removed {original_count - len(tested_apis)} duplicate API entries", file=sys.stderr)
     
     endpoints = code_index.get("endpoints", [])
     chunks = code_index.get("chunks", [])
@@ -314,23 +441,42 @@ def map_apis_to_code(
             path_segments = [s for s in api_path.split('/') if s and s not in ['api', 'v1', 'v2']]
             
             if path_segments:
-                # Strategy 1: Try last segment (e.g., "/api/v1/integrations" -> "integrations" -> "IntegrationsHandler")
-                last_segment = path_segments[-1]
-                words = last_segment.replace('-', '_').split('_')
-                capitalized_words = [w.capitalize() for w in words if w]
-                potential_handler = ''.join(capitalized_words) + "Handler"
-                
+                # Strategy 1: Try nested handler matching (for routes like vulnerability_v2/vulnerability)
                 if len(api_mappings) < 3:
-                    print(f"      Trying path-based handler (last segment): {potential_handler}")
+                    print(f"      Trying nested handler matching for path segments: {path_segments}")
                 
-                handler_chunk = find_handler_chunk(potential_handler, "", chunks)
-                if handler_chunk:
-                    handler_name = potential_handler
-                    handler_package = handler_chunk.get("package", "")
+                nested_handler = find_nested_handler(path_segments, chunks)
+                if nested_handler:
+                    handler_chunk = nested_handler
+                    handler_name = nested_handler.get("name", "")
+                    handler_package = nested_handler.get("package", "")
                     if len(api_mappings) < 3:
-                        print(f"      ✅ Found by last segment: {handler_name} in package {handler_package}")
+                        print(f"      ✅ Found nested handler: {handler_name} in package {handler_package}")
                 
-                # Strategy 2: Try last two segments for nested paths (e.g., "/api/v1/posture/clusters" -> "PostureClustersHandler")
+                # Strategy 2: Try last segment (e.g., "/api/v1/integrations" -> "integrations" -> "IntegrationsHandler")
+                if not handler_chunk:
+                    last_segment = path_segments[-1]
+                    words = last_segment.replace('-', '_').split('_')
+                    capitalized_words = [w.capitalize() for w in words if w]
+                    # Handle pluralization
+                    potential_handler = ''.join(capitalized_words)
+                    if potential_handler.endswith('y'):
+                        potential_handler = potential_handler[:-1] + 'ies'
+                    elif not potential_handler.endswith('s'):
+                        potential_handler = potential_handler + 's'
+                    potential_handler = potential_handler + "Handler"
+                    
+                    if len(api_mappings) < 3:
+                        print(f"      Trying path-based handler (last segment): {potential_handler}")
+                    
+                    handler_chunk = find_handler_chunk(potential_handler, "", chunks)
+                    if handler_chunk:
+                        handler_name = potential_handler
+                        handler_package = handler_chunk.get("package", "")
+                        if len(api_mappings) < 3:
+                            print(f"      ✅ Found by last segment: {handler_name} in package {handler_package}")
+                
+                # Strategy 3: Try last two segments for nested paths (e.g., "/api/v1/posture/clusters" -> "PostureClustersHandler")
                 if not handler_chunk and len(path_segments) >= 2:
                     last_two_segments = path_segments[-2:]
                     combined = '_'.join(last_two_segments)
@@ -348,7 +494,7 @@ def map_apis_to_code(
                         if len(api_mappings) < 3:
                             print(f"      ✅ Found by last 2 segments: {handler_name} in package {handler_package}")
                 
-                # Strategy 3: Try searching in common handler packages
+                # Strategy 4: Try searching in common handler packages with improved matching
                 if not handler_chunk:
                     # Common handler packages in cadashboardbe
                     handler_packages = [
@@ -357,11 +503,17 @@ def map_apis_to_code(
                         "bl",
                     ]
                     
-                    # Try with last segment
+                    # Try with last segment (with pluralization)
                     last_segment = path_segments[-1]
                     words = last_segment.replace('-', '_').split('_')
                     capitalized_words = [w.capitalize() for w in words if w]
-                    potential_handler = ''.join(capitalized_words) + "Handler"
+                    potential_handler = ''.join(capitalized_words)
+                    # Handle pluralization
+                    if potential_handler.endswith('y'):
+                        potential_handler = potential_handler[:-1] + 'ies'
+                    elif not potential_handler.endswith('s'):
+                        potential_handler = potential_handler + 's'
+                    potential_handler = potential_handler + "Handler"
                     
                     for pkg in handler_packages:
                         handler_chunk = find_handler_chunk(potential_handler, pkg, chunks)
@@ -371,6 +523,43 @@ def map_apis_to_code(
                             if len(api_mappings) < 3:
                                 print(f"      ✅ Found in package {pkg}: {handler_name}")
                             break
+                    
+                    # Strategy 5: For nested routes, try finding main handler then nested handler
+                    if not handler_chunk and len(path_segments) >= 2:
+                        # Try main handler (e.g., VulnerabilitiesV2Handler)
+                        prefix = path_segments[0]
+                        prefix_words = prefix.replace('-', '_').split('_')
+                        # Check if last word is a version suffix (v2, v3, etc.)
+                        if len(prefix_words) >= 2 and prefix_words[-1].lower().startswith('v') and prefix_words[-1][1:].isdigit():
+                            # Handle version suffix separately
+                            version_suffix = prefix_words[-1].upper()
+                            base_words = prefix_words[:-1]
+                            base_capitalized = ''.join([w.capitalize() for w in base_words if w])
+                            # Pluralize base word only
+                            if base_capitalized.endswith('y'):
+                                base_capitalized = base_capitalized[:-1] + 'ies'
+                            elif not base_capitalized.endswith('s'):
+                                base_capitalized = base_capitalized + 's'
+                            main_handler = base_capitalized + version_suffix + "Handler"
+                        else:
+                            # No version suffix, pluralize normally
+                            prefix_capitalized = ''.join([w.capitalize() for w in prefix_words if w])
+                            if prefix_capitalized.endswith('y'):
+                                prefix_capitalized = prefix_capitalized[:-1] + 'ies'
+                            elif not prefix_capitalized.endswith('s'):
+                                prefix_capitalized = prefix_capitalized + 's'
+                            main_handler = prefix_capitalized + "Handler"
+                        
+                        for pkg in handler_packages:
+                            main_chunk = find_handler_chunk(main_handler, pkg, chunks)
+                            if main_chunk:
+                                # Found main handler, use it as fallback
+                                handler_chunk = main_chunk
+                                handler_name = main_handler
+                                handler_package = pkg
+                                if len(api_mappings) < 3:
+                                    print(f"      ✅ Found main handler (fallback): {handler_name} in package {handler_package}")
+                                break
         
         if handler_chunk:
             matched_count += 1
