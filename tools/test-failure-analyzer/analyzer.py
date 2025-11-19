@@ -289,13 +289,12 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
         r"\bTest failed\b",
         r"\bERROR\b",
     ]
+    
+    # Pattern for ST(<name>) test names
+    st_pattern = r"ST\s*\(([^)]+)\)"
 
     for sec_name, sec_text in sections:
-        # Only consider sections that look like failures
-        looks_failed = any(re.search(p, sec_text, re.MULTILINE) for p in fail_indicator_patterns)
-        if not looks_failed:
-            continue
-
+        # Extract test names first (we'll filter by failure status later if needed)
         # Extract Go test failure names
         for m in re.finditer(r"^--- FAIL: ([^\s]+)(?:\s+\(.+\))?", sec_text, re.MULTILINE):
             name = m.group(1)
@@ -305,7 +304,6 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
 
         # Extract ST(<name>) style names from job logs (match anywhere, not just start of line)
         # Also try to extract from section name if it contains ST(...)
-        st_pattern = r"ST\s*\(([^)]+)\)"
         for m in re.finditer(st_pattern, sec_text, re.MULTILINE):
             name = m.group(1).strip()
             start = m.start()
@@ -326,6 +324,44 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
             # Add a minimal entry with the section name
             trimmed = sec_text[:2000]
             results.append({"name": sec_name, "file": None, "suite": None, "raw": trimmed, "section": sec_text})
+    
+    # Filter by failure status: only keep tests that look like failures
+    # BUT: include ALL tests extracted from ST() patterns (they may have succeeded but still be relevant)
+    # The caller will filter by --only-test and failure status as needed
+    filtered_results = []
+    for r in results:
+        sec_text = r.get("section", "")
+        test_name = r.get("name", "")
+        looks_failed = any(re.search(p, sec_text, re.MULTILINE) for p in fail_indicator_patterns)
+        
+        # Find which section this result came from to check if it has ST() pattern
+        original_sec_name = None
+        for sec_n, sec_t in sections:
+            if sec_t == sec_text or (sec_text and len(sec_text) > 0 and sec_text[:100] in sec_t[:200]):
+                original_sec_name = sec_n
+                break
+        
+        # Include if:
+        # 1. It looks failed (has failure indicators), OR
+        # 2. It was extracted from an ST() pattern (these are actual test names, even if they succeeded)
+        #    - Test names extracted from ST() patterns are clean names like "stripe_plans"
+        #    - Section names containing ST() look like "call-system-tests-staging / ST (stripe_plans)/..."
+        is_st_test = False
+        if original_sec_name and re.search(st_pattern, original_sec_name):
+            # This test was extracted from a section name containing ST()
+            is_st_test = True
+        elif test_name and not "/" in test_name and not "\\" in test_name:
+            # Simple test name (not a file path) - likely extracted from ST() pattern
+            # Check if any section name contains this test name in ST() format
+            for sec_n, _ in sections:
+                if re.search(rf"ST\s*\(\s*{re.escape(test_name)}\s*\)", sec_n):
+                    is_st_test = True
+                    break
+        
+        if looks_failed or is_st_test:
+            filtered_results.append(r)
+    
+    results = filtered_results
 
     # Deduplicate by name
     seen = set()
