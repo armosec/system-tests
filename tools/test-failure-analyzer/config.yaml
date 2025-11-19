@@ -16,13 +16,11 @@ loki:
   labels:
     namespace: "namespace"
     app: "app"
-    level: "level"
-  level_selector: 'level=~"error|warn"'
   templates:
-    event-ingester-service: '{{{namespace}="event-sourcing-be-stage"}} {id_filters}'
-    cadashboardbe: '{{{namespace}="event-sourcing-be-stage", app="ca-dashboard-be-egg"}} {id_filters}'
-    config-service: '{{{namespace}="event-sourcing-be-stage", app="config-service", {level_selector}}} {id_filters}'
-    users-notification-service: '{{{namespace}="event-sourcing-be-stage", app="ca-users-notification-service", {level_selector}}} {id_filters}'
+    event-ingester-service: '{{namespace="event-sourcing-be-stage"}} {id_filters}'
+    cadashboardbe: '{{namespace="event-sourcing-be-stage", app="ca-dashboard-be-egg"}} {id_filters}'
+    config-service: '{{namespace="event-sourcing-be-stage", app="config-service"}} {id_filters}'
+    users-notification-service: '{{namespace="event-sourcing-be-stage", app="ca-users-notification-service"}} {id_filters}'
 
 parser:
   # Regex patterns to extract identifiers from logs

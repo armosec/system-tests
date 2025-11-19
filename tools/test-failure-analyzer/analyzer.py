@@ -578,6 +578,8 @@ def map_test_to_repos_services(test: Dict[str, Any], mapping: Dict[str, Any]) ->
 def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns: Dict[str, List[str]]) -> Identifiers:
     customer_guid = overrides.get("customer_guid")
     cluster = overrides.get("cluster")
+    test_run_id = overrides.get("test_run_id")
+    
     if not customer_guid:
         # Prefer explicit "Customer guid" phrasing first if present
         prioritized_patterns: List[str] = [
@@ -606,7 +608,24 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
                 val = val.strip().strip("\"'").rstrip(",.;)]}")
                 cluster = val
                 break
-    return Identifiers(customer_guid=customer_guid, cluster=cluster)
+    
+    # Extract test run ID if not provided as override
+    if not test_run_id:
+        # Pattern 1: "Test Run ID updated to cluster name: <name>" (primary)
+        m = re.search(r'Test\s+Run\s+ID\s+updated\s+to\s+cluster\s+name:\s*(\S+)', text, re.IGNORECASE | re.MULTILINE)
+        if m:
+            test_run_id = m.group(1).strip()
+        else:
+            # Pattern 2: "Test Run ID: <id>" (fallback)
+            m = re.search(r'Test\s+Run\s+ID\s*:\s*(\S+)', text, re.IGNORECASE | re.MULTILINE)
+            if m:
+                test_run_id = m.group(1).strip()
+        
+        # Pattern 3: Use cluster name as test run ID (common in system tests)
+        if not test_run_id and cluster:
+            test_run_id = cluster
+    
+    return Identifiers(customer_guid=customer_guid, cluster=cluster, test_run_id=test_run_id)
 
 
 def build_loki_queries(services: List[str], ids: Identifiers, cfg: Dict[str, Any], use_templates: bool = True) -> List[str]:
@@ -620,6 +639,9 @@ def build_loki_queries(services: List[str], ids: Identifiers, cfg: Dict[str, Any
 
     q = []
     id_filters = []
+    # Use test_run_id to filter logs if available (this is typically the cluster name)
+    if ids.test_run_id:
+        id_filters.append(f'|= "{ids.test_run_id}"')
     # NOTE: customer_guid and cluster are no longer used as filters
     # We rely on namespace filtering instead (configured per environment)
     # if ids.customer_guid:
@@ -1203,7 +1225,7 @@ def main() -> None:
         section_text = t.get("section") or t.get("raw", "")  # prefer full section text if available
         identifiers = extract_identifiers(
             text=section_text + "\n" + raw_log,
-            overrides={"customer_guid": args.customer_guid, "cluster": args.cluster},
+            overrides={"customer_guid": args.customer_guid, "cluster": args.cluster, "test_run_id": None},
             patterns=cfg.get("parser", {}),
         )
         # If mapping indicates skip_cluster, drop cluster from identifiers
@@ -1214,7 +1236,9 @@ def main() -> None:
         if args.debug:
             console.print(f"[cyan]Failure '{t.get('name')}' services:[/cyan] {mapping_info.services}")
             console.print(f"[cyan]Generated {len(loki_q)} queries[/cyan]")
-            console.print(f"[cyan]Identifiers:[/cyan] customer={identifiers.customer_guid} cluster={identifiers.cluster}")
+            for q in loki_q:
+                console.print(f"  [yellow]Query:[/yellow] {q}")
+            console.print(f"[cyan]Identifiers:[/cyan] customer={identifiers.customer_guid} cluster={identifiers.cluster} test_run_id={identifiers.test_run_id}")
 
         # Extract section time window and errors (Step 18 logs)
         first_ts, last_ts, errors, from_padded, to_padded = extract_time_window_and_errors(section_text, padding_minutes=5)

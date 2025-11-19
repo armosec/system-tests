@@ -21,6 +21,7 @@ class MappingInfo(BaseModel):
 class Identifiers(BaseModel):
     customer_guid: Optional[str] = None
     cluster: Optional[str] = None
+    test_run_id: Optional[str] = None
     extra: Dict[str, Any] = Field(default_factory=dict)
 
 
