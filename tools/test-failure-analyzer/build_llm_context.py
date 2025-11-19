@@ -114,6 +114,21 @@ def load_text_file(file_path: str) -> Optional[str]:
         return None
 
 
+def load_analysis_prompts(prompts_file: str = None) -> Optional[str]:
+    """Load analysis prompts from file."""
+    if prompts_file and os.path.exists(prompts_file):
+        with open(prompts_file, 'r') as f:
+            return f.read()
+    
+    # Default prompts file
+    default_path = os.path.join(os.path.dirname(__file__), "analysis_prompts.md")
+    if os.path.exists(default_path):
+        with open(default_path, 'r') as f:
+            return f.read()
+    
+    return None
+
+
 def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Extract code chunks from API mapping with call chains."""
     chunks = []
@@ -382,7 +397,8 @@ def build_llm_context(
     error_logs: Optional[str] = None,
     resolved_commits: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
-    code_index: Optional[Dict[str, Any]] = None
+    code_index: Optional[Dict[str, Any]] = None,
+    analysis_prompts: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -396,6 +412,8 @@ def build_llm_context(
         error_logs: Error logs text
         resolved_commits: Output from resolve_repo_commits.py
         test_code: Test code (optional, if available)
+        code_index: Code index for looking up chunk code
+        analysis_prompts: Analysis instructions for the LLM
     
     Returns:
         Dictionary with LLM-ready context
@@ -484,6 +502,7 @@ def build_llm_context(
         "test_run_id": test_run_id,
         "workflow_commit": workflow_commit,
         "generated_at": datetime.utcnow().isoformat() + "Z",
+        "analysis_instructions": analysis_prompts,
         "total_chunks": len(formatted_chunks),
         "chunks_by_source": {},
         "chunks_by_repo": {},
@@ -571,6 +590,11 @@ def main():
         help="Path to code index JSON (optional, used to look up full chunk code for call chains)"
     )
     parser.add_argument(
+        "--prompts-file",
+        type=str,
+        help="Path to analysis prompts file (default: analysis_prompts.md)"
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/llm-context.json",
         help="Output file path (default: artifacts/llm-context.json)"
@@ -623,6 +647,7 @@ def main():
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
         code_index = load_json_file(args.code_index) if args.code_index else None
+        analysis_prompts = load_analysis_prompts(args.prompts_file if hasattr(args, 'prompts_file') else None)
         
         # Load workflow commit if not provided
         workflow_commit = args.workflow_commit
@@ -646,7 +671,8 @@ def main():
             error_logs=error_logs,
             resolved_commits=resolved_commits,
             test_code=test_code,
-            code_index=code_index
+            code_index=code_index,
+            analysis_prompts=analysis_prompts
         )
         
         print(f"DEBUG: build_llm_context() returned", file=sys.stderr)
