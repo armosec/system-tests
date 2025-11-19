@@ -114,15 +114,22 @@ def extract_function_calls(code: str, package: str) -> List[Tuple[str, Optional[
         
         calls.append((func_name, pkg_name))
     
-    # Pattern 3: Function() (local function calls)
-    # This is trickier - we'll match capitalized function names (likely exported)
-    # Matches: GetWorkflows(), ProcessData()
-    local_func_pattern = r'\b([A-Z]\w+)\s*\('
+    # Pattern 3: Function() (local function calls - BOTH exported and unexported)
+    # Matches: GetWorkflows(), ProcessData(), getVulnerabilitySummary(), newTicketsEnricher()
+    local_func_pattern = r'\b([a-zA-Z]\w+)\s*\('
     for match in re.finditer(local_func_pattern, code):
         func_name = match.group(1)
         
-        # Skip common Go types and built-ins
-        if func_name in ['New', 'Make', 'Error', 'String', 'Int', 'Bool', 'Float']:
+        # Skip common Go keywords and built-ins
+        if func_name in ['if', 'for', 'switch', 'select', 'return', 'break', 'continue',
+                         'New', 'Make', 'Error', 'String', 'Int', 'Bool', 'Float',
+                         'make', 'new', 'append', 'delete', 'len', 'cap', 'copy',
+                         'panic', 'recover', 'defer', 'close', 'range']:
+            continue
+        
+        # Skip common variable assignments (e.g., "err := func()")
+        # This is heuristic - might need refinement
+        if func_name in ['err', 'ok', 'res', 'result', 'value', 'data', 'item', 'i', 'j', 'k']:
             continue
         
         calls.append((func_name, None))
@@ -152,6 +159,12 @@ def classify_chunk_pattern(chunk: Dict[str, Any]) -> Optional[str]:
         return "repository"
     if "connector" in pattern:
         return "connector"
+    if "enricher" in pattern or "enrich" in pattern:
+        return "enricher"
+    if "validator" in pattern or "validate" in pattern:
+        return "validator"
+    if "helper" in pattern or "util" in pattern:
+        return "helper"
     
     # Infer from package name
     if "handler" in package or "http" in package:
@@ -162,6 +175,12 @@ def classify_chunk_pattern(chunk: Dict[str, Any]) -> Optional[str]:
         return "repository"
     if "connector" in package or "client" in package:
         return "connector"
+    if "enricher" in package or "enrich" in package:
+        return "enricher"
+    if "validator" in package or "validate" in package:
+        return "validator"
+    if "helper" in package or "util" in package:
+        return "helper"
     
     # Infer from name
     if "handler" in name:
@@ -170,6 +189,12 @@ def classify_chunk_pattern(chunk: Dict[str, Any]) -> Optional[str]:
         return "service"
     if "repository" in name or "repo" in name:
         return "repository"
+    if "enricher" in name or "enrich" in name:
+        return "enricher"
+    if "validator" in name or "validate" in name:
+        return "validator"
+    if "helper" in name or "util" in name:
+        return "helper"
     
     return None
 
@@ -261,17 +286,21 @@ def extract_call_chain(
                     called_chunk_id = called_chunk.get("id")
                     called_pattern = classify_chunk_pattern(called_chunk)
                     
-                    # Only follow service/repository patterns (skip handlers, connectors at deeper levels)
+                    # Only follow service/repository/enricher/helper patterns (skip handlers, connectors at deeper levels)
                     if level == 0:
                         # First level: can be anything
                         pass
                     elif level == 1:
-                        # Second level: prefer service/repository
-                        if called_pattern not in ["service", "repository"]:
+                        # Second level: prefer service/repository, but allow enrichers/validators/helpers
+                        if called_pattern and called_pattern not in ["service", "repository", "enricher", "validator", "helper", None]:
+                            continue
+                    elif level == 2:
+                        # Third level: repository, enricher, validator, helper, or unknown functions
+                        if called_pattern and called_pattern not in ["repository", "enricher", "validator", "helper", "dal", None]:
                             continue
                     else:
-                        # Third level and beyond: only repository
-                        if called_pattern != "repository":
+                        # Fourth level and beyond: repository, enricher, dal, or unknown functions
+                        if called_pattern and called_pattern not in ["repository", "enricher", "dal", None]:
                             continue
                     
                     # Skip if already visited
