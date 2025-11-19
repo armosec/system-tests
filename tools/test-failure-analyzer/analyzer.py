@@ -303,12 +303,23 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
             snippet = sec_text[start:start + 2000]
             results.append({"name": name, "file": None, "suite": None, "raw": snippet, "section": sec_text})
 
-        # Extract ST(<name>) style names from job logs
-        for m in re.finditer(r"^\s*ST\s*\(([^)]+)\)", sec_text, re.MULTILINE):
+        # Extract ST(<name>) style names from job logs (match anywhere, not just start of line)
+        # Also try to extract from section name if it contains ST(...)
+        st_pattern = r"ST\s*\(([^)]+)\)"
+        for m in re.finditer(st_pattern, sec_text, re.MULTILINE):
             name = m.group(1).strip()
             start = m.start()
             snippet = sec_text[start:start + 2000]
             results.append({"name": name, "file": None, "suite": None, "raw": snippet, "section": sec_text})
+        
+        # Also try to extract ST(...) from section name itself (file names often contain this)
+        sec_st_match = re.search(st_pattern, sec_name)
+        if sec_st_match:
+            name = sec_st_match.group(1).strip()
+            # Only add if we haven't already added this name from the section text
+            if not any(r.get("name") == name for r in results):
+                trimmed = sec_text[:2000]
+                results.append({"name": name, "file": None, "suite": None, "raw": trimmed, "section": sec_text})
 
         # If nothing matched, use the section name as a fallback
         if not any(r.get("raw") in sec_text for r in results[-2:]):
