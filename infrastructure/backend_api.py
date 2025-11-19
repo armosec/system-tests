@@ -1924,6 +1924,12 @@ class ControlPanelAPI(object):
 
         authorization = f"Authorization: Bearer {self.api_login.get_frontEgg_auth_user_id()}"
         headers.append(authorization)
+        
+        # Add test run ID header for consistency and traceability
+        if hasattr(self, 'test_run_id') and self.test_run_id:
+            test_run_header = f"X-Test-Run-Id: {self.test_run_id}"
+            headers.append(test_run_header)
+            Logger.logger.debug(f"Adding test run ID to WebSocket headers: {self.test_run_id}")
 
         try:
             ws.connect(server, header=headers, timeout=timeout)
@@ -1979,18 +1985,38 @@ class ControlPanelAPI(object):
         
         # Handle empty or invalid JSON response
         if not r or not r.strip():
-            Logger.logger.error("Received empty response from WebSocket")
-            raise ValueError("WebSocket returned empty response")
+            Logger.logger.error(f"Received empty response from WebSocket. Connection state: {ws.connected if hasattr(ws, 'connected') else 'unknown'}. "
+                              f"This may indicate no data matches the query filters or the backend returned 0 results.")
+            raise ValueError("WebSocket returned empty response - this may indicate no data matches the query filters")
         
         try:
             r = json.loads(r)
         except json.JSONDecodeError as e:
-            Logger.logger.error(f"Failed to parse JSON from WebSocket response. Error: {str(e)}. Response (first 500 chars): {r[:500]}")
-            raise json.JSONDecodeError(
-                f"Failed to parse JSON from WebSocket response. Original error: {str(e)}. "
-                f"Response (first 500 chars): {r[:500]}",
-                r, e.pos
-            )
+            # Try to extract JSON from response that might have extra data (similar to HTTP responses)
+            first_brace = r.find('{')
+            last_brace = r.rfind('}')
+            
+            if first_brace >= 0 and last_brace >= 0 and last_brace > first_brace:
+                json_part = r[first_brace:last_brace + 1]
+                try:
+                    r = json.loads(json_part)
+                    Logger.logger.warning(f"WebSocket response contained extra data, extracted JSON successfully. "
+                                        f"Original length: {len(r)}, JSON part length: {len(json_part)}")
+                except json.JSONDecodeError:
+                    Logger.logger.error(f"Failed to parse JSON from WebSocket response even after extraction. "
+                                      f"Error: {str(e)}. Response (first 500 chars): {r[:500]}")
+                    raise json.JSONDecodeError(
+                        f"Failed to parse JSON from WebSocket response. Original error: {str(e)}. "
+                        f"Response (first 500 chars): {r[:500]}",
+                        r, e.pos
+                    )
+            else:
+                Logger.logger.error(f"Failed to parse JSON from WebSocket response. Error: {str(e)}. Response (first 500 chars): {r[:500]}")
+                raise json.JSONDecodeError(
+                    f"Failed to parse JSON from WebSocket response. Original error: {str(e)}. "
+                    f"Response (first 500 chars): {r[:500]}",
+                    r, e.pos
+                )
         
         # Validate expected response structure
         if not isinstance(r, dict):
