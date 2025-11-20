@@ -132,8 +132,8 @@ def resolve_run_info(run_url: Optional[str], run_id: Optional[str], cfg: Dict[st
     )
 
 
-def download_and_parse_logs(run: RunInfo, cfg: Dict[str, Any]) -> Tuple[List[str], str]:
-    # Downloads the run logs ZIP and returns lines that look like failures + full combined text
+def download_and_parse_logs(run: RunInfo, cfg: Dict[str, Any], logs_zip_path: Optional[str] = None) -> Tuple[List[str], str]:
+    # Downloads the run logs ZIP (or uses provided ZIP) and returns lines that look like failures + full combined text
     import time
     import requests
     from requests.adapters import HTTPAdapter
@@ -142,59 +142,70 @@ def download_and_parse_logs(run: RunInfo, cfg: Dict[str, Any]) -> Tuple[List[str
     m = re.match(r"^([^/]+)/([^/]+)$", run.repo or "")
     owner, repo = (m.group(1), m.group(2)) if m else ("armosec", "shared-workflows")
 
-    base = cfg.get("github", {}).get("api_base_url", "https://api.github.com").rstrip("/")
-    token = os.environ.get("GITHUB_TOKEN") or cfg.get("github", {}).get("token")
+    tmp_zip = None
+    cleanup_tmp = False
 
-    # Two header sets: JSON for run info; ZIP for logs endpoint
-    json_headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "armosec-test-failure-analyzer/1.0",
-    }
-    # For logs endpoint, GitHub returns a 302 to a ZIP URL. Using JSON Accept is fine.
-    # Some orgs return 415 when Accept is not JSON, so prefer JSON here.
-    zip_headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "armosec-test-failure-analyzer/1.0",
-    }
-    if token and "${" not in str(token):
-        json_headers["Authorization"] = f"Bearer {token}"
-        zip_headers["Authorization"] = f"Bearer {token}"
+    # If pre-downloaded logs ZIP is provided, use it instead of downloading
+    if logs_zip_path and os.path.exists(logs_zip_path):
+        console.print(f"[cyan]Using pre-downloaded logs ZIP: {logs_zip_path}[/cyan]")
+        tmp_zip = Path(logs_zip_path)
+        cleanup_tmp = False  # Don't delete user-provided file
+    else:
+        # Download from GitHub API
+        base = cfg.get("github", {}).get("api_base_url", "https://api.github.com").rstrip("/")
+        token = os.environ.get("GITHUB_TOKEN") or cfg.get("github", {}).get("token")
 
-    logs_api = f"{base}/repos/{owner}/{repo}/actions/runs/{run.id}/logs"
-    console.print(f"[cyan]Downloading logs ZIP from {logs_api}[/cyan]")
+        # Two header sets: JSON for run info; ZIP for logs endpoint
+        json_headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "armosec-test-failure-analyzer/1.0",
+        }
+        # For logs endpoint, GitHub returns a 302 to a ZIP URL. Using JSON Accept is fine.
+        # Some orgs return 415 when Accept is not JSON, so prefer JSON here.
+        zip_headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "armosec-test-failure-analyzer/1.0",
+        }
+        if token and "${" not in str(token):
+            json_headers["Authorization"] = f"Bearer {token}"
+            zip_headers["Authorization"] = f"Bearer {token}"
 
-    # Session with retries for transient network/S3 issues
-    session = requests.Session()
-    retries = Retry(
-        total=5,
-        backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET", "HEAD"],
-        respect_retry_after_header=True,
-    )
-    adapter = HTTPAdapter(max_retries=retries)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+        logs_api = f"{base}/repos/{owner}/{repo}/actions/runs/{run.id}/logs"
+        console.print(f"[cyan]Downloading logs ZIP from {logs_api}[/cyan]")
 
-    tmp_zip = Path(".") / f"_run_{run.id}_logs.zip"
+        # Session with retries for transient network/S3 issues
+        session = requests.Session()
+        retries = Retry(
+            total=5,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "HEAD"],
+            respect_retry_after_header=True,
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
 
-    # Non-streamed download with retries and redirects
-    try:
-        resp = session.get(logs_api, headers=zip_headers, timeout=(10, 300), allow_redirects=True)
-        if resp.status_code == 415 or resp.status_code == 406:
-            # Retry with no Accept header as a fallback
-            console.print(f"[yellow]Got {resp.status_code}. Retrying without Accept header...[/yellow]")
-            alt_headers = dict(zip_headers)
-            alt_headers.pop("Accept", None)
-            resp = session.get(logs_api, headers=alt_headers, timeout=(10, 300), allow_redirects=True)
-        if resp.status_code != 200:
-            console.print(f"[yellow]Failed to fetch logs ZIP ({resp.status_code}). URL may be expired or token lacks permissions.[/yellow]")
+        tmp_zip = Path(".") / f"_run_{run.id}_logs.zip"
+        cleanup_tmp = True  # Clean up downloaded file
+
+        # Non-streamed download with retries and redirects
+        try:
+            resp = session.get(logs_api, headers=zip_headers, timeout=(10, 300), allow_redirects=True)
+            if resp.status_code == 415 or resp.status_code == 406:
+                # Retry with no Accept header as a fallback
+                console.print(f"[yellow]Got {resp.status_code}. Retrying without Accept header...[/yellow]")
+                alt_headers = dict(zip_headers)
+                alt_headers.pop("Accept", None)
+                resp = session.get(logs_api, headers=alt_headers, timeout=(10, 300), allow_redirects=True)
+            if resp.status_code != 200:
+                console.print(f"[yellow]Failed to fetch logs ZIP ({resp.status_code}). URL may be expired or token lacks permissions.[/yellow]")
+                return [], ""
+            with open(tmp_zip, "wb") as f:
+                f.write(resp.content)
+        except requests.exceptions.RequestException as e:
+            console.print(f"[yellow]Error downloading logs ZIP: {e}[/yellow]")
             return [], ""
-        with open(tmp_zip, "wb") as f:
-            f.write(resp.content)
-    except requests.exceptions.RequestException as e:
-        console.print(f"[yellow]Error downloading logs ZIP: {e}[/yellow]")
-        return [], ""
 
     combined = []
     try:
@@ -228,10 +239,12 @@ def download_and_parse_logs(run: RunInfo, cfg: Dict[str, Any]) -> Tuple[List[str
                 except Exception:
                     continue
     finally:
-        try:
-            tmp_zip.unlink(missing_ok=True)
-        except Exception:
-            pass
+        # Only cleanup if we downloaded the file (not user-provided)
+        if cleanup_tmp:
+            try:
+                tmp_zip.unlink(missing_ok=True)
+            except Exception:
+                pass
 
     full_text = "".join(combined)
     fail_lines = []
@@ -1180,7 +1193,7 @@ def main() -> None:
 
     run = resolve_run_info(args.run_url, args.run_id, cfg)
 
-    failing_lines, raw_log = download_and_parse_logs(run, cfg)
+    failing_lines, raw_log = download_and_parse_logs(run, cfg, args.logs_zip)
     inferred_service = infer_service_from_logs(raw_log)
     if not inferred_service:
         # Fallback 1: scan entire ZIP for repo
