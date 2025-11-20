@@ -874,9 +874,21 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
     (base_dir / "logs").mkdir(parents=True, exist_ok=True)
 
     # summary
+    # Calculate total loki logs and sources
+    total_loki_logs = 0
+    loki_sources = set()
+    for fentry in failures:
+        if fentry.loki.excerpts:
+            total_loki_logs += len(fentry.loki.excerpts)
+        # Extract sources from services
+        for service in fentry.mapping.services:
+            loki_sources.add(service)
+    
     summary = {
         "run": run.model_dump(),
         "num_failures": len(failures),
+        "loki_logs_count": total_loki_logs,
+        "loki_sources": sorted(list(loki_sources)),
     }
     with open(base_dir / "summary.json", "w") as f:
         f.write(json.dumps(summary, indent=2))
