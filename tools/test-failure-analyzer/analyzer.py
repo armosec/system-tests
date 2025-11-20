@@ -733,7 +733,7 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
 
     # In auto mode, if no base_url or we later see 404, we will try grafana proxy if info is present
 
-    LIMIT = 200
+    LIMIT = 300
 
     for fentry in failures:
         start_ns = iso_to_unix_ns(fentry.loki.from_time) if fentry.loki.from_time else None
@@ -1263,6 +1263,24 @@ def main() -> None:
     # Optionally fetch Loki excerpts before writing reports
     if args.fetch_loki:
         fetch_loki_excerpts_for_failures(failures, cfg, debug=args.debug)
+
+    # Save extracted identifiers to individual files for workflow artifacts
+    if failures:
+        first_identifiers = failures[0].identifiers
+        output_path = Path(args.output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        if first_identifiers.customer_guid:
+            customer_guid_file = output_path / "customer-guid.txt"
+            customer_guid_file.write_text(first_identifiers.customer_guid + "\n")
+            if args.debug:
+                console.print(f"[green]Saved customer_guid to {customer_guid_file}[/green]")
+        
+        if first_identifiers.cluster:
+            cluster_file = output_path / "cluster.txt"
+            cluster_file.write_text(first_identifiers.cluster + "\n")
+            if args.debug:
+                console.print(f"[green]Saved cluster to {cluster_file}[/green]")
 
     report = Report(run=run, failures=failures, summary=None)
     write_reports(report, args.output_dir)
