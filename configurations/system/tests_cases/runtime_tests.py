@@ -92,7 +92,7 @@ class RuntimeTests(object):
         Example below shows trigger alerts (malware, unexpected process) 
         and non-trigger alerts (benign DNS, benign network).
         """
-        from tests_scripts.runtime.stress_test import RuntimeStressTest
+        from tests_scripts.runtime.stress.stress_test import RuntimeStressTest
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=RuntimeStressTest,
@@ -140,6 +140,69 @@ class RuntimeTests(object):
                         "command": 'wget --timeout=2 -q -O- $(cat /proc/sys/kernel/random/uuid | cut -d"-" -f1).nip.io || true',
                         "use_shell": True,
                         "description": "Non-trigger network activity"
+                    }
+                ]
+            }
+        )
+    
+    @staticmethod
+    def backend_stress_test():
+        """
+        Backend Stress Test - Direct HTTP alert simulation (no cluster required)
+        
+        Sends runtime alerts directly to the backend synchronizer via HTTP,
+        bypassing the cluster entirely. This tests pure backend alert processing capacity.
+        
+        Prerequisites:
+        - Port-forward to synchronizer: kubectl port-forward -n kubescape svc/synchronizer 8089:8089
+        - Or provide custom synchronizer_url in backend_stress_config
+        
+        You MUST provide backend_stress_config with:
+        - duration_minutes: how long to run the test
+        - alert_profiles: list of alert types to send
+        
+        Each alert profile can have multiple workers for parallel sending.
+        """
+        from tests_scripts.runtime.stress.stress_backend_only import BackendStressTest
+        return TestConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=BackendStressTest,
+            # REQUIRED: You must configure backend stress test parameters
+            backend_stress_config={
+                "duration_minutes": 10,
+                "synchronizer_url": "http://localhost:8089/apis/v1/kubescape.io",
+                "cluster_name": "stress-test-cluster",
+                "namespace": "stress-test-namespace",
+                "alert_profiles": [
+                    {
+                        "name": "unexpected_syscall_high_load",
+                        "rate_per_minute": 500,
+                        "worker_count": 2,
+                        "alert_name": "Unexpected system call",
+                        "rule_id": "R0003",
+                        "severity": 1,
+                        "syscall": "sched_yield",
+                        "description": "High-frequency unexpected syscall alerts"
+                    },
+                    {
+                        "name": "file_operations_load",
+                        "rate_per_minute": 400,
+                        "worker_count": 2,
+                        "alert_name": "Malicious file detected",
+                        "rule_id": "R1001",
+                        "severity": 3,
+                        "syscall": "openat",
+                        "description": "Malicious file operation alerts"
+                    },
+                    {
+                        "name": "network_activity_load",
+                        "rate_per_minute": 600,
+                        "worker_count": 2,
+                        "alert_name": "Suspicious network activity",
+                        "rule_id": "R2001",
+                        "severity": 2,
+                        "syscall": "connect",
+                        "description": "Suspicious network activity alerts"
                     }
                 ]
             }
