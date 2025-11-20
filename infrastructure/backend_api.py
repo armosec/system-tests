@@ -3035,6 +3035,12 @@ class ControlPanelAPI(object):
     def unlink_issue(self, guid: str):
         url = API_INTEGRATIONS + "/link/" + guid
         r = self.delete(url, params={"customerGUID": self.customer_guid})
+        
+        # Handle 404 gracefully - integration already deleted is OK during cleanup
+        if r.status_code == 404:
+            Logger.logger.warning(f"Integration {guid} not found (already deleted) - skipping unlink")
+            return
+        
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request to: %s "%s" (code: %d, message: %s)' % (
