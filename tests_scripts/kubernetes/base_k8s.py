@@ -142,7 +142,7 @@ class BaseK8S(BaseDockerizeTest):
             old_test_run_id = self.backend.test_run_id
             self.backend.set_test_run_id(cluster_name)
             Logger.logger.info("=" * 80)
-            Logger.logger.info(f"Test Run ID: {cluster_name} (from cluster)")
+            Logger.logger.info(f"Test Run ID: {cluster_name} (updated from cluster name)")
             Logger.logger.info("=" * 80)
 
         return cluster_name, namespace

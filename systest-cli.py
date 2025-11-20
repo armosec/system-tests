@@ -117,6 +117,7 @@ def main():
     setup_logger(level=args.logger_level, name=args.test_name)
 
     # Generate test run ID for this test execution (must be done early)
+    # Note: This will be updated to cluster name in base_k8s.py if cluster is created
     test_run_id = str(uuid.uuid4())
     Logger.logger.info("=" * 80)
     Logger.logger.info(f"Test Run ID: {test_run_id}")
