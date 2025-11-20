@@ -578,6 +578,17 @@ def map_test_to_repos_services(test: Dict[str, Any], mapping: Dict[str, Any]) ->
 def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns: Dict[str, List[str]]) -> Identifiers:
     customer_guid = overrides.get("customer_guid")
     cluster = overrides.get("cluster")
+    test_run_id = None
+    
+    # Extract Test Run ID from logs (highest priority)
+    # Pattern: "Test Run ID: <value>" (printed by all tests now)
+    test_run_id_pattern = r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)'
+    m = re.search(test_run_id_pattern, text)
+    if m:
+        test_run_id = m.group(1).strip()
+        # Remove trailing punctuation like "(from" if present
+        test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
+    
     if not customer_guid:
         # Prefer explicit "Customer guid" phrasing first if present
         prioritized_patterns: List[str] = [
@@ -606,7 +617,7 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
                 val = val.strip().strip("\"'").rstrip(",.;)]}")
                 cluster = val
                 break
-    return Identifiers(customer_guid=customer_guid, cluster=cluster)
+    return Identifiers(customer_guid=customer_guid, cluster=cluster, test_run_id=test_run_id)
 
 
 def build_loki_queries(services: List[str], ids: Identifiers, cfg: Dict[str, Any], use_templates: bool = True) -> List[str]:
@@ -1255,6 +1266,12 @@ def main() -> None:
             cluster_file.write_text(first_identifiers.cluster + "\n")
             if args.debug:
                 console.print(f"[green]Saved cluster to {cluster_file}[/green]")
+        
+        if first_identifiers.test_run_id:
+            test_run_id_file = output_path / "test-run-id.txt"
+            test_run_id_file.write_text(first_identifiers.test_run_id + "\n")
+            if args.debug:
+                console.print(f"[green]Saved test_run_id to {test_run_id_file}[/green]")
 
     report = Report(run=run, failures=failures, summary=None)
     write_reports(report, args.output_dir)
