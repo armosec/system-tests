@@ -1244,19 +1244,17 @@ def main() -> None:
         output_path = Path(args.output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
-        if first_identifiers.test_run_id:
-            test_run_id_file = output_path / "test-run-id.txt"
-            test_run_id_file.write_text(first_identifiers.test_run_id + "\n")
-            if args.debug:
-                console.print(f"[green]Saved test_run_id to {test_run_id_file}[/green]")
-        
         if first_identifiers.customer_guid:
             customer_guid_file = output_path / "customer-guid.txt"
             customer_guid_file.write_text(first_identifiers.customer_guid + "\n")
+            if args.debug:
+                console.print(f"[green]Saved customer_guid to {customer_guid_file}[/green]")
         
         if first_identifiers.cluster:
             cluster_file = output_path / "cluster.txt"
             cluster_file.write_text(first_identifiers.cluster + "\n")
+            if args.debug:
+                console.print(f"[green]Saved cluster to {cluster_file}[/green]")
 
     report = Report(run=run, failures=failures, summary=None)
     write_reports(report, args.output_dir)
