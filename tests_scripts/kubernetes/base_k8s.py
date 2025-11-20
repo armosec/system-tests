@@ -137,19 +137,16 @@ class BaseK8S(BaseDockerizeTest):
 
         cluster_name = self.get_cluster_name()
         
-        # Print test run ID exactly once (either UUID or cluster name)
-        if self.backend:
+        # Print Test Run ID exactly once for K8s tests
+        # Use cluster name if available, otherwise use the UUID from backend
+        if self.backend and not self._test_run_id_printed:
             if cluster_name:
-                # If a cluster was created, use its name as the run id since it is unique anyway
                 self.backend.set_test_run_id(cluster_name)
-                Logger.logger.info("=" * 80)
-                Logger.logger.info(f"Test Run ID: {cluster_name} (from cluster)")
-                Logger.logger.info("=" * 80)
-            else:
-                # No cluster - print the UUID that was generated at test start
-                Logger.logger.info("=" * 80)
-                Logger.logger.info(f"Test Run ID: {self.backend.test_run_id}")
-                Logger.logger.info("=" * 80)
+            
+            Logger.logger.info("=" * 80)
+            Logger.logger.info(f"Test Run ID: {self.backend.test_run_id}")
+            Logger.logger.info("=" * 80)
+            self._test_run_id_printed = True
 
         return cluster_name, namespace
 

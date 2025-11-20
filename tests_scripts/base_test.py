@@ -46,6 +46,9 @@ class BaseTest(object):
         self.backend: backend_api.ControlPanelAPI = backend
         self.kwargs = kwargs
 
+        # Flag to track if Test Run ID was printed (K8s tests will print it in setup())
+        self._test_run_id_printed = False
+
         # stored for cleanup
         self.wlids: list = list()
         self.encryption_configurations: list = list()
@@ -74,7 +77,26 @@ class BaseTest(object):
 
         self.test_failed = False
 
+        # Print Test Run ID at the end of __init__
+        # K8s tests will override this in setup() when cluster name is available
+        self._print_test_run_id_if_needed()
 
+    def _print_test_run_id_if_needed(self):
+        """
+        Print Test Run ID exactly once. 
+        For K8s tests: printed in BaseK8S.setup() (where cluster name is available)
+        For other tests: printed here in BaseTest.__init__()
+        """
+        if not self._test_run_id_printed and self.backend and self.backend.test_run_id:
+            # Check if this is a K8s test (has setup method from BaseK8S)
+            # K8s tests will print in setup(), so skip here
+            is_k8s_test = hasattr(self, 'kubernetes_obj')
+            
+            if not is_k8s_test:
+                Logger.logger.info("=" * 80)
+                Logger.logger.info(f"Test Run ID: {self.backend.test_run_id}")
+                Logger.logger.info("=" * 80)
+                self._test_run_id_printed = True
 
     def __del__(self):
         # Final safety net - ensure cleanup is called even if test framework fails
