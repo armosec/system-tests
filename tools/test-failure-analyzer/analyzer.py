@@ -580,6 +580,17 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
     cluster = overrides.get("cluster")
     test_run_id = overrides.get("test_run_id")
     
+    # Extract Test Run ID from logs if not provided as override
+    if not test_run_id:
+        # Pattern: "Test Run ID: <value>" (printed by all tests now)
+        # Works for both old format ("Test Run ID: xxx (from cluster)") and new format ("Test Run ID: xxx")
+        test_run_id_pattern = r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)'
+        m = re.search(test_run_id_pattern, text)
+        if m:
+            test_run_id = m.group(1).strip()
+            # Remove trailing punctuation like "(from" if present
+            test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
+    
     if not customer_guid:
         # Prefer explicit "Customer guid" phrasing first if present
         prioritized_patterns: List[str] = [
@@ -609,21 +620,9 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
                 cluster = val
                 break
     
-    # Extract test run ID if not provided as override
-    if not test_run_id:
-        # Pattern 1: "Test Run ID updated to cluster name: <name>" (primary)
-        m = re.search(r'Test\s+Run\s+ID\s+updated\s+to\s+cluster\s+name:\s*(\S+)', text, re.IGNORECASE | re.MULTILINE)
-        if m:
-            test_run_id = m.group(1).strip()
-        else:
-            # Pattern 2: "Test Run ID: <id>" (fallback)
-            m = re.search(r'Test\s+Run\s+ID\s*:\s*(\S+)', text, re.IGNORECASE | re.MULTILINE)
-            if m:
-                test_run_id = m.group(1).strip()
-        
-        # Pattern 3: Use cluster name as test run ID (common in system tests)
-        if not test_run_id and cluster:
-            test_run_id = cluster
+    # Final fallback: Use cluster name as test run ID if still not found
+    if not test_run_id and cluster:
+        test_run_id = cluster
     
     return Identifiers(customer_guid=customer_guid, cluster=cluster, test_run_id=test_run_id)
 
@@ -1281,6 +1280,12 @@ def main() -> None:
             cluster_file.write_text(first_identifiers.cluster + "\n")
             if args.debug:
                 console.print(f"[green]Saved cluster to {cluster_file}[/green]")
+        
+        if first_identifiers.test_run_id:
+            test_run_id_file = output_path / "test-run-id.txt"
+            test_run_id_file.write_text(first_identifiers.test_run_id + "\n")
+            if args.debug:
+                console.print(f"[green]Saved test_run_id to {test_run_id_file}[/green]")
 
     report = Report(run=run, failures=failures, summary=None)
     write_reports(report, args.output_dir)
