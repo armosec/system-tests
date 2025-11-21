@@ -88,9 +88,11 @@ class BaseTest(object):
         For other tests: printed here in BaseTest.__init__()
         """
         if not self._test_run_id_printed and self.backend and self.backend.test_run_id:
-            # Check if this is a K8s test (has setup method from BaseK8S)
-            # K8s tests will print in setup(), so skip here
-            is_k8s_test = hasattr(self, 'kubernetes_obj')
+            # Check if this is a K8s test by checking class hierarchy
+            # K8s tests inherit from BaseK8S and will print in setup() with cluster name
+            # Note: can't use hasattr(self, 'kubernetes_obj') because it doesn't exist yet at __init__ time
+            from tests_scripts.kubernetes.base_k8s import BaseK8S
+            is_k8s_test = isinstance(self, BaseK8S)
             
             if not is_k8s_test:
                 Logger.logger.info("=" * 80)

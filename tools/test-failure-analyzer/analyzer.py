@@ -595,12 +595,14 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
     
     # Extract Test Run ID from logs if not provided as override
     if not test_run_id:
-        # Pattern: "Test Run ID: <value>" (printed by all tests now)
-        # Works for both old format ("Test Run ID: xxx (from cluster)") and new format ("Test Run ID: xxx")
+        # Pattern: "Test Run ID: <value>" (printed by all tests)
+        # K8s tests print with cluster name (e.g., "kind-abc123")
+        # Older logs may have printed twice (UUID then cluster name) - take last match for backward compatibility
         test_run_id_pattern = r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)'
-        m = re.search(test_run_id_pattern, text)
-        if m:
-            test_run_id = m.group(1).strip()
+        matches = re.findall(test_run_id_pattern, text)
+        if matches:
+            # Take the LAST match (handles both single-print and old double-print logs)
+            test_run_id = matches[-1].strip()
             # Remove trailing punctuation like "(from" if present
             test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
     
