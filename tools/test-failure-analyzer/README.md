@@ -26,6 +26,50 @@ The analyzer generates:
 - `report.md` - Human-readable report
 - Phase-specific outputs (api-map, call-chains, etc.)
 
+## Code Index Version Resolution
+
+The analyzer intelligently resolves which code index to use based on the **deployed version** being tested:
+
+### Automatic Version Detection
+
+The analyzer extracts the deployed version from `running-images.json`:
+```json
+{
+  "repos": {
+    "cadashboardbe": {
+      "images": [{"tag": "v0.0.223"}]
+    }
+  }
+}
+```
+
+### Resolution Strategy (4 tiers)
+
+1. **Version tag** (preferred): `code-index-v0.0.223` ⭐
+2. **Commit hash** (fallback): `code-index-d2714b50...`
+3. **Latest** (backward compatibility): `code-index-latest`
+4. **Local file** (development): Local checkout
+
+### Benefits
+
+✅ Uses **exact deployed version** code (not just latest main)  
+✅ Accurate analysis matching the actual running code  
+✅ Clear logging shows which strategy succeeded  
+✅ Backward compatible with old releases  
+✅ Future-ready for diff analysis (deployed vs latest)
+
+### Visibility
+
+The analyzer logs show the resolution process:
+```
+📦 Deployed Version:  v0.0.223
+📌 Deployed Commit:   d2714b50
+🔍 Strategy 2: Trying version tag: code-index-v0.0.223
+✅ Strategy 2: Successfully downloaded!
+```
+
+**See**: `../../shared-workflows/CODE_INDEX_VERSION_RESOLUTION.md` for complete details.
+
 ## Pipeline Phases
 
 Each phase can be run independently:
@@ -196,9 +240,12 @@ cat llm-context.json | jq '.code_chunks[] | select(.code == "")'
 ### Common Issues
 
 **No code indexes found**
-- Check that `code-index-generation.yml` workflow ran
-- Verify artifact was uploaded
-- Check index-registry.json has correct repo name
+- Check that `code-index-generation.yml` workflow ran for the deployed version
+- For releases, verify version-tagged artifact exists: `code-index-v0.0.XXX`
+- Check artifact retention (90 days for version/commit, 7 days for latest)
+- Verify artifact was uploaded successfully
+- Check analyzer logs to see which strategies were tried
+- Fallback: Ensure `code-index-latest` exists for backward compatibility
 
 **Empty code chunks**
 - Verify code index was loaded: `cat loaded-indexes.json | jq`
@@ -285,8 +332,19 @@ bash test_full_pipeline.sh
 - Exclude test setup/teardown code if not relevant
 
 ### Maintaining Indexes
-- Indexes are auto-generated on push to main
-- Keep indexes for at least 30 days (retention-days in workflow)
+- Indexes are auto-generated on push to main and on version tags
+- **Version-tagged artifacts** (e.g., `code-index-v0.0.223`):
+  - Created when pushing version tags: `git tag v0.0.223 && git push origin v0.0.223`
+  - Retention: 90 days (for historical analysis)
+  - Preferred for test failure analysis
+- **Commit-hash artifacts** (e.g., `code-index-abc123...`):
+  - Created on every commit
+  - Retention: 90 days
+  - Used as fallback
+- **Latest artifact** (`code-index-latest`):
+  - Created on every commit (overwrites previous)
+  - Retention: 7 days (rolling window)
+  - Used for backward compatibility
 - Clean up old artifacts manually if storage is an issue
 - Re-run index generation if schema changes
 
