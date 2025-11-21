@@ -605,6 +605,8 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
             test_run_id = matches[-1].strip()
             # Remove trailing punctuation like "(from" if present
             test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
+            # Clean up ANSI codes just in case
+            test_run_id = re.sub(r'\x1b[^m]*m', '', test_run_id)
     
     if not customer_guid:
         # Prefer explicit "Customer guid" phrasing first if present
@@ -813,19 +815,23 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
                         r = rq.get(proxy_url, headers=gh, params=params, timeout=60)
                         if r.status_code == 200:
                             session_ok = True
-                if r.status_code != 200:
+                
+                if not session_ok:
                     if debug:
                         body = ""
-                        try:
-                            body = r.text[:300]
-                        except Exception:
-                            pass
-                        print(f"[loki] fetch failed ({r.status_code}) url={url_tried} body={body}")
+                        if 'r' in locals():
+                            try:
+                                body = r.text[:300]
+                            except Exception:
+                                pass
+                            print(f"[loki] fetch failed ({r.status_code}) url={url_tried} body={body}")
+                        else:
+                            print(f"[loki] fetch failed (no response) url={url_tried}")
                     # Fallback: try milliseconds timestamps if ns failed
                     try_ms = False
                     try:
                         # if status is 400 and the backend might expect ms
-                        if r.status_code == 400:
+                        if 'r' in locals() and r.status_code == 400:
                             try_ms = True
                     except Exception:
                         pass
