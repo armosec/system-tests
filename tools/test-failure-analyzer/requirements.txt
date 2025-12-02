@@ -15,6 +15,9 @@ rich>=13.0.0
 # Data validation (used by schemas.py)
 pydantic>=2.0.0
 
+# OpenAI API for LLM analysis (Phase 8)
+openai>=1.0.0
+
 # Optional: Kubernetes API access (if needed for live pod querying)
 # kubernetes>=29.0.0
 
