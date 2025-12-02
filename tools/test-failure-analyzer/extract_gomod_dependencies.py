@@ -35,6 +35,35 @@ def load_code_index(path: str) -> Dict:
         return json.load(f)
 
 
+def download_gomod_from_github(repo: str, ref: str, token: Optional[str] = None) -> Optional[str]:
+    """
+    Download go.mod directly from GitHub.
+    
+    Args:
+        repo: Repository in format "owner/repo" (e.g., "armosec/cadashboardbe")
+        ref: Git ref (commit hash, tag, or branch)
+        token: Optional GitHub token
+    
+    Returns:
+        go.mod content as string, or None if not found
+    """
+    url = f"https://api.github.com/repos/{repo}/contents/go.mod?ref={ref}"
+    headers = {'Accept': 'application/vnd.github.v3.raw'}
+    if token:
+        headers['Authorization'] = f'token {token}'
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            return response.text
+        else:
+            print(f"⚠️  Failed to download go.mod from {repo}@{ref}: HTTP {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"⚠️  Error downloading go.mod: {e}")
+        return None
+
+
 def find_gomod_in_index(index: Dict) -> Optional[str]:
     """Find go.mod content in code index."""
     # Code index has 'files' array with file objects
@@ -194,14 +223,42 @@ def main():
         print(f"❌ Error loading code index: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # Find go.mod
+    # Find go.mod - first try code index, then fallback to GitHub
     gomod_content = find_gomod_in_index(index)
+    
     if not gomod_content:
-        print(f"❌ go.mod not found in code index", file=sys.stderr)
-        sys.exit(1)
+        if args.debug:
+            print(f"⚠️  go.mod not found in code index, trying GitHub fallback...")
+        
+        # Try to extract repo and commit from code index metadata
+        metadata = index.get('metadata', {})
+        repo = metadata.get('repo', 'armosec/cadashboardbe')
+        commit = metadata.get('commit') or metadata.get('version', 'main')
+        
+        if args.debug:
+            print(f"   Repo: {repo}")
+            print(f"   Ref: {commit}")
+        
+        # Download go.mod from GitHub
+        gomod_content = download_gomod_from_github(repo, commit, github_token)
+        
+        if not gomod_content:
+            print(f"❌ go.mod not found in code index or GitHub", file=sys.stderr)
+            # Create empty output and exit gracefully
+            output_path = Path(args.output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_path, 'w') as f:
+                json.dump({}, f)
+            print(f"⚠️  Created empty dependencies file")
+            sys.exit(0)
+        
+        if args.debug:
+            print(f"✅ Downloaded go.mod from GitHub")
+    else:
+        if args.debug:
+            print(f"✅ Found go.mod in code index")
     
     if args.debug:
-        print(f"✅ Found go.mod in code index")
         print()
     
     # Parse dependencies
