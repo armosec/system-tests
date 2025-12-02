@@ -445,6 +445,10 @@ def main():
         help="Repository that triggered the test (e.g., 'armosec/cadashboardbe' or 'cadashboardbe'). Used to distinguish triggering repo from services."
     )
     parser.add_argument(
+        "--rc-version",
+        help="Release candidate version tag (e.g., rc-v0.0.224-2437) - for test failure analysis"
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/running-images.json",
         help="Output file path (default: artifacts/running-images.json)"
@@ -509,6 +513,7 @@ def main():
         # Create empty result
         result = {
             "test_run_id": args.test_run_id,
+            "rc_version": args.rc_version,
             "source": "none",
             "repos": {}
         }
@@ -520,6 +525,7 @@ def main():
     # Prepare result - deduplicate images per repo
     result = {
         "test_run_id": args.test_run_id,
+        "rc_version": args.rc_version,  # Release candidate version tag (e.g., rc-v0.0.224-2437)
         "triggering_repo": args.triggering_repo,  # Full repo name (e.g., "armosec/cadashboardbe")
         "triggering_repo_normalized": triggering_repo_normalized,  # Normalized name (e.g., "cadashboardbe")
         "source": "event_sourcing_values" if args.event_sourcing_values else "deployment_manifest" if args.deployment_manifest else "workflow_artifacts" if args.workflow_artifacts else "image_tags_file",
