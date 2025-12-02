@@ -4,6 +4,7 @@ on:
   push:
     branches: [master, main]
     paths:
+      - '.github/workflows/generate-test-mapping.yml'
       - 'tests_scripts/**'
       - 'configurations/system/tests_cases/**'
       - 'scripts/update_mapping_with_methods.py'
@@ -11,6 +12,7 @@ on:
   pull_request:
     branches: [master, main]
     paths:
+      - '.github/workflows/generate-test-mapping.yml'
       - 'tests_scripts/**'
       - 'configurations/system/tests_cases/**'
       - 'scripts/update_mapping_with_methods.py'
