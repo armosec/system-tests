@@ -523,6 +523,10 @@ def main():
         sys.exit(0)
     
     # Prepare result - deduplicate images per repo
+    # Debug logging
+    print(f"🔍 Debug - Received RC_VERSION: '{args.rc_version}'", file=sys.stderr)
+    print(f"🔍 Debug - Triggering repo: '{args.triggering_repo}'", file=sys.stderr)
+    
     result = {
         "test_run_id": args.test_run_id,
         "rc_version": args.rc_version,  # Release candidate version tag (e.g., rc-v0.0.224-2437)
