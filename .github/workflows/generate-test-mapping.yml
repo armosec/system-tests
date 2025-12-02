@@ -1,0 +1,97 @@
+name: Generate Test Mapping
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'tests_scripts/**'
+      - 'configurations/system/tests_cases/**'
+      - 'scripts/update_mapping_with_methods.py'
+      - 'system_test_mapping.json'
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'tests_scripts/**'
+      - 'configurations/system/tests_cases/**'
+      - 'scripts/update_mapping_with_methods.py'
+      - 'system_test_mapping.json'
+  workflow_dispatch:
+
+jobs:
+  generate-mapping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Generate test mapping
+        run: |
+          echo "🔍 Generating test mapping..."
+          python3 scripts/update_mapping_with_methods.py
+          
+          echo ""
+          echo "📊 Mapping Statistics:"
+          python3 -c "
+          import json
+          with open('system_test_mapping.json') as f:
+              mapping = json.load(f)
+          tests_with_impl = sum(1 for t in mapping.values() if t.get('test_implementation_files'))
+          tests_with_apis = sum(1 for t in mapping.values() if t.get('tested_dashboard_apis'))
+          print(f'  Total tests: {len(mapping)}')
+          print(f'  Tests with implementation files: {tests_with_impl}')
+          print(f'  Tests with API mappings: {tests_with_apis}')
+          "
+
+      - name: Upload test mapping artifact (by commit)
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-mapping-${{ github.sha }}
+          path: system_test_mapping.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload test mapping artifact (latest)
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-mapping-latest
+          path: system_test_mapping.json
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Check for changes (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          if git diff --exit-code system_test_mapping.json; then
+            echo "✅ No changes to test mapping"
+          else
+            echo "⚠️  Test mapping has changes but was not committed"
+            echo ""
+            echo "📝 Changes detected:"
+            git diff --stat system_test_mapping.json
+            echo ""
+            echo "💡 If these changes are correct, commit them:"
+            echo "   git add system_test_mapping.json"
+            echo "   git commit -m 'Update test mapping'"
+          fi
+
+      - name: Print artifact summary
+        run: |
+          echo ""
+          echo "📦 Test Mapping Artifacts Created:"
+          echo "=================================="
+          echo "1. test-mapping-${{ github.sha }}"
+          echo "   Purpose: Find by commit hash"
+          echo "   Retention: 90 days"
+          echo ""
+          echo "2. test-mapping-latest"
+          echo "   Purpose: Always use most recent"
+          echo "   Retention: 7 days"
+          echo "=================================="
+
