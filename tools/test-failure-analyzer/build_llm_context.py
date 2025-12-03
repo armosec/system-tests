@@ -534,9 +534,35 @@ def build_llm_context(
             }
     
     # 9. Build final context
+    # Smart truncation of error logs to preserve Loki excerpts
+    truncated_error_logs = None
+    if error_logs:
+        # Check if we have both test errors and Loki excerpts
+        if "=== Loki Excerpts ===" in error_logs:
+            parts = error_logs.split("=== Loki Excerpts ===")
+            test_errors = parts[0]
+            loki_logs = parts[1] if len(parts) > 1 else ""
+            
+            # Truncate test errors to 3000 chars (they're often duplicated)
+            truncated_errors = test_errors[:3000]
+            if len(test_errors) > 3000:
+                truncated_errors += "\n... (truncated) ..."
+            
+            # Keep first 7000 chars of Loki logs (most relevant are at start)
+            truncated_loki = loki_logs[:7000]
+            if len(loki_logs) > 7000:
+                truncated_loki += "\n... (truncated) ..."
+            
+            truncated_error_logs = truncated_errors + "\n=== Loki Excerpts ===" + truncated_loki
+        else:
+            # No Loki logs, just truncate errors
+            truncated_error_logs = error_logs[:5000]
+            if len(error_logs) > 5000:
+                truncated_error_logs += "\n... (truncated) ..."
+    
     context = {
         "metadata": metadata,
-        "error_logs": error_logs[:5000] if error_logs else None,  # Limit error logs to 5000 chars
+        "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
         "code_chunks": formatted_chunks
     }
