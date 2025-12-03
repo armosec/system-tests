@@ -118,13 +118,24 @@ def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
                         
                         prompt_parts.append(f"- No new functions or endpoints added")
                         prompt_parts.append(f"- Code modifications: {len(files)} files, {total_commits} commits, +{total_additions}/-{total_deletions} lines")
-                        prompt_parts.append(f"\n**Modified Files (line-level changes):**")
-                        for file in files[:10]:  # Limit to top 10 files
+                        prompt_parts.append(f"\n**Modified Files (with code changes):**")
+                        for i, file in enumerate(files[:10]):  # Limit to top 10 files
                             filename = file.get('filename', 'unknown')
                             additions = file.get('additions', 0)
                             deletions = file.get('deletions', 0)
                             status = file.get('status', 'modified')
-                            prompt_parts.append(f"- {filename} ({status}): +{additions}/-{deletions}")
+                            patch = file.get('patch', '')
+                            
+                            prompt_parts.append(f"\n{i+1}. **{filename}** ({status}): +{additions}/-{deletions}")
+                            
+                            # Include actual code diff (limited to 500 chars to avoid token explosion)
+                            if patch:
+                                # Clean up the patch for better readability
+                                patch_lines = patch.split('\\n')[:15]  # First 15 lines
+                                patch_preview = '\\n'.join(patch_lines)
+                                if len(patch_preview) > 500:
+                                    patch_preview = patch_preview[:500] + '...'
+                                prompt_parts.append(f"```diff\n{patch_preview}\n```")
                     else:
                         prompt_parts.append(f"- No code changes detected")
                 else:
