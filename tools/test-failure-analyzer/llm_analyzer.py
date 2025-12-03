@@ -114,10 +114,10 @@ def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
         for i, chunk in enumerate(code_chunks[:10]):  # Limit to first 10 chunks
             chunk_id = chunk.get('id', f'chunk_{i}')
             chunk_type = chunk.get('type', 'unknown')
-            source = chunk.get('source', {})
-            file_path = source.get('file', 'unknown')
+            source = chunk.get('source', 'unknown')  # source is a string, not a dict
+            file_path = chunk.get('file', 'unknown')  # file is at chunk level
             
-            prompt_parts.append(f"\n### {chunk_id} ({chunk_type})")
+            prompt_parts.append(f"\n### {chunk_id} ({chunk_type}, source: {source})")
             prompt_parts.append(f"File: {file_path}")
             
             code = chunk.get('code', '')
