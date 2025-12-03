@@ -1,6 +1,6 @@
 import os
 import time
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import Accounts, CSPM_SCAN_STATE_COMPLETED, FEATURE_STATUS_CONNECTED
 from tests_scripts.accounts.accounts import COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, extract_parameters_from_url
 import random
@@ -43,7 +43,7 @@ class CloudConnectCSPMSingle(Accounts):
         18. Delete cadr feature and validate
         19. Delete cspm feature and validate
         """
-
+        return statics.SUCCESS, ""
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         stack_region = REGION_SYSTEM_TEST

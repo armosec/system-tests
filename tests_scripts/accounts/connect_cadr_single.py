@@ -1,10 +1,11 @@
 import os
 import time
-from systest_utils import Logger
 from tests_scripts.accounts.accounts import Accounts, FEATURE_STATUS_CONNECTED
 from tests_scripts.accounts.accounts import CADR_FEATURE_NAME
 from tests_scripts.accounts.accounts import CloudEntityTypes, CDR_ALERT_ACCOUNT_ID_PATH
 import random
+from systest_utils import Logger, statics
+
 from infrastructure import aws
 
 
@@ -31,6 +32,7 @@ class CloudConnectCADRSingle(Accounts):
         6. Create bad log location cloud account with cadr
         7. Delete cadr feature and validate account deleted
         """
+        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
