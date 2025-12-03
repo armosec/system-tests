@@ -68,40 +68,67 @@ def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
         prompt_parts.append("\n## Code Changes Since Deployment\n")
         
         for repo, diff in code_diffs.items():
-            if not diff.get('changed'):
-                continue
-            
             old_ver = diff.get('old_version', 'unknown')
             new_ver = diff.get('new_version', 'unknown')
             summary = diff.get('summary', {})
             
             prompt_parts.append(f"\n### {repo} ({old_ver} → {new_ver})")
-            prompt_parts.append(f"- Functions added: {summary.get('total_functions_added', 0)}")
-            prompt_parts.append(f"- Functions removed: {summary.get('total_functions_removed', 0)}")
-            prompt_parts.append(f"- Endpoints added: {summary.get('total_endpoints_added', 0)}")
-            prompt_parts.append(f"- Endpoints removed: {summary.get('total_endpoints_removed', 0)}")
             
-            # Show top changed functions
-            functions = diff.get('functions', {})
-            added_funcs = functions.get('added', [])
-            if added_funcs:
-                prompt_parts.append(f"\n**New Functions:**")
-                for func in added_funcs[:5]:
-                    prompt_parts.append(f"- {func.get('file')}:{func.get('name')}")
+            # Check if there are function-level changes
+            has_function_changes = diff.get('changed', False)
             
-            removed_funcs = functions.get('removed', [])
-            if removed_funcs:
-                prompt_parts.append(f"\n**Removed Functions:**")
-                for func in removed_funcs[:5]:
-                    prompt_parts.append(f"- {func.get('file')}:{func.get('name')}")
-            
-            # Show endpoint changes
-            endpoints = diff.get('endpoints', {})
-            added_eps = endpoints.get('added', [])
-            if added_eps:
-                prompt_parts.append(f"\n**New Endpoints:**")
-                for ep in added_eps[:5]:
-                    prompt_parts.append(f"- {ep.get('method')} {ep.get('path')}")
+            if has_function_changes:
+                # Show function-level changes
+                prompt_parts.append(f"- Functions added: {summary.get('total_functions_added', 0)}")
+                prompt_parts.append(f"- Functions removed: {summary.get('total_functions_removed', 0)}")
+                prompt_parts.append(f"- Endpoints added: {summary.get('total_endpoints_added', 0)}")
+                prompt_parts.append(f"- Endpoints removed: {summary.get('total_endpoints_removed', 0)}")
+                
+                # Show top changed functions
+                functions = diff.get('functions', {})
+                added_funcs = functions.get('added', [])
+                if added_funcs:
+                    prompt_parts.append(f"\n**New Functions:**")
+                    for func in added_funcs[:5]:
+                        prompt_parts.append(f"- {func.get('file')}:{func.get('name')}")
+                
+                removed_funcs = functions.get('removed', [])
+                if removed_funcs:
+                    prompt_parts.append(f"\n**Removed Functions:**")
+                    for func in removed_funcs[:5]:
+                        prompt_parts.append(f"- {func.get('file')}:{func.get('name')}")
+                
+                # Show endpoint changes
+                endpoints = diff.get('endpoints', {})
+                added_eps = endpoints.get('added', [])
+                if added_eps:
+                    prompt_parts.append(f"\n**New Endpoints:**")
+                    for ep in added_eps[:5]:
+                        prompt_parts.append(f"- {ep.get('method')} {ep.get('path')}")
+            else:
+                # No function-level changes, but check for git-based diff info
+                git_diff = diff.get('git_diff')
+                if git_diff:
+                    total_commits = git_diff.get('total_commits', 0)
+                    files = git_diff.get('files', [])
+                    
+                    if files:
+                        total_additions = sum(f.get('additions', 0) for f in files)
+                        total_deletions = sum(f.get('deletions', 0) for f in files)
+                        
+                        prompt_parts.append(f"- No new functions or endpoints added")
+                        prompt_parts.append(f"- Code modifications: {len(files)} files, {total_commits} commits, +{total_additions}/-{total_deletions} lines")
+                        prompt_parts.append(f"\n**Modified Files (line-level changes):**")
+                        for file in files[:10]:  # Limit to top 10 files
+                            filename = file.get('filename', 'unknown')
+                            additions = file.get('additions', 0)
+                            deletions = file.get('deletions', 0)
+                            status = file.get('status', 'modified')
+                            prompt_parts.append(f"- {filename} ({status}): +{additions}/-{deletions}")
+                    else:
+                        prompt_parts.append(f"- No code changes detected")
+                else:
+                    prompt_parts.append(f"- No code changes detected")
     
     # Error logs
     if error_log:
