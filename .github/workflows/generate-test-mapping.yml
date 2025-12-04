@@ -42,20 +42,26 @@ jobs:
           echo "📊 Mapping Statistics:"
           python3 -c "
           import json
+          # Check artifact file (with tested_dashboard_apis)
+          with open('system_test_mapping_artifact.json') as f:
+              artifact_mapping = json.load(f)
+          # Check source file (without tested_dashboard_apis)
           with open('system_test_mapping.json') as f:
-              mapping = json.load(f)
-          tests_with_impl = sum(1 for t in mapping.values() if t.get('test_implementation_files'))
-          tests_with_apis = sum(1 for t in mapping.values() if t.get('tested_dashboard_apis'))
-          print(f'  Total tests: {len(mapping)}')
+              source_mapping = json.load(f)
+          tests_with_impl = sum(1 for t in source_mapping.values() if t.get('test_implementation_files'))
+          tests_with_apis = sum(1 for t in artifact_mapping.values() if t.get('tested_dashboard_apis'))
+          print(f'  Total tests: {len(source_mapping)}')
           print(f'  Tests with implementation files: {tests_with_impl}')
-          print(f'  Tests with API mappings: {tests_with_apis}')
+          print(f'  Tests with API mappings (in artifact): {tests_with_apis}')
+          print(f'  ✅ Source file: system_test_mapping.json (without tested_dashboard_apis)')
+          print(f'  ✅ Artifact file: system_test_mapping_artifact.json (with tested_dashboard_apis)')
           "
 
       - name: Upload test mapping artifact (by commit)
         uses: actions/upload-artifact@v4
         with:
           name: test-mapping-${{ github.sha }}
-          path: system_test_mapping.json
+          path: system_test_mapping_artifact.json
           retention-days: 90
           if-no-files-found: error
 
@@ -63,25 +69,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-mapping-latest
-          path: system_test_mapping.json
+          path: system_test_mapping_artifact.json
           retention-days: 7
           if-no-files-found: error
-
-      - name: Check for changes (PR only)
-        if: github.event_name == 'pull_request'
-        run: |
-          if git diff --exit-code system_test_mapping.json; then
-            echo "✅ No changes to test mapping"
-          else
-            echo "⚠️  Test mapping has changes but was not committed"
-            echo ""
-            echo "📝 Changes detected:"
-            git diff --stat system_test_mapping.json
-            echo ""
-            echo "💡 If these changes are correct, commit them:"
-            echo "   git add system_test_mapping.json"
-            echo "   git commit -m 'Update test mapping'"
-          fi
 
       - name: Print artifact summary
         run: |
@@ -91,9 +81,14 @@ jobs:
           echo "1. test-mapping-${{ github.sha }}"
           echo "   Purpose: Find by commit hash"
           echo "   Retention: 90 days"
+          echo "   Contains: tested_dashboard_apis (generated dynamically)"
           echo ""
           echo "2. test-mapping-latest"
           echo "   Purpose: Always use most recent"
           echo "   Retention: 7 days"
+          echo "   Contains: tested_dashboard_apis (generated dynamically)"
+          echo ""
+          echo "📝 Note: Artifacts include tested_dashboard_apis, but source file"
+          echo "   (system_test_mapping.json) does not - it's generated fresh each time."
           echo "=================================="
 

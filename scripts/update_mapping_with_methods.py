@@ -354,15 +354,47 @@ def update_system_mapping():
         # Sort for consistency
         api_list.sort(key=lambda x: (x['path'], x['method']))
         
-        # Update tested_dashboard_apis
-        test_config['tested_dashboard_apis'] = api_list
+        # Store tested_dashboard_apis separately for artifact (not in source file)
+        # We'll add it to the artifact version later
         if api_list:
             tests_with_apis += 1
         
         updated_count += 1
     
-    # Save
+    # Create artifact version with tested_dashboard_apis included
+    artifact_mapping = {}
+    for test_name, test_config in system_mapping.items():
+        artifact_config = test_config.copy()
+        
+        # Re-extract API calls for this test to add to artifact
+        impl_files_list = artifact_config.get('test_implementation_files', [])
+        api_methods = set()
+        for impl_file in impl_files_list:
+            file_path = REPO_ROOT / impl_file
+            methods = extract_backend_api_calls(file_path)
+            api_methods.update(methods)
+        
+        # Convert to API format with HTTP methods
+        api_list = []
+        seen_apis = set()
+        for method_name in api_methods:
+            if method_name in api_method_mapping:
+                api_info = api_method_mapping[method_name]
+                api_key = (api_info['method'], api_info['path'])
+                if api_key not in seen_apis:
+                    seen_apis.add(api_key)
+                    api_list.append(api_info)
+        
+        api_list.sort(key=lambda x: (x['path'], x['method']))
+        artifact_config['tested_dashboard_apis'] = api_list
+        artifact_mapping[test_name] = artifact_config
+    
+    # Save source file WITHOUT tested_dashboard_apis
     save_json_file(str(mapping_file), system_mapping)
+    
+    # Save artifact file WITH tested_dashboard_apis
+    artifact_file = REPO_ROOT / 'system_test_mapping_artifact.json'
+    save_json_file(str(artifact_file), artifact_mapping)
     
     print(f"\n✅ Update complete!")
     print(f"   • Total tests: {updated_count}")
