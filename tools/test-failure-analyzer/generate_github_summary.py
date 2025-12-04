@@ -108,7 +108,7 @@ def generate_summary(
         matched = api_mapping.get('matched_count', 0)
         unmatched = api_mapping.get('unmatched_count', 0)
         lines.append(f"- ✅ **Phase 4:** Mapped {matched}/{api_count} APIs to code")
-        lines.append("  **Source:** APIs extracted from `system_test_mapping.json` → `tested_dashboard_apis` field")
+        lines.append("  **Source:** Downloaded from `test-mapping-latest` artifact (`system_test_mapping_artifact.json`)")
         lines.append("")
         
         # Show APIs
@@ -332,12 +332,6 @@ def generate_summary(
         lines.append("### ℹ️  No Cross-Repository Dependencies Detected\n")
         lines.append("")
         lines.append("This test only calls code within the main `cadashboardbe` repository.")
-        lines.append("")
-        lines.append("**When would dependencies appear here?**")
-        lines.append("- Database operations → `postgres-connector`")
-        lines.append("- Storage operations → `storage`")
-        lines.append("- Kubernetes operations → `k8s-interface`")
-        lines.append("- Messaging → `messaging`")
         lines.append("")
         lines.append("**Note:** Multi-repo code context is available when:")
         lines.append("1. The test calls functions in external dependencies")
