@@ -36,7 +36,8 @@ def generate_summary(
     context_summary_path: str,
     environment: str,
     run_ref: str,
-    workflow_commit_path: str = None
+    workflow_commit_path: str = None,
+    llm_analysis_path: str = None
 ) -> str:
     """Generate markdown summary from artifacts."""
     
@@ -50,6 +51,7 @@ def generate_summary(
     running_images = load_json(running_images_path)
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
+    llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
     
     # Load workflow commit as fallback
     workflow_commit_fallback = None
@@ -426,6 +428,162 @@ def generate_summary(
     lines.append("📥 **Download:** Artifact `llm-context-phase7` from this workflow run")
     lines.append("")
     
+    # ========================================
+    # Action Required Section
+    # ========================================
+    lines.append("---\n")
+    lines.append("")
+    lines.append("## 🎯 **Action Required**\n")
+    lines.append("")
+    lines.append("### **Test Status:** ❌ FAILED\n")
+    
+    # Determine test info
+    test_name = metadata.get('test_name', 'unknown')
+    test_run_id = metadata.get('test_run_id', 'unknown')
+    
+    lines.append(f"**Test:** `{test_name}`")
+    lines.append(f"**Run ID:** `{test_run_id}`")
+    lines.append(f"**Environment:** `{environment}`")
+    lines.append("")
+    
+    # Show LLM Analysis if available
+    if llm_analysis:
+        lines.append("### 🤖 **AI Analysis Summary**\n")
+        
+        # Show model used
+        llm_metadata = llm_analysis.get('_metadata', {})
+        if llm_metadata:
+            model = llm_metadata.get('model', 'unknown')
+            provider = llm_metadata.get('provider', 'unknown')
+            lines.append(f"**Analyzed by:** {provider.title()} `{model}`")
+            lines.append("")
+        
+        # Root Cause
+        root_cause = llm_analysis.get('root_cause', '')
+        if root_cause:
+            lines.append("**Root Cause:**")
+            lines.append(f"> {root_cause}")
+            lines.append("")
+        
+        # Impact
+        impact = llm_analysis.get('impact', {})
+        severity = impact.get('severity', 'unknown')
+        if severity:
+            severity_emoji = {
+                'low': '🟢',
+                'medium': '🟡',
+                'high': '🟠',
+                'critical': '🔴'
+            }.get(severity.lower(), '⚪')
+            lines.append(f"**Severity:** {severity_emoji} {severity.upper()}")
+            lines.append("")
+        
+        # Recommended Fix
+        recommended_fix = llm_analysis.get('recommended_fix', [])
+        if recommended_fix:
+            lines.append("**Recommended Fix:**")
+            for i, fix in enumerate(recommended_fix[:3], 1):  # Show top 3
+                lines.append(f"{i}. {fix}")
+            lines.append("")
+        
+        # Executive Verdict
+        executive_verdict = llm_analysis.get('executive_verdict', '')
+        if executive_verdict:
+            lines.append("**Executive Verdict:**")
+            lines.append(f"> {executive_verdict}")
+            lines.append("")
+        
+        lines.append("📥 **Download full analysis:** Artifact `llm-analysis-reports-phase8`")
+        lines.append("")
+    else:
+        lines.append("💡 **Tip:** Re-run with `use_llm_analysis: true` for AI-powered root cause analysis")
+        lines.append("")
+    
+    # Key findings
+    lines.append("### **Key Findings:**\n")
+    
+    # Show code changes if available
+    if code_diffs and 'cadashboardbe' in code_diffs:
+        cadashboard_diff = code_diffs['cadashboardbe']
+        if cadashboard_diff.get('changed'):
+            summary = cadashboard_diff.get('summary', {})
+            funcs_added = summary.get('total_functions_added', 0)
+            funcs_removed = summary.get('total_functions_removed', 0)
+            lines.append(f"- 📝 **Code Changes:** +{funcs_added} / -{funcs_removed} functions")
+        
+        git_diff = cadashboard_diff.get('git_diff', {})
+        if git_diff:
+            total_commits = git_diff.get('total_commits', 0)
+            files = git_diff.get('files', [])
+            if files:
+                lines.append(f"- 📂 **Files Changed:** {len(files)} files ({total_commits} commits)")
+    
+    # Show API count
+    total_apis = metadata.get('total_chunks', 0)
+    total_loc = metadata.get('total_lines_of_code', 0)
+    if total_apis > 0:
+        lines.append(f"- 🔍 **Code Context:** {total_apis} chunks, {total_loc} lines of code")
+    
+    # Show Loki logs info
+    loki_logs = llm_context.get('loki_logs', [])
+    if loki_logs:
+        lines.append(f"- 📋 **Backend Logs:** {len(loki_logs)} Loki log entries captured")
+    else:
+        lines.append(f"- ⚠️  **Backend Logs:** 0 entries (may need investigation)")
+    
+    lines.append("")
+    
+    # Next steps (only show if no LLM analysis)
+    if not llm_analysis:
+        lines.append("### **Next Steps:**\n")
+        lines.append("1. Review error logs in the test output above")
+        lines.append("2. Check code differences and recent changes")
+        if loki_logs:
+            lines.append("3. Analyze backend service logs (Loki excerpts)")
+        else:
+            lines.append("3. ⚠️  Investigate why Loki logs are missing")
+        lines.append("4. Download `llm-context-phase7` artifact for detailed analysis")
+        lines.append("5. **Recommended:** Re-run with `use_llm_analysis: true` for AI-powered root cause analysis")
+        lines.append("")
+    
+    # Quick links (always show)
+    lines.append("### **📎 Quick Links:**\n")
+    
+    # GitHub diff link
+    if found_indexes or code_diffs:
+        deployed_commit = None
+        rc_commit = None
+        
+        if found_indexes:
+            cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
+            deployed_commit = cadashboard.get('deployed', {}).get('commit')
+            rc_commit = cadashboard.get('rc', {}).get('commit')
+        
+        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and 'cadashboardbe' in code_diffs:
+            git_diff = code_diffs['cadashboardbe'].get('git_diff', {})
+            deployed_commit = git_diff.get('deployed_commit')
+            rc_commit = git_diff.get('rc_commit')
+        
+        if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
+            compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
+            lines.append(f"- [View Code Diff on GitHub]({compare_url})")
+    
+    # Original test run link
+    if run_ref:
+        if run_ref.startswith('http'):
+            lines.append(f"- [Original Test Run]({run_ref})")
+        else:
+            run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
+            lines.append(f"- [Original Test Run]({run_url})")
+    
+    lines.append("- [Download LLM Context](artifacts/llm-context-phase7)")
+    
+    # Show LLM analysis link if available
+    if llm_analysis:
+        lines.append("- [Download Full AI Analysis](artifacts/llm-analysis-reports-phase8)")
+    
+    lines.append("")
+    
     return "\n".join(lines)
 
 
@@ -441,6 +599,7 @@ def main():
     parser.add_argument('--environment', default='unknown')
     parser.add_argument('--run-ref', default='')
     parser.add_argument('--workflow-commit', help='Path to workflow-commit.txt (fallback for RC commit)')
+    parser.add_argument('--llm-analysis', help='Path to llm-analysis.json (optional, for AI analysis summary)')
     parser.add_argument('--output', help='Output file (defaults to $GITHUB_STEP_SUMMARY)')
     
     args = parser.parse_args()
@@ -456,7 +615,8 @@ def main():
         args.context_summary,
         args.environment,
         args.run_ref,
-        args.workflow_commit
+        args.workflow_commit,
+        args.llm_analysis
     )
     
     # Write to output
