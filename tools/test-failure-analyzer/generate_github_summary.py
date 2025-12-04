@@ -198,11 +198,13 @@ def generate_summary(
         
         lines.append("")
     
-    # Code Differences
+    # Code Differences - Always show if we have commit info
+    lines.append("### 🔄 Code Differences (RC vs Deployed)\n")
+    lines.append("")
+    
+    # Try to get diff stats from code_diffs
+    has_diff_stats = False
     if code_diffs and 'cadashboardbe' in code_diffs:
-        lines.append("### 🔄 Code Differences (RC vs Deployed)\n")
-        lines.append("")
-        
         cadashboard_diff = code_diffs['cadashboardbe']
         if cadashboard_diff.get('changed'):
             summary = cadashboard_diff.get('summary', {})
@@ -219,20 +221,23 @@ def generate_summary(
             lines.append(f"- **Functions:** +{funcs_added} / -{funcs_removed}")
             lines.append(f"- **Endpoints:** +{endpoints_added} / -{endpoints_removed}")
             lines.append(f"- **Files Changed:** {files_changed} ({total_commits} commits)")
-            
-            # Generate compare URL
-            if found_indexes:
-                cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-                deployed_commit = cadashboard.get('deployed', {}).get('commit')
-                rc_commit = cadashboard.get('rc', {}).get('commit')
-                
-                if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
-                    compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
-                    lines.append(f"- **[View Full Diff on GitHub]({compare_url})** (commit-to-commit)")
-        else:
-            lines.append("- No code changes detected between deployed and RC versions")
+            has_diff_stats = True
+    
+    # Always try to generate compare URL from found_indexes
+    if found_indexes:
+        cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
+        deployed_commit = cadashboard.get('deployed', {}).get('commit')
+        rc_commit = cadashboard.get('rc', {}).get('commit')
         
-        lines.append("")
+        if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
+            compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
+            lines.append(f"- **[View Full Diff on GitHub]({compare_url})** (commit-to-commit)")
+        elif not has_diff_stats:
+            lines.append("- ⚠️  Code diff analysis unavailable (code indexes not found)")
+    elif not has_diff_stats:
+        lines.append("- ⚠️  Code diff analysis unavailable (version info not found)")
+    
+    lines.append("")
     
     # ========================================
     # Dependency Analysis
