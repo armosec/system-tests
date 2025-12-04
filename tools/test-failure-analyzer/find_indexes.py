@@ -264,9 +264,48 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     return None, "failed"
 
 
+def find_dependency_index(repo: str, version: str, github_org: str, 
+                          github_token: str, output_dir: str, debug: bool) -> Optional[str]:
+    """
+    Find and download code index for a dependency.
+    
+    Tries multiple strategies:
+    1. Version tag: code-index-v0.0.1160
+    2. Commit hash: code-index-{commit}
+    3. Latest: code-index-latest
+    
+    Returns:
+        Path to downloaded index or None if not found
+    """
+    strategies = [
+        f"code-index-{version}",  # Try version tag first
+        "code-index-latest"       # Fallback to latest
+    ]
+    
+    for artifact_name in strategies:
+        if debug:
+            print(f"  Trying {repo}: {artifact_name}")
+        
+        index_path = download_artifact(repo, artifact_name, output_dir, 
+                                       github_token, github_org, debug)
+        if index_path:
+            return index_path
+    
+    return None
+
+
 def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Dict[str, Any]:
     """
     Resolve code indexes for all dependencies.
+    
+    New format handles version comparison:
+    {
+      "postgres-connector": {
+        "deployed_version": "v0.0.1160",
+        "rc_version": "v0.0.1165",
+        "version_changed": true
+      }
+    }
     
     Returns:
         Dict mapping dependency name to index info
@@ -274,54 +313,75 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
     results = {}
     
     for dep_name, dep_info in dependencies.items():
-        if not dep_info.get('has_index'):
+        if debug:
+            print(f"\n📦 Processing dependency: {dep_name}")
+        
+        deployed_ver = dep_info.get('deployed_version', 'unknown')
+        rc_ver = dep_info.get('rc_version', 'unknown')
+        version_changed = dep_info.get('version_changed', False)
+        
+        if deployed_ver == 'unknown' and rc_ver == 'unknown':
             if debug:
-                print(f"\n⏭️  Skipping {dep_name} (no code index available)")
+                print(f"  ⏭️  Skipping {dep_name} (no version info)")
             results[dep_name] = {
-                "found": False,
-                "reason": "no_index_workflow"
+                "deployed": {"found": False, "reason": "no_version"},
+                "rc": {"found": False, "reason": "no_version"},
+                "version_changed": False
             }
             continue
         
-        version = dep_info.get('version', '')
-        repo = dep_info.get('repo', '')
-        
-        if not repo:
+        # Resolve deployed version
+        deployed_index = None
+        deployed_found = False
+        if deployed_ver != 'unknown':
             if debug:
-                print(f"\n⏭️  Skipping {dep_name} (no repo info)")
-            results[dep_name] = {
-                "found": False,
-                "reason": "no_repo_info"
-            }
-            continue
+                print(f"  🔍 Resolving deployed version: {deployed_ver}")
+            
+            deployed_index = find_dependency_index(
+                dep_name, deployed_ver, github_org, 
+                github_token, f"{output_dir}/{dep_name}-deployed", debug
+            )
+            deployed_found = deployed_index is not None
+            
+            if deployed_found:
+                if debug:
+                    print(f"  ✅ Found deployed index")
+            else:
+                if debug:
+                    print(f"  ⚠️  Deployed index not found")
         
-        # Extract repo name from full path (e.g., armosec/postgres-connector -> postgres-connector)
-        repo_name = repo.split('/')[-1]
-        
-        if debug:
-            print(f"\n🔍 Resolving dependency: {dep_name}")
-            print(f"   Deployed version: {version}")
-        
-        # Get deployed version index
-        deployed_path, deployed_strategy = resolve_deployed_index(
-            repo_name, version, f"{output_dir}/{dep_name}", github_token, github_org, debug
-        )
-        
-        # Get latest version index
-        if debug:
-            print(f"\n🔍 Resolving latest version for {dep_name}")
-        
-        latest_path = download_artifact(
-            repo_name, "code-index-latest", f"{output_dir}/{dep_name}/latest", github_token, github_org, debug
-        )
+        # Resolve RC version if changed
+        rc_index = None
+        rc_found = False
+        if version_changed and rc_ver != 'unknown':
+            if debug:
+                print(f"  🔍 Resolving RC version: {rc_ver}")
+            
+            rc_index = find_dependency_index(
+                dep_name, rc_ver, github_org,
+                github_token, f"{output_dir}/{dep_name}-rc", debug
+            )
+            rc_found = rc_index is not None
+            
+            if rc_found:
+                if debug:
+                    print(f"  ✅ Found RC index")
+            else:
+                if debug:
+                    print(f"  ⚠️  RC index not found")
         
         results[dep_name] = {
-            "found": deployed_path is not None,
-            "deployed_version": version,
-            "deployed_index_path": deployed_path,
-            "deployed_strategy": deployed_strategy,
-            "latest_index_path": latest_path,
-            "repo": repo
+            "deployed": {
+                "version": deployed_ver,
+                "index_path": deployed_index,
+                "found": deployed_found
+            },
+            "rc": {
+                "version": rc_ver,
+                "index_path": rc_index,
+                "found": rc_found
+            },
+            "version_changed": version_changed
         }
     
     return results
@@ -344,7 +404,13 @@ def main():
     
     results = {
         "triggering_repo": args.triggering_repo,
-        "indexes": {}
+        "indexes": {},
+        "dependencies_summary": {
+            "total": 0,
+            "indexes_found": 0,
+            "indexes_missing": 0,
+            "version_changes": []
+        }
     }
     
     # Resolve dashboard indexes (both RC and deployed)
@@ -404,8 +470,20 @@ def main():
             args.debug
         )
         
+        # Add dependencies to results and calculate summary
         for dep_name, dep_info in dep_results.items():
             results["indexes"][dep_name] = dep_info
+            
+            # Update summary
+            results["dependencies_summary"]["total"] += 1
+            
+            if dep_info.get("deployed", {}).get("found") or dep_info.get("rc", {}).get("found"):
+                results["dependencies_summary"]["indexes_found"] += 1
+            else:
+                results["dependencies_summary"]["indexes_missing"] += 1
+            
+            if dep_info.get("version_changed"):
+                results["dependencies_summary"]["version_changes"].append(dep_name)
     
     # Save results
     output_path = Path(args.output)
