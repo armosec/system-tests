@@ -35,7 +35,8 @@ def generate_summary(
     gomod_deps_path: str,
     context_summary_path: str,
     environment: str,
-    run_ref: str
+    run_ref: str,
+    workflow_commit_path: str = None
 ) -> str:
     """Generate markdown summary from artifacts."""
     
@@ -49,6 +50,15 @@ def generate_summary(
     running_images = load_json(running_images_path)
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
+    
+    # Load workflow commit as fallback
+    workflow_commit_fallback = None
+    if workflow_commit_path and os.path.exists(workflow_commit_path):
+        try:
+            with open(workflow_commit_path, 'r') as f:
+                workflow_commit_fallback = f.read().strip()
+        except Exception:
+            pass
     
     if not llm_context:
         return "⚠️  LLM context not available - cannot generate summary\n"
@@ -172,6 +182,10 @@ def generate_summary(
         rc_version = rc_info.get('version', 'unknown')
         rc_commit = rc_info.get('commit', 'unknown')
         
+        # Use workflow_commit_fallback if RC commit is unknown
+        if rc_commit == 'unknown' and workflow_commit_fallback:
+            rc_commit = workflow_commit_fallback
+        
         lines.append(f"- **RC Version:** `{rc_version}`")
         lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
         lines.append("")
@@ -187,7 +201,19 @@ def generate_summary(
         
         if images:
             deployed_tag = images[0].get('tag', 'unknown')
-            lines.append(f"- **Deployed Version:** `{deployed_tag}`")
+            
+            # Check if deployed is also an RC - if so, show both actual and baseline
+            if deployed_tag.startswith('rc-'):
+                lines.append(f"- **Actual Deployed:** `{deployed_tag}` (RC in production)")
+                
+                # Get baseline version from found_indexes
+                if found_indexes:
+                    cadashboard_idx = found_indexes.get('indexes', {}).get('cadashboardbe', {})
+                    baseline_version = cadashboard_idx.get('deployed', {}).get('version', 'unknown')
+                    if baseline_version != 'unknown' and baseline_version != deployed_tag:
+                        lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
+            else:
+                lines.append(f"- **Deployed Version:** `{deployed_tag}`")
             
             # Get previous stable commit from code-diffs
             if code_diffs and 'cadashboardbe' in code_diffs:
@@ -223,17 +249,33 @@ def generate_summary(
             lines.append(f"- **Files Changed:** {files_changed} ({total_commits} commits)")
             has_diff_stats = True
     
-    # Always try to generate compare URL from found_indexes
-    if found_indexes:
-        cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-        deployed_commit = cadashboard.get('deployed', {}).get('commit')
-        rc_commit = cadashboard.get('rc', {}).get('commit')
+    # Always try to generate compare URL from found_indexes or fallbacks
+    if found_indexes or code_diffs:
+        deployed_commit = None
+        rc_commit = None
+        
+        # Try to get commits from found_indexes
+        if found_indexes:
+            cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
+            deployed_commit = cadashboard.get('deployed', {}).get('commit')
+            rc_commit = cadashboard.get('rc', {}).get('commit')
+        
+        # Fallback: Try code_diffs git_diff section
+        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and 'cadashboardbe' in code_diffs:
+            git_diff = code_diffs['cadashboardbe'].get('git_diff', {})
+            deployed_commit = git_diff.get('deployed_commit')
+            if not rc_commit or rc_commit == 'unknown':
+                rc_commit = git_diff.get('rc_commit')
+        
+        # Fallback: Use workflow_commit_fallback for RC
+        if (not rc_commit or rc_commit == 'unknown') and workflow_commit_fallback:
+            rc_commit = workflow_commit_fallback
         
         if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
             compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
             lines.append(f"- **[View Full Diff on GitHub]({compare_url})** (commit-to-commit)")
         elif not has_diff_stats:
-            lines.append("- ⚠️  Code diff analysis unavailable (code indexes not found)")
+            lines.append("- ⚠️  Code diff analysis unavailable (missing commit information)")
     elif not has_diff_stats:
         lines.append("- ⚠️  Code diff analysis unavailable (version info not found)")
     
@@ -398,6 +440,7 @@ def main():
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
     parser.add_argument('--run-ref', default='')
+    parser.add_argument('--workflow-commit', help='Path to workflow-commit.txt (fallback for RC commit)')
     parser.add_argument('--output', help='Output file (defaults to $GITHUB_STEP_SUMMARY)')
     
     args = parser.parse_args()
@@ -412,7 +455,8 @@ def main():
         args.gomod_deps,
         args.context_summary,
         args.environment,
-        args.run_ref
+        args.run_ref,
+        args.workflow_commit
     )
     
     # Write to output
