@@ -68,9 +68,14 @@ def download_gomod_from_github(repo: str, ref: str, token: Optional[str] = None)
 
 def find_gomod_in_index(index: Dict) -> Optional[str]:
     """Find go.mod content in code index."""
-    # Code index has 'files' array with file objects
-    files = index.get('files', [])
+    # Check metadata first (new format)
+    metadata = index.get('metadata', {})
+    gomod_content = metadata.get('goModContent') or metadata.get('go_mod_content')
+    if gomod_content:
+        return gomod_content
     
+    # Fallback: check 'files' array (old format - may not exist in current indexes)
+    files = index.get('files', [])
     for file_obj in files:
         path = file_obj.get('path', '')
         if path == 'go.mod' or path.endswith('/go.mod'):

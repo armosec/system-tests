@@ -238,10 +238,12 @@ def generate_summary(
     # Dependency Analysis
     # ========================================
     dep_analysis = metadata.get('dependency_analysis', {})
+    
+    # Always show dependency section header
+    lines.append("## 🔗 Dependency Analysis\n")
+    lines.append("")
+    
     if dep_analysis:
-        lines.append("## 🔗 Dependency Analysis\n")
-        lines.append("")
-        
         # High impact dependencies
         high_impact = [(name, info) for name, info in dep_analysis.items() if info.get('impact') == 'HIGH']
         
@@ -320,6 +322,23 @@ def generate_summary(
                     lines.append(f"  - Recommendation: Add code-index-generation workflow to {dep_name} repository")
                 
                 lines.append("")
+    else:
+        # No dependency analysis available - provide helpful context
+        lines.append("### ℹ️  No Cross-Repository Dependencies Detected\n")
+        lines.append("")
+        lines.append("This test only calls code within the main `cadashboardbe` repository.")
+        lines.append("")
+        lines.append("**When would dependencies appear here?**")
+        lines.append("- Database operations → `postgres-connector`")
+        lines.append("- Storage operations → `storage`")
+        lines.append("- Kubernetes operations → `k8s-interface`")
+        lines.append("- Messaging → `messaging`")
+        lines.append("")
+        lines.append("**Note:** Multi-repo code context is available when:")
+        lines.append("1. The test calls functions in external dependencies")
+        lines.append("2. Dependency versions can be detected from go.mod")
+        lines.append("3. Dependencies have code index generation enabled")
+        lines.append("")
     
     # ========================================
     # Code Context Statistics
