@@ -189,6 +189,29 @@ def download_artifact(repo: str, artifact_name: str, output_dir: str, github_tok
         return None
 
 
+def extract_commit_from_index(index_path: str, debug: bool = False) -> Optional[str]:
+    """Extract commit SHA from code index metadata."""
+    if not index_path or not os.path.exists(index_path):
+        return None
+    
+    try:
+        with open(index_path, 'r') as f:
+            index = json.load(f)
+        
+        # Check metadata for commit/commitHash
+        metadata = index.get('metadata', {})
+        commit = metadata.get('commit') or metadata.get('commitHash')
+        
+        if commit and debug:
+            print(f"   📌 Extracted commit from index: {commit[:8]}")
+        
+        return commit
+    except Exception as e:
+        if debug:
+            print(f"   ⚠️  Failed to extract commit: {e}")
+        return None
+
+
 def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Tuple[Optional[str], str]:
     """
     Resolve RC code index using PR-based strategy.
@@ -370,14 +393,25 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 if debug:
                     print(f"  ⚠️  RC index not found")
         
+        # Extract commits from downloaded indexes
+        deployed_commit = None
+        if deployed_index:
+            deployed_commit = extract_commit_from_index(deployed_index, debug)
+        
+        rc_commit = None
+        if rc_index:
+            rc_commit = extract_commit_from_index(rc_index, debug)
+        
         results[dep_name] = {
             "deployed": {
                 "version": deployed_ver,
+                "commit": deployed_commit,
                 "index_path": deployed_index,
                 "found": deployed_found
             },
             "rc": {
                 "version": rc_ver,
+                "commit": rc_commit,
                 "index_path": rc_index,
                 "found": rc_found
             },
@@ -426,8 +460,20 @@ def main():
             args.github_org,
             args.debug
         )
+        
+        # Extract commit from downloaded index
+        rc_commit = None
+        if rc_path:
+            rc_commit = extract_commit_from_index(rc_path, args.debug)
+            # Fallback to triggering_commit if not in index
+            if not rc_commit and args.triggering_commit:
+                rc_commit = args.triggering_commit
+                if args.debug:
+                    print(f"   📌 Using triggering commit as fallback: {rc_commit[:8]}")
+        
         dashboard_indexes["rc"] = {
             "version": args.rc_version,
+            "commit": rc_commit,
             "index_path": rc_path,
             "strategy": rc_strategy,
             "found": rc_path is not None
@@ -443,8 +489,15 @@ def main():
             args.github_org,
             args.debug
         )
+        
+        # Extract commit from downloaded index
+        deployed_commit = None
+        if deployed_path:
+            deployed_commit = extract_commit_from_index(deployed_path, args.debug)
+        
         dashboard_indexes["deployed"] = {
             "version": args.deployed_version,
+            "commit": deployed_commit,
             "index_path": deployed_path,
             "strategy": deployed_strategy,
             "found": deployed_path is not None
