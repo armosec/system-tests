@@ -361,6 +361,10 @@ def update_system_mapping():
         
         updated_count += 1
     
+    # Remove tested_dashboard_apis from source mapping (if it exists from old version)
+    for test_config in system_mapping.values():
+        test_config.pop('tested_dashboard_apis', None)
+    
     # Create artifact version with tested_dashboard_apis included
     artifact_mapping = {}
     for test_name, test_config in system_mapping.items():
