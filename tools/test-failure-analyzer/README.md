@@ -2,6 +2,39 @@
 
 Automated test failure analysis using LLM-powered insights. This tool collects comprehensive context about test failures and structures it for AI analysis.
 
+## Recent Updates (December 2024)
+
+### 🎯 Environment Auto-Detection
+The analyzer now automatically detects the test environment from the original failing run:
+- No need to manually specify `staging`, `production`, etc.
+- Auto-extracts from workflow logs: `ENVIRONMENT=staging`
+- Falls back to `staging` if detection fails
+- Manual override still available for custom scenarios
+
+### 🔧 Test Run ID Extraction Fix
+Fixed regex pattern for extracting Test Run IDs from logs:
+- Handles trailing punctuation and ANSI escape codes
+- Takes last match for backward compatibility with old double-print logs
+- More robust extraction prevents silent failures
+
+### 📊 Always-On Git Comparison
+Git-based diff analysis now runs for all test failures:
+- Previously only ran as fallback when code-index found no changes
+- Now enriches every analysis with commit counts and file changes
+- Accurate GitHub compare links for all runs
+
+### 📋 Enhanced LLM Context Summary
+Analyzer output now includes:
+- **Environment**: Shows which environment was analyzed
+- **Original Test Run Link**: Direct link back to the failing test
+- **Total Loki Log Lines**: Count of backend service logs collected
+- **Previous Stable Commit**: For RC deployments, shows last stable release
+- **Code Diff Details**: File counts, commit counts, and GitHub compare links
+- **Actual Mapped APIs**: List of APIs that were mapped to code implementations
+
+### 🗄️ Artifact Retention
+Reduced artifact retention from 30 days to **10 days** to optimize storage costs while maintaining adequate history for analysis.
+
 ## Quick Start
 
 ### Run a Full Analysis
