@@ -1591,7 +1591,8 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
-      "tests_scripts/workflows/slack_workflows.py"
+      "tests_scripts/workflows/slack_workflows.py",
+      "tests_scripts/workflows/workflows.py"
     ]
   },
   "teams_notifications_workflows": {
@@ -1607,7 +1608,8 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
-      "tests_scripts/workflows/teams_workflows.py"
+      "tests_scripts/workflows/teams_workflows.py",
+      "tests_scripts/workflows/workflows.py"
     ]
   },
   "jira_notifications_workflows": {
@@ -1623,7 +1625,8 @@
     "skip_on_environment": "production",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
-      "tests_scripts/workflows/jira_workflows.py"
+      "tests_scripts/workflows/jira_workflows.py",
+      "tests_scripts/workflows/workflows.py"
     ]
   },
   "linear_notifications_workflows": {
@@ -1640,7 +1643,8 @@
     "customer_name": "SECOND_CUSTOMER",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
-      "tests_scripts/workflows/linear_workflows.py"
+      "tests_scripts/workflows/linear_workflows.py",
+      "tests_scripts/workflows/workflows.py"
     ]
   },
   "workflows_configurations": {
@@ -1656,7 +1660,8 @@
     "skip_on_environment": "production,production-us",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
-      "tests_scripts/workflows/conf_workflows.py"
+      "tests_scripts/workflows/conf_workflows.py",
+      "tests_scripts/workflows/workflows.py"
     ]
   },
   "clusters": {

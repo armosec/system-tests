@@ -40,9 +40,16 @@ def extract_backend_api_calls(file_path):
             content = f.read()
         
         # Find all self.backend.method_name() or backend.method_name() calls
-        pattern = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)\('
-        matches = re.findall(pattern, content)
-        return set(matches)
+        # Pattern 1: Direct calls like self.backend.method_name(
+        pattern1 = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)\('
+        matches1 = re.findall(pattern1, content)
+        
+        # Pattern 2: Method references (passed as args) like self.backend.method_name
+        # Look for backend.method_name NOT followed by ( to catch function references
+        pattern2 = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)(?!\s*\()'
+        matches2 = re.findall(pattern2, content)
+        
+        return set(matches1 + matches2)
     except Exception as e:
         print(f"Warning: Could not read {file_path}: {e}")
         return set()
@@ -293,6 +300,10 @@ def find_base_classes(file_path):
             'tests_scripts/payments/base_payment.py',
             'tests_scripts/payments/base_stripe.py'
         ])
+    
+    if 'workflows/' in str(file_path):
+        if 'tests_scripts/workflows/workflows.py' not in base_files:
+            base_files.append('tests_scripts/workflows/workflows.py')
     
     return base_files
 
