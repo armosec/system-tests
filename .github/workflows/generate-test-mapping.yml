@@ -1,14 +1,6 @@
 name: Generate Test Mapping
 
 on:
-  push:
-    branches: [master, main]
-    paths:
-      - '.github/workflows/generate-test-mapping.yml'
-      - 'tests_scripts/**'
-      - 'configurations/system/tests_cases/**'
-      - 'scripts/update_mapping_with_methods.py'
-      - 'system_test_mapping.json'
   pull_request:
     branches: [master, main]
     paths:
