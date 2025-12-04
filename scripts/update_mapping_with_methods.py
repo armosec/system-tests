@@ -40,9 +40,16 @@ def extract_backend_api_calls(file_path):
             content = f.read()
         
         # Find all self.backend.method_name() or backend.method_name() calls
-        pattern = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)\('
-        matches = re.findall(pattern, content)
-        return set(matches)
+        # Pattern 1: Direct calls like self.backend.method_name(
+        pattern1 = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)\('
+        matches1 = re.findall(pattern1, content)
+        
+        # Pattern 2: Method references (passed as args) like self.backend.method_name
+        # Look for backend.method_name NOT followed by ( to catch function references
+        pattern2 = r'(?:self\.backend|backend|test_obj\.backend)\.(\w+)(?!\s*\()'
+        matches2 = re.findall(pattern2, content)
+        
+        return set(matches1 + matches2)
     except Exception as e:
         print(f"Warning: Could not read {file_path}: {e}")
         return set()
@@ -294,6 +301,10 @@ def find_base_classes(file_path):
             'tests_scripts/payments/base_stripe.py'
         ])
     
+    if 'workflows/' in str(file_path):
+        if 'tests_scripts/workflows/workflows.py' not in base_files:
+            base_files.append('tests_scripts/workflows/workflows.py')
+    
     return base_files
 
 def update_system_mapping():
@@ -354,15 +365,51 @@ def update_system_mapping():
         # Sort for consistency
         api_list.sort(key=lambda x: (x['path'], x['method']))
         
-        # Update tested_dashboard_apis
-        test_config['tested_dashboard_apis'] = api_list
+        # Store tested_dashboard_apis separately for artifact (not in source file)
+        # We'll add it to the artifact version later
         if api_list:
             tests_with_apis += 1
         
         updated_count += 1
     
-    # Save
+    # Remove tested_dashboard_apis from source mapping (if it exists from old version)
+    for test_config in system_mapping.values():
+        test_config.pop('tested_dashboard_apis', None)
+    
+    # Create artifact version with tested_dashboard_apis included
+    artifact_mapping = {}
+    for test_name, test_config in system_mapping.items():
+        artifact_config = test_config.copy()
+        
+        # Re-extract API calls for this test to add to artifact
+        impl_files_list = artifact_config.get('test_implementation_files', [])
+        api_methods = set()
+        for impl_file in impl_files_list:
+            file_path = REPO_ROOT / impl_file
+            methods = extract_backend_api_calls(file_path)
+            api_methods.update(methods)
+        
+        # Convert to API format with HTTP methods
+        api_list = []
+        seen_apis = set()
+        for method_name in api_methods:
+            if method_name in api_method_mapping:
+                api_info = api_method_mapping[method_name]
+                api_key = (api_info['method'], api_info['path'])
+                if api_key not in seen_apis:
+                    seen_apis.add(api_key)
+                    api_list.append(api_info)
+        
+        api_list.sort(key=lambda x: (x['path'], x['method']))
+        artifact_config['tested_dashboard_apis'] = api_list
+        artifact_mapping[test_name] = artifact_config
+    
+    # Save source file WITHOUT tested_dashboard_apis
     save_json_file(str(mapping_file), system_mapping)
+    
+    # Save artifact file WITH tested_dashboard_apis
+    artifact_file = REPO_ROOT / 'system_test_mapping_artifact.json'
+    save_json_file(str(artifact_file), artifact_mapping)
     
     print(f"\n✅ Update complete!")
     print(f"   • Total tests: {updated_count}")
