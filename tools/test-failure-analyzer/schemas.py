@@ -43,6 +43,7 @@ class FailureEntry(BaseModel):
     time_start: Optional[str] = None  # ISO8601 from Step 18 first log
     time_end: Optional[str] = None    # ISO8601 from Step 18 last log
     errors: List[str] = Field(default_factory=list)
+    incluster_logs: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)  # component -> log entries
 
 
 class Report(BaseModel):

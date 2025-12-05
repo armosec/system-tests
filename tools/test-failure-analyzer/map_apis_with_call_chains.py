@@ -29,7 +29,8 @@ def map_apis_with_call_chains(
     test_name: str,
     test_mapping: Dict[str, Any],
     code_index: Dict[str, Any],
-    max_depth: int = 3
+    max_depth: int = 3,
+    all_chunks: List[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Map tested APIs to code chunks with call chains.
@@ -39,6 +40,7 @@ def map_apis_with_call_chains(
         test_mapping: Full test mapping dict
         code_index: Code index dict
         max_depth: Maximum call chain depth
+        all_chunks: Optional list of all chunks from all repos (with _repo tag)
     
     Returns:
         Dict with API mappings and call chains
@@ -74,11 +76,12 @@ def map_apis_with_call_chains(
             api_results[api_key] = mapping
             continue
         
-        # Extract call chain
+        # Extract call chain (pass all_chunks if available for multi-repo support)
         call_chain_result = extract_call_chain(
             handler_chunk_id=handler_chunk_id,
             code_index=code_index,
-            max_depth=max_depth
+            max_depth=max_depth,
+            all_chunks=all_chunks
         )
         
         # Collect chunk IDs from call chain
@@ -130,6 +133,10 @@ def main():
         help="Path to code index JSON file"
     )
     parser.add_argument(
+        "--dependency-indexes",
+        help="JSON string mapping repo names to index paths: {\"postgres-connector\": \"path/to/index.json\"}"
+    )
+    parser.add_argument(
         "--max-depth",
         type=int,
         default=3,
@@ -150,6 +157,46 @@ def main():
     
     print(f"Loading code index from: {args.index}")
     code_index = load_code_index(args.index)
+    main_chunks = code_index.get('chunks', [])
+    
+    # Load dependency indexes if provided
+    all_chunks = None
+    dependency_chunks = {}
+    
+    if args.dependency_indexes:
+        try:
+            dep_indexes = json.loads(args.dependency_indexes)
+            print(f"Loading {len(dep_indexes)} dependency indexes...")
+            
+            for repo_name, index_path in dep_indexes.items():
+                if os.path.exists(index_path):
+                    dep_index = load_code_index(index_path)
+                    dep_chunks = dep_index.get('chunks', [])
+                    dependency_chunks[repo_name] = dep_chunks
+                    print(f"  Loaded {len(dep_chunks)} chunks from {repo_name}")
+                else:
+                    print(f"  ⚠️  Index not found: {index_path}")
+        except json.JSONDecodeError as e:
+            print(f"⚠️  Warning: Failed to parse dependency-indexes JSON: {e}")
+        except Exception as e:
+            print(f"⚠️  Warning: Error loading dependency indexes: {e}")
+    
+    # Combine all chunks with repo tags if we have dependencies
+    if dependency_chunks:
+        all_chunks = []
+        
+        # Tag main chunks
+        for chunk in main_chunks:
+            chunk['_repo'] = 'cadashboardbe'
+            all_chunks.append(chunk)
+        
+        # Tag dependency chunks
+        for repo_name, chunks in dependency_chunks.items():
+            for chunk in chunks:
+                chunk['_repo'] = repo_name
+                all_chunks.append(chunk)
+        
+        print(f"Total chunks available: {len(all_chunks)} (from {1 + len(dependency_chunks)} repos)")
     
     # Map APIs with call chains
     print(f"\nMapping APIs with call chains for test: {args.test_name}")
@@ -159,7 +206,8 @@ def main():
         test_name=args.test_name,
         test_mapping=test_mapping,
         code_index=code_index,
-        max_depth=args.max_depth
+        max_depth=args.max_depth,
+        all_chunks=all_chunks
     )
     
     # Print summary

@@ -15,7 +15,11 @@ rich>=13.0.0
 # Data validation (used by schemas.py)
 pydantic>=2.0.0
 
-# OpenAI API for LLM analysis (Phase 8)
+# LLM Analysis (Phase 8)
+# Google Gemini API (default, recommended)
+google-generativeai>=0.3.0
+
+# OpenAI API (alternative provider)
 openai>=1.0.0
 
 # Optional: Kubernetes API access (if needed for live pod querying)

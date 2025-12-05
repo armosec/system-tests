@@ -22,7 +22,9 @@ import requests
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract go.mod dependencies")
-    parser.add_argument("--code-index", required=True, help="Path to code index JSON")
+    parser.add_argument("--deployed-code-index", help="Path to deployed version code index JSON")
+    parser.add_argument("--rc-code-index", help="Path to RC version code index JSON")
+    parser.add_argument("--code-index", help="Path to code index JSON (deprecated, use --deployed-code-index)")
     parser.add_argument("--output", required=True, help="Output JSON file path")
     parser.add_argument("--github-token", help="GitHub token (or use GITHUB_TOKEN env var)")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
@@ -66,9 +68,14 @@ def download_gomod_from_github(repo: str, ref: str, token: Optional[str] = None)
 
 def find_gomod_in_index(index: Dict) -> Optional[str]:
     """Find go.mod content in code index."""
-    # Code index has 'files' array with file objects
-    files = index.get('files', [])
+    # Check metadata first (new format)
+    metadata = index.get('metadata', {})
+    gomod_content = metadata.get('goModContent') or metadata.get('go_mod_content')
+    if gomod_content:
+        return gomod_content
     
+    # Fallback: check 'files' array (old format - may not exist in current indexes)
+    files = index.get('files', [])
     for file_obj in files:
         path = file_obj.get('path', '')
         if path == 'go.mod' or path.endswith('/go.mod'):
@@ -137,6 +144,34 @@ def filter_relevant_dependencies(dependencies: Dict[str, str]) -> Dict[str, str]
             relevant[pkg] = version
     
     return relevant
+
+
+def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str, str]) -> Dict[str, Dict]:
+    """
+    Compare dependency versions between deployed and RC.
+    
+    Returns:
+        Dict with version_changed flag for each dependency
+    """
+    result = {}
+    all_deps = set(deployed_deps.keys()) | set(rc_deps.keys())
+    
+    for dep in all_deps:
+        deployed_ver = deployed_deps.get(dep, "unknown")
+        rc_ver = rc_deps.get(dep, "unknown")
+        
+        # Extract just the repo name (not full package path)
+        repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', dep)
+        repo_name = repo_match.group(2) if repo_match else dep
+        
+        result[repo_name] = {
+            "deployed_version": deployed_ver,
+            "rc_version": rc_ver,
+            "version_changed": deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown",
+            "has_index": False  # Will be updated later if we check
+        }
+    
+    return result
 
 
 def extract_repo_from_package(pkg: str) -> Optional[str]:
@@ -208,15 +243,94 @@ def main():
     # Get GitHub token
     github_token = args.github_token or os.environ.get('GITHUB_TOKEN')
     
+    # Determine which mode: comparison or single index
+    compare_mode = bool(args.deployed_code_index and args.rc_code_index)
+    single_mode = bool(args.code_index or (args.deployed_code_index and not args.rc_code_index))
+    
+    if not compare_mode and not single_mode:
+        print("❌ Error: Must provide either --code-index OR both --deployed-code-index and --rc-code-index", file=sys.stderr)
+        sys.exit(1)
+    
     if args.debug:
-        print(f"🔍 Extracting go.mod dependencies from code index...")
-        print(f"   Code index: {args.code_index}")
+        print(f"🔍 Extracting go.mod dependencies...")
+        if compare_mode:
+            print(f"   Mode: Comparison (deployed vs RC)")
+            print(f"   Deployed index: {args.deployed_code_index}")
+            print(f"   RC index: {args.rc_code_index}")
+        else:
+            code_index_path = args.code_index or args.deployed_code_index
+            print(f"   Mode: Single index")
+            print(f"   Code index: {code_index_path}")
         print(f"   Output: {args.output}")
         print()
     
+    if compare_mode:
+        # Load both indexes
+        try:
+            deployed_index = load_code_index(args.deployed_code_index)
+            rc_index = load_code_index(args.rc_code_index)
+            if args.debug:
+                print(f"✅ Loaded both code indexes")
+        except Exception as e:
+            print(f"❌ Error loading code indexes: {e}", file=sys.stderr)
+            sys.exit(1)
+        
+        # Extract go.mod from both
+        deployed_gomod = find_gomod_in_index(deployed_index)
+        rc_gomod = find_gomod_in_index(rc_index)
+        
+        if not deployed_gomod or not rc_gomod:
+            print(f"⚠️  Warning: go.mod not found in one or both indexes", file=sys.stderr)
+            deployed_gomod = deployed_gomod or ""
+            rc_gomod = rc_gomod or ""
+        
+        # Parse dependencies
+        deployed_deps_all = parse_gomod_dependencies(deployed_gomod)
+        rc_deps_all = parse_gomod_dependencies(rc_gomod)
+        
+        # Filter to relevant dependencies
+        deployed_deps = filter_relevant_dependencies(deployed_deps_all)
+        rc_deps = filter_relevant_dependencies(rc_deps_all)
+        
+        if args.debug:
+            print(f"📊 Found {len(deployed_deps)} relevant dependencies in deployed version")
+            print(f"📊 Found {len(rc_deps)} relevant dependencies in RC version")
+            print()
+        
+        # Compare versions
+        result = compare_dependency_versions(deployed_deps, rc_deps)
+        
+        # Optionally check if code indexes exist
+        if github_token and args.debug:
+            print(f"🔍 Checking code index availability...")
+            for repo_name, info in result.items():
+                # For now, just mark as unknown - actual check happens in find_indexes.py
+                info['has_index'] = None  # Will be determined later
+        
+        if args.debug:
+            changed_count = sum(1 for info in result.values() if info['version_changed'])
+            print(f"📊 {changed_count} dependencies changed versions")
+            print()
+        
+        # Write output
+        output_dir = os.path.dirname(args.output)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+        
+        with open(args.output, 'w') as f:
+            json.dump(result, f, indent=2)
+        
+        if args.debug:
+            print(f"✅ Wrote comparison results to {args.output}")
+        
+        return
+    
+    # Single index mode (backward compatibility)
+    code_index_path = args.code_index or args.deployed_code_index
+    
     # Load code index
     try:
-        index = load_code_index(args.code_index)
+        index = load_code_index(code_index_path)
         if args.debug:
             print(f"✅ Loaded code index")
     except Exception as e:

@@ -44,10 +44,23 @@ def generate_executive_summary(llm_analysis: Dict, code_diffs: Optional[Dict], t
     lines = []
     
     # Header
-    lines.append("# Test Failure Executive Summary")
+    lines.append("# 🤖 AI-Powered Test Failure Analysis")
     lines.append("")
     lines.append(f"**Test**: `{test_name}`")
     lines.append(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}")
+    
+    # Show model info if available
+    metadata = llm_analysis.get('_metadata', {})
+    if metadata:
+        model = metadata.get('model', 'unknown')
+        provider = metadata.get('provider', 'unknown')
+        lines.append(f"**AI Model**: {provider.title()} - `{model}`")
+        
+        # Show token usage if available
+        total_tokens = metadata.get('total_tokens')
+        if total_tokens:
+            lines.append(f"**Tokens Used**: {total_tokens:,}")
+    
     lines.append("")
     lines.append("---")
     lines.append("")

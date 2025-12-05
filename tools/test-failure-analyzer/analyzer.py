@@ -563,6 +563,80 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
         to_padded = end.isoformat()
     return first_ts, last_ts, errors, from_padded, to_padded
 
+def extract_incluster_logs(section_text: str, debug: bool = False) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Extract in-cluster component logs from test output.
+    
+    Looks for sections like:
+        ---------------- start operator logs ----------------
+        {"level":"info","ts":"...","msg":"..."}
+        ---------------- end operator logs ----------------
+    
+    Returns a dict mapping component name -> list of parsed log entries.
+    """
+    components = [
+        'operator',
+        'synchronizer',
+        'kubescape',
+        'node-agent',
+        'apiserver',
+        'kubescape-scheduler',
+        'grype-offline-db'
+    ]
+    
+    extracted = {}
+    total_lines = 0
+    
+    for component in components:
+        start_marker = f"start {component} logs"
+        end_marker = f"end {component} logs"
+        
+        # Find component logs between markers
+        pattern = re.compile(
+            rf"{re.escape(start_marker)}.*?\n(.*?)\n.*?{re.escape(end_marker)}",
+            re.DOTALL | re.IGNORECASE
+        )
+        
+        match = pattern.search(section_text)
+        if not match:
+            continue
+        
+        log_block = match.group(1).strip()
+        if not log_block:
+            continue
+        
+        # Parse JSON log lines
+        parsed_logs = []
+        for line in log_block.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Remove timestamp prefix if present (e.g., "2025-12-04T13:57:12.8545414Z ")
+            # Pattern: YYYY-MM-DDTHH:MM:SS.nnnnnnnZ
+            line = re.sub(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+', '', line)
+            
+            # Try to parse as JSON
+            try:
+                log_entry = json.loads(line)
+                parsed_logs.append(log_entry)
+                total_lines += 1
+            except json.JSONDecodeError:
+                # Not JSON, store as plain text
+                parsed_logs.append({"msg": line, "_raw": True})
+                total_lines += 1
+        
+        if parsed_logs:
+            extracted[component] = parsed_logs
+            if debug:
+                console.print(f"[cyan]Extracted {len(parsed_logs)} log lines from {component}[/cyan]")
+    
+    if debug and extracted:
+        console.print(f"[green]Total in-cluster log lines extracted: {total_lines} from {len(extracted)} components[/green]")
+    
+    return extracted
+
+
 def map_test_to_repos_services(test: Dict[str, Any], mapping: Dict[str, Any]) -> MappingInfo:
     name = (test.get("name") or "").lower()
     if "dummy" in name:
@@ -1277,6 +1351,15 @@ def main() -> None:
         if args.debug:
             console.print(f"[cyan]Time window:[/cyan] {first_ts} → {last_ts} (+5m) | errors={len(errors)}")
 
+        # Extract in-cluster logs (only if test uses a cluster)
+        incluster_logs = {}
+        if not mapping_info.skip_cluster:
+            incluster_logs = extract_incluster_logs(section_text, debug=args.debug)
+            if args.debug and incluster_logs:
+                console.print(f"[green]Extracted in-cluster logs from {len(incluster_logs)} components[/green]")
+        elif args.debug:
+            console.print(f"[yellow]Skipping in-cluster log extraction (skip_cluster=True)[/yellow]")
+
         failures.append(
             FailureEntry(
                 test=t,
@@ -1289,6 +1372,7 @@ def main() -> None:
                 time_start=first_ts,
                 time_end=last_ts,
                 errors=errors,
+                incluster_logs=incluster_logs,
             )
         )
 

@@ -59,6 +59,49 @@ def find_chunks_by_name(name: str, chunks: List[Dict[str, Any]], package: Option
     return matches
 
 
+def extract_repo_from_import(import_path: str) -> Optional[str]:
+    """
+    Extract repository name from Go import path.
+    
+    Examples:
+        github.com/armosec/postgres-connector/dal -> postgres-connector
+        github.com/kubescape/storage/pkg/apis -> storage
+    
+    Returns:
+        Repository name or None if not armosec/kubescape package
+    """
+    match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', import_path)
+    return match.group(2) if match else None
+
+
+def parse_imports(code: str) -> Dict[str, str]:
+    """
+    Parse Go import statements to build alias -> repo mapping.
+    
+    Returns:
+        Dict mapping package alias to repository name
+    """
+    imports = {}
+    
+    # Match: import "github.com/armosec/postgres-connector/dal"
+    # Match: import pc "github.com/armosec/postgres-connector/dal"
+    # Also handle multi-line import blocks
+    import_pattern = r'import\s+(?:(\w+)\s+)?"([^"]+)"'
+    
+    for match in re.finditer(import_pattern, code):
+        alias = match.group(1)
+        path = match.group(2)
+        repo = extract_repo_from_import(path)
+        
+        if repo:
+            # If no alias, use last part of path
+            if not alias:
+                alias = path.split('/')[-1]
+            imports[alias] = repo
+    
+    return imports
+
+
 def extract_function_calls(code: str, package: str) -> List[Tuple[str, Optional[str]]]:
     """
     Extract function calls from code.
@@ -203,16 +246,18 @@ def extract_call_chain(
     handler_chunk_id: str,
     code_index: Dict[str, Any],
     max_depth: int = 3,
-    visited: Optional[Set[str]] = None
+    visited: Optional[Set[str]] = None,
+    all_chunks: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     """
     Extract call chain starting from a handler chunk.
     
     Args:
         handler_chunk_id: ID of the handler chunk
-        code_index: Code index dict
+        code_index: Code index dict (main repository)
         max_depth: Maximum depth to traverse (default: 3)
         visited: Set of already visited chunk IDs (to prevent cycles)
+        all_chunks: Optional list of all chunks from all repos (with _repo tag)
     
     Returns:
         Dict with call chain information
@@ -220,7 +265,11 @@ def extract_call_chain(
     if visited is None:
         visited = set()
     
-    chunks = code_index.get("chunks", [])
+    # Use provided all_chunks if available, otherwise just use main index
+    if all_chunks is None:
+        chunks = code_index.get("chunks", [])
+    else:
+        chunks = all_chunks
     handler_chunk = find_chunk_by_id(handler_chunk_id, chunks)
     
     if not handler_chunk:
@@ -244,7 +293,14 @@ def extract_call_chain(
     handler_code = handler_chunk.get("code", "")
     handler_package = handler_chunk.get("package", "")
     
+    # Parse imports to build alias -> repo mapping
+    import_to_repo = parse_imports(handler_code)
+    
     function_calls = extract_function_calls(handler_code, handler_package)
+    
+    # Track cross-repo calls and repositories in chain
+    cross_repo_calls = []
+    repositories_in_chain = set(["cadashboardbe"])  # Start with main repo
     
     # Build call chain
     chain = []
@@ -275,6 +331,17 @@ def extract_call_chain(
             
             # Find matching chunks for each call
             for func_name, pkg_name in calls:
+                # Check if this is a cross-repo call
+                if pkg_name and pkg_name in import_to_repo:
+                    repo_name = import_to_repo[pkg_name]
+                    cross_repo_calls.append({
+                        "repo": repo_name,
+                        "package": pkg_name,
+                        "function": func_name,
+                        "called_from_chunk": item["chunk_id"]
+                    })
+                    repositories_in_chain.add(repo_name)
+                
                 # Try to find chunk by name and package
                 matching_chunks = find_chunks_by_name(func_name, chunks, pkg_name)
                 
@@ -331,7 +398,9 @@ def extract_call_chain(
         "handler_name": handler_chunk.get("name"),
         "max_depth": max_depth,
         "chain": chain,
-        "total_chunks": len(chain) + 1  # +1 for handler itself
+        "total_chunks": len(chain) + 1,  # +1 for handler itself
+        "cross_repo_calls": cross_repo_calls,
+        "repositories_in_chain": list(repositories_in_chain)
     }
 
 
@@ -350,6 +419,10 @@ def main():
         help="Path to code index JSON file"
     )
     parser.add_argument(
+        "--dependency-indexes",
+        help="JSON string mapping repo names to index paths: {\"postgres-connector\": \"path/to/index.json\"}"
+    )
+    parser.add_argument(
         "--max-depth",
         type=int,
         default=3,
@@ -366,6 +439,42 @@ def main():
     # Load code index
     print(f"Loading code index from: {args.index}")
     code_index = load_code_index(args.index)
+    main_chunks = code_index.get('chunks', [])
+    
+    # Load dependency indexes if provided
+    all_chunks = []
+    dependency_chunks = {}
+    
+    if args.dependency_indexes:
+        try:
+            dep_indexes = json.loads(args.dependency_indexes)
+            print(f"Loading {len(dep_indexes)} dependency indexes...")
+            
+            for repo_name, index_path in dep_indexes.items():
+                if os.path.exists(index_path):
+                    dep_index = load_code_index(index_path)
+                    dep_chunks = dep_index.get('chunks', [])
+                    dependency_chunks[repo_name] = dep_chunks
+                    print(f"  Loaded {len(dep_chunks)} chunks from {repo_name}")
+                else:
+                    print(f"  ⚠️  Index not found: {index_path}")
+        except json.JSONDecodeError as e:
+            print(f"⚠️  Warning: Failed to parse dependency-indexes JSON: {e}")
+        except Exception as e:
+            print(f"⚠️  Warning: Error loading dependency indexes: {e}")
+    
+    # Combine all chunks with repo tags
+    for chunk in main_chunks:
+        chunk['_repo'] = 'cadashboardbe'  # Tag with source repo
+        all_chunks.append(chunk)
+    
+    for repo_name, chunks in dependency_chunks.items():
+        for chunk in chunks:
+            chunk['_repo'] = repo_name
+            all_chunks.append(chunk)
+    
+    if dependency_chunks:
+        print(f"Total chunks available: {len(all_chunks)} (from {1 + len(dependency_chunks)} repos)")
     
     # Extract call chain
     print(f"Extracting call chain for handler chunk: {args.handler_chunk_id}")
@@ -374,7 +483,8 @@ def main():
     result = extract_call_chain(
         handler_chunk_id=args.handler_chunk_id,
         code_index=code_index,
-        max_depth=args.max_depth
+        max_depth=args.max_depth,
+        all_chunks=all_chunks if all_chunks else None
     )
     
     if "error" in result:

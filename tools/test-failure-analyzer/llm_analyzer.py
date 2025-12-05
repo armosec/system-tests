@@ -2,14 +2,22 @@
 """
 LLM-powered test failure analysis.
 
-Uses OpenAI GPT-4 to analyze test failures with complete context including
-code changes, test implementation, error logs, and service logs.
+Supports Google Gemini (default) and OpenAI GPT-4 for analyzing test failures
+with complete context including code changes, test implementation, error logs, and service logs.
 
 Usage:
-    export OPENAI_API_KEY="sk-..."
+    # Google Gemini (default, recommended - gemini-2.5-flash)
+    export GOOGLE_API_KEY="..."  # or SYSTEM_TEST_ANALYZER_GOOGLE_API_KEY in CI
     python llm_analyzer.py \
         --llm-context artifacts/llm-context.json \
         --code-diffs artifacts/code-diffs.json \
+        --output artifacts/llm-analysis.json
+    
+    # OpenAI GPT-4
+    export OPENAI_API_KEY="sk-..."  # or SYSTEM_TEST_ANALYZER_OPENAI_API_KEY in CI
+    python llm_analyzer.py \
+        --provider openai \
+        --llm-context artifacts/llm-context.json \
         --output artifacts/llm-analysis.json
 """
 
@@ -25,10 +33,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--llm-context", required=True, help="Path to llm-context.json from Phase 7")
     parser.add_argument("--code-diffs", help="Path to code-diffs.json (optional)")
     parser.add_argument("--output", required=True, help="Output JSON file path")
-    parser.add_argument("--model", default="gpt-4o", help="OpenAI model (default: gpt-4o)")
+    parser.add_argument("--provider", default="google", choices=["google", "openai"], 
+                        help="LLM provider: google (default, Gemini) or openai (GPT-4)")
+    parser.add_argument("--model", help="Model name (default: gemini-1.5-pro for Google, gpt-4o for OpenAI)")
     parser.add_argument("--max-tokens", type=int, default=6000, help="Max output tokens (default: 6000)")
     parser.add_argument("--temperature", type=float, default=0.3, help="Temperature (default: 0.3)")
-    parser.add_argument("--api-key", help="OpenAI API key (or use OPENAI_API_KEY env var)")
+    parser.add_argument("--api-key", help="API key (or use GOOGLE_API_KEY / OPENAI_API_KEY env var)")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     return parser.parse_args()
 
@@ -204,6 +214,118 @@ Respond in JSON format with these exact keys:
     return "\n".join(prompt_parts)
 
 
+def call_google_api(prompt: str, api_key: str, model: str, max_tokens: int, temperature: float, debug: bool = False) -> Dict:
+    """
+    Call Google Gemini API to analyze the test failure.
+    Tries multiple models with fallback if the primary model is unavailable.
+    
+    Returns:
+        Parsed JSON response from LLM
+    """
+    try:
+        import google.generativeai as genai
+    except ImportError:
+        print("❌ Error: google-generativeai package not installed", file=sys.stderr)
+        print("   Install with: pip install google-generativeai", file=sys.stderr)
+        sys.exit(1)
+    
+    genai.configure(api_key=api_key)
+    
+    # Model fallback chain
+    models_to_try = [
+        "gemini-3-pro-preview",  # Latest preview (if available)
+        "gemini-2.5-flash",      # Fast and reliable fallback
+        "gemini-1.5-pro-latest", # Older stable version
+        "gemini-pro"             # Legacy fallback
+    ]
+    
+    # If user specified a model, try that first
+    if model and model not in models_to_try:
+        models_to_try.insert(0, model)
+    elif model in models_to_try:
+        # Move specified model to front
+        models_to_try.remove(model)
+        models_to_try.insert(0, model)
+    
+    last_error = None
+    
+    for attempt_model in models_to_try:
+        try:
+            if debug:
+                print(f"🤖 Trying Google Gemini API...")
+                print(f"   Model: {attempt_model}")
+                print(f"   Max tokens: {max_tokens}")
+                print(f"   Temperature: {temperature}")
+                print(f"   Prompt length: {len(prompt)} chars")
+                print()
+            
+            # Create model with generation config
+            generation_config = {
+                "temperature": temperature,
+                "max_output_tokens": max_tokens,
+                "response_mime_type": "application/json"
+            }
+            
+            gemini_model = genai.GenerativeModel(
+                model_name=attempt_model,
+                generation_config=generation_config,
+                system_instruction="You are an expert software engineer analyzing test failures. Provide concise, actionable analysis in JSON format."
+            )
+            
+            response = gemini_model.generate_content(prompt)
+            
+            content = response.text
+            
+            if debug:
+                print(f"✅ Got response from Google Gemini")
+                print(f"   Model used: {attempt_model}")
+                print(f"   Candidates: {len(response.candidates)}")
+                if hasattr(response, 'usage_metadata'):
+                    print(f"   Usage: {response.usage_metadata.prompt_token_count} prompt + {response.usage_metadata.candidates_token_count} completion = {response.usage_metadata.total_token_count} total tokens")
+                print()
+            
+            # Parse JSON response
+            result = json.loads(content)
+            
+            # Add metadata (include actual model used)
+            metadata = {
+                'model': attempt_model,
+                'provider': 'google',
+                'requested_model': model
+            }
+            if hasattr(response, 'usage_metadata'):
+                metadata.update({
+                    'prompt_tokens': response.usage_metadata.prompt_token_count,
+                    'completion_tokens': response.usage_metadata.candidates_token_count,
+                    'total_tokens': response.usage_metadata.total_token_count
+                })
+            result['_metadata'] = metadata
+            
+            return result
+        
+        except Exception as e:
+            last_error = e
+            error_msg = str(e).lower()
+            
+            # Check if it's a "model not found" error
+            if '404' in error_msg or 'not found' in error_msg or 'not available' in error_msg:
+                if debug:
+                    print(f"⚠️  Model {attempt_model} not available, trying next fallback...")
+                    print(f"   Error: {e}")
+                    print()
+                continue
+            else:
+                # Other error, don't fallback
+                if debug:
+                    print(f"❌ Error calling Google Gemini API: {e}", file=sys.stderr)
+                raise
+    
+    # All models failed
+    if debug:
+        print(f"❌ All Gemini models failed. Last error: {last_error}", file=sys.stderr)
+    raise Exception(f"All Gemini models failed. Last error: {last_error}")
+
+
 def call_openai_api(prompt: str, api_key: str, model: str, max_tokens: int, temperature: float, debug: bool = False) -> Dict:
     """
     Call OpenAI API to analyze the test failure.
@@ -253,6 +375,7 @@ def call_openai_api(prompt: str, api_key: str, model: str, max_tokens: int, temp
         # Add metadata
         result['_metadata'] = {
             'model': model,
+            'provider': 'openai',
             'prompt_tokens': response.usage.prompt_tokens,
             'completion_tokens': response.usage.completion_tokens,
             'total_tokens': response.usage.total_tokens
@@ -269,16 +392,37 @@ def call_openai_api(prompt: str, api_key: str, model: str, max_tokens: int, temp
 def main():
     args = parse_args()
     
-    # Get API key
-    api_key = args.api_key or os.environ.get('OPENAI_API_KEY')
+    # Determine provider and get appropriate API key
+    provider = args.provider.lower()
+    
+    if provider == "google":
+        # Check multiple env var names (CI uses SYSTEM_TEST_ANALYZER_ prefix)
+        api_key = args.api_key or os.environ.get('GOOGLE_API_KEY') or os.environ.get('SYSTEM_TEST_ANALYZER_GOOGLE_API_KEY')
+        default_model = "gemini-3-pro-preview"  # Latest preview (with fallback to gemini-2.5-flash)
+        api_name = "Google Gemini"
+        env_var_name = "GOOGLE_API_KEY / SYSTEM_TEST_ANALYZER_GOOGLE_API_KEY"
+    else:  # openai
+        # Check multiple env var names (CI uses SYSTEM_TEST_ANALYZER_ prefix)
+        api_key = args.api_key or os.environ.get('OPENAI_API_KEY') or os.environ.get('SYSTEM_TEST_ANALYZER_OPENAI_API_KEY')
+        default_model = "gpt-4o"
+        api_name = "OpenAI"
+        env_var_name = "OPENAI_API_KEY / SYSTEM_TEST_ANALYZER_OPENAI_API_KEY"
+    
+    # Use default model if not specified
+    model = args.model or default_model
+    
+    # Check API key
     if not api_key:
-        print("❌ Error: OpenAI API key required (use --api-key or OPENAI_API_KEY env var)", file=sys.stderr)
+        print(f"❌ Error: {api_name} API key required", file=sys.stderr)
+        print(f"   Use --api-key or set {env_var_name} environment variable", file=sys.stderr)
         sys.exit(1)
     
     if args.debug:
         print("="*70)
         print("  LLM Test Failure Analysis")
         print("="*70)
+        print(f"Provider: {api_name}")
+        print(f"Model: {model}")
         print()
     
     # Load context
@@ -303,20 +447,30 @@ def main():
     
     prompt = build_prompt(llm_context, code_diffs)
     
-    # Call LLM
+    # Call LLM based on provider
     if args.debug:
-        print(f"🤖 Analyzing with {args.model}...")
+        print(f"🤖 Analyzing with {api_name} ({model})...")
         print()
     
     try:
-        analysis = call_openai_api(
-            prompt,
-            api_key,
-            args.model,
-            args.max_tokens,
-            args.temperature,
-            args.debug
-        )
+        if provider == "google":
+            analysis = call_google_api(
+                prompt,
+                api_key,
+                model,
+                args.max_tokens,
+                args.temperature,
+                args.debug
+            )
+        else:  # openai
+            analysis = call_openai_api(
+                prompt,
+                api_key,
+                model,
+                args.max_tokens,
+                args.temperature,
+                args.debug
+            )
     except Exception as e:
         print(f"❌ LLM analysis failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -330,6 +484,8 @@ def main():
     
     # Print summary
     print(f"✅ LLM analysis complete")
+    print(f"   Provider: {api_name}")
+    print(f"   Model: {model}")
     print(f"   Output: {args.output}")
     
     if args.debug:
