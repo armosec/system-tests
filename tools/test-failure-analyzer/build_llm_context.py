@@ -459,7 +459,8 @@ def build_llm_context(
     code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
     code_index: Optional[Dict[str, Any]] = None,
-    analysis_prompts: Optional[str] = None
+    analysis_prompts: Optional[str] = None,
+    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -695,11 +696,41 @@ def build_llm_context(
             if len(error_logs) > 5000:
                 truncated_error_logs += "\n... (truncated) ..."
     
+    # Process in-cluster logs if available
+    incluster_log_summary = {}
+    if incluster_logs:
+        total_incluster_lines = 0
+        incluster_log_summary = {
+            "components": list(incluster_logs.keys()),
+            "total_components": len(incluster_logs),
+            "lines_by_component": {},
+            "errors_by_component": {},
+            "warnings_by_component": {}
+        }
+        
+        for component, logs in incluster_logs.items():
+            line_count = len(logs)
+            total_incluster_lines += line_count
+            incluster_log_summary["lines_by_component"][component] = line_count
+            
+            # Count errors and warnings
+            errors = sum(1 for log in logs if log.get("level") == "error")
+            warnings = sum(1 for log in logs if log.get("level") == "warn")
+            
+            if errors > 0:
+                incluster_log_summary["errors_by_component"][component] = errors
+            if warnings > 0:
+                incluster_log_summary["warnings_by_component"][component] = warnings
+        
+        incluster_log_summary["total_lines"] = total_incluster_lines
+        metadata["incluster_log_summary"] = incluster_log_summary
+    
     context = {
         "metadata": metadata,
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
-        "code_chunks": formatted_chunks
+        "code_chunks": formatted_chunks,
+        "incluster_logs": incluster_logs or {}
     }
     
     # Calculate total size
@@ -745,6 +776,10 @@ def main():
     parser.add_argument(
         "--code-diffs",
         help="Path to code diffs JSON (from compare_code_indexes.py)"
+    )
+    parser.add_argument(
+        "--incluster-logs",
+        help="Path to in-cluster component logs JSON (from analyzer.py report.json)"
     )
     parser.add_argument(
         "--test-code",
@@ -811,6 +846,7 @@ def main():
         connected_context = load_json_file(args.connected_context) if args.connected_context else None
         code_diffs = load_json_file(args.code_diffs) if args.code_diffs else None
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
+        incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
         code_index = load_json_file(args.code_index) if args.code_index else None
         analysis_prompts = load_analysis_prompts(args.prompts_file if hasattr(args, 'prompts_file') else None)
@@ -839,7 +875,8 @@ def main():
             resolved_commits=resolved_commits,
             test_code=test_code,
             code_index=code_index,
-            analysis_prompts=analysis_prompts
+            analysis_prompts=analysis_prompts,
+            incluster_logs=incluster_logs
         )
         
         print(f"DEBUG: build_llm_context() returned", file=sys.stderr)

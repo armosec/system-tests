@@ -96,6 +96,35 @@ def generate_summary(
         loki_count = context_summary.get('loki_logs_count', 0)
         lines.append(f"**Total Loki Log Lines:** {loki_count}")
     
+    # Add in-cluster logs summary
+    incluster_log_summary = metadata.get('incluster_log_summary', {})
+    if incluster_log_summary and incluster_log_summary.get('total_lines', 0) > 0:
+        total_incluster_lines = incluster_log_summary.get('total_lines', 0)
+        total_components = incluster_log_summary.get('total_components', 0)
+        components = incluster_log_summary.get('components', [])
+        
+        lines.append(f"**In-Cluster Log Lines:** {total_incluster_lines} (from {total_components} components)")
+        
+        # Show error/warning counts if present
+        errors_by_comp = incluster_log_summary.get('errors_by_component', {})
+        warnings_by_comp = incluster_log_summary.get('warnings_by_component', {})
+        
+        if errors_by_comp or warnings_by_comp:
+            status_parts = []
+            total_errors = sum(errors_by_comp.values())
+            total_warnings = sum(warnings_by_comp.values())
+            
+            if total_errors > 0:
+                status_parts.append(f"❌ {total_errors} errors")
+            if total_warnings > 0:
+                status_parts.append(f"⚠️  {total_warnings} warnings")
+            
+            if status_parts:
+                lines.append(f"**In-Cluster Status:** {', '.join(status_parts)}")
+        
+        # Show components list
+        lines.append(f"**Components:** {', '.join(f'`{c}`' for c in components)}")
+    
     lines.append("")
     
     # ========================================
