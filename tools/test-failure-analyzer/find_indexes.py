@@ -189,6 +189,67 @@ def download_artifact(repo: str, artifact_name: str, output_dir: str, github_tok
         return None
 
 
+def get_commit_for_tag(repo_full_name: str, tag: str, github_token: str, debug: bool = False) -> Optional[str]:
+    """Get commit SHA for a Git tag using GitHub API."""
+    try:
+        headers = {'Authorization': f'token {github_token}'} if github_token else {}
+        url = f"https://api.github.com/repos/{repo_full_name}/git/ref/tags/{tag}"
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            # For lightweight tags, object.sha is the commit
+            # For annotated tags, we need to follow the tag object
+            object_type = data.get('object', {}).get('type')
+            sha = data.get('object', {}).get('sha')
+            
+            if object_type == 'commit':
+                if debug:
+                    print(f"   📌 Found commit for tag {tag}: {sha[:8]}")
+                return sha
+            elif object_type == 'tag':
+                # Annotated tag - need to dereference
+                tag_url = f"https://api.github.com/repos/{repo_full_name}/git/tags/{sha}"
+                tag_response = requests.get(tag_url, headers=headers, timeout=10)
+                if tag_response.status_code == 200:
+                    tag_data = tag_response.json()
+                    commit_sha = tag_data.get('object', {}).get('sha')
+                    if debug:
+                        print(f"   📌 Found commit for annotated tag {tag}: {commit_sha[:8]}")
+                    return commit_sha
+        
+        if debug:
+            print(f"   ⚠️  Could not find commit for tag {tag} (status: {response.status_code})")
+        return None
+    except Exception as e:
+        if debug:
+            print(f"   ⚠️  Failed to get commit for tag {tag}: {e}")
+        return None
+
+
+def extract_commit_from_index(index_path: str, debug: bool = False) -> Optional[str]:
+    """Extract commit SHA from code index metadata."""
+    if not index_path or not os.path.exists(index_path):
+        return None
+    
+    try:
+        with open(index_path, 'r') as f:
+            index = json.load(f)
+        
+        # Check metadata for commit/commitHash
+        metadata = index.get('metadata', {})
+        commit = metadata.get('commit') or metadata.get('commitHash')
+        
+        if commit and debug:
+            print(f"   📌 Extracted commit from index: {commit[:8]}")
+        
+        return commit
+    except Exception as e:
+        if debug:
+            print(f"   ⚠️  Failed to extract commit: {e}")
+        return None
+
+
 def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Tuple[Optional[str], str]:
     """
     Resolve RC code index using PR-based strategy.
@@ -264,9 +325,48 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     return None, "failed"
 
 
+def find_dependency_index(repo: str, version: str, github_org: str, 
+                          github_token: str, output_dir: str, debug: bool) -> Optional[str]:
+    """
+    Find and download code index for a dependency.
+    
+    Tries multiple strategies:
+    1. Version tag: code-index-v0.0.1160
+    2. Commit hash: code-index-{commit}
+    3. Latest: code-index-latest
+    
+    Returns:
+        Path to downloaded index or None if not found
+    """
+    strategies = [
+        f"code-index-{version}",  # Try version tag first
+        "code-index-latest"       # Fallback to latest
+    ]
+    
+    for artifact_name in strategies:
+        if debug:
+            print(f"  Trying {repo}: {artifact_name}")
+        
+        index_path = download_artifact(repo, artifact_name, output_dir, 
+                                       github_token, github_org, debug)
+        if index_path:
+            return index_path
+    
+    return None
+
+
 def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Dict[str, Any]:
     """
     Resolve code indexes for all dependencies.
+    
+    New format handles version comparison:
+    {
+      "postgres-connector": {
+        "deployed_version": "v0.0.1160",
+        "rc_version": "v0.0.1165",
+        "version_changed": true
+      }
+    }
     
     Returns:
         Dict mapping dependency name to index info
@@ -274,54 +374,94 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
     results = {}
     
     for dep_name, dep_info in dependencies.items():
-        if not dep_info.get('has_index'):
+        if debug:
+            print(f"\n📦 Processing dependency: {dep_name}")
+        
+        deployed_ver = dep_info.get('deployed_version', 'unknown')
+        rc_ver = dep_info.get('rc_version', 'unknown')
+        version_changed = dep_info.get('version_changed', False)
+        
+        if deployed_ver == 'unknown' and rc_ver == 'unknown':
             if debug:
-                print(f"\n⏭️  Skipping {dep_name} (no code index available)")
+                print(f"  ⏭️  Skipping {dep_name} (no version info)")
             results[dep_name] = {
-                "found": False,
-                "reason": "no_index_workflow"
+                "deployed": {"found": False, "reason": "no_version"},
+                "rc": {"found": False, "reason": "no_version"},
+                "version_changed": False
             }
             continue
         
-        version = dep_info.get('version', '')
-        repo = dep_info.get('repo', '')
-        
-        if not repo:
+        # Resolve deployed version
+        deployed_index = None
+        deployed_found = False
+        if deployed_ver != 'unknown':
             if debug:
-                print(f"\n⏭️  Skipping {dep_name} (no repo info)")
-            results[dep_name] = {
-                "found": False,
-                "reason": "no_repo_info"
-            }
-            continue
+                print(f"  🔍 Resolving deployed version: {deployed_ver}")
+            
+            deployed_index = find_dependency_index(
+                dep_name, deployed_ver, github_org, 
+                github_token, f"{output_dir}/{dep_name}-deployed", debug
+            )
+            deployed_found = deployed_index is not None
+            
+            if deployed_found:
+                if debug:
+                    print(f"  ✅ Found deployed index")
+            else:
+                if debug:
+                    print(f"  ⚠️  Deployed index not found")
         
-        # Extract repo name from full path (e.g., armosec/postgres-connector -> postgres-connector)
-        repo_name = repo.split('/')[-1]
+        # Resolve RC version if changed
+        rc_index = None
+        rc_found = False
+        if version_changed and rc_ver != 'unknown':
+            if debug:
+                print(f"  🔍 Resolving RC version: {rc_ver}")
+            
+            rc_index = find_dependency_index(
+                dep_name, rc_ver, github_org,
+                github_token, f"{output_dir}/{dep_name}-rc", debug
+            )
+            rc_found = rc_index is not None
+            
+            if rc_found:
+                if debug:
+                    print(f"  ✅ Found RC index")
+            else:
+                if debug:
+                    print(f"  ⚠️  RC index not found")
         
-        if debug:
-            print(f"\n🔍 Resolving dependency: {dep_name}")
-            print(f"   Deployed version: {version}")
+        # Extract commits from downloaded indexes
+        deployed_commit = None
+        if deployed_index:
+            deployed_commit = extract_commit_from_index(deployed_index, debug)
+            # Fallback: Get commit from Git tag if index has no metadata
+            if not deployed_commit and deployed_ver != 'unknown':
+                repo_full_name = f"{github_org}/{dep_name}"
+                deployed_commit = get_commit_for_tag(repo_full_name, deployed_ver, github_token, debug)
         
-        # Get deployed version index
-        deployed_path, deployed_strategy = resolve_deployed_index(
-            repo_name, version, f"{output_dir}/{dep_name}", github_token, github_org, debug
-        )
-        
-        # Get latest version index
-        if debug:
-            print(f"\n🔍 Resolving latest version for {dep_name}")
-        
-        latest_path = download_artifact(
-            repo_name, "code-index-latest", f"{output_dir}/{dep_name}/latest", github_token, github_org, debug
-        )
+        rc_commit = None
+        if rc_index:
+            rc_commit = extract_commit_from_index(rc_index, debug)
+            # Fallback: Get commit from Git tag if index has no metadata
+            if not rc_commit and rc_ver != 'unknown':
+                repo_full_name = f"{github_org}/{dep_name}"
+                rc_commit = get_commit_for_tag(repo_full_name, rc_ver, github_token, debug)
         
         results[dep_name] = {
-            "found": deployed_path is not None,
-            "deployed_version": version,
-            "deployed_index_path": deployed_path,
-            "deployed_strategy": deployed_strategy,
-            "latest_index_path": latest_path,
-            "repo": repo
+            "deployed": {
+                "version": deployed_ver,
+                "commit": deployed_commit,
+                "index_path": deployed_index,
+                "found": deployed_found
+            },
+            "rc": {
+                "version": rc_ver,
+                "commit": rc_commit,
+                "index_path": rc_index,
+                "found": rc_found
+            },
+            "version_changed": version_changed
         }
     
     return results
@@ -344,7 +484,13 @@ def main():
     
     results = {
         "triggering_repo": args.triggering_repo,
-        "indexes": {}
+        "indexes": {},
+        "dependencies_summary": {
+            "total": 0,
+            "indexes_found": 0,
+            "indexes_missing": 0,
+            "version_changes": []
+        }
     }
     
     # Resolve dashboard indexes (both RC and deployed)
@@ -360,8 +506,20 @@ def main():
             args.github_org,
             args.debug
         )
+        
+        # Extract commit from downloaded index
+        rc_commit = None
+        if rc_path:
+            rc_commit = extract_commit_from_index(rc_path, args.debug)
+            # Fallback to triggering_commit if not in index
+            if not rc_commit and args.triggering_commit:
+                rc_commit = args.triggering_commit
+                if args.debug:
+                    print(f"   📌 Using triggering commit as fallback: {rc_commit[:8]}")
+        
         dashboard_indexes["rc"] = {
             "version": args.rc_version,
+            "commit": rc_commit,
             "index_path": rc_path,
             "strategy": rc_strategy,
             "found": rc_path is not None
@@ -377,8 +535,21 @@ def main():
             args.github_org,
             args.debug
         )
+        
+        # Extract commit from downloaded index
+        deployed_commit = None
+        if deployed_path:
+            deployed_commit = extract_commit_from_index(deployed_path, args.debug)
+            # Fallback: Get commit from Git tag if index has no metadata
+            if not deployed_commit and args.deployed_version:
+                repo_full_name = f"{args.github_org}/{args.triggering_repo}"
+                deployed_commit = get_commit_for_tag(repo_full_name, args.deployed_version, github_token, args.debug)
+                if deployed_commit and args.debug:
+                    print(f"   📌 Using Git tag commit as fallback: {deployed_commit[:8]}")
+        
         dashboard_indexes["deployed"] = {
             "version": args.deployed_version,
+            "commit": deployed_commit,
             "index_path": deployed_path,
             "strategy": deployed_strategy,
             "found": deployed_path is not None
@@ -404,8 +575,20 @@ def main():
             args.debug
         )
         
+        # Add dependencies to results and calculate summary
         for dep_name, dep_info in dep_results.items():
             results["indexes"][dep_name] = dep_info
+            
+            # Update summary
+            results["dependencies_summary"]["total"] += 1
+            
+            if dep_info.get("deployed", {}).get("found") or dep_info.get("rc", {}).get("found"):
+                results["dependencies_summary"]["indexes_found"] += 1
+            else:
+                results["dependencies_summary"]["indexes_missing"] += 1
+            
+            if dep_info.get("version_changed"):
+                results["dependencies_summary"]["version_changes"].append(dep_name)
     
     # Save results
     output_path = Path(args.output)

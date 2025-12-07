@@ -129,6 +129,66 @@ def load_analysis_prompts(prompts_file: str = None) -> Optional[str]:
     return None
 
 
+def calculate_dependency_impact(dep_name: str, code_diffs: Dict, 
+                                call_chains: Dict, all_chunks: List[Dict]) -> tuple:
+    """
+    Calculate impact level for a dependency.
+    
+    Returns:
+        (impact_level, list of changed+called functions)
+    
+    Impact levels:
+        HIGH: Functions that both changed AND were called
+        MEDIUM: Functions changed but not called
+        LOW: Functions called but not changed
+        NONE: Not changed and not called
+    """
+    if not code_diffs or dep_name not in code_diffs:
+        return ("LOW", [])  # Called but not changed
+    
+    dep_diff = code_diffs[dep_name]
+    
+    # Skip if indexes were missing
+    if dep_diff.get('indexes_missing'):
+        return ("UNKNOWN", [])
+    
+    # Get changed functions
+    changed_funcs = set()
+    if 'functions' in dep_diff:
+        changed_funcs.update(dep_diff['functions'].get('added', []))
+        changed_funcs.update(dep_diff['functions'].get('removed', []))
+        # If there's a 'modified' field, include it
+        if 'modified' in dep_diff['functions']:
+            changed_funcs.update(dep_diff['functions'].get('modified', []))
+    
+    # Get called functions from call chains
+    called_funcs = set()
+    for mapping in call_chains.get('mappings', {}).values():
+        call_chain = mapping.get('call_chain', {})
+        cross_repo_calls = call_chain.get('cross_repo_calls', [])
+        
+        for cross_call in cross_repo_calls:
+            if cross_call.get('repo') == dep_name:
+                called_funcs.add(cross_call.get('function', ''))
+    
+    # Also check chunks with _repo tag
+    for chunk in all_chunks:
+        if chunk.get('_repo') == dep_name:
+            called_funcs.add(chunk.get('name', ''))
+    
+    # Calculate intersection
+    intersection = changed_funcs & called_funcs
+    
+    if intersection:
+        return ("HIGH", list(intersection))
+    elif called_funcs:
+        return ("LOW", [])
+    elif changed_funcs:
+        return ("MEDIUM", [])
+    else:
+        return ("NONE", [])
+
+
 def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Extract code chunks from API mapping with call chains."""
     chunks = []
@@ -396,9 +456,11 @@ def build_llm_context(
     connected_context: Optional[Dict[str, Any]] = None,
     error_logs: Optional[str] = None,
     resolved_commits: Optional[Dict[str, Any]] = None,
+    code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
     code_index: Optional[Dict[str, Any]] = None,
-    analysis_prompts: Optional[str] = None
+    analysis_prompts: Optional[str] = None,
+    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -409,6 +471,7 @@ def build_llm_context(
         workflow_commit: Workflow commit SHA
         api_mapping: Output from map_apis_with_call_chains.py
         connected_context: Output from extract_connected_context.py
+        code_diffs: Output from compare_code_indexes.py (multi-repo)
         error_logs: Error logs text
         resolved_commits: Output from resolve_repo_commits.py
         test_code: Test code (optional, if available)
@@ -517,6 +580,79 @@ def build_llm_context(
         metadata["chunks_by_source"][source] = metadata["chunks_by_source"].get(source, 0) + 1
         metadata["chunks_by_repo"][repo] = metadata["chunks_by_repo"].get(repo, 0) + 1
     
+    # Build dependency analysis if code_diffs available
+    if code_diffs and api_mapping:
+        print("📊 Building dependency impact analysis...", file=sys.stderr)
+        sys.stderr.flush()
+        
+        dependency_analysis = {}
+        repositories_included = set()
+        
+        # Collect all repos from chunks
+        for chunk in formatted_chunks:
+            repo = chunk.get("_repo") or chunk.get("repo")
+            if repo and repo != "cadashboardbe":
+                repositories_included.add(repo)
+        
+        # Analyze each dependency
+        for dep_name in repositories_included:
+            # Calculate impact
+            impact, critical_functions = calculate_dependency_impact(
+                dep_name, code_diffs, api_mapping, formatted_chunks
+            )
+            
+            # Get version info
+            deployed_ver = "unknown"
+            rc_ver = "unknown"
+            version_changed = False
+            
+            if dep_name in code_diffs:
+                deployed_ver = code_diffs[dep_name].get('old_version', 'unknown')
+                rc_ver = code_diffs[dep_name].get('new_version', 'unknown')
+                version_changed = code_diffs[dep_name].get('changed', False)
+            
+            # Count chunks from this dependency
+            chunks_included = sum(1 for c in formatted_chunks if c.get('_repo') == dep_name or c.get('repo') == dep_name)
+            
+            # Get called functions
+            functions_called = []
+            if api_mapping:
+                for mapping in api_mapping.get('mappings', {}).values():
+                    call_chain = mapping.get('call_chain', {})
+                    cross_repo_calls = call_chain.get('cross_repo_calls', [])
+                    
+                    for cross_call in cross_repo_calls:
+                        if cross_call.get('repo') == dep_name:
+                            func = cross_call.get('function', '')
+                            if func and func not in functions_called:
+                                functions_called.append(func)
+            
+            # Get changed functions
+            functions_changed = []
+            if dep_name in code_diffs and 'functions' in code_diffs[dep_name]:
+                functions_changed = (
+                    code_diffs[dep_name]['functions'].get('added', []) +
+                    code_diffs[dep_name]['functions'].get('removed', []) +
+                    code_diffs[dep_name]['functions'].get('modified', [])
+                )
+            
+            dependency_analysis[dep_name] = {
+                "deployed_version": deployed_ver,
+                "rc_version": rc_ver,
+                "version_changed": version_changed,
+                "chunks_included": chunks_included,
+                "functions_called": functions_called,
+                "functions_changed": functions_changed,
+                "functions_both_changed_and_called": critical_functions,
+                "impact": impact
+            }
+        
+        metadata["dependency_analysis"] = dependency_analysis
+        metadata["repositories_included"] = ["cadashboardbe"] + list(repositories_included)
+        
+        print(f"   Analyzed {len(dependency_analysis)} dependencies", file=sys.stderr)
+        sys.stderr.flush()
+    
     # Add repo commit information
     if resolved_commits:
         resolved = resolved_commits.get("resolved_commits", {})
@@ -560,11 +696,41 @@ def build_llm_context(
             if len(error_logs) > 5000:
                 truncated_error_logs += "\n... (truncated) ..."
     
+    # Process in-cluster logs if available
+    incluster_log_summary = {}
+    if incluster_logs:
+        total_incluster_lines = 0
+        incluster_log_summary = {
+            "components": list(incluster_logs.keys()),
+            "total_components": len(incluster_logs),
+            "lines_by_component": {},
+            "errors_by_component": {},
+            "warnings_by_component": {}
+        }
+        
+        for component, logs in incluster_logs.items():
+            line_count = len(logs)
+            total_incluster_lines += line_count
+            incluster_log_summary["lines_by_component"][component] = line_count
+            
+            # Count errors and warnings
+            errors = sum(1 for log in logs if log.get("level") == "error")
+            warnings = sum(1 for log in logs if log.get("level") == "warn")
+            
+            if errors > 0:
+                incluster_log_summary["errors_by_component"][component] = errors
+            if warnings > 0:
+                incluster_log_summary["warnings_by_component"][component] = warnings
+        
+        incluster_log_summary["total_lines"] = total_incluster_lines
+        metadata["incluster_log_summary"] = incluster_log_summary
+    
     context = {
         "metadata": metadata,
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
-        "code_chunks": formatted_chunks
+        "code_chunks": formatted_chunks,
+        "incluster_logs": incluster_logs or {}
     }
     
     # Calculate total size
@@ -606,6 +772,14 @@ def main():
     parser.add_argument(
         "--resolved-commits",
         help="Path to resolved repo commits JSON (from resolve_repo_commits.py)"
+    )
+    parser.add_argument(
+        "--code-diffs",
+        help="Path to code diffs JSON (from compare_code_indexes.py)"
+    )
+    parser.add_argument(
+        "--incluster-logs",
+        help="Path to in-cluster component logs JSON (from analyzer.py report.json)"
     )
     parser.add_argument(
         "--test-code",
@@ -670,7 +844,9 @@ def main():
         sys.stderr.flush()
         
         connected_context = load_json_file(args.connected_context) if args.connected_context else None
+        code_diffs = load_json_file(args.code_diffs) if args.code_diffs else None
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
+        incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
         code_index = load_json_file(args.code_index) if args.code_index else None
         analysis_prompts = load_analysis_prompts(args.prompts_file if hasattr(args, 'prompts_file') else None)
@@ -695,10 +871,12 @@ def main():
             api_mapping=api_mapping,
             connected_context=connected_context,
             error_logs=error_logs,
+            code_diffs=code_diffs,
             resolved_commits=resolved_commits,
             test_code=test_code,
             code_index=code_index,
-            analysis_prompts=analysis_prompts
+            analysis_prompts=analysis_prompts,
+            incluster_logs=incluster_logs
         )
         
         print(f"DEBUG: build_llm_context() returned", file=sys.stderr)
