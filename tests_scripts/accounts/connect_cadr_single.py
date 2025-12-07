@@ -32,7 +32,6 @@ class CloudConnectCADRSingle(Accounts):
         6. Create bad log location cloud account with cadr
         7. Delete cadr feature and validate account deleted
         """
-        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -48,6 +47,9 @@ class CloudConnectCADRSingle(Accounts):
         self.aws_manager = aws.AwsManager(stack_region, 
                                                   aws_access_key_id=aws_access_key_id, 
                                                   aws_secret_access_key=aws_secret_access_key)
+
+        account_id = self.aws_manager.get_account_id()
+        assert account_id is not None, f"Could not extract account ID from account {account_guid}"
         
         Logger.logger.info('Stage 2: Setup cloudtrail and log location')
         self.cloud_trail_name = CLOUDTRAIL_SYSTEM_TEST_CONNECT
@@ -61,6 +63,8 @@ class CloudConnectCADRSingle(Accounts):
         self.cadr_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-bad"
 
         Logger.logger.info('Stage 3: Connect cadr new account')
+        #validate that there are no existing accounts with cadr feature
+        self.validate_no_accounts_exists_by_id([account_id], CADR_FEATURE_NAME)
         account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_cloud_account_name, log_location)
         Logger.logger.info("cadr has been connected successfully")
         
