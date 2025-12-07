@@ -1887,18 +1887,26 @@ class Accounts(base_test.BaseTest):
         """Validate organization admin status."""
         self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
     
-    def validate_no_accounts_exists_by_id(self, account_ids: List[str], feature_name: str):
+    def validate_no_accounts_exists_by_id(self, account_ids: List[str], feature_name: Union[str, List[str]]):
         """
-        Validate that accounts with the specified IDs do NOT exist with the given feature.
-        If any accounts exist with the feature, fail the test with an informative message.
+        Validate that accounts with the specified IDs do NOT exist with the given feature(s).
+        If any accounts exist with any of the features, fail the test with an informative message.
         
         Args:
             account_ids: List of AWS account IDs to check
-            feature_name: Name of the feature to check (e.g., CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME)
+            feature_name: Name of the feature(s) to check. Can be a single feature name (str) 
+                         or a list of feature names (List[str]) (e.g., CADR_FEATURE_NAME, 
+                         COMPLIANCE_FEATURE_NAME, or [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
         
         Raises:
-            AssertionError: If any accounts exist with the specified feature, with detailed information
+            AssertionError: If any accounts exist with any of the specified features, with detailed information
         """
+        # Normalize feature_name to a list
+        if isinstance(feature_name, str):
+            feature_names = [feature_name]
+        else:
+            feature_names = feature_name
+        
         existing_accounts_with_feature = []
         
         for account_id in account_ids:
@@ -1909,31 +1917,44 @@ class Accounts(base_test.BaseTest):
                 account = res["response"][0]
                 # Get features dict, handling None case
                 features = account.get("features") or {}
-                # Check if account has the specified feature
-                if feature_name in features:
+                # Check if account has any of the specified features
+                found_features = [f for f in feature_names if f in features]
+                
+                if found_features:
                     # Extract required information
                     account_info = {
                         "guid": account.get("guid", "N/A"),
                         "accountID": account.get("providerInfo", {}).get("accountID", account_id),
                         "name": account.get("name", "N/A"),
                         "connectedFeatures": list(features.keys()),
-                        "managedByOrg": features.get(feature_name, {}).get("managedByOrg", "N/A")
+                        "foundFeatures": found_features,
+                        "managedByOrg": {}
                     }
+                    # Add managedByOrg for each found feature
+                    for feat in found_features:
+                        account_info["managedByOrg"][feat] = features.get(feat, {}).get("managedByOrg", "N/A")
+                    
                     existing_accounts_with_feature.append(account_info)
         
-        # If any accounts exist with the feature, fail with informative message
+        # If any accounts exist with any of the features, fail with informative message
         if len(existing_accounts_with_feature) > 0:
+            features_str = ", ".join([f"'{f}'" for f in feature_names])
             error_lines = [
-                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} account(s) that exist with feature '{feature_name}':"
+                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} account(s) that exist with feature(s) {features_str}:"
             ]
             for idx, acc in enumerate(existing_accounts_with_feature, 1):
+                managed_by_org_lines = []
+                for feat in acc["foundFeatures"]:
+                    managed_by_org_lines.append(f"      {feat}: {acc['managedByOrg'][feat]}")
+                
                 error_lines.append(
                     f"  Account {idx}:\n"
                     f"    GUID: {acc['guid']}\n"
                     f"    Account ID: {acc['accountID']}\n"
                     f"    Name: {acc['name']}\n"
                     f"    Connected Features: {', '.join(acc['connectedFeatures'])}\n"
-                    f"    Managed By Org ({feature_name}): {acc['managedByOrg']}"
+                    f"    Found Features: {', '.join(acc['foundFeatures'])}\n"
+                    f"    Managed By Org:\n" + "\n".join(managed_by_org_lines)
                 )
             error_message = "\n".join(error_lines)
             assert False, error_message
