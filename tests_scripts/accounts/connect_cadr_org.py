@@ -66,7 +66,7 @@ class CloudOrganizationCADR(Accounts):
 
         Logger.logger.info('Stage 1: Connect cadr new organization')
         #validate that there are no existing org with cadr feature
-        self.validate_no_accounts_exists_by_id([ORG_ID], CADR_FEATURE_NAME)
+        self.validate_org_not_exists_by_id(ORG_ID, CADR_FEATURE_NAME)
         org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
         Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")
                 

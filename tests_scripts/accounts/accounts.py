@@ -279,6 +279,18 @@ class Accounts(base_test.BaseTest):
             ]
         }
         return body
+    
+    def build_get_cloud_aws_org_by_orgID_request(self, orgID: str) -> Dict:
+        body = {
+            "pageSize": 1,
+            "pageNum": 1,
+            "innerFilters": [
+                {
+                    "providerData.providerEntityData.organizationID": orgID
+                }
+            ]
+        }
+        return body
 
     def setup_jira_config(self, site_name=DEFAULT_JIRA_SITE_NAME):
         """Setup Jira configuration using the standalone function."""
@@ -1925,7 +1937,45 @@ class Accounts(base_test.BaseTest):
                 )
             error_message = "\n".join(error_lines)
             assert False, error_message
+    
 
+    def validate_org_not_exists_by_id(self, org_id: str, feature_name: str):
+        """
+        Validate that an organization with the specified ID does NOT exist with the given feature.
+        If the organization exists with the feature, fail the test with an informative message.
+        
+        Args:
+            org_id: AWS organization ID (e.g., "o-63kbjphubt")
+            feature_name: Name of the feature to check (e.g., CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME)
+        
+        Raises:
+            AssertionError: If the organization exists with the specified feature, with detailed information
+        """
+        body = self.build_get_cloud_aws_org_by_orgID_request(org_id)
+        res = self.backend.get_cloud_orgs(body=body)
+        
+        if "response" in res and len(res["response"]) > 0:
+            org = res["response"][0]
+            # Get features dict, handling None case
+            features = org.get("features") or {}
+            # Check if org has the specified feature
+            if feature_name in features:
+                # Extract required information - only keys
+                org_info = {
+                    "guid": org.get("guid", "N/A"),
+                    "id": org.get("providerInfo", {}).get("accountID", org_id),
+                    "name": org.get("name", "N/A"),
+                    "featurelist": list(features.keys())
+                }
+                
+                error_message = (
+                    f"Organization with ID '{org_id}' exists with feature '{feature_name}' (this is bad):\n"
+                    f"  GUID: {org_info['guid']}\n"
+                    f"  ID: {org_info['id']}\n"
+                    f"  Name: {org_info['name']}\n"
+                    f"  Feature List: {', '.join(org_info['featurelist'])}"
+                )
+                assert False, error_message
 
     def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
         missing_accounts = []
