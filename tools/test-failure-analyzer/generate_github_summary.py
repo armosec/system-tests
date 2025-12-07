@@ -555,10 +555,19 @@ def generate_summary(
     
     # Show Loki logs info
     loki_logs = llm_context.get('loki_logs', [])
-    if loki_logs:
-        lines.append(f"- 📋 **Backend Logs:** {len(loki_logs)} Loki log entries captured")
+    loki_logs_text = llm_context.get('error_logs', '')
+    loki_has_content = bool(loki_logs) or (loki_logs_text and '=== Loki Excerpts ===' in loki_logs_text)
+    
+    if loki_has_content:
+        if loki_logs:
+            lines.append(f"- 📋 **Backend Logs:** {len(loki_logs)} Loki log entries captured")
+        else:
+            # Count lines in error_logs after Loki section
+            loki_section = loki_logs_text.split('=== Loki Excerpts ===')[1] if '=== Loki Excerpts ===' in loki_logs_text else ''
+            loki_line_count = len([l for l in loki_section.split('\n') if l.strip()]) if loki_section else 0
+            lines.append(f"- 📋 **Backend Logs:** ~{loki_line_count} Loki log lines captured")
     else:
-        lines.append(f"- ⚠️  **Backend Logs:** 0 entries (may need investigation)")
+        lines.append(f"- ⚠️  **Backend Logs:** No Loki logs captured (may need investigation)")
     
     lines.append("")
     
@@ -567,8 +576,8 @@ def generate_summary(
         lines.append("### **Next Steps:**\n")
         lines.append("1. Review error logs in the test output above")
         lines.append("2. Check code differences and recent changes")
-        if loki_logs:
-            lines.append("3. Analyze backend service logs (Loki excerpts)")
+        if loki_has_content:
+            lines.append("3. Analyze backend service logs (Loki excerpts in error_logs)")
         else:
             lines.append("3. ⚠️  Investigate why Loki logs are missing")
         lines.append("4. Download `llm-context-phase7` artifact for detailed analysis")
