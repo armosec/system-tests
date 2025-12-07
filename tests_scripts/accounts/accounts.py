@@ -1874,6 +1874,58 @@ class Accounts(base_test.BaseTest):
     def validate_admin_status(self, org_guid: str, expected_status: str):
         """Validate organization admin status."""
         self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
+    
+    def validate_no_accounts_exists_by_id(self, account_ids: List[str], feature_name: str):
+        """
+        Validate that accounts with the specified IDs do NOT exist with the given feature.
+        If any accounts exist with the feature, fail the test with an informative message.
+        
+        Args:
+            account_ids: List of AWS account IDs to check
+            feature_name: Name of the feature to check (e.g., CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME)
+        
+        Raises:
+            AssertionError: If any accounts exist with the specified feature, with detailed information
+        """
+        existing_accounts_with_feature = []
+        
+        for account_id in account_ids:
+            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if "response" in res and len(res["response"]) > 0:
+                account = res["response"][0]
+                # Get features dict, handling None case
+                features = account.get("features") or {}
+                # Check if account has the specified feature
+                if feature_name in features:
+                    # Extract required information
+                    account_info = {
+                        "guid": account.get("guid", "N/A"),
+                        "accountID": account.get("providerInfo", {}).get("accountID", account_id),
+                        "name": account.get("name", "N/A"),
+                        "connectedFeatures": list(features.keys()),
+                        "managedByOrg": features.get(feature_name, {}).get("managedByOrg", "N/A")
+                    }
+                    existing_accounts_with_feature.append(account_info)
+        
+        # If any accounts exist with the feature, fail with informative message
+        if len(existing_accounts_with_feature) > 0:
+            error_lines = [
+                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} account(s) that exist with feature '{feature_name}':"
+            ]
+            for idx, acc in enumerate(existing_accounts_with_feature, 1):
+                error_lines.append(
+                    f"  Account {idx}:\n"
+                    f"    GUID: {acc['guid']}\n"
+                    f"    Account ID: {acc['accountID']}\n"
+                    f"    Name: {acc['name']}\n"
+                    f"    Connected Features: {', '.join(acc['connectedFeatures'])}\n"
+                    f"    Managed By Org ({feature_name}): {acc['managedByOrg']}"
+                )
+            error_message = "\n".join(error_lines)
+            assert False, error_message
+
 
     def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
         missing_accounts = []

@@ -43,7 +43,6 @@ class CloudConnectCSPMSingle(Accounts):
         18. Delete cadr feature and validate
         19. Delete cspm feature and validate
         """
-        return statics.SUCCESS, ""
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         stack_region = REGION_SYSTEM_TEST
@@ -80,6 +79,8 @@ class CloudConnectCSPMSingle(Accounts):
         cloud_account_guid = self.connect_cspm_bad_arn(stack_region, bad_arn, self.cspm_bad_cloud_account_name)
 
         Logger.logger.info('Stage 4: Connect cspm new account')
+        #validate that there are no existing accounts with cspm feature
+        self.validate_no_accounts_exists_by_id([account_id], COMPLIANCE_FEATURE_NAME)
         cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id)
 
         # Store CSPM config for later validation

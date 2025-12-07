@@ -35,8 +35,6 @@ class CloudOrganizationCSPM(Accounts):
         """
         CSPM/Compliance-only organization test
         """
-        return statics.SUCCESS, ""
-
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
@@ -102,6 +100,9 @@ class CloudOrganizationCSPM(Accounts):
         compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-compliance-org"
         member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
 
+        #validate that there are no existing accounts manged by other orgs
+        self.validate_no_accounts_exists_by_id(expected_account_ids, COMPLIANCE_FEATURE_NAME)
+
         self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
         timeout=300, org_guid=test_org_guid, account_ids=expected_account_ids, 
         feature_name=COMPLIANCE_FEATURE_NAME)
@@ -161,7 +162,10 @@ class CloudOrganizationCSPM(Accounts):
         member_cloud_account_guid = res["response"][0]["guid"]
         self.update_and_validate_member_external_id(member_account_manager, test_org_guid, member_cloud_account_guid ,feature_name=COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('Stage 15: Update the stackset - add vuln connection')
+        Logger.logger.info('Stage 15: Update the stackset - add vuln connection')        
+        #validate that there are no existing accounts manged by other orgs for vuln scan feature after adding the feature
+        self.validate_no_accounts_exists_by_id(expected_account_ids, VULN_SCAN_FEATURE_NAME)
+
         # Add vulnerability scan feature to the organization
         self.add_cspm_feature_to_organization(
             aws_manager=self.delegated_admin_aws_manager,
