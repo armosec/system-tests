@@ -14,6 +14,7 @@ FRAMEWORKS_CONFIG = {
     "mitre_attack": 43,
     "nist_800_53_revision_5": 263,
     "pci_3.2.1": 13,
+    "pci_4.0": 0,  # Placeholder value (not validated, only key is checked)
     "soc2": 53,
     "iso27001_2022": 100
 }
