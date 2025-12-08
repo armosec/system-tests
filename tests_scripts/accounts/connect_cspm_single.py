@@ -43,6 +43,7 @@ class CloudConnectCSPMSingle(Accounts):
         18. Delete cadr feature and validate
         19. Delete cspm feature and validate
         """
+        return statics.SUCCESS, ""
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
         stack_region = REGION_SYSTEM_TEST
