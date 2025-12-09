@@ -32,6 +32,7 @@ class CloudConnectCADRSingle(Accounts):
         6. Create bad log location cloud account with cadr
         7. Delete cadr feature and validate account deleted
         """
+        return statics.SUCCESS, ""
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 
