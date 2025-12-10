@@ -14,11 +14,20 @@ class AccountsTests(object):
         )
 
     @staticmethod
-    def cloud_connect_aws_cspm_single():
-        from tests_scripts.accounts.connect_cspm_single import CloudConnectCSPMSingle
+    def cloud_connect_azure_cspm_single():
+        from tests_scripts.accounts.connect_cspm_single_azure import CloudConnectCSPMSingleAzure
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
-            test_obj=CloudConnectCSPMSingle,
+            test_obj=CloudConnectCSPMSingleAzure,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )
+
+    @staticmethod
+    def cloud_connect_aws_cspm_single():
+        from tests_scripts.accounts.connect_cspm_single_aws import CloudConnectCSPMSingleAWS
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudConnectCSPMSingleAWS,
             issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
         )
 

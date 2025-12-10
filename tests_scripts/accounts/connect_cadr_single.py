@@ -1,10 +1,15 @@
 import os
 import time
-from tests_scripts.accounts.accounts import Accounts, FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import CADR_FEATURE_NAME
-from tests_scripts.accounts.accounts import CloudEntityTypes, CDR_ALERT_ACCOUNT_ID_PATH
+from tests_scripts.accounts.accounts import (
+    Accounts,
+    CADR_FEATURE_NAME,
+    CDR_ALERT_ACCOUNT_ID_PATH,
+    CloudEntityTypes,
+    FEATURE_STATUS_CONNECTED,
+    PROVIDER_AWS,
+)
 import random
-from systest_utils import Logger, statics
+from systest_utils import Logger
 
 from infrastructure import aws
 
@@ -65,7 +70,7 @@ class CloudConnectCADRSingle(Accounts):
 
         Logger.logger.info('Stage 3: Connect cadr new account')
         #validate that there are no existing accounts with cadr feature
-        self.validate_no_accounts_exists_by_id([account_id], CADR_FEATURE_NAME)
+        self.validate_no_accounts_exists_by_id(PROVIDER_AWS, [account_id], CADR_FEATURE_NAME)
         account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_cloud_account_name, log_location)
         Logger.logger.info("cadr has been connected successfully")
         

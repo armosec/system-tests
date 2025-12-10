@@ -1679,6 +1679,22 @@
       "tests_scripts/accounts/clusters.py"
     ]
   },
+  "cloud_connect_azure_cspm_single": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks Azure cloud accounts connect with CSPM single subscription",
+    "skip_on_environment": "",
+    "owner": "benm@armosec.io",
+    "skip_cluster": true,
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_single_azure.py"
+    ]
+  },
   "cloud_connect_aws_cspm_single": {
     "target": [
       "Backend"
@@ -1687,12 +1703,12 @@
       "cadashboardbe",
       "event-ingester-service"
     ],
-    "description": "Checks cloud accounts connect with CSPM single account",
+    "description": "Checks AWS cloud accounts connect with CSPM single account",
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cspm_single.py"
+      "tests_scripts/accounts/connect_cspm_single_aws.py"
     ]
   },
   "cloud_connect_aws_cadr_single": {
