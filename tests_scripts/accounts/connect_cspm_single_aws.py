@@ -1,15 +1,21 @@
 import os
-import time
-from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import Accounts, CSPM_SCAN_STATE_COMPLETED, FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, extract_parameters_from_url
+from systest_utils import Logger
+from tests_scripts.accounts.accounts import (
+    Accounts,
+    CADR_FEATURE_NAME,
+    COMPLIANCE_FEATURE_NAME,
+    CSPM_SCAN_STATE_COMPLETED,
+    FEATURE_STATUS_CONNECTED,
+    PROVIDER_AWS,
+    extract_parameters_from_url,
+)
 import random
 from infrastructure import aws
 
 
 REGION_SYSTEM_TEST = "us-east-1"
 
-class CloudConnectCSPMSingle(Accounts):
+class CloudConnectCSPMSingleAWS(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
 
@@ -60,7 +66,7 @@ class CloudConnectCSPMSingle(Accounts):
                                                   aws_access_key_id=aws_access_key_id, 
                                                   aws_secret_access_key=aws_secret_access_key)
         
-        # cspm_stack_name doesn't require an existing account therefore can be created once and be used accross the test
+        # cspm_stack_name doesn't require an existing account therefore can be created once and be used across the test
         Logger.logger.info('Stage 2: Create cspm stack')
         self.cspm_stack_name = "systest-" + self.test_identifier_rand + "-cspm"
         aws_stack_response = self.get_and_validate_cspm_link_with_external_id(features=[COMPLIANCE_FEATURE_NAME], region=stack_region)
@@ -82,8 +88,8 @@ class CloudConnectCSPMSingle(Accounts):
 
         Logger.logger.info('Stage 4: Connect cspm new account')
         #validate that there are no existing accounts with cspm feature
-        self.validate_no_accounts_exists_by_id([account_id], COMPLIANCE_FEATURE_NAME)
-        cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id)
+        self.validate_no_accounts_exists_by_id(PROVIDER_AWS, [account_id], COMPLIANCE_FEATURE_NAME)
+        cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id)
 
         # Store CSPM config for later validation
         account = self.get_cloud_account_by_guid(cloud_account_guid)
@@ -93,7 +99,7 @@ class CloudConnectCSPMSingle(Accounts):
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
             # wait for success
-            self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance,
+            self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance_aws,
                                 timeout=1600,
                                 sleep_interval=60,
                                 cloud_account_guid=cloud_account_guid,
@@ -141,7 +147,7 @@ class CloudConnectCSPMSingle(Accounts):
         # Combination/Conflict section - test CSPM with CADR
         Logger.logger.info('Stage 14: Setup for combination test - reconnect CSPM account')
         # Reconnect CSPM for combination testing
-        cloud_account_guid = self.connect_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
+        cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
         
         # Store CSPM config for conflict validation
         account = self.get_cloud_account_by_guid(cloud_account_guid)
@@ -201,4 +207,3 @@ class CloudConnectCSPMSingle(Accounts):
     def cleanup(self, **kwargs):
         # Base Accounts.cleanup handles all stacks, stacksets, accounts, and organizations automatically
         return super().cleanup(**kwargs)
-

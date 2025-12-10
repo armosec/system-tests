@@ -1,7 +1,5 @@
-import os
 import datetime
 import json
-from re import T
 import time
 import uuid
 from dateutil import parser
@@ -9,12 +7,11 @@ from enum import Enum
 from typing import List, Tuple, Any, Dict, Union
 
 from infrastructure import aws
-from systest_utils import Logger, statics
-from urllib.parse import parse_qs, quote, urlparse
+from systest_utils import Logger
+from urllib.parse import parse_qs, urlparse
 from tests_scripts import base_test
 from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
 from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
-from pydantic import BaseModel
 from .cspm_test_models import (
     SeverityCount,
     ComplianceAccountResponse,
@@ -42,8 +39,6 @@ from .cspm_test_models import (
 )
 
 
-
-
 SCAN_TIME_WINDOW = 2000
 
 PROVIDER_AWS = "aws"
@@ -54,6 +49,10 @@ CADR_FEATURE_NAME = "cadr"
 COMPLIANCE_FEATURE_NAME = "cspm"
 VULN_SCAN_FEATURE_NAME = "vulnScan"
 
+PROVIDER_IDENTIFIER_FIELD_MAP = {
+    PROVIDER_AWS: "accountID",
+    PROVIDER_AZURE: "subscriptionID",
+}
 
 FEATURE_STATUS_CONNECTED = "Connected"
 FEATURE_STATUS_DISCONNECTED = "Disconnected"
@@ -321,7 +320,7 @@ class Accounts(base_test.BaseTest):
     def connect_cspm_vulnscan_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str: 
         if is_to_cleanup_accounts:
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
-            self.cleanup_existing_aws_cloud_accounts(account_id)
+            self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
         Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_vulnscan(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
@@ -329,21 +328,63 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return cloud_account_guid
 
-    def connect_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, is_to_cleanup_accounts=True)->str:
+    def connect_aws_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
-            self.cleanup_existing_aws_cloud_accounts(account_id)
+            self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
         Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=False)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        account = self.validate_accounts_cloud_list_cspm_compliance(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        self.validate_accounts_cloud_list_cspm_compliance_aws(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm unique values')
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
             Logger.logger.info('Edit name and validate cloud account with cspm')
-            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", arn)
+            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", provider=PROVIDER_AWS)
+        return cloud_account_guid
+
+    def connect_azure_cspm_new_account(
+        self,
+        subscription_id: str,
+        tenant_id: str,
+        client_id: str,
+        client_secret: str,
+        cloud_account_name: str,
+        services: List[str] = None,
+        skip_scan: bool = False,
+        validate_apis: bool = True,
+        is_to_cleanup_accounts: bool = True,
+    ) -> str:
+        """
+        Connect Azure CSPM account (called subscription in Azure) via Service Principal.
+        """
+        if is_to_cleanup_accounts:
+            Logger.logger.info(f"Cleaning up existing Azure cloud accounts for subscription {subscription_id}")
+            self.cleanup_existing_cloud_accounts(PROVIDER_AZURE, subscription_id)
+
+        Logger.logger.info(f"Creating and validating Azure CSPM cloud account: {cloud_account_name}, subscription: {subscription_id}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(
+            cloud_account_name=cloud_account_name,
+            subscription_id=subscription_id,
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+            services=services,
+            skip_scan=skip_scan,
+            expect_failure=False,
+        )
+        Logger.logger.info(f"connected azure cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
+        Logger.logger.info("Validate accounts cloud with azure cspm list")
+        self.validate_accounts_cloud_list_cspm_compliance_azure(cloud_account_guid, subscription_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
+
+        if validate_apis:
+            Logger.logger.info("Validate accounts cloud with cspm unique values")
+            self.validate_accounts_cloud_uniquevalues(cloud_account_name)
+            Logger.logger.info("Edit name and validate cloud account with cspm")
+            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", provider=PROVIDER_AZURE)
         return cloud_account_guid
     
     def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,
@@ -668,7 +709,7 @@ class Accounts(base_test.BaseTest):
     def connect_cspm_single_account_suppose_to_be_blocked(self, region:str, arn:str,external_id:str)->bool:
         Logger.logger.info(f"Creating and validating CSPM cloud account: need-to-block, ARN: {arn}, region: {region}, external_id: {external_id}")
         try:
-            cloud_account_guid = self.create_and_validate_cloud_account_with_cspm("need-to-block", arn, PROVIDER_AWS, region=region, external_id=external_id, expect_failure=True)
+            cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws("need-to-block", arn, region=region, external_id=external_id, expect_failure=True)
             if cloud_account_guid:
                 return False
             else:
@@ -681,7 +722,7 @@ class Accounts(base_test.BaseTest):
 
     def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
         Logger.logger.info(f"Attempting to connect CSPM with bad ARN: {arn} for account: {cloud_account_name}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm(cloud_account_name, arn, PROVIDER_AWS, region=region,external_id="", expect_failure=True)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id="", expect_failure=True)
         Logger.logger.info(f"Resulting cloud_account_guid for bad ARN: {cloud_account_guid}")
         return cloud_account_guid
 
@@ -696,9 +737,9 @@ class Accounts(base_test.BaseTest):
             aws_manager.wait_for_stack_creation(stack_name)
         except Exception as e:
             Logger.logger.error(f"An error occurred while waiting for stack creation: {e}")
-            failuer_reason = aws_manager.get_stack_failure_reason(stack_name)
-            Logger.logger.error(f"Stack failure reason: {failuer_reason}")
-            raise Exception(f"failed to create stack {stack_name}, failuer_reason is {failuer_reason}, exception is {e}")
+            failure_reason = aws_manager.get_stack_failure_reason(stack_name)
+            Logger.logger.error(f"Stack failure reason: {failure_reason}")
+            raise Exception(f"failed to create stack {stack_name}, failure_reason is {failure_reason}, exception is {e}")
         # Track with region-aware reference for accurate cleanup
         self.tested_stack_refs.append(StackRef(manager=aws_manager, stack_name=stack_name, region=aws_manager.region))
 
@@ -935,22 +976,31 @@ class Accounts(base_test.BaseTest):
         return True
 
 
-    def cleanup_existing_aws_cloud_accounts(self, account_id):
+    def cleanup_existing_cloud_accounts(self, provider: str, identifier: str):
         """
-        Cleanup existing aws cloud accounts.
+        Cleanup existing cloud accounts by provider and identifier.
+        
+        Args:
+            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, etc.)
+            identifier: The account identifier (account_id for AWS, subscription_id for Azure)
         """
-        Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id: {account_id}")
-        if not account_id:
-            Logger.logger.error("account_id is required for cleanup_existing_aws_cloud_accounts")
-            raise Exception("account_id is required")
-
+        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
+        if not identifier_field:
+            Logger.logger.error(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
+            raise Exception(f"Unknown provider {provider}")
+        
+        Logger.logger.info(f"Cleaning up existing {provider} cloud accounts for {identifier_field}: {identifier}")      
+        if not identifier:
+            Logger.logger.error(f"{identifier_field} is required for cleanup_existing_cloud_accounts")
+            raise Exception(f"{identifier_field} is required")
+        
         body = {
             "pageSize": 100,
             "pageNum": 0,
             "innerFilters": [
                 {
-                    "provider": PROVIDER_AWS,
-                    "providerInfo.accountID":account_id
+                    "provider": provider,
+                    f"providerInfo.{identifier_field}": identifier
                 }
             ]
         }
@@ -958,12 +1008,12 @@ class Accounts(base_test.BaseTest):
 
         if "response" in res:
             if len(res["response"]) == 0:
-                Logger.logger.info(f"No existing aws cloud accounts to cleanup for account_id {account_id}")
+                Logger.logger.info(f"No existing {provider} cloud accounts to cleanup for {identifier_field} {identifier}")
                 return
             for account in res["response"]:
                 guid = account["guid"]
                 self.backend.delete_cloud_account(guid)
-                Logger.logger.info(f"Deleted cloud account with guid {guid} for account_id {account_id}")
+                Logger.logger.info(f"Deleted {provider} cloud account with guid {guid} for {identifier_field} {identifier}")
 
         return res
 
@@ -1053,8 +1103,7 @@ class Accounts(base_test.BaseTest):
         }
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, expect_failure=expect_failure)
     
-    def create_and_validate_cloud_account_with_cspm(self, cloud_account_name: str, arn: str, provider: str, 
-                                                   region: str, external_id: str = "", skip_scan: bool = False, expect_failure: bool = False):
+    def create_and_validate_cloud_account_with_cspm_aws(self, cloud_account_name: str, arn: str, region: str, external_id: str = "", skip_scan: bool = False, expect_failure: bool = False):
         """Create and validate cloud account with CSPM feature."""
         cspm_config = {
             "crossAccountsRoleARN": arn,
@@ -1064,7 +1113,39 @@ class Accounts(base_test.BaseTest):
             cspm_config["externalID"] = external_id
             
         feature_config = {"cspmConfig": cspm_config}
-        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AWS, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
+
+    def create_and_validate_cloud_account_with_cspm_azure(
+        self,
+        cloud_account_name: str,
+        subscription_id: str,
+        tenant_id: str,
+        client_id: str,
+        client_secret: str,
+        services: List[str] = None,
+        skip_scan: bool = False,
+        expect_failure: bool = False,
+    ) -> str:
+        """
+        Create and validate Azure cloud account with CSPM feature using Service Principal credentials.
+        """
+        compliance_azure_config: Dict[str, Any] = {
+            "subscriptionID": subscription_id,
+            "tenantID": tenant_id,
+            "clientID": client_id,
+            "clientSecret": client_secret,
+        }
+        if services:
+            compliance_azure_config["services"] = services
+
+        feature_config = {"complianceAzureConfig": compliance_azure_config}
+        return self.create_and_validate_cloud_account_with_feature(
+            cloud_account_name,
+            PROVIDER_AZURE,
+            feature_config,
+            skip_scan=skip_scan,
+            expect_failure=expect_failure,
+        )
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
                                                    provider: str, region: str, expect_failure: bool = False) -> str:
@@ -1169,7 +1250,7 @@ class Accounts(base_test.BaseTest):
         
         return org_guid  # Returns None if failed, or GUID if it was created despite failure
 
-    def validate_accounts_cloud_list_cspm_compliance(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skipped_scan: bool = False):
+    def validate_accounts_cloud_list_cspm_compliance_aws(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skipped_scan: bool = False):
         """
         Validate accounts cloud list.
         """
@@ -1197,6 +1278,62 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return account
 
+    def validate_accounts_cloud_list_cspm_compliance_azure(self, cloud_account_guid: str, subscription_id: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
+        """
+        Validate Azure CSPM account listing and status.
+        
+        Args:
+            cloud_account_guid: GUID of the cloud account
+            subscription_id: Expected subscription ID
+            scan_status: Expected scan status (CSPM_SCAN_STATE_IN_PROGRESS, CSPM_SCAN_STATE_COMPLETED, etc.)
+                         Required when skipped_scan=False, can be None when skipped_scan=True
+            feature_status: Expected feature status
+            skipped_scan: Whether scan was skipped. When False, scan_status must be provided.
+        """
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        account_list = self.backend.get_cloud_accounts(body=body)
+        assert "response" in account_list, f"response not in {account_list}"
+        assert len(account_list["response"]) > 0, f"response is empty"
+        account = account_list["response"][0]
+
+        assert account["provider"] == PROVIDER_AZURE, f"provider is not azure: {account}"
+        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
+        feature = account["features"][COMPLIANCE_FEATURE_NAME]
+        assert feature["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {feature['featureStatus']}"
+        assert "config" in feature, f"config not in {feature}"
+        config = feature["config"]
+        assert config["subscriptionID"] == subscription_id, f"subscriptionID mismatch: {config}"
+        assert config["tenantID"], f"tenantID missing in config: {config}"
+        assert config["clientID"], f"clientID missing in config: {config}"
+        # clientSecret should not be returned back; ensure it is not exposed
+        assert "clientSecret" not in config, "clientSecret should not be returned in config"
+
+        provider_info = account["providerInfo"]
+        assert provider_info, f"providerInfo missing in account: {account}"
+        assert provider_info["subscriptionID"] == subscription_id, f"providerInfo subscriptionID mismatch: {provider_info}"
+        assert provider_info["tenantID"], f"providerInfo tenantID missing: {provider_info}"
+
+        if not skipped_scan:
+            assert feature["scanState"] == scan_status, f"scanState is not {scan_status} it is {feature['scanState']}"
+            assert "nextScanTime" in feature, f"nextScanTime key is missing from account features. Available keys: {list(feature.keys())}"
+            assert feature["nextScanTime"] != "", f"nextScanTime is empty"
+            if scan_status == CSPM_SCAN_STATE_COMPLETED:
+                assert feature["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+                assert feature["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+            elif scan_status == CSPM_SCAN_STATE_FAILED:
+                assert feature["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+        Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
+        return account
+
+    def connect_azure_cspm_bad_credentials(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str) -> str:
+        """
+        Attempt to connect Azure CSPM with invalid credentials (should fail).
+        Returns the cloud_account_guid if account was created despite failure, None otherwise.
+        """
+        Logger.logger.info(f"Attempting to connect Azure CSPM with bad credentials for account: {cloud_account_name}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(cloud_account_name, subscription_id, tenant_id, client_id, client_secret, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
+        return cloud_account_guid
 
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
         """
@@ -1214,7 +1351,7 @@ class Accounts(base_test.BaseTest):
             ],
             "pageSize": 100,
             "pageNum": 1
-            }
+        }
         
         res = self.backend.get_cloud_accounts_uniquevalues(body=unique_values_body)
         assert "fields" in res, f"failed to get fields for cloud accounts unique values, body used: {unique_values_body}, res is {res}"
@@ -1222,14 +1359,14 @@ class Accounts(base_test.BaseTest):
         assert len(res["fields"]["name"]) == 1, f"response is empty for name {cloud_account_name}, and request {unique_values_body}, res is {res}"
         assert res["fields"]["name"][0] == cloud_account_name, f"name is not {cloud_account_name}, request: {unique_values_body}, res: {res}"
 
-    def update_and_validate_cloud_account(self, guid:str, cloud_account_name:str, arn:str):
+    def update_and_validate_cloud_account(self, guid: str, cloud_account_name: str, provider: str = PROVIDER_AWS):
         Logger.logger.info(f"Updating cloud account {guid} to new name '{cloud_account_name}'")
         body = {
         "guid": guid,
         "name": cloud_account_name,
         }
 
-        res = self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
+        res = self.backend.update_cloud_account(body=body, provider=provider)
         assert "Cloud account updated" in res, f"Cloud account with guid {guid} was not updated"
         Logger.logger.info(f"Cloud account {guid} updated, validating update...")
         body = {
@@ -1887,13 +2024,14 @@ class Accounts(base_test.BaseTest):
         """Validate organization admin status."""
         self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
     
-    def validate_no_accounts_exists_by_id(self, account_ids: List[str], feature_name: Union[str, List[str]]):
+    def validate_no_accounts_exists_by_id(self, provider: str, ids: List[str], feature_name: Union[str, List[str]]):
         """
         Validate that accounts with the specified IDs do NOT exist with the given feature(s).
         If any accounts exist with any of the features, fail the test with an informative message.
         
         Args:
-            account_ids: List of AWS account IDs to check
+            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, etc.)
+            ids: List of account IDs to check (account_id for AWS, subscription_id for Azure)
             feature_name: Name of the feature(s) to check. Can be a single feature name (str) 
                          or a list of feature names (List[str]) (e.g., CADR_FEATURE_NAME, 
                          COMPLIANCE_FEATURE_NAME, or [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
@@ -1901,6 +2039,10 @@ class Accounts(base_test.BaseTest):
         Raises:
             AssertionError: If any accounts exist with any of the specified features, with detailed information
         """
+        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
+        if not identifier_field:
+            raise Exception(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
+        
         # Normalize feature_name to a list
         if isinstance(feature_name, str):
             feature_names = [feature_name]
@@ -1909,8 +2051,17 @@ class Accounts(base_test.BaseTest):
         
         existing_accounts_with_feature = []
         
-        for account_id in account_ids:
-            body = self.build_get_cloud_aws_org_by_accountID_request(account_id)
+        for identifier in ids:
+            body = {
+                "pageSize": 100,
+                "pageNum": 0,
+                "innerFilters": [
+                    {
+                        "provider": provider,
+                        f"providerInfo.{identifier_field}": identifier
+                    }
+                ]
+            }
             res = self.backend.get_cloud_accounts(body=body)
             
             if "response" in res and len(res["response"]) > 0:
@@ -1924,41 +2075,41 @@ class Accounts(base_test.BaseTest):
                     # Extract required information
                     account_info = {
                         "guid": account.get("guid", "N/A"),
-                        "accountID": account.get("providerInfo", {}).get("accountID", account_id),
+                        identifier_field: account.get("providerInfo", {}).get(identifier_field, identifier),
                         "name": account.get("name", "N/A"),
                         "connectedFeatures": list(features.keys()),
                         "foundFeatures": found_features,
-                        "managedByOrg": {}
                     }
-                    # Add managedByOrg for each found feature
-                    for feat in found_features:
-                        account_info["managedByOrg"][feat] = features.get(feat, {}).get("managedByOrg", "N/A")
+                    if provider == PROVIDER_AWS:
+                        # Add managedByOrg for each found feature
+                        account_info["managedByOrg"] = {}
+                        for feat in found_features:
+                            account_info["managedByOrg"][feat] = features.get(feat, {}).get("managedByOrg", "N/A")
                     
                     existing_accounts_with_feature.append(account_info)
         
         # If any accounts exist with any of the features, fail with informative message
-        if len(existing_accounts_with_feature) > 0:
+        if existing_accounts_with_feature:
             features_str = ", ".join([f"'{f}'" for f in feature_names])
             error_lines = [
-                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} account(s) that exist with feature(s) {features_str}:"
+                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} existing {provider} account(s) with feature(s) {features_str}:"
             ]
             for idx, acc in enumerate(existing_accounts_with_feature, 1):
-                managed_by_org_lines = []
-                for feat in acc["foundFeatures"]:
-                    managed_by_org_lines.append(f"      {feat}: {acc['managedByOrg'][feat]}")
-                
                 error_lines.append(
                     f"  Account {idx}:\n"
                     f"    GUID: {acc['guid']}\n"
-                    f"    Account ID: {acc['accountID']}\n"
+                    f"    {identifier_field}: {acc[identifier_field]}\n"
                     f"    Name: {acc['name']}\n"
                     f"    Connected Features: {', '.join(acc['connectedFeatures'])}\n"
                     f"    Found Features: {', '.join(acc['foundFeatures'])}\n"
-                    f"    Managed By Org:\n" + "\n".join(managed_by_org_lines)
                 )
+                if provider == PROVIDER_AWS:
+                    managed_by_org_lines = []
+                    for feat in acc["foundFeatures"]:
+                        managed_by_org_lines.append(f"      {feat}: {acc['managedByOrg'][feat]}")
+                    error_lines.append(f"    Managed By Org:\n" + "\n".join(managed_by_org_lines))
             error_message = "\n".join(error_lines)
             assert False, error_message
-    
 
     def validate_org_not_exists_by_id(self, org_id: str, feature_name: str):
         """
