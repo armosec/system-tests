@@ -89,11 +89,15 @@ class RuntimePoliciesConfigurations(Incidents):
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["more /etc/os-release"])
         
         
-        Logger.logger.info("4. Create SIEM webhook integration")
+        Logger.logger.info("4. Create SIEM webhook integration with events filter (only IncidentCreated and AlertCreated)")
         self.siem_integration_name = "systest-siem-webhook-integration-" + rand
         self.backend.create_siem_integration(
             provider=Providers.WEBHOOK,
-            body={"name": self.siem_integration_name, "configuration": {"webhookURL": siem_test_webhook_url}}
+            body={
+                "name": self.siem_integration_name,
+                "configuration": {"webhookURL": siem_test_webhook_url},
+                "events": ["IncidentCreated", "AlertCreated"]  # Only these events - policy events will be filtered
+            }
         )
         # Get the integration GUID by fetching it back
         integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
@@ -101,10 +105,14 @@ class RuntimePoliciesConfigurations(Incidents):
         for integration in integrations:
             if integration.get("name") == self.siem_integration_name:
                 siem_integration_guid = integration.get("guid")
+                # Verify events field is present and correct
+                assert "events" in integration, f"Events field missing in integration response: {integration}"
+                assert integration.get("events") == ["IncidentCreated", "AlertCreated"], \
+                    f"Expected events ['IncidentCreated', 'AlertCreated'], got {integration.get('events')}"
                 break
         assert siem_integration_guid, f"Failed to retrieve GUID for created SIEM integration: {self.siem_integration_name}"
         self.siem_integration_guids[siem_integration_guid] = Providers.WEBHOOK
-        Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid}")
+        Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid} and events filter: {integrations[0].get('events') if integrations else 'N/A'}")
 
         Logger.logger.info("5. validate incident types")
         self.validate_incident_types()
@@ -181,11 +189,29 @@ class RuntimePoliciesConfigurations(Incidents):
 
 
         Logger.logger.info("10. create new runtime policy with webhook")
+        # Get message count before creating policy to verify filtering
+        messages_before_create = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_before_create, list):
+            messages_before_create = []
+        count_before_create = len(messages_before_create)
+        
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
         self.validate_notifications(notifications_webhook, new_runtime_policy_body)
         
-        # Validate SIEM PolicyCreated event
-        self.wait_for_siem_event("RuntimePolicyCreated", siem_test_webhook_url)
+        # Verify RuntimePolicyCreated event is NOT received (filtered out - not in events list)
+        time.sleep(15)  # Wait for event to be processed if it would be sent
+        messages_after_create = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_after_create, list):
+            messages_after_create = []
+        new_messages_after_create = messages_after_create[count_before_create:] if len(messages_after_create) > count_before_create else []
+        runtime_policy_created_found = any(
+            msg.get("event_type") == "RuntimePolicyCreated" 
+            for msg in new_messages_after_create 
+            if isinstance(msg, dict)
+        )
+        assert not runtime_policy_created_found, \
+            f"RuntimePolicyCreated event was received but should have been filtered out. New messages: {new_messages_after_create}"
+        Logger.logger.info("✓ RuntimePolicyCreated event correctly filtered out (not in events list)")
     
         
  
@@ -214,11 +240,29 @@ class RuntimePoliciesConfigurations(Incidents):
 
         
         Logger.logger.info("11. update runtime policy with teams")
+        # Get message count before updating policy
+        messages_before_update = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_before_update, list):
+            messages_before_update = []
+        count_before_update = len(messages_before_update)
+        
         update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
         self.validate_notifications(notifications_teams, update_runtime_policy_body_res)
         
-        # Validate SIEM PolicyUpdated event
-        self.wait_for_siem_event("RuntimePolicyUpdated", siem_test_webhook_url)
+        # Verify RuntimePolicyUpdated event is NOT received (filtered out - not in events list)
+        time.sleep(15)  # Wait for event to be processed if it would be sent
+        messages_after_update = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_after_update, list):
+            messages_after_update = []
+        new_messages_after_update = messages_after_update[count_before_update:] if len(messages_after_update) > count_before_update else []
+        runtime_policy_updated_found = any(
+            msg.get("event_type") == "RuntimePolicyUpdated" 
+            for msg in new_messages_after_update 
+            if isinstance(msg, dict)
+        )
+        assert not runtime_policy_updated_found, \
+            f"RuntimePolicyUpdated event was received but should have been filtered out. New messages: {new_messages_after_update}"
+        Logger.logger.info("✓ RuntimePolicyUpdated event correctly filtered out (not in events list)")
         
 
         notifications_slack = [
@@ -232,18 +276,105 @@ class RuntimePoliciesConfigurations(Incidents):
 
         update_runtime_policy_body["notifications"]  = notifications_slack
         Logger.logger.info("12. update runtime policy with slack")
+        # Get message count before updating policy
+        messages_before_update2 = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_before_update2, list):
+            messages_before_update2 = []
+        count_before_update2 = len(messages_before_update2)
+        
         update_runtime_policy_body_res = self.validate_update_policy_against_backend(new_policy_guid, update_runtime_policy_body)
         self.validate_notifications(notifications_slack, update_runtime_policy_body_res)
         
-        # Validate SIEM PolicyUpdated event
-        self.wait_for_siem_event("RuntimePolicyUpdated", siem_test_webhook_url)
+        # Verify RuntimePolicyUpdated event is NOT received (filtered out - not in events list)
+        time.sleep(15)  # Wait for event to be processed if it would be sent
+        messages_after_update2 = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_after_update2, list):
+            messages_after_update2 = []
+        new_messages_after_update2 = messages_after_update2[count_before_update2:] if len(messages_after_update2) > count_before_update2 else []
+        runtime_policy_updated_found2 = any(
+            msg.get("event_type") == "RuntimePolicyUpdated" 
+            for msg in new_messages_after_update2 
+            if isinstance(msg, dict)
+        )
+        assert not runtime_policy_updated_found2, \
+            f"RuntimePolicyUpdated event was received but should have been filtered out. New messages: {new_messages_after_update2}"
+        Logger.logger.info("✓ RuntimePolicyUpdated event correctly filtered out (not in events list)")
 
 
         Logger.logger.info("13. delete runtime policy")
+        # Get message count before deleting policy
+        messages_before_delete = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_before_delete, list):
+            messages_before_delete = []
+        count_before_delete = len(messages_before_delete)
+        
         self.validate_delete_policy(new_policy_guid)
         
-        # Validate SIEM PolicyDeleted event
-        self.wait_for_siem_event("RuntimePolicyDeleted", siem_test_webhook_url)
+        # Verify RuntimePolicyDeleted event is NOT received (filtered out - not in events list)
+        time.sleep(15)  # Wait for event to be processed if it would be sent
+        messages_after_delete = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_after_delete, list):
+            messages_after_delete = []
+        new_messages_after_delete = messages_after_delete[count_before_delete:] if len(messages_after_delete) > count_before_delete else []
+        runtime_policy_deleted_found = any(
+            msg.get("event_type") == "RuntimePolicyDeleted" 
+            for msg in new_messages_after_delete 
+            if isinstance(msg, dict)
+        )
+        assert not runtime_policy_deleted_found, \
+            f"RuntimePolicyDeleted event was received but should have been filtered out. New messages: {new_messages_after_delete}"
+        Logger.logger.info("✓ RuntimePolicyDeleted event correctly filtered out (not in events list)")
+        
+        Logger.logger.info("13a. Update SIEM integration to include policy events and verify they are now received")
+        # Update integration to include policy events
+        current_integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
+        current_integration = None
+        for integration in current_integrations:
+            if integration.get("guid") == siem_integration_guid:
+                current_integration = integration
+                break
+        assert current_integration, f"Failed to find SIEM integration with GUID: {siem_integration_guid}"
+        
+        self.backend.update_siem_integration(
+            provider=Providers.WEBHOOK,
+            body={
+                "guid": siem_integration_guid,
+                "name": current_integration.get("name"),
+                "configuration": current_integration.get("configuration"),
+                "isEnabled": current_integration.get("isEnabled", True),
+                "events": ["IncidentCreated", "AlertCreated", "RuntimePolicyCreated", "RuntimePolicyUpdated", "RuntimePolicyDeleted", "RiskAcceptanceCreated", "RiskAcceptanceUpdated", "RiskAcceptanceDeleted"]
+            }
+        )
+        Logger.logger.info("✓ Updated SIEM integration to include policy events")
+        
+        # Create a new policy to verify RuntimePolicyCreated is now received
+        test_policy_for_events = {
+            "name": "Test-Policy-For-Events-" + rand,
+            "description": "Test policy to verify events are received",
+            "enabled": True,
+            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
+            "ruleSetType": "Managed",
+            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "notifications": [],
+            "actions": []
+        }
+        test_policy_guid = self.validate_new_policy(test_policy_for_events)
+        # Verify RuntimePolicyCreated event IS now received
+        self.wait_for_siem_event("RuntimePolicyCreated", siem_test_webhook_url, timeout=60)
+        Logger.logger.info("✓ RuntimePolicyCreated event received as expected (now in events list)")
+        
+        # Update the policy to verify RuntimePolicyUpdated is now received
+        test_policy_for_events["name"] = "Test-Policy-For-Events-Updated-" + rand
+        self.validate_update_policy_against_backend(test_policy_guid, test_policy_for_events)
+        # Verify RuntimePolicyUpdated event IS now received
+        self.wait_for_siem_event("RuntimePolicyUpdated", siem_test_webhook_url, timeout=60)
+        Logger.logger.info("✓ RuntimePolicyUpdated event received as expected (now in events list)")
+        
+        # Delete the policy to verify RuntimePolicyDeleted is now received
+        self.validate_delete_policy(test_policy_guid)
+        # Verify RuntimePolicyDeleted event IS now received
+        self.wait_for_siem_event("RuntimePolicyDeleted", siem_test_webhook_url, timeout=60)
+        Logger.logger.info("✓ RuntimePolicyDeleted event received as expected (now in events list)")
 
         Logger.logger.info("14. validate expected errors")
         self. validate_expected_errors()
@@ -346,8 +477,117 @@ class RuntimePoliciesConfigurations(Incidents):
             self.validate_delete_policy(policy_guid)
         # Validate SIEM PolicyDeleted event for each policy
         self.wait_for_siem_event("RuntimePolicyDeleted", siem_test_webhook_url)
+        
+        Logger.logger.info("27. Test SIEM Events filtering - Update existing integration with specific events")
+        # Get current integration to preserve its configuration
+        current_integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
+        current_integration = None
+        for integration in current_integrations:
+            if integration.get("guid") == siem_integration_guid:
+                current_integration = integration
+                break
+        assert current_integration, f"Failed to find existing SIEM integration with GUID: {siem_integration_guid}"
+        
+        # Update the existing integration to add events filter (only IncidentCreated and AlertCreated)
+        self.backend.update_siem_integration(
+            provider=Providers.WEBHOOK,
+            body={
+                "guid": siem_integration_guid,
+                "name": current_integration.get("name"),
+                "configuration": current_integration.get("configuration"),
+                "isEnabled": current_integration.get("isEnabled", True),
+                "events": ["IncidentCreated", "AlertCreated"]
+            }
+        )
+        # Verify the update was successful
+        updated_integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
+        updated_integration = None
+        for integration in updated_integrations:
+            if integration.get("guid") == siem_integration_guid:
+                updated_integration = integration
+                # Verify events field is present and correct
+                assert "events" in integration, f"Events field missing in integration response: {integration}"
+                assert integration.get("events") == ["IncidentCreated", "AlertCreated"], \
+                    f"Expected events ['IncidentCreated', 'AlertCreated'], got {integration.get('events')}"
+                break
+        assert updated_integration, f"Failed to retrieve updated SIEM integration with GUID: {siem_integration_guid}"
+        Logger.logger.info(f"Updated SIEM integration '{self.siem_integration_name}' with events filter: {updated_integration.get('events')}")
+        
+        Logger.logger.info("28. Test Events filtering - Verify IncidentCreated event IS received (in filter list)")
+        # Get initial message count to track new messages
+        initial_messages = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(initial_messages, list):
+            initial_messages = []
+        initial_count = len(initial_messages)
+        # Trigger an incident that should be sent (IncidentCreated is in the filter)
+        self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
+        self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                            cluster=cluster, namespace=namespace,
+                            incident_name=["Malware found"])
+        # Verify IncidentCreated event was received
+        self.wait_for_siem_event("IncidentCreated", siem_test_webhook_url, timeout=60)
+        Logger.logger.info("✓ IncidentCreated event received as expected (in filter list)")
+        
+        Logger.logger.info("29. Test Events filtering - Verify RuntimePolicyCreated event is NOT received (not in filter list)")
+        # Get message count before creating policy
+        messages_before = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_before, list):
+            messages_before = []
+        count_before = len(messages_before)
+        # Create a policy that should trigger RuntimePolicyCreated (but it's NOT in the filter)
+        test_policy_body = {
+            "name": "Filtered-Test-Policy-" + rand,
+            "description": "Test policy for events filtering",
+            "enabled": True,
+            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
+            "ruleSetType": "Managed",
+            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "notifications": [],
+            "actions": []
+        }
+        test_policy_guid = self.validate_new_policy(test_policy_body)
+        # Wait to ensure event would have been sent if not filtered
+        time.sleep(20)
+        # Verify RuntimePolicyCreated was NOT received
+        messages_after = self.backend.get_test_webhook_messages(siem_test_webhook_url)
+        if not isinstance(messages_after, list):
+            messages_after = []
+        # Check if any new RuntimePolicyCreated messages appeared
+        new_messages = messages_after[count_before:] if len(messages_after) > count_before else []
+        runtime_policy_created_found = any(
+            msg.get("event_type") == "RuntimePolicyCreated" 
+            for msg in new_messages 
+            if isinstance(msg, dict)
+        )
+        assert not runtime_policy_created_found, \
+            f"RuntimePolicyCreated event was received but should have been filtered out. New messages: {new_messages}"
+        Logger.logger.info("✓ RuntimePolicyCreated event correctly filtered out (not in filter list)")
+        # Clean up test policy
+        self.validate_delete_policy(test_policy_guid)
+        
+        Logger.logger.info("30. Restore SIEM integration to send all events (remove filter)")
+        # Update back to send all events (empty events list)
+        self.backend.update_siem_integration(
+            provider=Providers.WEBHOOK,
+            body={
+                "guid": siem_integration_guid,
+                "name": current_integration.get("name"),
+                "configuration": current_integration.get("configuration"),
+                "isEnabled": current_integration.get("isEnabled", True),
+                "events": []  # Empty list means send all events
+            }
+        )
+        # Verify events field is empty (or not present)
+        restored_integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
+        for integration in restored_integrations:
+            if integration.get("guid") == siem_integration_guid:
+                events = integration.get("events", [])
+                assert events == [] or len(events) == 0, \
+                    f"Expected empty events list (send all), got {events}"
+                Logger.logger.info(f"✓ SIEM integration restored to send all events")
+                break
             
-        Logger.logger.info("27. Delete SIEM integration")
+        Logger.logger.info("30. Delete SIEM integration")
         self.backend.delete_siem_integration(provider=Providers.WEBHOOK, guid=siem_integration_guid)
 
         return self.cleanup()
