@@ -522,14 +522,30 @@ class BaseKubescape(BaseK8S):
         else:
             arch = "amd64"  # default to amd64
 
-        # Extract version from release tag (e.g., "v3.0.47" -> "3.0.47")
-        version = release.lstrip("v") if release != "latest" else release
-
+        # If release is "latest", fetch the actual latest version tag
         if release == "latest":
-            # For latest, we need to fetch the actual latest version
-            download_url = f"https://github.com/{org}/kubescape/releases/latest/download/kubescape_{os_name}_{arch}"
-        else:
-            download_url = f"https://github.com/{org}/kubescape/releases/download/{release}/kubescape_{version}_{os_name}_{arch}"
+            try:
+                api_url = (
+                    f"https://api.github.com/repos/{org}/kubescape/releases/latest"
+                )
+                Logger.logger.debug(f"Fetching latest release from: {api_url}")
+                api_response = requests.get(api_url, timeout=10)
+                if api_response.status_code == 200:
+                    release = api_response.json()["tag_name"]
+                    Logger.logger.debug(f"Latest release is: {release}")
+                else:
+                    Logger.logger.warning(
+                        f"Failed to fetch latest release info, using 'latest' tag"
+                    )
+            except Exception as e:
+                Logger.logger.warning(
+                    f"Error fetching latest release: {e}, using 'latest' tag"
+                )
+
+        # Extract version from release tag (e.g., "v3.0.47" -> "3.0.47")
+        version = release.lstrip("v")
+
+        download_url = f"https://github.com/{org}/kubescape/releases/download/{release}/kubescape_{version}_{os_name}_{arch}"
 
         Logger.logger.debug("architecture: {}".format(platform.machine()))
         Logger.logger.debug("platform: {}".format(platform.platform()))
@@ -537,6 +553,18 @@ class BaseKubescape(BaseK8S):
 
         kubescape_exec = os.path.join(self.test_driver.temp_dir, "kubescape")
         res = requests.get(download_url)
+
+        # Check if download was successful
+        if res.status_code != 200:
+            raise Exception(
+                f"Failed to download kubescape: HTTP {res.status_code} from {download_url}"
+            )
+
+        # Check if we got a binary (not HTML error page)
+        if res.content.startswith(b"<!DOCTYPE") or res.content.startswith(b"<html"):
+            raise Exception(
+                f"Downloaded HTML instead of binary from {download_url}. The release asset may not exist."
+            )
 
         with open(kubescape_exec, "wb") as f:
             f.write(res.content)
