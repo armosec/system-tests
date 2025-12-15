@@ -2127,4 +2127,3 @@ class BaseKubescape(BaseK8S):
                 )
             )
         )
-                                      previous=False))
