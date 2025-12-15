@@ -1477,11 +1477,11 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe-dummy",
-      "event-ingester-service-dummy"
+      "cadashboardbe",
+      "event-ingester-service"
     ],
     "description": "testing linear integration",
-    "skip_on_environment": "staging,production,production-us,custom",
+    "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
@@ -1636,10 +1636,10 @@
     "target_repositories": [
       "users-notification-service",
       "cadashboardbe",
-      "event-ingester-service-dummy"
+      "event-ingester-service"
     ],
     "description": "Checks workflows linear notifications",
-    "skip_on_environment": "production,production-us",
+    "skip_on_environment": "",
     "customer_name": "SECOND_CUSTOMER",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
