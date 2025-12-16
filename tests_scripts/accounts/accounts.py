@@ -1835,9 +1835,9 @@ class Accounts(base_test.BaseTest):
         8. Validate scan data with accepted=False
         """
         # Get initial control and rule data
-        control_hash = self.validate_compliance_controls(last_success_scan_id, False)
-        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False)
-        resource_hash, _ = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, False, provider)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, provider)
+        resource_hash, _ = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False, provider)
 
         # 1. Create exception for specific resource
         Logger.logger.info("Creating exception for specific resource")
