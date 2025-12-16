@@ -13,6 +13,10 @@ from tests_scripts import base_test
 from tests_scripts.helm.jira_integration import setup_jira_config, DEFAULT_JIRA_SITE_NAME
 from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
 from .cspm_test_models import (
+    PROVIDER_AWS,
+    PROVIDER_AZURE,
+    FRAMEWORKS_CONFIG_PROVIDER_MAP,
+    TEST_CONFIG_PROVIDER_MAP,
     SeverityCount,
     ComplianceAccountResponse,
     ComplianceFramework,
@@ -22,13 +26,11 @@ from .cspm_test_models import (
     ComplianceResourceToCheck,
     ComplianceResourceSummaries,
     ComplianceControlWithChecks,
-    FRAMEWORKS_CONFIG,
-    DEFAULT_TEST_CONFIG,
-    get_expected_control_response,
-    get_expected_rules_response,
-    get_expected_resources_under_check_response,
-    get_expected_resource_summaries_response,
-    get_expected_only_check_under_control_response,
+    get_expected_aws_control_response,
+    get_expected_aws_rules_response,
+    get_expected_aws_resources_under_check_response,
+    get_expected_aws_resource_summaries_response,
+    get_expected_aws_only_check_under_control_response,
     AwsStackResponse,
     AwsMembersStackResponse,
     AWSOrgCreateCloudOrganizationAdminRequest,
@@ -40,10 +42,6 @@ from .cspm_test_models import (
 
 
 SCAN_TIME_WINDOW = 2000
-
-PROVIDER_AWS = "aws"
-PROVIDER_AZURE = "azure"
-PROVIDER_GCP = "gcp"
 
 CADR_FEATURE_NAME = "cadr"
 COMPLIANCE_FEATURE_NAME = "cspm"
@@ -1433,7 +1431,7 @@ class Accounts(base_test.BaseTest):
             assert feature_name not in res["response"][0]["features"], f"'{feature_name}' feature was not deleted and is in {res['response']['features']}, request: {body}"
 
 
-    def validate_scan_data(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str, with_accepted_resources: bool = False, with_jira: bool = False):
+    def validate_scan_data(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str, with_accepted_resources: bool = False, with_jira: bool = False, provider: str = PROVIDER_AWS):
         """
         Validate CSPM scan data across all relevant APIs.
 
@@ -1447,16 +1445,16 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"Validating account {cloud_account_guid}|{cloud_account_name} and its last scan ID {last_success_scan_id}")
 
         # self.validate_compliance_accounts(cloud_account_name, last_success_scan_id)
-        self.validate_compliance_frameworks(cloud_account_guid, last_success_scan_id)
-        control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira)
-        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira)
-        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id,rule_hash,with_accepted_resources,with_jira)
-        self.validate_resource_summaries_response(last_success_scan_id,resource_name,with_accepted_resources,with_jira)
-        self.validate_control_and_checks_under_resource(last_success_scan_id,resource_hash,with_accepted_resources,with_jira)
+        self.validate_compliance_frameworks(cloud_account_guid, last_success_scan_id, provider)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira,provider)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira,provider)
+        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id,rule_hash,with_accepted_resources,with_jira,provider)
+        self.validate_resource_summaries_response(last_success_scan_id,resource_name,with_accepted_resources,with_jira,provider)
+        self.validate_control_and_checks_under_resource(last_success_scan_id,resource_hash,with_accepted_resources,with_jira,provider)
 
         Logger.logger.info("Compliance account API data validation completed successfully")
 
-    def validate_compliance_accounts(self, cloud_account_name: str, last_success_scan_id: str):
+    def validate_compliance_accounts(self, cloud_account_name: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
         """Validate compliance accounts data."""
         # Get and validate severity counts
         severity_counts_res = self.backend.get_cloud_severity_count()
@@ -1473,13 +1471,15 @@ class Accounts(base_test.BaseTest):
         account_data = ComplianceAccountResponse(**accounts_data_res["response"][0])
 
         # Validate severity counts match
-        assert account_data.criticalSeverityResources == severity_counts.Critical
-        assert account_data.highSeverityResources == severity_counts.High
-        assert account_data.mediumSeverityResources == severity_counts.Medium
-        assert account_data.lowSeverityResources == severity_counts.Low
+        if provider == PROVIDER_AWS:
+            assert account_data.criticalSeverityResources == severity_counts.Critical
+            assert account_data.highSeverityResources == severity_counts.High
+            assert account_data.mediumSeverityResources == severity_counts.Medium
+            assert account_data.lowSeverityResources == severity_counts.Low
+        # TODO: Add validation for Azure
         assert account_data.reportGUID == last_success_scan_id
 
-    def validate_compliance_frameworks(self, cloud_account_guid: str, last_success_scan_id: str):
+    def validate_compliance_frameworks(self, cloud_account_guid: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
         """Validate compliance frameworks data."""
         # Validate frameworks API
         body = {
@@ -1489,7 +1489,7 @@ class Accounts(base_test.BaseTest):
         frameworks_res = self.backend.get_cloud_compliance_framework(body=body)
         frameworks = [ComplianceFramework(**f) for f in frameworks_res["response"]]
 
-        self._validate_frameworks(frameworks, last_success_scan_id)
+        self._validate_frameworks(frameworks, last_success_scan_id, provider)
 
         # Validate frameworks over time
         body = {
@@ -1502,12 +1502,12 @@ class Accounts(base_test.BaseTest):
         assert len(framework_over_time_resp["response"]) > 0, f"framework_over_time response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {framework_over_time_resp}"
         framework_over_time = ComplianceFrameworkOverTime(**framework_over_time_resp["response"][0])
 
-        self._validate_framework_over_time(framework_over_time, cloud_account_guid, last_success_scan_id)
+        self._validate_framework_over_time(framework_over_time, cloud_account_guid, last_success_scan_id, provider)
 
-    def _validate_frameworks(self, frameworks: List[ComplianceFramework], last_success_scan_id: str):
+    def _validate_frameworks(self, frameworks: List[ComplianceFramework], last_success_scan_id: str, provider : str = PROVIDER_AWS):
         """Validate framework data against expected values."""
         Logger.logger.info(f"frameworks: {frameworks}")
-        assert len(frameworks) == len(FRAMEWORKS_CONFIG), f"Expected {len(FRAMEWORKS_CONFIG)} frameworks, got {len(frameworks)}"
+        assert len(frameworks) == len(FRAMEWORKS_CONFIG_PROVIDER_MAP[provider]), f"Expected {len(FRAMEWORKS_CONFIG_PROVIDER_MAP[provider])} frameworks, got {len(frameworks)}"
 
         now = datetime.datetime.now(datetime.timezone.utc)
         scan_time_window = now - datetime.timedelta(minutes=SCAN_TIME_WINDOW)
@@ -1515,7 +1515,7 @@ class Accounts(base_test.BaseTest):
         framework_names = set()
         for framework in frameworks:
             framework_names.add(framework.name)
-            assert framework.name in FRAMEWORKS_CONFIG, f"Unexpected framework name: {framework.name}"
+            assert framework.name in FRAMEWORKS_CONFIG_PROVIDER_MAP[provider], f"Unexpected framework name: {framework.name}"
             assert framework.reportGUID == last_success_scan_id
             assert framework.failedControls > 0
             assert framework.complianceScorev1 > 0
@@ -1523,19 +1523,18 @@ class Accounts(base_test.BaseTest):
             timestamp = parser.parse(str(framework.timestamp))
             assert scan_time_window <= timestamp <= now, f"Timestamp {framework.timestamp} is not within the last {SCAN_TIME_WINDOW} minutes"
 
-        missing_frameworks = set(FRAMEWORKS_CONFIG.keys()) - framework_names
+        missing_frameworks = set(FRAMEWORKS_CONFIG_PROVIDER_MAP[provider].keys()) - framework_names
         assert not missing_frameworks, f"Missing frameworks: {missing_frameworks}"
 
-    def _validate_framework_over_time(self, framework_over_time: ComplianceFrameworkOverTime,
-                                    cloud_account_guid: str, last_success_scan_id: str):
+    def _validate_framework_over_time(self, framework_over_time: ComplianceFrameworkOverTime, cloud_account_guid: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
         """Validate framework over time data."""
         assert framework_over_time.cloudAccountGUID == cloud_account_guid
-        assert framework_over_time.provider == "aws"
+        assert provider in FRAMEWORKS_CONFIG_PROVIDER_MAP.keys(), f"Unexpected provider: {provider}"
 
         framework_names = set()
         for framework in framework_over_time.frameworks:
             framework_names.add(framework.frameworkName)
-            assert framework.frameworkName in FRAMEWORKS_CONFIG
+            assert framework.frameworkName in FRAMEWORKS_CONFIG_PROVIDER_MAP[provider].keys(), f"Unexpected framework name: {framework.frameworkName}"
             assert framework.complianceScore > 0
             assert len(framework.cords) > 0, f"framework.cords is empty for framework {framework.frameworkName}. This may indicate the backend hasn't fully processed the scan data yet."
 
@@ -1548,21 +1547,22 @@ class Accounts(base_test.BaseTest):
             scan_time_window = now - datetime.timedelta(minutes=SCAN_TIME_WINDOW)
             assert scan_time_window <= timestamp <= now
 
-        missing_frameworks = set(FRAMEWORKS_CONFIG.keys()) - framework_names
+        missing_frameworks = set(FRAMEWORKS_CONFIG_PROVIDER_MAP[provider].keys()) - framework_names
         assert not missing_frameworks, f"Missing frameworks: {missing_frameworks}"
 
 
-    def validate_compliance_controls(self, last_success_scan_id: str, with_accepted_resources: bool, with_jira: bool = False) -> str:
+    def validate_compliance_controls(self, last_success_scan_id: str, with_accepted_resources: bool, with_jira: bool = False, provider: str = PROVIDER_AWS) -> str:
         """Validate compliance controls data and return control hash."""
+        default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
         body = {
             "pageSize": 100,
             "pageNum": 1,
             "innerFilters": [
                 {
                     "reportGUID": last_success_scan_id,
-                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
-                    "cloudControlName": DEFAULT_TEST_CONFIG["control_name"],
-                    "status": DEFAULT_TEST_CONFIG["status"]
+                    "frameworkName": default_test_config["framework"],
+                    "cloudControlName": default_test_config["control_name"],
+                    "status": default_test_config["status"],
                 }
             ],
         }
@@ -1578,20 +1578,29 @@ class Accounts(base_test.BaseTest):
         control = ComplianceControl(**control_resp["response"][0])
 
         assert control.reportGUID == last_success_scan_id , f"Expected reportGUID: {last_success_scan_id}, got: {control.reportGUID}"
-        expected_response = get_expected_control_response(with_accepted_resources)
-        for key, value in expected_response.items():
-            if value != "":  # Skip empty string values as they're placeholders
-                assert getattr(control, key) == value, f"Expected {key}: {value}, got: {getattr(control, key)}"
-            elif key == "section":
-                assert getattr(control, key) != "", f"Expected non-empty section, got empty string"
+
+        if provider == PROVIDER_AWS:
+            expected_response = get_expected_aws_control_response(with_accepted_resources)
+            for key, value in expected_response.items():
+                if value != "":  # Skip empty string values as they're placeholders
+                    assert getattr(control, key) == value, f"Expected {key}: {value}, got: {getattr(control, key)}"
+                elif key == "section":
+                    assert getattr(control, key) != "", f"Expected non-empty section, got empty string"
+        else:
+            # TODO: Add validation for Azure
+            assert control.frameworkName, "frameworkName should not be empty"
+            assert control.cloudControlName, "cloudControlName should not be empty"
+            assert control.severity, "severity should not be empty"
+            assert control.checkType, "checkType should not be empty"
+            assert control.affectedResourcesCount >= 0
+            assert control.totalScannedResourcesCount >= control.failedResourcesCount
 
         if with_jira:
             assert control.tickets is not None and len(control.tickets) > 0, "Expected tickets to be present"
 
         return control.cloudControlHash
 
-    def validate_compliance_rules(self, last_success_scan_id: str, control_hash: str,
-                                 with_accepted_resources: bool = False, with_jira: bool = False) ->str:
+    def validate_compliance_rules(self, last_success_scan_id: str, control_hash: str, with_accepted_resources: bool = False, with_jira: bool = False, provider: str = PROVIDER_AWS) ->str:
         """Validate compliance checks data."""
         body = {
             "pageSize": 100,
@@ -1600,7 +1609,7 @@ class Accounts(base_test.BaseTest):
                 {
                     "reportGUID": last_success_scan_id,
                     "controlHash": control_hash,
-                    "frameworkName": DEFAULT_TEST_CONFIG["framework"]
+                    "frameworkName": TEST_CONFIG_PROVIDER_MAP[provider]["framework"],
                 }
             ],
         }
@@ -1610,9 +1619,17 @@ class Accounts(base_test.BaseTest):
         assert len(check_resp["response"]) > 0, f"rules response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {check_resp}"
         rule = ComplianceRuleSummary(**check_resp["response"][0])
 
-        expected_response = get_expected_rules_response(with_accepted_resources)
-        for key, value in expected_response.items():
-            assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+        if provider == PROVIDER_AWS:
+            expected_response = get_expected_aws_rules_response(with_accepted_resources)
+            for key, value in expected_response.items():
+                assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+        else:
+            # TODO: Add validation for Azure
+            assert rule.cloudCheckName, "cloudCheckName should not be empty"
+            assert rule.cloudCheckID, "cloudCheckID should not be empty"
+            assert rule.severity, "severity should not be empty"
+            assert rule.checkType, "checkType should not be empty"
+            assert rule.totalScannedResourcesCount >= rule.failedResourcesCount
 
         assert len(rule.affectedControls) > 0
 
@@ -1620,8 +1637,7 @@ class Accounts(base_test.BaseTest):
             assert rule.tickets is not None and len(rule.tickets) > 0, "Expected tickets to be present"
 
         return rule.cloudCheckHash
-    def validate_compliance_resources_under_rule(self, last_success_scan_id: str, rule_hash: str,
-                                              with_accepted_resources: bool, with_jira: bool) -> Tuple[str, str]:
+    def validate_compliance_resources_under_rule(self, last_success_scan_id: str, rule_hash: str, with_accepted_resources: bool, with_jira: bool, provider: str = PROVIDER_AWS) -> Tuple[str, str]:
         """Validate compliance resources under rule and return resource hash and name."""
         body = {
             "pageSize": 100,
@@ -1629,7 +1645,7 @@ class Accounts(base_test.BaseTest):
             "innerFilters": [
                 {
                     "reportGUID": last_success_scan_id,
-                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "frameworkName": TEST_CONFIG_PROVIDER_MAP[provider]["framework"],
                     "exceptionApplied": "|empty"
                 }
             ],
@@ -1642,23 +1658,32 @@ class Accounts(base_test.BaseTest):
         assert len(resources) == 1, f"Expected 1 resource, got: {len(resources)}"
 
         resource = resources[0]
-        expected_response = get_expected_resources_under_check_response(with_accepted_resources)
-        for key, value in expected_response.items():
-            if value != "":  # Skip empty string values as they're placeholders
-                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+
+        if provider == PROVIDER_AWS:
+            expected_response = get_expected_aws_resources_under_check_response(with_accepted_resources)
+            for key, value in expected_response.items():
+                if value != "":  # Skip empty string values as they're placeholders
+                    assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+        else:
+            # TODO: Add validation for Azure
+            assert resource.cloudResourceName, "cloudResourceName should not be empty"
+            assert resource.cloudResourceID, "cloudResourceID should not be empty"
+            assert resource.cloudResourceType, "cloudResourceType should not be empty"
+            assert resource.cloudCheckName, "cloudCheckName should not be empty"
+            assert resource.cloudCheckID, "cloudCheckID should not be empty"
 
         if with_jira:
             assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
 
         return resource.cloudResourceHash, resource.cloudResourceName
 
-    def validate_resource_summaries_response(self,last_success_scan_id:str,resource_name:str,with_accepted_resources:bool,with_jira:bool):
+    def validate_resource_summaries_response(self,last_success_scan_id:str,resource_name:str,with_accepted_resources:bool,with_jira:bool, provider: str = PROVIDER_AWS):
         body = {
             "pageSize": 100,
             "pageNum": 1,
             "innerFilters": [
                 {
-                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "frameworkName": TEST_CONFIG_PROVIDER_MAP[provider]["framework"],
                     "cloudResourceName": resource_name,
                     "reportGUID": last_success_scan_id
                 }
@@ -1672,51 +1697,73 @@ class Accounts(base_test.BaseTest):
         resources = [ComplianceResourceSummaries(**r) for r in resources_resp["response"]]
         assert len(resources) == 1, f"Expected resources, got: {resources}"
         resource = resources[0]
-        expected_response = get_expected_resource_summaries_response(with_accepted_resources)
-        for key, value in expected_response.items():
-              if value != "":  # Skip empty string values as they're placeholders
-                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+
+        if provider == PROVIDER_AWS:
+            expected_response = get_expected_aws_resource_summaries_response(with_accepted_resources)
+            for key, value in expected_response.items():
+                  if value != "":  # Skip empty string values as they're placeholders
+                    assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
+        else:
+            # TODO: Add validation for Azure
+            assert resource.cloudResourceName, "cloudResourceName should not be empty"
+            assert resource.cloudResourceID, "cloudResourceID should not be empty"
+            assert resource.cloudResourceType, "cloudResourceType should not be empty"
+            assert resource.frameworkName, "frameworkName should not be empty"
 
         if with_jira:
             assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
 
-    def validate_control_and_checks_under_resource(self,last_success_scan_id:str,resource_hash:str,with_accepted_resources:bool ,with_jira:bool):
+    def validate_control_and_checks_under_resource(self,last_success_scan_id:str,resource_hash:str,with_accepted_resources:bool ,with_jira:bool, provider: str = PROVIDER_AWS):
+        default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
         body = {
             "pageSize": 100,
             "pageNum": 1,
             "innerFilters": [
                 {
-                    "exceptionApplied" :"|empty",
+                    "exceptionApplied": "|empty",
                     "reportGUID": last_success_scan_id,
-                    "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+                    "frameworkName": default_test_config["framework"],
                     "cloudResourceHash": resource_hash,
-                    "status": DEFAULT_TEST_CONFIG["status"],
+                    "status": default_test_config["status"],
                 }
             ]
         }
         if with_accepted_resources:
             body["innerFilters"][0]["exceptionApplied"] = "true,|empty"
-            body["innerFilters"][0]["status"] =f"{DEFAULT_TEST_CONFIG['status']},ACCEPT"
+            body["innerFilters"][0]["status"] = f"{default_test_config['status']},ACCEPT"
             
 
         control_with_checks_resp = self.backend.get_cloud_compliance_controls(with_rules=True,body=body)
         assert len(control_with_checks_resp["response"]) > 0, f"control_with_checks response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {control_with_checks_resp}"
         control_with_checks = ComplianceControlWithChecks(**control_with_checks_resp["response"][0])
         assert control_with_checks.reportGUID == last_success_scan_id, f"Expected reportGUID: {last_success_scan_id}, got: {control_with_checks.ComplianceControl.reportGUID}"
-        assert control_with_checks.cloudControlName == DEFAULT_TEST_CONFIG["control_name"], f"Expected control name: {DEFAULT_TEST_CONFIG['control_name']}, got: {control_with_checks.ComplianceControl.name}"
+
+        if provider == PROVIDER_AWS:
+            assert control_with_checks.cloudControlName == default_test_config["control_name"], f"Expected control name: {default_test_config['control_name']}, got: {control_with_checks.ComplianceControl.name}"
+        else:
+            assert control_with_checks.cloudControlName, "cloudControlName should not be empty"
+
         assert len(control_with_checks.rules) == 1, f"Expected 1 rule, got: {len(control_with_checks.rules)}"
 
         rule = control_with_checks.rules[0]
-        expected_response = get_expected_only_check_under_control_response(with_accepted_resources)
-        for key, value in expected_response.items():
-            if value != "":
-                assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+
+        if provider == PROVIDER_AWS:
+            expected_response = get_expected_aws_only_check_under_control_response(with_accepted_resources)
+            for key, value in expected_response.items():
+                if value != "":
+                    assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
+        else:
+            # TODO: Add validation for Azure
+            assert rule.cloudCheckName, "cloudCheckName should not be empty"
+            assert rule.cloudCheckID, "cloudCheckID should not be empty"
+            assert rule.severity, "severity should not be empty"
+            assert rule.checkType, "checkType should not be empty"
 
         if with_jira:
             assert control_with_checks.tickets is not None and len(control_with_checks.tickets) > 0, "Expected tickets to be present in control"
             assert rule.tickets is not None and len(rule.tickets) > 0, "Expected tickets to be present in rule"
 
-    def create_jira_issue_for_cspm(self, last_success_scan_id: str, site_name: str = DEFAULT_JIRA_SITE_NAME):
+    def create_jira_issue_for_cspm(self, last_success_scan_id: str, site_name: str = DEFAULT_JIRA_SITE_NAME, provider: str = PROVIDER_AWS):
         """Create and validate a Jira issue for CSPM resource.
         Args:
             last_success_scan_id (str): The ID of the last successful scan
@@ -1727,9 +1774,9 @@ class Accounts(base_test.BaseTest):
             self.setup_jira_config(site_name)
 
         # Get control data first to use in the ticket
-        control_hash = self.validate_compliance_controls(last_success_scan_id, False, False)
-        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, False)
-        resource_hash, resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, False, False, provider)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, False, provider)
+        resource_hash, resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False, provider)
 
         # Create Jira issue
         Logger.logger.info(f"Create Jira issue for resource {resource_name} and rule {rule_hash}")
@@ -1745,14 +1792,15 @@ class Accounts(base_test.BaseTest):
         issue["subjects"] = [{
             "ruleHash": rule_hash
         }]
-        issue["fields"]["summary"] = f"{resource_name} ({DEFAULT_TEST_CONFIG['resource_type']}) - {DEFAULT_TEST_CONFIG['rule_name']}"
+        default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
+        issue["fields"]['summary'] = f"{resource_name} ({default_test_config['resource_type']}) - {default_test_config['rule_name']}"
         issue["fields"]["description"] = f"""CSPM System Test Issue
             Resource Name: {resource_name}
             Resource Hash: {resource_hash}
-            Framework: {DEFAULT_TEST_CONFIG['framework']}
-            Control: {DEFAULT_TEST_CONFIG['control_name']}
-            Status: {DEFAULT_TEST_CONFIG['status']}
-            Severity: {DEFAULT_TEST_CONFIG['severity']}
+            Framework: {default_test_config['framework']}
+            Control: {default_test_config['control_name']}
+            Status: {default_test_config['status']}
+            Severity: {default_test_config['severity']}
             """
 
         ticket = self.backend.create_jira_issue(issue)
@@ -1761,18 +1809,18 @@ class Accounts(base_test.BaseTest):
 
         # Validate ticket presence using existing validation functions with with_jira=True
         Logger.logger.info("Validating ticket presence in all APIs")
-        self.validate_compliance_controls(last_success_scan_id, False, True)
-        self.validate_compliance_rules(last_success_scan_id, control_hash, False, True)
-        self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, True)
-        self.validate_resource_summaries_response(last_success_scan_id, resource_name, False, True)
-        self.validate_control_and_checks_under_resource(last_success_scan_id, resource_hash, False, True)
+        self.validate_compliance_controls(last_success_scan_id, False, True, provider)
+        self.validate_compliance_rules(last_success_scan_id, control_hash, False, True, provider)
+        self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, True, provider)
+        self.validate_resource_summaries_response(last_success_scan_id, resource_name, False, True, provider)
+        self.validate_control_and_checks_under_resource(last_success_scan_id, resource_hash, False, True, provider)
 
         Logger.logger.info(f"Unlink Jira issue")
         self.backend.unlink_issue(ticket['guid'])
 
         return ticket
     
-    def accept_cspm_risk(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str):
+    def accept_cspm_risk(self, cloud_account_guid: str, cloud_account_name: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
         """
         Accept CSPM risk with different scopes and validate after each change.
         
@@ -1809,7 +1857,8 @@ class Accounts(base_test.BaseTest):
             cloud_account_guid=cloud_account_guid,
             cloud_account_name=cloud_account_name,
             last_success_scan_id=last_success_scan_id,
-            with_accepted_resources=True
+            with_accepted_resources=True,
+            provider=provider
         )
 
         # 2. Update to all resources in account
@@ -1829,7 +1878,8 @@ class Accounts(base_test.BaseTest):
             cloud_account_guid=cloud_account_guid,
             cloud_account_name=cloud_account_name,
             last_success_scan_id=last_success_scan_id,
-            with_accepted_resources=True
+            with_accepted_resources=True,
+            provider=provider
         )
 
         # 3. Delete exception
@@ -1845,7 +1895,8 @@ class Accounts(base_test.BaseTest):
             cloud_account_guid=cloud_account_guid,
             cloud_account_name=cloud_account_name,
             last_success_scan_id=last_success_scan_id,
-            with_accepted_resources=False
+            with_accepted_resources=False,
+            provider=provider
         )
 
     def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str, feature_name: str):

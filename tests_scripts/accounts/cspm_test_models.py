@@ -1,9 +1,13 @@
 from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 
 # Constants for test configuration
-FRAMEWORKS_CONFIG = {
+PROVIDER_AWS = "aws"
+PROVIDER_AZURE = "azure"
+PROVIDER_GCP = "gcp"
+
+FRAMEWORKS_CONFIG_AWS = {
     "cis_1.4": 50,
     "cis_1.5": 52,
     "cis_2.0": 52,
@@ -19,7 +23,32 @@ FRAMEWORKS_CONFIG = {
     "iso27001_2022": 100
 }
 
-DEFAULT_TEST_CONFIG = {
+FRAMEWORKS_CONFIG_AZURE = {
+    "cis_2.0": -1,
+    "cis_2.1": -1,
+    "cis_3.0": -1,
+    "mitre_attack": -1,
+    "iso27001_2022": -1,
+    "pci_4.0": -1,
+}
+
+FRAMEWORKS_CONFIG_GCP = {
+    "cis_2.0": -1,
+    "cis_2.1": -1,
+    "cis_3.0": -1,
+    "mitre_attack": -1,
+    "iso27001_2022": -1,
+    "pci_4.0": -1,
+    "soc2": -1,
+}
+
+FRAMEWORKS_CONFIG_PROVIDER_MAP = {
+    PROVIDER_AWS: FRAMEWORKS_CONFIG_AWS,
+    PROVIDER_AZURE: FRAMEWORKS_CONFIG_AZURE,
+    PROVIDER_GCP: FRAMEWORKS_CONFIG_GCP,
+}
+
+DEFAULT_TEST_CONFIG_AWS = {
     "framework": "cis_3.0",
     "control_name": "Ensure IAM instance roles are used for AWS resource access from instances",
     "rule_name": "Ensure IAM instance roles are used for AWS resource access from instances",
@@ -32,6 +61,27 @@ DEFAULT_TEST_CONFIG = {
     "resource_name" : "i-0df4d10d2f2ae99f7",
     "resource_type" :"ec2",
     "resource_id" : "arn:aws:ec2:eu-west-1:686255980207:instance/i-0df4d10d2f2ae99f7"
+}
+
+DEFAULT_TEST_CONFIG_AZURE = {
+    "framework": "cis_3.0",
+    "control_name": "",
+    "rule_name": "",
+    "rule_hash": "",
+    "rule_id": "",
+    "check_type": "",
+    "severity": "",
+    "status": "",
+    "resource_hash": "",
+    "resource_name": "",
+    "resource_type": "",
+    "resource_id": "",
+}
+
+TEST_CONFIG_PROVIDER_MAP = {
+    PROVIDER_AWS: DEFAULT_TEST_CONFIG_AWS,
+    PROVIDER_AZURE: DEFAULT_TEST_CONFIG_AZURE,
+    # PROVIDER_GCP: DEFAULT_TEST_CONFIG_GCP,
 }
 
 # Pydantic models for API responses
@@ -158,7 +208,7 @@ def get_expected_accounts_response(last_success_scan_id: str) -> Dict:
 def get_expected_framework_response(last_success_scan_id: str) -> Dict:
     """Get expected response for framework API."""
     return {
-        "name": None,  # Will be checked against FRAMEWORKS_CONFIG
+        "name": None,  # Will be checked against FRAMEWORKS_CONFIG_PROVIDER_MAP[provider]
         "reportGUID": last_success_scan_id,
         "failedControls": None,  # Will be checked > 0
         "complianceScorev1": None,  # Will be checked > 0
@@ -171,7 +221,7 @@ def get_expected_framework_over_time_response(cloud_account_guid: str, last_succ
         "cloudAccountGUID": cloud_account_guid,
         "provider": "aws",
         "frameworks": [{
-            "frameworkName": None,  # Will be checked against FRAMEWORKS_CONFIG
+            "frameworkName": None,  # Will be checked against FRAMEWORKS_CONFIG_PROVIDER_MAP[provider]
             "complianceScore": None,  # Will be checked > 0
             "cords": [{
                 "reportGUID": last_success_scan_id,
@@ -181,16 +231,16 @@ def get_expected_framework_over_time_response(cloud_account_guid: str, last_succ
         }]
     }
 
-def get_expected_control_response(with_accepted_resources: bool = False) -> Dict:
-    """Get expected response for control API."""
+def get_expected_aws_control_response(with_accepted_resources: bool = False) -> Dict:
+    """Get expected response for control API (AWS-specific)."""
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
-        "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+        "frameworkName": DEFAULT_TEST_CONFIG_AWS["framework"],
         "section": "",  # This will be checked to be non-empty
-        "cloudControlName": DEFAULT_TEST_CONFIG["control_name"],
-        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG["status"],
-        "severity":"none" if with_accepted_resources else DEFAULT_TEST_CONFIG["severity"],
-        "checkType": DEFAULT_TEST_CONFIG["check_type"],
+        "cloudControlName": DEFAULT_TEST_CONFIG_AWS["control_name"],
+        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["status"],
+        "severity":"none" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["severity"],
+        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
         "affectedResourcesCount": 1,
         "failedResourcesCount": 0 if with_accepted_resources else 1,
         "totalScannedResourcesCount": 1,
@@ -199,43 +249,43 @@ def get_expected_control_response(with_accepted_resources: bool = False) -> Dict
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_rules_response(with_accepted_resources: bool = False) -> Dict:
-    """Get expected response for check API."""
+def get_expected_aws_rules_response(with_accepted_resources: bool = False) -> Dict:
+    """Get expected response for check API (AWS-specific)."""
     return {
-        "cloudCheckName": DEFAULT_TEST_CONFIG["rule_name"],
-        "cloudCheckHash": DEFAULT_TEST_CONFIG["rule_hash"],
-        "cloudCheckID": DEFAULT_TEST_CONFIG["rule_id"],
-        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG["status"],
-        "severity": "none" if with_accepted_resources else DEFAULT_TEST_CONFIG["severity"],
-        "checkType": DEFAULT_TEST_CONFIG["check_type"],
+        "cloudCheckName": DEFAULT_TEST_CONFIG_AWS["rule_name"],
+        "cloudCheckHash": DEFAULT_TEST_CONFIG_AWS["rule_hash"],
+        "cloudCheckID": DEFAULT_TEST_CONFIG_AWS["rule_id"],
+        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["status"],
+        "severity": "none" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["severity"],
+        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
         "totalScannedResourcesCount": 1,
         "failedResourcesCount": 0 if with_accepted_resources else 1,
         "acceptedResourcesCount": 1 if with_accepted_resources else 0,
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_resources_under_check_response(with_accepted_resources: bool = False) -> Dict:
-    """Get expected response for resource to check API."""
+def get_expected_aws_resources_under_check_response(with_accepted_resources: bool = False) -> Dict:
+    """Get expected response for resource-to-check API (AWS-specific)."""
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
-        "cloudResourceHash": DEFAULT_TEST_CONFIG["resource_hash"],
-        "cloudResourceName": DEFAULT_TEST_CONFIG["resource_name"],
-        "cloudResourceID": DEFAULT_TEST_CONFIG["resource_id"],
-        "cloudResourceType": DEFAULT_TEST_CONFIG["resource_type"],
+        "cloudResourceHash": DEFAULT_TEST_CONFIG_AWS["resource_hash"],
+        "cloudResourceName": DEFAULT_TEST_CONFIG_AWS["resource_name"],
+        "cloudResourceID": DEFAULT_TEST_CONFIG_AWS["resource_id"],
+        "cloudResourceType": DEFAULT_TEST_CONFIG_AWS["resource_type"],
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_resource_summaries_response(with_accepted_resources: bool = False) -> Dict:
-    """Get expected response for resource summaries API."""
+def get_expected_aws_resource_summaries_response(with_accepted_resources: bool = False) -> Dict:
+    """Get expected response for resource-summaries API (AWS-specific)."""
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
         "cloudAccountGUID": "",  # This will be compared separately
         "provider": "aws",
-        "cloudResourceName": DEFAULT_TEST_CONFIG["resource_name"],
-        "cloudResourceID": DEFAULT_TEST_CONFIG["resource_id"],
-        "cloudResourceHash": DEFAULT_TEST_CONFIG["resource_hash"],
-        "cloudResourceType": DEFAULT_TEST_CONFIG["resource_type"],
-        "frameworkName": DEFAULT_TEST_CONFIG["framework"],
+        "cloudResourceName": DEFAULT_TEST_CONFIG_AWS["resource_name"],
+        "cloudResourceID": DEFAULT_TEST_CONFIG_AWS["resource_id"],
+        "cloudResourceHash": DEFAULT_TEST_CONFIG_AWS["resource_hash"],
+        "cloudResourceType": DEFAULT_TEST_CONFIG_AWS["resource_type"],
+        "frameworkName": DEFAULT_TEST_CONFIG_AWS["framework"],
         "failedControlsCount": 0 if with_accepted_resources else 1,
         "passedControlsCount": 1,
         "manualControlsCount": 0,
@@ -246,17 +296,17 @@ def get_expected_resource_summaries_response(with_accepted_resources: bool = Fal
         "lowSeverityControls": 0,
     }
 
-def get_expected_only_check_under_control_response(with_accepted_resources: bool = False) -> Dict:
-    """Get expected response for control with checks API."""
+def get_expected_aws_only_check_under_control_response(with_accepted_resources: bool = False) -> Dict:
+    """Get expected response for control-with-checks API (AWS-specific)."""
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
         "exceptionApplied": True if with_accepted_resources else False,
-        "severity": DEFAULT_TEST_CONFIG["severity"],
-        "status": DEFAULT_TEST_CONFIG["status"],
-        "checkType": DEFAULT_TEST_CONFIG["check_type"],
-        "cloudCheckHash": DEFAULT_TEST_CONFIG["rule_hash"],
-        "cloudCheckID": DEFAULT_TEST_CONFIG["rule_id"],
-        "cloudCheckName": DEFAULT_TEST_CONFIG["rule_name"],
+        "severity": DEFAULT_TEST_CONFIG_AWS["severity"],
+        "status": DEFAULT_TEST_CONFIG_AWS["status"],
+        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
+        "cloudCheckHash": DEFAULT_TEST_CONFIG_AWS["rule_hash"],
+        "cloudCheckID": DEFAULT_TEST_CONFIG_AWS["rule_id"],
+        "cloudCheckName": DEFAULT_TEST_CONFIG_AWS["rule_name"],
     }
 
 

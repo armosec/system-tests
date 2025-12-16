@@ -105,16 +105,16 @@ class CloudConnectCSPMSingleAzure(Accounts):
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
             Logger.logger.info("Stage 6: Validate all scan results")
-            self.validate_scan_data(cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
+            self.validate_scan_data(cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id, provider=PROVIDER_AZURE)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
                 Logger.logger.info("Stage 7: Create Jira issue for resource")
-                self.create_jira_issue_for_cspm(last_success_scan_id)
+                self.create_jira_issue_for_cspm(last_success_scan_id, provider=PROVIDER_AZURE)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
             Logger.logger.info("Stage 8: Accept the risk")
-            self.accept_cspm_risk(cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
+            self.accept_cspm_risk(cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id, provider=PROVIDER_AZURE)
             Logger.logger.info("risk has been accepted successfully")
 
         Logger.logger.info("Stage 9: Delete CSPM feature and validate")
