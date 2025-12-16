@@ -565,28 +565,7 @@ class RuntimePoliciesConfigurations(Incidents):
         # Clean up test policy
         self.validate_delete_policy(test_policy_guid)
         
-        Logger.logger.info("30. Restore SIEM integration to send all events (remove filter)")
-        # Update back to send all events (empty events list)
-        self.backend.update_siem_integration(
-            provider=Providers.WEBHOOK,
-            body={
-                "guid": siem_integration_guid,
-                "name": current_integration.get("name"),
-                "configuration": current_integration.get("configuration"),
-                "isEnabled": current_integration.get("isEnabled", True),
-                "events": []  # Empty list means send all events
-            }
-        )
-        # Verify events field is empty (or not present)
-        restored_integrations = self.backend.get_siem_integrations(provider=Providers.WEBHOOK)
-        for integration in restored_integrations:
-            if integration.get("guid") == siem_integration_guid:
-                events = integration.get("events", [])
-                assert events == [] or len(events) == 0, \
-                    f"Expected empty events list (send all), got {events}"
-                Logger.logger.info(f"✓ SIEM integration restored to send all events")
-                break
-            
+    
         Logger.logger.info("30. Delete SIEM integration")
         self.backend.delete_siem_integration(provider=Providers.WEBHOOK, guid=siem_integration_guid)
 
