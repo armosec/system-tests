@@ -1387,6 +1387,23 @@
       "tests_scripts/runtime/policies.py"
     ]
   },
+  "kdr_runtime_policies_configurations_no_cdr": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "Test kdr runtime policy configurations - list, create, update, delete, unique values - no CDR",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "jonathang@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/policies.py"
+    ]
+  },
   "kdr_slack_alerts": {
     "target": [
       "Backend"
