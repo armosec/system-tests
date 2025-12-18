@@ -4969,19 +4969,35 @@
     ],
     "tested_dashboard_apis": [
       {
-        "method": "GET",
+        "method": "POST",
         "path": "/api/v1/runtime/incidents"
       },
       {
         "method": "POST",
-        "path": "/api/v1/runtime/incidents"
+        "path": "/api/v1/runtime/incidents/changeStatus"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/{incident_id}/alerts/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/{incident_id}/alerts/uniqueValues"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}/process"
       },
       {
         "method": "POST",
         "path": "/api/v1/runtime/incidentsOvertime"
       },
       {
-        "method": "GET",
+        "method": "POST",
         "path": "/api/v1/runtime/incidentsPerSeverity"
       },
       {
@@ -5052,6 +5068,10 @@
         "path": "/api/v1/siem/{provider}"
       },
       {
+        "method": "PUT",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/uniqueValues/runtimeIncidentPolicy"
       }
@@ -5076,12 +5096,12 @@
     ],
     "tested_dashboard_apis": [
       {
-        "method": "GET",
+        "method": "POST",
         "path": "/api/v1/runtime/incidents"
       },
       {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
       },
       {
         "method": "POST",
@@ -5112,12 +5132,12 @@
     ],
     "tested_dashboard_apis": [
       {
-        "method": "GET",
+        "method": "POST",
         "path": "/api/v1/runtime/incidents"
       },
       {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidents"
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
       },
       {
         "method": "POST",
@@ -5300,11 +5320,11 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe-dummy",
+      "cadashboardbe",
       "event-ingester-service-dummy"
     ],
     "description": "testing linear integration",
-    "skip_on_environment": "staging,production,production-us,custom",
+    "skip_on_environment": "staging,production,production-us",
     "owner": "eranm@armosec.io",
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
@@ -5749,12 +5769,12 @@
       "Backend"
     ],
     "target_repositories": [
-      "users-notification-service",
+      "users-notification-service-dummy",
       "cadashboardbe",
       "event-ingester-service-dummy"
     ],
     "description": "Checks workflows linear notifications",
-    "skip_on_environment": "production,production-us",
+    "skip_on_environment": "",
     "customer_name": "SECOND_CUSTOMER",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
@@ -6033,7 +6053,11 @@
     "tested_dashboard_apis": [
       {
         "method": "POST",
-        "path": "/api/v1/runtime/incidents"
+        "path": "/api/v1/runtime/incidents/{incident_id}/auditlog"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/{incident_id}/response"
       }
     ]
   },
@@ -6112,12 +6136,45 @@
     "owner": "afekb@armosec.io",
     "test_implementation_files": [
       "tests_scripts/runtime/base_runtime.py",
-      "tests_scripts/runtime/cadr.py"
+      "tests_scripts/runtime/cadr.py",
+      "tests_scripts/runtime/incidents.py"
     ],
     "tested_dashboard_apis": [
       {
-        "method": "GET",
+        "method": "POST",
         "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/changeStatus"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/{incident_id}/alerts/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents/{incident_id}/alerts/uniqueValues"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}/process"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidentsPerSeverity"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/incidents"
       }
     ]
   },
