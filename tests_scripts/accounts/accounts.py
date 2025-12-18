@@ -1446,11 +1446,11 @@ class Accounts(base_test.BaseTest):
 
         # self.validate_compliance_accounts(cloud_account_name, last_success_scan_id)
         self.validate_compliance_frameworks(cloud_account_guid, last_success_scan_id, provider)
-        control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira,provider)
-        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira,provider)
-        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id,rule_hash,with_accepted_resources,with_jira,provider)
-        self.validate_resource_summaries_response(last_success_scan_id,resource_name,with_accepted_resources,with_jira,provider)
-        self.validate_control_and_checks_under_resource(last_success_scan_id,resource_hash,with_accepted_resources,with_jira,provider)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira, provider)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira, provider)
+        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, with_accepted_resources, with_jira, provider)
+        self.validate_resource_summaries_response(last_success_scan_id, resource_name, with_accepted_resources, with_jira, provider)
+        self.validate_control_and_checks_under_resource(last_success_scan_id, resource_hash, with_accepted_resources, with_jira, provider)
 
         Logger.logger.info("Compliance account API data validation completed successfully")
 
@@ -1835,8 +1835,8 @@ class Accounts(base_test.BaseTest):
         8. Validate scan data with accepted=False
         """
         # Get initial control and rule data
-        control_hash = self.validate_compliance_controls(last_success_scan_id, False, provider)
-        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, provider)
+        control_hash = self.validate_compliance_controls(last_success_scan_id, False, False, provider)
+        rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, False, False, provider)
         resource_hash, _ = self.validate_compliance_resources_under_rule(last_success_scan_id, rule_hash, False, False, provider)
 
         # 1. Create exception for specific resource

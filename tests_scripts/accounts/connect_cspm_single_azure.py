@@ -6,7 +6,6 @@ from tests_scripts.accounts.accounts import (
     Accounts,
     COMPLIANCE_FEATURE_NAME,
     CSPM_SCAN_STATE_COMPLETED,
-    FEATURE_STATUS_CONNECTED,
     PROVIDER_AZURE,
 )
 
