@@ -1814,7 +1814,8 @@
     "owner": "afekb@armosec.io",
     "test_implementation_files": [
       "tests_scripts/runtime/base_runtime.py",
-      "tests_scripts/runtime/cadr.py"
+      "tests_scripts/runtime/cadr.py",
+      "tests_scripts/runtime/incidents.py"
     ]
   },
   "runtime_stress_test": {
