@@ -204,7 +204,18 @@ def main():
                 args.max_changes
             )
             
-            diff['rc_commit'] = rc_info.get('version', '')
+            # Store commits (not versions) for git diff URLs
+            diff['rc_commit'] = rc_info.get('commit', '')
+            diff['deployed_commit'] = deployed_info.get('commit', '')
+            
+            # Also add git_diff section for compatibility with generate_github_summary.py
+            diff['git_diff'] = {
+                'deployed_commit': deployed_info.get('commit', ''),
+                'rc_commit': rc_info.get('commit', ''),
+                'total_commits': 0,  # Will be populated if git diff is run
+                'files': []  # Will be populated if git diff is run
+            }
+            
             results[triggering_repo] = diff
             
             if args.debug:
