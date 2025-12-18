@@ -1477,7 +1477,7 @@
       "Backend"
     ],
     "target_repositories": [
-      "cadashboardbe-dummy",
+      "cadashboardbe",
       "event-ingester-service-dummy"
     ],
     "description": "testing linear integration",
@@ -1635,7 +1635,7 @@
     ],
     "target_repositories": [
       "users-notification-service-dummy",
-      "cadashboardbe-dummy",
+      "cadashboardbe",
       "event-ingester-service-dummy"
     ],
     "description": "Checks workflows linear notifications",
