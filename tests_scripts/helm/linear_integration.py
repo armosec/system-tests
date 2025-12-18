@@ -489,6 +489,7 @@ class LinearIntegration(BaseKubescape, BaseHelm):
                         "workload": self.vulnWL["name"],
                         "cluster": self.cluster,
                         "namespace": self.namespace,
+                        "componentInfo.name": self.vuln["componentInfo"]["name"],
                         "tickets": "|exists",
                     }
                 ]
