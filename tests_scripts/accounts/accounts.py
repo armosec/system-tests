@@ -26,11 +26,11 @@ from .cspm_test_models import (
     ComplianceResourceToCheck,
     ComplianceResourceSummaries,
     ComplianceControlWithChecks,
-    get_expected_aws_control_response,
-    get_expected_aws_rules_response,
-    get_expected_aws_resources_under_check_response,
-    get_expected_aws_resource_summaries_response,
-    get_expected_aws_only_check_under_control_response,
+    get_expected_control_response,
+    get_expected_rules_response,
+    get_expected_resources_under_check_response,
+    get_expected_resource_summaries_response,
+    get_expected_only_check_under_control_response,
     AwsStackResponse,
     AwsMembersStackResponse,
     AWSOrgCreateCloudOrganizationAdminRequest,
@@ -1454,7 +1454,7 @@ class Accounts(base_test.BaseTest):
 
         Logger.logger.info("Compliance account API data validation completed successfully")
 
-    def validate_compliance_accounts(self, cloud_account_name: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
+    def validate_compliance_accounts(self, cloud_account_name: str, last_success_scan_id: str):
         """Validate compliance accounts data."""
         # Get and validate severity counts
         severity_counts_res = self.backend.get_cloud_severity_count()
@@ -1471,12 +1471,10 @@ class Accounts(base_test.BaseTest):
         account_data = ComplianceAccountResponse(**accounts_data_res["response"][0])
 
         # Validate severity counts match
-        if provider == PROVIDER_AWS:
-            assert account_data.criticalSeverityResources == severity_counts.Critical
-            assert account_data.highSeverityResources == severity_counts.High
-            assert account_data.mediumSeverityResources == severity_counts.Medium
-            assert account_data.lowSeverityResources == severity_counts.Low
-        # TODO: Add validation for Azure
+        assert account_data.criticalSeverityResources == severity_counts.Critical
+        assert account_data.highSeverityResources == severity_counts.High
+        assert account_data.mediumSeverityResources == severity_counts.Medium
+        assert account_data.lowSeverityResources == severity_counts.Low
         assert account_data.reportGUID == last_success_scan_id
 
     def validate_compliance_frameworks(self, cloud_account_guid: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
@@ -1579,21 +1577,12 @@ class Accounts(base_test.BaseTest):
 
         assert control.reportGUID == last_success_scan_id , f"Expected reportGUID: {last_success_scan_id}, got: {control.reportGUID}"
 
-        if provider == PROVIDER_AWS:
-            expected_response = get_expected_aws_control_response(with_accepted_resources)
-            for key, value in expected_response.items():
-                if value != "":  # Skip empty string values as they're placeholders
-                    assert getattr(control, key) == value, f"Expected {key}: {value}, got: {getattr(control, key)}"
-                elif key == "section":
-                    assert getattr(control, key) != "", f"Expected non-empty section, got empty string"
-        else:
-            # TODO: Add validation for Azure
-            assert control.frameworkName, "frameworkName should not be empty"
-            assert control.cloudControlName, "cloudControlName should not be empty"
-            assert control.severity, "severity should not be empty"
-            assert control.checkType, "checkType should not be empty"
-            assert control.affectedResourcesCount >= 0
-            assert control.totalScannedResourcesCount >= control.failedResourcesCount
+        expected_response = get_expected_control_response(with_accepted_resources, provider)
+        for key, value in expected_response.items():
+            if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(control, key) == value, f"Expected {key}: {value}, got: {getattr(control, key)}"
+            elif key == "section":
+                assert getattr(control, key) != "", f"Expected non-empty section, got empty string"
 
         if with_jira:
             assert control.tickets is not None and len(control.tickets) > 0, "Expected tickets to be present"
@@ -1619,17 +1608,9 @@ class Accounts(base_test.BaseTest):
         assert len(check_resp["response"]) > 0, f"rules response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {check_resp}"
         rule = ComplianceRuleSummary(**check_resp["response"][0])
 
-        if provider == PROVIDER_AWS:
-            expected_response = get_expected_aws_rules_response(with_accepted_resources)
-            for key, value in expected_response.items():
-                assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
-        else:
-            # TODO: Add validation for Azure
-            assert rule.cloudCheckName, "cloudCheckName should not be empty"
-            assert rule.cloudCheckID, "cloudCheckID should not be empty"
-            assert rule.severity, "severity should not be empty"
-            assert rule.checkType, "checkType should not be empty"
-            assert rule.totalScannedResourcesCount >= rule.failedResourcesCount
+        expected_response = get_expected_rules_response(with_accepted_resources, provider)
+        for key, value in expected_response.items():
+            assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
 
         assert len(rule.affectedControls) > 0
 
@@ -1659,18 +1640,10 @@ class Accounts(base_test.BaseTest):
 
         resource = resources[0]
 
-        if provider == PROVIDER_AWS:
-            expected_response = get_expected_aws_resources_under_check_response(with_accepted_resources)
-            for key, value in expected_response.items():
-                if value != "":  # Skip empty string values as they're placeholders
-                    assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
-        else:
-            # TODO: Add validation for Azure
-            assert resource.cloudResourceName, "cloudResourceName should not be empty"
-            assert resource.cloudResourceID, "cloudResourceID should not be empty"
-            assert resource.cloudResourceType, "cloudResourceType should not be empty"
-            assert resource.cloudCheckName, "cloudCheckName should not be empty"
-            assert resource.cloudCheckID, "cloudCheckID should not be empty"
+        expected_response = get_expected_resources_under_check_response(with_accepted_resources, provider)
+        for key, value in expected_response.items():
+            if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
 
         if with_jira:
             assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
@@ -1698,17 +1671,11 @@ class Accounts(base_test.BaseTest):
         assert len(resources) == 1, f"Expected resources, got: {resources}"
         resource = resources[0]
 
-        if provider == PROVIDER_AWS:
-            expected_response = get_expected_aws_resource_summaries_response(with_accepted_resources)
-            for key, value in expected_response.items():
-                  if value != "":  # Skip empty string values as they're placeholders
-                    assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
-        else:
-            # TODO: Add validation for Azure
-            assert resource.cloudResourceName, "cloudResourceName should not be empty"
-            assert resource.cloudResourceID, "cloudResourceID should not be empty"
-            assert resource.cloudResourceType, "cloudResourceType should not be empty"
-            assert resource.frameworkName, "frameworkName should not be empty"
+        expected_response = get_expected_resource_summaries_response(with_accepted_resources, provider)
+        Logger.logger.info(f"resource: {resource}\n expected_response: {expected_response}")
+        for key, value in expected_response.items():
+            if value != "":  # Skip empty string values as they're placeholders
+                assert getattr(resource, key) == value, f"Expected {key}: {value}, got: {getattr(resource, key)}"
 
         if with_jira:
             assert resource.tickets is not None and len(resource.tickets) > 0, "Expected tickets to be present"
@@ -1735,29 +1702,21 @@ class Accounts(base_test.BaseTest):
 
         control_with_checks_resp = self.backend.get_cloud_compliance_controls(with_rules=True,body=body)
         assert len(control_with_checks_resp["response"]) > 0, f"control_with_checks response is empty. This may indicate the backend hasn't fully processed the scan data yet. Response: {control_with_checks_resp}"
-        control_with_checks = ComplianceControlWithChecks(**control_with_checks_resp["response"][0])
+        for control in control_with_checks_resp["response"]:
+            if control["cloudControlName"] == default_test_config["control_name"]:
+                control_with_checks = ComplianceControlWithChecks(**control)
+                break
+        assert control_with_checks is not None, f"Control with name {default_test_config['control_name']} not found in response"
         assert control_with_checks.reportGUID == last_success_scan_id, f"Expected reportGUID: {last_success_scan_id}, got: {control_with_checks.ComplianceControl.reportGUID}"
-
-        if provider == PROVIDER_AWS:
-            assert control_with_checks.cloudControlName == default_test_config["control_name"], f"Expected control name: {default_test_config['control_name']}, got: {control_with_checks.ComplianceControl.name}"
-        else:
-            assert control_with_checks.cloudControlName, "cloudControlName should not be empty"
+        assert control_with_checks.cloudControlName == default_test_config["control_name"], f"Expected control name: {default_test_config['control_name']}, got: {control_with_checks.ComplianceControl.name}"
 
         assert len(control_with_checks.rules) == 1, f"Expected 1 rule, got: {len(control_with_checks.rules)}"
-
         rule = control_with_checks.rules[0]
 
-        if provider == PROVIDER_AWS:
-            expected_response = get_expected_aws_only_check_under_control_response(with_accepted_resources)
-            for key, value in expected_response.items():
-                if value != "":
-                    assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
-        else:
-            # TODO: Add validation for Azure
-            assert rule.cloudCheckName, "cloudCheckName should not be empty"
-            assert rule.cloudCheckID, "cloudCheckID should not be empty"
-            assert rule.severity, "severity should not be empty"
-            assert rule.checkType, "checkType should not be empty"
+        expected_response = get_expected_only_check_under_control_response(with_accepted_resources, provider)
+        for key, value in expected_response.items():
+            if value != "":
+                assert getattr(rule, key) == value, f"Expected {key}: {value}, got: {getattr(rule, key)}"
 
         if with_jira:
             assert control_with_checks.tickets is not None and len(control_with_checks.tickets) > 0, "Expected tickets to be present in control"
