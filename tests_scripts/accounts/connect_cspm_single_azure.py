@@ -86,8 +86,22 @@ class CloudConnectCSPMSingleAzure(Accounts):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         self.azure_cloud_account_name = account["name"]
 
+        Logger.logger.info("Stage 5: Try to connect the same account again (should fail)")
+        duplicate_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-duplicate"
+        # This should fail because the subscription is already connected
+        duplicate_cloud_account_guid = self.connect_azure_cspm_new_account(
+            subscription_id, tenant_id, client_id, client_secret, duplicate_account_name,
+            validate_apis=False, expect_failure=True, is_to_cleanup_accounts=False
+        )
+        assert duplicate_cloud_account_guid is None, \
+            f"Expected duplicate connection to fail (return None), but got {duplicate_cloud_account_guid}"
+        
+        # Verify the original account still exists
+        account = self.get_cloud_account_by_guid(cloud_account_guid)
+        assert account is not None, "Original account should still exist after duplicate connection attempt"
+
         if not self.skip_apis_validation:
-            Logger.logger.info("Stage 5: Wait for CSPM scan to complete successfully")
+            Logger.logger.info("Stage 6: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
                 self.validate_accounts_cloud_list_cspm_compliance_azure,
@@ -103,16 +117,16 @@ class CloudConnectCSPMSingleAzure(Accounts):
             last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
-            Logger.logger.info("Stage 6: Validate all scan results")
+            Logger.logger.info("Stage 7: Validate all scan results")
             self.validate_scan_data(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
-                Logger.logger.info("Stage 7: Create Jira issue for resource")
+                Logger.logger.info("Stage 8: Create Jira issue for resource")
                 self.create_jira_issue_for_cspm(PROVIDER_AZURE, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info("Stage 8: Accept the risk")
+            Logger.logger.info("Stage 9: Accept the risk")
             self.accept_cspm_risk(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 

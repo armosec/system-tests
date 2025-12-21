@@ -326,12 +326,12 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return cloud_account_guid
 
-    def connect_aws_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, is_to_cleanup_accounts=True)->str:
+    def connect_aws_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, expect_failure: bool = False, is_to_cleanup_accounts=True)->str:
         if is_to_cleanup_accounts:   
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
         Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=False)
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=expect_failure)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
         self.validate_accounts_cloud_list_cspm_compliance_aws(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
@@ -350,9 +350,9 @@ class Accounts(base_test.BaseTest):
         client_id: str,
         client_secret: str,
         cloud_account_name: str,
-        services: List[str] = None,
         skip_scan: bool = False,
         validate_apis: bool = True,
+        expect_failure: bool = False,
         is_to_cleanup_accounts: bool = True,
     ) -> str:
         """
@@ -363,26 +363,24 @@ class Accounts(base_test.BaseTest):
             self.cleanup_existing_cloud_accounts(PROVIDER_AZURE, subscription_id)
 
         Logger.logger.info(f"Creating and validating Azure CSPM cloud account: {cloud_account_name}, subscription: {subscription_id}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(
-            cloud_account_name=cloud_account_name,
-            subscription_id=subscription_id,
-            tenant_id=tenant_id,
-            client_id=client_id,
-            client_secret=client_secret,
-            services=services,
-            skip_scan=skip_scan,
-            expect_failure=False,
-        )
-        Logger.logger.info(f"connected azure cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
-        Logger.logger.info("Validate accounts cloud with azure cspm list")
-        self.validate_accounts_cloud_list_cspm_compliance_azure(cloud_account_guid, subscription_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
-        Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(cloud_account_name, subscription_id, tenant_id, client_id, client_secret, skip_scan, expect_failure)
+        
+        if cloud_account_guid is not None:
+            Logger.logger.info(f"connected azure cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
 
-        if validate_apis:
-            Logger.logger.info("Validate accounts cloud with cspm unique values")
-            self.validate_accounts_cloud_uniquevalues(cloud_account_name)
-            Logger.logger.info("Edit name and validate cloud account with cspm")
-            self.update_and_validate_cloud_account(PROVIDER_AZURE, cloud_account_guid, cloud_account_name + "-updated")
+            # Validate the account was created successfully
+            Logger.logger.info("Validate accounts cloud with azure cspm list")
+            self.validate_accounts_cloud_list_cspm_compliance_azure(cloud_account_guid, subscription_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+            Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
+
+            if validate_apis:
+                Logger.logger.info("Validate accounts cloud with cspm unique values")
+                self.validate_accounts_cloud_uniquevalues(cloud_account_name)
+                Logger.logger.info("Edit name and validate cloud account with cspm")
+                self.update_and_validate_cloud_account(PROVIDER_AZURE, cloud_account_guid, cloud_account_name + "-updated")
+        else:
+            if expect_failure:
+                Logger.logger.info(f"expected failure, returning None")
         return cloud_account_guid
     
     def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,
@@ -1120,7 +1118,6 @@ class Accounts(base_test.BaseTest):
         tenant_id: str,
         client_id: str,
         client_secret: str,
-        services: List[str] = None,
         skip_scan: bool = False,
         expect_failure: bool = False,
     ) -> str:
