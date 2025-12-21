@@ -198,7 +198,7 @@ class ComplianceResourceSummaries(BaseModel):
     containsAcceptedControlCount : int
     tickets: Optional[List[Dict]] = None
 
-def get_expected_control_response(with_accepted_resources: bool = False, provider: str = PROVIDER_AWS) -> Dict:
+def get_expected_control_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for control API (AWS-specific)."""
     default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
@@ -217,7 +217,7 @@ def get_expected_control_response(with_accepted_resources: bool = False, provide
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_rules_response(with_accepted_resources: bool = False, provider: str = PROVIDER_AWS) -> Dict:
+def get_expected_rules_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for check API (AWS-specific)."""
     default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
@@ -233,7 +233,7 @@ def get_expected_rules_response(with_accepted_resources: bool = False, provider:
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_resources_under_check_response(with_accepted_resources: bool = False, provider: str = PROVIDER_AWS) -> Dict:
+def get_expected_resources_under_check_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for resource-to-check API (AWS-specific)."""
     default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
@@ -245,7 +245,7 @@ def get_expected_resources_under_check_response(with_accepted_resources: bool = 
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_resource_summaries_response(with_accepted_resources: bool = False, provider: str = PROVIDER_AWS) -> Dict:
+def get_expected_resource_summaries_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for resource-summaries API (AWS-specific)."""
     default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     failed_controls_count = default_test_config["failed_controls_count"]
@@ -269,7 +269,7 @@ def get_expected_resource_summaries_response(with_accepted_resources: bool = Fal
         "lowSeverityControls": 0,
     }
 
-def get_expected_only_check_under_control_response(with_accepted_resources: bool = False, provider: str = PROVIDER_AWS) -> Dict:
+def get_expected_only_check_under_control_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for control-with-checks API (AWS-specific)."""
     default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
