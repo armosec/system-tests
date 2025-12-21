@@ -36,6 +36,11 @@ class CloudConnectCSPMSingleAzure(Accounts):
         # generate random suffix for uniqueness
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
+        Logger.logger.info("Stage 0: Cleanup existing Azure single accounts")
+        subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID_CLOUD_TESTS")
+        if subscription_id:
+            self.cleanup_azure_single_accounts_by_id(subscription_id, [COMPLIANCE_FEATURE_NAME])
+
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
         client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
         client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
@@ -50,10 +55,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm"
         bad_cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-bad"
 
-        Logger.logger.info("Stage 2: Validate no existing accounts with CSPM feature")
-        self.validate_no_accounts_exists_by_id(PROVIDER_AZURE, [subscription_id], COMPLIANCE_FEATURE_NAME)
-
-        Logger.logger.info("Stage 3: Test bad credentials (should fail)")
+        Logger.logger.info("Stage 2: Test bad credentials (should fail)")
         bad_client_secret = "invalid-secret-12345"
         cloud_account_guid_bad = self.connect_azure_cspm_bad_credentials(
             subscription_id=subscription_id,
@@ -79,7 +81,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         assert "response" in res, f"Failed to query accounts: {res}"
         assert len(res["response"]) == 0, f"Expected no account to be created with bad credentials, but found: {res['response']}"
 
-        Logger.logger.info("Stage 4: Connect Azure CSPM account")
+        Logger.logger.info("Stage 3: Connect Azure CSPM account")
         cloud_account_guid = self.connect_azure_cspm_new_account(subscription_id, tenant_id, client_id, client_secret, cloud_account_name, validate_apis=not self.skip_apis_validation)
 
         # Store account name for later validation
@@ -101,7 +103,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         assert account is not None, "Original account should still exist after duplicate connection attempt"
 
         if not self.skip_apis_validation:
-            Logger.logger.info("Stage 6: Wait for CSPM scan to complete successfully")
+            Logger.logger.info("Stage 4: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
                 self.validate_accounts_cloud_list_cspm_compliance_azure,
@@ -117,20 +119,20 @@ class CloudConnectCSPMSingleAzure(Accounts):
             last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
-            Logger.logger.info("Stage 7: Validate all scan results")
+            Logger.logger.info("Stage 5: Validate all scan results")
             self.validate_scan_data(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
-                Logger.logger.info("Stage 8: Create Jira issue for resource")
+                Logger.logger.info("Stage 6: Create Jira issue for resource")
                 self.create_jira_issue_for_cspm(PROVIDER_AZURE, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info("Stage 9: Accept the risk")
+            Logger.logger.info("Stage 7: Accept the risk")
             self.accept_cspm_risk(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
-        Logger.logger.info("Stage 9: Delete CSPM feature and validate")
+        Logger.logger.info("Stage 8: Delete CSPM feature and validate")
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info("Azure CSPM single subscription test completed successfully")

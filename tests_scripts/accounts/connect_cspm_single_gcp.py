@@ -82,8 +82,12 @@ class CloudConnectCSPMSingleGCP(Accounts):
         # generate random suffix for uniqueness
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
-        Logger.logger.info("Stage 1: Read GCP service account key and project id from env")
+        Logger.logger.info("Stage 0: Cleanup existing GCP single accounts")
         project_id = os.environ.get("GCP_PROJECT_ID_CLOUD_TESTS")
+        if project_id:
+            self.cleanup_gcp_single_accounts_by_id(project_id, [COMPLIANCE_FEATURE_NAME])
+
+        Logger.logger.info("Stage 1: Read GCP service account key and project id from env")
         service_account_key_raw = os.environ.get("GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS")
 
         assert project_id, "GCP_PROJECT_ID_CLOUD_TESTS is not set"
@@ -97,10 +101,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
         cloud_account_name = f"systest-{self.test_identifier_rand}-gcp-cspm"
         bad_cloud_account_name = f"systest-{self.test_identifier_rand}-gcp-cspm-bad"
 
-        Logger.logger.info("Stage 2: Validate no existing accounts with CSPM feature")
-        self.validate_no_accounts_exists_by_id(PROVIDER_GCP, [project_id], COMPLIANCE_FEATURE_NAME)
-
-        Logger.logger.info("Stage 3: Test bad credentials (should fail)")
+        Logger.logger.info("Stage 2: Test bad credentials (should fail)")
         # Create bad credentials as a separate variable to avoid any confusion
         bad_service_account_key = '{"type": "service_account", "project_id": "invalid", "private_key_id": "invalid", "private_key": "invalid", "client_email": "invalid@invalid.iam.gserviceaccount.com", "client_id": "invalid", "auth_uri": "https://accounts.google.com/o/oauth2/auth", "token_uri": "https://oauth2.googleapis.com/token", "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs", "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/invalid%40invalid.iam.gserviceaccount.com"}'
         
@@ -127,7 +128,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
         assert "response" in res, f"Failed to query accounts: {res}"
         assert len(res["response"]) == 0, f"Expected no account to be created with bad credentials, but found: {res['response']}"
 
-        Logger.logger.info("Stage 4: Connect GCP CSPM account")
+        Logger.logger.info("Stage 3: Connect GCP CSPM account")
         # Credentials already validated in _parse_and_validate_service_account_key above
         cloud_account_guid = self.connect_gcp_cspm_new_account(project_id, service_account_key, cloud_account_name, validate_apis=not self.skip_apis_validation)
 
@@ -141,7 +142,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
 
 
         if not self.skip_apis_validation:
-            Logger.logger.info("Stage 5: Wait for CSPM scan to complete successfully")
+            Logger.logger.info("Stage 4: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
                 self.validate_accounts_cloud_list_cspm_compliance_gcp,
@@ -157,20 +158,20 @@ class CloudConnectCSPMSingleGCP(Accounts):
             last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
-            Logger.logger.info("Stage 6: Validate all scan results")
+            Logger.logger.info("Stage 5: Validate all scan results")
             self.validate_scan_data(PROVIDER_GCP, cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
-                Logger.logger.info("Stage 7: Create Jira issue for resource")
+                Logger.logger.info("Stage 6: Create Jira issue for resource")
                 self.create_jira_issue_for_cspm(PROVIDER_GCP, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info("Stage 8: Accept the risk")
+            Logger.logger.info("Stage 7: Accept the risk")
             self.accept_cspm_risk(PROVIDER_GCP, cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
-            Logger.logger.info("Stage 9: Break service account permissions and reconnect")
+            Logger.logger.info("Stage 8: Break service account permissions and reconnect")
             # Break permissions by removing roles/viewer, scanNow, validate disconnected, restore, reconnect with skipScan
             
             self.break_and_reconnect_gcp_service_account(
@@ -181,7 +182,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
             )
             Logger.logger.info("Service account permissions broken and reconnected successfully")
 
-        Logger.logger.info("Stage 10: Delete CSPM feature and validate")
+        Logger.logger.info("Stage 9: Delete CSPM feature and validate")
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info("GCP CSPM single project test completed successfully")

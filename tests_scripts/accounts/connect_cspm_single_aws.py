@@ -7,6 +7,7 @@ from tests_scripts.accounts.accounts import (
     CSPM_SCAN_STATE_COMPLETED,
     FEATURE_STATUS_CONNECTED,
     PROVIDER_AWS,
+    VULN_SCAN_FEATURE_NAME,
     extract_parameters_from_url,
 )
 import random
@@ -56,6 +57,16 @@ class CloudConnectCSPMSingleAWS(Accounts):
         # generate random number for cloud account name for uniqueness
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
+        Logger.logger.info('Stage 0: Cleanup existing AWS single accounts')
+        aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+        temp_aws_manager = aws.AwsManager(stack_region, 
+                                          aws_access_key_id=aws_access_key_id, 
+                                          aws_secret_access_key=aws_secret_access_key)
+        account_id = temp_aws_manager.get_account_id()
+        if account_id:
+            self.cleanup_aws_single_accounts_by_id(account_id, [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+
         Logger.logger.info('Stage 1: Init AwsManager')
         aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
@@ -86,8 +97,6 @@ class CloudConnectCSPMSingleAWS(Accounts):
         cloud_account_guid = self.connect_cspm_bad_arn(stack_region, bad_arn, self.cspm_bad_cloud_account_name)
 
         Logger.logger.info('Stage 4: Connect cspm new account')
-        #validate that there are no existing accounts with cspm feature
-        self.validate_no_accounts_exists_by_id(PROVIDER_AWS, [account_id], COMPLIANCE_FEATURE_NAME)
         cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id)
 
         # Store CSPM config for later validation

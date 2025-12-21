@@ -1573,6 +1573,212 @@ class Accounts(base_test.BaseTest):
         self.backend.delete_org_feature(org_guid=guid, feature_name=feature_name)
         self.validate_feature_deleted_from_entity(guid, feature_name, orgNeedToBeDeleted, CloudEntityTypes.ORGANIZATION)
 
+    def cleanup_single_accounts_by_id(self, provider: str, identifier: str, features_to_cleanup: List[str]):
+        """
+        Generic cleanup method for single accounts by provider and identifier, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, PROVIDER_GCP)
+            identifier: The account identifier (account_id for AWS, subscription_id for Azure, project_id for GCP)
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
+        if not identifier_field:
+            Logger.logger.error(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
+            raise Exception(f"Unknown provider {provider}")
+        
+        Logger.logger.info(f"Cleaning up {provider} single accounts for {identifier_field}: {identifier}, features: {features_to_cleanup}")
+        
+        body = {
+            "pageSize": 100,
+            "pageNum": 0,
+            "innerFilters": [
+                {
+                    "provider": provider,
+                    f"providerInfo.{identifier_field}": identifier
+                }
+            ]
+        }
+        res = self.backend.get_cloud_accounts(body=body)
+        
+        if "response" not in res or len(res["response"]) == 0:
+            Logger.logger.info(f"No {provider} single accounts found for {identifier_field}: {identifier}")
+            return
+        
+        deleted_guids = []
+        for account in res["response"]:
+            account_guid = account.get("guid")
+            if not account_guid:
+                continue
+            
+            features = account.get("features") or {}
+            
+            # Delete each feature that exists
+            for feature_name in features_to_cleanup:
+                if feature_name in features:
+                    try:
+                        self.delete_and_validate_account_feature(account_guid, feature_name)
+                        deleted_guids.append(account_guid)
+                        Logger.logger.info(f"Deleted feature '{feature_name}' from account GUID: {account_guid}")
+                    except Exception as e:
+                        Logger.logger.error(f"Failed to delete feature '{feature_name}' from account {account_guid}: {e}")
+        
+        if deleted_guids:
+            Logger.logger.info(f"Cleanup completed. Deleted account GUIDs: {', '.join(set(deleted_guids))}")
+        else:
+            Logger.logger.info("No accounts were deleted during cleanup")
+
+    def cleanup_aws_single_accounts_by_id(self, account_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup AWS single accounts by account ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            account_id: AWS account ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, features_to_cleanup)
+
+    def cleanup_azure_single_accounts_by_id(self, subscription_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup Azure single accounts by subscription ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            subscription_id: Azure subscription ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, features_to_cleanup)
+
+    def cleanup_gcp_single_accounts_by_id(self, project_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup GCP single accounts by project ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            project_id: GCP project ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_GCP, project_id, features_to_cleanup)
+
+    def cleanup_aws_orgs_by_id(self, org_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup AWS organizations by org ID, deleting specified features.
+        Validates that all accounts managed by the organization are also deleted.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            org_id: AWS organization ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        Logger.logger.info(f"Cleaning up AWS organizations for org_id: {org_id}, features: {features_to_cleanup}")
+        
+        body = self.build_get_cloud_aws_org_by_orgID_request(org_id)
+        res = self.backend.get_cloud_orgs(body=body)
+        
+        if "response" not in res or len(res["response"]) == 0:
+            Logger.logger.info(f"No AWS organizations found for org_id: {org_id}")
+            return
+        
+        deleted_org_guids = []
+        for org in res["response"]:
+            org_guid = org.get("guid")
+            if not org_guid:
+                continue
+            
+            # Store org_guid before deletion for validation
+            features = org.get("features") or {}
+            for feature_name in features_to_cleanup:
+                if feature_name in features:
+                    try:
+                        self.delete_and_validate_org_feature(org_guid, feature_name)
+                        deleted_org_guids.append(org_guid)
+                        Logger.logger.info(f"Deleted feature '{feature_name}' from organization GUID: {org_guid}")
+                    except Exception as e:
+                        Logger.logger.error(f"Failed to delete feature '{feature_name}' from organization {org_guid}: {e}")
+        
+        if deleted_org_guids:
+            Logger.logger.info(f"Cleanup completed. Deleted organization GUIDs: {', '.join(set(deleted_org_guids))}")
+            
+            # Validate that all accounts managed by these orgs are deleted
+            for org_guid in set(deleted_org_guids):
+                self._validate_accounts_managed_by_org_deleted(org_guid, features_to_cleanup)
+        else:
+            Logger.logger.info("No organizations were deleted during cleanup")
+
+    def _validate_accounts_managed_by_org_deleted(self, org_guid: str, deleted_features: List[str]):
+        """
+        Validates that all accounts managed by the organization are deleted after org feature deletion.
+        Checks all AWS accounts across multiple pages to ensure complete validation.
+        
+        Args:
+            org_guid: GUID of the organization
+            deleted_features: List of feature names that were deleted from the org
+        """
+        Logger.logger.info(f"Validating that all accounts managed by org {org_guid} are deleted")
+        
+        accounts_still_managed = []
+        page_num = 0
+        page_size = 100
+        
+        # Query all AWS accounts with pagination to find those managed by this org
+        while True:
+            body = {
+                "pageSize": page_size,
+                "pageNum": page_num,
+                "innerFilters": [
+                    {
+                        "provider": PROVIDER_AWS
+                    }
+                ]
+            }
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if "response" not in res:
+                Logger.logger.warning(f"Failed to query accounts for validation at page {page_num}: {res}")
+                break
+            
+            accounts = res.get("response", [])
+            if len(accounts) == 0:
+                break
+            
+            for account in accounts:
+                account_guid = account.get("guid")
+                account_id = account.get("providerInfo", {}).get("accountID")
+                if not account_guid:
+                    continue
+                
+                features = account.get("features") or {}
+                
+                # Check if any of the deleted features are still managed by this org
+                for feature_name in deleted_features:
+                    if feature_name in features:
+                        managed_by_org = features[feature_name].get("managedByOrg")
+                        if managed_by_org == org_guid:
+                            accounts_still_managed.append({
+                                "account_guid": account_guid,
+                                "account_id": account_id,
+                                "feature": feature_name
+                            })
+            
+            # Check if there are more pages
+            total = res.get("total", {}).get("value", 0)
+            if (page_num + 1) * page_size >= total:
+                break
+            
+            page_num += 1
+        
+        if accounts_still_managed:
+            # Accounts still exist with features managed by the org - this shouldn't happen
+            error_msg = f"Found {len(accounts_still_managed)} account(s) still managed by org {org_guid}:\n"
+            for acc in accounts_still_managed:
+                error_msg += f"  - Account GUID: {acc['account_guid']}, Account ID: {acc['account_id']}, Feature: {acc['feature']}\n"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+        
+        Logger.logger.info(f"✅ All accounts managed by org {org_guid} have been deleted or disconnected")
+
     def validate_feature_deleted_from_entity(self, guid: str, feature_name: str, NeedsToBeDeleted: bool, cloud_entity_type: CloudEntityTypes):
         body = self.build_get_cloud_entity_by_guid_request(guid)
 
@@ -2191,131 +2397,6 @@ class Accounts(base_test.BaseTest):
     def validate_admin_status(self, org_guid: str, expected_status: str):
         """Validate organization admin status."""
         self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
-    
-    def validate_no_accounts_exists_by_id(self, provider: str, ids: List[str], feature_name: Union[str, List[str]]):
-        """
-        Validate that accounts with the specified IDs do NOT exist with the given feature(s).
-        If any accounts exist with any of the features, fail the test with an informative message.
-        
-        Args:
-            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, etc.)
-            ids: List of account IDs to check (account_id for AWS, subscription_id for Azure)
-            feature_name: Name of the feature(s) to check. Can be a single feature name (str) 
-                         or a list of feature names (List[str]) (e.g., CADR_FEATURE_NAME, 
-                         COMPLIANCE_FEATURE_NAME, or [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
-        
-        Raises:
-            AssertionError: If any accounts exist with any of the specified features, with detailed information
-        """
-        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
-        if not identifier_field:
-            raise Exception(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
-        
-        # Normalize feature_name to a list
-        if isinstance(feature_name, str):
-            feature_names = [feature_name]
-        else:
-            feature_names = feature_name
-        
-        existing_accounts_with_feature = []
-        
-        for identifier in ids:
-            body = {
-                "pageSize": 100,
-                "pageNum": 0,
-                "innerFilters": [
-                    {
-                        "provider": provider,
-                        f"providerInfo.{identifier_field}": identifier
-                    }
-                ]
-            }
-            res = self.backend.get_cloud_accounts(body=body)
-            
-            if "response" in res and len(res["response"]) > 0:
-                account = res["response"][0]
-                # Get features dict, handling None case
-                features = account.get("features") or {}
-                # Check if account has any of the specified features
-                found_features = [f for f in feature_names if f in features]
-                
-                if found_features:
-                    # Extract required information
-                    account_info = {
-                        "guid": account.get("guid", "N/A"),
-                        identifier_field: account.get("providerInfo", {}).get(identifier_field, identifier),
-                        "name": account.get("name", "N/A"),
-                        "connectedFeatures": list(features.keys()),
-                        "foundFeatures": found_features,
-                    }
-                    if provider == PROVIDER_AWS:
-                        # Add managedByOrg for each found feature
-                        account_info["managedByOrg"] = {}
-                        for feat in found_features:
-                            account_info["managedByOrg"][feat] = features.get(feat, {}).get("managedByOrg", "N/A")
-                    
-                    existing_accounts_with_feature.append(account_info)
-        
-        # If any accounts exist with any of the features, fail with informative message
-        if existing_accounts_with_feature:
-            features_str = ", ".join([f"'{f}'" for f in feature_names])
-            error_lines = [
-                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} existing {provider} account(s) with feature(s) {features_str}:"
-            ]
-            for idx, acc in enumerate(existing_accounts_with_feature, 1):
-                error_lines.append(
-                    f"  Account {idx}:\n"
-                    f"    GUID: {acc['guid']}\n"
-                    f"    {identifier_field}: {acc[identifier_field]}\n"
-                    f"    Name: {acc['name']}\n"
-                    f"    Connected Features: {', '.join(acc['connectedFeatures'])}\n"
-                    f"    Found Features: {', '.join(acc['foundFeatures'])}\n"
-                )
-                if provider == PROVIDER_AWS:
-                    managed_by_org_lines = []
-                    for feat in acc["foundFeatures"]:
-                        managed_by_org_lines.append(f"      {feat}: {acc['managedByOrg'][feat]}")
-                    error_lines.append(f"    Managed By Org:\n" + "\n".join(managed_by_org_lines))
-            error_message = "\n".join(error_lines)
-            assert False, error_message
-
-    def validate_org_not_exists_by_id(self, org_id: str, feature_name: str):
-        """
-        Validate that an organization with the specified ID does NOT exist with the given feature.
-        If the organization exists with the feature, fail the test with an informative message.
-        
-        Args:
-            org_id: AWS organization ID (e.g., "o-63kbjphubt")
-            feature_name: Name of the feature to check (e.g., CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME)
-        
-        Raises:
-            AssertionError: If the organization exists with the specified feature, with detailed information
-        """
-        body = self.build_get_cloud_aws_org_by_orgID_request(org_id)
-        res = self.backend.get_cloud_orgs(body=body)
-        
-        if "response" in res and len(res["response"]) > 0:
-            org = res["response"][0]
-            # Get features dict, handling None case
-            features = org.get("features") or {}
-            # Check if org has the specified feature
-            if feature_name in features:
-                # Extract required information - only keys
-                org_info = {
-                    "guid": org.get("guid", "N/A"),
-                    "id": org.get("providerInfo", {}).get("accountID", org_id),
-                    "name": org.get("name", "N/A"),
-                    "featurelist": list(features.keys())
-                }
-                
-                error_message = (
-                    f"Organization with ID '{org_id}' exists with feature '{feature_name}' (this is bad):\n"
-                    f"  GUID: {org_info['guid']}\n"
-                    f"  ID: {org_info['id']}\n"
-                    f"  Name: {org_info['name']}\n"
-                    f"  Feature List: {', '.join(org_info['featurelist'])}"
-                )
-                assert False, error_message
 
     def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
         missing_accounts = []
