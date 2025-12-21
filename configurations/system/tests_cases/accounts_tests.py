@@ -14,7 +14,7 @@ class AccountsTests(object):
         )
 
     @staticmethod
-    def cloud_connect_azure_cspm_single():
+    def cloud_connect_cspm_single_azure():
         from tests_scripts.accounts.cloud_connect_cspm_single_azure import CloudConnectCSPMSingleAzure
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -22,7 +22,7 @@ class AccountsTests(object):
             issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
         )
     @staticmethod
-    def cloud_connect_gcp_cspm_single():
+    def cloud_connect_cspm_single_gcp():
         from tests_scripts.accounts.cloud_connect_cspm_single_gcp import CloudConnectCSPMSingleGCP
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -31,7 +31,7 @@ class AccountsTests(object):
         )
 
     @staticmethod
-    def cloud_connect_aws_cspm_single():
+    def cloud_connect_cspm_single_aws():
         from tests_scripts.accounts.cloud_connect_cspm_single_aws import CloudConnectCSPMSingleAWS
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -40,7 +40,7 @@ class AccountsTests(object):
         )
 
     @staticmethod
-    def cloud_connect_aws_cadr_single():
+    def cloud_connect_cadr_single_aws():
         from tests_scripts.accounts.cloud_connect_cadr_single_aws import CloudConnectCADRSingle
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -49,7 +49,7 @@ class AccountsTests(object):
         )
 
     @staticmethod
-    def cloud_organization_aws_cspm():
+    def cloud_connect_cspm_org_aws():
         from tests_scripts.accounts.cloud_connect_cspm_org_aws import CloudOrganizationCSPM
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -58,7 +58,7 @@ class AccountsTests(object):
         )
     
     @staticmethod
-    def cloud_organization_aws_cadr():
+    def cloud_connect_cadr_org_aws():
         from tests_scripts.accounts.cloud_connect_cadr_org_aws import CloudOrganizationCADR
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
