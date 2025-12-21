@@ -12,7 +12,7 @@ from tests_scripts.accounts.accounts import (
     PROVIDER_GCP,
 )
 
-
+TEST_PROJECT_ID = "elated-pottery-310110"
 class CloudConnectCSPMSingleGCP(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
         super().__init__(test_driver=test_driver, test_obj=test_obj, backend=backend, kubernetes_obj=kubernetes_obj)
@@ -83,14 +83,12 @@ class CloudConnectCSPMSingleGCP(Accounts):
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
         Logger.logger.info("Stage 0: Cleanup existing GCP single accounts")
-        project_id = os.environ.get("GCP_PROJECT_ID_CLOUD_TESTS")
-        if project_id:
-            self.cleanup_gcp_single_accounts_by_id(project_id, [COMPLIANCE_FEATURE_NAME])
+        project_id = TEST_PROJECT_ID
+        self.cleanup_gcp_single_accounts_by_id(project_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read GCP service account key and project id from env")
         service_account_key_raw = os.environ.get("GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS")
 
-        assert project_id, "GCP_PROJECT_ID_CLOUD_TESTS is not set"
         assert service_account_key_raw, "GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS is not set"
 
         # Parse, validate, and normalize the JSON to ensure proper formatting
