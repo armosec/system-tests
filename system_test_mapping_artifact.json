@@ -5879,7 +5879,7 @@
     ],
     "tested_dashboard_apis": []
   },
-  "cloud_connect_aws_cspm_single": {
+  "cloud_connect_cspm_single_aws": {
     "target": [
       "Backend"
     ],
@@ -5892,7 +5892,7 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cspm_single_aws.py"
+      "tests_scripts/accounts/cloud_connect_cspm_single_aws.py"
     ],
     "tested_dashboard_apis": [
       {
@@ -5905,7 +5905,7 @@
       }
     ]
   },
-  "cloud_connect_azure_cspm_single": {
+  "cloud_connect_cspm_single_azure": {
     "target": [
       "Backend"
     ],
@@ -5918,11 +5918,28 @@
     "owner": "benm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cspm_single_azure.py"
+      "tests_scripts/accounts/cloud_connect_cspm_single_azure.py"
     ],
     "tested_dashboard_apis": []
   },
-  "cloud_connect_aws_cadr_single": {
+  "cloud_connect_cspm_single_gcp": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks GCP cloud accounts connect with CSPM single project",
+    "skip_on_environment": "",
+    "owner": "benm@armosec.io",
+    "skip_cluster": true,
+    "test_implementation_files": [
+      "tests_scripts/accounts/cloud_connect_cspm_single_gcp.py"
+    ],
+    "tested_dashboard_apis": []
+  },
+  "cloud_connect_cadr_single_aws": {
     "target": [
       "Backend"
     ],
@@ -5936,7 +5953,7 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cadr_single.py"
+      "tests_scripts/accounts/cloud_connect_cadr_single_aws.py"
     ],
     "tested_dashboard_apis": [
       {
@@ -5945,7 +5962,7 @@
       }
     ]
   },
-  "cloud_organization_aws_cspm": {
+  "cloud_connect_cspm_org_aws": {
     "target": [
       "Backend"
     ],
@@ -5959,11 +5976,11 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cspm_org.py"
+      "tests_scripts/accounts/cloud_connect_cspm_org_aws.py"
     ],
     "tested_dashboard_apis": []
   },
-  "cloud_organization_aws_cadr": {
+  "cloud_connect_cadr_org_aws": {
     "target": [
       "Backend"
     ],
@@ -5976,7 +5993,7 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
-      "tests_scripts/accounts/connect_cadr_org.py"
+      "tests_scripts/accounts/cloud_connect_cadr_org_aws.py"
     ],
     "tested_dashboard_apis": [
       {
@@ -6000,7 +6017,7 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
-      "tests_scripts/accounts/vulnscan.py"
+      "tests_scripts/accounts/cloud_vulnscan_aws.py"
     ],
     "tested_dashboard_apis": [
       {

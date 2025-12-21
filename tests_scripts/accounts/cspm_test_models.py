@@ -34,7 +34,6 @@ FRAMEWORKS_CONFIG_AZURE = {
 
 FRAMEWORKS_CONFIG_GCP = {
     "cis_2.0": -1,
-    "cis_2.1": -1,
     "cis_3.0": -1,
     "mitre_attack": -1,
     "iso27001_2022": -1,
@@ -84,10 +83,28 @@ DEFAULT_TEST_CONFIG_AZURE = {
     "high_severity_controls": 1
 }
 
+DEFAULT_TEST_CONFIG_GCP = {
+    "framework": "cis_3.0",
+    "control_name": "Ensure That a Default Customer-Managed Encryption Key (CMEK) Is Specified for All BigQuery Data Sets",
+    "rule_name": "Ensure BigQuery datasets are encrypted with Customer-Managed Keys (CMKs).",
+    "rule_hash": "c59734e5-1214-9c26-2df9-a5c6e00f8638",
+    "rule_id": "bigquery_dataset_cmk_encryption",
+    "check_type": "AUTOMATED",
+    "severity": "high",
+    "status": "FAIL",
+    "resource_hash": "ffb9edfe-49e8-3b12-9d93-8d16f6b491b6",
+    "resource_name": "umbrella",
+    "resource_type": "bigquery",
+    "resource_id": "elated-pottery-310110:umbrella",
+    "failed_controls_count": 1,
+    "passed_controls_count": 1,
+    "high_severity_controls": 1
+}
+
 TEST_CONFIG_PROVIDER_MAP = {
     PROVIDER_AWS: DEFAULT_TEST_CONFIG_AWS,
     PROVIDER_AZURE: DEFAULT_TEST_CONFIG_AZURE,
-    # PROVIDER_GCP: DEFAULT_TEST_CONFIG_GCP,
+    PROVIDER_GCP: DEFAULT_TEST_CONFIG_GCP,
 }
 
 # Pydantic models for API responses

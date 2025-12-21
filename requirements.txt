@@ -39,3 +39,5 @@ wheel
 psutil
 deepdiff==7.0.1
 slack_sdk
+google-api-python-client>=2.0.0
+google-auth>=2.14.0

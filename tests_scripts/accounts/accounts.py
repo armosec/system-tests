@@ -4,9 +4,13 @@ import time
 import uuid
 from dateutil import parser
 from enum import Enum
-from typing import List, Tuple, Any, Dict, Union
+from typing import List, Tuple, Any, Dict, Union, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from infrastructure import gcp as gcp_module
 
 from infrastructure import aws
+from infrastructure import gcp
 from systest_utils import Logger
 from urllib.parse import parse_qs, urlparse
 from tests_scripts import base_test
@@ -15,6 +19,7 @@ from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
 from .cspm_test_models import (
     PROVIDER_AWS,
     PROVIDER_AZURE,
+    PROVIDER_GCP,
     FRAMEWORKS_CONFIG_PROVIDER_MAP,
     TEST_CONFIG_PROVIDER_MAP,
     SeverityCount,
@@ -50,6 +55,7 @@ VULN_SCAN_FEATURE_NAME = "vulnScan"
 PROVIDER_IDENTIFIER_FIELD_MAP = {
     PROVIDER_AWS: "accountID",
     PROVIDER_AZURE: "subscriptionID",
+    PROVIDER_GCP: "projectID",
 }
 
 FEATURE_STATUS_CONNECTED = "Connected"
@@ -381,6 +387,43 @@ class Accounts(base_test.BaseTest):
         else:
             if expect_failure:
                 Logger.logger.info(f"expected failure, returning None")
+        return cloud_account_guid
+    
+    def connect_gcp_cspm_new_account(
+        self,
+        project_id: str,
+        service_account_key: str,
+        cloud_account_name: str,
+        skip_scan: bool = False,
+        validate_apis: bool = True,
+        is_to_cleanup_accounts: bool = True,
+        expect_failure: bool = False,
+    ) -> str:
+        """
+        Connect GCP CSPM account (single project) via Service Account.
+        """
+        if is_to_cleanup_accounts:
+            Logger.logger.info(f"Cleaning up existing GCP cloud accounts for project {project_id}")
+            self.cleanup_existing_cloud_accounts(PROVIDER_GCP, project_id)
+
+        Logger.logger.info(f"Creating and validating GCP CSPM cloud account: {cloud_account_name}, project: {project_id}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(
+            cloud_account_name=cloud_account_name,
+            project_id=project_id,
+            service_account_key=service_account_key,
+            skip_scan=skip_scan,
+            expect_failure=expect_failure,
+        )
+        Logger.logger.info(f"connected gcp cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
+        Logger.logger.info("Validate accounts cloud with gcp cspm list")
+        self.validate_accounts_cloud_list_cspm_compliance_gcp(cloud_account_guid, project_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
+
+        if validate_apis:
+            Logger.logger.info("Validate accounts cloud with cspm unique values")
+            self.validate_accounts_cloud_uniquevalues(cloud_account_name)
+            Logger.logger.info("Edit name and validate cloud account with cspm")
+            self.update_and_validate_cloud_account(PROVIDER_GCP, cloud_account_guid, cloud_account_name + "-updated")
         return cloud_account_guid
     
     def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,
@@ -1139,6 +1182,58 @@ class Accounts(base_test.BaseTest):
             skip_scan=skip_scan,
             expect_failure=expect_failure,
         )
+    
+    def create_and_validate_cloud_account_with_cspm_gcp(
+        self,
+        cloud_account_name: str,
+        project_id: str,
+        service_account_key: str,
+        skip_scan: bool = False,
+        expect_failure: bool = False,
+    ) -> str:
+        """
+        Create and validate GCP cloud account with CSPM feature using Service Account credentials.
+        """
+        # Validate service_account_key is a string and contains valid JSON
+        import json
+        if not isinstance(service_account_key, str):
+            raise ValueError(f"service_account_key must be a string, got {type(service_account_key)}")
+        
+        # Validate JSON structure
+        try:
+            parsed = json.loads(service_account_key)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"service_account_key is not valid JSON: {e}")
+        
+        # Only validate credentials quality when NOT expecting failure (i.e., for good credentials)
+        # When expect_failure=True, we're testing with bad credentials intentionally
+        if not expect_failure:
+            if parsed.get("project_id") == "invalid":
+                raise ValueError("service_account_key contains 'invalid' project_id - wrong credentials detected! This should only happen when expect_failure=True")
+            if parsed.get("project_id") != project_id:
+                Logger.logger.warning(
+                    f"service_account_key project_id ({parsed.get('project_id')}) doesn't match "
+                    f"provided project_id ({project_id})"
+                )
+        
+        compliance_gcp_config: Dict[str, Any] = {
+            "projectID": project_id,
+            "serviceAccountKey": service_account_key,  # This is a JSON string, will be properly escaped by requests
+        }
+
+        feature_config = {"complianceGCPConfig": compliance_gcp_config}
+        
+        # Log a snippet for debugging (without exposing full key)
+        key_snippet = service_account_key[:100] + "..." if len(service_account_key) > 100 else service_account_key
+        Logger.logger.debug(f"Creating GCP account with project_id={project_id}, expect_failure={expect_failure}, serviceAccountKey snippet: {key_snippet}")
+        
+        return self.create_and_validate_cloud_account_with_feature(
+            cloud_account_name,
+            PROVIDER_GCP,
+            feature_config,
+            skip_scan=skip_scan,
+            expect_failure=expect_failure,
+        )
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
                                                    provider: str, region: str, expect_failure: bool = False) -> str:
@@ -1209,6 +1304,21 @@ class Accounts(base_test.BaseTest):
                     "skipScan": skip_scan,
                 }
         self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
+        return cloud_account_guid
+    
+    def reconnect_cloud_account_cspm_feature_gcp(self, cloud_account_guid: str, project_id: str, service_account_key: str, skip_scan: bool = False):
+        """
+        Reconnect GCP CSPM feature by updating the account configuration.
+        """
+        body = {
+            "guid": cloud_account_guid,
+            "complianceGCPConfig": {
+                "projectID": project_id,
+                "serviceAccountKey": service_account_key,
+            },
+            "skipScan": skip_scan,
+        }
+        self.backend.update_cloud_account(body=body, provider=PROVIDER_GCP)
         return cloud_account_guid
     
     def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
@@ -1318,6 +1428,49 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
         return account
 
+    def validate_accounts_cloud_list_cspm_compliance_gcp(self, cloud_account_guid: str, project_id: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
+        """
+        Validate GCP CSPM account listing and status.
+        
+        Args:
+            cloud_account_guid: GUID of the cloud account
+            project_id: Expected project ID
+            scan_status: Expected scan status (CSPM_SCAN_STATE_IN_PROGRESS, CSPM_SCAN_STATE_COMPLETED, etc.)
+                         Required when skipped_scan=False, can be None when skipped_scan=True
+            feature_status: Expected feature status
+            skipped_scan: Whether scan was skipped. When False, scan_status must be provided.
+        """
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        account_list = self.backend.get_cloud_accounts(body=body)
+        assert "response" in account_list, f"response not in {account_list}"
+        assert len(account_list["response"]) > 0, f"response is empty"
+        account = account_list["response"][0]
+
+        assert account["provider"] == PROVIDER_GCP, f"provider is not gcp: {account}"
+        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
+        feature = account["features"][COMPLIANCE_FEATURE_NAME]
+        assert feature["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {feature['featureStatus']}"
+        assert "config" in feature, f"config not in {feature}"
+        config = feature["config"]
+        assert config["projectID"] == project_id, f"projectID mismatch: {config}"
+        assert config["serviceAccountKey"], f"serviceAccountKey missing in config: {config}"
+
+        provider_info = account["providerInfo"]
+        assert provider_info, f"providerInfo missing in account: {account}"
+        assert provider_info["projectID"] == project_id, f"providerInfo projectID mismatch: {provider_info}"
+
+        if not skipped_scan:
+            assert feature["scanState"] == scan_status, f"scanState is not {scan_status} it is {feature['scanState']}"
+            assert "nextScanTime" in feature, f"nextScanTime key is missing from account features. Available keys: {list(feature.keys())}"
+            assert feature["nextScanTime"] != "", f"nextScanTime is empty"
+            if scan_status == CSPM_SCAN_STATE_COMPLETED:
+                assert feature["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+                assert feature["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+            elif scan_status == CSPM_SCAN_STATE_FAILED:
+                assert feature["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+        Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
+        return account
+
     def connect_azure_cspm_bad_credentials(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str) -> str:
         """
         Attempt to connect Azure CSPM with invalid credentials (should fail).
@@ -1325,6 +1478,16 @@ class Accounts(base_test.BaseTest):
         """
         Logger.logger.info(f"Attempting to connect Azure CSPM with bad credentials for account: {cloud_account_name}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(cloud_account_name, subscription_id, tenant_id, client_id, client_secret, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
+        return cloud_account_guid
+    
+    def connect_gcp_cspm_bad_credentials(self, project_id: str, service_account_key: str, cloud_account_name: str) -> str:
+        """
+        Attempt to connect GCP CSPM with invalid credentials (should fail).
+        Returns the cloud_account_guid if account was created despite failure, None otherwise.
+        """
+        Logger.logger.info(f"Attempting to connect GCP CSPM with bad credentials for account: {cloud_account_name}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(cloud_account_name, project_id, service_account_key, expect_failure=True)
         Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
         return cloud_account_guid
 
@@ -1409,6 +1572,212 @@ class Accounts(base_test.BaseTest):
 
         self.backend.delete_org_feature(org_guid=guid, feature_name=feature_name)
         self.validate_feature_deleted_from_entity(guid, feature_name, orgNeedToBeDeleted, CloudEntityTypes.ORGANIZATION)
+
+    def cleanup_single_accounts_by_id(self, provider: str, identifier: str, features_to_cleanup: List[str]):
+        """
+        Generic cleanup method for single accounts by provider and identifier, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, PROVIDER_GCP)
+            identifier: The account identifier (account_id for AWS, subscription_id for Azure, project_id for GCP)
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
+        if not identifier_field:
+            Logger.logger.error(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
+            raise Exception(f"Unknown provider {provider}")
+        
+        Logger.logger.info(f"Cleaning up {provider} single accounts for {identifier_field}: {identifier}, features: {features_to_cleanup}")
+        
+        body = {
+            "pageSize": 100,
+            "pageNum": 0,
+            "innerFilters": [
+                {
+                    "provider": provider,
+                    f"providerInfo.{identifier_field}": identifier
+                }
+            ]
+        }
+        res = self.backend.get_cloud_accounts(body=body)
+        
+        if "response" not in res or len(res["response"]) == 0:
+            Logger.logger.info(f"No {provider} single accounts found for {identifier_field}: {identifier}")
+            return
+        
+        deleted_guids = []
+        for account in res["response"]:
+            account_guid = account.get("guid")
+            if not account_guid:
+                continue
+            
+            features = account.get("features") or {}
+            
+            # Delete each feature that exists
+            for feature_name in features_to_cleanup:
+                if feature_name in features:
+                    try:
+                        self.delete_and_validate_account_feature(account_guid, feature_name)
+                        deleted_guids.append(account_guid)
+                        Logger.logger.info(f"Deleted feature '{feature_name}' from account GUID: {account_guid}")
+                    except Exception as e:
+                        Logger.logger.error(f"Failed to delete feature '{feature_name}' from account {account_guid}: {e}")
+        
+        if deleted_guids:
+            Logger.logger.info(f"Cleanup completed. Deleted account GUIDs: {', '.join(set(deleted_guids))}")
+        else:
+            Logger.logger.info("No accounts were deleted during cleanup")
+
+    def cleanup_aws_single_accounts_by_id(self, account_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup AWS single accounts by account ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            account_id: AWS account ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, features_to_cleanup)
+
+    def cleanup_azure_single_accounts_by_id(self, subscription_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup Azure single accounts by subscription ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            subscription_id: Azure subscription ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, features_to_cleanup)
+
+    def cleanup_gcp_single_accounts_by_id(self, project_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup GCP single accounts by project ID, deleting specified features.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            project_id: GCP project ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
+        """
+        self.cleanup_single_accounts_by_id(PROVIDER_GCP, project_id, features_to_cleanup)
+
+    def cleanup_aws_orgs_by_id(self, org_id: str, features_to_cleanup: List[str]):
+        """
+        Cleanup AWS organizations by org ID, deleting specified features.
+        Validates that all accounts managed by the organization are also deleted.
+        Prints the GUIDs of entities deleted.
+        
+        Args:
+            org_id: AWS organization ID
+            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        """
+        Logger.logger.info(f"Cleaning up AWS organizations for org_id: {org_id}, features: {features_to_cleanup}")
+        
+        body = self.build_get_cloud_aws_org_by_orgID_request(org_id)
+        res = self.backend.get_cloud_orgs(body=body)
+        
+        if "response" not in res or len(res["response"]) == 0:
+            Logger.logger.info(f"No AWS organizations found for org_id: {org_id}")
+            return
+        
+        deleted_org_guids = []
+        for org in res["response"]:
+            org_guid = org.get("guid")
+            if not org_guid:
+                continue
+            
+            # Store org_guid before deletion for validation
+            features = org.get("features") or {}
+            for feature_name in features_to_cleanup:
+                if feature_name in features:
+                    try:
+                        self.delete_and_validate_org_feature(org_guid, feature_name)
+                        deleted_org_guids.append(org_guid)
+                        Logger.logger.info(f"Deleted feature '{feature_name}' from organization GUID: {org_guid}")
+                    except Exception as e:
+                        Logger.logger.error(f"Failed to delete feature '{feature_name}' from organization {org_guid}: {e}")
+        
+        if deleted_org_guids:
+            Logger.logger.info(f"Cleanup completed. Deleted organization GUIDs: {', '.join(set(deleted_org_guids))}")
+            
+            # Validate that all accounts managed by these orgs are deleted
+            for org_guid in set(deleted_org_guids):
+                self._validate_accounts_managed_by_org_deleted(org_guid, features_to_cleanup)
+        else:
+            Logger.logger.info("No organizations were deleted during cleanup")
+
+    def _validate_accounts_managed_by_org_deleted(self, org_guid: str, deleted_features: List[str]):
+        """
+        Validates that all accounts managed by the organization are deleted after org feature deletion.
+        Checks all AWS accounts across multiple pages to ensure complete validation.
+        
+        Args:
+            org_guid: GUID of the organization
+            deleted_features: List of feature names that were deleted from the org
+        """
+        Logger.logger.info(f"Validating that all accounts managed by org {org_guid} are deleted")
+        
+        accounts_still_managed = []
+        page_num = 0
+        page_size = 100
+        
+        # Query all AWS accounts with pagination to find those managed by this org
+        while True:
+            body = {
+                "pageSize": page_size,
+                "pageNum": page_num,
+                "innerFilters": [
+                    {
+                        "provider": PROVIDER_AWS
+                    }
+                ]
+            }
+            res = self.backend.get_cloud_accounts(body=body)
+            
+            if "response" not in res:
+                Logger.logger.warning(f"Failed to query accounts for validation at page {page_num}: {res}")
+                break
+            
+            accounts = res.get("response", [])
+            if len(accounts) == 0:
+                break
+            
+            for account in accounts:
+                account_guid = account.get("guid")
+                account_id = account.get("providerInfo", {}).get("accountID")
+                if not account_guid:
+                    continue
+                
+                features = account.get("features") or {}
+                
+                # Check if any of the deleted features are still managed by this org
+                for feature_name in deleted_features:
+                    if feature_name in features:
+                        managed_by_org = features[feature_name].get("managedByOrg")
+                        if managed_by_org == org_guid:
+                            accounts_still_managed.append({
+                                "account_guid": account_guid,
+                                "account_id": account_id,
+                                "feature": feature_name
+                            })
+            
+            # Check if there are more pages
+            total = res.get("total", {}).get("value", 0)
+            if (page_num + 1) * page_size >= total:
+                break
+            
+            page_num += 1
+        
+        if accounts_still_managed:
+            # Accounts still exist with features managed by the org - this shouldn't happen
+            error_msg = f"Found {len(accounts_still_managed)} account(s) still managed by org {org_guid}:\n"
+            for acc in accounts_still_managed:
+                error_msg += f"  - Account GUID: {acc['account_guid']}, Account ID: {acc['account_id']}, Feature: {acc['feature']}\n"
+            Logger.logger.error(error_msg)
+            raise Exception(error_msg)
+        
+        Logger.logger.info(f"All accounts managed by org {org_guid} have been deleted or disconnected")
 
     def validate_feature_deleted_from_entity(self, guid: str, feature_name: str, NeedsToBeDeleted: bool, cloud_entity_type: CloudEntityTypes):
         body = self.build_get_cloud_entity_by_guid_request(guid)
@@ -2028,131 +2397,6 @@ class Accounts(base_test.BaseTest):
     def validate_admin_status(self, org_guid: str, expected_status: str):
         """Validate organization admin status."""
         self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
-    
-    def validate_no_accounts_exists_by_id(self, provider: str, ids: List[str], feature_name: Union[str, List[str]]):
-        """
-        Validate that accounts with the specified IDs do NOT exist with the given feature(s).
-        If any accounts exist with any of the features, fail the test with an informative message.
-        
-        Args:
-            provider: Cloud provider (PROVIDER_AWS, PROVIDER_AZURE, etc.)
-            ids: List of account IDs to check (account_id for AWS, subscription_id for Azure)
-            feature_name: Name of the feature(s) to check. Can be a single feature name (str) 
-                         or a list of feature names (List[str]) (e.g., CADR_FEATURE_NAME, 
-                         COMPLIANCE_FEATURE_NAME, or [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
-        
-        Raises:
-            AssertionError: If any accounts exist with any of the specified features, with detailed information
-        """
-        identifier_field = PROVIDER_IDENTIFIER_FIELD_MAP.get(provider)
-        if not identifier_field:
-            raise Exception(f"Unknown provider {provider}, supported providers: {list(PROVIDER_IDENTIFIER_FIELD_MAP.keys())}")
-        
-        # Normalize feature_name to a list
-        if isinstance(feature_name, str):
-            feature_names = [feature_name]
-        else:
-            feature_names = feature_name
-        
-        existing_accounts_with_feature = []
-        
-        for identifier in ids:
-            body = {
-                "pageSize": 100,
-                "pageNum": 0,
-                "innerFilters": [
-                    {
-                        "provider": provider,
-                        f"providerInfo.{identifier_field}": identifier
-                    }
-                ]
-            }
-            res = self.backend.get_cloud_accounts(body=body)
-            
-            if "response" in res and len(res["response"]) > 0:
-                account = res["response"][0]
-                # Get features dict, handling None case
-                features = account.get("features") or {}
-                # Check if account has any of the specified features
-                found_features = [f for f in feature_names if f in features]
-                
-                if found_features:
-                    # Extract required information
-                    account_info = {
-                        "guid": account.get("guid", "N/A"),
-                        identifier_field: account.get("providerInfo", {}).get(identifier_field, identifier),
-                        "name": account.get("name", "N/A"),
-                        "connectedFeatures": list(features.keys()),
-                        "foundFeatures": found_features,
-                    }
-                    if provider == PROVIDER_AWS:
-                        # Add managedByOrg for each found feature
-                        account_info["managedByOrg"] = {}
-                        for feat in found_features:
-                            account_info["managedByOrg"][feat] = features.get(feat, {}).get("managedByOrg", "N/A")
-                    
-                    existing_accounts_with_feature.append(account_info)
-        
-        # If any accounts exist with any of the features, fail with informative message
-        if existing_accounts_with_feature:
-            features_str = ", ".join([f"'{f}'" for f in feature_names])
-            error_lines = [
-                f"There are leftover accounts from another run - Found {len(existing_accounts_with_feature)} existing {provider} account(s) with feature(s) {features_str}:"
-            ]
-            for idx, acc in enumerate(existing_accounts_with_feature, 1):
-                error_lines.append(
-                    f"  Account {idx}:\n"
-                    f"    GUID: {acc['guid']}\n"
-                    f"    {identifier_field}: {acc[identifier_field]}\n"
-                    f"    Name: {acc['name']}\n"
-                    f"    Connected Features: {', '.join(acc['connectedFeatures'])}\n"
-                    f"    Found Features: {', '.join(acc['foundFeatures'])}\n"
-                )
-                if provider == PROVIDER_AWS:
-                    managed_by_org_lines = []
-                    for feat in acc["foundFeatures"]:
-                        managed_by_org_lines.append(f"      {feat}: {acc['managedByOrg'][feat]}")
-                    error_lines.append(f"    Managed By Org:\n" + "\n".join(managed_by_org_lines))
-            error_message = "\n".join(error_lines)
-            assert False, error_message
-
-    def validate_org_not_exists_by_id(self, org_id: str, feature_name: str):
-        """
-        Validate that an organization with the specified ID does NOT exist with the given feature.
-        If the organization exists with the feature, fail the test with an informative message.
-        
-        Args:
-            org_id: AWS organization ID (e.g., "o-63kbjphubt")
-            feature_name: Name of the feature to check (e.g., CADR_FEATURE_NAME, COMPLIANCE_FEATURE_NAME)
-        
-        Raises:
-            AssertionError: If the organization exists with the specified feature, with detailed information
-        """
-        body = self.build_get_cloud_aws_org_by_orgID_request(org_id)
-        res = self.backend.get_cloud_orgs(body=body)
-        
-        if "response" in res and len(res["response"]) > 0:
-            org = res["response"][0]
-            # Get features dict, handling None case
-            features = org.get("features") or {}
-            # Check if org has the specified feature
-            if feature_name in features:
-                # Extract required information - only keys
-                org_info = {
-                    "guid": org.get("guid", "N/A"),
-                    "id": org.get("providerInfo", {}).get("accountID", org_id),
-                    "name": org.get("name", "N/A"),
-                    "featurelist": list(features.keys())
-                }
-                
-                error_message = (
-                    f"Organization with ID '{org_id}' exists with feature '{feature_name}' (this is bad):\n"
-                    f"  GUID: {org_info['guid']}\n"
-                    f"  ID: {org_info['id']}\n"
-                    f"  Name: {org_info['name']}\n"
-                    f"  Feature List: {', '.join(org_info['featurelist'])}"
-                )
-                assert False, error_message
 
     def validate_org_manged_account_list(self, org_guid: str, account_ids: List[str] ,feature_name: str):
         missing_accounts = []
@@ -2469,7 +2713,77 @@ class Accounts(base_test.BaseTest):
         elif feature_name == VULN_SCAN_FEATURE_NAME:
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
+    
+    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager: Optional['gcp_module.GcpManager'] = None):
+        """
+        Break GCP service account permissions by removing roles/viewer, trigger scanNow, validate disconnected status,
+        restore permissions, and reconnect with skipScan.
         
+        Args:
+            cloud_account_guid: GUID of the cloud account
+            project_id: GCP project ID
+            original_service_account_key: Original valid service account key JSON string
+            gcp_manager: GCP manager instance (optional, will be created if not provided)
+        """
+        
+        role_to_remove = "roles/viewer"
+        Logger.logger.info(f"Removing {role_to_remove} from service account to break permissions")
+        
+        # Remove role (this already includes a 5 second sleep for propagation)
+        remove_success = gcp_manager.remove_role(role_to_remove)
+        assert remove_success, f"Failed to remove role {role_to_remove} from service account"
+        Logger.logger.info(f"Successfully removed {role_to_remove} from service account")
+        
+        # Trigger scanNow to detect broken permissions
+        Logger.logger.info("Triggering scanNow to detect broken permissions")
+        self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
+        
+        # Validate feature status is disconnected
+        Logger.logger.info("Validating feature status is disconnected")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_DISCONNECTED
+        )
+        Logger.logger.info("Feature status validated as disconnected")
+        
+        # Restore roles/viewer to service account
+        Logger.logger.info(f"Restoring {role_to_remove} to service account")
+        try:
+            gcp_manager.add_role(role_to_remove)
+            Logger.logger.info(f"Successfully restored {role_to_remove} to service account")
+        except Exception as e:
+            Logger.logger.error(f"Failed to restore role {role_to_remove}: {e}")
+            raise
+        
+        # Reconnect with skipScan
+        Logger.logger.info("Reconnecting account with skipScan=True")
+        body = {
+            "guid": cloud_account_guid,
+            "complianceGCPConfig": {
+                "projectID": project_id,
+                "serviceAccountKey": original_service_account_key,
+            },
+            "skipScan": True
+        }
+        self.backend.update_cloud_account(body=body, provider=PROVIDER_GCP)
+        Logger.logger.info("Reconnected account with skipScan=True")
+        
+        # Final Validation
+        Logger.logger.info("Validating feature status is connected after reconnection")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_CONNECTED
+        )
+        Logger.logger.info("Feature status validated as connected after reconnection")
+            
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)
