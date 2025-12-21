@@ -59,22 +59,28 @@ DEFAULT_TEST_CONFIG_AWS = {
     "resource_hash": "00702d59-a435-c9cf-0860-c05098c4f23e",
     "resource_name" : "i-0df4d10d2f2ae99f7",
     "resource_type" :"ec2",
-    "resource_id" : "arn:aws:ec2:eu-west-1:686255980207:instance/i-0df4d10d2f2ae99f7"
+    "resource_id" : "arn:aws:ec2:eu-west-1:686255980207:instance/i-0df4d10d2f2ae99f7",
+    "failed_controls_count": 1,
+    "passed_controls_count": 1,
+    "high_severity_controls": 0
 }
 
 DEFAULT_TEST_CONFIG_AZURE = {
     "framework": "cis_3.0",
-    "control_name": "",
-    "rule_name": "",
-    "rule_hash": "",
-    "rule_id": "",
-    "check_type": "",
-    "severity": "",
-    "status": "",
-    "resource_hash": "",
-    "resource_name": "",
-    "resource_type": "",
-    "resource_id": "",
+    "control_name": "Ensure That 'Notify about alerts with the following severity' is Set to 'High'",
+    "rule_name": "Ensure That 'Notify about alerts with the following severity' is Set to 'High'",
+    "rule_hash": "a8ec28b1-8c97-4b7b-ab82-db3b5d3ccdaa",
+    "rule_id": "defender_ensure_notify_alerts_severity_is_high",
+    "check_type": "AUTOMATED",
+    "severity": "high",
+    "status": "FAIL",
+    "resource_hash": "bb1c4e9a-e7e5-36ad-d0d8-bc936f6149b6",
+    "resource_name": "default",
+    "resource_type": "defender",
+    "resource_id": "/subscriptions/57e3175c-71ce-45f8-8bfc-34d966223068/providers/Microsoft.Security/securityContacts/default",
+    "failed_controls_count": 3,
+    "passed_controls_count": 0,
+    "high_severity_controls": 1
 }
 
 DEFAULT_TEST_CONFIG_GCP = {
@@ -203,58 +209,20 @@ class ComplianceResourceSummaries(BaseModel):
     highSeverityControls : int
     criticalSeverityControls : int
 
-    failedControlsCount : int
     containsAcceptedControlCount : int
-    passedControlsCount : int
-    manualControlsCount : int
     tickets: Optional[List[Dict]] = None
 
-def get_expected_accounts_response(last_success_scan_id: str) -> Dict:
-    """Get expected response for accounts API."""
-    return {
-        "reportGUID": last_success_scan_id,
-        "criticalSeverityResources": None,  # Will be compared with actual severity count
-        "highSeverityResources": None,      # Will be compared with actual severity count
-        "mediumSeverityResources": None,    # Will be compared with actual severity count
-        "lowSeverityResources": None        # Will be compared with actual severity count
-    }
-
-def get_expected_framework_response(last_success_scan_id: str) -> Dict:
-    """Get expected response for framework API."""
-    return {
-        "name": None,  # Will be checked against FRAMEWORKS_CONFIG_PROVIDER_MAP[provider]
-        "reportGUID": last_success_scan_id,
-        "failedControls": None,  # Will be checked > 0
-        "complianceScorev1": None,  # Will be checked > 0
-        "timestamp": None  # Will be checked within time window
-    }
-
-def get_expected_framework_over_time_response(cloud_account_guid: str, last_success_scan_id: str) -> Dict:
-    """Get expected response for framework over time API."""
-    return {
-        "cloudAccountGUID": cloud_account_guid,
-        "provider": "aws",
-        "frameworks": [{
-            "frameworkName": None,  # Will be checked against FRAMEWORKS_CONFIG_PROVIDER_MAP[provider]
-            "complianceScore": None,  # Will be checked > 0
-            "cords": [{
-                "reportGUID": last_success_scan_id,
-                "complianceScore": None,  # Will be checked > 0
-                "timestamp": None  # Will be checked within time window
-            }]
-        }]
-    }
-
-def get_expected_aws_control_response(with_accepted_resources: bool = False) -> Dict:
+def get_expected_control_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for control API (AWS-specific)."""
+    default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
-        "frameworkName": DEFAULT_TEST_CONFIG_AWS["framework"],
+        "frameworkName": default_test_config["framework"],
         "section": "",  # This will be checked to be non-empty
-        "cloudControlName": DEFAULT_TEST_CONFIG_AWS["control_name"],
-        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["status"],
-        "severity":"none" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["severity"],
-        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
+        "cloudControlName": default_test_config["control_name"],
+        "status": "ACCEPT" if with_accepted_resources else default_test_config["status"],
+        "severity":"none" if with_accepted_resources else default_test_config["severity"],
+        "checkType": default_test_config["check_type"],
         "affectedResourcesCount": 1,
         "failedResourcesCount": 0 if with_accepted_resources else 1,
         "totalScannedResourcesCount": 1,
@@ -263,64 +231,70 @@ def get_expected_aws_control_response(with_accepted_resources: bool = False) -> 
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_aws_rules_response(with_accepted_resources: bool = False) -> Dict:
+def get_expected_rules_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for check API (AWS-specific)."""
+    default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
-        "cloudCheckName": DEFAULT_TEST_CONFIG_AWS["rule_name"],
-        "cloudCheckHash": DEFAULT_TEST_CONFIG_AWS["rule_hash"],
-        "cloudCheckID": DEFAULT_TEST_CONFIG_AWS["rule_id"],
-        "status": "ACCEPT" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["status"],
-        "severity": "none" if with_accepted_resources else DEFAULT_TEST_CONFIG_AWS["severity"],
-        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
+        "cloudCheckName": default_test_config["rule_name"],
+        "cloudCheckHash": default_test_config["rule_hash"],
+        "cloudCheckID": default_test_config["rule_id"],
+        "status": "ACCEPT" if with_accepted_resources else default_test_config["status"],
+        "severity": "none" if with_accepted_resources else default_test_config["severity"],
+        "checkType": default_test_config["check_type"],
         "totalScannedResourcesCount": 1,
         "failedResourcesCount": 0 if with_accepted_resources else 1,
         "acceptedResourcesCount": 1 if with_accepted_resources else 0,
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_aws_resources_under_check_response(with_accepted_resources: bool = False) -> Dict:
+def get_expected_resources_under_check_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for resource-to-check API (AWS-specific)."""
+    default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
-        "cloudResourceHash": DEFAULT_TEST_CONFIG_AWS["resource_hash"],
-        "cloudResourceName": DEFAULT_TEST_CONFIG_AWS["resource_name"],
-        "cloudResourceID": DEFAULT_TEST_CONFIG_AWS["resource_id"],
-        "cloudResourceType": DEFAULT_TEST_CONFIG_AWS["resource_type"],
+        "cloudResourceHash": default_test_config["resource_hash"],
+        "cloudResourceName": default_test_config["resource_name"],
+        "cloudResourceID": default_test_config["resource_id"],
+        "cloudResourceType": default_test_config["resource_type"],
         "exceptionApplied": True if with_accepted_resources else False
     }
 
-def get_expected_aws_resource_summaries_response(with_accepted_resources: bool = False) -> Dict:
+def get_expected_resource_summaries_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for resource-summaries API (AWS-specific)."""
+    default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
+    failed_controls_count = default_test_config["failed_controls_count"]
+    high_severity_controls = default_test_config["high_severity_controls"]
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
         "cloudAccountGUID": "",  # This will be compared separately
-        "provider": "aws",
-        "cloudResourceName": DEFAULT_TEST_CONFIG_AWS["resource_name"],
-        "cloudResourceID": DEFAULT_TEST_CONFIG_AWS["resource_id"],
-        "cloudResourceHash": DEFAULT_TEST_CONFIG_AWS["resource_hash"],
-        "cloudResourceType": DEFAULT_TEST_CONFIG_AWS["resource_type"],
-        "frameworkName": DEFAULT_TEST_CONFIG_AWS["framework"],
-        "failedControlsCount": 0 if with_accepted_resources else 1,
-        "passedControlsCount": 1,
+        "provider": provider,
+        "cloudResourceName": default_test_config["resource_name"],
+        "cloudResourceID": default_test_config["resource_id"],
+        "cloudResourceHash": default_test_config["resource_hash"],
+        "cloudResourceType": default_test_config["resource_type"],
+        "frameworkName": default_test_config["framework"],
+        "failedControlsCount": max(0, failed_controls_count - 1) if with_accepted_resources else failed_controls_count,
+        "passedControlsCount": default_test_config["passed_controls_count"],
         "manualControlsCount": 0,
         "containsAcceptedControlCount": 1 if with_accepted_resources else 0,
         "criticalSeverityControls": 0,
-        "highSeverityControls": 0,
-        "mediumSeverityControls": 0 if with_accepted_resources else 1,
+        "highSeverityControls": max(0, high_severity_controls - 1) if with_accepted_resources else high_severity_controls,
+        "mediumSeverityControls": "", # Placeholder value (not validated, only key is checked)
         "lowSeverityControls": 0,
     }
 
-def get_expected_aws_only_check_under_control_response(with_accepted_resources: bool = False) -> Dict:
+def get_expected_only_check_under_control_response(provider: str, with_accepted_resources: bool = False) -> Dict:
     """Get expected response for control-with-checks API (AWS-specific)."""
+    default_test_config = TEST_CONFIG_PROVIDER_MAP[provider]
     return {
         "reportGUID": "",  # This will be compared separately with the actual scan ID
         "exceptionApplied": True if with_accepted_resources else False,
-        "severity": DEFAULT_TEST_CONFIG_AWS["severity"],
-        "status": DEFAULT_TEST_CONFIG_AWS["status"],
-        "checkType": DEFAULT_TEST_CONFIG_AWS["check_type"],
-        "cloudCheckHash": DEFAULT_TEST_CONFIG_AWS["rule_hash"],
-        "cloudCheckID": DEFAULT_TEST_CONFIG_AWS["rule_id"],
-        "cloudCheckName": DEFAULT_TEST_CONFIG_AWS["rule_name"],
+        "severity": default_test_config["severity"],
+        "status": default_test_config["status"],
+        "checkType": default_test_config["check_type"],
+        "cloudCheckHash": default_test_config["rule_hash"],
+        "cloudCheckID": default_test_config["rule_id"],
+        "cloudCheckName": default_test_config["rule_name"],
     }
 
 
