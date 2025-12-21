@@ -7,6 +7,7 @@ from enum import Enum
 from typing import List, Tuple, Any, Dict, Union
 
 from infrastructure import aws
+from infrastructure import gcp
 from systest_utils import Logger
 from urllib.parse import parse_qs, urlparse
 from tests_scripts import base_test
@@ -15,6 +16,7 @@ from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE
 from .cspm_test_models import (
     PROVIDER_AWS,
     PROVIDER_AZURE,
+    PROVIDER_GCP,
     FRAMEWORKS_CONFIG_PROVIDER_MAP,
     TEST_CONFIG_PROVIDER_MAP,
     SeverityCount,
@@ -50,6 +52,7 @@ VULN_SCAN_FEATURE_NAME = "vulnScan"
 PROVIDER_IDENTIFIER_FIELD_MAP = {
     PROVIDER_AWS: "accountID",
     PROVIDER_AZURE: "subscriptionID",
+    PROVIDER_GCP: "projectID",
 }
 
 FEATURE_STATUS_CONNECTED = "Connected"
@@ -383,6 +386,43 @@ class Accounts(base_test.BaseTest):
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
             Logger.logger.info("Edit name and validate cloud account with cspm")
             self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", provider=PROVIDER_AZURE)
+        return cloud_account_guid
+    
+    def connect_gcp_cspm_new_account(
+        self,
+        project_id: str,
+        service_account_key: str,
+        cloud_account_name: str,
+        skip_scan: bool = False,
+        validate_apis: bool = True,
+        is_to_cleanup_accounts: bool = True,
+        expect_failure: bool = False,
+    ) -> str:
+        """
+        Connect GCP CSPM account (single project) via Service Account.
+        """
+        if is_to_cleanup_accounts:
+            Logger.logger.info(f"Cleaning up existing GCP cloud accounts for project {project_id}")
+            self.cleanup_existing_cloud_accounts(PROVIDER_GCP, project_id)
+
+        Logger.logger.info(f"Creating and validating GCP CSPM cloud account: {cloud_account_name}, project: {project_id}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(
+            cloud_account_name=cloud_account_name,
+            project_id=project_id,
+            service_account_key=service_account_key,
+            skip_scan=skip_scan,
+            expect_failure=expect_failure,
+        )
+        Logger.logger.info(f"connected gcp cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
+        Logger.logger.info("Validate accounts cloud with gcp cspm list")
+        self.validate_accounts_cloud_list_cspm_compliance_gcp(cloud_account_guid, project_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
+
+        if validate_apis:
+            Logger.logger.info("Validate accounts cloud with cspm unique values")
+            self.validate_accounts_cloud_uniquevalues(cloud_account_name)
+            Logger.logger.info("Edit name and validate cloud account with cspm")
+            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", provider=PROVIDER_GCP)
         return cloud_account_guid
     
     def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,
@@ -1142,6 +1182,58 @@ class Accounts(base_test.BaseTest):
             skip_scan=skip_scan,
             expect_failure=expect_failure,
         )
+    
+    def create_and_validate_cloud_account_with_cspm_gcp(
+        self,
+        cloud_account_name: str,
+        project_id: str,
+        service_account_key: str,
+        skip_scan: bool = False,
+        expect_failure: bool = False,
+    ) -> str:
+        """
+        Create and validate GCP cloud account with CSPM feature using Service Account credentials.
+        """
+        # Validate service_account_key is a string and contains valid JSON
+        import json
+        if not isinstance(service_account_key, str):
+            raise ValueError(f"service_account_key must be a string, got {type(service_account_key)}")
+        
+        # Validate JSON structure
+        try:
+            parsed = json.loads(service_account_key)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"service_account_key is not valid JSON: {e}")
+        
+        # Only validate credentials quality when NOT expecting failure (i.e., for good credentials)
+        # When expect_failure=True, we're testing with bad credentials intentionally
+        if not expect_failure:
+            if parsed.get("project_id") == "invalid":
+                raise ValueError("service_account_key contains 'invalid' project_id - wrong credentials detected! This should only happen when expect_failure=True")
+            if parsed.get("project_id") != project_id:
+                Logger.logger.warning(
+                    f"service_account_key project_id ({parsed.get('project_id')}) doesn't match "
+                    f"provided project_id ({project_id})"
+                )
+        
+        compliance_gcp_config: Dict[str, Any] = {
+            "projectID": project_id,
+            "serviceAccountKey": service_account_key,  # This is a JSON string, will be properly escaped by requests
+        }
+
+        feature_config = {"complianceGCPConfig": compliance_gcp_config}
+        
+        # Log a snippet for debugging (without exposing full key)
+        key_snippet = service_account_key[:100] + "..." if len(service_account_key) > 100 else service_account_key
+        Logger.logger.debug(f"Creating GCP account with project_id={project_id}, expect_failure={expect_failure}, serviceAccountKey snippet: {key_snippet}")
+        
+        return self.create_and_validate_cloud_account_with_feature(
+            cloud_account_name,
+            PROVIDER_GCP,
+            feature_config,
+            skip_scan=skip_scan,
+            expect_failure=expect_failure,
+        )
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
                                                    provider: str, region: str, expect_failure: bool = False) -> str:
@@ -1212,6 +1304,21 @@ class Accounts(base_test.BaseTest):
                     "skipScan": skip_scan,
                 }
         self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
+        return cloud_account_guid
+    
+    def reconnect_cloud_account_cspm_feature_gcp(self, cloud_account_guid: str, project_id: str, service_account_key: str, skip_scan: bool = False):
+        """
+        Reconnect GCP CSPM feature by updating the account configuration.
+        """
+        body = {
+            "guid": cloud_account_guid,
+            "complianceGCPConfig": {
+                "projectID": project_id,
+                "serviceAccountKey": service_account_key,
+            },
+            "skipScan": skip_scan,
+        }
+        self.backend.update_cloud_account(body=body, provider=PROVIDER_GCP)
         return cloud_account_guid
     
     def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
@@ -1321,6 +1428,49 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
         return account
 
+    def validate_accounts_cloud_list_cspm_compliance_gcp(self, cloud_account_guid: str, project_id: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
+        """
+        Validate GCP CSPM account listing and status.
+        
+        Args:
+            cloud_account_guid: GUID of the cloud account
+            project_id: Expected project ID
+            scan_status: Expected scan status (CSPM_SCAN_STATE_IN_PROGRESS, CSPM_SCAN_STATE_COMPLETED, etc.)
+                         Required when skipped_scan=False, can be None when skipped_scan=True
+            feature_status: Expected feature status
+            skipped_scan: Whether scan was skipped. When False, scan_status must be provided.
+        """
+        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
+        account_list = self.backend.get_cloud_accounts(body=body)
+        assert "response" in account_list, f"response not in {account_list}"
+        assert len(account_list["response"]) > 0, f"response is empty"
+        account = account_list["response"][0]
+
+        assert account["provider"] == PROVIDER_GCP, f"provider is not gcp: {account}"
+        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
+        feature = account["features"][COMPLIANCE_FEATURE_NAME]
+        assert feature["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {feature['featureStatus']}"
+        assert "config" in feature, f"config not in {feature}"
+        config = feature["config"]
+        assert config["projectID"] == project_id, f"projectID mismatch: {config}"
+        assert config["serviceAccountKey"], f"serviceAccountKey missing in config: {config}"
+
+        provider_info = account["providerInfo"]
+        assert provider_info, f"providerInfo missing in account: {account}"
+        assert provider_info["projectID"] == project_id, f"providerInfo projectID mismatch: {provider_info}"
+
+        if not skipped_scan:
+            assert feature["scanState"] == scan_status, f"scanState is not {scan_status} it is {feature['scanState']}"
+            assert "nextScanTime" in feature, f"nextScanTime key is missing from account features. Available keys: {list(feature.keys())}"
+            assert feature["nextScanTime"] != "", f"nextScanTime is empty"
+            if scan_status == CSPM_SCAN_STATE_COMPLETED:
+                assert feature["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
+                assert feature["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+            elif scan_status == CSPM_SCAN_STATE_FAILED:
+                assert feature["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
+        Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
+        return account
+
     def connect_azure_cspm_bad_credentials(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str) -> str:
         """
         Attempt to connect Azure CSPM with invalid credentials (should fail).
@@ -1328,6 +1478,16 @@ class Accounts(base_test.BaseTest):
         """
         Logger.logger.info(f"Attempting to connect Azure CSPM with bad credentials for account: {cloud_account_name}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(cloud_account_name, subscription_id, tenant_id, client_id, client_secret, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
+        return cloud_account_guid
+    
+    def connect_gcp_cspm_bad_credentials(self, project_id: str, service_account_key: str, cloud_account_name: str) -> str:
+        """
+        Attempt to connect GCP CSPM with invalid credentials (should fail).
+        Returns the cloud_account_guid if account was created despite failure, None otherwise.
+        """
+        Logger.logger.info(f"Attempting to connect GCP CSPM with bad credentials for account: {cloud_account_name}")
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(cloud_account_name, project_id, service_account_key, expect_failure=True)
         Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
         return cloud_account_guid
 
@@ -1444,7 +1604,7 @@ class Accounts(base_test.BaseTest):
         """
         Logger.logger.info(f"Validating account {cloud_account_guid}|{cloud_account_name} and its last scan ID {last_success_scan_id}")
 
-        # self.validate_compliance_accounts(cloud_account_name, last_success_scan_id)
+        self.validate_compliance_accounts(cloud_account_name, last_success_scan_id)
         self.validate_compliance_frameworks(cloud_account_guid, last_success_scan_id, provider)
         control_hash = self.validate_compliance_controls(last_success_scan_id, with_accepted_resources, with_jira, provider)
         rule_hash = self.validate_compliance_rules(last_success_scan_id, control_hash, with_accepted_resources, with_jira, provider)
@@ -1470,13 +1630,11 @@ class Accounts(base_test.BaseTest):
         accounts_data_res = self.backend.get_cloud_compliance_account(body=body)
         account_data = ComplianceAccountResponse(**accounts_data_res["response"][0])
 
-        # Validate severity counts match
-        if provider == PROVIDER_AWS:
-            assert account_data.criticalSeverityResources == severity_counts.Critical
-            assert account_data.highSeverityResources == severity_counts.High
-            assert account_data.mediumSeverityResources == severity_counts.Medium
-            assert account_data.lowSeverityResources == severity_counts.Low
-        # TODO: Add validation for Azure
+      
+        assert account_data.criticalSeverityResources == severity_counts.Critical
+        assert account_data.highSeverityResources == severity_counts.High
+        assert account_data.mediumSeverityResources == severity_counts.Medium
+        assert account_data.lowSeverityResources == severity_counts.Low
         assert account_data.reportGUID == last_success_scan_id
 
     def validate_compliance_frameworks(self, cloud_account_guid: str, last_success_scan_id: str, provider: str = PROVIDER_AWS):
@@ -2513,7 +2671,78 @@ class Accounts(base_test.BaseTest):
         elif feature_name == VULN_SCAN_FEATURE_NAME:
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
+    
+    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager=None):
+        """
+        Break GCP service account permissions by removing roles/viewer, trigger scanNow, validate disconnected status,
+        restore permissions, and reconnect with skipScan.
+        """
+        service_account_email = gcp_manager.get_service_account_email()
+        Logger.logger.info(f"Service account email: {service_account_email}")
         
+        role_to_remove = "roles/viewer"
+        Logger.logger.info(f"Removing {role_to_remove} from service account to break permissions")
+        
+        remove_success = gcp_manager.remove_iam_role_from_service_account(role_to_remove)
+        assert remove_success, f"Failed to remove role {role_to_remove}"
+
+        Logger.logger.info("Waiting for IAM removal to propagate in GCP...")
+        is_gone = gcp_manager.wait_for_permission_propagation(
+            permission="storage.buckets.getIamPolicy", 
+            should_have_access=False
+        )
+        assert is_gone, "GCP still reports role is present after timeout. Propagation failed."
+        
+        #Trigger scanNow to detect broken permissions
+        Logger.logger.info("Triggering scanNow to detect broken permissions")
+        self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
+        
+        #Validate feature status is disconnected
+        Logger.logger.info("Validating feature status is disconnected")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_DISCONNECTED
+        )
+        
+        #Restore roles/viewer
+        Logger.logger.info(f"Restoring {role_to_remove} to service account")
+        add_success = gcp_manager.add_iam_role_to_service_account(role_to_remove)
+        assert add_success, f"Failed to restore role {role_to_remove}"
+
+        Logger.logger.info("Waiting for IAM restoration to propagate...")
+        is_restored = gcp_manager.wait_for_permission_propagation(
+            permission="storage.buckets.getIamPolicy", 
+            should_have_access=True
+        )
+        assert is_restored, "GCP still reports role is missing after timeout."
+        
+        # 7. Reconnect with skipScan
+        Logger.logger.info("Reconnecting account with and skipping scan")
+        body = {
+            "guid": cloud_account_guid,
+            "complianceGCPConfig": {
+                "projectID": project_id,
+                "serviceAccountKey": original_service_account_key,
+            },
+            "skipScan": True
+        }
+        self.backend.update_cloud_account(body=body, provider=PROVIDER_GCP)
+        
+        #Final Validation
+        Logger.logger.info("Validating feature status is connected after reconnection")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_CONNECTED
+        )
+            
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:
     parsed_url = urlparse(url)

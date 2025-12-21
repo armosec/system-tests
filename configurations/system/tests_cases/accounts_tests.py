@@ -21,6 +21,14 @@ class AccountsTests(object):
             test_obj=CloudConnectCSPMSingleAzure,
             issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
         )
+    @staticmethod
+    def cloud_connect_gcp_cspm_single():
+        from tests_scripts.accounts.connect_cspm_single_gcp import CloudConnectCSPMSingleGCP
+        return KubescapeConfiguration(
+            name=inspect.currentframe().f_code.co_name,
+            test_obj=CloudConnectCSPMSingleGCP,
+            issueTemplate = TestUtil.get_expected_json(join(statics.DEFAULT_INTEGRATIONS_PATH, "issueTmpl.json"))
+        )
 
     @staticmethod
     def cloud_connect_aws_cspm_single():

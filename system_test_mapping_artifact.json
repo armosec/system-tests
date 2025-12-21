@@ -5922,6 +5922,23 @@
     ],
     "tested_dashboard_apis": []
   },
+  "cloud_connect_gcp_cspm_single": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks GCP cloud accounts connect with CSPM single project",
+    "skip_on_environment": "",
+    "owner": "benm@armosec.io",
+    "skip_cluster": true,
+    "test_implementation_files": [
+      "tests_scripts/accounts/connect_cspm_single_gcp.py"
+    ],
+    "tested_dashboard_apis": []
+  },
   "cloud_connect_aws_cadr_single": {
     "target": [
       "Backend"

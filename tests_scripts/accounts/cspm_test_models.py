@@ -34,7 +34,6 @@ FRAMEWORKS_CONFIG_AZURE = {
 
 FRAMEWORKS_CONFIG_GCP = {
     "cis_2.0": -1,
-    "cis_2.1": -1,
     "cis_3.0": -1,
     "mitre_attack": -1,
     "iso27001_2022": -1,
@@ -78,10 +77,25 @@ DEFAULT_TEST_CONFIG_AZURE = {
     "resource_id": "",
 }
 
+DEFAULT_TEST_CONFIG_GCP = {
+    "framework": "cis_3.0",
+    "control_name": "",
+    "rule_name": "",
+    "rule_hash": "",
+    "rule_id": "",
+    "check_type": "",
+    "severity": "",
+    "status": "",
+    "resource_hash": "",
+    "resource_name": "",
+    "resource_type": "",
+    "resource_id": "",
+}
+
 TEST_CONFIG_PROVIDER_MAP = {
     PROVIDER_AWS: DEFAULT_TEST_CONFIG_AWS,
     PROVIDER_AZURE: DEFAULT_TEST_CONFIG_AZURE,
-    # PROVIDER_GCP: DEFAULT_TEST_CONFIG_GCP,
+    PROVIDER_GCP: DEFAULT_TEST_CONFIG_GCP,
 }
 
 # Pydantic models for API responses
