@@ -1,7 +1,7 @@
 import os
 import json
 import random
-from re import T
+from typing import Tuple, Dict
 
 from infrastructure import gcp
 from systest_utils import Logger
@@ -20,6 +20,47 @@ class CloudConnectCSPMSingleGCP(Accounts):
         self.skip_apis_validation = False
         self.skip_jira_validation = False
         self.gcp_manager = None
+    
+    def _parse_and_validate_service_account_key(self, service_account_key_raw: str, expected_project_id: str) -> Tuple[str, Dict]:
+        """
+        Parse, validate, and normalize GCP service account key JSON.
+        
+        Args:
+            service_account_key_raw: Raw service account key as JSON string
+            expected_project_id: Expected project ID to validate against
+            
+        Returns:
+            Tuple of (normalized_json_string, parsed_dict)
+            
+        Raises:
+            ValueError: If JSON is invalid or project_id doesn't match
+        """
+        try:
+            # Parse to validate and normalize - this handles any extra escaping
+            parsed_key = json.loads(service_account_key_raw)
+            
+            # Validate that the parsed key has the correct project_id
+            parsed_project_id = parsed_key.get("project_id")
+            if parsed_project_id != expected_project_id:
+                raise ValueError(
+                    f"Service account key project_id ({parsed_project_id}) does not match "
+                    f"expected project_id ({expected_project_id}). Please verify your environment variables."
+                )
+            if parsed_project_id == "invalid":
+                raise ValueError(
+                    "Service account key contains 'invalid' project_id. "
+                    "This suggests the wrong credentials are being used. Please check GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS."
+                )
+            
+            # Re-serialize with compact formatting to ensure clean JSON string
+            # This ensures consistent formatting regardless of how it was stored in env
+            normalized_json = json.dumps(parsed_key, separators=(',', ':'))
+            Logger.logger.info(f"Successfully parsed and normalized GCP service account key (project_id: {expected_project_id})")
+            return normalized_json, parsed_key
+            
+        except json.JSONDecodeError as e:
+            Logger.logger.error(f"Failed to parse GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS as JSON: {e}")
+            raise ValueError(f"GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS must be a valid JSON string. Error: {e}")
 
     def start(self):
         """
@@ -49,37 +90,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
         assert service_account_key_raw, "GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS is not set"
 
         # Parse, validate, and normalize the JSON to ensure proper formatting
-        # This handles cases where the env var might have extra escaping or formatting issues
-        # The API expects serviceAccountKey as a JSON string, which will be properly escaped
-        # when the request body is serialized by requests.post(..., json=body)
-        try:
-            if isinstance(service_account_key_raw, str):
-                # Parse to validate and normalize - this handles any extra escaping
-                parsed_key = json.loads(service_account_key_raw)
-                
-                # Validate that the parsed key has the correct project_id
-                parsed_project_id = parsed_key.get("project_id")
-                if parsed_project_id != project_id:
-                    raise ValueError(
-                        f"Service account key project_id ({parsed_project_id}) does not match "
-                        f"GCP_PROJECT_ID_CLOUD_TESTS ({project_id}). Please verify your environment variables."
-                    )
-                if parsed_project_id == "invalid":
-                    raise ValueError(
-                        "Service account key contains 'invalid' project_id. "
-                        "This suggests the wrong credentials are being used. Please check GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS."
-                    )
-                
-                # Re-serialize with compact formatting to ensure clean JSON string
-                # This ensures consistent formatting regardless of how it was stored in env
-                service_account_key = json.dumps(parsed_key, separators=(',', ':'))
-            else:
-                # If it's already a dict, serialize it
-                service_account_key = json.dumps(service_account_key_raw, separators=(',', ':'))
-            Logger.logger.info(f"Successfully parsed and normalized GCP service account key from env (project_id: {project_id})")
-        except json.JSONDecodeError as e:
-            Logger.logger.error(f"Failed to parse GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS as JSON: {e}")
-            raise ValueError(f"GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS must be a valid JSON string. Error: {e}")
+        service_account_key, parsed_key = self._parse_and_validate_service_account_key(service_account_key_raw, project_id)
         
         self.gcp_manager = gcp.GcpManager(service_account_key)
 
@@ -117,13 +128,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
         assert len(res["response"]) == 0, f"Expected no account to be created with bad credentials, but found: {res['response']}"
 
         Logger.logger.info("Stage 4: Connect GCP CSPM account")
-        # Verify we're using the good credentials (not the bad ones)
-        # Parse and check the project_id in the key matches
-        parsed_good_key = json.loads(service_account_key)
-        assert parsed_good_key.get("project_id") == project_id, f"Service account key project_id ({parsed_good_key.get('project_id')}) does not match expected project_id ({project_id})"
-        assert parsed_good_key.get("project_id") != "invalid", "ERROR: Good credentials still contain 'invalid' project_id - credentials may have been corrupted!"
-        Logger.logger.info(f"Verified good credentials have correct project_id: {project_id}")
-        
+        # Credentials already validated in _parse_and_validate_service_account_key above
         cloud_account_guid = self.connect_gcp_cspm_new_account(project_id, service_account_key, cloud_account_name, validate_apis=not self.skip_apis_validation)
 
         # Store account name for later validation
