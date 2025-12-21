@@ -158,11 +158,11 @@ class CloudConnectCSPMSingleGCP(Accounts):
 
             if not self.skip_jira_validation:
                 Logger.logger.info("Stage 7: Create Jira issue for resource")
-                self.create_jira_issue_for_cspm(last_success_scan_id, provider=PROVIDER_GCP)
+                self.create_jira_issue_for_cspm(PROVIDER_GCP, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
             Logger.logger.info("Stage 8: Accept the risk")
-            self.accept_cspm_risk(cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id, provider=PROVIDER_GCP)
+            self.accept_cspm_risk(PROVIDER_GCP, cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
             Logger.logger.info("Stage 9: Break service account permissions and reconnect")

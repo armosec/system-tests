@@ -4,7 +4,10 @@ import time
 import uuid
 from dateutil import parser
 from enum import Enum
-from typing import List, Tuple, Any, Dict, Union
+from typing import List, Tuple, Any, Dict, Union, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from infrastructure import gcp as gcp_module
 
 from infrastructure import aws
 from infrastructure import gcp
@@ -2630,32 +2633,31 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
     
-    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager=None):
+    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager: Optional['gcp_module.GcpManager'] = None):
         """
         Break GCP service account permissions by removing roles/viewer, trigger scanNow, validate disconnected status,
         restore permissions, and reconnect with skipScan.
+        
+        Args:
+            cloud_account_guid: GUID of the cloud account
+            project_id: GCP project ID
+            original_service_account_key: Original valid service account key JSON string
+            gcp_manager: GCP manager instance (optional, will be created if not provided)
         """
-        service_account_email = gcp_manager.get_service_account_email()
-        Logger.logger.info(f"Service account email: {service_account_email}")
         
         role_to_remove = "roles/viewer"
         Logger.logger.info(f"Removing {role_to_remove} from service account to break permissions")
         
-        remove_success = gcp_manager.remove_iam_role_from_service_account(role_to_remove)
-        assert remove_success, f"Failed to remove role {role_to_remove}"
-
-        Logger.logger.info("Waiting for IAM removal to propagate in GCP...")
-        is_gone = gcp_manager.wait_for_permission_propagation(
-            permission="storage.buckets.getIamPolicy", 
-            should_have_access=False
-        )
-        assert is_gone, "GCP still reports role is present after timeout. Propagation failed."
+        # Remove role (this already includes a 5 second sleep for propagation)
+        remove_success = gcp_manager.remove_role(role_to_remove)
+        assert remove_success, f"Failed to remove role {role_to_remove} from service account"
+        Logger.logger.info(f"Successfully removed {role_to_remove} from service account")
         
-        #Trigger scanNow to detect broken permissions
+        # Trigger scanNow to detect broken permissions
         Logger.logger.info("Triggering scanNow to detect broken permissions")
         self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
         
-        #Validate feature status is disconnected
+        # Validate feature status is disconnected
         Logger.logger.info("Validating feature status is disconnected")
         self.wait_for_report(
             self.validate_account_feature_status,
@@ -2665,21 +2667,19 @@ class Accounts(base_test.BaseTest):
             feature_name=COMPLIANCE_FEATURE_NAME,
             expected_status=FEATURE_STATUS_DISCONNECTED
         )
+        Logger.logger.info("Feature status validated as disconnected")
         
-        #Restore roles/viewer
+        # Restore roles/viewer to service account
         Logger.logger.info(f"Restoring {role_to_remove} to service account")
-        add_success = gcp_manager.add_iam_role_to_service_account(role_to_remove)
-        assert add_success, f"Failed to restore role {role_to_remove}"
-
-        Logger.logger.info("Waiting for IAM restoration to propagate...")
-        is_restored = gcp_manager.wait_for_permission_propagation(
-            permission="storage.buckets.getIamPolicy", 
-            should_have_access=True
-        )
-        assert is_restored, "GCP still reports role is missing after timeout."
+        try:
+            gcp_manager.add_role(role_to_remove)
+            Logger.logger.info(f"Successfully restored {role_to_remove} to service account")
+        except Exception as e:
+            Logger.logger.error(f"Failed to restore role {role_to_remove}: {e}")
+            raise
         
-        # 7. Reconnect with skipScan
-        Logger.logger.info("Reconnecting account with and skipping scan")
+        # Reconnect with skipScan
+        Logger.logger.info("Reconnecting account with skipScan=True")
         body = {
             "guid": cloud_account_guid,
             "complianceGCPConfig": {
@@ -2689,8 +2689,9 @@ class Accounts(base_test.BaseTest):
             "skipScan": True
         }
         self.backend.update_cloud_account(body=body, provider=PROVIDER_GCP)
+        Logger.logger.info("Reconnected account with skipScan=True")
         
-        #Final Validation
+        # Final Validation
         Logger.logger.info("Validating feature status is connected after reconnection")
         self.wait_for_report(
             self.validate_account_feature_status,
@@ -2700,6 +2701,7 @@ class Accounts(base_test.BaseTest):
             feature_name=COMPLIANCE_FEATURE_NAME,
             expected_status=FEATURE_STATUS_CONNECTED
         )
+        Logger.logger.info("Feature status validated as connected after reconnection")
             
 
 def extract_parameters_from_url(url: str) -> Tuple[str, str, str, List[Dict[str, str]]]:

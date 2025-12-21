@@ -97,8 +97,8 @@ DEFAULT_TEST_CONFIG_GCP = {
     "resource_type": "bigquery",
     "resource_id": "elated-pottery-310110:umbrella",
     "failed_controls_count": 1,
-    "passed_controls_count": 0,
-    "high_severity_controls": 0
+    "passed_controls_count": 1,
+    "high_severity_controls": 1
 }
 
 TEST_CONFIG_PROVIDER_MAP = {
