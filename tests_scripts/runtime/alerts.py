@@ -1,19 +1,15 @@
 
 
 import json
-from random import random
 import time
 from configurations.system.tests_cases.structures import TestConfiguration
-from infrastructure.kubectl_wrapper import KubectlWrapper
-from systest_utils.systests_utilities import TestUtil
 from systest_utils.tests_logger import Logger
-from tests_scripts.base_test import BaseTest
 from tests_scripts.runtime.incidents import __RELATED_ALERTS_KEY__
-from tests_scripts.runtime.policies import POLICY_CREATED_RESPONSE, RuntimePoliciesConfigurations
-from tests_scripts.users_notifications.alert_notifications import TEST_NAMESPACE, AlertNotifications, get_env
+from tests_scripts.runtime.policies import RuntimePoliciesConfigurations, RuntimePoliciesConfigurationsNoCDR
+from tests_scripts.users_notifications.alert_notifications import AlertNotifications, get_env
 
 
-class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations):
+class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, RuntimePoliciesConfigurationsNoCDR):
     def __init__(self, test_obj: TestConfiguration = None, backend=None, test_driver=None):
         super(IncidentsAlerts, self).__init__(test_obj=test_obj, backend=backend, test_driver=test_driver)
 

@@ -539,6 +539,10 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
                 back -= 1
             start = max(0, j + 1)
         block = "\n".join(lines[start:idx + 1]).strip()
+        # Truncate very long error blocks to keep them manageable
+        MAX_ERROR_BLOCK_LENGTH = 2000  # Error blocks can be multi-line, allow more length
+        if len(block) > MAX_ERROR_BLOCK_LENGTH:
+            block = block[:MAX_ERROR_BLOCK_LENGTH - 3] + "..."
         if block and block not in errors:
             errors.append(block)
 
@@ -552,13 +556,21 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
     for pat in error_patterns:
         for m in re.finditer(pat, section_text, re.MULTILINE):
             snippet = m.group(0).strip()
+            # Truncate very long error snippets to keep them manageable
+            MAX_ERROR_BLOCK_LENGTH = 2000  # Error blocks can be multi-line, allow more length
+            if len(snippet) > MAX_ERROR_BLOCK_LENGTH:
+                snippet = snippet[:MAX_ERROR_BLOCK_LENGTH - 3] + "..."
             if snippet and snippet not in errors:
                 errors.append(snippet)
 
     from_padded = to_padded = None
     if timestamps:
-        start = timestamps[0] - td(minutes=padding_minutes)
-        end = timestamps[-1] + td(minutes=padding_minutes)
+        # Asymmetric padding: less before test, more after test completion
+        # This catches delayed errors, async processing, and cleanup issues
+        padding_before = padding_minutes  # Keep same (typically 5-10 minutes)
+        padding_after = padding_minutes + 25  # Add 25 minutes after test (total 30-35 minutes)
+        start = timestamps[0] - td(minutes=padding_before)
+        end = timestamps[-1] + td(minutes=padding_after)
         from_padded = start.isoformat()
         to_padded = end.isoformat()
     return first_ts, last_ts, errors, from_padded, to_padded
@@ -738,6 +750,8 @@ def build_loki_queries(services: List[str], ids: Identifiers, cfg: Dict[str, Any
     #     id_filters.append(f'|= "{ids.customer_guid}"')
     # if ids.cluster:
     #     id_filters.append(f'|= "{ids.cluster}"')
+    # Add error filter to prioritize error/warning logs (in-cluster components)
+    id_filters.append('|~ "(?i)error|warn|fail|exception"')
     id_filter_str = " ".join(id_filters)
 
     target_services = services or []
@@ -823,7 +837,7 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
 
     # In auto mode, if no base_url or we later see 404, we will try grafana proxy if info is present
 
-    LIMIT = 300
+    LIMIT = 500  # Reasonable limit (not 5000, not 1) - focuses on error logs with test run ID filter
 
     for fentry in failures:
         start_ns = iso_to_unix_ns(fentry.loki.from_time) if fentry.loki.from_time else None
@@ -929,18 +943,22 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
                         continue
                 data = r.json()
                 # Loki results can be 'streams' with 'values' entries: [ts, line]
+                # Loki returns results in reverse chronological order (most recent first)
+                # Since we filter for errors, we prioritize recent error logs
                 before_count = len(snippets)
                 for stream in (data.get("data", {}).get("result", []) or []):
                     values = stream.get("values") or []
+                    # Take first LIMIT entries (most recent, since Loki returns reverse chronological)
                     for ts, line in values[:LIMIT]:
-                        # keep concise snippet
+                        # Truncate long log lines to keep snippets concise
                         line_s = str(line)
-                        if len(line_s) > 400:
-                            line_s = line_s[:397] + "..."
+                        MAX_LINE_LENGTH = 300  # Truncate long log lines for better readability
+                        if len(line_s) > MAX_LINE_LENGTH:
+                            line_s = line_s[:MAX_LINE_LENGTH - 3] + "..."
                         snippets.append(line_s)
-                        if len(snippets) >= 100:  # cap per failure
+                        if len(snippets) >= 500:  # Increased cap per failure (was 100)
                             break
-                    if len(snippets) >= 100:
+                    if len(snippets) >= 500:  # Increased cap per failure (was 100)
                         break
                 if debug:
                     added = len(snippets) - before_count
@@ -1158,7 +1176,7 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
                     "test": fentry.test.get("name"),
                     "from": fentry.loki.from_time,
                     "to": fentry.loki.to_time,
-                    "snippets": fentry.loki.excerpts[:100],
+                    "snippets": fentry.loki.excerpts[:500],  # Increased from 100 to 500
                 })
         with open(base_dir / "logs" / "excerpts.json", "w") as f:
             f.write(json.dumps(excerpts, indent=2))

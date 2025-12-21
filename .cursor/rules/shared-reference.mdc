@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+# Shared Rules Reference
+
+> **Shared rules** are in `shared-rules/.cursor/rules/shared/` (directory with multiple `.mdc` files).
+> **Repo-specific rules** are in `.cursor/rules/local/` (this repository only).
+> The AI assistant reads both: shared rules + local rules.

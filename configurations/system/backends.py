@@ -86,6 +86,15 @@ def set_backends():
                             event_receiver_server="https://cloud-report.us.armosec.io",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+    
+    # armo-stage-us-east-1 frontEgg 
+    backends.append(Backend(name='armo-stage-us-east-1',
+                            dashboard='https://api.stage-us-east-1.r7.armo-cadr.com',
+                            api_url="api.stage-us-east-1.r7.armo-cadr.com",
+                            auth_url='https://auth.r7.armo-cadr.com',
+                            event_receiver_server="https://cloud-report.stage-us-east-1.r7.armo-cadr.com",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
     # armo-stage-us-east-1 frontEgg 
     backends.append(Backend(name='armo-stage-us-east-1',

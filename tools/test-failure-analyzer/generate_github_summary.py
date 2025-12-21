@@ -9,6 +9,7 @@ markdown summary for the GitHub Actions job summary.
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -302,7 +303,29 @@ def generate_summary(
         if (not rc_commit or rc_commit == 'unknown') and workflow_commit_fallback:
             rc_commit = workflow_commit_fallback
         
-        if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
+        # Validate commits are actual SHA hashes (not error messages)
+        def is_valid_commit_hash(commit_str):
+            """Check if commit string is a valid SHA hash."""
+            if not commit_str or commit_str == 'unknown':
+                return False
+            # Check if it looks like a JSON error message
+            if commit_str.startswith('{') or commit_str.startswith('['):
+                return False
+            # Check if it's a valid SHA (7-40 hex characters)
+            return bool(re.match(r'^[0-9a-f]{7,40}$', commit_str, re.IGNORECASE))
+        
+        # Clean and validate commits
+        if deployed_commit:
+            deployed_commit = deployed_commit.strip()
+            if not is_valid_commit_hash(deployed_commit):
+                deployed_commit = None
+        
+        if rc_commit:
+            rc_commit = rc_commit.strip()
+            if not is_valid_commit_hash(rc_commit):
+                rc_commit = None
+        
+        if deployed_commit and rc_commit:
             compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
             lines.append(f"- **[View Full Diff on GitHub]({compare_url})** (commit-to-commit)")
         elif not has_diff_stats:
@@ -587,7 +610,17 @@ def generate_summary(
     # Quick links (always show)
     lines.append("### **📎 Quick Links:**\n")
     
-    # GitHub diff link
+    # GitHub diff link - reuse validation function from above
+    def is_valid_commit_hash(commit_str):
+        """Check if commit string is a valid SHA hash."""
+        if not commit_str or commit_str == 'unknown':
+            return False
+        # Check if it looks like a JSON error message
+        if commit_str.startswith('{') or commit_str.startswith('['):
+            return False
+        # Check if it's a valid SHA (7-40 hex characters)
+        return bool(re.match(r'^[0-9a-f]{7,40}$', commit_str, re.IGNORECASE))
+    
     if found_indexes or code_diffs:
         deployed_commit = None
         rc_commit = None
@@ -602,7 +635,18 @@ def generate_summary(
             deployed_commit = git_diff.get('deployed_commit')
             rc_commit = git_diff.get('rc_commit')
         
-        if deployed_commit and rc_commit and deployed_commit != 'unknown' and rc_commit != 'unknown':
+        # Validate commits before using them
+        if deployed_commit:
+            deployed_commit = deployed_commit.strip()
+            if not is_valid_commit_hash(deployed_commit):
+                deployed_commit = None
+        
+        if rc_commit:
+            rc_commit = rc_commit.strip()
+            if not is_valid_commit_hash(rc_commit):
+                rc_commit = None
+        
+        if deployed_commit and rc_commit:
             compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
             lines.append(f"- [View Code Diff on GitHub]({compare_url})")
     

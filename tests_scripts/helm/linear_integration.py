@@ -43,7 +43,6 @@ class LinearIntegration(BaseKubescape, BaseHelm):
         return statics.SUCCESS, ""
 
     def start(self):
-        return statics.SUCCESS, ""
         if (
             self.test_driver.test_name == "linear_integration"
             and self.backend.server == "https://api.armosec.io"
@@ -490,6 +489,7 @@ class LinearIntegration(BaseKubescape, BaseHelm):
                         "workload": self.vulnWL["name"],
                         "cluster": self.cluster,
                         "namespace": self.namespace,
+                        "componentInfo.name": self.vuln["componentInfo"]["name"],
                         "tickets": "|exists",
                     }
                 ]
