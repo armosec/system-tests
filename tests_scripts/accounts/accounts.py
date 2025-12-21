@@ -4,10 +4,7 @@ import time
 import uuid
 from dateutil import parser
 from enum import Enum
-from typing import List, Tuple, Any, Dict, Union, Optional, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from infrastructure import gcp as gcp_module
+from typing import List, Tuple, Any, Dict, Union, Optional
 
 from infrastructure import aws
 from infrastructure import gcp
@@ -2859,7 +2856,7 @@ class Accounts(base_test.BaseTest):
         
         Logger.logger.info(f"Azure account {cloud_account_guid} reconnected successfully")
 
-    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager: Optional['gcp_module.GcpManager'] = None):
+    def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager: Optional['gcp.GcpManager'] = None):
         """
         Break GCP service account permissions by removing roles/viewer, trigger scanNow, validate disconnected status,
         restore permissions, and reconnect with skipScan.
