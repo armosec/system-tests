@@ -9,6 +9,8 @@ from tests_scripts.accounts.accounts import (
     PROVIDER_AZURE,
 )
 
+AZURE_TENANT_ID_CLOUD_TESTS = "50a70646-52e3-4e46-911e-6ca1b46afba3"
+AZURE_SUBSCRIPTION_ID_CLOUD_TESTS = "57e3175c-71ce-45f8-8bfc-34d966223068"
 
 class CloudConnectCSPMSingleAzure(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -43,14 +45,14 @@ class CloudConnectCSPMSingleAzure(Accounts):
 
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
         client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
+        client_object_id = os.environ.get("AZURE_CLIENT_OBJECT_ID_CLOUD_TESTS")
         client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
-        tenant_id = os.environ.get("AZURE_TENANT_ID_CLOUD_TESTS")
-        subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID_CLOUD_TESTS")
+        tenant_id = AZURE_TENANT_ID_CLOUD_TESTS
+        subscription_id = AZURE_SUBSCRIPTION_ID_CLOUD_TESTS
 
         assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
+        assert client_object_id, "AZURE_CLIENT_OBJECT_ID_CLOUD_TESTS is not set"
         assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
-        assert tenant_id, "AZURE_TENANT_ID_CLOUD_TESTS is not set"
-        assert subscription_id, "AZURE_SUBSCRIPTION_ID_CLOUD_TESTS is not set"
 
         cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm"
         bad_cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-bad"
@@ -132,7 +134,11 @@ class CloudConnectCSPMSingleAzure(Accounts):
             self.accept_cspm_risk(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
-        Logger.logger.info("Stage 8: Delete CSPM feature and validate")
+            Logger.logger.info("Stage 10: Fail Azure connection and reconnect")
+            self.fail_and_reconnect_azure_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_object_id, client_secret)
+            Logger.logger.info("Azure connection has been failed and reconnected successfully")
+
+        Logger.logger.info("Stage 11: Delete CSPM feature and validate")
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info("Azure CSPM single subscription test completed successfully")

@@ -71,6 +71,8 @@ CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
 
+AZURE_READER_ROLE_DEFINITION_PATH = "/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
+
 class CloudEntityTypes(Enum):
     ACCOUNT = "account"
     ORGANIZATION = "organization"
@@ -2713,7 +2715,152 @@ class Accounts(base_test.BaseTest):
         elif feature_name == VULN_SCAN_FEATURE_NAME:
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
-    
+
+    def fail_and_reconnect_azure_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_object_id: str, client_secret: str):
+        Logger.logger.info("Failing Azure connection by removing Reader role from Service Principal")
+        reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret)
+        assert reader_role_removed, "Failed to remove Reader role from Service Principal"
+        Logger.logger.info("Waiting for the role removal to propagate")
+        time.sleep(10)
+
+        Logger.logger.info("Trying to scan now (should fail)")
+        try:
+            self.backend.cspm_scan_now(cloud_account_guid, with_error=True)
+        except Exception as e:
+            Logger.logger.info(f"Scan now failed as expected: {str(e)}")
+
+        Logger.logger.info("Validating account status becomes disconnected")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_DISCONNECTED,
+        )
+        Logger.logger.info("Account status is now disconnected as expected")
+        
+        Logger.logger.info("Restoring Reader role with Azure API")
+        reader_role_restored = self.create_azure_reader_role(subscription_id, tenant_id, client_id, client_object_id, client_secret)
+        assert reader_role_restored, "Failed to restore Reader role to Service Principal"
+        Logger.logger.info("Waiting for the role restoration to propagate")
+        time.sleep(150)
+
+        Logger.logger.info("Reconnecting by updating the account")
+        # Retry reconnection in case role hasn't fully propagated yet
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.reconnect_azure_cspm_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_secret)
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    Logger.logger.warning(f"Reconnection attempt {attempt + 1} failed: {str(e)}. Waiting longer for role propagation...")
+                    time.sleep(30)
+                else:
+                    raise
+
+        Logger.logger.info("Validating account status becomes connected")
+        self.wait_for_report(
+            self.validate_account_feature_status,
+            timeout=180,
+            sleep_interval=10,
+            cloud_account_guid=cloud_account_guid,
+            feature_name=COMPLIANCE_FEATURE_NAME,
+            expected_status=FEATURE_STATUS_CONNECTED,
+        )
+        Logger.logger.info("Account has been reconnected successfully")
+
+    def remove_azure_reader_role(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str) -> bool:
+        """
+        Remove Reader role assignment from the Service Principal.
+        Uses Azure Management API to remove the role assignment.
+        
+        Note: We assume we have writing permission as per requirements.
+        """
+        try:
+            from azure.identity import ClientSecretCredential
+            from azure.mgmt.authorization import AuthorizationManagementClient
+            
+            Logger.logger.info(f"Trying to remove Reader role from client {client_id} in subscription {subscription_id}")
+            credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
+            auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
+            scope = f"/subscriptions/{subscription_id}"
+            reader_role_definition_id = f"{scope}{AZURE_READER_ROLE_DEFINITION_PATH}"
+            
+            role_assignments = auth_client.role_assignments.list_for_scope(scope=scope)
+            for assignment in role_assignments:
+                if assignment.role_definition_id == reader_role_definition_id:
+                    Logger.logger.info(f"Removing Reader role...")
+                    auth_client.role_assignments.delete_by_id(role_assignment_id=assignment.id)
+                    Logger.logger.info(f"Successfully removed Reader role for client {client_id} in subscription {subscription_id}")
+                    return True
+            
+            Logger.logger.warning(f"No Reader role found for client {client_id} in subscription {subscription_id}")
+            return False
+
+        except ImportError:
+            Logger.logger.warning("Azure SDK not available")
+            return False
+        except Exception as e:
+            Logger.logger.error(f"Failed to remove Reader role: {str(e)}")
+            return False
+
+    def create_azure_reader_role(self, subscription_id: str, tenant_id: str, client_id: str, client_object_id: str, client_secret: str) -> bool:
+        """
+        Create Reader role assignment for the Service Principal.
+        Uses Azure Management API to create the role assignment.
+        
+        Note: We assume we have writing permission as per requirements.
+        """
+        try:
+            from azure.identity import ClientSecretCredential
+            from azure.mgmt.authorization import AuthorizationManagementClient
+            from azure.mgmt.authorization.models import RoleAssignmentCreateParameters
+            
+            Logger.logger.info(f"Trying to create Reader role for client {client_id} in subscription {subscription_id}")
+            credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
+            auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
+            scope = f"/subscriptions/{subscription_id}"
+            reader_role_definition_id = f"{scope}{AZURE_READER_ROLE_DEFINITION_PATH}"
+            
+            # Create role assignment
+            role_assignment_name = str(uuid.uuid4())
+            role_assignment_params = RoleAssignmentCreateParameters(role_definition_id=reader_role_definition_id, principal_id=client_object_id, principal_type="ServicePrincipal")
+            
+            Logger.logger.info(f"Creating Reader role...")
+            auth_client.role_assignments.create(scope=scope, role_assignment_name=role_assignment_name, parameters=role_assignment_params)
+            Logger.logger.info(f"Successfully created Reader role for client {client_id} in subscription {subscription_id}")
+            return True
+            
+        except ImportError:
+            Logger.logger.warning("Azure SDK not available")
+            return False
+        except Exception as e:
+            Logger.logger.error(f"Failed to create Reader role: {str(e)}")
+            return False
+
+    def reconnect_azure_cspm_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_secret: str):
+        Logger.logger.info(f"Reconnecting Azure CSPM account {cloud_account_guid}")
+        compliance_azure_config = {
+            "subscriptionID": subscription_id,
+            "tenantID": tenant_id,
+            "clientID": client_id,
+            "clientSecret": client_secret,
+        }
+        
+        body = {
+            "guid": cloud_account_guid,
+            "complianceAzureConfig": compliance_azure_config,
+            "skipScan": True,
+        }
+        
+        res = self.backend.update_cloud_account(body, PROVIDER_AZURE)
+        assert "Cloud account updated" in res or "updated" in str(res).lower(), \
+            f"Failed to reconnect Azure account: {res}"
+        
+        Logger.logger.info(f"Azure account {cloud_account_guid} reconnected successfully")
+
     def break_and_reconnect_gcp_service_account(self, cloud_account_guid: str, project_id: str, original_service_account_key: str, gcp_manager: Optional['gcp_module.GcpManager'] = None):
         """
         Break GCP service account permissions by removing roles/viewer, trigger scanNow, validate disconnected status,
