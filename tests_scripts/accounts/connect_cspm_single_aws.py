@@ -95,6 +95,10 @@ class CloudConnectCSPMSingleAWS(Accounts):
         self.cspm_cloud_account_name = account["name"]
         cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
         
+        Logger.logger.info('Stage 5: Fail to connect same AWS CSPM account')
+        cloud_account_guid_fail = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False, expect_failure=True)
+        assert cloud_account_guid_fail is None, f"Expected same account to fail, but got account GUID: {cloud_account_guid_fail}"
+
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
             # wait for success

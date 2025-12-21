@@ -85,17 +85,20 @@ DEFAULT_TEST_CONFIG_AZURE = {
 
 DEFAULT_TEST_CONFIG_GCP = {
     "framework": "cis_3.0",
-    "control_name": "",
-    "rule_name": "",
-    "rule_hash": "",
-    "rule_id": "",
-    "check_type": "",
-    "severity": "",
-    "status": "",
-    "resource_hash": "",
-    "resource_name": "",
-    "resource_type": "",
-    "resource_id": "",
+    "control_name": "Ensure That a Default Customer-Managed Encryption Key (CMEK) Is Specified for All BigQuery Data Sets",
+    "rule_name": "Ensure BigQuery datasets are encrypted with Customer-Managed Keys (CMKs).",
+    "rule_hash": "c59734e5-1214-9c26-2df9-a5c6e00f8638",
+    "rule_id": "bigquery_dataset_cmk_encryption",
+    "check_type": "AUTOMATED",
+    "severity": "high",
+    "status": "FAIL",
+    "resource_hash": "ffb9edfe-49e8-3b12-9d93-8d16f6b491b6",
+    "resource_name": "umbrella",
+    "resource_type": "bigquery",
+    "resource_id": "elated-pottery-310110:umbrella",
+    "failed_controls_count": 1,
+    "passed_controls_count": 0,
+    "high_severity_controls": 0
 }
 
 TEST_CONFIG_PROVIDER_MAP = {

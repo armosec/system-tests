@@ -420,7 +420,7 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info("Validate accounts cloud with cspm unique values")
             self.validate_accounts_cloud_uniquevalues(cloud_account_name)
             Logger.logger.info("Edit name and validate cloud account with cspm")
-            self.update_and_validate_cloud_account(cloud_account_guid, cloud_account_name + "-updated", provider=PROVIDER_GCP)
+            self.update_and_validate_cloud_account(PROVIDER_GCP, cloud_account_guid, cloud_account_name + "-updated")
         return cloud_account_guid
     
     def add_cspm_feature_to_organization(self, aws_manager: aws.AwsManager, stackset_name: str,

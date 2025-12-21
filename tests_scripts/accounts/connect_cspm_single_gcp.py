@@ -153,7 +153,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
             Logger.logger.info("Stage 6: Validate all scan results")
-            self.validate_scan_data(cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id, provider=PROVIDER_GCP)
+            self.validate_scan_data(PROVIDER_GCP, cloud_account_guid, self.gcp_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
