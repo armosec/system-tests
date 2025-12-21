@@ -2747,18 +2747,16 @@ class Accounts(base_test.BaseTest):
         time.sleep(150)
 
         Logger.logger.info("Reconnecting by updating the account")
-        # Retry reconnection in case role hasn't fully propagated yet
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                self.reconnect_azure_cspm_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_secret)
-                break
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    Logger.logger.warning(f"Reconnection attempt {attempt + 1} failed: {str(e)}. Waiting longer for role propagation...")
-                    time.sleep(30)
-                else:
-                    raise
+        self.wait_for_report(
+            self.reconnect_azure_cspm_account,
+            timeout=300,
+            sleep_interval=30,
+            cloud_account_guid=cloud_account_guid,
+            subscription_id=subscription_id,
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+        )
 
         Logger.logger.info("Validating account status becomes connected")
         self.wait_for_report(
