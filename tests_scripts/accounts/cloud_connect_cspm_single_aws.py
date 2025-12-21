@@ -109,7 +109,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
         assert cloud_account_guid_fail is None, f"Expected same account to fail, but got account GUID: {cloud_account_guid_fail}"
 
         if not self.skip_apis_validation:
-            Logger.logger.info('Stage 5: Wait for cspm scan to complete successfully')
+            Logger.logger.info('Stage 6: Wait for cspm scan to complete successfully')
             # wait for success
             self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance_aws,
                                 timeout=1600,
@@ -124,40 +124,40 @@ class CloudConnectCSPMSingleAWS(Accounts):
             last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info("extracted last success scan id from created account")
 
-            Logger.logger.info('Stage 6: Validate all scan results')
+            Logger.logger.info('Stage 7: Validate all scan results')
             self.validate_scan_data(PROVIDER_AWS, cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
-                Logger.logger.info('Stage 7: Create Jira issue for resource')
+                Logger.logger.info('Stage 8: Create Jira issue for resource')
                 self.create_jira_issue_for_cspm(PROVIDER_AWS, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info('Stage 8: Accept the risk')
+            Logger.logger.info('Stage 9: Accept the risk')
             self.accept_cspm_risk(PROVIDER_AWS, cloud_account_guid, self.cspm_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
         if not self.skip_apis_validation:
-            Logger.logger.info('Stage 9: Disconnect the cspm account')
+            Logger.logger.info('Stage 10: Disconnect the cspm account')
             self.disconnect_cspm_account_without_deleting_cloud_account(stack_name=self.cspm_stack_name, cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
 
-            Logger.logger.info('Stage 10: Recreate cspm stack')
+            Logger.logger.info('Stage 11: Recreate cspm stack')
             new_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
             test_arn = new_arn #update the test arn to the new arn - it is changed though time format in role name
             
-        Logger.logger.info('Stage 11: Delete cspm feature and validate')
+        Logger.logger.info('Stage 12: Delete cspm feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
-        Logger.logger.info('Stage 12: Validate aws regions')
+        Logger.logger.info('Stage 13: Validate aws regions')
         res = self.backend.get_aws_regions()
         assert len(res) > 0, f"failed to get aws regions, res is {res}"
 
-        Logger.logger.info('Stage 13: Validate aws regions details')
+        Logger.logger.info('Stage 14: Validate aws regions details')
         res = self.backend.get_aws_regions_details()
         assert len(res) > 0, f"failed to get aws regions details, res is {res}"
 
         # Combination/Conflict section - test CSPM with CADR
-        Logger.logger.info('Stage 14: Setup for combination test - reconnect CSPM account')
+        Logger.logger.info('Stage 15: Setup for combination test - reconnect CSPM account')
         # Reconnect CSPM for combination testing
         cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
         
@@ -179,7 +179,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
         self.cadr_stack_name = "systest-" + self.test_identifier_rand + "-cadr-conflict"
         self.cadr_conflict_account_name = "systest-" + self.test_identifier_rand + "-cadr-conflict"
 
-        Logger.logger.info('Stage 15: Test connection conflict - connect CADR to existing CSPM account')
+        Logger.logger.info('Stage 16: Test connection conflict - connect CADR to existing CSPM account')
         # Connect CADR to the same account to test conflict handling
         account_guid_after_cadr = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_conflict_account_name, log_location)
         Logger.logger.info("CADR has been connected successfully to existing CSPM account")
@@ -197,21 +197,21 @@ class CloudConnectCSPMSingleAWS(Accounts):
             if cspm_feature.get("lastSuccessScanID") != cspm_feature_after.get("lastSuccessScanID"):
                 Logger.logger.warning(f"WARNING: Scan ID changed after CADR connection! Before: {cspm_feature.get('lastSuccessScanID')}, After: {cspm_feature_after.get('lastSuccessScanID')}")
 
-        Logger.logger.info('Stage 16: Validate CSPM feature unchanged after CADR connection')
+        Logger.logger.info('Stage 17: Validate CSPM feature unchanged after CADR connection')
         # Validate CSPM config remains unchanged after CADR connection
         self.validate_features_unchanged(cloud_account_guid, COMPLIANCE_FEATURE_NAME, cspm_feature)
         Logger.logger.info("CSPM feature config remains unchanged after CADR connection")
 
-        Logger.logger.info('Stage 17: Test CSPM connection blocked - try to connect CSPM again to existing account')
+        Logger.logger.info('Stage 18: Test CSPM connection blocked - try to connect CSPM again to existing account')
         # Try to connect CSPM again - should be blocked
         is_blocked = self.connect_cspm_single_account_suppose_to_be_blocked(stack_region, test_arn, self.cspm_external_id)
         assert is_blocked, "Connecting CSPM again to existing account should be blocked"
         Logger.logger.info("CSPM connection correctly blocked for account that already has CSPM")
 
-        Logger.logger.info('Stage 18: Delete cadr feature and validate')
+        Logger.logger.info('Stage 19: Delete cadr feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, CADR_FEATURE_NAME)
 
-        Logger.logger.info('Stage 19: Delete cspm feature and validate')
+        Logger.logger.info('Stage 20: Delete cspm feature and validate')
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         return self.cleanup()

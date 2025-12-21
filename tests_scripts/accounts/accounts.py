@@ -1777,7 +1777,7 @@ class Accounts(base_test.BaseTest):
             Logger.logger.error(error_msg)
             raise Exception(error_msg)
         
-        Logger.logger.info(f"✅ All accounts managed by org {org_guid} have been deleted or disconnected")
+        Logger.logger.info(f"All accounts managed by org {org_guid} have been deleted or disconnected")
 
     def validate_feature_deleted_from_entity(self, guid: str, feature_name: str, NeedsToBeDeleted: bool, cloud_entity_type: CloudEntityTypes):
         body = self.build_get_cloud_entity_by_guid_request(guid)
