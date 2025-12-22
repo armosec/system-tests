@@ -331,7 +331,7 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         return cloud_account_guid
 
-    def connect_aws_cspm_new_account(self, region, account_id, arn, cloud_account_name,external_id, skip_scan: bool = False, validate_apis=True, expect_failure: bool = False, is_to_cleanup_accounts=True)->str:
+    def connect_aws_cspm_new_account(self, region, account_id, arn, cloud_account_name, external_id, skip_scan: bool = False, validate_apis=True, expect_failure: bool = False, is_to_cleanup_accounts=True) -> str:
         if is_to_cleanup_accounts:   
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
@@ -348,21 +348,7 @@ class Accounts(base_test.BaseTest):
             self.update_and_validate_cloud_account(PROVIDER_AWS, cloud_account_guid, cloud_account_name + "-updated")
         return cloud_account_guid
 
-    def connect_azure_cspm_new_account(
-        self,
-        subscription_id: str,
-        tenant_id: str,
-        client_id: str,
-        client_secret: str,
-        cloud_account_name: str,
-        skip_scan: bool = False,
-        validate_apis: bool = True,
-        expect_failure: bool = False,
-        is_to_cleanup_accounts: bool = True,
-    ) -> str:
-        """
-        Connect Azure CSPM account (called subscription in Azure) via Service Principal.
-        """
+    def connect_azure_cspm_new_account(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str, skip_scan: bool = False, validate_apis: bool = True, expect_failure: bool = False, is_to_cleanup_accounts: bool = True) -> str:
         if is_to_cleanup_accounts:
             Logger.logger.info(f"Cleaning up existing Azure cloud accounts for subscription {subscription_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_AZURE, subscription_id)
@@ -388,31 +374,13 @@ class Accounts(base_test.BaseTest):
                 Logger.logger.info(f"expected failure, returning None")
         return cloud_account_guid
     
-    def connect_gcp_cspm_new_account(
-        self,
-        project_id: str,
-        service_account_key: str,
-        cloud_account_name: str,
-        skip_scan: bool = False,
-        validate_apis: bool = True,
-        is_to_cleanup_accounts: bool = True,
-        expect_failure: bool = False,
-    ) -> str:
-        """
-        Connect GCP CSPM account (single project) via Service Account.
-        """
+    def connect_gcp_cspm_new_account(self, project_id: str, service_account_key: str, cloud_account_name: str, skip_scan: bool = False, validate_apis: bool = True, is_to_cleanup_accounts: bool = True, expect_failure: bool = False) -> str:
         if is_to_cleanup_accounts:
             Logger.logger.info(f"Cleaning up existing GCP cloud accounts for project {project_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_GCP, project_id)
 
         Logger.logger.info(f"Creating and validating GCP CSPM cloud account: {cloud_account_name}, project: {project_id}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(
-            cloud_account_name=cloud_account_name,
-            project_id=project_id,
-            service_account_key=service_account_key,
-            skip_scan=skip_scan,
-            expect_failure=expect_failure,
-        )
+        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(cloud_account_name, project_id, service_account_key, skip_scan, expect_failure)
         Logger.logger.info(f"connected gcp cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info("Validate accounts cloud with gcp cspm list")
         self.validate_accounts_cloud_list_cspm_compliance(PROVIDER_GCP, cloud_account_guid, project_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
@@ -1132,7 +1100,6 @@ class Accounts(base_test.BaseTest):
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, expect_failure=expect_failure)
     
     def create_and_validate_cloud_account_with_cspm_aws(self, cloud_account_name: str, arn: str, region: str, external_id: str = "", skip_scan: bool = False, expect_failure: bool = False):
-        """Create and validate cloud account with CSPM feature."""
         cspm_config = {
             "crossAccountsRoleARN": arn,
             "stackRegion": region,
@@ -1144,9 +1111,6 @@ class Accounts(base_test.BaseTest):
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AWS, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
 
     def create_and_validate_cloud_account_with_cspm_azure(self, cloud_account_name: str, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
-        """
-        Create and validate Azure cloud account with CSPM feature using Service Principal credentials.
-        """
         compliance_azure_config: Dict[str, Any] = {
             "subscriptionID": subscription_id,
             "tenantID": tenant_id,
@@ -1158,9 +1122,6 @@ class Accounts(base_test.BaseTest):
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AZURE, feature_config, skip_scan, expect_failure)
     
     def create_and_validate_cloud_account_with_cspm_gcp(self, cloud_account_name: str, project_id: str, service_account_key: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
-        """
-        Create and validate GCP cloud account with CSPM feature using Service Account credentials.
-        """
         # Validate service_account_key is a string and contains valid JSON
         import json
         if not isinstance(service_account_key, str):
@@ -1196,9 +1157,7 @@ class Accounts(base_test.BaseTest):
         
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_GCP, feature_config, skip_scan, expect_failure)
             
-    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
-                                                   provider: str, region: str, expect_failure: bool = False) -> str:
-        """Create and validate cloud account with CADR feature."""
+    def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, provider: str, region: str, expect_failure: bool = False) -> str:
         feature_config = {
             "cadrConfig": {
                 "trailLogLocation": trail_log_location,
@@ -1207,12 +1166,7 @@ class Accounts(base_test.BaseTest):
         }
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, provider, feature_config, expect_failure=expect_failure)
     
-    def create_and_validate_cloud_account(self, body, provider, expect_failure:bool=False)->str:
-        """
-        Create and validate cloud account.
-        Automatically tracks created accounts for cleanup if a GUID is returned.
-        """
-
+    def create_and_validate_cloud_account(self, body: dict, provider: str, expect_failure: bool = False) -> str:
         failed = False
         account_guid = None
         
@@ -1268,9 +1222,6 @@ class Accounts(base_test.BaseTest):
         return cloud_account_guid
     
     def reconnect_cloud_account_cspm_feature_gcp(self, cloud_account_guid: str, project_id: str, service_account_key: str, skip_scan: bool = False):
-        """
-        Reconnect GCP CSPM feature by updating the account configuration.
-        """
         body = {
             "guid": cloud_account_guid,
             "complianceGCPConfig": {
@@ -1283,10 +1234,6 @@ class Accounts(base_test.BaseTest):
         return cloud_account_guid
     
     def create_and_validate_cloud_org_with_cadr(self, trail_log_location: str, region: str, expect_failure: bool=False) -> str:
-        """
-        Create and validate cloud org with cadr.
-        """
-
         body = {
                 "trailLogLocation": trail_log_location,
                 "stackRegion": region,
@@ -1368,10 +1315,6 @@ class Accounts(base_test.BaseTest):
         return account
 
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
-        """
-        Validate accounts cloud uniquevalues.
-        """
-
         unique_values_body = {
             "fields": {
                 "name": "",
@@ -1418,9 +1361,6 @@ class Accounts(base_test.BaseTest):
         Logger.logger.info(f"Cloud account {guid} name successfully updated to '{cloud_account_name}'")
 
     def delete_and_validate_account_feature(self, guid:str, feature_name:str):
-        """
-        Delete and validate feature.
-        """
         account = self.get_cloud_account_by_guid(guid)
         assert account is not None, f"Cloud account with guid {guid} was not found"
         assert feature_name in account["features"], f"'{feature_name}' feature was not found in {account['features']}"
@@ -1434,9 +1374,6 @@ class Accounts(base_test.BaseTest):
         self.validate_feature_deleted_from_entity(guid, feature_name, accountNeedToBeDeleted, CloudEntityTypes.ACCOUNT)
         
     def delete_and_validate_org_feature(self, guid: str, feature_name: str):
-        """
-        Delete and validate org feature.
-        """
         org = self.get_cloud_org_by_guid(guid)
         assert org is not None, f"Cloud org with guid {guid} was not found"
         assert feature_name in org["features"], f"'{feature_name}' feature was not found in {org['features']}"
@@ -1504,39 +1441,6 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info(f"Cleanup completed. Deleted account GUIDs: {', '.join(set(deleted_guids))}")
         else:
             Logger.logger.info("No accounts were deleted during cleanup")
-
-    def cleanup_aws_single_accounts_by_id(self, account_id: str, features_to_cleanup: List[str]):
-        """
-        Cleanup AWS single accounts by account ID, deleting specified features.
-        Prints the GUIDs of entities deleted.
-        
-        Args:
-            account_id: AWS account ID
-            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME, CADR_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
-        """
-        self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, features_to_cleanup)
-
-    def cleanup_azure_single_accounts_by_id(self, subscription_id: str, features_to_cleanup: List[str]):
-        """
-        Cleanup Azure single accounts by subscription ID, deleting specified features.
-        Prints the GUIDs of entities deleted.
-        
-        Args:
-            subscription_id: Azure subscription ID
-            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
-        """
-        self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, features_to_cleanup)
-
-    def cleanup_gcp_single_accounts_by_id(self, project_id: str, features_to_cleanup: List[str]):
-        """
-        Cleanup GCP single accounts by project ID, deleting specified features.
-        Prints the GUIDs of entities deleted.
-        
-        Args:
-            project_id: GCP project ID
-            features_to_cleanup: List of feature names to delete (e.g., [COMPLIANCE_FEATURE_NAME])
-        """
-        self.cleanup_single_accounts_by_id(PROVIDER_GCP, project_id, features_to_cleanup)
 
     def cleanup_aws_orgs_by_id(self, org_id: str, features_to_cleanup: List[str]):
         """

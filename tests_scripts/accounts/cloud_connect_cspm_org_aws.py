@@ -61,7 +61,7 @@ class CloudOrganizationCSPM(Accounts):
         
         # Cleanup org and single accounts features
         self.cleanup_aws_orgs_by_id(ORG_ID, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
-        self.cleanup_aws_single_accounts_by_id(single_account_id, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        self.cleanup_single_accounts_by_id(PROVIDER_AWS, single_account_id, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
 
         #compliance tests
         # Initialize AWS manager for compliance tests

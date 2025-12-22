@@ -84,7 +84,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
 
         Logger.logger.info("Stage 0: Cleanup existing GCP single accounts")
         project_id = TEST_PROJECT_ID
-        self.cleanup_gcp_single_accounts_by_id(project_id, [COMPLIANCE_FEATURE_NAME])
+        self.cleanup_single_accounts_by_id(PROVIDER_GCP, project_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read GCP service account key and project id from env")
         service_account_key_raw = os.environ.get("GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS")

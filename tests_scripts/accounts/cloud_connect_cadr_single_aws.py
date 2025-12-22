@@ -51,7 +51,7 @@ class CloudConnectCADRSingle(Accounts):
                                           aws_secret_access_key=aws_secret_access_key)
         account_id = temp_aws_manager.get_account_id()
         if account_id:
-            self.cleanup_aws_single_accounts_by_id(account_id, [CADR_FEATURE_NAME])
+            self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, [CADR_FEATURE_NAME])
 
         Logger.logger.info('Stage 1: Init AwsManager')
         aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")

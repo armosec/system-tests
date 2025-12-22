@@ -40,7 +40,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
 
         Logger.logger.info("Stage 0: Cleanup existing Azure single accounts")
         subscription_id = AZURE_SUBSCRIPTION_ID_CLOUD_TESTS
-        self.cleanup_azure_single_accounts_by_id(subscription_id, [COMPLIANCE_FEATURE_NAME])
+        self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
         client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
