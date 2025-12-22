@@ -432,7 +432,7 @@ class AwsAccountsMixin:
     def connect_cadr_new_organization(self, aws_manager: aws.AwsManager, region: str, stack_name: str, log_location: str) -> str:
         from .accounts import CloudEntityTypes, FEATURE_STATUS_PENDING
         Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
-        org_guid = self.create_and_validate_cloud_org_with_cadr(aws_manager, trail_log_location=log_location, region=region, expect_failure=False)
+        org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
         Logger.logger.info('Validate feature status Pending')
         assert self.verify_cadr_status(org_guid, CloudEntityTypes.ORGANIZATION, FEATURE_STATUS_PENDING)
         self.create_stack_cadr_org(aws_manager, region, stack_name, org_guid)
