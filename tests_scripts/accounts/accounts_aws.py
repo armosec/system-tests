@@ -82,7 +82,12 @@ class AwsAccountsMixin:
             self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
         Logger.logger.info(f"Creating and validating CSPM cloud account: {cloud_account_name}, ARN: {arn}, region: {region}, external_id: {external_id}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region, external_id, skip_scan, expect_failure)
+         # Skip validation if we expected failure and got None
+        if expect_failure and cloud_account_guid is None:
+            Logger.logger.info("Account creation failed as expected, returning None")
+            return None
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
+        
         Logger.logger.info("Validate accounts cloud with cspm list")
         from .accounts import CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED
         self.validate_accounts_cloud_list_cspm_compliance(PROVIDER_AWS, cloud_account_guid, arn, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)

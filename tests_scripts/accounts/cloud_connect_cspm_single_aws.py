@@ -107,7 +107,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
         cspm_feature = account["features"][COMPLIANCE_FEATURE_NAME]
         
         Logger.logger.info('Stage 5: Fail to connect same AWS CSPM account')
-        cloud_account_guid_fail = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False, expect_failure=True)
+        cloud_account_guid_fail = self.connect_aws_cspm_new_account(region=stack_region, account_id=account_id, arn=test_arn, cloud_account_name=self.cspm_cloud_account_name, external_id=self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False, expect_failure=True)
         assert cloud_account_guid_fail is None, f"Expected same account to fail, but got account GUID: {cloud_account_guid_fail}"
 
         if not self.skip_apis_validation:
@@ -161,7 +161,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
         # Combination/Conflict section - test CSPM with CADR
         Logger.logger.info('Stage 15: Setup for combination test - reconnect CSPM account')
         # Reconnect CSPM for combination testing
-        cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
+        cloud_account_guid = self.connect_aws_cspm_new_account(region=stack_region, account_id=account_id, arn=test_arn, cloud_account_name=self.cspm_cloud_account_name, external_id=self.cspm_external_id, validate_apis=False, is_to_cleanup_accounts=False)
         
         # Store CSPM config for conflict validation
         account = self.get_cloud_account_by_guid(cloud_account_guid)
