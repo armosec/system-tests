@@ -65,7 +65,7 @@ class AwsAccountsMixin:
         feature_config = {"cspmConfig": cspm_config}
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AWS, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
 
-    def connect_cspm_vulnscan_new_account(self, region: str, account_id: str, arn: str, cloud_account_name: str, external_id: str, validate_apis: bool = True, is_to_cleanup_accounts: bool = True) -> str:
+    def connect_cspm_vulnscan_new_account(self, region: str, account_id: str, arn: str, cloud_account_name: str, external_id: str, is_to_cleanup_accounts: bool = True) -> str:
         if is_to_cleanup_accounts:
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
@@ -405,40 +405,47 @@ class AwsAccountsMixin:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
-    def connect_cadr_new_account(self, region: str, stack_name: str, cloud_account_name: str, log_location: str, validate_apis: bool = True) -> str:
+    def connect_cadr_new_account(self, region: str, stack_name: str, cloud_account_name: str, log_location: str, aws_manager: aws.AwsManager = None) -> str:
+        from .accounts import CADR_FEATURE_NAME, FEATURE_STATUS_PENDING
         Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         Logger.logger.info('Validate feature status Pending')
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
-        self.create_stack_cadr(region, stack_name, cloud_account_guid)
-        Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
+
+        if aws_manager is not None:
+            Logger.logger.info(f"Creating stack for CADR account {cloud_account_guid} in region {region} with name {stack_name}")
+            self.create_stack_cadr(aws_manager, region, stack_name, cloud_account_guid)
+            Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
+        else:
+            Logger.logger.info(f"No AWS manager provided, skipping stack creation for CADR account {cloud_account_guid}")
         return cloud_account_guid
 
-    def create_stack_cadr(self, region: str, stack_name: str, cloud_account_guid: str) -> str:
+    def create_stack_cadr(self, aws_manager: aws.AwsManager, region: str, stack_name: str, cloud_account_guid: str) -> str:
+        from .accounts import extract_parameters_from_url
         Logger.logger.info('Get and validate cadr link')
         stack_link = self.get_and_validate_cadr_link(region, cloud_account_guid)
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ = self.create_stack(self.aws_manager, stack_name, template_url, parameters)
+        _ = self.create_stack(aws_manager, stack_name, template_url, parameters)
 
-    def connect_cadr_new_organization(self, region: str, stack_name: str, log_location: str) -> str:
+    def connect_cadr_new_organization(self, aws_manager: aws.AwsManager, region: str, stack_name: str, log_location: str) -> str:
         from .accounts import CloudEntityTypes, FEATURE_STATUS_PENDING
         Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
-        org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
+        org_guid = self.create_and_validate_cloud_org_with_cadr(aws_manager, trail_log_location=log_location, region=region, expect_failure=False)
         Logger.logger.info('Validate feature status Pending')
         assert self.verify_cadr_status(org_guid, CloudEntityTypes.ORGANIZATION, FEATURE_STATUS_PENDING)
-        self.create_stack_cadr_org(region, stack_name, org_guid)
+        self.create_stack_cadr_org(aws_manager, region, stack_name, org_guid)
         Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
         return org_guid
 
-    def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
+    def create_stack_cadr_org(self, aws_manager: aws.AwsManager, region: str, stack_name: str, org_guid: str) -> str:
         from .accounts import extract_parameters_from_url
         Logger.logger.info('Get and validate cadr org link')
         stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ = self.create_stack(self.aws_manager, stack_name, template_url, parameters)
+        _ = self.create_stack(aws_manager, stack_name, template_url, parameters)
 
     def connect_cspm_new_organization(self, aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
         from .accounts import extract_parameters_from_url
@@ -549,8 +556,8 @@ class AwsAccountsMixin:
         self.backend.update_cloud_account(body=body, provider=PROVIDER_AWS)
         return cloud_account_guid
 
-    def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str, cloud_account_guid: str, feature_name: str):
-        self.aws_manager.delete_stack(stack_name)
+    def disconnect_cspm_account_without_deleting_cloud_account(self, aws_manager: aws.AwsManager, stack_name: str, cloud_account_guid: str, feature_name: str):
+        aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
         self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
         from .accounts import FEATURE_STATUS_DISCONNECTED

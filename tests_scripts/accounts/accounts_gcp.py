@@ -9,27 +9,11 @@ class GcpAccountsMixin:
     """GCP-specific methods for Accounts class."""
 
     def create_and_validate_cloud_account_with_cspm_gcp(self, cloud_account_name: str, project_id: str, service_account_key: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
-        if not isinstance(service_account_key, str):
-            raise ValueError(f"service_account_key must be a string, got {type(service_account_key)}")
-        try:
-            parsed = json.loads(service_account_key)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"service_account_key is not valid JSON: {e}")
-        if not expect_failure:
-            if parsed.get("project_id") == "invalid":
-                raise ValueError("service_account_key contains 'invalid' project_id - wrong credentials detected! This should only happen when expect_failure=True")
-            if parsed.get("project_id") != project_id:
-                Logger.logger.warning(
-                    f"service_account_key project_id ({parsed.get('project_id')}) doesn't match "
-                    f"provided project_id ({project_id})"
-                )
         compliance_gcp_config: Dict[str, Any] = {
             "projectID": project_id,
             "serviceAccountKey": service_account_key,
         }
         feature_config = {"complianceGCPConfig": compliance_gcp_config}
-        key_snippet = service_account_key[:100] + "..." if len(service_account_key) > 100 else service_account_key
-        Logger.logger.debug(f"Creating GCP account with project_id={project_id}, expect_failure={expect_failure}, serviceAccountKey snippet: {key_snippet}")
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_GCP, feature_config, skip_scan, expect_failure)
 
     def reconnect_cloud_account_cspm_feature_gcp(self, cloud_account_guid: str, project_id: str, service_account_key: str, skip_scan: bool = False):
