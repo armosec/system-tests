@@ -447,6 +447,16 @@ class AwsAccountsMixin:
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
         _ = self.create_stack(aws_manager, stack_name, template_url, parameters)
 
+    def verify_cadr_status(self, guid: str, cloud_entity_type, expected_status: str) -> bool:
+        from .accounts import CADR_FEATURE_NAME, CloudEntityTypes
+        if cloud_entity_type == CloudEntityTypes.ACCOUNT:
+            res = self.get_cloud_account_by_guid(guid)
+        else:
+            res = self.get_cloud_org_by_guid(guid)
+            
+        assert res["features"][CADR_FEATURE_NAME]["featureStatus"] == expected_status, f"featureStatus is not {expected_status} but {res['features'][CADR_FEATURE_NAME]['featureStatus']}"
+        return True
+
     def connect_cspm_new_organization(self, aws_manager: aws.AwsManager, stack_name: str, region: str, external_id: Union[str, None] = None) -> CreateOrUpdateCloudOrganizationResponse:
         from .accounts import extract_parameters_from_url
         Logger.logger.info(f"Connecting new cspm org")
@@ -573,7 +583,8 @@ class AwsAccountsMixin:
         return False
 
     def update_and_validate_admin_external_id(self, aws_manager: aws.AwsManager, org_guid: str, admin_role_arn: str):
-        from .accounts import SyncCloudOrganizationRequest, FEATURE_STATUS_DISCONNECTED, FEATURE_STATUS_CONNECTED, CSPM_STATUS_DEGRADED, CSPM_STATUS_HEALTHY
+        from .accounts import FEATURE_STATUS_DISCONNECTED, FEATURE_STATUS_CONNECTED, CSPM_STATUS_DEGRADED, CSPM_STATUS_HEALTHY
+        from .cspm_test_models import SyncCloudOrganizationRequest
         new_external_id = str(uuid.uuid4())
         old_external_id = aws_manager.get_role_external_id_by_arn(admin_role_arn)
         assert old_external_id is not None, f"Old external id is not found"
