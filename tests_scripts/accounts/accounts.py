@@ -869,7 +869,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
-    def connect_cadr_new_account(self, aws_manager: aws.AwsManager, region: str, stack_name: str, cloud_account_name: str, log_location: str, validate_apis: bool = True) ->     str:
+    def connect_cadr_new_account(self, region: str, stack_name: str, cloud_account_name: str, log_location: str, aws_manager: aws.AwsManager = None) ->     str:
         Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
@@ -877,8 +877,12 @@ class Accounts(base_test.BaseTest):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
         
-        self.create_stack_cadr(aws_manager, region, stack_name, cloud_account_guid)
-        Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
+        if aws_manager is not None:
+            Logger.logger.info(f"Creating stack for CADR account {cloud_account_guid} in region {region} with name {stack_name}")
+            self.create_stack_cadr(aws_manager, region, stack_name, cloud_account_guid)
+            Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
+        else:
+            Logger.logger.info(f"No AWS manager provided, skipping stack creation for CADR account {cloud_account_guid}")
         return cloud_account_guid
 
 

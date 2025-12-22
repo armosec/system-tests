@@ -77,7 +77,7 @@ class CloudConnectCADRSingle(Accounts):
         self.cadr_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-bad"
 
         Logger.logger.info('Stage 3: Connect cadr new account')
-        account_guid = self.connect_cadr_new_account(self.aws_manager, stack_region, self.cadr_stack_name, self.cadr_cloud_account_name, log_location)
+        account_guid = self.connect_cadr_new_account(aws_manager=self.aws_manager, region=stack_region, stack_name=self.cadr_stack_name, cloud_account_name=self.cadr_cloud_account_name, log_location=log_location)
         Logger.logger.info("cadr has been connected successfully")
         
         # Get account ID for alert validation

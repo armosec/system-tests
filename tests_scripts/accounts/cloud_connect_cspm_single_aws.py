@@ -183,7 +183,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
 
         Logger.logger.info('Stage 16: Test connection conflict - connect CADR to existing CSPM account')
         # Connect CADR to the same account to test conflict handling
-        account_guid_after_cadr = self.connect_cadr_new_account(self.aws_manager, stack_region, self.cadr_stack_name, self.cadr_conflict_account_name, log_location)
+        account_guid_after_cadr = self.connect_cadr_new_account(region=stack_region, stack_name=self.cadr_stack_name, cloud_account_name=self.cadr_conflict_account_name, log_location=log_location, aws_manager=None)
         Logger.logger.info("CADR has been connected successfully to existing CSPM account")
         # Verify it's the same account (CADR merges into existing account)
         assert account_guid_after_cadr == cloud_account_guid, f"Account GUID mismatch: {account_guid_after_cadr} != {cloud_account_guid}"
