@@ -38,6 +38,12 @@ class GcpAccountsMixin:
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(
             cloud_account_name, project_id, service_account_key, skip_scan, expect_failure
         )
+        
+        # Skip validation if we expected failure and got None (account creation failed as expected)
+        if expect_failure and cloud_account_guid is None:
+            Logger.logger.info("Account creation failed as expected, returning None")
+            return cloud_account_guid
+        
         Logger.logger.info(f"connected gcp cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info("Validate accounts cloud with gcp cspm list")
         self.validate_accounts_cloud_list_cspm_compliance(
