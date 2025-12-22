@@ -35,9 +35,6 @@ class CloudConnectCSPMSingleGCP(Accounts):
         Raises:
             ValueError: If JSON is invalid or project_id doesn't match
         """
-        # Log first 100 chars for debugging (without exposing full key)
-        debug_snippet = service_account_key_raw[:100] if len(service_account_key_raw) > 100 else service_account_key_raw
-        Logger.logger.debug(f"Raw service account key (first 100 chars): {repr(debug_snippet)}")
         
         # Clean up the input: strip whitespace
         cleaned_key = service_account_key_raw.strip()
