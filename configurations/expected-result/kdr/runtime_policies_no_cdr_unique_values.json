@@ -24,7 +24,7 @@
         "ruleSetType": [
             {
                 "key": "Managed",
-                "count": 3
+                "count": 2
             }
         ],
         "scope.designators.cluster": [],
