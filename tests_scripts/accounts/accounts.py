@@ -2590,14 +2590,14 @@ class Accounts(base_test.BaseTest):
             Logger.logger.info(f"there is no scan now capability to vuln scan")
         return
 
-    def fail_and_reconnect_azure_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_object_id: str, client_secret: str):
-        Logger.logger.info("Failing Azure connection by removing Reader role from Service Principal")
+    def break_and_reconnect_azure_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_object_id: str, client_secret: str):
+        Logger.logger.info("Breaking Azure connection by removing Reader role from Service Principal")
         reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret)
         assert reader_role_removed, "Failed to remove Reader role from Service Principal"
         Logger.logger.info("Waiting for the role removal to propagate")
         time.sleep(10)
 
-        Logger.logger.info("Trying to scan now (should fail)")
+        Logger.logger.info("Triggering scan now (should fail)")
         try:
             self.backend.cspm_scan_now(cloud_account_guid, with_error=True)
         except Exception as e:

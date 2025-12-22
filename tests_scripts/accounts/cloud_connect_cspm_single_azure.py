@@ -129,9 +129,9 @@ class CloudConnectCSPMSingleAzure(Accounts):
             self.accept_cspm_risk(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
-            Logger.logger.info("Stage 10: Fail Azure connection and reconnect")
-            self.fail_and_reconnect_azure_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_object_id, client_secret)
-            Logger.logger.info("Azure connection has been failed and reconnected successfully")
+            Logger.logger.info("Stage 10: Break Azure connection and reconnect")
+            self.break_and_reconnect_azure_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_object_id, client_secret)
+            Logger.logger.info("Azure connection has been broken and reconnected successfully")
 
         Logger.logger.info("Stage 11: Delete CSPM feature and validate")
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
