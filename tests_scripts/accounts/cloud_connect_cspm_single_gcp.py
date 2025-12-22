@@ -143,11 +143,12 @@ class CloudConnectCSPMSingleGCP(Accounts):
             Logger.logger.info("Stage 4: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
-                self.validate_accounts_cloud_list_cspm_compliance_gcp,
+                self.validate_accounts_cloud_list_cspm_compliance,
                 timeout=1600,
                 sleep_interval=60,
+                provider=PROVIDER_GCP,
                 cloud_account_guid=cloud_account_guid,
-                project_id=project_id,
+                identifier=project_id,
                 scan_status=CSPM_SCAN_STATE_COMPLETED,
             )
             Logger.logger.info("the account has been scanned successfully")

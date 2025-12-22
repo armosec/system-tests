@@ -106,11 +106,12 @@ class CloudConnectCSPMSingleAzure(Accounts):
             Logger.logger.info("Stage 4: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
-                self.validate_accounts_cloud_list_cspm_compliance_azure,
+                self.validate_accounts_cloud_list_cspm_compliance,
                 timeout=1600,
                 sleep_interval=60,
+                provider=PROVIDER_AZURE,
                 cloud_account_guid=cloud_account_guid,
-                subscription_id=subscription_id,
+                identifier=subscription_id,
                 scan_status=CSPM_SCAN_STATE_COMPLETED,
             )
             Logger.logger.info("the account has been scanned successfully")

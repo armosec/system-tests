@@ -339,7 +339,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id=external_id, skip_scan=skip_scan, expect_failure=expect_failure)
         Logger.logger.info(f"connected cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info('Validate accounts cloud with cspm list')
-        self.validate_accounts_cloud_list_cspm_compliance_aws(cloud_account_guid, arn ,CSPM_SCAN_STATE_IN_PROGRESS , FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        self.validate_accounts_cloud_list_cspm_compliance(PROVIDER_AWS, cloud_account_guid, arn, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
         Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
         if validate_apis:
             Logger.logger.info('Validate accounts cloud with cspm unique values')
@@ -375,7 +375,7 @@ class Accounts(base_test.BaseTest):
 
             # Validate the account was created successfully
             Logger.logger.info("Validate accounts cloud with azure cspm list")
-            self.validate_accounts_cloud_list_cspm_compliance_azure(cloud_account_guid, subscription_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+            self.validate_accounts_cloud_list_cspm_compliance(PROVIDER_AZURE, cloud_account_guid, subscription_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
             Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
 
             if validate_apis:
@@ -415,7 +415,7 @@ class Accounts(base_test.BaseTest):
         )
         Logger.logger.info(f"connected gcp cspm to new account {cloud_account_name}, cloud_account_guid is {cloud_account_guid}")
         Logger.logger.info("Validate accounts cloud with gcp cspm list")
-        self.validate_accounts_cloud_list_cspm_compliance_gcp(cloud_account_guid, project_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
+        self.validate_accounts_cloud_list_cspm_compliance(PROVIDER_GCP, cloud_account_guid, project_id, CSPM_SCAN_STATE_IN_PROGRESS, FEATURE_STATUS_CONNECTED, skipped_scan=skip_scan)
         Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
 
         if validate_apis:
@@ -1324,122 +1324,57 @@ class Accounts(base_test.BaseTest):
         
         return org_guid  # Returns None if failed, or GUID if it was created despite failure
 
-    def validate_accounts_cloud_list_cspm_compliance_aws(self, cloud_account_guid:str, arn:str ,scan_status: str ,feature_status :str ,skipped_scan: bool = False):
-        """
-        Validate accounts cloud list.
-        """
-        
+    def validate_accounts_cloud_list_cspm_compliance(self, provider: str, cloud_account_guid: str, identifier: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
-        acount_list = self.backend.get_cloud_accounts(body=body)
-        assert "response" in acount_list, f"response not in {acount_list}"
-        assert len(acount_list["response"]) > 0, f"response is empty"
-        account = acount_list["response"][0]
+        account_list = self.backend.get_cloud_accounts(body=body)
+        assert "response" in account_list, f"response not in {account_list}"
+        assert len(account_list["response"]) > 0, "response is empty"
+        account = account_list["response"][0]
+
+        assert account["provider"] == provider, f"provider mismatch, expected {provider}, got {account["provider"]}: {account}"
         assert "features" in account, f"features not in {account}"
         assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
-        assert account["features"][COMPLIANCE_FEATURE_NAME]["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['featureStatus']}"
-        assert "config" in account["features"][COMPLIANCE_FEATURE_NAME], f"config not in {account['features']['cspm']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
-        assert "crossAccountsRoleARN" in account["features"][COMPLIANCE_FEATURE_NAME]["config"], f"crossAccountsRoleARN not in {account['features']['cspm']['config']} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']}"
-        assert account["features"][COMPLIANCE_FEATURE_NAME]["config"]["crossAccountsRoleARN"] == arn, f"crossAccountsRoleARN is not {arn} it is {account['features'][COMPLIANCE_FEATURE_NAME]['config']['crossAccountsRoleARN']}"
-        if not skipped_scan:
-            assert account["features"][COMPLIANCE_FEATURE_NAME]["scanState"] == scan_status, f"scanState is not {scan_status} it is {account['features'][COMPLIANCE_FEATURE_NAME]['scanState']}"
-            assert "nextScanTime" in account["features"][COMPLIANCE_FEATURE_NAME], f"nextScanTime key is missing from account features. Available keys: {list(account['features'][COMPLIANCE_FEATURE_NAME].keys())}"
-            assert account["features"][COMPLIANCE_FEATURE_NAME]["nextScanTime"] != "", f"nextScanTime is empty"
-            if scan_status==CSPM_SCAN_STATE_COMPLETED:
-                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
-                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
-            elif scan_status==CSPM_SCAN_STATE_FAILED:
-                assert account["features"][COMPLIANCE_FEATURE_NAME]["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
-        Logger.logger.info(f"validated cspm list for {cloud_account_guid} successfully")
-        return account
-
-    def validate_accounts_cloud_list_cspm_compliance_azure(self, cloud_account_guid: str, subscription_id: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
-        """
-        Validate Azure CSPM account listing and status.
-        
-        Args:
-            cloud_account_guid: GUID of the cloud account
-            subscription_id: Expected subscription ID
-            scan_status: Expected scan status (CSPM_SCAN_STATE_IN_PROGRESS, CSPM_SCAN_STATE_COMPLETED, etc.)
-                         Required when skipped_scan=False, can be None when skipped_scan=True
-            feature_status: Expected feature status
-            skipped_scan: Whether scan was skipped. When False, scan_status must be provided.
-        """
-        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
-        account_list = self.backend.get_cloud_accounts(body=body)
-        assert "response" in account_list, f"response not in {account_list}"
-        assert len(account_list["response"]) > 0, f"response is empty"
-        account = account_list["response"][0]
-
-        assert account["provider"] == PROVIDER_AZURE, f"provider is not azure: {account}"
-        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
         feature = account["features"][COMPLIANCE_FEATURE_NAME]
         assert feature["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {feature['featureStatus']}"
         assert "config" in feature, f"config not in {feature}"
         config = feature["config"]
-        assert config["subscriptionID"] == subscription_id, f"subscriptionID mismatch: {config}"
-        assert config["tenantID"], f"tenantID missing in config: {config}"
-        assert config["clientID"], f"clientID missing in config: {config}"
-        # TODO: clientSecret should not be returned back; ensure it is not exposed
-        assert config["clientSecret"], f"clientSecret missing in config: {config}"
 
         provider_info = account["providerInfo"]
-        assert provider_info, f"providerInfo missing in account: {account}"
-        assert provider_info["subscriptionID"] == subscription_id, f"providerInfo subscriptionID mismatch: {provider_info}"
-        assert provider_info["tenantID"], f"providerInfo tenantID missing: {provider_info}"
+        if provider == PROVIDER_AWS:
+            # AWS: identifier is role ARN
+            assert "crossAccountsRoleARN" in config, f"crossAccountsRoleARN not in config {config}"
+            assert config["crossAccountsRoleARN"] == identifier, f"crossAccountsRoleARN is not {identifier} it is {config['crossAccountsRoleARN']}"
+            assert provider_info["accountID"], f"providerInfo.accountID missing: {provider_info}"
+        elif provider == PROVIDER_AZURE:
+            # Azure: identifier is subscription ID
+            assert config["subscriptionID"] == identifier, f"subscriptionID mismatch: {config}"
+            assert config["tenantID"], f"tenantID missing in config: {config}"
+            assert config["clientID"], f"clientID missing in config: {config}"
+            # TODO: clientSecret should not be returned back; ensure it is not exposed
+            assert config["clientSecret"], f"clientSecret missing in config: {config}"
+            assert provider_info, f"providerInfo missing in account: {account}"
+            assert provider_info["subscriptionID"] == identifier, f"providerInfo subscriptionID mismatch: {provider_info}"
+            assert provider_info["tenantID"], f"providerInfo tenantID missing: {provider_info}"
+        elif provider == PROVIDER_GCP:
+            # GCP: identifier is project ID
+            assert config["projectID"] == identifier, f"projectID mismatch: {config}"
+            assert config["serviceAccountKey"], f"serviceAccountKey missing in config: {config}"
+            assert provider_info, f"providerInfo missing in account: {account}"
+            assert provider_info["projectID"] == identifier, f"providerInfo projectID mismatch: {provider_info}"
+        else:
+            raise AssertionError(f"Unsupported provider for CSPM validation: {provider}")
 
         if not skipped_scan:
+            assert scan_status is not None, "scan_status must be provided when skipped_scan is False"
             assert feature["scanState"] == scan_status, f"scanState is not {scan_status} it is {feature['scanState']}"
             assert "nextScanTime" in feature, f"nextScanTime key is missing from account features. Available keys: {list(feature.keys())}"
-            assert feature["nextScanTime"] != "", f"nextScanTime is empty"
+            assert feature["nextScanTime"] != "", "nextScanTime is empty"
             if scan_status == CSPM_SCAN_STATE_COMPLETED:
-                assert feature["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
-                assert feature["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
+                assert feature["lastTimeScanSuccess"], "lastTimeScanSuccess is empty"
+                assert feature["lastSuccessScanID"], "lastSuccessScanID is empty"
             elif scan_status == CSPM_SCAN_STATE_FAILED:
-                assert feature["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
-        Logger.logger.info(f"validated azure cspm list for {cloud_account_guid} successfully")
-        return account
-
-    def validate_accounts_cloud_list_cspm_compliance_gcp(self, cloud_account_guid: str, project_id: str, scan_status: str = None, feature_status: str = FEATURE_STATUS_CONNECTED, skipped_scan: bool = False):
-        """
-        Validate GCP CSPM account listing and status.
-        
-        Args:
-            cloud_account_guid: GUID of the cloud account
-            project_id: Expected project ID
-            scan_status: Expected scan status (CSPM_SCAN_STATE_IN_PROGRESS, CSPM_SCAN_STATE_COMPLETED, etc.)
-                         Required when skipped_scan=False, can be None when skipped_scan=True
-            feature_status: Expected feature status
-            skipped_scan: Whether scan was skipped. When False, scan_status must be provided.
-        """
-        body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
-        account_list = self.backend.get_cloud_accounts(body=body)
-        assert "response" in account_list, f"response not in {account_list}"
-        assert len(account_list["response"]) > 0, f"response is empty"
-        account = account_list["response"][0]
-
-        assert account["provider"] == PROVIDER_GCP, f"provider is not gcp: {account}"
-        assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
-        feature = account["features"][COMPLIANCE_FEATURE_NAME]
-        assert feature["featureStatus"] == feature_status, f"featureStatus is not {feature_status} it is {feature['featureStatus']}"
-        assert "config" in feature, f"config not in {feature}"
-        config = feature["config"]
-        assert config["projectID"] == project_id, f"projectID mismatch: {config}"
-        assert config["serviceAccountKey"], f"serviceAccountKey missing in config: {config}"
-
-        provider_info = account["providerInfo"]
-        assert provider_info, f"providerInfo missing in account: {account}"
-        assert provider_info["projectID"] == project_id, f"providerInfo projectID mismatch: {provider_info}"
-
-        if not skipped_scan:
-            assert feature["scanState"] == scan_status, f"scanState is not {scan_status} it is {feature['scanState']}"
-            assert "nextScanTime" in feature, f"nextScanTime key is missing from account features. Available keys: {list(feature.keys())}"
-            assert feature["nextScanTime"] != "", f"nextScanTime is empty"
-            if scan_status == CSPM_SCAN_STATE_COMPLETED:
-                assert feature["lastTimeScanSuccess"] != "", f"lastTimeScanSuccess is empty"
-                assert feature["lastSuccessScanID"] != "", f"lastSuccessScanID is empty"
-            elif scan_status == CSPM_SCAN_STATE_FAILED:
-                assert feature["lastTimeScanFailed"] != "", f"lastTimeScanFailed is empty"
-        Logger.logger.info(f"validated gcp cspm list for {cloud_account_guid} successfully")
+                assert feature["lastTimeScanFailed"], "lastTimeScanFailed is empty"
+        Logger.logger.info(f"validated {provider} cspm list for {cloud_account_guid} successfully")
         return account
 
     def connect_azure_cspm_bad_credentials(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str) -> str:

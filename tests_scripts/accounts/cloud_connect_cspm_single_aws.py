@@ -111,13 +111,13 @@ class CloudConnectCSPMSingleAWS(Accounts):
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 6: Wait for cspm scan to complete successfully')
             # wait for success
-            self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance_aws,
+            self.wait_for_report(self.validate_accounts_cloud_list_cspm_compliance,
                                 timeout=1600,
                                 sleep_interval=60,
+                                provider=PROVIDER_AWS,
                                 cloud_account_guid=cloud_account_guid,
-                                arn=test_arn,
-                                scan_status=CSPM_SCAN_STATE_COMPLETED,
-                                feature_status=FEATURE_STATUS_CONNECTED)
+                                identifier=test_arn,
+                                scan_status=CSPM_SCAN_STATE_COMPLETED)
             Logger.logger.info("the account has been scan successfully")
 
             account = self.get_cloud_account_by_guid(cloud_account_guid)
