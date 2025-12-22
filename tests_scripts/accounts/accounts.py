@@ -1153,16 +1153,7 @@ class Accounts(base_test.BaseTest):
         feature_config = {"cspmConfig": cspm_config}
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AWS, feature_config, skip_scan=skip_scan, expect_failure=expect_failure)
 
-    def create_and_validate_cloud_account_with_cspm_azure(
-        self,
-        cloud_account_name: str,
-        subscription_id: str,
-        tenant_id: str,
-        client_id: str,
-        client_secret: str,
-        skip_scan: bool = False,
-        expect_failure: bool = False,
-    ) -> str:
+    def create_and_validate_cloud_account_with_cspm_azure(self, cloud_account_name: str, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
         """
         Create and validate Azure cloud account with CSPM feature using Service Principal credentials.
         """
@@ -1174,22 +1165,9 @@ class Accounts(base_test.BaseTest):
         }
 
         feature_config = {"complianceAzureConfig": compliance_azure_config}
-        return self.create_and_validate_cloud_account_with_feature(
-            cloud_account_name,
-            PROVIDER_AZURE,
-            feature_config,
-            skip_scan=skip_scan,
-            expect_failure=expect_failure,
-        )
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AZURE, feature_config, skip_scan, expect_failure)
     
-    def create_and_validate_cloud_account_with_cspm_gcp(
-        self,
-        cloud_account_name: str,
-        project_id: str,
-        service_account_key: str,
-        skip_scan: bool = False,
-        expect_failure: bool = False,
-    ) -> str:
+    def create_and_validate_cloud_account_with_cspm_gcp(self, cloud_account_name: str, project_id: str, service_account_key: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
         """
         Create and validate GCP cloud account with CSPM feature using Service Account credentials.
         """
@@ -1226,13 +1204,7 @@ class Accounts(base_test.BaseTest):
         key_snippet = service_account_key[:100] + "..." if len(service_account_key) > 100 else service_account_key
         Logger.logger.debug(f"Creating GCP account with project_id={project_id}, expect_failure={expect_failure}, serviceAccountKey snippet: {key_snippet}")
         
-        return self.create_and_validate_cloud_account_with_feature(
-            cloud_account_name,
-            PROVIDER_GCP,
-            feature_config,
-            skip_scan=skip_scan,
-            expect_failure=expect_failure,
-        )
+        return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_GCP, feature_config, skip_scan, expect_failure)
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, 
                                                    provider: str, region: str, expect_failure: bool = False) -> str:

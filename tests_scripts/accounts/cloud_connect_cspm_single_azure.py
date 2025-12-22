@@ -39,19 +39,17 @@ class CloudConnectCSPMSingleAzure(Accounts):
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
         Logger.logger.info("Stage 0: Cleanup existing Azure single accounts")
-        subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID_CLOUD_TESTS")
-        if subscription_id:
-            self.cleanup_azure_single_accounts_by_id(subscription_id, [COMPLIANCE_FEATURE_NAME])
+        subscription_id = AZURE_SUBSCRIPTION_ID_CLOUD_TESTS
+        self.cleanup_azure_single_accounts_by_id(subscription_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
         client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
-        client_object_id = os.environ.get("AZURE_CLIENT_OBJECT_ID_CLOUD_TESTS")
+        client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS")
         client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
         tenant_id = AZURE_TENANT_ID_CLOUD_TESTS
-        subscription_id = AZURE_SUBSCRIPTION_ID_CLOUD_TESTS
 
         assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
-        assert client_object_id, "AZURE_CLIENT_OBJECT_ID_CLOUD_TESTS is not set"
+        assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS is not set"
         assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
 
         cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm"
