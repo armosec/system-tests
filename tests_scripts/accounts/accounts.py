@@ -107,8 +107,6 @@ class Accounts(base_test.BaseTest):
         self.test_global_aws_users = []
         self.tested_stack_refs: List[StackRef] = []
         self.tested_stackset_refs: List[StackSetRef] = []
-        self.aws_manager: aws.AwsManager
-        self.delegated_admin_aws_manager: aws.AwsManager
 
     def generate_timestamped_role_name(self, role_prefix: str) -> str:
         """
@@ -320,7 +318,7 @@ class Accounts(base_test.BaseTest):
         return test_arn
 
 
-    def connect_cspm_vulnscan_new_account(self, region, account_id, arn, cloud_account_name,external_id, validate_apis=True, is_to_cleanup_accounts=True)->str: 
+    def connect_cspm_vulnscan_new_account(self, region, account_id, arn, cloud_account_name,external_id, is_to_cleanup_accounts=True)->str: 
         if is_to_cleanup_accounts:
             Logger.logger.info(f"Cleaning up existing AWS cloud accounts for account_id {account_id}")
             self.cleanup_existing_cloud_accounts(PROVIDER_AWS, account_id)
@@ -871,7 +869,7 @@ class Accounts(base_test.BaseTest):
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, trail_log_location, PROVIDER_AWS, region=region, expect_failure=True)
         return cloud_account_guid
 
-    def connect_cadr_new_account(self, region: str, stack_name: str, cloud_account_name: str, log_location: str, validate_apis: bool = True) ->     str:
+    def connect_cadr_new_account(self, aws_manager: aws.AwsManager, region: str, stack_name: str, cloud_account_name: str, log_location: str, validate_apis: bool = True) ->     str:
         Logger.logger.info(f"Connecting new CADR account: {cloud_account_name}, log_location: {log_location}, region: {region}")
         cloud_account_guid = self.create_and_validate_cloud_account_with_cadr(cloud_account_name, log_location, PROVIDER_AWS, region=region, expect_failure=False)
         
@@ -879,28 +877,28 @@ class Accounts(base_test.BaseTest):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         assert account["features"][CADR_FEATURE_NAME]["featureStatus"] == FEATURE_STATUS_PENDING, f"featureStatus is not {FEATURE_STATUS_PENDING} but {account['features'][CADR_FEATURE_NAME]['featureStatus']}"
         
-        self.create_stack_cadr(region, stack_name, cloud_account_guid)
+        self.create_stack_cadr(aws_manager, region, stack_name, cloud_account_guid)
         Logger.logger.info(f"CADR account {cloud_account_guid} connected and stack created.")
         return cloud_account_guid
 
 
-    def create_stack_cadr(self, region: str, stack_name: str, cloud_account_guid: str) -> str:
+    def create_stack_cadr(self, aws_manager: aws.AwsManager, region: str, stack_name: str, cloud_account_guid: str) -> str:
         Logger.logger.info('Get and validate cadr link')
         stack_link = self.get_and_validate_cadr_link(region, cloud_account_guid)
 
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ =  self.create_stack(self.aws_manager, stack_name, template_url, parameters)
+        _ =  self.create_stack(aws_manager, stack_name, template_url, parameters)
 
-    def connect_cadr_new_organization(self, region: str, stack_name: str, log_location: str) -> str:
+    def connect_cadr_new_organization(self, aws_manager: aws.AwsManager, region: str, stack_name: str, log_location: str) -> str:
         Logger.logger.info(f"Connecting new CADR org, log_location: {log_location}, region: {region}")
         org_guid = self.create_and_validate_cloud_org_with_cadr(trail_log_location=log_location, region=region, expect_failure=False)
 
         Logger.logger.info('Validate feature status Pending')
         assert self.verify_cadr_status(org_guid, CloudEntityTypes.ORGANIZATION, FEATURE_STATUS_PENDING)
        
-        self.create_stack_cadr_org(region, stack_name, org_guid)
+        self.create_stack_cadr_org(aws_manager, region, stack_name, org_guid)
         Logger.logger.info(f"CADR org {org_guid} connected and stack created.")
         return org_guid
     
@@ -953,14 +951,14 @@ class Accounts(base_test.BaseTest):
             self.test_cloud_orgs_guids.append(returned_org_guid)
         return CreateOrUpdateCloudOrganizationResponse(guid=returned_org_guid)
 
-    def create_stack_cadr_org(self, region: str, stack_name: str, org_guid: str) -> str:
+    def create_stack_cadr_org(self, aws_manager: aws.AwsManager, region: str, stack_name: str, org_guid: str) -> str:
         Logger.logger.info('Get and validate cadr org link')
         stack_link = self.get_and_validate_cadr_org_link(region, org_guid)
 
         _, template_url, region, parameters = extract_parameters_from_url(stack_link)
 
         Logger.logger.info(f"Creating stack with name: {stack_name}, template_url: {template_url}, parameters: {parameters}")
-        _ =  self.create_stack(self.aws_manager, stack_name, template_url, parameters)
+        _ =  self.create_stack(aws_manager, stack_name, template_url, parameters)
 
     def verify_cadr_status(self, guid: str, cloud_entity_type: CloudEntityTypes, expected_status: str) -> bool:
         if cloud_entity_type == CloudEntityTypes.ACCOUNT:
@@ -1122,39 +1120,13 @@ class Accounts(base_test.BaseTest):
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_AZURE, feature_config, skip_scan, expect_failure)
     
     def create_and_validate_cloud_account_with_cspm_gcp(self, cloud_account_name: str, project_id: str, service_account_key: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
-        # Validate service_account_key is a string and contains valid JSON
-        import json
-        if not isinstance(service_account_key, str):
-            raise ValueError(f"service_account_key must be a string, got {type(service_account_key)}")
-        
-        # Validate JSON structure
-        try:
-            parsed = json.loads(service_account_key)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"service_account_key is not valid JSON: {e}")
-        
-        # Only validate credentials quality when NOT expecting failure (i.e., for good credentials)
-        # When expect_failure=True, we're testing with bad credentials intentionally
-        if not expect_failure:
-            if parsed.get("project_id") == "invalid":
-                raise ValueError("service_account_key contains 'invalid' project_id - wrong credentials detected! This should only happen when expect_failure=True")
-            if parsed.get("project_id") != project_id:
-                Logger.logger.warning(
-                    f"service_account_key project_id ({parsed.get('project_id')}) doesn't match "
-                    f"provided project_id ({project_id})"
-                )
-        
         compliance_gcp_config: Dict[str, Any] = {
             "projectID": project_id,
             "serviceAccountKey": service_account_key,  # This is a JSON string, will be properly escaped by requests
         }
 
         feature_config = {"complianceGCPConfig": compliance_gcp_config}
-        
-        # Log a snippet for debugging (without exposing full key)
-        key_snippet = service_account_key[:100] + "..." if len(service_account_key) > 100 else service_account_key
-        Logger.logger.debug(f"Creating GCP account with project_id={project_id}, expect_failure={expect_failure}, serviceAccountKey snippet: {key_snippet}")
-        
+           
         return self.create_and_validate_cloud_account_with_feature(cloud_account_name, PROVIDER_GCP, feature_config, skip_scan, expect_failure)
             
     def create_and_validate_cloud_account_with_cadr(self, cloud_account_name: str, trail_log_location: str, provider: str, region: str, expect_failure: bool = False) -> str:
@@ -2004,8 +1976,8 @@ class Accounts(base_test.BaseTest):
             with_accepted_resources=False
         )
 
-    def disconnect_cspm_account_without_deleting_cloud_account(self, stack_name: str ,cloud_account_guid: str, feature_name: str):
-        self.aws_manager.delete_stack(stack_name)
+    def disconnect_cspm_account_without_deleting_cloud_account(self, aws_manager: aws.AwsManager, stack_name: str ,cloud_account_guid: str, feature_name: str):
+        aws_manager.delete_stack(stack_name)
         Logger.logger.info("Disconnecting CSPM account without deleting cloud account")
         self.backend.cspm_scan_now(cloud_account_guid=cloud_account_guid, with_error=True)
         self.wait_for_report(self.validate_account_feature_status, timeout=30, sleep_interval=5, cloud_account_guid=cloud_account_guid, feature_name=feature_name, expected_status=FEATURE_STATUS_DISCONNECTED)

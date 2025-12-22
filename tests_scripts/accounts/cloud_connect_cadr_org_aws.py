@@ -68,7 +68,7 @@ class CloudOrganizationCADR(Accounts):
 
 
         Logger.logger.info('Stage 1: Connect cadr new organization')
-        org_guid = self.connect_cadr_new_organization(cadr_region, self.cadr_org_stack_name, self.org_log_location)
+        org_guid = self.connect_cadr_new_organization(self.aws_manager, cadr_region, self.cadr_org_stack_name, self.org_log_location)
         Logger.logger.info(f"CADR organization created successfully with guid {org_guid}")
                 
         Logger.logger.info('Stage 2: Validate cadr status is connected')

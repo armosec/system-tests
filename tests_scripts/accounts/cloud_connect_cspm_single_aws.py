@@ -141,7 +141,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
 
         if not self.skip_apis_validation:
             Logger.logger.info('Stage 10: Disconnect the cspm account')
-            self.disconnect_cspm_account_without_deleting_cloud_account(stack_name=self.cspm_stack_name, cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
+            self.disconnect_cspm_account_without_deleting_cloud_account(aws_manager=self.aws_manager, stack_name=self.cspm_stack_name, cloud_account_guid=cloud_account_guid, feature_name=COMPLIANCE_FEATURE_NAME)
 
             Logger.logger.info('Stage 11: Recreate cspm stack')
             new_arn = self.create_stack_cspm(self.aws_manager, self.cspm_stack_name, template_url, parameters)
@@ -183,7 +183,7 @@ class CloudConnectCSPMSingleAWS(Accounts):
 
         Logger.logger.info('Stage 16: Test connection conflict - connect CADR to existing CSPM account')
         # Connect CADR to the same account to test conflict handling
-        account_guid_after_cadr = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_conflict_account_name, log_location)
+        account_guid_after_cadr = self.connect_cadr_new_account(self.aws_manager, stack_region, self.cadr_stack_name, self.cadr_conflict_account_name, log_location)
         Logger.logger.info("CADR has been connected successfully to existing CSPM account")
         # Verify it's the same account (CADR merges into existing account)
         assert account_guid_after_cadr == cloud_account_guid, f"Account GUID mismatch: {account_guid_after_cadr} != {cloud_account_guid}"

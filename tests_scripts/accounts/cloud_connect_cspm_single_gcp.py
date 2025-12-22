@@ -35,9 +35,26 @@ class CloudConnectCSPMSingleGCP(Accounts):
         Raises:
             ValueError: If JSON is invalid or project_id doesn't match
         """
+        # Log first 100 chars for debugging (without exposing full key)
+        debug_snippet = service_account_key_raw[:100] if len(service_account_key_raw) > 100 else service_account_key_raw
+        Logger.logger.debug(f"Raw service account key (first 100 chars): {repr(debug_snippet)}")
+        
+        # Clean up the input: strip whitespace
+        cleaned_key = service_account_key_raw.strip()
+        
+        # Handle potential double-escaping from GitHub Actions
+        # If the string is wrapped in quotes and looks like a JSON-encoded string, unquote it
+        if cleaned_key.startswith('"') and cleaned_key.endswith('"'):
+            try:
+                # Try to decode as a JSON string (handles escaped quotes)
+                cleaned_key = json.loads(cleaned_key)
+            except (json.JSONDecodeError, ValueError):
+                # If that fails, it might just be a quoted string, remove quotes
+                cleaned_key = cleaned_key[1:-1]
+        
         try:
-            # Parse to validate and normalize - this handles any extra escaping
-            parsed_key = json.loads(service_account_key_raw)
+            # Parse the JSON - cleaned_key should now be a valid JSON string
+            parsed_key = json.loads(cleaned_key)
             
             # Validate that the parsed key has the correct project_id
             parsed_project_id = parsed_key.get("project_id")
@@ -59,8 +76,16 @@ class CloudConnectCSPMSingleGCP(Accounts):
             return normalized_json, parsed_key
             
         except json.JSONDecodeError as e:
+            # Enhanced error message with more debugging info
+            first_chars = repr(service_account_key_raw[:50]) if len(service_account_key_raw) > 50 else repr(service_account_key_raw)
             Logger.logger.error(f"Failed to parse GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS as JSON: {e}")
-            raise ValueError(f"GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS must be a valid JSON string. Error: {e}")
+            Logger.logger.error(f"First 50 characters of received value: {first_chars}")
+            Logger.logger.error(f"Value length: {len(service_account_key_raw)}")
+            raise ValueError(
+                f"GCP_SERVICE_ACCOUNT_KEY_CLOUD_TESTS must be a valid JSON string. Error: {e}. "
+                f"First 50 chars: {first_chars}. "
+                f"Please ensure the GitHub secret contains valid JSON and the workflow uses the correct secret name."
+            )
 
     def start(self):
         """
