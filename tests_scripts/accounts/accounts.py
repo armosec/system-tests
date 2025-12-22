@@ -1268,7 +1268,7 @@ class Accounts(base_test.BaseTest):
         assert len(account_list["response"]) > 0, "response is empty"
         account = account_list["response"][0]
 
-        assert account["provider"] == provider, f"provider mismatch, expected {provider}, got {account["provider"]}: {account}"
+        assert account["provider"] == provider, f"provider mismatch, expected {provider}, got {account['provider']}: {account}"
         assert "features" in account, f"features not in {account}"
         assert COMPLIANCE_FEATURE_NAME in account["features"], f"cspm not in {account['features']}"
         feature = account["features"][COMPLIANCE_FEATURE_NAME]
