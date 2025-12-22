@@ -1,10 +1,10 @@
 import time
 from .base_helm import BaseHelm
 from ..kubescape.base_kubescape import BaseKubescape
-from systest_utils import statics, Logger, TestUtil
+from systest_utils import statics, Logger
 from ..workflows.utils import get_jira_ticket_by_id
 import json
-
+from infrastructure.backend_api import ControlPanelAPI
 DEFAULT_JIRA_SITE_NAME = "cyberarmor-io"
 
 # configuration of auto closure settings
@@ -20,7 +20,7 @@ DEFAULT_AUTO_CLOSURE_SETTINGS =  {
                                 }
                                 
 
-def setup_jira_config(backend, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_settings=DEFAULT_AUTO_CLOSURE_SETTINGS):       
+def setup_jira_config(backend: ControlPanelAPI, site_name=DEFAULT_JIRA_SITE_NAME, auto_closure_settings=DEFAULT_AUTO_CLOSURE_SETTINGS):       
     """Setup and validate Jira configuration. Returns necessary Jira config objects.
     
     Args:
