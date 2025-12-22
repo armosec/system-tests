@@ -52,6 +52,20 @@ class CloudConnectCSPMSingleGCP(Accounts):
                 # If that fails, it might just be a quoted string, remove quotes
                 cleaned_key = cleaned_key[1:-1]
         
+        # Handle double-escaped sequences (common when passing through multiple layers)
+        # If we see \\" it means the string has literal backslash+quote sequences that need unescaping
+        if isinstance(cleaned_key, str) and '\\"' in cleaned_key:
+            # The string has double-escaped quotes (\\") which need to be unescaped to (")
+            # Use Python's string encoding to properly decode escape sequences
+            try:
+                # Encode to bytes, then decode with unicode_escape to handle escape sequences
+                # This converts \\" to \" and \\n to \n, etc.
+                cleaned_key = cleaned_key.encode('utf-8').decode('unicode_escape')
+            except (UnicodeDecodeError, ValueError) as e:
+                Logger.logger.warning(f"Failed to unescape string with unicode_escape: {e}, trying manual replacement")
+                # Fallback: manual replacement of common double-escaped sequences
+                cleaned_key = cleaned_key.replace('\\"', '"').replace('\\\\', '\\').replace('\\n', '\n')
+        
         try:
             # Parse the JSON - cleaned_key should now be a valid JSON string
             parsed_key = json.loads(cleaned_key)
