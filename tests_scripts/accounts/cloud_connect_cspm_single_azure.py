@@ -57,13 +57,9 @@ class CloudConnectCSPMSingleAzure(Accounts):
 
         Logger.logger.info("Stage 2: Test bad credentials (should fail)")
         bad_client_secret = "invalid-secret-12345"
-        cloud_account_guid_bad = self.connect_azure_cspm_bad_credentials(
-            subscription_id=subscription_id,
-            tenant_id=tenant_id,
-            client_id=client_id,
-            client_secret=bad_client_secret,
-            cloud_account_name=bad_cloud_account_name,
-        )
+        Logger.logger.info(f"Attempting to connect Azure CSPM with bad credentials for account: {bad_cloud_account_name}")
+        cloud_account_guid_bad = self.create_and_validate_cloud_account_with_cspm_azure(bad_cloud_account_name, subscription_id, tenant_id, client_id, bad_client_secret, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid_bad}")
         # Verify that account creation failed (expect_failure=True should return None)
         assert cloud_account_guid_bad is None, f"Expected bad credentials to fail, but got account GUID: {cloud_account_guid_bad}"
         # Double-check: verify no account was created with this name

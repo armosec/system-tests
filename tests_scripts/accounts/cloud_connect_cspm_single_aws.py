@@ -91,10 +91,12 @@ class CloudConnectCSPMSingleAWS(Accounts):
 
         # cspm cloud account names
         self.cspm_cloud_account_name = "systest-" + self.test_identifier_rand + "-cspm"
-        self.cspm_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cspm-bad"
+        cspm_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cspm-bad"
 
         Logger.logger.info('Stage 3: Create bad arn cloud account with cspm')
-        cloud_account_guid = self.connect_cspm_bad_arn(stack_region, bad_arn, self.cspm_bad_cloud_account_name)
+        Logger.logger.info(f"Attempting to connect CSPM with bad ARN for account: {cspm_bad_cloud_account_name}")
+        cloud_account_guid_bad = self.create_and_validate_cloud_account_with_cspm_aws(cspm_bad_cloud_account_name, bad_arn, stack_region, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad ARN: {cloud_account_guid_bad}")
 
         Logger.logger.info('Stage 4: Connect cspm new account')
         cloud_account_guid = self.connect_aws_cspm_new_account(stack_region, account_id, test_arn, self.cspm_cloud_account_name, self.cspm_external_id)

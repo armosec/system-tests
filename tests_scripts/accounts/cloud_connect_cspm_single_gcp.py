@@ -103,12 +103,9 @@ class CloudConnectCSPMSingleGCP(Accounts):
         # Create bad credentials as a separate variable to avoid any confusion
         bad_service_account_key = '{"type": "service_account", "project_id": "invalid", "private_key_id": "invalid", "private_key": "invalid", "client_email": "invalid@invalid.iam.gserviceaccount.com", "client_id": "invalid", "auth_uri": "https://accounts.google.com/o/oauth2/auth", "token_uri": "https://oauth2.googleapis.com/token", "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs", "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/invalid%40invalid.iam.gserviceaccount.com"}'
         
-        
-        cloud_account_guid_bad = self.connect_gcp_cspm_bad_credentials(
-            project_id=project_id,
-            service_account_key=bad_service_account_key,
-            cloud_account_name=bad_cloud_account_name,
-        )
+        Logger.logger.info(f"Attempting to connect GCP CSPM with bad credentials for account: {bad_cloud_account_name}")
+        cloud_account_guid_bad = self.create_and_validate_cloud_account_with_cspm_gcp(bad_cloud_account_name, project_id, bad_service_account_key, expect_failure=True)
+        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid_bad}")
         # Verify that account creation failed (expect_failure=True should return None)
         assert cloud_account_guid_bad is None, f"Expected bad credentials to fail, but got account GUID: {cloud_account_guid_bad}"
         # Double-check: verify no account was created with this name

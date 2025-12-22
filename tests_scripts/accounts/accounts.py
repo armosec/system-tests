@@ -755,16 +755,6 @@ class Accounts(base_test.BaseTest):
         except Exception as e:
             Logger.logger.info(f"Expected error: {e}")
             return True
-        
-
-
-    def connect_cspm_bad_arn(self, region, arn, cloud_account_name)->str:
-        Logger.logger.info(f"Attempting to connect CSPM with bad ARN: {arn} for account: {cloud_account_name}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_aws(cloud_account_name, arn, region=region, external_id="", expect_failure=True)
-        Logger.logger.info(f"Resulting cloud_account_guid for bad ARN: {cloud_account_guid}")
-        return cloud_account_guid
-
-
 
     def create_stack(self, aws_manager: aws.AwsManager, stack_name: str, template_url: str, parameters: List[Dict[str, str]]) -> str:
         Logger.logger.info(f"Initiating stack creation: {stack_name}, template_url: {template_url}, parameters: {parameters}")
@@ -1376,26 +1366,6 @@ class Accounts(base_test.BaseTest):
                 assert feature["lastTimeScanFailed"], "lastTimeScanFailed is empty"
         Logger.logger.info(f"validated {provider} cspm list for {cloud_account_guid} successfully")
         return account
-
-    def connect_azure_cspm_bad_credentials(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, cloud_account_name: str) -> str:
-        """
-        Attempt to connect Azure CSPM with invalid credentials (should fail).
-        Returns the cloud_account_guid if account was created despite failure, None otherwise.
-        """
-        Logger.logger.info(f"Attempting to connect Azure CSPM with bad credentials for account: {cloud_account_name}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_azure(cloud_account_name, subscription_id, tenant_id, client_id, client_secret, expect_failure=True)
-        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
-        return cloud_account_guid
-    
-    def connect_gcp_cspm_bad_credentials(self, project_id: str, service_account_key: str, cloud_account_name: str) -> str:
-        """
-        Attempt to connect GCP CSPM with invalid credentials (should fail).
-        Returns the cloud_account_guid if account was created despite failure, None otherwise.
-        """
-        Logger.logger.info(f"Attempting to connect GCP CSPM with bad credentials for account: {cloud_account_name}")
-        cloud_account_guid = self.create_and_validate_cloud_account_with_cspm_gcp(cloud_account_name, project_id, service_account_key, expect_failure=True)
-        Logger.logger.info(f"Resulting cloud_account_guid for bad credentials: {cloud_account_guid}")
-        return cloud_account_guid
 
     def validate_accounts_cloud_uniquevalues(self, cloud_account_name:str):
         """
