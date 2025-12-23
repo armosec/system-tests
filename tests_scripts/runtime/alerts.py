@@ -122,7 +122,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
 
         inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=15 * 60, sleep_interval=20,
                                       incident_id=incs[0]['guid'])
-        self.verify_unexpected_process_on_backend(cluster=self.cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self.verify_unexpected_process_on_backend(cluster=self.cluster, namespace=namespace, expected_incident_name="", expected_incident_guid=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"
