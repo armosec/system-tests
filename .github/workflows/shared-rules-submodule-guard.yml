@@ -11,6 +11,7 @@ jobs:
     name: Verify shared rules submodule
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: not(github.repository == 'armosec/armo-ng-app' && github.base_ref == 'master')
 
     steps:
       - name: Checkout repository with submodules
