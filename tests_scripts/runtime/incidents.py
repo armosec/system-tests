@@ -110,7 +110,7 @@ class Incidents(BaseHelm):
         """
         Logger.logger.info(f"Simulate unexpected process from {cluster} {namespace}")
         inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
-        self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
+        self.verify_unexpected_process_on_backend(cluster, namespace, "cat /etc/hosts", expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
@@ -137,7 +137,7 @@ class Incidents(BaseHelm):
         assert inc['status'] == IncidentStatuses.OPEN, f"Incident status is not Open {json.dumps(inc)}"
         return inc
 
-    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str, expected_incident_guid: str = None) -> dict:
+    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, unexpected_cmd: str, expected_incident_name: str, expected_incident_guid: str = None) -> dict:
         if expected_incident_guid is not None:
             Logger.logger.info(f"Getting specific incident {expected_incident_guid}")
             inc = self.backend.get_incident(incident_id=expected_incident_guid)
@@ -156,7 +156,7 @@ class Incidents(BaseHelm):
         assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields
-        assert "cat /etc/shadow" in actual_process_tree.get('cmdline', "cat /etc/shadow"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert unexpected_cmd in actual_process_tree.get('cmdline', unexpected_cmd), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
         assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
         assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
         assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
