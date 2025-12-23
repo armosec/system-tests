@@ -460,7 +460,8 @@ def build_llm_context(
     test_code: Optional[str] = None,
     code_index: Optional[Dict[str, Any]] = None,
     analysis_prompts: Optional[str] = None,
-    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None
+    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
+    cross_test_interference: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -733,6 +734,12 @@ def build_llm_context(
         "incluster_logs": incluster_logs or {}
     }
     
+    # Add cross-test interference data if available (this is INPUT context, not a conclusion)
+    if cross_test_interference:
+        context["cross_test_interference"] = cross_test_interference
+        print(f"   ✅ Added cross-test interference data to context", file=sys.stderr)
+        sys.stderr.flush()
+    
     # Calculate total size
     total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
     context["metadata"]["total_lines_of_code"] = total_lines
@@ -793,6 +800,10 @@ def main():
         "--prompts-file",
         type=str,
         help="Path to analysis prompts file (default: analysis_prompts.md)"
+    )
+    parser.add_argument(
+        "--cross-test-interference",
+        help="Path to cross-test interference data JSON (optional, from detect_cross_test_interference.py)"
     )
     parser.add_argument(
         "--output",
@@ -858,6 +869,14 @@ def main():
             if workflow_commit_path.exists():
                 workflow_commit = load_text_file(str(workflow_commit_path))
         
+        # Load cross-test interference data if available
+        cross_test_interference = None
+        if args.cross_test_interference:
+            cross_test_interference = load_json_file(args.cross_test_interference)
+            if cross_test_interference:
+                print(f"📖 Loaded cross-test interference data", file=sys.stderr)
+                sys.stderr.flush()
+        
         # Build context
         print(f"DEBUG: About to call build_llm_context()", file=sys.stderr)
         print(f"DEBUG: api_mapping is {'present' if api_mapping else 'None'}", file=sys.stderr)
@@ -876,7 +895,8 @@ def main():
             test_code=test_code,
             code_index=code_index,
             analysis_prompts=analysis_prompts,
-            incluster_logs=incluster_logs
+            incluster_logs=incluster_logs,
+            cross_test_interference=cross_test_interference
         )
         
         print(f"DEBUG: build_llm_context() returned", file=sys.stderr)

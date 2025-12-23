@@ -1769,8 +1769,26 @@ def main() -> None:
             console.print(f"[yellow]Cross-test interference detection failed: {e}[/yellow]")
         interference_map = {}
     
+    # Save interference data to separate file for LLM context (this is INPUT, not a conclusion)
+    context_dir = Path(args.output_dir) / "context"
+    context_dir.mkdir(parents=True, exist_ok=True)
+    interference_file = context_dir / "cross_test_interference.json"
+    if interference_signals:
+        # Get interference data for the first failing test (or first test if analyzing single test)
+        test_name_for_llm = failures[0].test.get('name') if failures else None
+        if test_name_for_llm and test_name_for_llm in interference_map:
+            interference_data_for_llm = interference_map[test_name_for_llm]
+            interference_file.write_text(json.dumps(interference_data_for_llm, indent=2))
+            if args.debug:
+                console.print(f"[green]Saved cross-test interference data to {interference_file}[/green]")
+        elif interference_signals:
+            # If no specific test match, use first signal
+            interference_file.write_text(json.dumps(interference_signals[0], indent=2))
+            if args.debug:
+                console.print(f"[green]Saved cross-test interference data to {interference_file}[/green]")
+    
     # Update conclusions with interference data (now that file exists)
-    conclusions_path = Path(args.output_dir) / "context" / "conclusions.json"
+    conclusions_path = context_dir / "conclusions.json"
     if conclusions_path.exists():
         try:
             conclusions = json.loads(conclusions_path.read_text())
