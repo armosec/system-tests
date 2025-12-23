@@ -123,7 +123,7 @@ class AzureAccountsMixin:
         reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret)
         assert reader_role_removed, "Failed to remove Reader role from Service Principal"
         Logger.logger.info("Reader role removed successfully, waiting for propagation")
-        time.sleep(10)
+        time.sleep(150)
 
         Logger.logger.info("Triggering scan now (should fail)")
         try:
