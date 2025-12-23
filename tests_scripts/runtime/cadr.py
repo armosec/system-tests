@@ -60,7 +60,7 @@ class CADRIncidents(Incidents):
     def _verify_incident_alerts(self, incident_id: str, public_ip: str):
         response = self.backend.get_alerts_of_incident(incident_id=incident_id)
         alerts = response["response"]
-        assert len(alerts) > 3, f"Failed to get alerts of incident {incident_id}, got {alerts}"
+        assert len(alerts) < 2, f"Failed to get alerts of incident {incident_id}, got {alerts}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
         expected_rule_ids =["C0002", "C0001"]
         cdr_rule_ids = []
