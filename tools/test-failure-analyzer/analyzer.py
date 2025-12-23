@@ -1725,7 +1725,13 @@ def main() -> None:
             if args.debug:
                 console.print(f"[green]Saved test_run_id to {test_run_id_file}[/green]")
 
-    # Detect cross-test interference (after failures are populated)
+    report = Report(run=run, failures=failures, summary=None)
+    write_reports(report, args.output_dir)
+
+    # Bundle context for local Cursor exploration
+    bundle_context(run, failures, raw_log, args.output_dir, args, cfg)
+    
+    # Detect cross-test interference AFTER conclusions.json is written
     interference_signals = []
     interference_map = {}
     try:
@@ -1763,7 +1769,7 @@ def main() -> None:
             console.print(f"[yellow]Cross-test interference detection failed: {e}[/yellow]")
         interference_map = {}
     
-    # Update conclusions with interference data
+    # Update conclusions with interference data (now that file exists)
     conclusions_path = Path(args.output_dir) / "context" / "conclusions.json"
     if conclusions_path.exists():
         try:
@@ -1784,18 +1790,16 @@ def main() -> None:
                         conclusion['hypothesis'] = 'cross-test interference (isolation issue)'
                         if not conclusion.get('signals'):
                             conclusion['signals'] = []
-                        conclusion['signals'].append(f"Parallel tests detected: {', '.join(interference_data.get('parallel_tests', [])[:3])}")
+                        parallel_tests = interference_data.get('parallel_tests', [])
+                        if parallel_tests:
+                            conclusion['signals'].append(f"Parallel tests detected: {', '.join(parallel_tests[:3])}")
                         conclusion['signals'].append("Potential bulk operation affecting shared resources")
             conclusions_path.write_text(json.dumps(conclusions, indent=2))
+            if args.debug:
+                console.print(f"[green]Updated conclusions.json with interference data[/green]")
         except Exception as e:
             if args.debug:
                 console.print(f"[yellow]Failed to update conclusions with interference data: {e}[/yellow]")
-
-    report = Report(run=run, failures=failures, summary=None)
-    write_reports(report, args.output_dir)
-
-    # Bundle context for local Cursor exploration
-    bundle_context(run, failures, raw_log, args.output_dir, args, cfg)
 
 
 if __name__ == "__main__":
