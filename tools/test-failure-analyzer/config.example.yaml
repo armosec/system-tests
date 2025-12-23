@@ -64,3 +64,24 @@ defaults:
   time_padding: "10m"
   mapping_path: "../../system_test_mapping.json"
 
+# Cross-test interference detection
+cross_test_interference:
+  enabled: true
+  time_window_minutes: 15  # Tests within this window are considered parallel
+  patterns:
+    bulk_operations:
+      - "change_.*_status"
+      - "delete_.*"
+      - "update_.*"
+      - "resolve_.*"
+    filter_fields:
+      - "name"
+      - "type"
+      - "cluster"
+      - "namespace"
+    specific_identifier_params:
+      - "*_guids"
+      - "*_ids"
+      - "guid"
+      - "id"
+

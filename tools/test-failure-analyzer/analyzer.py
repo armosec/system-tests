@@ -15,9 +15,21 @@ from datetime import datetime, timezone, timedelta as td
 import subprocess
 import shutil
 import glob
-from rich.console import Console
+try:
+    from rich.console import Console
+except ImportError:
+    # Fallback if rich not available (should not happen if requirements.txt is installed)
+    class Console:
+        def print(self, *args, **kwargs):
+            print(*args)
 
 from schemas import Report, RunInfo, FailureEntry, Identifiers, MappingInfo, LokiData
+try:
+    from detect_cross_test_interference import detect_cross_test_interference
+except ImportError:
+    # Fallback if module not available
+    def detect_cross_test_interference(*args, **kwargs):
+        return []
 
 console = Console()
 
@@ -385,6 +397,79 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
             seen.add(key)
             deduped.append(r)
 
+    return deduped
+
+
+def parse_all_tests_with_timestamps(log_text: str) -> List[Dict[str, Any]]:
+    """
+    Extract ALL tests from raw_log (including successful ones) with timestamps.
+    Similar to parse_failing_tests() but includes all tests, not just failures.
+    
+    Returns:
+        List of dicts with {name, time_start, time_end, section_text}
+    """
+    if not log_text:
+        return []
+    
+    results: List[Dict[str, Any]] = []
+    
+    # Split the combined text into sections: "===== <name> ====="
+    section_pattern = re.compile(r"\n===== (.+?) =====\n")
+    sections: List[Tuple[str, str]] = []
+    last_end = 0
+    last_name = "combined"
+    for m in section_pattern.finditer(log_text):
+        if last_end > 0:
+            prev_chunk = log_text[last_end:m.start()]
+            sections.append((last_name, prev_chunk))
+        last_name = m.group(1)
+        last_end = m.end()
+    if last_end > 0:
+        sections.append((last_name, log_text[last_end:]))
+    if not sections:
+        sections.append(("combined", log_text))
+    
+    # Pattern for ST(<name>) test names
+    st_pattern = r"ST\s*\(([^)]+)\)"
+    
+    for sec_name, sec_text in sections:
+        # Extract test names from ST() patterns (these are actual test names)
+        test_name = None
+        
+        # Try to extract from section name first
+        sec_st_match = re.search(st_pattern, sec_name)
+        if sec_st_match:
+            test_name = sec_st_match.group(1).strip()
+        else:
+            # Try to extract from section text
+            for m in re.finditer(st_pattern, sec_text, re.MULTILINE):
+                test_name = m.group(1).strip()
+                break
+        
+        # If no ST() pattern found, skip this section (it's not a test)
+        if not test_name:
+            continue
+        
+        # Extract timestamps from this section
+        first_ts, last_ts, _, _, _ = extract_time_window_and_errors(sec_text, padding_minutes=0)
+        
+        results.append({
+            'name': test_name,
+            'time_start': first_ts,
+            'time_end': last_ts,
+            'section_text': sec_text,
+            'section_name': sec_name
+        })
+    
+    # Deduplicate by name
+    seen = set()
+    deduped: List[Dict[str, Any]] = []
+    for r in results:
+        name = r.get('name')
+        if name and name not in seen:
+            seen.add(name)
+            deduped.append(r)
+    
     return deduped
 
 
@@ -1404,6 +1489,7 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
     src_dir_exists = (base_dir / "tests" / "src").exists() and any((base_dir / "tests" / "src").iterdir())
     repos_manifest = (base_dir / "repos" / "repos.json").exists()
 
+
     data_status = []
     conclusions = []
     for fentry in failures:
@@ -1436,11 +1522,13 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
             hypothesis = "permissions/authorization issue"
             signals.append("permission/forbidden in logs")
             next_steps.append("verify tokens/roles and config for the test tenant")
+        
         if hypothesis == "uncategorized" and fentry.errors:
             hypothesis = "application error"
             signals.append("error lines present")
             next_steps.append("inspect last error lines and changed files in PR")
-        conclusions.append({
+        
+        conclusion = {
             "test": fentry.test.get("name"),
             "services": fentry.mapping.services,
             "customer_guid": fentry.identifiers.customer_guid,
@@ -1450,7 +1538,9 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
             "hypothesis": hypothesis,
             "signals": signals,
             "next_steps": next_steps,
-        })
+        }
+        
+        conclusions.append(conclusion)
 
     with open(base_dir / "data_status.json", "w") as f:
         f.write(json.dumps(data_status, indent=2))
@@ -1530,6 +1620,11 @@ def main() -> None:
         console.print("[red]Failed to detect triggering repository/service from logs and metadata. Aborting.[/red]")
         sys.exit(1)
     tests = parse_failing_tests(raw_log)
+    
+    # Extract all tests (including successful ones) for cross-test interference detection
+    all_tests = parse_all_tests_with_timestamps(raw_log)
+    if args.debug:
+        console.print(f"[cyan]Extracted {len(all_tests)} total tests (including successful)[/cyan]")
 
     mapping = load_mapping(args.mapping, cfg.get("defaults", {}).get("mapping_path"))
 
@@ -1629,6 +1724,72 @@ def main() -> None:
             test_run_id_file.write_text(first_identifiers.test_run_id + "\n")
             if args.debug:
                 console.print(f"[green]Saved test_run_id to {test_run_id_file}[/green]")
+
+    # Detect cross-test interference (after failures are populated)
+    interference_signals = []
+    interference_map = {}
+    try:
+        # Build test code map if bundle_test_sources was used
+        test_code_map = {}
+        base_dir = Path(args.output_dir) / "context"
+        src_dir_exists = (base_dir / "tests" / "src").exists() and any((base_dir / "tests" / "src").iterdir())
+        if args.bundle_test_sources and src_dir_exists:
+            src_dir = base_dir / "tests" / "src"
+            for test_dir in src_dir.iterdir():
+                if test_dir.is_dir():
+                    # Find Python test files
+                    for py_file in test_dir.glob("*.py"):
+                        test_name = test_dir.name.split("_", 1)[-1] if "_" in test_dir.name else test_dir.name
+                        try:
+                            test_code_map[test_name] = py_file.read_text()
+                        except Exception:
+                            pass
+        
+        interference_signals = detect_cross_test_interference(
+            failures=failures,
+            all_tests=all_tests,
+            raw_log=raw_log,
+            mapping=mapping,
+            config=cfg,
+            test_code_map=test_code_map if test_code_map else None
+        )
+        if args.debug and interference_signals:
+            console.print(f"[cyan]Cross-test interference detection: {len(interference_signals)} signals[/cyan]")
+        
+        # Build interference map for quick lookup
+        interference_map = {sig['test']: sig for sig in interference_signals}
+    except Exception as e:
+        if args.debug:
+            console.print(f"[yellow]Cross-test interference detection failed: {e}[/yellow]")
+        interference_map = {}
+    
+    # Update conclusions with interference data
+    conclusions_path = Path(args.output_dir) / "context" / "conclusions.json"
+    if conclusions_path.exists():
+        try:
+            conclusions = json.loads(conclusions_path.read_text())
+            for conclusion in conclusions:
+                test_name = conclusion.get('test')
+                interference_data = interference_map.get(test_name, {})
+                if interference_data.get('interference_detected'):
+                    conclusion['cross_test_interference'] = {
+                        'type': 'bulk_operation_affecting_shared_resource',
+                        'parallel_tests': interference_data.get('parallel_tests', []),
+                        'bulk_operations': interference_data.get('bulk_operations', []),
+                        'shared_resources': interference_data.get('shared_resources', []),
+                        'recommendations': interference_data.get('recommendations', [])
+                    }
+                    # Update hypothesis if not already set
+                    if conclusion.get('hypothesis') == 'uncategorized':
+                        conclusion['hypothesis'] = 'cross-test interference (isolation issue)'
+                        if not conclusion.get('signals'):
+                            conclusion['signals'] = []
+                        conclusion['signals'].append(f"Parallel tests detected: {', '.join(interference_data.get('parallel_tests', [])[:3])}")
+                        conclusion['signals'].append("Potential bulk operation affecting shared resources")
+            conclusions_path.write_text(json.dumps(conclusions, indent=2))
+        except Exception as e:
+            if args.debug:
+                console.print(f"[yellow]Failed to update conclusions with interference data: {e}[/yellow]")
 
     report = Report(run=run, failures=failures, summary=None)
     write_reports(report, args.output_dir)
