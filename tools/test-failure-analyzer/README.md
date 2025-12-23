@@ -181,6 +181,62 @@ python3 build_llm_context.py \
   --output llm-context.json
 ```
 
+## Loki Log Fetching
+
+The analyzer fetches logs from Loki using timestamp-based pagination and applies optimization to preserve critical information while staying within LLM context limits.
+
+### How It Works
+
+1. **Fetch Phase**: Uses pagination to fetch up to 20,000 logs (configurable via `max_total_fetch`)
+   - Fetches logs in batches of 5,000 (configurable via `limit_per_query`)
+   - Uses timestamp-based pagination to ensure no logs are missed
+   - Continues fetching until hitting the limit or no more logs available
+
+2. **Optimization Phase**: Applies multiple strategies to compress logs:
+   - **Deduplication**: Removes duplicate or similar log lines
+   - **Prioritization**: Scores logs by importance (errors > warnings > info)
+   - **Summarization**: Condenses logs when still too large
+
+3. **Output**: Final logs fit within context limits:
+   - Maximum 500 snippets (configurable via `optimization.max_snippets`)
+   - Maximum 7,000 characters (configurable via `optimization.max_chars`)
+
+### Configuration
+
+Loki fetching can be configured in `config.yaml`:
+
+```yaml
+loki:
+  # Pagination settings
+  limit_per_query: 5000      # Logs per pagination query
+  max_total_fetch: 20000     # Maximum logs to fetch before optimizing
+  enable_pagination: true     # Enable/disable pagination
+  max_line_length: 500        # Truncate lines before optimization (0 = no truncation)
+  
+  # Optimization settings
+  optimization:
+    max_snippets: 500         # Final snippet limit
+    max_chars: 7000           # Final character limit
+    similarity_threshold: 0.9 # Deduplication threshold (0.0-1.0)
+```
+
+### Troubleshooting
+
+**Pagination issues**:
+- Check Loki API connectivity and timeouts
+- Verify `limit_per_query` isn't too high (may cause timeouts)
+- Check debug logs for pagination progress
+
+**Optimization not preserving expected logs**:
+- Adjust `similarity_threshold` (lower = less aggressive deduplication)
+- Check if errors are being prioritized correctly
+- Review optimization statistics in debug output
+
+**Performance problems**:
+- Reduce `max_total_fetch` for faster fetching
+- Disable pagination (`enable_pagination: false`) for single-query mode
+- Increase `limit_per_query` to reduce number of pagination requests
+
 ## Configuration
 
 ### index-registry.json

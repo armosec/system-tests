@@ -16,6 +16,23 @@ loki:
     url: "https://<your-grafana-host>"
     api_token: "${GRAFANA_TOKEN}"
     datasource_id: 2
+  # Pagination and optimization settings
+  # Number of logs to fetch per pagination query (default: 5000)
+  limit_per_query: 5000
+  # Maximum total logs to fetch before optimizing (default: 20000)
+  max_total_fetch: 20000
+  # Enable timestamp-based pagination to fetch more logs (default: true)
+  enable_pagination: true
+  # Truncate log lines before optimization (default: 500, 0 = no truncation)
+  max_line_length: 500
+  # Optimization settings
+  optimization:
+    # Final snippet limit after optimization (default: 500)
+    max_snippets: 500
+    # Final character limit after optimization (default: 7000)
+    max_chars: 7000
+    # Similarity threshold for deduplication (0.0-1.0, default: 0.9)
+    similarity_threshold: 0.9
   # Default label keys used across services
   labels:
     namespace: "namespace"
