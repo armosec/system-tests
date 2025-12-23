@@ -122,7 +122,7 @@ class Incidents(BaseHelm):
         self.backend.change_incident_status(IncidentStatuses.INVESTIGATING, incident_guids=[inc['guid']])
         self.check_incident_status_changed(inc['guid'], IncidentStatuses.INVESTIGATING)
 
-        self.backend.change_incident_status(IncidentStatuses.RESOLVED, inner_filters=[{"name": expected_incident_name}], mark_as_false_positive=True)
+        self.backend.change_incident_status(IncidentStatuses.RESOLVED, incident_guids=[inc['guid']], mark_as_false_positive=True)
         self.check_incident_status_changed(inc['guid'], IncidentStatuses.RESOLVED, mark_as_false_positive=True)
         #self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
