@@ -576,6 +576,16 @@ def build_llm_context(
             if repo and repo != "cadashboardbe":
                 repositories_included.add(repo)
         
+        # ALSO collect repos from api_mapping call chains
+        if api_mapping:
+            for mapping in api_mapping.get('mappings', {}).values():
+                call_chain = mapping.get('call_chain', {})
+                repos = call_chain.get('repositories_in_chain', [])
+                if repos:
+                    for repo in repos:
+                        if repo and repo != "cadashboardbe":
+                            repositories_included.add(repo)
+        
         # Analyze each dependency
         for dep_name in repositories_included:
             # Calculate impact

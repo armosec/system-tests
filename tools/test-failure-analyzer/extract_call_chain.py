@@ -77,32 +77,43 @@ def extract_repo_from_import(import_path: str) -> Optional[str]:
 def parse_imports(code: str) -> Dict[str, str]:
     """
     Parse Go import statements to build alias -> repo mapping.
+    Handles both single-line and block imports.
     
     Returns:
         Dict mapping package alias to repository name
     """
     imports = {}
     
-    # Match: import "github.com/armosec/postgres-connector/dal"
-    # Match: import pc "github.com/armosec/postgres-connector/dal"
-    # Also handle multi-line import blocks
-    import_pattern = r'import\s+(?:(\w+)\s+)?"([^"]+)"'
-    
-    for match in re.finditer(import_pattern, code):
+    # 1. Match single-line imports: import [alias] "path"
+    single_pattern = r'import\s+(?:(\w+)\s+)?"([^"]+)"'
+    for match in re.finditer(single_pattern, code):
         alias = match.group(1)
         path = match.group(2)
         repo = extract_repo_from_import(path)
-        
         if repo:
-            # If no alias, use last part of path
             if not alias:
                 alias = path.split('/')[-1]
             imports[alias] = repo
-    
+            
+    # 2. Match block imports: import (\n  [alias] "path"\n)
+    block_pattern = r'import\s+\(([\s\S]*?)\)'
+    for block_match in re.finditer(block_pattern, code):
+        block_content = block_match.group(1)
+        # Inside block: [alias] "path"
+        line_pattern = r'(?:(\w+)\s+)?"([^"]+)"'
+        for line_match in re.finditer(line_pattern, block_content):
+            alias = line_match.group(1)
+            path = line_match.group(2)
+            repo = extract_repo_from_import(path)
+            if repo:
+                if not alias:
+                    alias = path.split('/')[-1]
+                imports[alias] = repo
+                
     return imports
 
 
-def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
+def detect_pulsar_producers(code: str, file_path: Optional[str] = None, all_chunks: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
     """
     Detect Pulsar message producers (functions that send messages to topics).
     
@@ -112,12 +123,18 @@ def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
     - handler.messagingProducer.SendAsync(...) - multi-level
     - PublishMessage(...) - direct calls
     
+    Args:
+        code: Source code of the chunk
+        file_path: Path of the file containing the code
+        all_chunks: All available chunks (to look for topic constants in the same file)
+    
     Returns:
         List of dicts with topic, message_type info
     """
     producers = []
     seen_positions = set()  # Deduplicate by position
     
+    # 1. Detect all Send calls
     # Pattern 1: Nested producer field access (NEW - catches pc.userInputPulsarProducer.Send)
     # Matches: pc.userInputPulsarProducer.Send, handler.producer.SendAsync, etc.
     nested_producer_pattern = r'(\w+(?:\.\w+)*[Pp]roducer)\.(?:Send(?:Async)?)\s*\('
@@ -143,7 +160,7 @@ def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
             "topic": topic,
             "position": match.start(),
             "pattern": "nested_producer"
-        })
+        } )
     
     # Pattern 2: Simple producer.Send() (catches simple cases)
     send_pattern = r'(\w+)\.(Send(?:Async)?)\s*\([^)]*\)'
@@ -191,29 +208,22 @@ def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
             "pattern": "publish_call"
         })
     
-    # Pattern 4: Topic constants in the file (NEW - look for topic definitions)
-    # userInputTopic = "user-input", const TopicName = "persistent://..."
-    topic_const_pattern = r'(?:const|var)?\s*(\w*[Tt]opic)\s*=\s*["\']([^"\']+)["\']'
-    topic_constants = {}
-    for match in re.finditer(topic_const_pattern, code):
-        const_name = match.group(1)
-        topic_value = match.group(2)
-        topic_constants[const_name] = topic_value
-    
-    # Enrich existing producers with topic constants
-    for producer in producers:
-        if not producer.get("topic") and topic_constants:
-            # Look for topic constant usage near the producer
-            context_start = max(0, producer["position"] - 500)
-            context_end = min(len(code), producer["position"] + 500)
-            context = code[context_start:context_end]
-            
-            for const_name, topic_value in topic_constants.items():
-                if const_name in context:
-                    producer["topic"] = topic_value
-                    producer["topic_source"] = "constant:" + const_name
-                    break
-    
+    # 2. Enrich producers without topics by looking at other chunks in the same file
+    if all_chunks and file_path:
+        for producer in producers:
+            if not producer.get("topic"):
+                # Search for topic constants in OTHER chunks from the same file
+                for other_chunk in all_chunks:
+                    if other_chunk.get("file") == file_path:
+                        other_code = other_chunk.get("code", "")
+                        # Reuse the topic constant detection logic (Pattern 4 from before)
+                        topic_const_pattern = r'(?:\w*[Tt]opic)\s*=\s*["\']([^"\']+)["\']'
+                        match = re.search(topic_const_pattern, other_code)
+                        if match:
+                            producer["topic"] = match.group(1)
+                            producer["topic_source"] = "file_constant"
+                            break
+                            
     return producers
 
 
@@ -223,14 +233,20 @@ def extract_topic_from_context(context: str) -> Optional[str]:
     
     Returns topic string or None if not found.
     """
-    # Pattern 1: topic assignment (topic = "...", topic: "...")
+    # 1. Direct topic assignment: topic = "...", topic: "..."
     topic_pattern = r'topic[:\s=]+["\']([^"\']+)["\']'
     match = re.search(topic_pattern, context, re.IGNORECASE)
     if match:
         return match.group(1)
     
-    # Pattern 2: Topic literal in string (look for "user-input", "persistent://...")
-    # Must be at least 5 chars and look like a topic name
+    # 2. Pulsar Topic literal or constant pattern: userInputTopic = "..."
+    const_pattern = r'(?:\w*[Tt]opic)\s*=\s*["\']([^"\']+)["\']'
+    match = re.search(const_pattern, context)
+    if match:
+        return match.group(1)
+
+    # 3. Topic literal in string (look for "user-input", "persistent://...")
+    # This pattern matches clean topic strings
     literal_pattern = r'["\']([a-zA-Z][\w\-:/]{4,60})["\']'
     for match in re.finditer(literal_pattern, context):
         potential_topic = match.group(1)
@@ -242,6 +258,20 @@ def extract_topic_from_context(context: str) -> Optional[str]:
             if not any(skip in potential_topic.lower() for skip in 
                       ['error', 'failed', 'invalid', '.go', '.json', 'http://']):
                 return potential_topic
+
+    # 4. Heuristic: Look for "user-input" or similar in log messages
+    # Matches: "sending message to user-input topic", "message from user-input"
+    log_patterns = [
+        r'["\'][^"\']*(user-input)[^"\']*["\']',
+        r'["\'][^"\']*(user-output)[^"\']*["\']',
+        r'["\'][^"\']*(user-input-reply)[^"\']*["\']',
+        r'["\'][^"\']*(synchronizer-out-topic)[^"\']*["\']',
+        r'["\'][^"\']*(cloud-scheduler-command-v1)[^"\']*["\']'
+    ]
+    for pattern in log_patterns:
+        match = re.search(pattern, context, re.IGNORECASE)
+        if match:
+            return match.group(1).lower()
     
     return None
 
@@ -260,7 +290,9 @@ def is_pulsar_sender(chunk: Dict[str, Any]) -> bool:
         True if chunk contains Pulsar producer .Send() calls
     """
     code = chunk.get("code", "")
+    name = chunk.get("name", "")
     
+    # 1. Look for Pulsar Send/Publish calls
     # Pattern 1: producer.Send() or producer.SendAsync()
     if re.search(r'\w+Producer\s*\.\s*Send(?:Async)?\s*\(', code):
         return True
@@ -271,6 +303,14 @@ def is_pulsar_sender(chunk: Dict[str, Any]) -> bool:
     
     # Pattern 3: Direct producer variable usage: myProducer.Send()
     if re.search(r'\w+\s*\.\s*Send(?:Async)?\s*\([^)]*(?:Message|Event|Payload)', code):
+        return True
+        
+    # Pattern 4: PublishMessage calls
+    if re.search(r'Publish(?:Message|Event)?\s*\(', code):
+        return True
+        
+    # 2. Heuristic: Repository helper that likely sends messages
+    if "handleUserInputOutput" in name:
         return True
     
     return False
@@ -312,7 +352,18 @@ def detect_pulsar_consumers(chunk: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         consumer_info["topics"].append(topic)
         consumer_info["handler_type"] = "explicit_subscribe"
     
-    # Pattern 3: Implements Consumer interface or has Receive method
+    # Pattern 3: Heuristic based on name
+    if "UserInput" in name:
+        consumer_info["is_consumer"] = True
+        consumer_info["topics"].append("user-input")
+    elif "Synchronizer" in name:
+        consumer_info["is_consumer"] = True
+        consumer_info["topics"].append("synchronizer-out-topic")
+    elif "CloudScheduler" in name:
+        consumer_info["is_consumer"] = True
+        consumer_info["topics"].append("cloud-scheduler-command-v1")
+
+    # Pattern 4: Implements Consumer interface or has Receive method
     if re.search(r'func\s+\([^)]+\)\s+(?:Receive|Consume|Handle)\s*\(', code):
         consumer_info["is_consumer"] = True
         consumer_info["handler_type"] = "interface_implementation"
@@ -581,7 +632,7 @@ def extract_call_chain(
     import_to_repo = parse_imports(handler_code)
     
     # Detect Pulsar message producers in handler
-    pulsar_producers = detect_pulsar_producers(handler_code)
+    pulsar_producers = detect_pulsar_producers(handler_code, handler_chunk.get("file"), all_chunks)
     
     # Match producers to consumers (if all_chunks available)
     pulsar_matches = []
@@ -629,10 +680,13 @@ def extract_call_chain(
             chunk_imports = parse_imports(chunk_code)
             if chunk_imports:
                 import_to_repo.update(chunk_imports)  # Merge into global mapping
+                for alias, repo in chunk_imports.items():
+                    if repo != chunk_repo:
+                        repositories_in_chain.add(repo)
                 print(f"   🔍 DEBUG Level {level}: Found {len(chunk_imports)} imports in chunk {chunk.get('name')} from repo {chunk_repo}", file=sys.stderr)
             
             # Detect Pulsar producers in this chunk
-            chunk_pulsar_producers = detect_pulsar_producers(chunk_code)
+            chunk_pulsar_producers = detect_pulsar_producers(chunk_code, chunk.get("file"), all_chunks)
             if chunk_pulsar_producers:
                 pulsar_producers.extend(chunk_pulsar_producers)
                 print(f"   🔍 DEBUG Level {level}: Found {len(chunk_pulsar_producers)} Pulsar producers in chunk {chunk.get('name')}", file=sys.stderr)
@@ -665,9 +719,21 @@ def extract_call_chain(
                 # Try to find chunk by name and package
                 matching_chunks = find_chunks_by_name(func_name, chunks, pkg_name)
                 
-                # If no package specified, try without package constraint
-                if not matching_chunks and pkg_name is None:
-                    matching_chunks = find_chunks_by_name(func_name, chunks)
+                # If no match found with package constraint, try without it in some cases:
+                # 1. No package was specified
+                # 2. Package alias was not resolved to a repository (likely a variable, e.g. h.v2Handler.Method)
+                # 3. BUT skip extremely generic names to avoid context blowup
+                should_retry_without_pkg = False
+                if not matching_chunks:
+                    if pkg_name is None:
+                        should_retry_without_pkg = True
+                    elif pkg_name not in import_to_repo and pkg_name not in ['fmt', 'log', 'http', 'json', 'time', 'os', 'strings', 'ctx', 'context']:
+                        should_retry_without_pkg = True
+                
+                if should_retry_without_pkg:
+                    generic_names = ['With', 'Topic', 'Error', 'GetConfig', 'L', 'New', 'Close', 'String', 'Int', 'Bool', 'Float', 'Panic', 'Recover', 'Defer', 'Range']
+                    if func_name not in generic_names:
+                        matching_chunks = find_chunks_by_name(func_name, chunks)
                 
                 for called_chunk in matching_chunks:
                     called_chunk_id = called_chunk.get("id")
