@@ -28,6 +28,9 @@ import json
 import os
 import sys
 import traceback
+
+# Import dependency detection functions
+from detect_dependencies import analyze_all_chunks, filter_available_indexes
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -841,6 +844,15 @@ def main():
         help="Path to cross-test interference data JSON (optional, from detect_cross_test_interference.py)"
     )
     parser.add_argument(
+        "--found-indexes",
+        help="Path to found-indexes.json (for smart filtering)"
+    )
+    parser.add_argument(
+        "--smart-filter",
+        action="store_true",
+        help="Enable smart dependency filtering based on imports"
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/llm-context.json",
         help="Output file path (default: artifacts/llm-context.json)"
@@ -906,6 +918,53 @@ def main():
             if cross_test_interference:
                 print(f"📖 Loaded cross-test interference data", file=sys.stderr)
                 sys.stderr.flush()
+        
+        # Smart filtering: Analyze imports and filter dependency indexes
+        if args.smart_filter and connected_context and args.found_indexes:
+            print(f"\n🔍 Smart dependency filtering enabled...", file=sys.stderr)
+            sys.stderr.flush()
+            
+            # Extract chunks from connected_context
+            chunks_dict = connected_context.get('filtered_chunks', {})
+            
+            if chunks_dict:
+                # Analyze imports
+                analysis = analyze_all_chunks(chunks_dict)
+                print(f"   Detected {analysis['total_unique_dependencies']} unique dependencies", file=sys.stderr)
+                sys.stderr.flush()
+                
+                # Load found-indexes.json
+                found_indexes = load_json_file(args.found_indexes)
+                
+                if found_indexes:
+                    # Filter indexes based on detected dependencies
+                    filtered_indexes = filter_available_indexes(
+                        analysis['detected_dependencies'],
+                        found_indexes
+                    )
+                    
+                    summary = filtered_indexes['filtering_summary']
+                    print(f"   Available indexes: {summary['total_available']}", file=sys.stderr)
+                    print(f"   After filtering: {summary['after_filtering']}", file=sys.stderr)
+                    print(f"   Removed: {summary['removed']} unused indexes", file=sys.stderr)
+                    sys.stderr.flush()
+                    
+                    # Filter extra_indexes to only include detected dependencies
+                    if extra_indexes:
+                        original_count = len(extra_indexes)
+                        filtered_extra_indexes = {
+                            repo: index_data 
+                            for repo, index_data in extra_indexes.items()
+                            if repo in filtered_indexes['indexes']
+                        }
+                        extra_indexes = filtered_extra_indexes
+                        removed = original_count - len(extra_indexes)
+                        
+                        if removed > 0:
+                            estimated_savings = removed * 5000
+                            print(f"   💰 Estimated token savings: ~{estimated_savings:,} tokens", file=sys.stderr)
+                            print(f"      (Removed {removed} unused dependency indexes)", file=sys.stderr)
+                            sys.stderr.flush()
         
         # Build context
         context = build_llm_context(
