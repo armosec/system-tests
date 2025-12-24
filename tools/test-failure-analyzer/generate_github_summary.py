@@ -237,16 +237,23 @@ def generate_summary(
         if images:
             deployed_tag = images[0].get('tag', 'unknown')
             
+            # Get baseline version from found_indexes (if available)
+            baseline_version = 'unknown'
+            if found_indexes:
+                repo_idx = found_indexes.get('indexes', {}).get(triggering_repo, {})
+                baseline_version = repo_idx.get('deployed', {}).get('version', 'unknown')
+            
+            # Special handling for event-ingester-service: prefer baseline over cluster version
+            if triggering_repo == 'event-ingester-service' and baseline_version != 'unknown':
+                lines.append(f"- **Deployed Version:** `{baseline_version}` (derived from RC)")
+                if deployed_tag != baseline_version:
+                    lines.append(f"- **Cluster Version:** `{deployed_tag}` (for reference)")
             # Check if deployed is also an RC - if so, show both actual and baseline
-            if deployed_tag.startswith('rc-'):
+            elif deployed_tag.startswith('rc-'):
                 lines.append(f"- **Actual Deployed:** `{deployed_tag}` (RC in production)")
                 
-                # Get baseline version from found_indexes
-                if found_indexes:
-                    repo_idx = found_indexes.get('indexes', {}).get(triggering_repo, {})
-                    baseline_version = repo_idx.get('deployed', {}).get('version', 'unknown')
-                    if baseline_version != 'unknown' and baseline_version != deployed_tag:
-                        lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
+                if baseline_version != 'unknown' and baseline_version != deployed_tag:
+                    lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
             else:
                 lines.append(f"- **Deployed Version:** `{deployed_tag}`")
             
