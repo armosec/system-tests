@@ -620,7 +620,9 @@ def main():
             "commit": rc_commit,
             "index_path": rc_path,
             "strategy": rc_strategy,
-            "found": rc_path is not None
+            "found": rc_path is not None,
+            "github_org": triggering_org,
+            "source": "service"  # Triggering repo is a service, not a go.mod dependency
         }
     
     # Deployed version
@@ -650,7 +652,9 @@ def main():
             "commit": deployed_commit,
             "index_path": deployed_path,
             "strategy": deployed_strategy,
-            "found": deployed_path is not None
+            "found": deployed_path is not None,
+            "github_org": triggering_org,
+            "source": "service"  # Triggering repo is a service, not a go.mod dependency
         }
     
     results["indexes"][args.triggering_repo] = dashboard_indexes
