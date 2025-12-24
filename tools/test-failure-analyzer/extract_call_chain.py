@@ -113,6 +113,78 @@ def parse_imports(code: str) -> Dict[str, str]:
     return imports
 
 
+def get_key_chunks_from_imported_package(
+    repo_name: str,
+    package_alias: str, 
+    all_chunks: List[Dict[str, Any]],
+    current_chunk: Dict[str, Any],
+    debug: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Get key chunks from an imported cross-repo package.
+    
+    This implements the "Import Usage Heuristic": if a chunk imports from
+    another repo, include some key chunks from that package to capture
+    type definitions and related functions.
+    
+    Args:
+        repo_name: The repository name (e.g., "armosec-infra")
+        package_alias: The import alias used (e.g., "notificationsArmosec")
+        all_chunks: All available chunks across all repos
+        current_chunk: The chunk that imports this package
+        debug: Enable debug logging
+    
+    Returns:
+        List of key chunks from the imported package
+    """
+    key_chunks = []
+    
+    # Look for chunks from this repo
+    repo_chunks = [c for c in all_chunks if c.get('_repo') == repo_name]
+    
+    if not repo_chunks:
+        if debug:
+            print(f"   📦 DEBUG: No chunks found for imported repo: {repo_name}", file=sys.stderr)
+        return []
+    
+    # Strategy 1: Find exported types and their methods
+    # Heuristic: Chunks with type=type or type=struct
+    type_chunks = [c for c in repo_chunks if c.get('type') in ['type', 'struct']]
+    
+    # Strategy 2: Find exported functions (CamelCase names)
+    # Heuristic: Functions starting with uppercase letter
+    exported_functions = [
+        c for c in repo_chunks 
+        if c.get('type') == 'function' and c.get('name', '')[0:1].isupper()
+    ]
+    
+    # Strategy 3: Find methods (might be related to types used)
+    methods = [c for c in repo_chunks if c.get('type') == 'method']
+    
+    # Combine and limit
+    candidates = type_chunks[:5] + exported_functions[:5] + methods[:5]
+    
+    # Deduplicate by chunk ID
+    seen_ids = set()
+    for chunk in candidates:
+        chunk_id = chunk.get('id')
+        if chunk_id and chunk_id not in seen_ids:
+            seen_ids.add(chunk_id)
+            key_chunks.append(chunk)
+    
+    # Limit to avoid context explosion (max 15 chunks per imported package)
+    key_chunks = key_chunks[:15]
+    
+    if debug and key_chunks:
+        print(f"   📦 DEBUG: Adding {len(key_chunks)} key chunks from imported package {repo_name} (imported as '{package_alias}')", file=sys.stderr)
+        for chunk in key_chunks[:3]:  # Show first 3
+            print(f"      - {chunk.get('name')} (type: {chunk.get('type')})", file=sys.stderr)
+        if len(key_chunks) > 3:
+            print(f"      ... and {len(key_chunks) - 3} more", file=sys.stderr)
+    
+    return key_chunks
+
+
 def detect_pulsar_producers(code: str, file_path: Optional[str] = None, all_chunks: Optional[List[Dict[str, Any]]] = None) -> List[Dict[str, Any]]:
     """
     Detect Pulsar message producers (functions that send messages to topics).
@@ -695,6 +767,40 @@ def extract_call_chain(
                     if repo != chunk_repo:
                         repositories_in_chain.add(repo)
                 print(f"   🔍 DEBUG Level {level}: Found {len(chunk_imports)} imports in chunk {chunk.get('name')} from repo {chunk_repo}", file=sys.stderr)
+            
+            # Import Usage Heuristic: Add key chunks from imported cross-repo packages
+            # This helps capture type definitions and related functions from dependencies
+            # Only do this at shallow depths to avoid context explosion
+            if chunk_imports and level <= 3 and all_chunks:
+                for alias, repo in chunk_imports.items():
+                    if repo != chunk_repo:  # Cross-repo import
+                        # Get key chunks from the imported package
+                        key_chunks = get_key_chunks_from_imported_package(
+                            repo, alias, all_chunks, chunk, debug=True
+                        )
+                        
+                        # Add these chunks to the next level (but mark them specially)
+                        for imported_chunk in key_chunks:
+                            imported_chunk_id = imported_chunk.get("id")
+                            
+                            if imported_chunk_id and imported_chunk_id not in visited:
+                                visited.add(imported_chunk_id)
+                                
+                                imported_item = {
+                                    "chunk_id": imported_chunk_id,
+                                    "name": imported_chunk.get("name"),
+                                    "type": imported_chunk.get("type"),
+                                    "pattern": classify_chunk_pattern(imported_chunk),
+                                    "package": imported_chunk.get("package"),
+                                    "file": imported_chunk.get("file"),
+                                    "repo": repo,
+                                    "called_from": item["chunk_id"],
+                                    "function_name": f"import:{alias}"
+                                }
+                                
+                                next_level.append(imported_item)
+                                chain.append(imported_item)
+                                repositories_in_chain.add(repo)
             
             # Detect Pulsar producers in this chunk
             chunk_pulsar_producers = detect_pulsar_producers(chunk_code, chunk.get("file"), all_chunks)
