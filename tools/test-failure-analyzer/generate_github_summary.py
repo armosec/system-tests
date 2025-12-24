@@ -205,12 +205,14 @@ def generate_summary(
     # ========================================
     # Version Information
     # ========================================
+    triggering_repo = found_indexes.get('triggering_repo', 'cadashboardbe') if found_indexes else 'cadashboardbe'
+    
     if found_indexes:
         lines.append("### 🎯 Triggering Repository Version\n")
         lines.append("")
         
-        cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-        rc_info = cadashboard.get('rc', {})
+        repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+        rc_info = repo_info.get('rc', {})
         rc_version = rc_info.get('version', 'unknown')
         rc_commit = rc_info.get('commit', 'unknown')
         
@@ -218,6 +220,7 @@ def generate_summary(
         if rc_commit == 'unknown' and workflow_commit_fallback:
             rc_commit = workflow_commit_fallback
         
+        lines.append(f"- **Repository:** `armosec/{triggering_repo}`")
         lines.append(f"- **RC Version:** `{rc_version}`")
         lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
         lines.append("")
@@ -228,28 +231,35 @@ def generate_summary(
         lines.append("")
         
         repos = running_images.get('repos', {})
-        cadashboard = repos.get('cadashboardbe', {})
-        images = cadashboard.get('images', [])
+        repo_data = repos.get(triggering_repo, {})
+        images = repo_data.get('images', [])
         
         if images:
             deployed_tag = images[0].get('tag', 'unknown')
             
+            # Get baseline version from found_indexes (if available)
+            baseline_version = 'unknown'
+            if found_indexes:
+                repo_idx = found_indexes.get('indexes', {}).get(triggering_repo, {})
+                baseline_version = repo_idx.get('deployed', {}).get('version', 'unknown')
+            
+            # Special handling for event-ingester-service: prefer baseline over cluster version
+            if triggering_repo == 'event-ingester-service' and baseline_version != 'unknown':
+                lines.append(f"- **Deployed Version:** `{baseline_version}` (derived from RC)")
+                if deployed_tag != baseline_version:
+                    lines.append(f"- **Cluster Version:** `{deployed_tag}` (for reference)")
             # Check if deployed is also an RC - if so, show both actual and baseline
-            if deployed_tag.startswith('rc-'):
+            elif deployed_tag.startswith('rc-'):
                 lines.append(f"- **Actual Deployed:** `{deployed_tag}` (RC in production)")
                 
-                # Get baseline version from found_indexes
-                if found_indexes:
-                    cadashboard_idx = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-                    baseline_version = cadashboard_idx.get('deployed', {}).get('version', 'unknown')
-                    if baseline_version != 'unknown' and baseline_version != deployed_tag:
-                        lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
+                if baseline_version != 'unknown' and baseline_version != deployed_tag:
+                    lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
             else:
                 lines.append(f"- **Deployed Version:** `{deployed_tag}`")
             
             # Get previous stable commit from code-diffs
-            if code_diffs and 'cadashboardbe' in code_diffs:
-                git_diff = code_diffs['cadashboardbe'].get('git_diff', {})
+            if code_diffs and triggering_repo in code_diffs:
+                git_diff = code_diffs[triggering_repo].get('git_diff', {})
                 prev_commit = git_diff.get('deployed_commit', 'unknown')
                 if prev_commit != 'unknown':
                     lines.append(f"- **Previous Stable Commit:** `{prev_commit[:8]}`")
@@ -262,22 +272,23 @@ def generate_summary(
     
     # Try to get diff stats from code_diffs
     has_diff_stats = False
-    if code_diffs and 'cadashboardbe' in code_diffs:
-        cadashboard_diff = code_diffs['cadashboardbe']
-        if cadashboard_diff.get('changed'):
-            summary = cadashboard_diff.get('summary', {})
+    if code_diffs and triggering_repo in code_diffs:
+        repo_diff = code_diffs[triggering_repo]
+        if repo_diff.get('changed'):
+            summary = repo_diff.get('summary', {})
             funcs_added = summary.get('total_functions_added', 0)
             funcs_removed = summary.get('total_functions_removed', 0)
             endpoints_added = summary.get('total_endpoints_added', 0)
             endpoints_removed = summary.get('total_endpoints_removed', 0)
             
-            git_diff = cadashboard_diff.get('git_diff', {})
+            git_diff = repo_diff.get('git_diff', {})
             total_commits = git_diff.get('total_commits', 0)
             files = git_diff.get('files', [])
             files_changed = len(files)
             
             lines.append(f"- **Functions:** +{funcs_added} / -{funcs_removed}")
-            lines.append(f"- **Endpoints:** +{endpoints_added} / -{endpoints_removed}")
+            if triggering_repo == 'cadashboardbe':
+                lines.append(f"- **Endpoints:** +{endpoints_added} / -{endpoints_removed}")
             lines.append(f"- **Files Changed:** {files_changed} ({total_commits} commits)")
             has_diff_stats = True
     
@@ -288,13 +299,13 @@ def generate_summary(
         
         # Try to get commits from found_indexes
         if found_indexes:
-            cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-            deployed_commit = cadashboard.get('deployed', {}).get('commit')
-            rc_commit = cadashboard.get('rc', {}).get('commit')
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            deployed_commit = repo_info.get('deployed', {}).get('commit')
+            rc_commit = repo_info.get('rc', {}).get('commit')
         
         # Fallback: Try code_diffs git_diff section
-        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and 'cadashboardbe' in code_diffs:
-            git_diff = code_diffs['cadashboardbe'].get('git_diff', {})
+        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and triggering_repo in code_diffs:
+            git_diff = code_diffs[triggering_repo].get('git_diff', {})
             deployed_commit = git_diff.get('deployed_commit')
             if not rc_commit or rc_commit == 'unknown':
                 rc_commit = git_diff.get('rc_commit')
@@ -316,17 +327,17 @@ def generate_summary(
         
         # Clean and validate commits
         if deployed_commit:
-            deployed_commit = deployed_commit.strip()
+            deployed_commit = str(deployed_commit).strip()
             if not is_valid_commit_hash(deployed_commit):
                 deployed_commit = None
         
         if rc_commit:
-            rc_commit = rc_commit.strip()
+            rc_commit = str(rc_commit).strip()
             if not is_valid_commit_hash(rc_commit):
                 rc_commit = None
         
         if deployed_commit and rc_commit:
-            compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
+            compare_url = f"https://github.com/armosec/{triggering_repo}/compare/{deployed_commit}...{rc_commit}"
             lines.append(f"- **[View Full Diff on GitHub]({compare_url})** (commit-to-commit)")
         elif not has_diff_stats:
             lines.append("- ⚠️  Code diff analysis unavailable (missing commit information)")
@@ -396,38 +407,38 @@ def generate_summary(
         
         lines.append("")
         
-        # Missing indexes
-        if found_indexes:
-            indexes = found_indexes.get('indexes', {})
-            missing = []
-            
-            for dep_name, dep_info in indexes.items():
-                if dep_name != 'cadashboardbe' and dep_info.get('version_changed'):
-                    deployed_found = dep_info.get('deployed', {}).get('found', False)
-                    rc_found = dep_info.get('rc', {}).get('found', False)
-                    
-                    if not deployed_found or not rc_found:
-                        missing.append((dep_name, dep_info))
-            
-            if missing:
-                lines.append("### ⚠️  Changed Dependencies Without Code Indexes\n")
-                lines.append("")
+    # Missing indexes
+    if found_indexes:
+        indexes = found_indexes.get('indexes', {})
+        missing = []
+        
+        for dep_name, dep_info in indexes.items():
+            if dep_name != triggering_repo and dep_info.get('version_changed'):
+                deployed_found = dep_info.get('deployed', {}).get('found', False)
+                rc_found = dep_info.get('rc', {}).get('found', False)
                 
-                for dep_name, dep_info in missing:
-                    old_ver = dep_info.get('deployed', {}).get('version', 'unknown')
-                    new_ver = dep_info.get('rc', {}).get('version', 'unknown')
-                    
-                    lines.append(f"- **{dep_name}**: {old_ver} → {new_ver}")
-                    lines.append("  - Code index not available")
-                    lines.append("  - Cannot determine if changes are related to failure")
-                    lines.append(f"  - Recommendation: Add code-index-generation workflow to {dep_name} repository")
+                if not deployed_found or not rc_found:
+                    missing.append((dep_name, dep_info))
+        
+        if missing:
+            lines.append("### ⚠️  Changed Dependencies Without Code Indexes\n")
+            lines.append("")
+            
+            for dep_name, dep_info in missing:
+                old_ver = dep_info.get('deployed', {}).get('version', 'unknown')
+                new_ver = dep_info.get('rc', {}).get('version', 'unknown')
                 
-                lines.append("")
+                lines.append(f"- **{dep_name}**: {old_ver} → {new_ver}")
+                lines.append("  - Code index not available")
+                lines.append("  - Cannot determine if changes are related to failure")
+                lines.append(f"  - Recommendation: Add code-index-generation workflow to {dep_name} repository")
+            
+            lines.append("")
     else:
         # No dependency analysis available - provide helpful context
         lines.append("### ℹ️  No Cross-Repository Dependencies Detected\n")
         lines.append("")
-        lines.append("This test only calls code within the main `cadashboardbe` repository.")
+        lines.append(f"This test only calls code within the main `{triggering_repo}` repository.")
         lines.append("")
         lines.append("**Note:** Multi-repo code context is available when:")
         lines.append("1. The test calls functions in external dependencies")
@@ -555,15 +566,15 @@ def generate_summary(
     lines.append("### **Key Findings:**\n")
     
     # Show code changes if available
-    if code_diffs and 'cadashboardbe' in code_diffs:
-        cadashboard_diff = code_diffs['cadashboardbe']
-        if cadashboard_diff.get('changed'):
-            summary = cadashboard_diff.get('summary', {})
+    if code_diffs and triggering_repo in code_diffs:
+        repo_diff = code_diffs[triggering_repo]
+        if repo_diff.get('changed'):
+            summary = repo_diff.get('summary', {})
             funcs_added = summary.get('total_functions_added', 0)
             funcs_removed = summary.get('total_functions_removed', 0)
             lines.append(f"- 📝 **Code Changes:** +{funcs_added} / -{funcs_removed} functions")
         
-        git_diff = cadashboard_diff.get('git_diff', {})
+        git_diff = repo_diff.get('git_diff', {})
         if git_diff:
             total_commits = git_diff.get('total_commits', 0)
             files = git_diff.get('files', [])
@@ -626,28 +637,28 @@ def generate_summary(
         rc_commit = None
         
         if found_indexes:
-            cadashboard = found_indexes.get('indexes', {}).get('cadashboardbe', {})
-            deployed_commit = cadashboard.get('deployed', {}).get('commit')
-            rc_commit = cadashboard.get('rc', {}).get('commit')
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            deployed_commit = repo_info.get('deployed', {}).get('commit')
+            rc_commit = repo_info.get('rc', {}).get('commit')
         
-        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and 'cadashboardbe' in code_diffs:
-            git_diff = code_diffs['cadashboardbe'].get('git_diff', {})
+        if (not deployed_commit or deployed_commit == 'unknown') and code_diffs and triggering_repo in code_diffs:
+            git_diff = code_diffs[triggering_repo].get('git_diff', {})
             deployed_commit = git_diff.get('deployed_commit')
             rc_commit = git_diff.get('rc_commit')
         
         # Validate commits before using them
         if deployed_commit:
-            deployed_commit = deployed_commit.strip()
+            deployed_commit = str(deployed_commit).strip()
             if not is_valid_commit_hash(deployed_commit):
                 deployed_commit = None
         
         if rc_commit:
-            rc_commit = rc_commit.strip()
+            rc_commit = str(rc_commit).strip()
             if not is_valid_commit_hash(rc_commit):
                 rc_commit = None
         
         if deployed_commit and rc_commit:
-            compare_url = f"https://github.com/armosec/cadashboardbe/compare/{deployed_commit}...{rc_commit}"
+            compare_url = f"https://github.com/armosec/{triggering_repo}/compare/{deployed_commit}...{rc_commit}"
             lines.append(f"- [View Code Diff on GitHub]({compare_url})")
     
     # Original test run link

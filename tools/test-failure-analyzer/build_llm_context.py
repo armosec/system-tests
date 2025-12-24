@@ -1,27 +1,4 @@
 #!/usr/bin/python3
-# CRITICAL: Write to file BEFORE any imports to verify script execution
-# Write to current directory since /tmp might have restrictions
-try:
-    import os
-    log_dir = "artifacts"
-    os.makedirs(log_dir, exist_ok=True)
-    with open(os.path.join(log_dir, "script_start.log"), "w") as f:
-        f.write("Script file is being read and executed\n")
-        f.write(f"Working directory: {os.getcwd()}\n")
-        f.flush()
-        try:
-            os.fsync(f.fileno())
-        except:
-            pass
-except Exception as e:
-    # Last resort - try /tmp with error handling
-    try:
-        with open("/tmp/build_llm_context_script_start_error.log", "w") as err_f:
-            err_f.write(f"Error writing to artifacts: {e}\n")
-            err_f.flush()
-    except:
-        pass
-
 """
 Build LLM-ready context from all available sources.
 
@@ -46,38 +23,11 @@ Usage:
       --output artifacts/llm-context.json
 """
 
-# CRITICAL: Print at module load time to verify script is executing
-import sys
-import os
-
-# Write to file immediately to verify script is loading
-try:
-    with open("/tmp/build_llm_context_module_load.log", "w") as f:
-        try:
-            file_path = __file__
-        except NameError:
-            file_path = "unknown"
-        f.write(f"Module loading at {file_path}\n")
-        f.write(f"sys.argv = {sys.argv}\n")
-        f.write(f"Python version: {sys.version}\n")
-        f.flush()
-        os.fsync(f.fileno())
-except Exception as e:
-    # Try to write error to a different location
-    try:
-        with open("/tmp/build_llm_context_module_load_error.log", "w") as err_f:
-            err_f.write(f"Error in module load logging: {e}\n")
-            err_f.flush()
-            os.fsync(err_f.fileno())
-    except:
-        pass
-
-print("MODULE_LOAD: build_llm_context.py is being executed", file=sys.stderr)
-sys.stderr.flush()
-
 import argparse
 import json
 import os
+import sys
+import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -436,15 +386,27 @@ def deduplicate_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return unique_chunks
 
 
-def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None) -> Optional[str]:
+def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None, extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None) -> Optional[str]:
     """Look up full chunk code from code index using chunk_id."""
-    if not code_index or not chunk_id:
+    if not chunk_id:
         return None
     
-    chunks = code_index.get("chunks", [])
-    for chunk in chunks:
-        if chunk.get("id") == chunk_id:
-            return chunk.get("code", "")
+    # Try main index
+    if code_index:
+        chunks = code_index.get("chunks", [])
+        for chunk in chunks:
+            if chunk.get("id") == chunk_id:
+                return chunk.get("code", "")
+    
+    # Try extra indexes
+    if extra_indexes:
+        for repo_name, idx in extra_indexes.items():
+            if not idx: continue
+            chunks = idx.get("chunks", [])
+            for chunk in chunks:
+                if chunk.get("id") == chunk_id:
+                    return chunk.get("code", "")
+    
     return None
 
 
@@ -459,8 +421,10 @@ def build_llm_context(
     code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
     code_index: Optional[Dict[str, Any]] = None,
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
-    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None
+    incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
+    cross_test_interference: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -506,16 +470,16 @@ def build_llm_context(
     print(f"   {len(unique_chunks)} unique chunks after deduplication (from {len(all_chunks)} total)", file=sys.stderr)
     sys.stderr.flush()
     
-    # 4. Look up missing code for ALL chunks (if code_index provided)
-    if code_index:
-        print("🔍 Looking up missing chunk code from code index...", file=sys.stderr)
+    # 4. Look up missing code for ALL chunks (if code_index or extra_indexes provided)
+    if code_index or extra_indexes:
+        print("🔍 Looking up missing chunk code from code indexes...", file=sys.stderr)
         sys.stderr.flush()
         looked_up = 0
         for chunk in unique_chunks:
             chunk_id = chunk.get("id") or chunk.get("chunk_id")
             # Look up code for ANY chunk that doesn't have it yet
             if chunk_id and not chunk.get("code"):
-                code = lookup_chunk_code(chunk_id, code_index)
+                code = lookup_chunk_code(chunk_id, code_index, extra_indexes)
                 if code:
                     chunk["code"] = code
                     looked_up += 1
@@ -534,11 +498,25 @@ def build_llm_context(
     repo_mapping = {}
     if resolved_commits:
         resolved = resolved_commits.get("resolved_commits", {})
-        # Use first repo as default (usually cadashboardbe)
-        default_repo = list(resolved.keys())[0] if resolved else "cadashboardbe"
+        # Use triggering repo as default if available, otherwise first repo, otherwise cadashboardbe
+        triggering_repo_normalized = resolved_commits.get("triggering_repo_normalized", "").lower()
+        default_repo = None
+        if triggering_repo_normalized:
+            # Find matching repo key (case-insensitive match, but preserve original case)
+            for repo_key in resolved.keys():
+                if repo_key.lower() == triggering_repo_normalized:
+                    default_repo = repo_key
+                    print(f"   Using triggering repo as default: {default_repo}", file=sys.stderr)
+                    break
+        if not default_repo and resolved:
+            default_repo = list(resolved.keys())[0]
+            print(f"   Using first repo as default: {default_repo}", file=sys.stderr)
+        if not default_repo:
+            default_repo = "cadashboardbe"
+            print(f"   No resolved repos, defaulting to cadashboardbe", file=sys.stderr)
         repo_mapping["default"] = default_repo
     else:
-        repo_mapping["default"] = "cadashboardbe"
+        repo_mapping["default"] = "cadashboardbe"  # Fallback for backward compatibility
     
     # 7. Format chunks for LLM
     formatted_chunks = []
@@ -733,6 +711,12 @@ def build_llm_context(
         "incluster_logs": incluster_logs or {}
     }
     
+    # Add cross-test interference data if available (this is INPUT context, not a conclusion)
+    if cross_test_interference:
+        context["cross_test_interference"] = cross_test_interference
+        print(f"   ✅ Added cross-test interference data to context", file=sys.stderr)
+        sys.stderr.flush()
+    
     # Calculate total size
     total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
     context["metadata"]["total_lines_of_code"] = total_lines
@@ -790,9 +774,17 @@ def main():
         help="Path to code index JSON (optional, used to look up full chunk code for call chains)"
     )
     parser.add_argument(
+        "--dependency-indexes",
+        help="JSON string or file mapping repo name to code index path"
+    )
+    parser.add_argument(
         "--prompts-file",
         type=str,
         help="Path to analysis prompts file (default: analysis_prompts.md)"
+    )
+    parser.add_argument(
+        "--cross-test-interference",
+        help="Path to cross-test interference data JSON (optional, from detect_cross_test_interference.py)"
     )
     parser.add_argument(
         "--output",
@@ -812,36 +804,13 @@ def main():
     
     args = parser.parse_args()
     
-    # Debug: Print immediately to verify we got here
-    print("DEBUG: After parse_args", file=sys.stderr)
-    sys.stderr.flush()
-    print("DEBUG: args.test_name =", args.test_name, file=sys.stderr)
-    sys.stderr.flush()
-    
     try:
         print("🚀 Building LLM Context\n", file=sys.stderr)
-        print("🚀 Building LLM Context\n", file=sys.stdout)
         sys.stderr.flush()
-        sys.stdout.flush()
         
         # Load all input files
-        print(f"DEBUG: Loading api_mapping from {args.api_mapping}", file=sys.stderr)
-        sys.stderr.flush()
         api_mapping = load_json_file(args.api_mapping) if args.api_mapping else None
-        if api_mapping:
-            print(f"DEBUG: Loaded api_mapping: {len(api_mapping.get('mappings', {}))} APIs", file=sys.stderr)
-        else:
-            print(f"DEBUG: api_mapping is None", file=sys.stderr)
-        sys.stderr.flush()
-        
-        print(f"DEBUG: Loading resolved_commits from {args.resolved_commits}", file=sys.stderr)
-        sys.stderr.flush()
         resolved_commits = load_json_file(args.resolved_commits) if args.resolved_commits else None
-        if resolved_commits:
-            print(f"DEBUG: Loaded resolved_commits: {len(resolved_commits.get('resolved_commits', {}))} repos", file=sys.stderr)
-        else:
-            print(f"DEBUG: resolved_commits is None", file=sys.stderr)
-        sys.stderr.flush()
         
         connected_context = load_json_file(args.connected_context) if args.connected_context else None
         code_diffs = load_json_file(args.code_diffs) if args.code_diffs else None
@@ -849,6 +818,24 @@ def main():
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
         code_index = load_json_file(args.code_index) if args.code_index else None
+        
+        # Load extra indexes for dependencies
+        extra_indexes = {}
+        if args.dependency_indexes:
+            if os.path.exists(args.dependency_indexes):
+                with open(args.dependency_indexes, 'r') as f:
+                    dep_map = json.load(f)
+            else:
+                try:
+                    dep_map = json.loads(args.dependency_indexes)
+                except:
+                    dep_map = {}
+            
+            for repo_name, path in dep_map.items():
+                if os.path.exists(path):
+                    print(f"📖 Loading dependency index for {repo_name} from {path}", file=sys.stderr)
+                    extra_indexes[repo_name] = load_json_file(path)
+        
         analysis_prompts = load_analysis_prompts(args.prompts_file if hasattr(args, 'prompts_file') else None)
         
         # Load workflow commit if not provided
@@ -858,12 +845,15 @@ def main():
             if workflow_commit_path.exists():
                 workflow_commit = load_text_file(str(workflow_commit_path))
         
-        # Build context
-        print(f"DEBUG: About to call build_llm_context()", file=sys.stderr)
-        print(f"DEBUG: api_mapping is {'present' if api_mapping else 'None'}", file=sys.stderr)
-        print(f"DEBUG: resolved_commits is {'present' if resolved_commits else 'None'}", file=sys.stderr)
-        sys.stderr.flush()
+        # Load cross-test interference data if available
+        cross_test_interference = None
+        if args.cross_test_interference:
+            cross_test_interference = load_json_file(args.cross_test_interference)
+            if cross_test_interference:
+                print(f"📖 Loaded cross-test interference data", file=sys.stderr)
+                sys.stderr.flush()
         
+        # Build context
         context = build_llm_context(
             test_name=args.test_name,
             test_run_id=args.test_run_id,
@@ -875,131 +865,22 @@ def main():
             resolved_commits=resolved_commits,
             test_code=test_code,
             code_index=code_index,
+            extra_indexes=extra_indexes,
             analysis_prompts=analysis_prompts,
-            incluster_logs=incluster_logs
+            incluster_logs=incluster_logs,
+            cross_test_interference=cross_test_interference
         )
-        
-        print(f"DEBUG: build_llm_context() returned", file=sys.stderr)
-        print(f"DEBUG: Context has {len(context.get('code_chunks', []))} chunks", file=sys.stderr)
-        sys.stderr.flush()
-        
-        # Debug: Check context structure
-        if not context:
-            print("❌ Error: build_llm_context returned empty context", file=sys.stderr)
-            sys.exit(1)
-        
-        if not context.get("metadata"):
-            print("❌ Error: Context missing metadata", file=sys.stderr)
-            sys.exit(1)
-            
-        if "code_chunks" not in context:
-            print("❌ Error: Context missing code_chunks", file=sys.stderr)
-            sys.exit(1)
         
         # Save output
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Debug: Write to log file as backup
-        debug_log = Path("/tmp/build_llm_context_debug.log")
-        try:
-            with open(debug_log, 'w') as f:
-                f.write(f"Output path: {output_path}\n")
-                f.write(f"Context keys: {list(context.keys())}\n")
-                f.write(f"Total chunks: {len(context.get('code_chunks', []))}\n")
-                f.write(f"Metadata: {json.dumps(context.get('metadata', {}), indent=2)}\n")
-        except:
-            pass
-        
         # Save JSON format
         if args.format in ["json", "both"]:
-            try:
-                print(f"DEBUG: Writing to {output_path}", file=sys.stderr)
-                sys.stderr.flush()
-                
-                # Ensure output directory exists
-                output_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                # Write the file with explicit error handling
-                try:
-                    with open(output_path, 'w') as f:
-                        json.dump(context, f, indent=2)
-                        f.flush()
-                        try:
-                            os.fsync(f.fileno())
-                        except:
-                            pass
-                except Exception as write_error:
-                    # If write fails, try to write error info
-                    try:
-                        with open(output_path, 'w') as f:
-                            json.dump({
-                                "error": "Failed to write context",
-                                "error_message": str(write_error),
-                                "metadata": context.get("metadata", {}) if context else {}
-                            }, f, indent=2)
-                            f.flush()
-                            os.fsync(f.fileno())
-                    except:
-                        pass
-                    raise write_error
-                
-                # Verify file was written - CRITICAL CHECK
-                if not output_path.exists():
-                    # File doesn't exist - this is a critical error
-                    # Try one more time with a simple write
-                    try:
-                        with open(output_path, 'w') as f:
-                            json.dump({
-                                "error": "Output file was not created",
-                                "metadata": context.get("metadata", {}) if context else {}
-                            }, f, indent=2)
-                            f.flush()
-                            os.fsync(f.fileno())
-                    except Exception as final_error:
-                        # Last resort - write to stderr and exit
-                        print(f"CRITICAL: Cannot create output file: {final_error}", file=sys.stderr)
-                        sys.stderr.flush()
-                        sys.exit(1)
-                
-                file_size = output_path.stat().st_size
-                print(f"DEBUG: File exists, size: {file_size} bytes", file=sys.stderr)
-                sys.stderr.flush()
-                
-                if file_size > 0:
-                    print(f"\n📄 LLM context (JSON) saved to: {args.output}", file=sys.stderr)
-                    print(f"   File size: {file_size} bytes", file=sys.stderr)
-                    sys.stderr.flush()
-                else:
-                    print(f"\n⚠️  Warning: File was created but appears empty: {args.output}", file=sys.stderr)
-                    sys.stderr.flush()
-                    # Write a minimal valid JSON to ensure file is not empty
-                    with open(output_path, 'w') as f:
-                        json.dump({
-                            "error": "Context building failed - file was empty",
-                            "metadata": context.get("metadata", {}) if context else {}
-                        }, f, indent=2)
-                        f.flush()
-                        os.fsync(f.fileno())
-            except Exception as e:
-                print(f"\n❌ Error saving JSON file: {e}", file=sys.stderr)
-                import traceback
-                traceback.print_exc(file=sys.stderr)
-                sys.stderr.flush()
-                # Try to write error to output file before exiting
-                try:
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
-                    with open(output_path, 'w') as f:
-                        json.dump({
-                            "error": "Failed to save context",
-                            "error_message": str(e),
-                            "traceback": traceback.format_exc()
-                        }, f, indent=2)
-                        f.flush()
-                        os.fsync(f.fileno())
-                except:
-                    pass
-                sys.exit(1)
+            with open(output_path, 'w') as f:
+                json.dump(context, f, indent=2)
+            print(f"\n📄 LLM context (JSON) saved to: {args.output}", file=sys.stderr)
+            sys.stderr.flush()
         
         # Save text format (markdown)
         if args.format in ["text", "both"]:
@@ -1007,12 +888,6 @@ def main():
             text_content = format_context_as_text(context)
             with open(text_output_path, 'w') as f:
                 f.write(text_content)
-                f.flush()
-                import os
-                try:
-                    os.fsync(f.fileno())
-                except:
-                    pass
             print(f"📄 LLM context (Text/Markdown) saved to: {text_output_path}", file=sys.stderr)
             sys.stderr.flush()
         
@@ -1035,70 +910,10 @@ def main():
         sys.exit(130)
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}", file=sys.stderr)
-        import traceback
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    # Ensure we always write something to a log file for debugging
-    import traceback
-    error_log_path = "/tmp/build_llm_context_error.log"
-    
-    try:
-        with open(error_log_path, "w") as log_file:
-            log_file.write(f"Script started: {sys.argv}\n")
-            log_file.flush()
-            os.fsync(log_file.fileno())
-        
-        print("MAIN_BLOCK: Entering if __name__ == '__main__'", file=sys.stderr)
-        sys.stderr.flush()
-        print("MAIN_BLOCK: sys.argv =", sys.argv, file=sys.stderr)
-        sys.stderr.flush()
-        
-        try:
-            print("MAIN_BLOCK: About to call main()", file=sys.stderr)
-            sys.stderr.flush()
-            main()
-            print("MAIN_BLOCK: main() returned successfully", file=sys.stderr)
-            sys.stderr.flush()
-            
-            with open(error_log_path, "a") as log_file:
-                log_file.write("Script completed successfully\n")
-                log_file.flush()
-                os.fsync(log_file.fileno())
-                
-        except SystemExit as e:
-            with open(error_log_path, "a") as log_file:
-                log_file.write(f"SystemExit with code {e.code}\n")
-                log_file.flush()
-                os.fsync(log_file.fileno())
-            print(f"MAIN_BLOCK: SystemExit with code {e.code}", file=sys.stderr)
-            sys.stderr.flush()
-            raise
-        except Exception as e:
-            error_msg = f"MAIN_BLOCK: FATAL ERROR: {e}\n{traceback.format_exc()}"
-            with open(error_log_path, "a") as log_file:
-                log_file.write(error_msg + "\n")
-                log_file.flush()
-                os.fsync(log_file.fileno())
-            print(error_msg, file=sys.stderr)
-            sys.stderr.flush()
-            sys.exit(1)
-        
-        print("MAIN_BLOCK: Script ending normally", file=sys.stderr)
-        sys.stderr.flush()
-    except Exception as outer_e:
-        # Last resort error handling
-        try:
-            with open(error_log_path, "a") as log_file:
-                log_file.write(f"Outer exception: {outer_e}\n{traceback.format_exc()}\n")
-                log_file.flush()
-                os.fsync(log_file.fileno())
-        except:
-            pass
-        raise
-else:
-    print(f"MODULE_IMPORT: Script imported as module, __name__ = {__name__}", file=sys.stderr)
-    sys.stderr.flush()
+    main()
 

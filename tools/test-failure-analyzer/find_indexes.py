@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     
     # Dashboard (triggering repo) arguments
     parser.add_argument("--triggering-repo", required=True, help="Name of triggering repository (e.g., cadashboardbe)")
+    parser.add_argument("--dashboard-repo", default="cadashboardbe", help="Name of dashboard repository for API mapping")
     parser.add_argument("--triggering-commit", help="Workflow commit SHA")
     parser.add_argument("--rc-version", help="RC version tag (e.g., rc-v0.0.224-2435)")
     parser.add_argument("--deployed-version", help="Deployed version (e.g., v0.0.223)")
@@ -49,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-org", default="armosec", help="GitHub organization")
     
     # Options
+    parser.add_argument("--images", help="Path to running-images.json to resolve dashboard version")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     
     return parser.parse_args()
@@ -270,7 +272,7 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
         if commit:
             artifact_name = f"code-index-{commit}"
-            index_path = download_artifact(repo, artifact_name, f"{output_dir}/rc", github_token, github_org, debug)
+            index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
             if index_path:
                 return index_path, "pr_commit"
     
@@ -282,7 +284,7 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         print(f"\n📋 Strategy 3: Falling back to latest")
     
     artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/rc", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
     if index_path:
         if debug:
             print(f"  ⚠️  Using latest index (may not match RC exactly)")
@@ -307,7 +309,7 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
         print(f"\n📋 Strategy 1: Version tag")
     
     artifact_name = f"code-index-{version}"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/deployed", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         return index_path, "version_tag"
     
@@ -316,7 +318,7 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
         print(f"\n📋 Strategy 2: Falling back to latest")
     
     artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/deployed", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         if debug:
             print(f"  ⚠️  Using latest index (may not match deployed version)")
@@ -589,6 +591,36 @@ def main():
             
             if dep_info.get("version_changed"):
                 results["dependencies_summary"]["version_changes"].append(dep_name)
+    
+    # Resolve dashboard indexes if different from triggering repo
+    if args.dashboard_repo != args.triggering_repo:
+        if args.debug:
+            print(f"\n🔍 Resolving dashboard index for {args.dashboard_repo} (required for API mapping)...")
+        
+        # Dashboard repo usually uses latest index for mapping
+        # We don't try to resolve RC version for dashboard if it's not the triggering repo
+        dash_deployed_ver = "latest"
+        
+        dash_path, dash_strategy = resolve_deployed_index(
+            args.dashboard_repo,
+            dash_deployed_ver,
+            args.output_dir,
+            github_token,
+            args.github_org,
+            args.debug
+        )
+        
+        dash_commit = extract_commit_from_index(dash_path, args.debug) if dash_path else None
+        
+        results["indexes"][args.dashboard_repo] = {
+            "deployed": {
+                "version": dash_deployed_ver,
+                "commit": dash_commit,
+                "index_path": dash_path,
+                "strategy": dash_strategy,
+                "found": dash_path is not None
+            }
+        }
     
     # Save results
     output_path = Path(args.output)

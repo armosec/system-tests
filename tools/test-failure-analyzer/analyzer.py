@@ -15,9 +15,21 @@ from datetime import datetime, timezone, timedelta as td
 import subprocess
 import shutil
 import glob
-from rich.console import Console
+try:
+    from rich.console import Console
+except ImportError:
+    # Fallback if rich not available (should not happen if requirements.txt is installed)
+    class Console:
+        def print(self, *args, **kwargs):
+            print(*args)
 
 from schemas import Report, RunInfo, FailureEntry, Identifiers, MappingInfo, LokiData
+try:
+    from detect_cross_test_interference import detect_cross_test_interference
+except ImportError:
+    # Fallback if module not available
+    def detect_cross_test_interference(*args, **kwargs):
+        return []
 
 console = Console()
 
@@ -385,6 +397,79 @@ def parse_failing_tests(log_text: str) -> List[Dict[str, Any]]:
             seen.add(key)
             deduped.append(r)
 
+    return deduped
+
+
+def parse_all_tests_with_timestamps(log_text: str) -> List[Dict[str, Any]]:
+    """
+    Extract ALL tests from raw_log (including successful ones) with timestamps.
+    Similar to parse_failing_tests() but includes all tests, not just failures.
+    
+    Returns:
+        List of dicts with {name, time_start, time_end, section_text}
+    """
+    if not log_text:
+        return []
+    
+    results: List[Dict[str, Any]] = []
+    
+    # Split the combined text into sections: "===== <name> ====="
+    section_pattern = re.compile(r"\n===== (.+?) =====\n")
+    sections: List[Tuple[str, str]] = []
+    last_end = 0
+    last_name = "combined"
+    for m in section_pattern.finditer(log_text):
+        if last_end > 0:
+            prev_chunk = log_text[last_end:m.start()]
+            sections.append((last_name, prev_chunk))
+        last_name = m.group(1)
+        last_end = m.end()
+    if last_end > 0:
+        sections.append((last_name, log_text[last_end:]))
+    if not sections:
+        sections.append(("combined", log_text))
+    
+    # Pattern for ST(<name>) test names
+    st_pattern = r"ST\s*\(([^)]+)\)"
+    
+    for sec_name, sec_text in sections:
+        # Extract test names from ST() patterns (these are actual test names)
+        test_name = None
+        
+        # Try to extract from section name first
+        sec_st_match = re.search(st_pattern, sec_name)
+        if sec_st_match:
+            test_name = sec_st_match.group(1).strip()
+        else:
+            # Try to extract from section text
+            for m in re.finditer(st_pattern, sec_text, re.MULTILINE):
+                test_name = m.group(1).strip()
+                break
+        
+        # If no ST() pattern found, skip this section (it's not a test)
+        if not test_name:
+            continue
+        
+        # Extract timestamps from this section
+        first_ts, last_ts, _, _, _ = extract_time_window_and_errors(sec_text, padding_minutes=0)
+        
+        results.append({
+            'name': test_name,
+            'time_start': first_ts,
+            'time_end': last_ts,
+            'section_text': sec_text,
+            'section_name': sec_name
+        })
+    
+    # Deduplicate by name
+    seen = set()
+    deduped: List[Dict[str, Any]] = []
+    for r in results:
+        name = r.get('name')
+        if name and name not in seen:
+            seen.add(name)
+            deduped.append(r)
+    
     return deduped
 
 
@@ -804,14 +889,217 @@ def iso_to_unix_ns(iso_s: str) -> Optional[int]:
         return None
 
 
+def execute_loki_query(
+    query: str,
+    start_ns: int,
+    end_ns: int,
+    limit: int,
+    query_range_url: Optional[str],
+    fallback_url: Optional[str],
+    headers: Dict[str, str],
+    grafana_url: Optional[str],
+    grafana_token: Optional[str],
+    datasource_id: Optional[int],
+    mode: str,
+    debug: bool = False
+) -> Optional[Any]:
+    """
+    Execute Loki query with fallback logic (direct URL → Grafana proxy → ms timestamp retry).
+    Returns Response object or None if all attempts fail.
+    """
+    import requests
+    
+    params = {
+        "query": query,
+        "start": str(start_ns),
+        "end": str(end_ns),
+        "limit": str(limit),
+        "direction": "forward",
+    }
+    
+    session_ok = False
+    url_tried = None
+    r = None
+    
+    # Try direct if configured
+    if query_range_url:
+        url_tried = query_range_url
+        r = requests.get(query_range_url, headers=headers, params=params, timeout=60)
+        if r.status_code == 404 and fallback_url:
+            if debug:
+                print(f"[loki] 404 on {query_range_url}, retrying {fallback_url}")
+            url_tried = fallback_url
+            r = requests.get(fallback_url, headers=headers, params=params, timeout=60)
+        if r.status_code == 200:
+            session_ok = True
+    
+    # If still not ok, and grafana proxy configured or in auto mode with grafana creds, try proxy
+    if not session_ok and (mode == "grafana_proxy" or (mode == "auto" and grafana_url and grafana_token)):
+        import requests as rq
+        gh = {"Accept": "application/json"}
+        if grafana_token and "${" not in str(grafana_token):
+            gh["Authorization"] = f"Bearer {grafana_token}"
+        ds_id = datasource_id
+        if ds_id is None:
+            # discover first loki datasource id
+            try:
+                ds_resp = rq.get(f"{str(grafana_url).rstrip('/')}/api/datasources", headers=gh, timeout=30)
+                if ds_resp.status_code == 200:
+                    for ds in ds_resp.json():
+                        if str(ds.get("type")) == "loki":
+                            ds_id = ds.get("id")
+                            break
+            except Exception:
+                pass
+        if ds_id is not None:
+            proxy_url = f"{str(grafana_url).rstrip('/')}/api/datasources/proxy/{ds_id}/loki/api/v1/query_range"
+            if debug:
+                print(f"[loki] trying grafana proxy: {proxy_url}")
+            url_tried = proxy_url
+            r = rq.get(proxy_url, headers=gh, params=params, timeout=60)
+            if r.status_code == 200:
+                session_ok = True
+    
+    if not session_ok:
+        if debug:
+            body = ""
+            if r is not None:
+                try:
+                    body = r.text[:300]
+                except Exception:
+                    pass
+                print(f"[loki] fetch failed ({r.status_code}) url={url_tried} body={body}")
+            else:
+                print(f"[loki] fetch failed (no response) url={url_tried}")
+        # Fallback: try milliseconds timestamps if ns failed
+        try_ms = False
+        try:
+            # if status is 400 and the backend might expect ms
+            if r is not None and r.status_code == 400:
+                try_ms = True
+        except Exception:
+            pass
+        if try_ms:
+            start_ms = int(int(params["start"]) / 1_000_000)
+            end_ms = int(int(params["end"]) / 1_000_000)
+            params_ms = dict(params)
+            params_ms["start"] = str(start_ms)
+            params_ms["end"] = str(end_ms)
+            if debug:
+                print(f"[loki] retry with ms: start={params_ms['start']} end={params_ms['end']}")
+            r = requests.get(url_tried, headers=headers, params=params_ms, timeout=60)
+            if r.status_code != 200 and debug:
+                body = ""
+                try:
+                    body = r.text[:300]
+                except Exception:
+                    pass
+                print(f"[loki] ms retry failed ({r.status_code}) url={url_tried} body={body}")
+        if r is None or r.status_code != 200:
+            return None
+    
+    # Return successful response
+    if r and r.status_code == 200:
+        return r
+    
+    return None
+
+
+def fetch_loki_with_pagination(
+    query: str,
+    start_ns: int,
+    end_ns: int,
+    max_total: int,
+    limit_per_query: int,
+    execute_query_fn,
+    debug: bool = False
+) -> List[Tuple[str, str]]:
+    """
+    Fetch logs from Loki with timestamp-based pagination.
+    Returns list of (timestamp, log_line) tuples.
+    
+    Pagination strategy:
+    1. Execute query with start_ns to end_ns
+    2. Extract last timestamp from results
+    3. Use last_timestamp + 1ns as new start_ns for next query
+    4. Continue until no more results or hit max_total
+    """
+    all_logs = []
+    current_start = start_ns
+    
+    while len(all_logs) < max_total:
+        # Execute query using extracted function
+        response = execute_query_fn(query, current_start, end_ns, limit_per_query)
+        
+        if not response or response.status_code != 200:
+            break
+        
+        try:
+            data = response.json()
+        except Exception:
+            if debug:
+                print(f"[loki] Failed to parse JSON response")
+            break
+        
+        result = data.get("data", {}).get("result", [])
+        
+        # Extract logs and timestamps
+        batch_logs = []
+        last_timestamp = None
+        
+        for stream in result:
+            values = stream.get("values") or []
+            for ts, line in values:
+                batch_logs.append((ts, str(line)))
+                if last_timestamp is None or ts > last_timestamp:
+                    last_timestamp = ts
+        
+        if not batch_logs:
+            break  # No more results
+        
+        all_logs.extend(batch_logs)
+        
+        # Check if we got fewer than requested (last page)
+        if len(batch_logs) < limit_per_query:
+            break
+        
+        # Prepare for next page: use last timestamp + 1ns
+        if last_timestamp:
+            try:
+                last_ts_ns = int(last_timestamp)
+                current_start = last_ts_ns + 1  # Add 1ns to avoid duplicates
+            except (ValueError, TypeError):
+                if debug:
+                    print(f"[loki] Invalid timestamp format: {last_timestamp}")
+                break  # Invalid timestamp, stop pagination
+        
+        if debug:
+            print(f"[loki] Pagination: fetched {len(batch_logs)} logs, total: {len(all_logs)}")
+    
+    return all_logs
+
+
 def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str, Any], debug: bool = False) -> None:
     """
     For each failure and each query, fetch up to N log lines from Loki within the time window.
-    Appends short snippets into failure.loki.excerpts.
+    Uses pagination to fetch more logs (up to max_total_fetch), then applies optimization
+    to compress logs while preserving critical information.
+    Appends optimized snippets into failure.loki.excerpts.
     """
     import requests
+    import time
+    
+    # Read configuration (Step 1.5)
     loki_cfg = (cfg.get("loki", {}) or {})
     mode = loki_cfg.get("mode", "auto")
+    limit_per_query = loki_cfg.get("limit_per_query", 5000)
+    max_total_fetch = loki_cfg.get("max_total_fetch", 20000)
+    enable_pagination = loki_cfg.get("enable_pagination", True)
+    max_line_length = loki_cfg.get("max_line_length", 500)  # 0 = no truncation
+    optimization_cfg = loki_cfg.get("optimization", {})
+    max_snippets_final = optimization_cfg.get("max_snippets", 500)
+    max_chars_final = optimization_cfg.get("max_chars", 7000)
+    similarity_threshold = optimization_cfg.get("similarity_threshold", 0.9)
 
     headers = {"Accept": "application/json"}
     query_range_url = None
@@ -829,31 +1117,38 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
             if debug:
                 print(f"[loki] mode={mode} primary endpoint: {query_range_url} (fallback: {fallback_url})")
 
-    use_grafana = False
     grafana = loki_cfg.get("grafana", {}) or {}
     grafana_url = grafana.get("url")
     grafana_token = os.environ.get("GRAFANA_TOKEN") or grafana.get("api_token")
     datasource_id = grafana.get("datasource_id")
 
-    # In auto mode, if no base_url or we later see 404, we will try grafana proxy if info is present
-
-    LIMIT = 500  # Reasonable limit (not 5000, not 1) - focuses on error logs with test run ID filter
+    # Create a partial function for execute_loki_query with fixed parameters
+    def execute_query(query: str, start_ns: int, end_ns: int, limit: int):
+        return execute_loki_query(
+            query=query,
+            start_ns=start_ns,
+            end_ns=end_ns,
+            limit=limit,
+            query_range_url=query_range_url,
+            fallback_url=fallback_url,
+            headers=headers,
+            grafana_url=grafana_url,
+            grafana_token=grafana_token,
+            datasource_id=datasource_id,
+            mode=mode,
+            debug=debug
+        )
 
     for fentry in failures:
         start_ns = iso_to_unix_ns(fentry.loki.from_time) if fentry.loki.from_time else None
         end_ns = iso_to_unix_ns(fentry.loki.to_time) if fentry.loki.to_time else None
         if not start_ns or not end_ns:
             continue
-        snippets: List[str] = []
+        
+        all_fetched_logs: List[Tuple[str, str]] = []
+        
         for q in fentry.loki.queries:
             try:
-                params = {
-                    "query": q,
-                    "start": str(start_ns),
-                    "end": str(end_ns),
-                    "limit": str(LIMIT),
-                    "direction": "forward",
-                }
                 if debug:
                     short_q = q if len(q) < 180 else q[:177] + "..."
                     # Try to extract namespace/app for a human-friendly line
@@ -861,112 +1156,110 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
                     app_match = re.search(r'{[^}]*\bapp\s*=\s*"(.*?)"', q)
                     ns_val = ns_match.group(1) if ns_match else "?"
                     app_val = app_match.group(1) if app_match else "?"
-                    print(f"[loki] GET {query_range_url}")
-                    print(f"[loki] window: {fentry.loki.from_time} → {fentry.loki.to_time} | ns={ns_val} app={app_val} limit={LIMIT}")
-                    print(f"[loki] query: {short_q}")
-                session_ok = False
-                url_tried = None
-                # Try direct if configured
-                if query_range_url:
-                    url_tried = query_range_url
-                    r = requests.get(query_range_url, headers=headers, params=params, timeout=60)
-                    if r.status_code == 404 and fallback_url:
+                    print(f"[loki] Query: {short_q}")
+                    print(f"[loki] window: {fentry.loki.from_time} → {fentry.loki.to_time} | ns={ns_val} app={app_val}")
+                    print(f"[loki] pagination={enable_pagination}, limit_per_query={limit_per_query}, max_total={max_total_fetch}")
+                
+                fetch_start_time = time.time()
+                query_logs: List[Tuple[str, str]] = []
+                
+                # Use pagination if enabled, otherwise single query
+                if enable_pagination:
+                    try:
+                        query_logs = fetch_loki_with_pagination(
+                            query=q,
+                            start_ns=start_ns,
+                            end_ns=end_ns,
+                            max_total=max_total_fetch,
+                            limit_per_query=limit_per_query,
+                            execute_query_fn=execute_query,
+                            debug=debug
+                        )
+                        fetch_time = time.time() - fetch_start_time
                         if debug:
-                            print(f"[loki] 404 on {query_range_url}, retrying {fallback_url}")
-                        url_tried = fallback_url
-                        r = requests.get(fallback_url, headers=headers, params=params, timeout=60)
-                    if r.status_code == 200:
-                        session_ok = True
-                # If still not ok, and grafana proxy configured or in auto mode with grafana creds, try proxy
-                if not session_ok and (mode == "grafana_proxy" or (mode == "auto" and grafana_url and grafana_token)):
-                    import requests as rq
-                    gh = {"Accept": "application/json"}
-                    if grafana_token and "${" not in str(grafana_token):
-                        gh["Authorization"] = f"Bearer {grafana_token}"
-                    ds_id = datasource_id
-                    if ds_id is None:
-                        # discover first loki datasource id
+                            print(f"[loki] Pagination completed: {len(query_logs)} logs fetched in {fetch_time:.2f}s")
+                    except Exception as e:
+                        if debug:
+                            print(f"[loki] Pagination failed: {e}, falling back to single query")
+                        # Fallback to single query
+                        response = execute_query(q, start_ns, end_ns, limit_per_query)
+                        if response and response.status_code == 200:
+                            try:
+                                data = response.json()
+                                result = data.get("data", {}).get("result", [])
+                                for stream in result:
+                                    values = stream.get("values") or []
+                                    for ts, line in values[:limit_per_query]:
+                                        query_logs.append((ts, str(line)))
+                            except Exception:
+                                pass
+                else:
+                    # Single query mode (pagination disabled)
+                    response = execute_query(q, start_ns, end_ns, limit_per_query)
+                    if response and response.status_code == 200:
                         try:
-                            ds_resp = rq.get(f"{str(grafana_url).rstrip('/')}/api/datasources", headers=gh, timeout=30)
-                            if ds_resp.status_code == 200:
-                                for ds in ds_resp.json():
-                                    if str(ds.get("type")) == "loki":
-                                        ds_id = ds.get("id")
-                                        break
+                            data = response.json()
+                            result = data.get("data", {}).get("result", [])
+                            for stream in result:
+                                values = stream.get("values") or []
+                                for ts, line in values[:limit_per_query]:
+                                    query_logs.append((ts, str(line)))
                         except Exception:
                             pass
-                    if ds_id is not None:
-                        proxy_url = f"{str(grafana_url).rstrip('/')}/api/datasources/proxy/{ds_id}/loki/api/v1/query_range"
-                        if debug:
-                            print(f"[loki] trying grafana proxy: {proxy_url}")
-                        url_tried = proxy_url
-                        r = rq.get(proxy_url, headers=gh, params=params, timeout=60)
-                        if r.status_code == 200:
-                            session_ok = True
                 
-                if not session_ok:
-                    if debug:
-                        body = ""
-                        if 'r' in locals():
-                            try:
-                                body = r.text[:300]
-                            except Exception:
-                                pass
-                            print(f"[loki] fetch failed ({r.status_code}) url={url_tried} body={body}")
-                        else:
-                            print(f"[loki] fetch failed (no response) url={url_tried}")
-                    # Fallback: try milliseconds timestamps if ns failed
-                    try_ms = False
-                    try:
-                        # if status is 400 and the backend might expect ms
-                        if 'r' in locals() and r.status_code == 400:
-                            try_ms = True
-                    except Exception:
-                        pass
-                    if try_ms:
-                        start_ms = int(int(params["start"]) / 1_000_000)
-                        end_ms = int(int(params["end"]) / 1_000_000)
-                        params_ms = dict(params)
-                        params_ms["start"] = str(start_ms)
-                        params_ms["end"] = str(end_ms)
-                        if debug:
-                            print(f"[loki] retry with ms: start={params_ms['start']} end={params_ms['end']}")
-                        r = requests.get(url_tried, headers=headers, params=params_ms, timeout=60)
-                        if r.status_code != 200 and debug:
-                            body = ""
-                            try:
-                                body = r.text[:300]
-                            except Exception:
-                                pass
-                            print(f"[loki] ms retry failed ({r.status_code}) url={url_tried} body={body}")
-                    if r.status_code != 200:
-                        continue
-                data = r.json()
-                # Loki results can be 'streams' with 'values' entries: [ts, line]
-                # Loki returns results in reverse chronological order (most recent first)
-                # Since we filter for errors, we prioritize recent error logs
-                before_count = len(snippets)
-                for stream in (data.get("data", {}).get("result", []) or []):
-                    values = stream.get("values") or []
-                    # Take first LIMIT entries (most recent, since Loki returns reverse chronological)
-                    for ts, line in values[:LIMIT]:
-                        # Truncate long log lines to keep snippets concise
-                        line_s = str(line)
-                        MAX_LINE_LENGTH = 300  # Truncate long log lines for better readability
-                        if len(line_s) > MAX_LINE_LENGTH:
-                            line_s = line_s[:MAX_LINE_LENGTH - 3] + "..."
-                        snippets.append(line_s)
-                        if len(snippets) >= 500:  # Increased cap per failure (was 100)
-                            break
-                    if len(snippets) >= 500:  # Increased cap per failure (was 100)
-                        break
+                all_fetched_logs.extend(query_logs)
+                
+                # Cap at max_total_fetch across all queries
+                if len(all_fetched_logs) >= max_total_fetch:
+                    all_fetched_logs = all_fetched_logs[:max_total_fetch]
+                    break
+                    
+            except Exception as e:
                 if debug:
-                    added = len(snippets) - before_count
-                    print(f"[loki] results: {added} lines from url={url_tried}")
-            except Exception:
+                    print(f"[loki] Error processing query: {e}")
                 continue
-        if snippets:
-            fentry.loki.excerpts = snippets
+        
+        # Apply optimization if we have logs
+        if all_fetched_logs:
+            try:
+                # Convert to list of strings
+                log_strings = [line for _, line in all_fetched_logs]
+                
+                # Apply line truncation if configured (before optimization)
+                if max_line_length and max_line_length > 0:
+                    log_strings = [
+                        line[:max_line_length] + ("..." if len(line) > max_line_length else "")
+                        for line in log_strings
+                    ]
+                
+                # Apply optimization
+                from log_optimization_examples import optimize_logs_for_llm
+                
+                opt_start_time = time.time()
+                optimized_logs = optimize_logs_for_llm(
+                    log_strings,
+                    max_snippets=max_snippets_final,
+                    max_chars=max_chars_final
+                )
+                opt_time = time.time() - opt_start_time
+                
+                if debug:
+                    print(f"[loki] Optimization: {len(log_strings)} → {len(optimized_logs)} logs in {opt_time:.2f}s")
+                    total_chars = sum(len(log) for log in optimized_logs)
+                    print(f"[loki] Final output: {len(optimized_logs)} snippets, {total_chars} chars")
+                
+                fentry.loki.excerpts = optimized_logs
+            except Exception as e:
+                if debug:
+                    print(f"[loki] Optimization failed: {e}, using raw logs (limited)")
+                # Fallback: use raw logs but limit to max_snippets_final
+                log_strings = [line for _, line in all_fetched_logs]
+                if max_line_length and max_line_length > 0:
+                    log_strings = [
+                        line[:max_line_length] + ("..." if len(line) > max_line_length else "")
+                        for line in log_strings
+                    ]
+                fentry.loki.excerpts = log_strings[:max_snippets_final]
 
 def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, output_dir: str, args: argparse.Namespace, cfg: Dict[str, Any]) -> None:
     base_dir = Path(output_dir) / "context"
@@ -1196,6 +1489,7 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
     src_dir_exists = (base_dir / "tests" / "src").exists() and any((base_dir / "tests" / "src").iterdir())
     repos_manifest = (base_dir / "repos" / "repos.json").exists()
 
+
     data_status = []
     conclusions = []
     for fentry in failures:
@@ -1228,11 +1522,13 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
             hypothesis = "permissions/authorization issue"
             signals.append("permission/forbidden in logs")
             next_steps.append("verify tokens/roles and config for the test tenant")
+        
         if hypothesis == "uncategorized" and fentry.errors:
             hypothesis = "application error"
             signals.append("error lines present")
             next_steps.append("inspect last error lines and changed files in PR")
-        conclusions.append({
+        
+        conclusion = {
             "test": fentry.test.get("name"),
             "services": fentry.mapping.services,
             "customer_guid": fentry.identifiers.customer_guid,
@@ -1242,7 +1538,9 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
             "hypothesis": hypothesis,
             "signals": signals,
             "next_steps": next_steps,
-        })
+        }
+        
+        conclusions.append(conclusion)
 
     with open(base_dir / "data_status.json", "w") as f:
         f.write(json.dumps(data_status, indent=2))
@@ -1322,6 +1620,11 @@ def main() -> None:
         console.print("[red]Failed to detect triggering repository/service from logs and metadata. Aborting.[/red]")
         sys.exit(1)
     tests = parse_failing_tests(raw_log)
+    
+    # Extract all tests (including successful ones) for cross-test interference detection
+    all_tests = parse_all_tests_with_timestamps(raw_log)
+    if args.debug:
+        console.print(f"[cyan]Extracted {len(all_tests)} total tests (including successful)[/cyan]")
 
     mapping = load_mapping(args.mapping, cfg.get("defaults", {}).get("mapping_path"))
 
@@ -1427,6 +1730,94 @@ def main() -> None:
 
     # Bundle context for local Cursor exploration
     bundle_context(run, failures, raw_log, args.output_dir, args, cfg)
+    
+    # Detect cross-test interference AFTER conclusions.json is written
+    interference_signals = []
+    interference_map = {}
+    try:
+        # Build test code map if bundle_test_sources was used
+        test_code_map = {}
+        base_dir = Path(args.output_dir) / "context"
+        src_dir_exists = (base_dir / "tests" / "src").exists() and any((base_dir / "tests" / "src").iterdir())
+        if args.bundle_test_sources and src_dir_exists:
+            src_dir = base_dir / "tests" / "src"
+            for test_dir in src_dir.iterdir():
+                if test_dir.is_dir():
+                    # Find Python test files
+                    for py_file in test_dir.glob("*.py"):
+                        test_name = test_dir.name.split("_", 1)[-1] if "_" in test_dir.name else test_dir.name
+                        try:
+                            test_code_map[test_name] = py_file.read_text()
+                        except Exception:
+                            pass
+        
+        interference_signals = detect_cross_test_interference(
+            failures=failures,
+            all_tests=all_tests,
+            raw_log=raw_log,
+            mapping=mapping,
+            config=cfg,
+            test_code_map=test_code_map if test_code_map else None
+        )
+        if args.debug and interference_signals:
+            console.print(f"[cyan]Cross-test interference detection: {len(interference_signals)} signals[/cyan]")
+        
+        # Build interference map for quick lookup
+        interference_map = {sig['test']: sig for sig in interference_signals}
+    except Exception as e:
+        if args.debug:
+            console.print(f"[yellow]Cross-test interference detection failed: {e}[/yellow]")
+        interference_map = {}
+    
+    # Save interference data to separate file for LLM context (this is INPUT, not a conclusion)
+    context_dir = Path(args.output_dir) / "context"
+    context_dir.mkdir(parents=True, exist_ok=True)
+    interference_file = context_dir / "cross_test_interference.json"
+    if interference_signals:
+        # Get interference data for the first failing test (or first test if analyzing single test)
+        test_name_for_llm = failures[0].test.get('name') if failures else None
+        if test_name_for_llm and test_name_for_llm in interference_map:
+            interference_data_for_llm = interference_map[test_name_for_llm]
+            interference_file.write_text(json.dumps(interference_data_for_llm, indent=2))
+            if args.debug:
+                console.print(f"[green]Saved cross-test interference data to {interference_file}[/green]")
+        elif interference_signals:
+            # If no specific test match, use first signal
+            interference_file.write_text(json.dumps(interference_signals[0], indent=2))
+            if args.debug:
+                console.print(f"[green]Saved cross-test interference data to {interference_file}[/green]")
+    
+    # Update conclusions with interference data (now that file exists)
+    conclusions_path = context_dir / "conclusions.json"
+    if conclusions_path.exists():
+        try:
+            conclusions = json.loads(conclusions_path.read_text())
+            for conclusion in conclusions:
+                test_name = conclusion.get('test')
+                interference_data = interference_map.get(test_name, {})
+                if interference_data.get('interference_detected'):
+                    conclusion['cross_test_interference'] = {
+                        'type': 'bulk_operation_affecting_shared_resource',
+                        'parallel_tests': interference_data.get('parallel_tests', []),
+                        'bulk_operations': interference_data.get('bulk_operations', []),
+                        'shared_resources': interference_data.get('shared_resources', []),
+                        'recommendations': interference_data.get('recommendations', [])
+                    }
+                    # Update hypothesis if not already set
+                    if conclusion.get('hypothesis') == 'uncategorized':
+                        conclusion['hypothesis'] = 'cross-test interference (isolation issue)'
+                        if not conclusion.get('signals'):
+                            conclusion['signals'] = []
+                        parallel_tests = interference_data.get('parallel_tests', [])
+                        if parallel_tests:
+                            conclusion['signals'].append(f"Parallel tests detected: {', '.join(parallel_tests[:3])}")
+                        conclusion['signals'].append("Potential bulk operation affecting shared resources")
+            conclusions_path.write_text(json.dumps(conclusions, indent=2))
+            if args.debug:
+                console.print(f"[green]Updated conclusions.json with interference data[/green]")
+        except Exception as e:
+            if args.debug:
+                console.print(f"[yellow]Failed to update conclusions with interference data: {e}[/yellow]")
 
 
 if __name__ == "__main__":
