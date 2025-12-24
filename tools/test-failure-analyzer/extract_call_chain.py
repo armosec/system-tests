@@ -106,55 +106,144 @@ def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
     """
     Detect Pulsar message producers (functions that send messages to topics).
     
-    Patterns:
-    - producer.Send(...)
-    - producer.SendAsync(...)
-    - client.Send(...)
-    - messaging.Produce(...)
-    - PublishMessage(...)
+    Enhanced patterns to catch:
+    - producer.Send(...) - simple
+    - pc.userInputPulsarProducer.Send(...) - nested field access
+    - handler.messagingProducer.SendAsync(...) - multi-level
+    - PublishMessage(...) - direct calls
     
     Returns:
         List of dicts with topic, message_type info
     """
     producers = []
+    seen_positions = set()  # Deduplicate by position
     
-    # Pattern 1: producer.Send() or producer.SendAsync()
-    # Look for topic names nearby (usually in variable or function args)
+    # Pattern 1: Nested producer field access (NEW - catches pc.userInputPulsarProducer.Send)
+    # Matches: pc.userInputPulsarProducer.Send, handler.producer.SendAsync, etc.
+    nested_producer_pattern = r'(\w+(?:\.\w+)*[Pp]roducer)\.(?:Send(?:Async)?)\s*\('
+    for match in re.finditer(nested_producer_pattern, code):
+        if match.start() in seen_positions:
+            continue
+        seen_positions.add(match.start())
+        
+        producer_path = match.group(1)
+        method = "Send" if "SendAsync" not in match.group(0) else "SendAsync"
+        
+        # Try to extract topic from nearby context (400 chars for nested calls)
+        start_pos = max(0, match.start() - 400)
+        end_pos = min(len(code), match.end() + 200)
+        context = code[start_pos:end_pos]
+        
+        topic = extract_topic_from_context(context)
+        
+        producers.append({
+            "type": "producer",
+            "method": method,
+            "variable": producer_path,
+            "topic": topic,
+            "position": match.start(),
+            "pattern": "nested_producer"
+        })
+    
+    # Pattern 2: Simple producer.Send() (catches simple cases)
     send_pattern = r'(\w+)\.(Send(?:Async)?)\s*\([^)]*\)'
     for match in re.finditer(send_pattern, code):
+        if match.start() in seen_positions:
+            continue
+        seen_positions.add(match.start())
+        
         producer_var = match.group(1)
         method = match.group(2)
         
-        # Try to extract topic from nearby context
-        # Look 200 chars before match for topic definition
-        start_pos = max(0, match.start() - 200)
-        context_before = code[start_pos:match.start()]
+        # Skip if producer_var is not actually a producer variable
+        if not re.search(r'[Pp]roducer|[Mm]essaging|[Cc]lient', producer_var):
+            continue
         
-        # Extract topic patterns
-        topic_pattern = r'topic[:\s=]+["\']([^"\']+)["\']'
-        topic_match = re.search(topic_pattern, context_before, re.IGNORECASE)
-        topic = topic_match.group(1) if topic_match else None
+        # Try to extract topic from nearby context
+        start_pos = max(0, match.start() - 200)
+        end_pos = min(len(code), match.end() + 100)
+        context = code[start_pos:end_pos]
+        
+        topic = extract_topic_from_context(context)
         
         producers.append({
             "type": "producer",
             "method": method,
             "variable": producer_var,
             "topic": topic,
-            "position": match.start()
+            "position": match.start(),
+            "pattern": "simple_producer"
         })
     
-    # Pattern 2: Direct Publish() calls
+    # Pattern 3: Direct Publish() calls
     publish_pattern = r'Publish(?:Message|Event)?\s*\([^)]*["\']([^"\']+)["\']'
     for match in re.finditer(publish_pattern, code):
+        if match.start() in seen_positions:
+            continue
+        seen_positions.add(match.start())
+        
         topic = match.group(1)
         producers.append({
             "type": "producer",
             "method": "Publish",
             "topic": topic,
-            "position": match.start()
+            "position": match.start(),
+            "pattern": "publish_call"
         })
     
+    # Pattern 4: Topic constants in the file (NEW - look for topic definitions)
+    # userInputTopic = "user-input", const TopicName = "persistent://..."
+    topic_const_pattern = r'(?:const|var)?\s*(\w*[Tt]opic)\s*=\s*["\']([^"\']+)["\']'
+    topic_constants = {}
+    for match in re.finditer(topic_const_pattern, code):
+        const_name = match.group(1)
+        topic_value = match.group(2)
+        topic_constants[const_name] = topic_value
+    
+    # Enrich existing producers with topic constants
+    for producer in producers:
+        if not producer.get("topic") and topic_constants:
+            # Look for topic constant usage near the producer
+            context_start = max(0, producer["position"] - 500)
+            context_end = min(len(code), producer["position"] + 500)
+            context = code[context_start:context_end]
+            
+            for const_name, topic_value in topic_constants.items():
+                if const_name in context:
+                    producer["topic"] = topic_value
+                    producer["topic_source"] = "constant:" + const_name
+                    break
+    
     return producers
+
+
+def extract_topic_from_context(context: str) -> Optional[str]:
+    """
+    Extract topic name from code context using multiple patterns.
+    
+    Returns topic string or None if not found.
+    """
+    # Pattern 1: topic assignment (topic = "...", topic: "...")
+    topic_pattern = r'topic[:\s=]+["\']([^"\']+)["\']'
+    match = re.search(topic_pattern, context, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    
+    # Pattern 2: Topic literal in string (look for "user-input", "persistent://...")
+    # Must be at least 5 chars and look like a topic name
+    literal_pattern = r'["\']([a-zA-Z][\w\-:/]{4,60})["\']'
+    for match in re.finditer(literal_pattern, context):
+        potential_topic = match.group(1)
+        # Check if it looks like a Pulsar topic
+        if ('persistent://' in potential_topic or 
+            '-' in potential_topic or  # user-input, user-output style
+            '/' in potential_topic):   # path-like topics
+            # Avoid false positives (error messages, file paths)
+            if not any(skip in potential_topic.lower() for skip in 
+                      ['error', 'failed', 'invalid', '.go', '.json', 'http://']):
+                return potential_topic
+    
+    return None
 
 
 def detect_pulsar_consumers(chunk: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -458,7 +547,7 @@ def extract_call_chain(
     handler_code = handler_chunk.get("code", "")
     handler_package = handler_chunk.get("package", "")
     
-    # Parse imports to build alias -> repo mapping
+    # Parse imports to build alias -> repo mapping (will be updated per chunk)
     import_to_repo = parse_imports(handler_code)
     
     # Detect Pulsar message producers in handler
@@ -473,7 +562,12 @@ def extract_call_chain(
     
     # Track cross-repo calls and repositories in chain
     cross_repo_calls = []
-    repositories_in_chain = set(["cadashboardbe"])  # Start with main repo
+    repositories_in_chain = set([handler_chunk.get("_repo", "cadashboardbe")])  # Start with handler's repo
+    
+    # DEBUG: Log initial state
+    if all_chunks:
+        print(f"   🔍 DEBUG: all_chunks contains {len(all_chunks)} chunks from repos: {set(c.get('_repo', 'unknown') for c in all_chunks)}", file=sys.stderr)
+        print(f"   🔍 DEBUG: Handler repo: {handler_chunk.get('_repo', 'cadashboardbe')}", file=sys.stderr)
     
     # Build call chain
     chain = []
@@ -483,7 +577,8 @@ def extract_call_chain(
         "type": handler_chunk.get("type"),
         "pattern": classify_chunk_pattern(handler_chunk),
         "package": handler_package,
-        "file": handler_chunk.get("file")
+        "file": handler_chunk.get("file"),
+        "repo": handler_chunk.get("_repo", "cadashboardbe")  # Include repo tag
     }]
     
     level = 0
@@ -498,15 +593,25 @@ def extract_call_chain(
             
             chunk_code = chunk.get("code", "")
             chunk_package = chunk.get("package", "")
+            chunk_repo = chunk.get("_repo", "cadashboardbe")
+            
+            # Parse imports from THIS chunk (update import_to_repo for this level)
+            chunk_imports = parse_imports(chunk_code)
+            if chunk_imports:
+                import_to_repo.update(chunk_imports)  # Merge into global mapping
+                print(f"   🔍 DEBUG Level {level}: Found {len(chunk_imports)} imports in chunk {chunk.get('name')} from repo {chunk_repo}", file=sys.stderr)
             
             # Detect Pulsar producers in this chunk
             chunk_pulsar_producers = detect_pulsar_producers(chunk_code)
             if chunk_pulsar_producers:
                 pulsar_producers.extend(chunk_pulsar_producers)
+                print(f"   🔍 DEBUG Level {level}: Found {len(chunk_pulsar_producers)} Pulsar producers in chunk {chunk.get('name')}", file=sys.stderr)
                 # Match these producers to consumers
                 if all_chunks:
                     new_matches = match_pulsar_producers_to_consumers(chunk_pulsar_producers, all_chunks)
                     pulsar_matches.extend(new_matches)
+                    if new_matches:
+                        print(f"   ✅ DEBUG Level {level}: Matched {len(new_matches)} Pulsar producer-consumer pairs", file=sys.stderr)
             
             # Extract calls from this chunk
             calls = extract_function_calls(chunk_code, chunk_package)
@@ -516,13 +621,16 @@ def extract_call_chain(
                 # Check if this is a cross-repo call
                 if pkg_name and pkg_name in import_to_repo:
                     repo_name = import_to_repo[pkg_name]
-                    cross_repo_calls.append({
-                        "repo": repo_name,
-                        "package": pkg_name,
-                        "function": func_name,
-                        "called_from_chunk": item["chunk_id"]
-                    })
-                    repositories_in_chain.add(repo_name)
+                    if repo_name != chunk_repo:  # Only log if different repo
+                        print(f"   🌐 DEBUG Level {level}: Cross-repo call detected: {chunk_repo}.{func_name} -> {repo_name}.{pkg_name}", file=sys.stderr)
+                        cross_repo_calls.append({
+                            "repo": repo_name,
+                            "package": pkg_name,
+                            "function": func_name,
+                            "called_from_chunk": item["chunk_id"],
+                            "called_from_repo": chunk_repo
+                        })
+                        repositories_in_chain.add(repo_name)
                 
                 # Try to find chunk by name and package
                 matching_chunks = find_chunks_by_name(func_name, chunks, pkg_name)
@@ -534,6 +642,7 @@ def extract_call_chain(
                 for called_chunk in matching_chunks:
                     called_chunk_id = called_chunk.get("id")
                     called_pattern = classify_chunk_pattern(called_chunk)
+                    called_repo = called_chunk.get("_repo", "cadashboardbe")
                     
                     # Only follow service/repository/enricher/helper patterns (skip handlers, connectors at deeper levels)
                     if level == 0:
@@ -565,9 +674,17 @@ def extract_call_chain(
                         "pattern": called_pattern,
                         "package": called_chunk.get("package"),
                         "file": called_chunk.get("file"),
+                        "repo": called_repo,  # Include repo tag
                         "called_from": item["chunk_id"],
                         "function_name": func_name
                     }
+                    
+                    # Track repo in chain
+                    repositories_in_chain.add(called_repo)
+                    
+                    # DEBUG: Log when adding chunk from different repo
+                    if called_repo != chunk_repo:
+                        print(f"   ✅ DEBUG Level {level}: Adding cross-repo chunk: {called_repo}/{called_chunk.get('name')} (called from {chunk_repo})", file=sys.stderr)
                     
                     next_level.append(next_item)
                     chain.append(next_item)
