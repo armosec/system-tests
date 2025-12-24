@@ -1,15 +1,19 @@
 import os
-import time
-from systest_utils import Logger, statics
-from tests_scripts.accounts.accounts import COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME
-from tests_scripts.accounts.accounts import ExclusionActions, UpdateCloudOrganizationMetadataRequest
-from tests_scripts.accounts.accounts import extract_parameters_from_url
-from tests_scripts.accounts.accounts import Accounts
+from systest_utils import Logger
+from tests_scripts.accounts.accounts import (
+    Accounts,
+    COMPLIANCE_FEATURE_NAME,
+    CSPM_STATUS_HEALTHY,
+    ExclusionActions,
+    PROVIDER_AWS,
+    UpdateCloudOrganizationMetadataRequest,
+    VULN_SCAN_FEATURE_NAME,
+    extract_parameters_from_url,
+)
 import random
 from urllib.parse import parse_qs, quote, urlparse
 from infrastructure import aws
 from typing import List
-from tests_scripts.accounts.accounts import CSPM_STATUS_HEALTHY
 # static cloudtrail and bucket names that are expected to be existed in the test account
 ORGANIZATION_CLOUDTRAIL_SYSTEM_TEST_CONNECT = "trail-system-test-organization-connect-dont-delete"
 ORGANIZATION_TRAIL_LOG_LOCATION = "system-test-organization-bucket-armo/AWSLogs/o-63kbjphubt/930002936888"
@@ -17,6 +21,7 @@ ACCOUNT_TRAIL_LOG_LOCATION = "system-test-organization-bucket-armo/AWSLogs/93000
 
 REGION_SYSTEM_TEST = "us-east-1"
 REGION_SYSTEM_TEST_2 = "us-east-2"
+ORG_ID = "o-63kbjphubt"
 
 
 
@@ -48,6 +53,15 @@ class CloudOrganizationCSPM(Accounts):
         if not aws_secret_access_key:
             raise Exception("ORGANIZATION_AWS_SECRET_ACCESS_KEY_CLOUD_TESTS is not set")
         
+        Logger.logger.info('Stage 0: Cleanup existing AWS organizations and single accounts')
+        # Define account IDs before cleanup
+        delegated_admin_account_id = "515497298766"
+        single_account_id = "617632154863"
+        member_account_id = "897545368193"
+        
+        # Cleanup org and single accounts features
+        self.cleanup_aws_orgs_by_id(ORG_ID, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        self.cleanup_single_accounts_by_id(PROVIDER_AWS, single_account_id, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
 
         #compliance tests
         # Initialize AWS manager for compliance tests
@@ -58,9 +72,6 @@ class CloudOrganizationCSPM(Accounts):
                                                 aws_secret_access_key=aws_secret_access_key)
         Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
         Logger.logger.info('Stage 2: Setup AWS managers and validate permissions')
-        delegated_admin_account_id = "515497298766"
-        single_account_id = "617632154863"
-        member_account_id = "897545368193"
         expected_account_ids = [single_account_id, delegated_admin_account_id, member_account_id]
         initial_OU = "ou-fo1t-hbdw5p8g"
         
@@ -100,8 +111,6 @@ class CloudOrganizationCSPM(Accounts):
         compliance_stack_set_name = "systest-" + self.test_identifier_rand + "-compliance-org"
         member_role_name, member_role_external_id, stack_set_operation_id = self.connect_cspm_features_to_org(delegated_admin_aws_manager, compliance_stack_set_name, compliance_test_region, features, test_org_guid,organizational_unit_ids=[initial_OU],skip_wait=True)
 
-        #validate that there are no existing accounts manged by other orgs
-        self.validate_no_accounts_exists_by_id(expected_account_ids, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
 
         self.wait_for_report(self.validate_org_manged_account_list, sleep_interval=30, 
         timeout=300, org_guid=test_org_guid, account_ids=expected_account_ids, 
@@ -124,7 +133,7 @@ class CloudOrganizationCSPM(Accounts):
 
         Logger.logger.info('Stage 8: Connect single account (without scanning)')
         single_compliance_account_name = "single-compliance-account"
-        single_cloud_account_guid = self.connect_cspm_new_account(compliance_test_region, account_id, single_compliance_role_arn, single_compliance_account_name, self.cspm_external_id,skip_scan=True)
+        single_cloud_account_guid = self.connect_aws_cspm_new_account(compliance_test_region, account_id, single_compliance_role_arn, single_compliance_account_name, self.cspm_external_id,skip_scan=True)
         self.validate_account_feature_is_excluded(single_cloud_account_guid, COMPLIANCE_FEATURE_NAME, False)
 
         Logger.logger.info('Stage 9: Update single account stack add vuln feature')

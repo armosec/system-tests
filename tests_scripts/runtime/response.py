@@ -212,6 +212,7 @@ class IncidentResponse(Incidents):
             namespace_to_incident[namespace] = self.verify_unexpected_process_on_backend(
                 cluster=cluster,
                 namespace=namespace,
+                unexpected_cmd="cat /etc/hosts",
                 expected_incident_name="Unexpected process launched",
             )
             Logger.logger.info(f"Verified unexpected process on backend in namespace {namespace} with incident {namespace_to_incident[namespace]}")

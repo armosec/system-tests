@@ -92,7 +92,6 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
 
         Logger.logger.info(f"New policy created with guid {new_policy_guid}")
-        self.test_policy_guids.append(new_policy_guid)
 
 
         Logger.logger.info('4. Install kubescape')
@@ -113,7 +112,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
         self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
         time.sleep(80) # the node agent cache waits 60+ secs before caching profile, needs to update helm chart with value to make it 5 secs
-        self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
+        self.exec_pod(wlid=wlids[0], command="cat /etc/shadow")
 
         Logger.logger.info("Get incidents list")
         incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=5,
@@ -122,7 +121,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
 
         inc, _ = self.wait_for_report(self.verify_incident_status_completed, timeout=15 * 60, sleep_interval=20,
                                       incident_id=incs[0]['guid'])
-        self.verify_unexpected_process_on_backend(cluster=self.cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
+        self.verify_unexpected_process_on_backend(cluster=self.cluster, namespace=namespace, unexpected_cmd="cat /etc/shadow", expected_incident_name="", expected_incident_guid=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc.get(__RELATED_ALERTS_KEY__, None) is None or len(
             inc[__RELATED_ALERTS_KEY__]) == 0, f"Expected no related alerts in the incident API {json.dumps(inc)}"

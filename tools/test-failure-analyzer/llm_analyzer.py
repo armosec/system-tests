@@ -54,6 +54,7 @@ def load_json_file(path: str) -> Dict:
 def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
     """
     Build LLM prompt from context and diffs.
+    Cross-test interference data is read from llm_context['cross_test_interference'].
     
     Returns:
         Formatted prompt string
@@ -71,6 +72,47 @@ def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
 ## Test Information
 - **Test Name**: {test_name}
 - **Test Type**: System integration test
+""")
+    
+    # Add cross-test interference data from context (this is INPUT, not a conclusion)
+    interference_data = llm_context.get('cross_test_interference')
+    if interference_data and interference_data.get('interference_detected'):
+        prompt_parts.append(f"""
+## ⚠️ Cross-Test Interference Detected
+
+**CRITICAL**: Cross-test interference has been detected! This suggests a **test isolation failure**, not an application bug.
+
+- **Parallel Tests**: {', '.join(interference_data.get('parallel_tests', []))}
+- **Bulk Operations Found**:""")
+        
+        for bulk_op in interference_data.get('bulk_operations', []):
+            if bulk_op.get('risk') == 'high':
+                prompt_parts.append(f"""
+  - Operation: `{bulk_op.get('operation')}`
+  - Filter Used: {bulk_op.get('filters')}
+  - Filter Value: {bulk_op.get('filter_values')}
+  - Risk Level: {bulk_op.get('risk')} ⚠️""")
+        
+        prompt_parts.append(f"""
+- **Shared Resources**:""")
+        for resource in interference_data.get('shared_resources', []):
+            if isinstance(resource, dict):
+                prompt_parts.append(f"""
+  - Type: {resource.get('type')}
+  - Values: {resource.get('values')}
+  - Affected by: {resource.get('parallel_test')}""")
+        
+        recommendations = interference_data.get('recommendations', [])
+        if recommendations:
+            prompt_parts.append(f"""
+- **Recommendations**:
+{chr(10).join('  - ' + r for r in recommendations)}
+
+**IMPORTANT**: Given the cross-test interference detection, focus your analysis on:
+1. **Test Isolation Failure** (not application bugs)
+2. Verify if parallel test resolved/affected the incident
+3. Check if bulk operations with filters affected shared resources
+4. Recommend fixing test isolation (use specific GUIDs instead of filters)
 """)
     
     # Code changes section (if available)
@@ -441,7 +483,14 @@ def main():
             print(f"📖 Loading code diffs from {args.code_diffs}...")
         code_diffs = load_json_file(args.code_diffs)
     
-    # Build prompt
+    # Check for cross-test interference data in context (it's part of the input context, not conclusions)
+    if args.debug and llm_context.get('cross_test_interference'):
+        interference = llm_context.get('cross_test_interference')
+        if interference.get('interference_detected'):
+            print(f"   ✅ Cross-test interference data found in context!")
+            print(f"      Parallel tests: {', '.join(interference.get('parallel_tests', []))}")
+    
+    # Build prompt (interference data is already in llm_context)
     if args.debug:
         print(f"📝 Building prompt...")
     

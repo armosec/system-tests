@@ -110,7 +110,7 @@ class Incidents(BaseHelm):
         """
         Logger.logger.info(f"Simulate unexpected process from {cluster} {namespace}")
         inc = self.wait_for_incident(cluster, namespace, expected_incident_name)
-        self.verify_unexpected_process_on_backend(cluster, namespace, expected_incident_name)
+        self.verify_unexpected_process_on_backend(cluster, namespace, "cat /etc/hosts", expected_incident_name)
         self.check_incident_unique_values(inc)
         self.check_incidents_per_severity()
         self.check_incidents_overtime()
@@ -122,7 +122,7 @@ class Incidents(BaseHelm):
         self.backend.change_incident_status(IncidentStatuses.INVESTIGATING, incident_guids=[inc['guid']])
         self.check_incident_status_changed(inc['guid'], IncidentStatuses.INVESTIGATING)
 
-        self.backend.change_incident_status(IncidentStatuses.RESOLVED, inner_filters=[{"name": expected_incident_name}], mark_as_false_positive=True)
+        self.backend.change_incident_status(IncidentStatuses.RESOLVED, incident_guids=[inc['guid']], mark_as_false_positive=True)
         self.check_incident_status_changed(inc['guid'], IncidentStatuses.RESOLVED, mark_as_false_positive=True)
         #self.wait_for_report(self.check_overtime_resolved_incident, sleep_interval=5, timeout=30)
         #self.wait_for_report(self.check_process_graph, sleep_interval=5, timeout=30, incident=inc)
@@ -137,11 +137,16 @@ class Incidents(BaseHelm):
         assert inc['status'] == IncidentStatuses.OPEN, f"Incident status is not Open {json.dumps(inc)}"
         return inc
 
-    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, expected_incident_name: str):
-        incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
-                                cluster=cluster, namespace=namespace,
-                                incident_name=[expected_incident_name])
-        inc = self.backend.get_incident(incident_id=incs[0]['guid'])
+    def verify_unexpected_process_on_backend(self, cluster: str, namespace: str, unexpected_cmd: str, expected_incident_name: str, expected_incident_guid: str = None) -> dict:
+        if expected_incident_guid is not None:
+            Logger.logger.info(f"Getting specific incident {expected_incident_guid}")
+            inc = self.backend.get_incident(incident_id=expected_incident_guid)
+        else:
+            Logger.logger.info(f"Looking for incident with name {expected_incident_name}")
+            incs, _ = self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
+                                    cluster=cluster, namespace=namespace,
+                                    incident_name=[expected_incident_name])
+            inc = self.backend.get_incident(incident_id=incs[0]['guid'])
         Logger.logger.info(f"Got incident {json.dumps(inc)}")
         assert inc['processTree'] is not None, f"Failed to get processTree {json.dumps(inc)}"
         assert inc['processTree']['processTree'] is not None, f"Failed to get processTree/processTree {json.dumps(inc)}"
@@ -151,7 +156,7 @@ class Incidents(BaseHelm):
         assert "cat" in actual_process_tree['comm'], f"Unexpected process tree comm {json.dumps(actual_process_tree)}"
         assert actual_process_tree['pid'] > 0, f"Unexpected process tree pid {json.dumps(actual_process_tree)}"
         # optional fields
-        assert "cat /etc/hosts" in actual_process_tree.get('cmdline', "cat /etc/hosts"), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
+        assert unexpected_cmd in actual_process_tree.get('cmdline', unexpected_cmd), f"Unexpected process tree cmdline {json.dumps(actual_process_tree)}"
         assert "/data" in actual_process_tree.get('cwd', '/data'), f"Unexpected process tree cwd {json.dumps(actual_process_tree)}"
         assert "/bin/busybox" in actual_process_tree.get('hardlink', "/bin/busybox"), f"Unexpected process tree path {json.dumps(actual_process_tree)}"
         assert not actual_process_tree.get('upperLayer', False), f"Unexpected process tree upperLayer {json.dumps(actual_process_tree)}"
@@ -293,7 +298,7 @@ class Incidents(BaseHelm):
         resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
         alerts = resp[__RESPONSE_FIELD__]
         assert alerts is not None, f"Failed to get alerts of incident {json.dumps(incident)}"
-        assert len(alerts) > 1, f"Failed to get alerts of incident {incident['guid']}, got {resp}"
+        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got {resp}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
         self.check_alerts_unique_values(incident)
 

@@ -1,10 +1,15 @@
 import os
 import time
-from tests_scripts.accounts.accounts import Accounts, FEATURE_STATUS_CONNECTED
-from tests_scripts.accounts.accounts import CADR_FEATURE_NAME
-from tests_scripts.accounts.accounts import CloudEntityTypes, CDR_ALERT_ACCOUNT_ID_PATH
+from tests_scripts.accounts.accounts import (
+    Accounts,
+    CADR_FEATURE_NAME,
+    CDR_ALERT_ACCOUNT_ID_PATH,
+    CloudEntityTypes,
+    FEATURE_STATUS_CONNECTED,
+    PROVIDER_AWS,
+)
 import random
-from systest_utils import Logger, statics
+from systest_utils import Logger
 
 from infrastructure import aws
 
@@ -38,6 +43,16 @@ class CloudConnectCADRSingle(Accounts):
         # generate random number for cloud account name for uniqueness
         self.test_identifier_rand = str(random.randint(10000000, 99999999))
 
+        Logger.logger.info('Stage 0: Cleanup existing AWS single accounts')
+        aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
+        aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
+        temp_aws_manager = aws.AwsManager(stack_region, 
+                                          aws_access_key_id=aws_access_key_id, 
+                                          aws_secret_access_key=aws_secret_access_key)
+        account_id = temp_aws_manager.get_account_id()
+        if account_id:
+            self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, [CADR_FEATURE_NAME])
+
         Logger.logger.info('Stage 1: Init AwsManager')
         aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID_CLOUD_TESTS")
         aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY_CLOUD_TESTS")
@@ -62,9 +77,7 @@ class CloudConnectCADRSingle(Accounts):
         self.cadr_bad_cloud_account_name = "systest-" + self.test_identifier_rand + "-cadr-bad"
 
         Logger.logger.info('Stage 3: Connect cadr new account')
-        #validate that there are no existing accounts with cadr feature
-        self.validate_no_accounts_exists_by_id([account_id], CADR_FEATURE_NAME)
-        account_guid = self.connect_cadr_new_account(stack_region, self.cadr_stack_name, self.cadr_cloud_account_name, log_location)
+        account_guid = self.connect_cadr_new_account(aws_manager=self.aws_manager, region=stack_region, stack_name=self.cadr_stack_name, cloud_account_name=self.cadr_cloud_account_name, log_location=log_location)
         Logger.logger.info("cadr has been connected successfully")
         
         # Get account ID for alert validation
