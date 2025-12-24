@@ -424,7 +424,8 @@ def build_llm_context(
     extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
-    cross_test_interference: Optional[Dict[str, Any]] = None
+    cross_test_interference: Optional[Dict[str, Any]] = None,
+    found_indexes_path: str = "artifacts/found-indexes.json"
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -703,8 +704,53 @@ def build_llm_context(
         incluster_log_summary["total_lines"] = total_incluster_lines
         metadata["incluster_log_summary"] = incluster_log_summary
     
+    # Load dependency information from found-indexes.json
+    dependencies_info = {}
+    if os.path.exists(found_indexes_path):
+        try:
+            with open(found_indexes_path, 'r') as f:
+                found_indexes = json.load(f)
+                dependencies_info = {
+                    "total_dependencies": len(found_indexes.get('indexes', {})),
+                    "version_changes": [
+                        {
+                            "repository": repo_name,
+                            "deployed_version": repo_info.get('deployed', {}).get('version', 'N/A'),
+                            "rc_version": repo_info.get('rc', {}).get('version', 'N/A'),
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'unknown')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                        if repo_info.get('version_changed', False)
+                    ],
+                    "missing_indexes": [
+                        {
+                            "repository": repo_name,
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'unknown')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                        if not repo_info.get('deployed', {}).get('found', False)
+                    ],
+                    "discovered_repositories": [
+                        {
+                            "repository": repo_name,
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 
+                                          repo_info.get('rc', {}).get('github_org', 'unknown')),
+                            "has_deployed_index": repo_info.get('deployed', {}).get('found', False),
+                            "has_rc_index": repo_info.get('rc', {}).get('found', False),
+                            "strategy": repo_info.get('deployed', {}).get('strategy', 'unknown')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                    ]
+                }
+                print(f"   ✅ Added dependency information ({dependencies_info['total_dependencies']} deps)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"   ⚠️  Failed to load dependency info: {e}", file=sys.stderr)
+            sys.stderr.flush()
+    
     context = {
         "metadata": metadata,
+        "dependencies": dependencies_info,  # NEW: Add dependencies section
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
         "code_chunks": formatted_chunks,
@@ -720,6 +766,11 @@ def build_llm_context(
     # Calculate total size
     total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
     context["metadata"]["total_lines_of_code"] = total_lines
+    
+    # Add dependency statistics to metadata
+    context["metadata"]["dependencies_count"] = dependencies_info.get('total_dependencies', 0)
+    context["metadata"]["version_changes_count"] = len(dependencies_info.get('version_changes', []))
+    context["metadata"]["missing_indexes_count"] = len(dependencies_info.get('missing_indexes', []))
     
     return context
 

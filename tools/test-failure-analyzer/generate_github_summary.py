@@ -27,6 +27,56 @@ def load_json(path: str) -> Optional[Dict[str, Any]]:
         return None
 
 
+def format_dependencies_table(found_indexes: Dict[str, Any]) -> str:
+    """
+    Generate markdown table showing discovered dependencies.
+    
+    Columns: Repository | Deployed Version | RC Version | Changed | Index Available
+    """
+    if not found_indexes or 'indexes' not in found_indexes:
+        return "No dependency information available."
+    
+    table_lines = [
+        "| Repository | Deployed Version | RC Version | Changed | Index Available |",
+        "|-----------|------------------|------------|---------|-----------------|"
+    ]
+    
+    for repo_name, repo_info in sorted(found_indexes['indexes'].items()):
+        deployed = repo_info.get('deployed', {})
+        rc = repo_info.get('rc', {})
+        
+        # Extract versions
+        deployed_ver = deployed.get('version', 'N/A')
+        rc_ver = rc.get('version', 'N/A')
+        
+        # Check if version changed
+        version_changed = repo_info.get('version_changed', False)
+        changed_icon = "⚠️ Yes" if version_changed else "✅ No"
+        
+        # Check if index exists
+        has_deployed_index = deployed.get('found', False)
+        has_rc_index = rc.get('found', False)
+        
+        if has_deployed_index and has_rc_index:
+            index_status = "✅ Both"
+        elif has_deployed_index:
+            index_status = "✅ Deployed only"
+        elif has_rc_index:
+            index_status = "✅ RC only"
+        else:
+            index_status = "❌ Missing"
+        
+        # GitHub org (for multi-org visibility)
+        github_org = deployed.get('github_org', rc.get('github_org', 'unknown'))
+        repo_display = f"{github_org}/{repo_name}" if github_org != 'unknown' else repo_name
+        
+        table_lines.append(
+            f"| {repo_display} | {deployed_ver} | {rc_ver} | {changed_icon} | {index_status} |"
+        )
+    
+    return "\n".join(table_lines)
+
+
 def generate_summary(
     llm_context_path: str,
     api_mapping_path: str,
@@ -345,6 +395,27 @@ def generate_summary(
         lines.append("- ⚠️  Code diff analysis unavailable (version info not found)")
     
     lines.append("")
+    
+    # ========================================
+    # Dependencies Table
+    # ========================================
+    if found_indexes and 'indexes' in found_indexes:
+        lines.append("## 📦 Dependencies\n")
+        lines.append("")
+        lines.append(format_dependencies_table(found_indexes))
+        lines.append("")
+        
+        # Summary stats
+        total_deps = len(found_indexes.get('indexes', {}))
+        changed_deps = sum(1 for dep in found_indexes.get('indexes', {}).values() 
+                          if dep.get('version_changed', False))
+        missing_indexes = sum(1 for dep in found_indexes.get('indexes', {}).values()
+                             if not dep.get('deployed', {}).get('found', False))
+        
+        lines.append(f"**Summary**: {total_deps} dependencies, ")
+        lines.append(f"{changed_deps} version changes, ")
+        lines.append(f"{missing_indexes} missing indexes\n")
+        lines.append("")
     
     # ========================================
     # Dependency Analysis
