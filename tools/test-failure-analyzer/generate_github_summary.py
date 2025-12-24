@@ -144,8 +144,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_status = "❌ Missing"
             
-            github_org = deployed.get('github_org', 'armosec')
-            repo_display = f"{github_org}/{dep['name']}"
+            github_org = deployed.get('github_org') or 'armosec'
+            repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
             # Get chunk/LOC stats for this repo
             stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})
@@ -185,8 +185,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_status = "❌ Missing"
             
-            github_org = deployed.get('github_org', 'armosec')
-            repo_display = f"{github_org}/{dep['name']}"
+            github_org = deployed.get('github_org') or 'armosec'
+            repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
             # Get chunk/LOC stats for this repo
             stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})

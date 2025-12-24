@@ -411,6 +411,13 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         deployed_ver = dep_info.get('deployed_version', 'unknown')
         rc_ver = dep_info.get('rc_version', 'unknown')
         version_changed = dep_info.get('version_changed', False)
+        github_org_hint = dep_info.get('github_org')
+        
+        # If we have an org hint, prioritize it in the orgs list
+        check_orgs = github_orgs
+        if github_org_hint and github_org_hint in github_orgs:
+            # Move the hinted org to the front
+            check_orgs = [github_org_hint] + [o for o in github_orgs if o != github_org_hint]
         
         if deployed_ver == 'unknown' and rc_ver == 'unknown':
             if debug:
@@ -432,7 +439,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 print(f"  🔍 Resolving deployed version: {deployed_ver}")
             
             deployed_index, deployed_org, deployed_strategy = find_dependency_index(
-                dep_name, deployed_ver, github_orgs, 
+                dep_name, deployed_ver, check_orgs, 
                 github_token, f"{output_dir}/{dep_name}-deployed", debug
             )
             deployed_found = deployed_index is not None
@@ -454,7 +461,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 print(f"  🔍 Resolving RC version: {rc_ver}")
             
             rc_index, rc_org, rc_strategy = find_dependency_index(
-                dep_name, rc_ver, github_orgs,
+                dep_name, rc_ver, check_orgs,
                 github_token, f"{output_dir}/{dep_name}-rc", debug
             )
             rc_found = rc_index is not None
@@ -483,11 +490,11 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 repo_full_name = f"{rc_org}/{dep_name}"
                 rc_commit = get_commit_for_tag(repo_full_name, rc_ver, github_token, debug)
         
-        # Default to armosec if org not found (for go.mod dependencies)
+        # Use org hint if still not found, otherwise default to armosec
         if not deployed_org:
-            deployed_org = 'armosec'
+            deployed_org = github_org_hint or 'armosec'
         if not rc_org and version_changed:
-            rc_org = 'armosec'
+            rc_org = github_org_hint or 'armosec'
         
         results[dep_name] = {
             "deployed": {
@@ -591,20 +598,59 @@ def main():
     # Resolve dashboard indexes (both RC and deployed)
     dashboard_indexes = {}
     
-    # Use first org for triggering repo (usually armosec)
-    triggering_org = github_orgs[0]
-    
-    # RC version
+    # Discovery triggering org (usually armosec, but could be kubescape)
+    # We check both orgs for the triggering repo index
+    triggering_org = None
+    rc_path = None
+    rc_strategy = None
+    deployed_path = None
+    deployed_strategy = None
+
     if args.rc_version:
-        rc_path, rc_strategy = resolve_rc_index(
-            args.triggering_repo,
-            args.rc_version,
-            args.output_dir,
-            github_token,
-            triggering_org,
-            args.debug
-        )
-        
+        for org in github_orgs:
+            rc_path, rc_strategy = resolve_rc_index(
+                args.triggering_repo,
+                args.rc_version,
+                args.output_dir,
+                github_token,
+                org,
+                args.debug
+            )
+            if rc_path:
+                triggering_org = org
+                break
+    
+    if args.deployed_version:
+        # If we already found the org from RC, use it. Otherwise discover.
+        if triggering_org:
+            deployed_path, deployed_strategy = resolve_deployed_index(
+                args.triggering_repo,
+                args.deployed_version,
+                args.output_dir,
+                github_token,
+                triggering_org,
+                args.debug
+            )
+        else:
+            for org in github_orgs:
+                deployed_path, deployed_strategy = resolve_deployed_index(
+                    args.triggering_repo,
+                    args.deployed_version,
+                    args.output_dir,
+                    github_token,
+                    org,
+                    args.debug
+                )
+                if deployed_path:
+                    triggering_org = org
+                    break
+                
+    # Fallback to first org if not found
+    if not triggering_org:
+        triggering_org = github_orgs[0]
+    
+    # RC version metadata
+    if args.rc_version:
         # Extract commit from downloaded index
         rc_commit = None
         if rc_path:
@@ -625,17 +671,8 @@ def main():
             "source": "service"  # Triggering repo is a service, not a go.mod dependency
         }
     
-    # Deployed version
+    # Deployed version metadata
     if args.deployed_version:
-        deployed_path, deployed_strategy = resolve_deployed_index(
-            args.triggering_repo,
-            args.deployed_version,
-            args.output_dir,
-            github_token,
-            triggering_org,
-            args.debug
-        )
-        
         # Extract commit from downloaded index
         deployed_commit = None
         if deployed_path:

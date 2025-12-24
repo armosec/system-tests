@@ -160,14 +160,16 @@ def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str
         deployed_ver = deployed_deps.get(dep, "unknown")
         rc_ver = rc_deps.get(dep, "unknown")
         
-        # Extract just the repo name (not full package path)
+        # Extract org and repo name
         repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', dep)
+        github_org = repo_match.group(1) if repo_match else "armosec"
         repo_name = repo_match.group(2) if repo_match else dep
         
         result[repo_name] = {
             "deployed_version": deployed_ver,
             "rc_version": rc_ver,
             "version_changed": deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown",
+            "github_org": github_org,
             "has_index": False  # Will be updated later if we check
         }
     
