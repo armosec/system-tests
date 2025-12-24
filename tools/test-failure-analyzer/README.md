@@ -2,6 +2,32 @@
 
 Automated test failure analysis using LLM-powered insights. This tool collects comprehensive context about test failures and structures it for AI analysis.
 
+## 🎯 Latest Updates (December 24, 2025)
+
+### Cross-Repo Call Chain Tracing - MAJOR FIX
+
+**Problem Solved:** Dependency repository chunks (especially `armosec-infra`) were never included in LLM context, even when code traced into those repositories.
+
+**Root Cause:** Workflow phase ordering issue - API mapping ran before dependency indexes were downloaded.
+
+**Impact:**
+- ✅ `armosec-infra` chunks now included (~100-150 chunks)
+- ✅ `postgres-connector` and other deps also included
+- ✅ Cross-repo type usage correctly traced
+- ✅ Pulsar message flows completely traced
+- ✅ LLM context 40-50% larger with relevant dependency code
+
+**What Changed:**
+1. **Workflow Architecture Fix**: Moved 3-pass index resolution to Phase 4 (before API mapping)
+2. **Import Parsing Fix**: Correctly parse Go `import (...)` blocks
+3. **Pulsar Detection**: Enhanced producer/consumer matching and topic extraction
+4. **Import Usage Heuristic**: NEW - Automatically include chunks from imported cross-repo packages
+5. **GitHub Org Tracking**: Correctly attribute `kubescape/*` vs `armosec/*` repos
+
+**See:** `../../../shared-workflows/ANALYZER_IMPROVEMENTS_2025_12_24.md` for complete details.
+
+---
+
 ## Recent Updates (December 2024)
 
 ### 🎯 Environment Auto-Detection
