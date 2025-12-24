@@ -38,11 +38,11 @@ class HelmWrapper(object):
     def is_multi_prod_environment(server: str) -> bool:
         """
         Check if the environment is a multi-prod environment based on server URL.
-        Multi-prod environments have URLs like: api.stage-us-east-1.r7.armo-cadr.com or api.prod-*.r7.armo-cadr.com
+        Multi-prod environments have URLs containing: r7.armo-cadr.com
         """
         if not server:
             return False
-        return "r7.armo-cadr.com" in server or server.startswith("api.stage-") or server.startswith("api.prod-")
+        return "r7.armo-cadr.com" in server
 
     @staticmethod
     def get_current_kubectl_context() -> str:
@@ -68,40 +68,12 @@ class HelmWrapper(object):
         is_multi_prod = HelmWrapper.is_multi_prod_environment(server)
         
         if is_multi_prod:
-            # For multi-prod environments, clone from armosec/helm-charts repo and use rapid7-operator chart
-            Logger.logger.info("Detected multi-prod environment, using armosec/helm-charts repository")
+            # For multi-prod environments, use armosec Helm repo and rapid7-operator chart
+            Logger.logger.info("Detected multi-prod environment, using armosec/rapid7-operator chart")
             
-            # Clone armosec/helm-charts repository
-            if temp_dir is None:
-                temp_dir = os.path.join(os.getcwd(), "temp")
-            armosec_helm_charts_dir = os.path.join(temp_dir, "armosec-helm-charts")
-            
-            # Remove existing directory if it exists
-            if os.path.exists(armosec_helm_charts_dir):
-                shutil.rmtree(armosec_helm_charts_dir)
-            
-            # Clone the repository (use branch if provided, otherwise default to main)
-            branch = helm_branch if helm_branch and helm_branch != "release" else "main"
-            Logger.logger.info(f"Cloning armosec/helm-charts from branch: {branch}")
-            clone_command = ["git", "clone", "-b", branch, "https://github.com/armosec/helm-charts.git", armosec_helm_charts_dir]
-            return_code, return_obj = TestUtil.run_command(command_args=clone_command, timeout=360)
-            if return_code != 0:
-                # If branch doesn't exist, try main/master
-                Logger.logger.warning(f"Failed to clone branch {branch}, trying main")
-                if os.path.exists(armosec_helm_charts_dir):
-                    shutil.rmtree(armosec_helm_charts_dir)
-                clone_command = ["git", "clone", "https://github.com/armosec/helm-charts.git", armosec_helm_charts_dir]
-                return_code, return_obj = TestUtil.run_command(command_args=clone_command, timeout=360)
-                if return_code != 0:
-                    raise Exception(f"Failed to clone armosec/helm-charts repository: {return_obj.stderr}")
-            
-            # Use local path to rapid7-operator chart
-            rapid7_chart_path = os.path.join(armosec_helm_charts_dir, "charts", "rapid7-operator")
-            if not os.path.exists(rapid7_chart_path):
-                raise Exception(f"Chart path not found: {rapid7_chart_path}")
-            
-            # Update helm dependencies
-            HelmWrapper.helm_dependency_update(rapid7_chart_path)
+            # Add and update armosec repo
+            HelmWrapper.add_armosec_to_repo()
+            HelmWrapper.upgrade_armosec_in_repo()
             
             # Get current kubectl context for cluster name
             current_context = HelmWrapper.get_current_kubectl_context()
@@ -116,8 +88,8 @@ class HelmWrapper(object):
             if not image_pull_secret_password:
                 Logger.logger.warning("NA_IMAGE_PULL_SECRET_PASSWORD environment variable not set")
             
-            # Build command for multi-prod using local chart path
-            command_args = ["helm", "upgrade", "--debug", "--install", "rapid7", rapid7_chart_path, "-n", namespace,
+            # Build command for multi-prod using armosec/rapid7-operator from Helm repo
+            command_args = ["helm", "upgrade", "--debug", "--install", "armosec", "armosec/rapid7-operator", "-n", namespace,
                             "--set", "kubescape-operator.clusterName={}".format(current_context),
                             "--set", "kubescape-operator.account={}".format(customer),
                             "--set", "kubescape-operator.server={}".format(server)]
@@ -166,9 +138,15 @@ class HelmWrapper(object):
             command_args.extend(["--set", "synchronizer.resources.requests.cpu=50m"])
             command_args.extend(["--set", "synchronizer.resources.requests.memory=150Mi"])
 
-        # Add any additional helm_kwargs (works for both multi-prod and standard)
+        # Add any additional helm_kwargs
+        # For multi-prod, prefix with kubescape-operator. if not already prefixed
         for k, v in helm_kwargs.items():
-            command_args.extend(["--set", f"{k}={v}"])
+            if is_multi_prod and not k.startswith("kubescape-operator."):
+                # Prefix with kubescape-operator. for multi-prod environments
+                prefixed_key = f"kubescape-operator.{k}"
+                command_args.extend(["--set", f"{prefixed_key}={v}"])
+            else:
+                command_args.extend(["--set", f"{k}={v}"])
 
         return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code,

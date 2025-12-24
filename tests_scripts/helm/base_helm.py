@@ -252,9 +252,18 @@ class BaseHelm(BaseK8S):
         HelmWrapper.add_armo_to_repo()
         HelmWrapper.upgrade_armo_in_repo()
 
-    @staticmethod
-    def uninstall_kubescape_chart():
-        HelmWrapper.uninstall_kubescape_chart()
+    def uninstall_kubescape_chart(self):
+        # Determine release name based on environment
+        # For multi-prod environments, use 'armosec', otherwise use default 'kubescape'
+        release_name = statics.CA_HELM_NAME  # default
+        if self.backend and hasattr(self.backend, 'get_api_url'):
+            try:
+                server = self.backend.get_api_url()
+                if server and "r7.armo-cadr.com" in server:
+                    release_name = "armosec"
+            except:
+                pass  # If we can't get server URL, use default
+        HelmWrapper.uninstall_kubescape_chart(release_name=release_name)
 
     @staticmethod
     def remove_armo_from_repo():
