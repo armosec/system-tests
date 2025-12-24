@@ -271,7 +271,7 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
         if commit:
             artifact_name = f"code-index-{commit}"
-            index_path = download_artifact(repo, artifact_name, f"{output_dir}/rc", github_token, github_org, debug)
+            index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
             if index_path:
                 return index_path, "pr_commit"
     
@@ -283,7 +283,7 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         print(f"\n📋 Strategy 3: Falling back to latest")
     
     artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/rc", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
     if index_path:
         if debug:
             print(f"  ⚠️  Using latest index (may not match RC exactly)")
@@ -308,7 +308,7 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
         print(f"\n📋 Strategy 1: Version tag")
     
     artifact_name = f"code-index-{version}"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/deployed", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         return index_path, "version_tag"
     
@@ -317,7 +317,7 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
         print(f"\n📋 Strategy 2: Falling back to latest")
     
     artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/deployed", github_token, github_org, debug)
+    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         if debug:
             print(f"  ⚠️  Using latest index (may not match deployed version)")
