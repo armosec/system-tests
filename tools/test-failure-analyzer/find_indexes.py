@@ -50,6 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-org", default="armosec", help="GitHub organization")
     
     # Options
+    parser.add_argument("--images", help="Path to running-images.json to resolve dashboard version")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     
     return parser.parse_args()
@@ -596,10 +597,23 @@ def main():
         if args.debug:
             print(f"\n🔍 Resolving dashboard index for {args.dashboard_repo} (required for API mapping)...")
         
-        # Dashboard repo usually uses latest index for mapping
+        # Try to resolve actual version for dashboard if available in running-images
+        dash_deployed_ver = "latest"
+        if args.images and os.path.exists(args.images):
+            try:
+                with open(args.images, 'r') as f:
+                    running_images = json.load(f)
+                    repos = running_images.get('repos', {})
+                    dash_data = repos.get(args.dashboard_repo, {})
+                    images = dash_data.get('images', [])
+                    if images:
+                        dash_deployed_ver = images[0].get('tag', 'latest')
+            except Exception:
+                pass
+
         dash_path, dash_strategy = resolve_deployed_index(
             args.dashboard_repo,
-            "latest",
+            dash_deployed_ver,
             args.output_dir,
             github_token,
             args.github_org,
@@ -610,7 +624,7 @@ def main():
         
         results["indexes"][args.dashboard_repo] = {
             "deployed": {
-                "version": "latest",
+                "version": dash_deployed_ver,
                 "commit": dash_commit,
                 "index_path": dash_path,
                 "strategy": dash_strategy,
