@@ -102,6 +102,171 @@ def parse_imports(code: str) -> Dict[str, str]:
     return imports
 
 
+def detect_pulsar_producers(code: str) -> List[Dict[str, Any]]:
+    """
+    Detect Pulsar message producers (functions that send messages to topics).
+    
+    Patterns:
+    - producer.Send(...)
+    - producer.SendAsync(...)
+    - client.Send(...)
+    - messaging.Produce(...)
+    - PublishMessage(...)
+    
+    Returns:
+        List of dicts with topic, message_type info
+    """
+    producers = []
+    
+    # Pattern 1: producer.Send() or producer.SendAsync()
+    # Look for topic names nearby (usually in variable or function args)
+    send_pattern = r'(\w+)\.(Send(?:Async)?)\s*\([^)]*\)'
+    for match in re.finditer(send_pattern, code):
+        producer_var = match.group(1)
+        method = match.group(2)
+        
+        # Try to extract topic from nearby context
+        # Look 200 chars before match for topic definition
+        start_pos = max(0, match.start() - 200)
+        context_before = code[start_pos:match.start()]
+        
+        # Extract topic patterns
+        topic_pattern = r'topic[:\s=]+["\']([^"\']+)["\']'
+        topic_match = re.search(topic_pattern, context_before, re.IGNORECASE)
+        topic = topic_match.group(1) if topic_match else None
+        
+        producers.append({
+            "type": "producer",
+            "method": method,
+            "variable": producer_var,
+            "topic": topic,
+            "position": match.start()
+        })
+    
+    # Pattern 2: Direct Publish() calls
+    publish_pattern = r'Publish(?:Message|Event)?\s*\([^)]*["\']([^"\']+)["\']'
+    for match in re.finditer(publish_pattern, code):
+        topic = match.group(1)
+        producers.append({
+            "type": "producer",
+            "method": "Publish",
+            "topic": topic,
+            "position": match.start()
+        })
+    
+    return producers
+
+
+def detect_pulsar_consumers(chunk: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Detect if a chunk is a Pulsar message consumer/handler.
+    
+    Patterns:
+    - Function implementing Consumer interface
+    - Function with "Handle", "Process", "Consume" in name
+    - Function taking Message/Event parameter
+    - Subscribe() calls in code
+    
+    Returns:
+        Dict with consumer info or None
+    """
+    code = chunk.get("code", "")
+    name = chunk.get("name", "")
+    chunk_type = chunk.get("type", "")
+    
+    consumer_info = {
+        "is_consumer": False,
+        "topics": [],
+        "message_type": None
+    }
+    
+    # Pattern 1: Function name indicates message handling
+    if re.search(r'(Handle|Process|Consume|Ingest|Listen)', name, re.IGNORECASE):
+        consumer_info["is_consumer"] = True
+        consumer_info["handler_type"] = "name_pattern"
+    
+    # Pattern 2: Subscribe() call in code
+    subscribe_pattern = r'Subscribe\s*\([^)]*["\']([^"\']+)["\']'
+    for match in re.finditer(subscribe_pattern, code):
+        topic = match.group(1)
+        consumer_info["is_consumer"] = True
+        consumer_info["topics"].append(topic)
+        consumer_info["handler_type"] = "explicit_subscribe"
+    
+    # Pattern 3: Implements Consumer interface or has Receive method
+    if re.search(r'func\s+\([^)]+\)\s+(?:Receive|Consume|Handle)\s*\(', code):
+        consumer_info["is_consumer"] = True
+        consumer_info["handler_type"] = "interface_implementation"
+    
+    # Pattern 4: Parameter type indicates message
+    param_pattern = r'func\s+\w+\s*\([^)]*(?:Message|Event|Payload)\s+(\w+)'
+    match = re.search(param_pattern, code)
+    if match:
+        consumer_info["is_consumer"] = True
+        consumer_info["message_type"] = match.group(1)
+        consumer_info["handler_type"] = "message_parameter"
+    
+    return consumer_info if consumer_info["is_consumer"] else None
+
+
+def match_pulsar_producers_to_consumers(
+    producer_calls: List[Dict[str, Any]],
+    all_chunks: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """
+    Match Pulsar message producers to their consumer handlers.
+    
+    Args:
+        producer_calls: List of detected producer calls (from detect_pulsar_producers)
+        all_chunks: All code chunks from all repos
+    
+    Returns:
+        List of matched producer->consumer pairs
+    """
+    matches = []
+    
+    # Build consumer index by topic
+    consumers_by_topic = {}
+    for chunk in all_chunks:
+        consumer_info = detect_pulsar_consumers(chunk)
+        if consumer_info:
+            for topic in consumer_info.get("topics", []):
+                if topic not in consumers_by_topic:
+                    consumers_by_topic[topic] = []
+                consumers_by_topic[topic].append({
+                    "chunk": chunk,
+                    "consumer_info": consumer_info
+                })
+    
+    # Match producers to consumers by topic
+    for producer in producer_calls:
+        topic = producer.get("topic")
+        if topic and topic in consumers_by_topic:
+            for consumer_data in consumers_by_topic[topic]:
+                matches.append({
+                    "producer": producer,
+                    "consumer_chunk": consumer_data["chunk"],
+                    "consumer_info": consumer_data["consumer_info"],
+                    "topic": topic,
+                    "match_type": "topic_exact"
+                })
+        elif topic:
+            # Try fuzzy matching for partial topic names
+            for consumer_topic, consumer_list in consumers_by_topic.items():
+                if topic in consumer_topic or consumer_topic in topic:
+                    for consumer_data in consumer_list:
+                        matches.append({
+                            "producer": producer,
+                            "consumer_chunk": consumer_data["chunk"],
+                            "consumer_info": consumer_data["consumer_info"],
+                            "topic": topic,
+                            "consumer_topic": consumer_topic,
+                            "match_type": "topic_partial"
+                        })
+    
+    return matches
+
+
 def extract_function_calls(code: str, package: str) -> List[Tuple[str, Optional[str]]]:
     """
     Extract function calls from code.
@@ -296,6 +461,14 @@ def extract_call_chain(
     # Parse imports to build alias -> repo mapping
     import_to_repo = parse_imports(handler_code)
     
+    # Detect Pulsar message producers in handler
+    pulsar_producers = detect_pulsar_producers(handler_code)
+    
+    # Match producers to consumers (if all_chunks available)
+    pulsar_matches = []
+    if all_chunks and pulsar_producers:
+        pulsar_matches = match_pulsar_producers_to_consumers(pulsar_producers, all_chunks)
+    
     function_calls = extract_function_calls(handler_code, handler_package)
     
     # Track cross-repo calls and repositories in chain
@@ -325,6 +498,15 @@ def extract_call_chain(
             
             chunk_code = chunk.get("code", "")
             chunk_package = chunk.get("package", "")
+            
+            # Detect Pulsar producers in this chunk
+            chunk_pulsar_producers = detect_pulsar_producers(chunk_code)
+            if chunk_pulsar_producers:
+                pulsar_producers.extend(chunk_pulsar_producers)
+                # Match these producers to consumers
+                if all_chunks:
+                    new_matches = match_pulsar_producers_to_consumers(chunk_pulsar_producers, all_chunks)
+                    pulsar_matches.extend(new_matches)
             
             # Extract calls from this chunk
             calls = extract_function_calls(chunk_code, chunk_package)
@@ -393,6 +575,34 @@ def extract_call_chain(
         current_level = next_level
         level += 1
     
+    # Add Pulsar consumer chunks to chain if matched
+    pulsar_consumer_chunks = []
+    if pulsar_matches:
+        for match in pulsar_matches:
+            consumer_chunk = match["consumer_chunk"]
+            consumer_chunk_id = consumer_chunk.get("id")
+            if consumer_chunk_id and consumer_chunk_id not in visited:
+                visited.add(consumer_chunk_id)
+                consumer_item = {
+                    "chunk_id": consumer_chunk_id,
+                    "name": consumer_chunk.get("name"),
+                    "type": consumer_chunk.get("type"),
+                    "pattern": "pulsar_consumer",
+                    "package": consumer_chunk.get("package"),
+                    "file": consumer_chunk.get("file"),
+                    "repo": consumer_chunk.get("_repo", "unknown"),
+                    "pulsar_topic": match.get("topic"),
+                    "match_type": match.get("match_type"),
+                    "called_from": "pulsar_message"
+                }
+                chain.append(consumer_item)
+                pulsar_consumer_chunks.append(consumer_item)
+                
+                # Track repo
+                repo = consumer_chunk.get("_repo")
+                if repo:
+                    repositories_in_chain.add(repo)
+    
     return {
         "handler_chunk_id": handler_chunk_id,
         "handler_name": handler_chunk.get("name"),
@@ -400,7 +610,10 @@ def extract_call_chain(
         "chain": chain,
         "total_chunks": len(chain) + 1,  # +1 for handler itself
         "cross_repo_calls": cross_repo_calls,
-        "repositories_in_chain": list(repositories_in_chain)
+        "repositories_in_chain": list(repositories_in_chain),
+        "pulsar_producers": pulsar_producers,
+        "pulsar_matches": pulsar_matches,
+        "pulsar_consumer_chunks": pulsar_consumer_chunks
     }
 
 
@@ -509,6 +722,42 @@ def main():
         print(f"\n   Chunks by pattern:")
         for pattern, count in patterns.items():
             print(f"     {pattern}: {count}")
+    
+    # Print Pulsar detection summary
+    pulsar_producers = result.get("pulsar_producers", [])
+    pulsar_matches = result.get("pulsar_matches", [])
+    pulsar_consumers = result.get("pulsar_consumer_chunks", [])
+    
+    if pulsar_producers:
+        print(f"\n   📨 Pulsar Producers detected: {len(pulsar_producers)}")
+        for prod in pulsar_producers[:5]:  # Show first 5
+            topic = prod.get("topic", "unknown")
+            method = prod.get("method", "unknown")
+            print(f"     - {method} to topic: {topic}")
+        if len(pulsar_producers) > 5:
+            print(f"     ... and {len(pulsar_producers) - 5} more")
+    
+    if pulsar_matches:
+        print(f"\n   🔗 Pulsar Producer→Consumer matches: {len(pulsar_matches)}")
+        for match in pulsar_matches[:5]:  # Show first 5
+            topic = match.get("topic", "unknown")
+            consumer_name = match.get("consumer_chunk", {}).get("name", "unknown")
+            consumer_repo = match.get("consumer_chunk", {}).get("_repo", "unknown")
+            match_type = match.get("match_type", "unknown")
+            print(f"     - Topic '{topic}' → {consumer_repo}/{consumer_name} ({match_type})")
+        if len(pulsar_matches) > 5:
+            print(f"     ... and {len(pulsar_matches) - 5} more")
+    
+    # Print cross-repo calls
+    cross_repo_calls = result.get("cross_repo_calls", [])
+    if cross_repo_calls:
+        print(f"\n   🌐 Cross-repo calls detected: {len(cross_repo_calls)}")
+        repos = set(call.get("repo") for call in cross_repo_calls)
+        print(f"     Calling into: {', '.join(sorted(repos))}")
+    
+    repositories = result.get("repositories_in_chain", [])
+    if len(repositories) > 1:
+        print(f"\n   📦 Repositories in chain: {', '.join(sorted(repositories))}")
     
     # Save results
     os.makedirs(os.path.dirname(args.output) if os.path.dirname(args.output) else '.', exist_ok=True)
