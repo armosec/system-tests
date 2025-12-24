@@ -246,6 +246,36 @@ def extract_topic_from_context(context: str) -> Optional[str]:
     return None
 
 
+def is_pulsar_sender(chunk: Dict[str, Any]) -> bool:
+    """
+    Check if a chunk sends Pulsar messages (contains .Send() or .SendAsync() calls).
+    
+    This is used to exempt Pulsar-sending functions from pattern filtering,
+    since they are critical for cross-service communication tracing.
+    
+    Args:
+        chunk: Code chunk dictionary with 'code' field
+    
+    Returns:
+        True if chunk contains Pulsar producer .Send() calls
+    """
+    code = chunk.get("code", "")
+    
+    # Pattern 1: producer.Send() or producer.SendAsync()
+    if re.search(r'\w+Producer\s*\.\s*Send(?:Async)?\s*\(', code):
+        return True
+    
+    # Pattern 2: pc.xxxProducer.Send()
+    if re.search(r'\w+\.\w+Producer\s*\.\s*Send(?:Async)?\s*\(', code):
+        return True
+    
+    # Pattern 3: Direct producer variable usage: myProducer.Send()
+    if re.search(r'\w+\s*\.\s*Send(?:Async)?\s*\([^)]*(?:Message|Event|Payload)', code):
+        return True
+    
+    return False
+
+
 def detect_pulsar_consumers(chunk: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Detect if a chunk is a Pulsar message consumer/handler.
@@ -644,8 +674,15 @@ def extract_call_chain(
                     called_pattern = classify_chunk_pattern(called_chunk)
                     called_repo = called_chunk.get("_repo", "cadashboardbe")
                     
+                    # Check if this chunk sends Pulsar messages (critical for cross-service tracing)
+                    sends_pulsar = is_pulsar_sender(called_chunk)
+                    
                     # Only follow service/repository/enricher/helper patterns (skip handlers, connectors at deeper levels)
-                    if level == 0:
+                    # EXCEPTION: Always follow Pulsar-sending functions regardless of pattern
+                    if sends_pulsar:
+                        # Always follow Pulsar senders (e.g., handleUserInputOutput)
+                        print(f"   🚀 DEBUG Level {level}: Following Pulsar sender: {called_chunk.get('name')} (pattern: {called_pattern})", file=sys.stderr)
+                    elif level == 0:
                         # First level: can be anything
                         pass
                     elif level == 1:
