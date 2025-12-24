@@ -436,15 +436,27 @@ def deduplicate_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return unique_chunks
 
 
-def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None) -> Optional[str]:
+def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None, extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None) -> Optional[str]:
     """Look up full chunk code from code index using chunk_id."""
-    if not code_index or not chunk_id:
+    if not chunk_id:
         return None
     
-    chunks = code_index.get("chunks", [])
-    for chunk in chunks:
-        if chunk.get("id") == chunk_id:
-            return chunk.get("code", "")
+    # Try main index
+    if code_index:
+        chunks = code_index.get("chunks", [])
+        for chunk in chunks:
+            if chunk.get("id") == chunk_id:
+                return chunk.get("code", "")
+    
+    # Try extra indexes
+    if extra_indexes:
+        for repo_name, idx in extra_indexes.items():
+            if not idx: continue
+            chunks = idx.get("chunks", [])
+            for chunk in chunks:
+                if chunk.get("id") == chunk_id:
+                    return chunk.get("code", "")
+    
     return None
 
 
@@ -459,6 +471,7 @@ def build_llm_context(
     code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
     code_index: Optional[Dict[str, Any]] = None,
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     cross_test_interference: Optional[Dict[str, Any]] = None
@@ -507,16 +520,16 @@ def build_llm_context(
     print(f"   {len(unique_chunks)} unique chunks after deduplication (from {len(all_chunks)} total)", file=sys.stderr)
     sys.stderr.flush()
     
-    # 4. Look up missing code for ALL chunks (if code_index provided)
-    if code_index:
-        print("🔍 Looking up missing chunk code from code index...", file=sys.stderr)
+    # 4. Look up missing code for ALL chunks (if code_index or extra_indexes provided)
+    if code_index or extra_indexes:
+        print("🔍 Looking up missing chunk code from code indexes...", file=sys.stderr)
         sys.stderr.flush()
         looked_up = 0
         for chunk in unique_chunks:
             chunk_id = chunk.get("id") or chunk.get("chunk_id")
             # Look up code for ANY chunk that doesn't have it yet
             if chunk_id and not chunk.get("code"):
-                code = lookup_chunk_code(chunk_id, code_index)
+                code = lookup_chunk_code(chunk_id, code_index, extra_indexes)
                 if code:
                     chunk["code"] = code
                     looked_up += 1
@@ -811,6 +824,10 @@ def main():
         help="Path to code index JSON (optional, used to look up full chunk code for call chains)"
     )
     parser.add_argument(
+        "--dependency-indexes",
+        help="JSON string or file mapping repo name to code index path"
+    )
+    parser.add_argument(
         "--prompts-file",
         type=str,
         help="Path to analysis prompts file (default: analysis_prompts.md)"
@@ -874,6 +891,24 @@ def main():
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
         code_index = load_json_file(args.code_index) if args.code_index else None
+        
+        # Load extra indexes for dependencies
+        extra_indexes = {}
+        if args.dependency_indexes:
+            if os.path.exists(args.dependency_indexes):
+                with open(args.dependency_indexes, 'r') as f:
+                    dep_map = json.load(f)
+            else:
+                try:
+                    dep_map = json.loads(args.dependency_indexes)
+                except:
+                    dep_map = {}
+            
+            for repo_name, path in dep_map.items():
+                if os.path.exists(path):
+                    print(f"📖 Loading dependency index for {repo_name} from {path}", file=sys.stderr)
+                    extra_indexes[repo_name] = load_json_file(path)
+        
         analysis_prompts = load_analysis_prompts(args.prompts_file if hasattr(args, 'prompts_file') else None)
         
         # Load workflow commit if not provided
@@ -908,6 +943,7 @@ def main():
             resolved_commits=resolved_commits,
             test_code=test_code,
             code_index=code_index,
+            extra_indexes=extra_indexes,
             analysis_prompts=analysis_prompts,
             incluster_logs=incluster_logs,
             cross_test_interference=cross_test_interference

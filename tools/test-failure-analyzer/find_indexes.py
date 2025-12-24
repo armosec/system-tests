@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     
     # Dashboard (triggering repo) arguments
     parser.add_argument("--triggering-repo", required=True, help="Name of triggering repository (e.g., cadashboardbe)")
+    parser.add_argument("--dashboard-repo", default="cadashboardbe", help="Name of dashboard repository for API mapping")
     parser.add_argument("--triggering-commit", help="Workflow commit SHA")
     parser.add_argument("--rc-version", help="RC version tag (e.g., rc-v0.0.224-2435)")
     parser.add_argument("--deployed-version", help="Deployed version (e.g., v0.0.223)")
@@ -589,6 +590,33 @@ def main():
             
             if dep_info.get("version_changed"):
                 results["dependencies_summary"]["version_changes"].append(dep_name)
+    
+    # Resolve dashboard indexes if different from triggering repo
+    if args.dashboard_repo != args.triggering_repo:
+        if args.debug:
+            print(f"\n🔍 Resolving dashboard index for {args.dashboard_repo} (required for API mapping)...")
+        
+        # Dashboard repo usually uses latest index for mapping
+        dash_path, dash_strategy = resolve_deployed_index(
+            args.dashboard_repo,
+            "latest",
+            args.output_dir,
+            github_token,
+            args.github_org,
+            args.debug
+        )
+        
+        dash_commit = extract_commit_from_index(dash_path, args.debug) if dash_path else None
+        
+        results["indexes"][args.dashboard_repo] = {
+            "deployed": {
+                "version": "latest",
+                "commit": dash_commit,
+                "index_path": dash_path,
+                "strategy": dash_strategy,
+                "found": dash_path is not None
+            }
+        }
     
     # Save results
     output_path = Path(args.output)
