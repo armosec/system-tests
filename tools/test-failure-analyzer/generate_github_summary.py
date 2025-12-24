@@ -27,16 +27,56 @@ def load_json(path: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def format_dependencies_table(found_indexes: Dict[str, Any]) -> str:
+def extract_chunk_stats_per_repo(llm_context: Optional[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
+    """
+    Extract chunk count and LOC per repository from LLM context.
+    
+    Returns:
+        Dict mapping repo_name -> {"chunks": count, "loc": lines_of_code}
+    """
+    stats = {}
+    
+    if not llm_context:
+        return stats
+    
+    code_chunks = llm_context.get('code_chunks', [])
+    
+    for chunk in code_chunks:
+        # Get repo from either '_repo' or 'repo' field
+        repo = chunk.get('_repo') or chunk.get('repo') or chunk.get('repo_name')
+        
+        if not repo:
+            continue
+        
+        # Initialize stats for this repo if not seen
+        if repo not in stats:
+            stats[repo] = {"chunks": 0, "loc": 0}
+        
+        # Count this chunk
+        stats[repo]["chunks"] += 1
+        
+        # Count LOC
+        code = chunk.get('code', '')
+        if code:
+            loc = len([line for line in code.split('\n') if line.strip()])
+            stats[repo]["loc"] += loc
+    
+    return stats
+
+
+def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Optional[Dict[str, Dict[str, int]]] = None) -> str:
     """
     Generate markdown table showing discovered dependencies.
     Split by source (go.mod dependencies vs service dependencies).
     Ordered by: index available first, then missing.
     
-    Columns: Repository | Deployed Version | RC Version | Changed | Index Available
+    Columns: Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC
     """
     if not found_indexes or 'indexes' not in found_indexes:
         return "No dependency information available."
+    
+    if chunk_stats is None:
+        chunk_stats = {}
     
     triggering_repo = found_indexes.get('triggering_repo', 'unknown')
     
@@ -83,8 +123,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any]) -> str:
     if gomod_deps:
         table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available |")
-        table_lines.append("|-----------|------------------|------------|---------|-----------------|")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|--------|-----|")
         
         for dep in gomod_deps:
             deployed = dep['deployed']
@@ -107,22 +147,34 @@ def format_dependencies_table(found_indexes: Dict[str, Any]) -> str:
             github_org = deployed.get('github_org', 'armosec')
             repo_display = f"{github_org}/{dep['name']}"
             
+            # Get chunk/LOC stats for this repo
+            stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})
+            chunks_count = stats["chunks"]
+            loc_count = stats["loc"]
+            
+            # Format counts (0 means no chunks included)
+            chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
+            loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
+            
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} |"
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {chunks_display} | {loc_display} |"
             )
         
         table_lines.append("")
         total_gomod = len(gomod_deps)
         with_indexes = sum(1 for d in gomod_deps if d['index_score'] > 0)
-        table_lines.append(f"**Summary**: {total_gomod} go.mod dependencies, {with_indexes} with indexes, {total_gomod - with_indexes} missing")
+        total_chunks = sum(chunk_stats.get(d['name'], {}).get('chunks', 0) for d in gomod_deps)
+        total_loc = sum(chunk_stats.get(d['name'], {}).get('loc', 0) for d in gomod_deps)
+        with_chunks = sum(1 for d in gomod_deps if chunk_stats.get(d['name'], {}).get('chunks', 0) > 0)
+        table_lines.append(f"**Summary**: {total_gomod} go.mod dependencies, {with_indexes} with indexes, {with_chunks} contributed code ({total_chunks} chunks, {total_loc:,} LOC)")
         table_lines.append("")
     
     # Service Dependencies Section
     if service_deps:
         table_lines.append("### 🔧 Service Dependencies (runtime services)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | Index Available |")
-        table_lines.append("|-----------|------------------|-----------------|")
+        table_lines.append("| Repository | Deployed Version | Index Available | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|-----------------|--------|-----|")
         
         for dep in service_deps:
             deployed = dep['deployed']
@@ -136,14 +188,26 @@ def format_dependencies_table(found_indexes: Dict[str, Any]) -> str:
             github_org = deployed.get('github_org', 'armosec')
             repo_display = f"{github_org}/{dep['name']}"
             
+            # Get chunk/LOC stats for this repo
+            stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})
+            chunks_count = stats["chunks"]
+            loc_count = stats["loc"]
+            
+            # Format counts
+            chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
+            loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
+            
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | {index_status} |"
+                f"| {repo_display} | `{deployed_ver}` | {index_status} | {chunks_display} | {loc_display} |"
             )
         
         table_lines.append("")
         total_services = len(service_deps)
         with_indexes = sum(1 for d in service_deps if d['index_score'] > 0)
-        table_lines.append(f"**Summary**: {total_services} service dependencies, {with_indexes} with indexes, {total_services - with_indexes} missing")
+        total_chunks = sum(chunk_stats.get(d['name'], {}).get('chunks', 0) for d in service_deps)
+        total_loc = sum(chunk_stats.get(d['name'], {}).get('loc', 0) for d in service_deps)
+        with_chunks = sum(1 for d in service_deps if chunk_stats.get(d['name'], {}).get('chunks', 0) > 0)
+        table_lines.append(f"**Summary**: {total_services} service dependencies, {with_indexes} with indexes, {with_chunks} contributed code ({total_chunks} chunks, {total_loc:,} LOC)")
         table_lines.append("")
     
     if not gomod_deps and not service_deps:
@@ -477,7 +541,11 @@ def generate_summary(
     if found_indexes and 'indexes' in found_indexes:
         lines.append("## 📦 Dependencies\n")
         lines.append("")
-        lines.append(format_dependencies_table(found_indexes))
+        
+        # Extract chunk/LOC stats from LLM context
+        chunk_stats = extract_chunk_stats_per_repo(llm_context)
+        
+        lines.append(format_dependencies_table(found_indexes, chunk_stats))
         lines.append("")
         
         # Summary stats
