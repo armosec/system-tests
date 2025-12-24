@@ -693,6 +693,11 @@ class RuntimePoliciesConfigurations(Incidents):
 
 
     def validate_new_policy(self, body: Dict[str, Any]) -> str:
+        """
+        Validate the creation of a new runtime policy and append the GUID to the tested_policy_guid list.
+        :param body: The body of the runtime policy to create.
+        :return: The GUID of the created runtime policy.
+        """
         res = self.backend.new_runtime_policy(body)
         new_runtime_policy_no_scope_res = json.loads(res.text)
         assert new_runtime_policy_no_scope_res == POLICY_CREATED_RESPONSE, f"failed to create new runtime policy, got {new_runtime_policy_no_scope_res}"
