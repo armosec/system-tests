@@ -27,7 +27,6 @@ class CloudVulnScan(Accounts):
         self.cspm_vulnscan_stack_name = None
         self.cspm_vulnscan_external_id = None
         self.cspm_vulnscan_cloud_account_name = None
-        self.test_cloud_accounts_guids = []
 
 
 
