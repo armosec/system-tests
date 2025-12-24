@@ -78,6 +78,9 @@ sys.stderr.flush()
 import argparse
 import json
 import os
+import sys
+import time
+import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -775,6 +778,12 @@ def build_llm_context(
 
 
 def main():
+    # #region agent log
+    try:
+        payload = {"sessionId":"debug-session","runId":"run1","hypothesisId":"H1","location":"build_llm_context.py:main","message":"Entering main","data":{},"timestamp":int(time.time()*1000)}
+        with open("/Users/eranmadar/repos/cadashboardbe/.cursor/debug.log", "a") as f: f.write(json.dumps(payload) + "\n")
+    except: pass
+    # #endregion
     parser = argparse.ArgumentParser(
         description="Build LLM-ready context from all available sources."
     )
@@ -894,6 +903,12 @@ def main():
         
         # Load extra indexes for dependencies
         extra_indexes = {}
+        # #region agent log
+        try:
+            payload = {"sessionId":"debug-session","runId":"run1","hypothesisId":"H1","location":"build_llm_context.py:897","message":"About to check dependency_indexes","data":{"dependency_indexes":args.dependency_indexes, "global_os_exists": "os" in globals()}, "timestamp":int(time.time()*1000)}
+            with open("/Users/eranmadar/repos/cadashboardbe/.cursor/debug.log", "a") as f: f.write(json.dumps(payload) + "\n")
+        except: pass
+        # #endregion
         if args.dependency_indexes:
             if os.path.exists(args.dependency_indexes):
                 with open(args.dependency_indexes, 'r') as f:
@@ -1026,9 +1041,15 @@ def main():
                             }, f, indent=2)
                             f.flush()
                             os.fsync(f.fileno())
-                    except Exception as final_error:
+                    except Exception as final_write_error:
                         # Last resort - write to stderr and exit
-                        print(f"CRITICAL: Cannot create output file: {final_error}", file=sys.stderr)
+                        # #region agent log
+                        try:
+                            payload = {"sessionId":"debug-session","runId":"run1","hypothesisId":"H1","location":"build_llm_context.py:1031","message":"CRITICAL: Cannot create output file","data":{"error":str(final_write_error)},"timestamp":int(time.time()*1000)}
+                            with open("/Users/eranmadar/repos/cadashboardbe/.cursor/debug.log", "a") as f: f.write(json.dumps(payload) + "\n")
+                        except: pass
+                        # #endregion
+                        print(f"CRITICAL: Cannot create output file: {final_write_error}", file=sys.stderr)
                         sys.stderr.flush()
                         sys.exit(1)
                 
@@ -1053,7 +1074,6 @@ def main():
                         os.fsync(f.fileno())
             except Exception as e:
                 print(f"\n❌ Error saving JSON file: {e}", file=sys.stderr)
-                import traceback
                 traceback.print_exc(file=sys.stderr)
                 sys.stderr.flush()
                 # Try to write error to output file before exiting
@@ -1078,7 +1098,6 @@ def main():
             with open(text_output_path, 'w') as f:
                 f.write(text_content)
                 f.flush()
-                import os
                 try:
                     os.fsync(f.fileno())
                 except:
@@ -1105,14 +1124,12 @@ def main():
         sys.exit(130)
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}", file=sys.stderr)
-        import traceback
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
 
 if __name__ == "__main__":
     # Ensure we always write something to a log file for debugging
-    import traceback
     error_log_path = "/tmp/build_llm_context_error.log"
     
     try:
