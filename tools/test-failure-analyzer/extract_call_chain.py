@@ -511,6 +511,16 @@ def extract_function_calls(code: str, package: str) -> List[Tuple[str, Optional[
             continue
         
         calls.append((func_name, None))
+        
+    # Pattern 4: Map-based handlers (NEW)
+    # Matches: UserInputCommandCreate: handleCreate, ...
+    # This catches functions mentioned in map literals
+    map_handler_pattern = r':\s+([a-zA-Z]\w+)\s*[,}]'
+    for match in re.finditer(map_handler_pattern, code):
+        func_name = match.group(1)
+        # Only add if it looks like a handler function (starts with 'handle')
+        if func_name.startswith('handle') and len(func_name) > 6:
+            calls.append((func_name, None))
     
     # Remove duplicates
     return list(set(calls))
@@ -643,6 +653,7 @@ def extract_call_chain(
     
     # Track cross-repo calls and repositories in chain
     cross_repo_calls = []
+    pulsar_consumer_chunks = []
     repositories_in_chain = set([handler_chunk.get("_repo", "cadashboardbe")])  # Start with handler's repo
     
     # DEBUG: Log initial state
@@ -690,15 +701,57 @@ def extract_call_chain(
             if chunk_pulsar_producers:
                 pulsar_producers.extend(chunk_pulsar_producers)
                 print(f"   🔍 DEBUG Level {level}: Found {len(chunk_pulsar_producers)} Pulsar producers in chunk {chunk.get('name')}", file=sys.stderr)
-                # Match these producers to consumers
+                # Match these producers to consumers and ADD THEM TO NEXT LEVEL
                 if all_chunks:
                     new_matches = match_pulsar_producers_to_consumers(chunk_pulsar_producers, all_chunks)
                     pulsar_matches.extend(new_matches)
-                    if new_matches:
-                        print(f"   ✅ DEBUG Level {level}: Matched {len(new_matches)} Pulsar producer-consumer pairs", file=sys.stderr)
+                    
+                    for match in new_matches:
+                        consumer_chunk = match["consumer_chunk"]
+                        consumer_chunk_id = consumer_chunk.get("id")
+                        
+                        if consumer_chunk_id and consumer_chunk_id not in visited:
+                            visited.add(consumer_chunk_id)
+                            consumer_pattern = classify_chunk_pattern(consumer_chunk) or "pulsar_consumer"
+                            
+                            consumer_item = {
+                                "chunk_id": consumer_chunk_id,
+                                "name": consumer_chunk.get("name"),
+                                "type": consumer_chunk.get("type"),
+                                "pattern": consumer_pattern,
+                                "package": consumer_chunk.get("package"),
+                                "file": consumer_chunk.get("file"),
+                                "repo": consumer_chunk.get("_repo", "unknown"),
+                                "pulsar_topic": match.get("topic"),
+                                "match_type": match.get("match_type"),
+                                "called_from": item["chunk_id"],
+                                "function_name": f"pulsar_message:{match.get('topic')}"
+                            }
+                            
+                            # Add to next level to continue tracing FROM the consumer
+                            next_level.append(consumer_item)
+                            chain.append(consumer_item)
+                            pulsar_consumer_chunks.append(consumer_item)
+                            
+                            # Track repo
+                            repo = consumer_chunk.get("_repo")
+                            if repo:
+                                repositories_in_chain.add(repo)
+                                
+                            print(f"   ✅ DEBUG Level {level}: Following Pulsar consumer: {repo}/{consumer_chunk.get('name')} (topic: {match.get('topic')})", file=sys.stderr)
             
             # Extract calls from this chunk
             calls = extract_function_calls(chunk_code, chunk_package)
+            
+            # Heuristic: If this chunk mentions 'handlers' and is in a user_input_ingester package,
+            # pull in all handleXXX functions from the same package.
+            if 'handlers' in chunk_code and 'user_input_ingester' in chunk_package:
+                print(f"   🎯 DEBUG Level {level}: Map-based handlers detected in {chunk_repo}/{chunk.get('name')}. Probing same package for handlers...", file=sys.stderr)
+                for c in chunks:
+                    if c.get('package') == chunk_package and c.get('name', '').startswith('handle') and c.get('_repo') == chunk_repo:
+                        if c.get('id') not in visited:
+                            # Add these as potential next steps
+                            calls.append((c.get('name'), None))
             
             # Find matching chunks for each call
             for func_name, pkg_name in calls:
@@ -756,12 +809,13 @@ def extract_call_chain(
                         if called_pattern and called_pattern not in ["service", "repository", "enricher", "validator", "helper", None]:
                             continue
                     elif level == 2:
-                        # Third level: repository, enricher, validator, helper, or unknown functions
-                        if called_pattern and called_pattern not in ["repository", "enricher", "validator", "helper", "dal", None]:
+                        # Third level: service, repository, enricher, validator, helper, or unknown functions
+                        if called_pattern and called_pattern not in ["service", "repository", "enricher", "validator", "helper", "dal", None]:
                             continue
                     else:
-                        # Fourth level and beyond: repository, enricher, dal, or unknown functions
-                        if called_pattern and called_pattern not in ["repository", "enricher", "dal", None]:
+                        # Fourth level and beyond: service, repository, enricher, dal, or unknown functions
+                        # Also allow "handler" if we're already deep in the chain (could be sub-handlers)
+                        if called_pattern and called_pattern not in ["service", "repository", "enricher", "dal", "handler", None]:
                             continue
                     
                     # Skip if already visited
@@ -794,34 +848,6 @@ def extract_call_chain(
         
         current_level = next_level
         level += 1
-    
-    # Add Pulsar consumer chunks to chain if matched
-    pulsar_consumer_chunks = []
-    if pulsar_matches:
-        for match in pulsar_matches:
-            consumer_chunk = match["consumer_chunk"]
-            consumer_chunk_id = consumer_chunk.get("id")
-            if consumer_chunk_id and consumer_chunk_id not in visited:
-                visited.add(consumer_chunk_id)
-                consumer_item = {
-                    "chunk_id": consumer_chunk_id,
-                    "name": consumer_chunk.get("name"),
-                    "type": consumer_chunk.get("type"),
-                    "pattern": "pulsar_consumer",
-                    "package": consumer_chunk.get("package"),
-                    "file": consumer_chunk.get("file"),
-                    "repo": consumer_chunk.get("_repo", "unknown"),
-                    "pulsar_topic": match.get("topic"),
-                    "match_type": match.get("match_type"),
-                    "called_from": "pulsar_message"
-                }
-                chain.append(consumer_item)
-                pulsar_consumer_chunks.append(consumer_item)
-                
-                # Track repo
-                repo = consumer_chunk.get("_repo")
-                if repo:
-                    repositories_in_chain.add(repo)
     
     return {
         "handler_chunk_id": handler_chunk_id,
