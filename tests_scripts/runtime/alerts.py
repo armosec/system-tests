@@ -92,7 +92,6 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
         new_policy_guid = self.validate_new_policy(new_runtime_policy_body)
 
         Logger.logger.info(f"New policy created with guid {new_policy_guid}")
-        self.test_policy_guids.append(new_policy_guid)
 
 
         Logger.logger.info('4. Install kubescape')
