@@ -483,6 +483,12 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 repo_full_name = f"{rc_org}/{dep_name}"
                 rc_commit = get_commit_for_tag(repo_full_name, rc_ver, github_token, debug)
         
+        # Default to armosec if org not found (for go.mod dependencies)
+        if not deployed_org:
+            deployed_org = 'armosec'
+        if not rc_org and version_changed:
+            rc_org = 'armosec'
+        
         results[dep_name] = {
             "deployed": {
                 "version": deployed_ver,
@@ -490,7 +496,8 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 "index_path": deployed_index,
                 "found": deployed_found,
                 "github_org": deployed_org,
-                "strategy": deployed_strategy
+                "strategy": deployed_strategy,
+                "source": "gomod"  # Mark as coming from go.mod
             },
             "rc": {
                 "version": rc_ver,
@@ -524,15 +531,28 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                         "commit": commit,
                         "index_path": index_path,
                         "found": True,
-                        "github_org": found_org,
-                        "strategy": "always_include_fallback"
+                        "github_org": found_org or org,  # Use found_org or default to specified org
+                        "strategy": "always_include_fallback",
+                        "source": "service"  # Mark as service dependency
                     },
                     "rc": {"found": False},
                     "version_changed": False
                 }
             else:
-                if debug:
-                    print(f"  ⚠️  Could not find index for {org}/{repo}")
+                # Even if not found, add placeholder with org
+                results[repo] = {
+                    "deployed": {
+                        "version": "latest",
+                        "commit": None,
+                        "index_path": None,
+                        "found": False,
+                        "github_org": org,  # Use specified org
+                        "strategy": "always_include_fallback",
+                        "source": "service"  # Mark as service dependency
+                    },
+                    "rc": {"found": False},
+                    "version_changed": False
+                }
     
     return results
 

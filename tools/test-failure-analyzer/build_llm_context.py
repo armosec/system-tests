@@ -717,7 +717,8 @@ def build_llm_context(
                             "repository": repo_name,
                             "deployed_version": repo_info.get('deployed', {}).get('version', 'N/A'),
                             "rc_version": repo_info.get('rc', {}).get('version', 'N/A'),
-                            "github_org": repo_info.get('deployed', {}).get('github_org', 'unknown')
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'armosec'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
                         }
                         for repo_name, repo_info in found_indexes.get('indexes', {}).items()
                         if repo_info.get('version_changed', False)
@@ -725,7 +726,8 @@ def build_llm_context(
                     "missing_indexes": [
                         {
                             "repository": repo_name,
-                            "github_org": repo_info.get('deployed', {}).get('github_org', 'unknown')
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'armosec'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
                         }
                         for repo_name, repo_info in found_indexes.get('indexes', {}).items()
                         if not repo_info.get('deployed', {}).get('found', False)
@@ -734,10 +736,11 @@ def build_llm_context(
                         {
                             "repository": repo_name,
                             "github_org": repo_info.get('deployed', {}).get('github_org', 
-                                          repo_info.get('rc', {}).get('github_org', 'unknown')),
+                                          repo_info.get('rc', {}).get('github_org', 'armosec')),
                             "has_deployed_index": repo_info.get('deployed', {}).get('found', False),
                             "has_rc_index": repo_info.get('rc', {}).get('found', False),
-                            "strategy": repo_info.get('deployed', {}).get('strategy', 'unknown')
+                            "strategy": repo_info.get('deployed', {}).get('strategy', 'unknown'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
                         }
                         for repo_name, repo_info in found_indexes.get('indexes', {}).items()
                     ]
