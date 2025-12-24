@@ -597,20 +597,10 @@ def main():
         if args.debug:
             print(f"\n🔍 Resolving dashboard index for {args.dashboard_repo} (required for API mapping)...")
         
-        # Try to resolve actual version for dashboard if available in running-images
+        # Dashboard repo usually uses latest index for mapping
+        # We don't try to resolve RC version for dashboard if it's not the triggering repo
         dash_deployed_ver = "latest"
-        if args.images and os.path.exists(args.images):
-            try:
-                with open(args.images, 'r') as f:
-                    running_images = json.load(f)
-                    repos = running_images.get('repos', {})
-                    dash_data = repos.get(args.dashboard_repo, {})
-                    images = dash_data.get('images', [])
-                    if images:
-                        dash_deployed_ver = images[0].get('tag', 'latest')
-            except Exception:
-                pass
-
+        
         dash_path, dash_strategy = resolve_deployed_index(
             args.dashboard_repo,
             dash_deployed_ver,
