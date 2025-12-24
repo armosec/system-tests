@@ -535,11 +535,25 @@ def build_llm_context(
     repo_mapping = {}
     if resolved_commits:
         resolved = resolved_commits.get("resolved_commits", {})
-        # Use first repo as default (usually cadashboardbe)
-        default_repo = list(resolved.keys())[0] if resolved else "cadashboardbe"
+        # Use triggering repo as default if available, otherwise first repo, otherwise cadashboardbe
+        triggering_repo_normalized = resolved_commits.get("triggering_repo_normalized", "").lower()
+        default_repo = None
+        if triggering_repo_normalized:
+            # Find matching repo key (case-insensitive match, but preserve original case)
+            for repo_key in resolved.keys():
+                if repo_key.lower() == triggering_repo_normalized:
+                    default_repo = repo_key
+                    print(f"   Using triggering repo as default: {default_repo}", file=sys.stderr)
+                    break
+        if not default_repo and resolved:
+            default_repo = list(resolved.keys())[0]
+            print(f"   Using first repo as default: {default_repo}", file=sys.stderr)
+        if not default_repo:
+            default_repo = "cadashboardbe"
+            print(f"   No resolved repos, defaulting to cadashboardbe", file=sys.stderr)
         repo_mapping["default"] = default_repo
     else:
-        repo_mapping["default"] = "cadashboardbe"
+        repo_mapping["default"] = "cadashboardbe"  # Fallback for backward compatibility
     
     # 7. Format chunks for LLM
     formatted_chunks = []
