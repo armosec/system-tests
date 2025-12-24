@@ -175,7 +175,8 @@ class BaseHelm(BaseK8S):
                                             cluster_name=self.kubernetes_obj.get_cluster_name(),
                                             namespace=namespace,
                                             repo=self.helm_armo_repo, create_namespace=create_namespace,
-                                            helm_kwargs=helm_kwargs, use_offline_db=use_offline_db)
+                                            helm_kwargs=helm_kwargs, use_offline_db=use_offline_db,
+                                            temp_dir=self.test_driver.temp_dir, helm_branch=self.helm_branch)
 
     def get_in_cluster_tags(self):
         component_tag = {}
