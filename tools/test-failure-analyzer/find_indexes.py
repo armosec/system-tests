@@ -261,9 +261,18 @@ def extract_commit_from_index(index_path: str, debug: bool = False) -> Optional[
         return None
 
 
-def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Tuple[Optional[str], str]:
+def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: str, github_org: str, triggering_commit: Optional[str] = None, debug: bool = False) -> Tuple[Optional[str], str]:
     """
-    Resolve RC code index using PR-based strategy.
+    Resolve RC code index using multiple strategies.
+    
+    Args:
+        repo: Repository name
+        rc_version: RC version tag (e.g., rc-v0.0.224-2435)
+        output_dir: Directory to download index to
+        github_token: GitHub token
+        github_org: GitHub organization
+        triggering_commit: Optional commit hash from workflow context
+        debug: Enable debug logging
     
     Returns:
         (index_path, strategy_used)
@@ -271,6 +280,8 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
     if debug:
         print(f"\n🔍 Resolving RC index for {repo}...")
         print(f"   RC version: {rc_version}")
+        if triggering_commit:
+            print(f"   Triggering commit: {triggering_commit}")
     
     # Strategy 1: PR-based resolution
     pr_number = extract_pr_from_rc(rc_version)
@@ -285,8 +296,15 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
             if index_path:
                 return index_path, "pr_commit"
     
-    # Strategy 2: Try RC commit directly (if provided)
-    # This would require extracting commit from workflow context
+    # Strategy 2: Try RC commit directly (if provided from workflow context)
+    if triggering_commit and len(triggering_commit) >= 7:
+        if debug:
+            print(f"\n📋 Strategy 2: Commit-based resolution (commit {triggering_commit[:8]})")
+        
+        artifact_name = f"code-index-{triggering_commit}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
+        if index_path:
+            return index_path, "commit_direct"
     
     # Strategy 3: Fallback to latest
     if debug:
@@ -628,6 +646,7 @@ def main():
                 args.output_dir,
                 github_token,
                 org,
+                args.triggering_commit,  # Pass triggering commit for Strategy 2
                 args.debug
             )
             if rc_path:
