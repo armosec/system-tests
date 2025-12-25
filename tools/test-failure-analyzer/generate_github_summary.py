@@ -488,21 +488,74 @@ def generate_summary(
         lines.append("| Service | Deployed Version | Index Available |")
         lines.append("|---------|------------------|-----------------|")
         
+        # Collect all service entries (one per service_key, not per repo)
+        service_entries = []
+        
         for repo_name, repo_info in sorted(services_data.items()):
             images = repo_info.get('images', [])
-            deployed_tag = images[0].get('tag', 'unknown') if images else 'unknown'
             
-            # Check if index is available
-            index_available = "❌"
-            if found_indexes:
-                repo_idx = found_indexes.get('indexes', {}).get(repo_name, {})
-                if repo_idx.get('deployed', {}).get('found', False):
-                    index_available = "✅"
+            # Filter out dataPurger (should already be filtered, but double-check)
+            filtered_images = [img for img in images if img.get('service_key') != 'dataPurger']
             
-            lines.append(f"| `{repo_name}` | `{deployed_tag}` | {index_available} |")
+            if not filtered_images:
+                continue
+            
+            # Group by unique tags to show all services
+            # For repos with multiple services (like event-ingester-service), show each service
+            unique_tags = {}
+            for img in filtered_images:
+                tag = img.get('tag', 'unknown')
+                service_key = img.get('service_key', 'unknown')
+                
+                if tag not in unique_tags:
+                    unique_tags[tag] = []
+                if service_key not in unique_tags[tag]:
+                    unique_tags[tag].append(service_key)
+            
+            # Create entries: one per unique tag, showing all service_keys using that tag
+            for tag, service_keys in sorted(unique_tags.items()):
+                # Format service display: repo name + service keys if multiple
+                if len(service_keys) > 1:
+                    service_display = f"{repo_name} ({', '.join(service_keys)})"
+                elif len(service_keys) == 1 and service_keys[0] != 'unknown':
+                    service_display = f"{repo_name} ({service_keys[0]})"
+                else:
+                    service_display = repo_name
+                
+                # Check if index is available - try multiple key formats
+                index_available = "❌"
+                if found_indexes:
+                    indexes = found_indexes.get('indexes', {})
+                    
+                    # Try exact repo name match first
+                    repo_idx = indexes.get(repo_name, {})
+                    if repo_idx.get('deployed', {}).get('found', False):
+                        index_available = "✅"
+                    else:
+                        # Try tag-suffixed key (for repos with multiple tags)
+                        tag_key = f"{repo_name}-{tag}"
+                        repo_idx = indexes.get(tag_key, {})
+                        if repo_idx.get('deployed', {}).get('found', False):
+                            index_available = "✅"
+                        else:
+                            # Try any key starting with repo_name (for multiple versions)
+                            for key in indexes.keys():
+                                if key.startswith(f"{repo_name}-") and indexes[key].get('deployed', {}).get('found', False):
+                                    index_available = "✅"
+                                    break
+                
+                service_entries.append({
+                    'display': service_display,
+                    'tag': tag,
+                    'index_available': index_available
+                })
+        
+        # Sort and display entries
+        for entry in sorted(service_entries, key=lambda x: x['display']):
+            lines.append(f"| `{entry['display']}` | `{entry['tag']}` | {entry['index_available']} |")
         
         lines.append("")
-        lines.append(f"**Total Services:** {len(services_data)}")
+        lines.append(f"**Total Services:** {len(service_entries)}")
         lines.append("")
     else:
         lines.append("No service data available.\n")
