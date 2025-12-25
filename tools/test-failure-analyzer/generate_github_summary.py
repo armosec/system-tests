@@ -228,7 +228,8 @@ def generate_summary(
     run_ref: str,
     workflow_commit_path: str = None,
     llm_analysis_path: str = None,
-    test_deployed_services_path: str = None
+    test_deployed_services_path: str = None,
+    services_only_path: str = None
 ) -> str:
     """Generate markdown summary from artifacts."""
     
@@ -242,6 +243,8 @@ def generate_summary(
     # Prefer new format, fallback to legacy
     test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
     running_images = load_json(running_images_path) if not test_deployed_services else None
+    # Prefer services-only.json (already filtered) for services display
+    services_only = load_json(services_only_path) if services_only_path else None
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
@@ -472,7 +475,11 @@ def generate_summary(
     lines.append("")
     
     services_data = None
-    if test_deployed_services:
+    # Prefer services-only.json (already filtered, excludes dataPurger and triggering repo)
+    if services_only:
+        services_data = services_only
+    elif test_deployed_services:
+        # Use services from test-deployed-services.json, but note that dataPurger filtering happens below
         services_data = test_deployed_services.get('services', {})
     elif running_images:
         # Legacy format - extract services (exclude triggering repo)
@@ -1028,6 +1035,7 @@ def main():
     parser.add_argument('--found-indexes', default='artifacts/found-indexes.json')
     parser.add_argument('--running-images', default='artifacts/running-images.json', help='Legacy format (backward compatibility)')
     parser.add_argument('--test-deployed-services', help='New format with separated triggering_repo and services sections')
+    parser.add_argument('--services-only', help='Filtered services-only.json (excludes dataPurger and triggering repo)')
     parser.add_argument('--gomod-deps', default='artifacts/gomod-dependencies.json')
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
@@ -1049,9 +1057,9 @@ def main():
         args.context_summary,
         args.environment,
         args.run_ref,
-        args.workflow_commit,
         args.llm_analysis,
-        args.test_deployed_services
+        args.test_deployed_services,
+        args.services_only
     )
     
     # Write to output
