@@ -28,6 +28,14 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 import requests
 
+# Always include these repositories (fallback for critical dependencies)
+ALWAYS_INCLUDE_REPOS = [
+    ('armosec', 'armosec-infra'),      # Always needed for notifications, utils
+    ('armosec', 'postgres-connector'),  # Database layer
+]
+
+GITHUB_ORGS_TO_CHECK = ['armosec', 'kubescape']  # Check both orgs
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Find and download code indexes")
     
@@ -47,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     
     # GitHub config
     parser.add_argument("--github-token", help="GitHub token (or use GITHUB_TOKEN env var)")
-    parser.add_argument("--github-org", default="armosec", help="GitHub organization")
+    parser.add_argument("--github-orgs", default="armosec,kubescape", help="Comma-separated GitHub organizations to check")
     
     # Options
     parser.add_argument("--images", help="Path to running-images.json to resolve dashboard version")
@@ -327,18 +335,23 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     return None, "failed"
 
 
-def find_dependency_index(repo: str, version: str, github_org: str, 
-                          github_token: str, output_dir: str, debug: bool) -> Optional[str]:
+def find_dependency_index(
+    repo: str, 
+    version: str, 
+    github_orgs: List[str],  # Changed from single github_org
+    github_token: str,
+    output_dir: str, 
+    debug: bool = False
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
-    Find and download code index for a dependency.
+    Find dependency index, checking multiple GitHub organizations.
     
     Tries multiple strategies:
     1. Version tag: code-index-v0.0.1160
-    2. Commit hash: code-index-{commit}
-    3. Latest: code-index-latest
+    2. Latest: code-index-latest
     
     Returns:
-        Path to downloaded index or None if not found
+        (index_path, github_org_found, strategy_used)
     """
     strategies = [
         f"code-index-{version}",  # Try version tag first
@@ -346,22 +359,37 @@ def find_dependency_index(repo: str, version: str, github_org: str,
     ]
     
     for artifact_name in strategies:
-        if debug:
-            print(f"  Trying {repo}: {artifact_name}")
-        
-        index_path = download_artifact(repo, artifact_name, output_dir, 
-                                       github_token, github_org, debug)
-        if index_path:
-            return index_path
+        for github_org in github_orgs:
+            if debug:
+                print(f"  Checking {github_org}/{repo} with {artifact_name}")
+            
+            # Try finding in this org
+            index_path = download_artifact(
+                repo, 
+                artifact_name,
+                output_dir,
+                github_token,
+                github_org,
+                debug
+            )
+            
+            if index_path:
+                if debug:
+                    print(f"  ✅ Found in {github_org}/{repo}")
+                strategy = "version_tag" if artifact_name == f"code-index-{version}" else "latest_fallback"
+                return index_path, github_org, strategy
     
-    return None
+    # Not found in any org
+    if debug:
+        print(f"  ⚠️  Not found in any organization: {github_orgs}")
+    return None, None, "not_found"
 
 
-def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Dict[str, Any]:
+def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_orgs: List[str], debug: bool = False) -> Dict[str, Any]:
     """
-    Resolve code indexes for all dependencies.
+    Resolve code indexes for all dependencies from multiple GitHub organizations.
     
-    New format handles version comparison:
+    New format handles version comparison and multi-org discovery:
     {
       "postgres-connector": {
         "deployed_version": "v0.0.1160",
@@ -375,6 +403,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
     """
     results = {}
     
+    # First, process gomod dependencies
     for dep_name, dep_info in dependencies.items():
         if debug:
             print(f"\n📦 Processing dependency: {dep_name}")
@@ -382,6 +411,13 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         deployed_ver = dep_info.get('deployed_version', 'unknown')
         rc_ver = dep_info.get('rc_version', 'unknown')
         version_changed = dep_info.get('version_changed', False)
+        github_org_hint = dep_info.get('github_org')
+        
+        # If we have an org hint, prioritize it in the orgs list
+        check_orgs = github_orgs
+        if github_org_hint and github_org_hint in github_orgs:
+            # Move the hinted org to the front
+            check_orgs = [github_org_hint] + [o for o in github_orgs if o != github_org_hint]
         
         if deployed_ver == 'unknown' and rc_ver == 'unknown':
             if debug:
@@ -395,76 +431,135 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         
         # Resolve deployed version
         deployed_index = None
+        deployed_org = None
+        deployed_strategy = None
         deployed_found = False
         if deployed_ver != 'unknown':
             if debug:
                 print(f"  🔍 Resolving deployed version: {deployed_ver}")
             
-            deployed_index = find_dependency_index(
-                dep_name, deployed_ver, github_org, 
+            deployed_index, deployed_org, deployed_strategy = find_dependency_index(
+                dep_name, deployed_ver, check_orgs, 
                 github_token, f"{output_dir}/{dep_name}-deployed", debug
             )
             deployed_found = deployed_index is not None
             
             if deployed_found:
                 if debug:
-                    print(f"  ✅ Found deployed index")
+                    print(f"  ✅ Found deployed index in {deployed_org}")
             else:
                 if debug:
                     print(f"  ⚠️  Deployed index not found")
         
         # Resolve RC version if changed
         rc_index = None
+        rc_org = None
+        rc_strategy = None
         rc_found = False
         if version_changed and rc_ver != 'unknown':
             if debug:
                 print(f"  🔍 Resolving RC version: {rc_ver}")
             
-            rc_index = find_dependency_index(
-                dep_name, rc_ver, github_org,
+            rc_index, rc_org, rc_strategy = find_dependency_index(
+                dep_name, rc_ver, check_orgs,
                 github_token, f"{output_dir}/{dep_name}-rc", debug
             )
             rc_found = rc_index is not None
             
             if rc_found:
                 if debug:
-                    print(f"  ✅ Found RC index")
+                    print(f"  ✅ Found RC index in {rc_org}")
             else:
                 if debug:
                     print(f"  ⚠️  RC index not found")
         
         # Extract commits from downloaded indexes
         deployed_commit = None
-        if deployed_index:
+        if deployed_index and deployed_org:
             deployed_commit = extract_commit_from_index(deployed_index, debug)
             # Fallback: Get commit from Git tag if index has no metadata
             if not deployed_commit and deployed_ver != 'unknown':
-                repo_full_name = f"{github_org}/{dep_name}"
+                repo_full_name = f"{deployed_org}/{dep_name}"
                 deployed_commit = get_commit_for_tag(repo_full_name, deployed_ver, github_token, debug)
         
         rc_commit = None
-        if rc_index:
+        if rc_index and rc_org:
             rc_commit = extract_commit_from_index(rc_index, debug)
             # Fallback: Get commit from Git tag if index has no metadata
             if not rc_commit and rc_ver != 'unknown':
-                repo_full_name = f"{github_org}/{dep_name}"
+                repo_full_name = f"{rc_org}/{dep_name}"
                 rc_commit = get_commit_for_tag(repo_full_name, rc_ver, github_token, debug)
+        
+        # Use org hint if still not found, otherwise default to armosec
+        if not deployed_org:
+            deployed_org = github_org_hint or 'armosec'
+        if not rc_org and version_changed:
+            rc_org = github_org_hint or 'armosec'
         
         results[dep_name] = {
             "deployed": {
                 "version": deployed_ver,
                 "commit": deployed_commit,
                 "index_path": deployed_index,
-                "found": deployed_found
+                "found": deployed_found,
+                "github_org": deployed_org,
+                "strategy": deployed_strategy,
+                "source": "gomod"  # Mark as coming from go.mod
             },
             "rc": {
                 "version": rc_ver,
                 "commit": rc_commit,
                 "index_path": rc_index,
-                "found": rc_found
+                "found": rc_found,
+                "github_org": rc_org,
+                "strategy": rc_strategy
             },
             "version_changed": version_changed
         }
+    
+    # NEW: Add always-include repos as fallback
+    if debug:
+        print("\n📌 Adding always-include repositories...")
+    for org, repo in ALWAYS_INCLUDE_REPOS:
+        if repo not in results:
+            if debug:
+                print(f"  Adding fallback: {org}/{repo}")
+            # Get latest release
+            index_path, found_org, strategy = find_dependency_index(
+                repo, "latest", [org],  # Just check specific org
+                github_token, f"{output_dir}/{repo}-fallback", debug
+            )
+            if index_path:
+                # Extract commit
+                commit = extract_commit_from_index(index_path, debug)
+                results[repo] = {
+                    "deployed": {
+                        "version": "latest",
+                        "commit": commit,
+                        "index_path": index_path,
+                        "found": True,
+                        "github_org": found_org or org,  # Use found_org or default to specified org
+                        "strategy": "always_include_fallback",
+                        "source": "service"  # Mark as service dependency
+                    },
+                    "rc": {"found": False},
+                    "version_changed": False
+                }
+            else:
+                # Even if not found, add placeholder with org
+                results[repo] = {
+                    "deployed": {
+                        "version": "latest",
+                        "commit": None,
+                        "index_path": None,
+                        "found": False,
+                        "github_org": org,  # Use specified org
+                        "strategy": "always_include_fallback",
+                        "source": "service"  # Mark as service dependency
+                    },
+                    "rc": {"found": False},
+                    "version_changed": False
+                }
     
     return results
 
@@ -477,6 +572,11 @@ def main():
     if not github_token:
         print("❌ Error: GitHub token required (use --github-token or GITHUB_TOKEN env var)", file=sys.stderr)
         sys.exit(1)
+    
+    # Parse GitHub orgs (comma-separated)
+    github_orgs = [org.strip() for org in args.github_orgs.split(',')]
+    if args.debug:
+        print(f"🔍 Checking GitHub organizations: {', '.join(github_orgs)}")
     
     if args.debug:
         print("="*70)
@@ -498,17 +598,59 @@ def main():
     # Resolve dashboard indexes (both RC and deployed)
     dashboard_indexes = {}
     
-    # RC version
+    # Discovery triggering org (usually armosec, but could be kubescape)
+    # We check both orgs for the triggering repo index
+    triggering_org = None
+    rc_path = None
+    rc_strategy = None
+    deployed_path = None
+    deployed_strategy = None
+
     if args.rc_version:
-        rc_path, rc_strategy = resolve_rc_index(
-            args.triggering_repo,
-            args.rc_version,
-            args.output_dir,
-            github_token,
-            args.github_org,
-            args.debug
-        )
-        
+        for org in github_orgs:
+            rc_path, rc_strategy = resolve_rc_index(
+                args.triggering_repo,
+                args.rc_version,
+                args.output_dir,
+                github_token,
+                org,
+                args.debug
+            )
+            if rc_path:
+                triggering_org = org
+                break
+    
+    if args.deployed_version:
+        # If we already found the org from RC, use it. Otherwise discover.
+        if triggering_org:
+            deployed_path, deployed_strategy = resolve_deployed_index(
+                args.triggering_repo,
+                args.deployed_version,
+                args.output_dir,
+                github_token,
+                triggering_org,
+                args.debug
+            )
+        else:
+            for org in github_orgs:
+                deployed_path, deployed_strategy = resolve_deployed_index(
+                    args.triggering_repo,
+                    args.deployed_version,
+                    args.output_dir,
+                    github_token,
+                    org,
+                    args.debug
+                )
+                if deployed_path:
+                    triggering_org = org
+                    break
+                
+    # Fallback to first org if not found
+    if not triggering_org:
+        triggering_org = github_orgs[0]
+    
+    # RC version metadata
+    if args.rc_version:
         # Extract commit from downloaded index
         rc_commit = None
         if rc_path:
@@ -524,27 +666,20 @@ def main():
             "commit": rc_commit,
             "index_path": rc_path,
             "strategy": rc_strategy,
-            "found": rc_path is not None
+            "found": rc_path is not None,
+            "github_org": triggering_org,
+            "source": "service"  # Triggering repo is a service, not a go.mod dependency
         }
     
-    # Deployed version
+    # Deployed version metadata
     if args.deployed_version:
-        deployed_path, deployed_strategy = resolve_deployed_index(
-            args.triggering_repo,
-            args.deployed_version,
-            args.output_dir,
-            github_token,
-            args.github_org,
-            args.debug
-        )
-        
         # Extract commit from downloaded index
         deployed_commit = None
         if deployed_path:
             deployed_commit = extract_commit_from_index(deployed_path, args.debug)
             # Fallback: Get commit from Git tag if index has no metadata
             if not deployed_commit and args.deployed_version:
-                repo_full_name = f"{args.github_org}/{args.triggering_repo}"
+                repo_full_name = f"{triggering_org}/{args.triggering_repo}"
                 deployed_commit = get_commit_for_tag(repo_full_name, args.deployed_version, github_token, args.debug)
                 if deployed_commit and args.debug:
                     print(f"   📌 Using Git tag commit as fallback: {deployed_commit[:8]}")
@@ -554,7 +689,9 @@ def main():
             "commit": deployed_commit,
             "index_path": deployed_path,
             "strategy": deployed_strategy,
-            "found": deployed_path is not None
+            "found": deployed_path is not None,
+            "github_org": triggering_org,
+            "source": "service"  # Triggering repo is a service, not a go.mod dependency
         }
     
     results["indexes"][args.triggering_repo] = dashboard_indexes
@@ -573,7 +710,7 @@ def main():
             dependencies,
             args.output_dir,
             github_token,
-            args.github_org,
+            github_orgs,  # Pass list of orgs
             args.debug
         )
         
@@ -606,7 +743,7 @@ def main():
             dash_deployed_ver,
             args.output_dir,
             github_token,
-            args.github_org,
+            triggering_org,  # Use same org as triggering repo
             args.debug
         )
         

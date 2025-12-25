@@ -27,6 +27,195 @@ def load_json(path: str) -> Optional[Dict[str, Any]]:
         return None
 
 
+def extract_chunk_stats_per_repo(llm_context: Optional[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
+    """
+    Extract chunk count and LOC per repository from LLM context.
+    
+    Returns:
+        Dict mapping repo_name -> {"chunks": count, "loc": lines_of_code}
+    """
+    stats = {}
+    
+    if not llm_context:
+        return stats
+    
+    code_chunks = llm_context.get('code_chunks', [])
+    
+    for chunk in code_chunks:
+        # Get repo from either '_repo' or 'repo' field
+        repo = chunk.get('_repo') or chunk.get('repo') or chunk.get('repo_name')
+        
+        if not repo:
+            continue
+        
+        # Initialize stats for this repo if not seen
+        if repo not in stats:
+            stats[repo] = {"chunks": 0, "loc": 0}
+        
+        # Count this chunk
+        stats[repo]["chunks"] += 1
+        
+        # Count LOC
+        code = chunk.get('code', '')
+        if code:
+            loc = len([line for line in code.split('\n') if line.strip()])
+            stats[repo]["loc"] += loc
+    
+    return stats
+
+
+def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Optional[Dict[str, Dict[str, int]]] = None) -> str:
+    """
+    Generate markdown table showing discovered dependencies.
+    Split by source (go.mod dependencies vs service dependencies).
+    Ordered by: index available first, then missing.
+    
+    Columns: Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC
+    """
+    if not found_indexes or 'indexes' not in found_indexes:
+        return "No dependency information available."
+    
+    if chunk_stats is None:
+        chunk_stats = {}
+    
+    triggering_repo = found_indexes.get('triggering_repo', 'unknown')
+    
+    # Categorize dependencies
+    gomod_deps = []
+    service_deps = []
+    
+    for repo_name, repo_info in found_indexes['indexes'].items():
+        # Skip triggering repo (shown separately)
+        if repo_name == triggering_repo:
+            continue
+        
+        deployed = repo_info.get('deployed', {})
+        rc = repo_info.get('rc', {})
+        source = deployed.get('source', 'gomod')  # Default to gomod if not specified
+        
+        # Calculate index availability score (for sorting)
+        has_deployed_index = deployed.get('found', False)
+        has_rc_index = rc.get('found', False)
+        index_score = (2 if has_deployed_index else 0) + (1 if has_rc_index else 0)
+        
+        dep_data = {
+            'name': repo_name,
+            'deployed': deployed,
+            'rc': rc,
+            'version_changed': repo_info.get('version_changed', False),
+            'index_score': index_score,
+            'has_deployed_index': has_deployed_index,
+            'has_rc_index': has_rc_index
+        }
+        
+        if source == 'service':
+            service_deps.append(dep_data)
+        else:
+            gomod_deps.append(dep_data)
+    
+    # Sort by index availability (available first, then alphabetical)
+    gomod_deps.sort(key=lambda x: (-x['index_score'], x['name']))
+    service_deps.sort(key=lambda x: (-x['index_score'], x['name']))
+    
+    table_lines = []
+    
+    # Go.mod Dependencies Section
+    if gomod_deps:
+        table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
+        table_lines.append("")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|--------|-----|")
+        
+        for dep in gomod_deps:
+            deployed = dep['deployed']
+            rc = dep['rc']
+            
+            deployed_ver = deployed.get('version', 'N/A')
+            rc_ver = rc.get('version', 'N/A')
+            
+            changed_icon = "⚠️ Yes" if dep['version_changed'] else "✅ No"
+            
+            if dep['has_deployed_index'] and dep['has_rc_index']:
+                index_status = "✅ Both"
+            elif dep['has_deployed_index']:
+                index_status = "✅ Deployed only"
+            elif dep['has_rc_index']:
+                index_status = "✅ RC only"
+            else:
+                index_status = "❌ Missing"
+            
+            github_org = deployed.get('github_org') or 'armosec'
+            repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
+            
+            # Get chunk/LOC stats for this repo
+            stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})
+            chunks_count = stats["chunks"]
+            loc_count = stats["loc"]
+            
+            # Format counts (0 means no chunks included)
+            chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
+            loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
+            
+            table_lines.append(
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {chunks_display} | {loc_display} |"
+            )
+        
+        table_lines.append("")
+        total_gomod = len(gomod_deps)
+        with_indexes = sum(1 for d in gomod_deps if d['index_score'] > 0)
+        total_chunks = sum(chunk_stats.get(d['name'], {}).get('chunks', 0) for d in gomod_deps)
+        total_loc = sum(chunk_stats.get(d['name'], {}).get('loc', 0) for d in gomod_deps)
+        with_chunks = sum(1 for d in gomod_deps if chunk_stats.get(d['name'], {}).get('chunks', 0) > 0)
+        table_lines.append(f"**Summary**: {total_gomod} go.mod dependencies, {with_indexes} with indexes, {with_chunks} contributed code ({total_chunks} chunks, {total_loc:,} LOC)")
+        table_lines.append("")
+    
+    # Service Dependencies Section
+    if service_deps:
+        table_lines.append("### 🔧 Service Dependencies (runtime services)")
+        table_lines.append("")
+        table_lines.append("| Repository | Deployed Version | Index Available | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|-----------------|--------|-----|")
+        
+        for dep in service_deps:
+            deployed = dep['deployed']
+            deployed_ver = deployed.get('version', 'latest')
+            
+            if dep['has_deployed_index']:
+                index_status = "✅ Available"
+            else:
+                index_status = "❌ Missing"
+            
+            github_org = deployed.get('github_org') or 'armosec'
+            repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
+            
+            # Get chunk/LOC stats for this repo
+            stats = chunk_stats.get(dep['name'], {"chunks": 0, "loc": 0})
+            chunks_count = stats["chunks"]
+            loc_count = stats["loc"]
+            
+            # Format counts
+            chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
+            loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
+            
+            table_lines.append(
+                f"| {repo_display} | `{deployed_ver}` | {index_status} | {chunks_display} | {loc_display} |"
+            )
+        
+        table_lines.append("")
+        total_services = len(service_deps)
+        with_indexes = sum(1 for d in service_deps if d['index_score'] > 0)
+        total_chunks = sum(chunk_stats.get(d['name'], {}).get('chunks', 0) for d in service_deps)
+        total_loc = sum(chunk_stats.get(d['name'], {}).get('loc', 0) for d in service_deps)
+        with_chunks = sum(1 for d in service_deps if chunk_stats.get(d['name'], {}).get('chunks', 0) > 0)
+        table_lines.append(f"**Summary**: {total_services} service dependencies, {with_indexes} with indexes, {with_chunks} contributed code ({total_chunks} chunks, {total_loc:,} LOC)")
+        table_lines.append("")
+    
+    if not gomod_deps and not service_deps:
+        return "No dependencies found."
+    
+    return "\n".join(table_lines)
+
+
 def generate_summary(
     llm_context_path: str,
     api_mapping_path: str,
@@ -345,6 +534,31 @@ def generate_summary(
         lines.append("- ⚠️  Code diff analysis unavailable (version info not found)")
     
     lines.append("")
+    
+    # ========================================
+    # Dependencies Table
+    # ========================================
+    if found_indexes and 'indexes' in found_indexes:
+        lines.append("## 📦 Dependencies\n")
+        lines.append("")
+        
+        # Extract chunk/LOC stats from LLM context
+        chunk_stats = extract_chunk_stats_per_repo(llm_context)
+        
+        lines.append(format_dependencies_table(found_indexes, chunk_stats))
+        lines.append("")
+        
+        # Summary stats
+        total_deps = len(found_indexes.get('indexes', {}))
+        changed_deps = sum(1 for dep in found_indexes.get('indexes', {}).values() 
+                          if dep.get('version_changed', False))
+        missing_indexes = sum(1 for dep in found_indexes.get('indexes', {}).values()
+                             if not dep.get('deployed', {}).get('found', False))
+        
+        lines.append(f"**Summary**: {total_deps} dependencies, ")
+        lines.append(f"{changed_deps} version changes, ")
+        lines.append(f"{missing_indexes} missing indexes\n")
+        lines.append("")
     
     # ========================================
     # Dependency Analysis

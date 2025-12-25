@@ -28,6 +28,9 @@ import json
 import os
 import sys
 import traceback
+
+# Import dependency detection functions
+from detect_dependencies import analyze_all_chunks, filter_available_indexes
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -424,7 +427,8 @@ def build_llm_context(
     extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
-    cross_test_interference: Optional[Dict[str, Any]] = None
+    cross_test_interference: Optional[Dict[str, Any]] = None,
+    found_indexes_path: str = "artifacts/found-indexes.json"
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -572,6 +576,16 @@ def build_llm_context(
             if repo and repo != "cadashboardbe":
                 repositories_included.add(repo)
         
+        # ALSO collect repos from api_mapping call chains
+        if api_mapping:
+            for mapping in api_mapping.get('mappings', {}).values():
+                call_chain = mapping.get('call_chain', {})
+                repos = call_chain.get('repositories_in_chain', [])
+                if repos:
+                    for repo in repos:
+                        if repo and repo != "cadashboardbe":
+                            repositories_included.add(repo)
+        
         # Analyze each dependency
         for dep_name in repositories_included:
             # Calculate impact
@@ -703,8 +717,56 @@ def build_llm_context(
         incluster_log_summary["total_lines"] = total_incluster_lines
         metadata["incluster_log_summary"] = incluster_log_summary
     
+    # Load dependency information from found-indexes.json
+    dependencies_info = {}
+    if os.path.exists(found_indexes_path):
+        try:
+            with open(found_indexes_path, 'r') as f:
+                found_indexes = json.load(f)
+                dependencies_info = {
+                    "total_dependencies": len(found_indexes.get('indexes', {})),
+                    "version_changes": [
+                        {
+                            "repository": repo_name,
+                            "deployed_version": repo_info.get('deployed', {}).get('version', 'N/A'),
+                            "rc_version": repo_info.get('rc', {}).get('version', 'N/A'),
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'armosec'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                        if repo_info.get('version_changed', False)
+                    ],
+                    "missing_indexes": [
+                        {
+                            "repository": repo_name,
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 'armosec'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                        if not repo_info.get('deployed', {}).get('found', False)
+                    ],
+                    "discovered_repositories": [
+                        {
+                            "repository": repo_name,
+                            "github_org": repo_info.get('deployed', {}).get('github_org', 
+                                          repo_info.get('rc', {}).get('github_org', 'armosec')),
+                            "has_deployed_index": repo_info.get('deployed', {}).get('found', False),
+                            "has_rc_index": repo_info.get('rc', {}).get('found', False),
+                            "strategy": repo_info.get('deployed', {}).get('strategy', 'unknown'),
+                            "source": repo_info.get('deployed', {}).get('source', 'gomod')
+                        }
+                        for repo_name, repo_info in found_indexes.get('indexes', {}).items()
+                    ]
+                }
+                print(f"   ✅ Added dependency information ({dependencies_info['total_dependencies']} deps)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"   ⚠️  Failed to load dependency info: {e}", file=sys.stderr)
+            sys.stderr.flush()
+    
     context = {
         "metadata": metadata,
+        "dependencies": dependencies_info,  # NEW: Add dependencies section
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
         "code_chunks": formatted_chunks,
@@ -720,6 +782,11 @@ def build_llm_context(
     # Calculate total size
     total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
     context["metadata"]["total_lines_of_code"] = total_lines
+    
+    # Add dependency statistics to metadata
+    context["metadata"]["dependencies_count"] = dependencies_info.get('total_dependencies', 0)
+    context["metadata"]["version_changes_count"] = len(dependencies_info.get('version_changes', []))
+    context["metadata"]["missing_indexes_count"] = len(dependencies_info.get('missing_indexes', []))
     
     return context
 
@@ -787,6 +854,15 @@ def main():
         help="Path to cross-test interference data JSON (optional, from detect_cross_test_interference.py)"
     )
     parser.add_argument(
+        "--found-indexes",
+        help="Path to found-indexes.json (for smart filtering)"
+    )
+    parser.add_argument(
+        "--smart-filter",
+        action="store_true",
+        help="Enable smart dependency filtering based on imports"
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/llm-context.json",
         help="Output file path (default: artifacts/llm-context.json)"
@@ -852,6 +928,53 @@ def main():
             if cross_test_interference:
                 print(f"📖 Loaded cross-test interference data", file=sys.stderr)
                 sys.stderr.flush()
+        
+        # Smart filtering: Analyze imports and filter dependency indexes
+        if args.smart_filter and connected_context and args.found_indexes:
+            print(f"\n🔍 Smart dependency filtering enabled...", file=sys.stderr)
+            sys.stderr.flush()
+            
+            # Extract chunks from connected_context
+            chunks_dict = connected_context.get('filtered_chunks', {})
+            
+            if chunks_dict:
+                # Analyze imports
+                analysis = analyze_all_chunks(chunks_dict)
+                print(f"   Detected {analysis['total_unique_dependencies']} unique dependencies", file=sys.stderr)
+                sys.stderr.flush()
+                
+                # Load found-indexes.json
+                found_indexes = load_json_file(args.found_indexes)
+                
+                if found_indexes:
+                    # Filter indexes based on detected dependencies
+                    filtered_indexes = filter_available_indexes(
+                        analysis['detected_dependencies'],
+                        found_indexes
+                    )
+                    
+                    summary = filtered_indexes['filtering_summary']
+                    print(f"   Available indexes: {summary['total_available']}", file=sys.stderr)
+                    print(f"   After filtering: {summary['after_filtering']}", file=sys.stderr)
+                    print(f"   Removed: {summary['removed']} unused indexes", file=sys.stderr)
+                    sys.stderr.flush()
+                    
+                    # Filter extra_indexes to only include detected dependencies
+                    if extra_indexes:
+                        original_count = len(extra_indexes)
+                        filtered_extra_indexes = {
+                            repo: index_data 
+                            for repo, index_data in extra_indexes.items()
+                            if repo in filtered_indexes['indexes']
+                        }
+                        extra_indexes = filtered_extra_indexes
+                        removed = original_count - len(extra_indexes)
+                        
+                        if removed > 0:
+                            estimated_savings = removed * 5000
+                            print(f"   💰 Estimated token savings: ~{estimated_savings:,} tokens", file=sys.stderr)
+                            print(f"      (Removed {removed} unused dependency indexes)", file=sys.stderr)
+                            sys.stderr.flush()
         
         # Build context
         context = build_llm_context(
