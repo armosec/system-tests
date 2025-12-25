@@ -146,6 +146,28 @@ def filter_relevant_dependencies(dependencies: Dict[str, str]) -> Dict[str, str]
     return relevant
 
 
+def extract_base_version(version: str) -> str:
+    """
+    Extract base version from pseudo-version or regular version.
+    
+    Examples:
+        v0.0.1182-0.20251225061625-832fbea140cc -> v0.0.1182
+        v0.0.1182 -> v0.0.1182
+        v1.2.3-0.20240101120000-abc123 -> v1.2.3
+    """
+    if not version or version == "unknown":
+        return "unknown"
+    
+    # Pseudo-version format: v0.0.1182-0.20251225061625-832fbea140cc
+    # Extract base version before the first dash after version number
+    match = re.match(r'^(v\d+\.\d+\.\d+)(?:-|$)', version)
+    if match:
+        return match.group(1)
+    
+    # If no match, return as-is (might be a commit hash or other format)
+    return version
+
+
 def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str, str]) -> Dict[str, Dict]:
     """
     Compare dependency versions between deployed and RC.
@@ -157,8 +179,12 @@ def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str
     all_deps = set(deployed_deps.keys()) | set(rc_deps.keys())
     
     for dep in all_deps:
-        deployed_ver = deployed_deps.get(dep, "unknown")
-        rc_ver = rc_deps.get(dep, "unknown")
+        deployed_ver_raw = deployed_deps.get(dep, "unknown")
+        rc_ver_raw = rc_deps.get(dep, "unknown")
+        
+        # Extract base versions (handle pseudo-versions)
+        deployed_ver = extract_base_version(deployed_ver_raw)
+        rc_ver = extract_base_version(rc_ver_raw)
         
         # Extract org and repo name
         repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', dep)
@@ -166,8 +192,8 @@ def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str
         repo_name = repo_match.group(2) if repo_match else dep
         
         result[repo_name] = {
-            "deployed_version": deployed_ver,
-            "rc_version": rc_ver,
+            "deployed_version": deployed_ver,  # Use base version, not pseudo-version
+            "rc_version": rc_ver,  # Use base version, not pseudo-version
             "version_changed": deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown",
             "github_org": github_org,
             "has_index": False  # Will be updated later if we check

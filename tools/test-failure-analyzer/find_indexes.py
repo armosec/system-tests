@@ -743,70 +743,98 @@ def main():
             
             # Process each service repo
             for repo_name, repo_info in services_data.items():
-                # Skip dataPurger (explicitly excluded per plan)
-                if repo_name == "dataPurger":
-                    if args.debug:
-                        print(f"\n⏭️  Skipping dataPurger (excluded from analysis)")
-                    continue
-                
                 images = repo_info.get("images", [])
                 if not images:
                     if args.debug:
                         print(f"\n⚠️  No images found for service {repo_name}")
                     continue
                 
-                # Get deployed version from first image (services use deployed version, not RC)
-                deployed_tag = images[0].get("tag", "")
-                if not deployed_tag or deployed_tag == "unknown":
+                # Filter out dataPurger service_key (already filtered in normalization, but double-check)
+                filtered_images = [img for img in images if img.get('service_key') != 'dataPurger']
+                if not filtered_images:
                     if args.debug:
-                        print(f"\n⚠️  No deployed version tag for service {repo_name}")
+                        print(f"\n⏭️  Skipping {repo_name} (only dataPurger images, excluded from analysis)")
                     continue
                 
-                if args.debug:
-                    print(f"\n📦 Processing service: {repo_name}")
-                    print(f"   Deployed version: {deployed_tag}")
+                # For event-ingester-service and other repos with multiple services:
+                # Process ALL images to show all service versions
+                # Group by unique tags to avoid duplicates
+                unique_tags = {}
+                for img in filtered_images:
+                    tag = img.get("tag", "")
+                    service_key = img.get("service_key", "")
+                    if tag and tag != "unknown":
+                        if tag not in unique_tags:
+                            unique_tags[tag] = {
+                                "tag": tag,
+                                "service_keys": [],
+                                "image": img
+                            }
+                        if service_key and service_key not in unique_tags[tag]["service_keys"]:
+                            unique_tags[tag]["service_keys"].append(service_key)
                 
-                # Resolve deployed index for this service
-                service_index_path = None
-                service_org = None
-                service_strategy = None
+                if not unique_tags:
+                    if args.debug:
+                        print(f"\n⚠️  No valid deployed version tags for service {repo_name}")
+                    continue
                 
-                # Try each org
-                for org in github_orgs:
-                    service_index_path, service_org, service_strategy = find_dependency_index(
-                        repo_name,
-                        deployed_tag,
-                        [org],  # Check one org at a time
-                        github_token,
-                        f"{args.output_dir}/{repo_name}-service",
-                        args.debug
-                    )
+                # Process each unique tag (for repos with multiple services using different versions)
+                for tag, tag_info in unique_tags.items():
+                    service_keys_str = ", ".join(tag_info["service_keys"]) if tag_info["service_keys"] else "unknown"
+                    
+                    if args.debug:
+                        print(f"\n📦 Processing service: {repo_name}")
+                        print(f"   Deployed version: {tag}")
+                        if len(unique_tags) > 1:
+                            print(f"   Service keys: {service_keys_str}")
+                    
+                    # Resolve deployed index for this service version
+                    service_index_path = None
+                    service_org = None
+                    service_strategy = None
+                    
+                    # Try each org
+                    for org in github_orgs:
+                        service_index_path, service_org, service_strategy = find_dependency_index(
+                            repo_name,
+                            tag,
+                            [org],  # Check one org at a time
+                            github_token,
+                            f"{args.output_dir}/{repo_name}-service-{tag}",
+                            args.debug
+                        )
+                        if service_index_path:
+                            break
+                    
+                    # Extract commit from tag or index
+                    service_commit = None
                     if service_index_path:
-                        break
-                
-                # Extract commit from tag or index
-                service_commit = None
-                if service_index_path:
-                    service_commit = extract_commit_from_index(service_index_path, args.debug)
-                    # Fallback: Get commit from Git tag
-                    if not service_commit:
-                        repo_full_name = f"{service_org or github_orgs[0]}/{repo_name}"
-                        service_commit = get_commit_for_tag(repo_full_name, deployed_tag, github_token, args.debug)
-                
-                # Add to results
-                results["indexes"][repo_name] = {
-                    "deployed": {
-                        "version": deployed_tag,
-                        "commit": service_commit,
-                        "index_path": service_index_path,
-                        "strategy": service_strategy,
-                        "found": service_index_path is not None,
-                        "github_org": service_org or github_orgs[0],
-                        "source": "service"
-                    },
-                    "rc": {"found": False},  # Services don't use RC versions
-                    "version_changed": False
-                }
+                        service_commit = extract_commit_from_index(service_index_path, args.debug)
+                        # Fallback: Get commit from Git tag
+                        if not service_commit:
+                            repo_full_name = f"{service_org or github_orgs[0]}/{repo_name}"
+                            service_commit = get_commit_for_tag(repo_full_name, tag, github_token, args.debug)
+                    
+                    # Use repo_name as key, but if multiple versions exist, append tag
+                    result_key = repo_name
+                    if len(unique_tags) > 1:
+                        result_key = f"{repo_name}-{tag}"
+                    
+                    # Add to results
+                    results["indexes"][result_key] = {
+                        "deployed": {
+                            "version": tag,
+                            "commit": service_commit,
+                            "index_path": service_index_path,
+                            "strategy": service_strategy,
+                            "found": service_index_path is not None,
+                            "github_org": service_org or github_orgs[0],
+                            "source": "service",
+                            "service_keys": tag_info["service_keys"] if len(unique_tags) > 1 else None
+                        },
+                        "rc": {"found": False},  # Services don't use RC versions
+                        "version_changed": False
+                    }
                 
                 # Update summary
                 results["dependencies_summary"]["total"] += 1
