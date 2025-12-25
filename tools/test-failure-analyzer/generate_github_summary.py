@@ -479,9 +479,11 @@ def generate_summary(
     # services-only.json is a flat dict: {"repo-name": {"images": [...]}, ...}
     if services_only and isinstance(services_only, dict) and len(services_only) > 0:
         services_data = services_only
+        print(f"🔍 DEBUG: Using services-only.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
     elif test_deployed_services:
         # Use services from test-deployed-services.json, but note that dataPurger filtering happens below
         services_data = test_deployed_services.get('services', {})
+        print(f"🔍 DEBUG: Using test-deployed-services.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
     elif running_images:
         # Legacy format - extract services (exclude triggering repo)
         repos = running_images.get('repos', {})
@@ -490,6 +492,9 @@ def generate_summary(
         for repo_name, repo_info in repos.items():
             if not repo_info.get('is_triggering_repo', False) and repo_name.lower() != triggering_repo_normalized.lower():
                 services_data[repo_name] = repo_info
+        print(f"🔍 DEBUG: Using running-images.json (legacy) with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+    else:
+        print(f"🔍 DEBUG: No services data source available (services_only={services_only is not None}, test_deployed_services={test_deployed_services is not None}, running_images={running_images is not None})", file=sys.stderr)
     
     if services_data and len(services_data) > 0:
         # Create table for services
