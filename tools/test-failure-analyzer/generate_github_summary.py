@@ -250,11 +250,17 @@ def generate_summary(
     test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
     running_images = load_json(running_images_path) if not test_deployed_services else None
     # Prefer services-only.json (already filtered) for services display
+    print(f"🔍 DEBUG: services_only_path = {services_only_path}", file=sys.stderr)
     services_only = load_json(services_only_path) if services_only_path else None
+    print(f"🔍 DEBUG: After load_json, services_only = {services_only is not None}, type={type(services_only) if services_only else 'None'}", file=sys.stderr)
     if services_only_path:
         print(f"🔍 DEBUG: Loaded services_only from {services_only_path}: {services_only is not None}, type={type(services_only)}, len={len(services_only) if isinstance(services_only, dict) else 'N/A'}", file=sys.stderr)
         if services_only and isinstance(services_only, dict):
             print(f"🔍 DEBUG: services_only keys: {list(services_only.keys())}", file=sys.stderr)
+        elif services_only is None:
+            print(f"🔍 DEBUG: services_only is None (file might not exist or failed to load)", file=sys.stderr)
+        elif isinstance(services_only, dict) and len(services_only) == 0:
+            print(f"🔍 DEBUG: services_only is empty dict {{}}", file=sys.stderr)
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
