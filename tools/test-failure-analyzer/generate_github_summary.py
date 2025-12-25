@@ -476,7 +476,8 @@ def generate_summary(
     
     services_data = None
     # Prefer services-only.json (already filtered, excludes dataPurger and triggering repo)
-    if services_only:
+    # services-only.json is a flat dict: {"repo-name": {"images": [...]}, ...}
+    if services_only and isinstance(services_only, dict) and len(services_only) > 0:
         services_data = services_only
     elif test_deployed_services:
         # Use services from test-deployed-services.json, but note that dataPurger filtering happens below
@@ -490,7 +491,7 @@ def generate_summary(
             if not repo_info.get('is_triggering_repo', False) and repo_name.lower() != triggering_repo_normalized.lower():
                 services_data[repo_name] = repo_info
     
-    if services_data:
+    if services_data and len(services_data) > 0:
         # Create table for services
         lines.append("| Service | Deployed Version | Index Available |")
         lines.append("|---------|------------------|-----------------|")
