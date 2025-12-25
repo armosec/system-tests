@@ -182,19 +182,29 @@ def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str
         deployed_ver_raw = deployed_deps.get(dep, "unknown")
         rc_ver_raw = rc_deps.get(dep, "unknown")
         
-        # Extract base versions (handle pseudo-versions)
-        deployed_ver = extract_base_version(deployed_ver_raw)
-        rc_ver = extract_base_version(rc_ver_raw)
+        # Use EXACT versions from go.mod (don't extract base versions)
+        # The versions shown should match exactly what's in go.mod
+        deployed_ver = deployed_ver_raw
+        rc_ver = rc_ver_raw
+        
+        # Extract base versions ONLY for comparison (to detect version changes)
+        # Pseudo-versions like v0.0.1182-0.20251225061625-832fbea140cc should be compared
+        # against base version v0.0.1182 to detect if they're the same base version
+        deployed_base = extract_base_version(deployed_ver_raw)
+        rc_base = extract_base_version(rc_ver_raw)
         
         # Extract org and repo name
         repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', dep)
         github_org = repo_match.group(1) if repo_match else "armosec"
         repo_name = repo_match.group(2) if repo_match else dep
         
+        # Version changed if base versions differ (pseudo-version vs tag of same base = not changed)
+        version_changed = deployed_base != rc_base and deployed_base != "unknown" and rc_base != "unknown"
+        
         result[repo_name] = {
-            "deployed_version": deployed_ver,  # Use base version, not pseudo-version
-            "rc_version": rc_ver,  # Use base version, not pseudo-version
-            "version_changed": deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown",
+            "deployed_version": deployed_ver,  # Exact version from go.mod
+            "rc_version": rc_ver,  # Exact version from go.mod (may include pseudo-version)
+            "version_changed": version_changed,
             "github_org": github_org,
             "has_index": False  # Will be updated later if we check
         }

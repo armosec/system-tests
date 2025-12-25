@@ -409,10 +409,23 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         if debug:
             print(f"\n📦 Processing dependency: {dep_name}")
         
-        deployed_ver = dep_info.get('deployed_version', 'unknown')
-        rc_ver = dep_info.get('rc_version', 'unknown')
+        deployed_ver_raw = dep_info.get('deployed_version', 'unknown')
+        rc_ver_raw = dep_info.get('rc_version', 'unknown')
         version_changed = dep_info.get('version_changed', False)
         github_org_hint = dep_info.get('github_org')
+        
+        # Extract base versions for index resolution (indexes are tagged with base versions)
+        # But keep raw versions for display
+        def extract_base_version(version: str) -> str:
+            """Extract base version from pseudo-version for index resolution."""
+            if not version or version == "unknown":
+                return "unknown"
+            # Pseudo-version format: v0.0.1182-0.20251225061625-832fbea140cc -> v0.0.1182
+            match = re.match(r'^(v\d+\.\d+\.\d+)(?:-|$)', version)
+            return match.group(1) if match else version
+        
+        deployed_ver_base = extract_base_version(deployed_ver_raw) if deployed_ver_raw != 'unknown' else 'unknown'
+        rc_ver_base = extract_base_version(rc_ver_raw) if rc_ver_raw != 'unknown' else 'unknown'
         
         # If we have an org hint, prioritize it in the orgs list
         check_orgs = github_orgs
@@ -420,7 +433,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
             # Move the hinted org to the front
             check_orgs = [github_org_hint] + [o for o in github_orgs if o != github_org_hint]
         
-        if deployed_ver == 'unknown' and rc_ver == 'unknown':
+        if deployed_ver_raw == 'unknown' and rc_ver_raw == 'unknown':
             if debug:
                 print(f"  ⏭️  Skipping {dep_name} (no version info)")
             results[dep_name] = {
@@ -430,17 +443,17 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
             }
             continue
         
-        # Resolve deployed version
+        # Resolve deployed version (use base version for index lookup)
         deployed_index = None
         deployed_org = None
         deployed_strategy = None
         deployed_found = False
-        if deployed_ver != 'unknown':
+        if deployed_ver_base != 'unknown':
             if debug:
-                print(f"  🔍 Resolving deployed version: {deployed_ver}")
+                print(f"  🔍 Resolving deployed version: {deployed_ver_raw} (using base {deployed_ver_base} for index lookup)")
             
             deployed_index, deployed_org, deployed_strategy = find_dependency_index(
-                dep_name, deployed_ver, check_orgs, 
+                dep_name, deployed_ver_base, check_orgs,  # Use base version for index lookup
                 github_token, f"{output_dir}/{dep_name}-deployed", debug
             )
             deployed_found = deployed_index is not None
@@ -452,17 +465,17 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 if debug:
                     print(f"  ⚠️  Deployed index not found")
         
-        # Resolve RC version if changed
+        # Resolve RC version if changed (use base version for index lookup)
         rc_index = None
         rc_org = None
         rc_strategy = None
         rc_found = False
-        if version_changed and rc_ver != 'unknown':
+        if version_changed and rc_ver_base != 'unknown':
             if debug:
-                print(f"  🔍 Resolving RC version: {rc_ver}")
+                print(f"  🔍 Resolving RC version: {rc_ver_raw} (using base {rc_ver_base} for index lookup)")
             
             rc_index, rc_org, rc_strategy = find_dependency_index(
-                dep_name, rc_ver, check_orgs,
+                dep_name, rc_ver_base, check_orgs,  # Use base version for index lookup
                 github_token, f"{output_dir}/{dep_name}-rc", debug
             )
             rc_found = rc_index is not None
@@ -478,18 +491,18 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         deployed_commit = None
         if deployed_index and deployed_org:
             deployed_commit = extract_commit_from_index(deployed_index, debug)
-            # Fallback: Get commit from Git tag if index has no metadata
-            if not deployed_commit and deployed_ver != 'unknown':
+            # Fallback: Get commit from Git tag if index has no metadata (use base version for tag lookup)
+            if not deployed_commit and deployed_ver_base != 'unknown':
                 repo_full_name = f"{deployed_org}/{dep_name}"
-                deployed_commit = get_commit_for_tag(repo_full_name, deployed_ver, github_token, debug)
+                deployed_commit = get_commit_for_tag(repo_full_name, deployed_ver_base, github_token, debug)
         
         rc_commit = None
         if rc_index and rc_org:
             rc_commit = extract_commit_from_index(rc_index, debug)
-            # Fallback: Get commit from Git tag if index has no metadata
-            if not rc_commit and rc_ver != 'unknown':
+            # Fallback: Get commit from Git tag if index has no metadata (use base version for tag lookup)
+            if not rc_commit and rc_ver_base != 'unknown':
                 repo_full_name = f"{rc_org}/{dep_name}"
-                rc_commit = get_commit_for_tag(repo_full_name, rc_ver, github_token, debug)
+                rc_commit = get_commit_for_tag(repo_full_name, rc_ver_base, github_token, debug)
         
         # Use org hint if still not found, otherwise default to armosec
         if not deployed_org:
@@ -499,7 +512,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         
         results[dep_name] = {
             "deployed": {
-                "version": deployed_ver,
+                "version": deployed_ver_raw,  # Store exact version from go.mod
                 "commit": deployed_commit,
                 "index_path": deployed_index,
                 "found": deployed_found,
@@ -508,7 +521,7 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 "source": "gomod"  # Mark as coming from go.mod
             },
             "rc": {
-                "version": rc_ver,
+                "version": rc_ver_raw,  # Store exact version from go.mod (may include pseudo-version)
                 "commit": rc_commit,
                 "index_path": rc_index,
                 "found": rc_found,
