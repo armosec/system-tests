@@ -101,6 +101,39 @@ class AzureAccountsMixin:
             Logger.logger.error(f"Failed to create Reader role: {str(e)}")
             return False
 
+    def verify_azure_reader_role_status(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, client_object_id: str, expected_present: bool) -> bool:
+        try:
+            from azure.identity import ClientSecretCredential
+            from azure.mgmt.authorization import AuthorizationManagementClient
+
+            from .accounts import AZURE_READER_ROLE_DEFINITION_PATH
+            credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
+            auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
+            scope = f"/subscriptions/{subscription_id}"
+            reader_role_definition_id = f"{scope}{AZURE_READER_ROLE_DEFINITION_PATH}"
+
+            role_assignments = auth_client.role_assignments.list_for_scope(scope=scope)
+            role_found = False
+            for assignment in role_assignments:
+                if assignment.role_definition_id == reader_role_definition_id and assignment.principal_id == client_object_id:
+                    role_found = True
+                    break
+
+            if expected_present and not role_found:
+                raise Exception(f"Reader role not found for client {client_id} (object_id: {client_object_id}) in subscription {subscription_id}")
+            elif not expected_present and role_found:
+                raise Exception(f"Reader role still present for client {client_id} (object_id: {client_object_id}) in subscription {subscription_id}")
+
+            Logger.logger.info(f"Reader role verification successful: role is {'present' if expected_present else 'absent'} for client {client_id}")
+            return True
+
+        except ImportError:
+            Logger.logger.warning("Azure SDK not available")
+            raise Exception("Azure SDK not available - cannot verify Reader role status")
+        except Exception as e:
+            Logger.logger.error(f"Failed to verify Reader role status: {str(e)}")
+            raise Exception(f"Failed to verify Reader role status: {str(e)}")
+
     def reconnect_azure_cspm_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_secret: str):
         Logger.logger.info(f"Reconnecting Azure CSPM account {cloud_account_guid}")
         compliance_azure_config = {
@@ -123,7 +156,17 @@ class AzureAccountsMixin:
         reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret)
         assert reader_role_removed, "Failed to remove Reader role from Service Principal"
         Logger.logger.info("Reader role removed successfully, waiting for propagation")
-        time.sleep(10)
+        self.wait_for_report(
+            self.verify_azure_reader_role_status,
+            timeout=180,
+            sleep_interval=30,
+            subscription_id=subscription_id,
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+            client_object_id=client_object_id,
+            expected_present=False,
+        )
 
         Logger.logger.info("Triggering scan now (should fail)")
         try:
@@ -144,8 +187,18 @@ class AzureAccountsMixin:
         Logger.logger.info("Restoring Reader role with Azure API")
         reader_role_restored = self.create_azure_reader_role(subscription_id, tenant_id, client_id, client_object_id, client_secret)
         assert reader_role_restored, "Failed to restore Reader role to Service Principal"
-        Logger.logger.info("Waiting for the role restoration to propagate")
-        time.sleep(150)
+        Logger.logger.info("Reader role restored successfully, waiting for propagation")
+        self.wait_for_report(
+            self.verify_azure_reader_role_status,
+            timeout=300,
+            sleep_interval=30,
+            subscription_id=subscription_id,
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+            client_object_id=client_object_id,
+            expected_present=True,
+        )
 
         Logger.logger.info("Reconnecting by updating the account")
         self.wait_for_report(

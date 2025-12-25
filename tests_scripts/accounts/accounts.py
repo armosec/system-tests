@@ -1010,7 +1010,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
         return None
 
-    def validate_entity_status(self, entity_guid: str, status_path: str, expected_status: str, entity_type: str = "account"):
+    def validate_entity_status(self, entity_guid: str, status_path: str, expected_status: str, entity_type: CloudEntityTypes):
         """
         Generic function to validate status of accounts or organizations.
         
@@ -1018,14 +1018,14 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
             entity_guid: GUID of the account or organization
             status_path: JSON path to the status field (e.g., "cspmSpecificData.cspmStatus")
             expected_status: Expected status value
-            entity_type: Type of entity ("account" or "org")
+            entity_type: Type of entity (CloudEntityTypes.ACCOUNT or CloudEntityTypes.ORGANIZATION)
         """
-        if entity_type == "account":
+        if entity_type == CloudEntityTypes.ACCOUNT:
             entity = self.get_cloud_account_by_guid(entity_guid)
-        else:
+        elif entity_type == CloudEntityTypes.ORGANIZATION:
             entity = self.get_cloud_org_by_guid(entity_guid)
         
-        # Navigate through the status path
+        # Navigate through the status path on the json
         current = entity
         for key in status_path.split('.'):
             current = current[key]
@@ -1034,23 +1034,23 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
     def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
         """Validate account feature status."""
-        self.validate_entity_status(cloud_account_guid, f"features.{feature_name}.featureStatus", expected_status, "account")
+        self.validate_entity_status(cloud_account_guid, f"features.{feature_name}.featureStatus", expected_status, CloudEntityTypes.ACCOUNT)
 
     def validate_account_status(self, cloud_account_guid: str, expected_status: str):
         """Validate account CSPM status."""
-        self.validate_entity_status(cloud_account_guid, "cspmSpecificData.cspmStatus", expected_status, "account")
+        self.validate_entity_status(cloud_account_guid, "cspmSpecificData.cspmStatus", expected_status, CloudEntityTypes.ACCOUNT)
    
     def validate_org_status(self, org_guid: str, expected_status: str):
         """Validate organization CSPM status."""
-        self.validate_entity_status(org_guid, "cspmSpecificData.cspmStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, "cspmSpecificData.cspmStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_org_feature_status(self, org_guid: str, feature_name: str, expected_status: str):
         """Validate organization feature status."""
-        self.validate_entity_status(org_guid, f"features.{feature_name}.featureStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, f"features.{feature_name}.featureStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_admin_status(self, org_guid: str, expected_status: str):
         """Validate organization admin status."""
-        self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_account_feature_is_excluded(self, cloud_account_guid: str, feature_name: str, is_excluded: bool):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
@@ -1091,14 +1091,6 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         }
         self.backend.update_org_exclude_accounts(body)
     
-    def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
-
-    def validate_account__cspm_status(self, cloud_account_guid: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
-
     def validate_no_account(self,cloud_account_guid: str):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)
