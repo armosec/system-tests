@@ -316,13 +316,28 @@ def generate_summary(
     total_lines = metadata.get('total_lines_of_code', 0)
     
     # Get triggering repo name for header
+    # Extract from found_indexes or test_deployed_services
+    triggering_repo = 'unknown'
+    triggering_repo_data = None
+    
+    if test_deployed_services and isinstance(test_deployed_services, dict):
+        triggering_repo_data = test_deployed_services.get('triggering_repo')
+        if triggering_repo_data and isinstance(triggering_repo_data, dict):
+            triggering_repo = triggering_repo_data.get('name', triggering_repo_data.get('repo', 'unknown'))
+        elif isinstance(triggering_repo_data, str):
+            triggering_repo = triggering_repo_data
+    elif found_indexes and isinstance(found_indexes, dict):
+        triggering_repo = found_indexes.get('triggering_repo', 'unknown')
+    
+    # Format display name
     triggering_repo_display = 'unknown'
-    if triggering_repo_data:
+    if triggering_repo_data and isinstance(triggering_repo_data, dict):
         triggering_repo_display = triggering_repo_data.get('name', f'armosec/{triggering_repo}')
-    elif found_indexes:
-        triggering_repo_display = f"armosec/{found_indexes.get('triggering_repo', triggering_repo)}"
-    else:
-        triggering_repo_display = f"armosec/{triggering_repo}"
+    elif triggering_repo and triggering_repo != 'unknown':
+        if '/' in triggering_repo:
+            triggering_repo_display = triggering_repo
+        else:
+            triggering_repo_display = f"armosec/{triggering_repo}"
     
     # Header section - Repository, Environment, Test
     lines.append(f"**Repository:** `{triggering_repo_display}`")
