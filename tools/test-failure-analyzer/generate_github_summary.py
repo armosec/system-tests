@@ -1072,8 +1072,10 @@ def main():
     args = parser.parse_args()
     
     # Debug: Print all args to see what's being parsed
-    print(f"🔍 DEBUG: Parsed args.services_only = {getattr(args, 'services_only', 'NOT_FOUND')}", file=sys.stderr)
+    services_only_arg = getattr(args, 'services_only', None)
+    print(f"🔍 DEBUG: Parsed args.services_only = {services_only_arg}", file=sys.stderr)
     print(f"🔍 DEBUG: All args: {vars(args)}", file=sys.stderr)
+    print(f"🔍 DEBUG: About to call generate_summary with services_only_path = {services_only_arg}", file=sys.stderr)
     
     # Generate summary
     summary = generate_summary(
@@ -1086,9 +1088,10 @@ def main():
         args.context_summary,
         args.environment,
         args.run_ref,
-        args.llm_analysis,
-        args.test_deployed_services,
-        getattr(args, 'services_only', None)  # Use getattr to handle potential attribute name issues
+        args.workflow_commit,  # workflow_commit_path (position 10)
+        args.llm_analysis,      # llm_analysis_path (position 11)
+        args.test_deployed_services,  # test_deployed_services_path (position 12)
+        services_only_arg       # services_only_path (position 13)
     )
     
     # Write to output
