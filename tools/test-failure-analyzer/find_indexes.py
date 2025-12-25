@@ -58,7 +58,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-orgs", default="armosec,kubescape", help="Comma-separated GitHub organizations to check")
     
     # Options
-    parser.add_argument("--images", help="Path to running-images.json to resolve dashboard version")
+    parser.add_argument("--images", help="Path to test-deployed-services.json or running-images.json (for triggering repo)")
+    parser.add_argument("--services-only", help="Path to services-only.json (filtered services, excludes triggering repo)")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     
     return parser.parse_args()
@@ -728,6 +729,99 @@ def main():
             
             if dep_info.get("version_changed"):
                 results["dependencies_summary"]["version_changes"].append(dep_name)
+    
+    # Resolve service indexes from services-only.json (excludes triggering repo)
+    if args.services_only and os.path.exists(args.services_only):
+        if args.debug:
+            print("\n" + "="*70)
+            print("  Resolving Service Indexes")
+            print("="*70)
+        
+        try:
+            with open(args.services_only, 'r') as f:
+                services_data = json.load(f)
+            
+            # Process each service repo
+            for repo_name, repo_info in services_data.items():
+                # Skip dataPurger (explicitly excluded per plan)
+                if repo_name == "dataPurger":
+                    if args.debug:
+                        print(f"\n⏭️  Skipping dataPurger (excluded from analysis)")
+                    continue
+                
+                images = repo_info.get("images", [])
+                if not images:
+                    if args.debug:
+                        print(f"\n⚠️  No images found for service {repo_name}")
+                    continue
+                
+                # Get deployed version from first image (services use deployed version, not RC)
+                deployed_tag = images[0].get("tag", "")
+                if not deployed_tag or deployed_tag == "unknown":
+                    if args.debug:
+                        print(f"\n⚠️  No deployed version tag for service {repo_name}")
+                    continue
+                
+                if args.debug:
+                    print(f"\n📦 Processing service: {repo_name}")
+                    print(f"   Deployed version: {deployed_tag}")
+                
+                # Resolve deployed index for this service
+                service_index_path = None
+                service_org = None
+                service_strategy = None
+                
+                # Try each org
+                for org in github_orgs:
+                    service_index_path, service_org, service_strategy = find_dependency_index(
+                        repo_name,
+                        deployed_tag,
+                        [org],  # Check one org at a time
+                        github_token,
+                        f"{args.output_dir}/{repo_name}-service",
+                        args.debug
+                    )
+                    if service_index_path:
+                        break
+                
+                # Extract commit from tag or index
+                service_commit = None
+                if service_index_path:
+                    service_commit = extract_commit_from_index(service_index_path, args.debug)
+                    # Fallback: Get commit from Git tag
+                    if not service_commit:
+                        repo_full_name = f"{service_org or github_orgs[0]}/{repo_name}"
+                        service_commit = get_commit_for_tag(repo_full_name, deployed_tag, github_token, args.debug)
+                
+                # Add to results
+                results["indexes"][repo_name] = {
+                    "deployed": {
+                        "version": deployed_tag,
+                        "commit": service_commit,
+                        "index_path": service_index_path,
+                        "strategy": service_strategy,
+                        "found": service_index_path is not None,
+                        "github_org": service_org or github_orgs[0],
+                        "source": "service"
+                    },
+                    "rc": {"found": False},  # Services don't use RC versions
+                    "version_changed": False
+                }
+                
+                # Update summary
+                results["dependencies_summary"]["total"] += 1
+                if service_index_path:
+                    results["dependencies_summary"]["indexes_found"] += 1
+                else:
+                    results["dependencies_summary"]["indexes_missing"] += 1
+                
+                if args.debug:
+                    status = "✅" if service_index_path else "❌"
+                    print(f"   {status} Index: {service_index_path or 'not found'}")
+        except Exception as e:
+            if args.debug:
+                print(f"\n⚠️  Error processing services-only.json: {e}")
+            # Non-fatal, continue
     
     # Resolve dashboard indexes if different from triggering repo
     if args.dashboard_repo != args.triggering_repo:
