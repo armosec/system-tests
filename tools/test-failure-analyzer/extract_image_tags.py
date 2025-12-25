@@ -168,69 +168,88 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
             "eventIngester": "event-ingester-service",
             "event-ingester": "event-ingester-service",
             "event-ingester-service": "event-ingester-service",
-            "dataPurger": "event-ingester-service",  # Common case, but actual repo determined from image.repository
-            "synchronizerIngester": "event-ingester-service",  # Additional event-ingester-service services
+            # Common event-ingester-service services (kept for documentation/hints)
+            # NOTE: These are NOT required - extraction discovers all services dynamically
+            "dataPurger": "event-ingester-service",
+            "synchronizerIngester": "event-ingester-service",
             "analyticsIngester": "event-ingester-service",
             "dbMigrator": "event-ingester-service",
             "eventReceiver": "dashboard-event-receiver",
             "eventReceiverKubescape": "dashboard-event-receiver",
             "event-receiver": "dashboard-event-receiver",
-            # Note: Services colloquially called "ingesters" may come from event-ingester-service repo,
-            # but could also come from other repos. Always check image.repository to determine actual source.
+            # Note: Many more services exist (attackChainEngineIngester, securityRisksIngester, etc.)
+            # but they are automatically discovered by checking image.repository fields.
+            # No need to list them all here - the extraction logic handles it dynamically.
         }
         
         def extract_from_nested_dict(obj: dict, parent_key: str = "") -> None:
-            """Recursively extract image tags from nested YAML structure."""
+            """
+            Recursively extract image tags from nested YAML structure.
+            
+            This function dynamically extracts ALL services that have an image.repository field,
+            regardless of service key name. It uses map_image_to_repo() to determine if the
+            image belongs to a backend repo we care about.
+            
+            This approach is more robust than hardcoding service_keys because:
+            1. It automatically discovers new services without code changes
+            2. It doesn't require maintaining a list of all service keys
+            3. The image.repository field is the source of truth for determining the actual repo
+            """
             for key, value in obj.items():
                 current_key = key
                 full_path = f"{parent_key}.{key}" if parent_key else key
                 
-                # Check if this is a service we care about
-                repo_name = None
-                for service_key, repo in service_keys.items():
-                    if key == service_key or key.lower() == service_key.lower():
-                        repo_name = repo
-                        break
-                
-                # If this is a service key, look for image.repository and image.tag
-                if repo_name and isinstance(value, dict):
+                # Check if this dict has an image.repository field (any service with an image)
+                if isinstance(value, dict):
                     image_section = value.get("image", {})
                     if isinstance(image_section, dict):
                         repository = image_section.get("repository", "")
                         tag = image_section.get("tag", "")
+                        
                         if repository and tag:
-                            image_string = f"{repository}:{tag}"
-                            
-                            # CRITICAL: Determine actual repo from image repository name, NOT from service key or naming
+                            # CRITICAL: Determine actual repo from image repository name
+                            # This is the source of truth - we don't need service_keys mapping
                             # Services may be colloquially called "ingesters" but could come from any repo.
                             # The image.repository field is the source of truth for determining the actual source repo.
                             actual_repo = map_image_to_repo(repository)
-                            if not actual_repo:
-                                # Fallback to service key mapping only if image doesn't match any known patterns
-                                actual_repo = repo_name
                             
-                            if actual_repo not in repo_images:
-                                repo_images[actual_repo] = []
-                            
-                            # Build note explaining the mapping
-                            note_parts = [f"Service key '{key}' initially mapped to '{repo_name}'"]
-                            if actual_repo != repo_name:
-                                note_parts.append(f"but actual repo is '{actual_repo}' (determined from image '{repository}')")
-                            else:
-                                note_parts.append(f"confirmed as '{actual_repo}' from image '{repository}'")
-                            
-                            repo_images[actual_repo].append({
-                                "image": image_string,
-                                "tag": tag,
-                                "full_image": image_string,
-                                "repository": repository,
-                                "source": f"event_sourcing_values:{os.path.basename(values_file_path)}",
-                                "yaml_path": full_path,
-                                "service_key": key,  # Service key from YAML (e.g., "dataPurger", "dashboardBE")
-                                "service_key_mapped_to_repo": repo_name,  # Initial mapping from service key (hint only)
-                                "actual_repo": actual_repo,  # Actual repo determined from image.repository (source of truth)
-                                "note": " | ".join(note_parts)
-                            })
+                            # Only extract if it's a backend repo we care about
+                            if actual_repo and actual_repo in BACKEND_REPOS:
+                                image_string = f"{repository}:{tag}"
+                                
+                                if actual_repo not in repo_images:
+                                    repo_images[actual_repo] = []
+                                
+                                # Use service key as initial hint for documentation, but actual repo comes from image
+                                # Try to find matching service_key for documentation purposes
+                                repo_name_hint = None
+                                for service_key, mapped_repo in service_keys.items():
+                                    if key == service_key or key.lower() == service_key.lower():
+                                        repo_name_hint = mapped_repo
+                                        break
+                                
+                                # Build note explaining the mapping
+                                note_parts = [f"Service key '{key}'"]
+                                if repo_name_hint and repo_name_hint == actual_repo:
+                                    note_parts.append(f"mapped to '{actual_repo}'")
+                                elif repo_name_hint:
+                                    note_parts.append(f"initially mapped to '{repo_name_hint}' but actual repo is '{actual_repo}'")
+                                else:
+                                    note_parts.append(f"discovered as '{actual_repo}' (no service_key mapping)")
+                                note_parts.append(f"confirmed from image '{repository}'")
+                                
+                                repo_images[actual_repo].append({
+                                    "image": image_string,
+                                    "tag": tag,
+                                    "full_image": image_string,
+                                    "repository": repository,
+                                    "source": f"event_sourcing_values:{os.path.basename(values_file_path)}",
+                                    "yaml_path": full_path,
+                                    "service_key": key,  # Service key from YAML (e.g., "dataPurger", "synchronizerIngester")
+                                    "service_key_mapped_to_repo": repo_name_hint,  # Initial mapping hint (if exists in service_keys)
+                                    "actual_repo": actual_repo,  # Actual repo determined from image.repository (source of truth)
+                                    "note": " | ".join(note_parts)
+                                })
                 
                 # Recurse into nested dicts
                 if isinstance(value, dict):
