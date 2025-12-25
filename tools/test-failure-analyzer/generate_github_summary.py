@@ -1071,6 +1071,10 @@ def main():
     
     args = parser.parse_args()
     
+    # Debug: Print all args to see what's being parsed
+    print(f"🔍 DEBUG: Parsed args.services_only = {getattr(args, 'services_only', 'NOT_FOUND')}", file=sys.stderr)
+    print(f"🔍 DEBUG: All args: {vars(args)}", file=sys.stderr)
+    
     # Generate summary
     summary = generate_summary(
         args.llm_context,
@@ -1084,7 +1088,7 @@ def main():
         args.run_ref,
         args.llm_analysis,
         args.test_deployed_services,
-        args.services_only
+        getattr(args, 'services_only', None)  # Use getattr to handle potential attribute name issues
     )
     
     # Write to output
