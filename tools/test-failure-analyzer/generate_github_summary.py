@@ -17,11 +17,17 @@ from typing import Dict, Any, Optional
 
 def load_json(path: str) -> Optional[Dict[str, Any]]:
     """Load JSON file, return None if not found."""
+    if not path:
+        return None
     if not os.path.exists(path):
+        print(f"🔍 DEBUG: File does not exist: {path}", file=sys.stderr)
         return None
     try:
         with open(path, 'r') as f:
-            return json.load(f)
+            data = json.load(f)
+            if isinstance(data, dict) and len(data) == 0:
+                print(f"🔍 DEBUG: File {path} is empty dict {{}}", file=sys.stderr)
+            return data
     except Exception as e:
         print(f"Warning: Failed to load {path}: {e}", file=sys.stderr)
         return None
@@ -245,6 +251,10 @@ def generate_summary(
     running_images = load_json(running_images_path) if not test_deployed_services else None
     # Prefer services-only.json (already filtered) for services display
     services_only = load_json(services_only_path) if services_only_path else None
+    if services_only_path:
+        print(f"🔍 DEBUG: Loaded services_only from {services_only_path}: {services_only is not None}, type={type(services_only)}, len={len(services_only) if isinstance(services_only, dict) else 'N/A'}", file=sys.stderr)
+        if services_only and isinstance(services_only, dict):
+            print(f"🔍 DEBUG: services_only keys: {list(services_only.keys())}", file=sys.stderr)
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
