@@ -313,9 +313,45 @@ def main():
             print(f"❌ Error loading code indexes: {e}", file=sys.stderr)
             sys.exit(1)
         
-        # Extract go.mod from both
-        deployed_gomod = find_gomod_in_index(deployed_index)
-        rc_gomod = find_gomod_in_index(rc_index)
+        # Extract go.mod from both - prefer GitHub download (actual repo file) over code index content
+        # Code index go.mod might have pseudo-versions if index was generated from commit after tag
+        deployed_gomod = None
+        rc_gomod = None
+        
+        # Try to download from GitHub first (more accurate - actual repo file)
+        deployed_metadata = deployed_index.get('metadata', {})
+        rc_metadata = rc_index.get('metadata', {})
+        
+        deployed_repo = deployed_metadata.get('repo', 'armosec/cadashboardbe')
+        deployed_commit = deployed_metadata.get('commit') or deployed_metadata.get('version', 'main')
+        rc_repo = rc_metadata.get('repo', 'armosec/cadashboardbe')
+        rc_commit = rc_metadata.get('commit') or rc_metadata.get('version', 'main')
+        
+        if args.debug:
+            print(f"📥 Attempting to download go.mod from GitHub...")
+            print(f"   Deployed: {deployed_repo}@{deployed_commit}")
+            print(f"   RC: {rc_repo}@{rc_commit}")
+        
+        # Download deployed go.mod from GitHub
+        deployed_gomod = download_gomod_from_github(deployed_repo, deployed_commit, github_token)
+        if deployed_gomod and args.debug:
+            print(f"✅ Downloaded deployed go.mod from GitHub")
+        
+        # Download RC go.mod from GitHub
+        rc_gomod = download_gomod_from_github(rc_repo, rc_commit, github_token)
+        if rc_gomod and args.debug:
+            print(f"✅ Downloaded RC go.mod from GitHub")
+        
+        # Fallback to code index go.mod if GitHub download failed
+        if not deployed_gomod:
+            deployed_gomod = find_gomod_in_index(deployed_index)
+            if deployed_gomod and args.debug:
+                print(f"⚠️  Using deployed go.mod from code index (GitHub download failed)")
+        
+        if not rc_gomod:
+            rc_gomod = find_gomod_in_index(rc_index)
+            if rc_gomod and args.debug:
+                print(f"⚠️  Using RC go.mod from code index (GitHub download failed)")
         
         if not deployed_gomod or not rc_gomod:
             print(f"⚠️  Warning: go.mod not found in one or both indexes", file=sys.stderr)
