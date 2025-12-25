@@ -571,6 +571,7 @@ def main():
         "test_run_id": args.test_run_id,
         "rc_version": args.rc_version,  # Release candidate version tag (e.g., rc-v0.0.224-2437)
         "commit_hash": args.commit_hash,  # Latest commit hash from main/master branch (from Step 5)
+        "kubernetes_deployment_commit": args.kubernetes_deployment_commit if args.kubernetes_deployment_commit else "",  # Commit hash of kubernetes-deployment repo used for extraction
         "triggering_repo": args.triggering_repo,  # Full repo name (e.g., "armosec/cadashboardbe")
         "triggering_repo_normalized": triggering_repo_normalized,  # Normalized name (e.g., "cadashboardbe")
         "source": "event_sourcing_values" if args.event_sourcing_values else "deployment_manifest" if args.deployment_manifest else "workflow_artifacts" if args.workflow_artifacts else "image_tags_file",
