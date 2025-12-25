@@ -169,6 +169,9 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
             "event-ingester": "event-ingester-service",
             "event-ingester-service": "event-ingester-service",
             "dataPurger": "event-ingester-service",  # Common case, but actual repo determined from image.repository
+            "synchronizerIngester": "event-ingester-service",  # Additional event-ingester-service services
+            "analyticsIngester": "event-ingester-service",
+            "dbMigrator": "event-ingester-service",
             "eventReceiver": "dashboard-event-receiver",
             "eventReceiverKubescape": "dashboard-event-receiver",
             "event-receiver": "dashboard-event-receiver",
