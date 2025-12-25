@@ -289,9 +289,20 @@ def generate_summary(
     total_chunks = metadata.get('total_chunks', 0)
     total_lines = metadata.get('total_lines_of_code', 0)
     
+    # Get triggering repo name for header
+    triggering_repo_display = 'unknown'
+    if triggering_repo_data:
+        triggering_repo_display = triggering_repo_data.get('name', f'armosec/{triggering_repo}')
+    elif found_indexes:
+        triggering_repo_display = f"armosec/{found_indexes.get('triggering_repo', triggering_repo)}"
+    else:
+        triggering_repo_display = f"armosec/{triggering_repo}"
+    
+    # Header section - Repository, Environment, Test
+    lines.append(f"**Repository:** `{triggering_repo_display}`")
+    lines.append(f"**Environment:** `{environment}`")
     lines.append(f"**Test:** `{test_name}`")
     lines.append(f"**Test Run ID:** `{test_run_id}`")
-    lines.append(f"**Environment:** `{environment}`")
     
     # Format original test run link
     if run_ref.startswith('http'):
@@ -300,13 +311,50 @@ def generate_summary(
         run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
         lines.append(f"**Original Test Run:** [Run #{run_ref}]({run_url})")
     
-    lines.append(f"**Total Code Chunks:** {total_chunks}")
-    lines.append(f"**Total Lines of Code:** {total_lines}")
+    # Code chunks and LOC - clarify these include ALL repos (triggering + dependencies)
+    chunks_by_repo = metadata.get('chunks_by_repo', {})
+    if chunks_by_repo:
+        # Show breakdown by repo
+        triggering_repo_chunks = chunks_by_repo.get(triggering_repo, {}).get('chunks', 0) if isinstance(chunks_by_repo.get(triggering_repo), dict) else 0
+        triggering_repo_loc = chunks_by_repo.get(triggering_repo, {}).get('loc', 0) if isinstance(chunks_by_repo.get(triggering_repo), dict) else 0
+        if triggering_repo_chunks == 0:
+            # Try alternative format
+            for repo, count in chunks_by_repo.items():
+                if repo.lower() == triggering_repo.lower():
+                    triggering_repo_chunks = count if isinstance(count, int) else count.get('chunks', 0)
+                    triggering_repo_loc = count.get('loc', 0) if isinstance(count, dict) else 0
+                    break
+        
+        dep_chunks = total_chunks - triggering_repo_chunks
+        dep_loc = total_lines - triggering_repo_loc
+        
+        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
+    else:
+        lines.append(f"**Total Code Chunks:** {total_chunks} (includes triggering repo + dependencies)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} (includes triggering repo + dependencies)")
     
-    # Add Loki logs count
-    if context_summary:
+    # Add Loki logs count - use consistent counting method
+    loki_logs = llm_context.get('loki_logs', [])
+    loki_logs_text = llm_context.get('error_logs', '')
+    
+    # Count Loki log lines consistently
+    loki_line_count = 0
+    if loki_logs:
+        # Count structured log entries
+        loki_line_count = len(loki_logs)
+    elif loki_logs_text and '=== Loki Excerpts ===' in loki_logs_text:
+        # Count lines in Loki excerpts section
+        loki_section = loki_logs_text.split('=== Loki Excerpts ===')[1] if '=== Loki Excerpts ===' in loki_logs_text else ''
+        loki_line_count = len([l for l in loki_section.split('\n') if l.strip()]) if loki_section else 0
+    
+    if loki_line_count > 0:
+        lines.append(f"**Total Loki Log Lines:** {loki_line_count}")
+    elif context_summary:
+        # Fallback to context_summary if available
         loki_count = context_summary.get('loki_logs_count', 0)
-        lines.append(f"**Total Loki Log Lines:** {loki_count}")
+        if loki_count > 0:
+            lines.append(f"**Total Loki Log Lines:** {loki_count}")
     
     # Add in-cluster logs summary
     incluster_log_summary = metadata.get('incluster_log_summary', {})
@@ -457,7 +505,7 @@ def generate_summary(
         if rc_commit == 'unknown' and workflow_commit_fallback:
             rc_commit = workflow_commit_fallback
         
-        lines.append(f"- **Repository:** `{repo_name}`")
+        # Repository already shown in header, so skip here
         lines.append(f"- **RC Version:** `{rc_version}`")
         lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
         
