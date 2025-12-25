@@ -490,10 +490,13 @@ def generate_summary(
     if services_only and isinstance(services_only, dict) and len(services_only) > 0:
         services_data = services_only
         print(f"🔍 DEBUG: Using services-only.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
-    elif test_deployed_services:
+    elif test_deployed_services and isinstance(test_deployed_services, dict):
         # Use services from test-deployed-services.json, but note that dataPurger filtering happens below
         services_data = test_deployed_services.get('services', {})
-        print(f"🔍 DEBUG: Using test-deployed-services.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+        if services_data and len(services_data) > 0:
+            print(f"🔍 DEBUG: Using test-deployed-services.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+        else:
+            print(f"🔍 DEBUG: test-deployed-services.json has no services (empty dict)", file=sys.stderr)
     elif running_images:
         # Legacy format - extract services (exclude triggering repo)
         repos = running_images.get('repos', {})
