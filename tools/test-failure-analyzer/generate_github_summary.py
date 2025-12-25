@@ -129,8 +129,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
     if gomod_deps:
         table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC |")
-        table_lines.append("|-----------|------------------|------------|---------|-----------------|--------|-----|")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|")
         
         for dep in gomod_deps:
             deployed = dep['deployed']
@@ -150,6 +150,32 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_status = "❌ Missing"
             
+            # Get code index type/strategy
+            deployed_strategy = deployed.get('strategy', 'unknown')
+            rc_strategy = rc.get('strategy', 'unknown')
+            
+            # Format strategy display
+            def format_strategy(strategy: str) -> str:
+                """Format strategy for display."""
+                if not strategy or strategy == 'unknown' or strategy == 'not_found':
+                    return "-"
+                strategy_map = {
+                    'version_tag': '🏷️ version-tag',
+                    'latest_fallback': '📌 latest',
+                    'pr_commit': '🔀 PR commit',
+                    'commit_direct': '🔀 commit',
+                    'always_include_fallback': '📌 latest (fallback)'
+                }
+                return strategy_map.get(strategy, strategy)
+            
+            # Show deployed strategy, or RC strategy if deployed not available
+            if dep['has_deployed_index']:
+                index_type = format_strategy(deployed_strategy)
+            elif dep['has_rc_index']:
+                index_type = format_strategy(rc_strategy)
+            else:
+                index_type = "-"
+            
             github_org = deployed.get('github_org') or 'armosec'
             repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
@@ -163,7 +189,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
             
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {chunks_display} | {loc_display} |"
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} |"
             )
         
         table_lines.append("")

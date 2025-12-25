@@ -549,49 +549,54 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
             "version_changed": version_changed
         }
     
-    # NEW: Add always-include repos as fallback
+    # NEW: Add always-include repos as fallback (only if not already in go.mod dependencies)
     if debug:
-        print("\n📌 Adding always-include repositories...")
+        print("\n📌 Adding always-include repositories (if not in go.mod)...")
     for org, repo in ALWAYS_INCLUDE_REPOS:
-        if repo not in results:
+        # Skip if already processed from go.mod dependencies (will have version-tagged artifacts)
+        if repo in results:
             if debug:
-                print(f"  Adding fallback: {org}/{repo}")
-            # Get latest release
-            index_path, found_org, strategy = find_dependency_index(
-                repo, "latest", [org],  # Just check specific org
-                github_token, f"{output_dir}/{repo}-fallback", debug
-            )
-            if index_path:
-                # Extract commit
-                commit = extract_commit_from_index(index_path, debug)
-                results[repo] = {
-                    "deployed": {
-                        "version": "latest",
-                        "commit": commit,
-                        "index_path": index_path,
-                        "found": True,
-                        "github_org": found_org or org,  # Use found_org or default to specified org
-                        "strategy": "always_include_fallback",
-                        "source": "service"  # Mark as service dependency
-                    },
-                    "rc": {"found": False},
-                    "version_changed": False
-                }
-            else:
-                # Even if not found, add placeholder with org
-                results[repo] = {
-                    "deployed": {
-                        "version": "latest",
-                        "commit": None,
-                        "index_path": None,
-                        "found": False,
-                        "github_org": org,  # Use specified org
-                        "strategy": "always_include_fallback",
-                        "source": "service"  # Mark as service dependency
-                    },
-                    "rc": {"found": False},
-                    "version_changed": False
-                }
+                print(f"  ⏭️  Skipping {org}/{repo} - already in go.mod dependencies with version {results[repo].get('deployed', {}).get('version', 'unknown')}")
+            continue
+        
+        if debug:
+            print(f"  Adding fallback: {org}/{repo} (not in go.mod, using latest)")
+        # Get latest release (only used if not in go.mod)
+        index_path, found_org, strategy = find_dependency_index(
+            repo, "latest", [org],  # Just check specific org
+            github_token, f"{output_dir}/{repo}-fallback", debug
+        )
+        if index_path:
+            # Extract commit
+            commit = extract_commit_from_index(index_path, debug)
+            results[repo] = {
+                "deployed": {
+                    "version": "latest",
+                    "commit": commit,
+                    "index_path": index_path,
+                    "found": True,
+                    "github_org": found_org or org,  # Use found_org or default to specified org
+                    "strategy": "always_include_fallback",
+                    "source": "service"  # Mark as service dependency
+                },
+                "rc": {"found": False},
+                "version_changed": False
+            }
+        else:
+            # Even if not found, add placeholder with org
+            results[repo] = {
+                "deployed": {
+                    "version": "latest",
+                    "commit": None,
+                    "index_path": None,
+                    "found": False,
+                    "github_org": org,  # Use specified org
+                    "strategy": "always_include_fallback",
+                    "source": "service"  # Mark as service dependency
+                },
+                "rc": {"found": False},
+                "version_changed": False
+            }
     
     return results
 
