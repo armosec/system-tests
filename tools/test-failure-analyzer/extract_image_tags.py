@@ -485,6 +485,10 @@ def main():
         help="Latest commit hash from main/master branch (from Step 5 - Get Latest Commit SHA)"
     )
     parser.add_argument(
+        "--kubernetes-deployment-commit",
+        help="Commit hash of kubernetes-deployment repo used for values file extraction. Ensures we know which version of values files was used."
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/running-images.json",
         help="Output file path (default: artifacts/running-images.json)"
