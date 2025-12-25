@@ -143,7 +143,11 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
             return repo_images
         
         # Map of service keys in YAML to repo names
-        # These are top-level keys in the YAML file (case-insensitive matching)
+        # These are used ONLY as hints for documentation purposes.
+        # 
+        # IMPORTANT: The extraction logic now dynamically discovers ALL services with image.repository fields
+        # and uses map_image_to_repo() to determine the actual backend repo. This service_keys mapping
+        # is kept for backward compatibility and documentation, but is NOT required for extraction.
         # 
         # IMPORTANT DISTINCTION:
         # - Triggering repos: The repository that triggered the test (e.g., cadashboardbe, event-ingester-service)
@@ -153,8 +157,7 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
         # event-ingester-service repo. The actual source repo is ALWAYS determined by the image.repository 
         # field, NOT by service naming conventions or service keys.
         # 
-        # This mapping is only used as an initial hint - the final repo assignment comes from 
-        # map_image_to_repo() which analyzes the actual image repository name.
+        # NOTE: This mapping is optional - extraction works without it by discovering services dynamically.
         service_keys = {
             "dashboardBE": "cadashboardbe",
             "dashboard-be": "cadashboardbe",
