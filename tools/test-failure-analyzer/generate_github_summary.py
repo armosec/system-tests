@@ -227,7 +227,8 @@ def generate_summary(
     environment: str,
     run_ref: str,
     workflow_commit_path: str = None,
-    llm_analysis_path: str = None
+    llm_analysis_path: str = None,
+    test_deployed_services_path: str = None
 ) -> str:
     """Generate markdown summary from artifacts."""
     
@@ -238,7 +239,9 @@ def generate_summary(
     api_mapping = load_json(api_mapping_path)
     code_diffs = load_json(code_diffs_path)
     found_indexes = load_json(found_indexes_path)
-    running_images = load_json(running_images_path)
+    # Prefer new format, fallback to legacy
+    test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
+    running_images = load_json(running_images_path) if not test_deployed_services else None
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
@@ -392,68 +395,126 @@ def generate_summary(
     lines.append("")
     
     # ========================================
-    # Version Information
+    # Triggering Repository Data
     # ========================================
     triggering_repo = found_indexes.get('triggering_repo', 'cadashboardbe') if found_indexes else 'cadashboardbe'
     
-    if found_indexes:
-        lines.append("### 🎯 Triggering Repository Version\n")
-        lines.append("")
+    lines.append("## 🎯 Triggering Repository Data\n")
+    lines.append("")
+    
+    # Extract triggering repo info from new format or legacy format
+    triggering_repo_data = None
+    if test_deployed_services:
+        triggering_repo_data = test_deployed_services.get('triggering_repo', {})
+        triggering_repo = triggering_repo_data.get('normalized', triggering_repo)
+    elif running_images:
+        # Legacy format - extract triggering repo info
+        repos = running_images.get('repos', {})
+        repo_data = repos.get(triggering_repo, {})
+        images = repo_data.get('images', [])
+        if images:
+            triggering_repo_data = {
+                'name': running_images.get('triggering_repo', f'armosec/{triggering_repo}'),
+                'normalized': triggering_repo,
+                'rc_version': running_images.get('rc_version', 'unknown'),
+                'commit_hash': running_images.get('commit_hash', 'unknown'),
+                'images': images
+            }
+    
+    if triggering_repo_data:
+        repo_name = triggering_repo_data.get('name', f'armosec/{triggering_repo}')
+        rc_version = triggering_repo_data.get('rc_version', 'unknown')
+        commit_hash = triggering_repo_data.get('commit_hash', 'unknown')
+        images = triggering_repo_data.get('images', [])
         
-        repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
-        rc_info = repo_info.get('rc', {})
-        rc_version = rc_info.get('version', 'unknown')
-        rc_commit = rc_info.get('commit', 'unknown')
+        # Get RC commit from found_indexes if available
+        rc_commit = 'unknown'
+        if found_indexes:
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            rc_info = repo_info.get('rc', {})
+            rc_commit = rc_info.get('commit', commit_hash)
         
         # Use workflow_commit_fallback if RC commit is unknown
         if rc_commit == 'unknown' and workflow_commit_fallback:
             rc_commit = workflow_commit_fallback
         
-        lines.append(f"- **Repository:** `armosec/{triggering_repo}`")
+        lines.append(f"- **Repository:** `{repo_name}`")
         lines.append(f"- **RC Version:** `{rc_version}`")
         lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
+        
+        # Get deployed version from found_indexes
+        if found_indexes:
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            deployed_info = repo_info.get('deployed', {})
+            deployed_version = deployed_info.get('version', 'unknown')
+            deployed_commit = deployed_info.get('commit', 'unknown')
+            
+            if deployed_version != 'unknown':
+                lines.append(f"- **Deployed Version:** `{deployed_version}`")
+            if deployed_commit != 'unknown':
+                lines.append(f"- **Deployed Commit:** `{deployed_commit[:8]}`")
+        
+        # Show PR info if available
+        if rc_version and rc_version.startswith('rc-') and '-' in rc_version:
+            pr_num = rc_version.split('-')[-1]
+            if pr_num.isdigit():
+                pr_url = f"https://github.com/{repo_name}/pull/{pr_num}"
+                lines.append(f"- **PR:** [#{pr_num}]({pr_url})")
+        
         lines.append("")
     
-    # Deployed Version
-    if running_images:
-        lines.append("### 📦 Deployed Version (Currently Running)\n")
-        lines.append("")
-        
+    # ========================================
+    # Services Data
+    # ========================================
+    lines.append("## 📦 Services Data\n")
+    lines.append("")
+    lines.append("External services that were running when the test executed:\n")
+    lines.append("")
+    
+    services_data = None
+    if test_deployed_services:
+        services_data = test_deployed_services.get('services', {})
+    elif running_images:
+        # Legacy format - extract services (exclude triggering repo)
         repos = running_images.get('repos', {})
-        repo_data = repos.get(triggering_repo, {})
-        images = repo_data.get('images', [])
+        services_data = {}
+        triggering_repo_normalized = running_images.get('triggering_repo_normalized', triggering_repo)
+        for repo_name, repo_info in repos.items():
+            if not repo_info.get('is_triggering_repo', False) and repo_name.lower() != triggering_repo_normalized.lower():
+                services_data[repo_name] = repo_info
+    
+    if services_data:
+        # Create table for services
+        lines.append("| Service | Deployed Version | Index Available |")
+        lines.append("|---------|------------------|-----------------|")
         
-        if images:
-            deployed_tag = images[0].get('tag', 'unknown')
+        for repo_name, repo_info in sorted(services_data.items()):
+            images = repo_info.get('images', [])
+            deployed_tag = images[0].get('tag', 'unknown') if images else 'unknown'
             
-            # Get baseline version from found_indexes (if available)
-            baseline_version = 'unknown'
+            # Check if index is available
+            index_available = "❌"
             if found_indexes:
-                repo_idx = found_indexes.get('indexes', {}).get(triggering_repo, {})
-                baseline_version = repo_idx.get('deployed', {}).get('version', 'unknown')
+                repo_idx = found_indexes.get('indexes', {}).get(repo_name, {})
+                if repo_idx.get('deployed', {}).get('found', False):
+                    index_available = "✅"
             
-            # Special handling for event-ingester-service: prefer baseline over cluster version
-            if triggering_repo == 'event-ingester-service' and baseline_version != 'unknown':
-                lines.append(f"- **Deployed Version:** `{baseline_version}` (derived from RC)")
-                if deployed_tag != baseline_version:
-                    lines.append(f"- **Cluster Version:** `{deployed_tag}` (for reference)")
-            # Check if deployed is also an RC - if so, show both actual and baseline
-            elif deployed_tag.startswith('rc-'):
-                lines.append(f"- **Actual Deployed:** `{deployed_tag}` (RC in production)")
-                
-                if baseline_version != 'unknown' and baseline_version != deployed_tag:
-                    lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
-            else:
-                lines.append(f"- **Deployed Version:** `{deployed_tag}`")
-            
-            # Get previous stable commit from code-diffs
-            if code_diffs and triggering_repo in code_diffs:
-                git_diff = code_diffs[triggering_repo].get('git_diff', {})
-                prev_commit = git_diff.get('deployed_commit', 'unknown')
-                if prev_commit != 'unknown':
-                    lines.append(f"- **Previous Stable Commit:** `{prev_commit[:8]}`")
+            lines.append(f"| `{repo_name}` | `{deployed_tag}` | {index_available} |")
         
         lines.append("")
+        lines.append(f"**Total Services:** {len(services_data)}")
+        lines.append("")
+    else:
+        lines.append("No service data available.\n")
+        lines.append("")
+    
+    # ========================================
+    # Go Mod Dependencies Data
+    # ========================================
+    lines.append("## 📚 Go Mod Dependencies Data\n")
+    lines.append("")
+    lines.append("Internal Go libraries and shared modules extracted from `go.mod`:\n")
+    lines.append("")
     
     # Code Differences - Always show if we have commit info
     lines.append("### 🔄 Code Differences (RC vs Deployed)\n")
@@ -535,30 +596,42 @@ def generate_summary(
     
     lines.append("")
     
-    # ========================================
-    # Dependencies Table
-    # ========================================
-    if found_indexes and 'indexes' in found_indexes:
-        lines.append("## 📦 Dependencies\n")
-        lines.append("")
-        
+    # Show go.mod dependencies table (only go.mod deps, not services)
+    if gomod_deps:
         # Extract chunk/LOC stats from LLM context
         chunk_stats = extract_chunk_stats_per_repo(llm_context)
         
-        lines.append(format_dependencies_table(found_indexes, chunk_stats))
-        lines.append("")
+        # Filter to only go.mod dependencies (source='gomod' or not 'service')
+        gomod_only_indexes = {}
+        if found_indexes and 'indexes' in found_indexes:
+            for repo_name, repo_info in found_indexes.get('indexes', {}).items():
+                # Skip triggering repo and services
+                if repo_name == triggering_repo:
+                    continue
+                source = repo_info.get('deployed', {}).get('source', 'gomod')
+                if source != 'service':
+                    gomod_only_indexes[repo_name] = repo_info
         
-        # Summary stats
-        total_deps = len(found_indexes.get('indexes', {}))
-        changed_deps = sum(1 for dep in found_indexes.get('indexes', {}).values() 
-                          if dep.get('version_changed', False))
-        missing_indexes = sum(1 for dep in found_indexes.get('indexes', {}).values()
-                             if not dep.get('deployed', {}).get('found', False))
-        
-        lines.append(f"**Summary**: {total_deps} dependencies, ")
-        lines.append(f"{changed_deps} version changes, ")
-        lines.append(f"{missing_indexes} missing indexes\n")
-        lines.append("")
+        if gomod_only_indexes:
+            # Create filtered found_indexes for format_dependencies_table
+            filtered_found_indexes = {
+                'triggering_repo': triggering_repo,
+                'indexes': gomod_only_indexes
+            }
+            lines.append(format_dependencies_table(filtered_found_indexes, chunk_stats))
+            lines.append("")
+            
+            # Summary stats for go.mod deps only
+            total_gomod_deps = len(gomod_only_indexes)
+            changed_gomod_deps = sum(1 for dep in gomod_only_indexes.values() 
+                                    if dep.get('version_changed', False))
+            missing_gomod_indexes = sum(1 for dep in gomod_only_indexes.values()
+                                      if not dep.get('deployed', {}).get('found', False))
+            
+            lines.append(f"**Summary**: {total_gomod_deps} go.mod dependencies, ")
+            lines.append(f"{changed_gomod_deps} with version changes, ")
+            lines.append(f"{missing_gomod_indexes} missing indexes")
+            lines.append("")
     
     # ========================================
     # Dependency Analysis
@@ -900,7 +973,8 @@ def main():
     parser.add_argument('--api-mapping', default='artifacts/api-code-map-with-chains.json')
     parser.add_argument('--code-diffs', default='artifacts/code-diffs.json')
     parser.add_argument('--found-indexes', default='artifacts/found-indexes.json')
-    parser.add_argument('--running-images', default='artifacts/running-images.json')
+    parser.add_argument('--running-images', default='artifacts/running-images.json', help='Legacy format (backward compatibility)')
+    parser.add_argument('--test-deployed-services', help='New format with separated triggering_repo and services sections')
     parser.add_argument('--gomod-deps', default='artifacts/gomod-dependencies.json')
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
@@ -923,7 +997,8 @@ def main():
         args.environment,
         args.run_ref,
         args.workflow_commit,
-        args.llm_analysis
+        args.llm_analysis,
+        args.test_deployed_services
     )
     
     # Write to output
