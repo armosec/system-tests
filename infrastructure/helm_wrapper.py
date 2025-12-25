@@ -92,7 +92,8 @@ class HelmWrapper(object):
             command_args = ["helm", "upgrade", "--debug", "--install", "armosec", "armosec/rapid7-operator", "-n", namespace,
                             "--set", "kubescape-operator.clusterName={}".format(current_context),
                             "--set", "kubescape-operator.account={}".format(customer),
-                            "--set", "kubescape-operator.server={}".format(server)]
+                            "--set", "kubescape-operator.server={}".format(server),
+                            "--set", "kubescape-operator.logger.level=debug"]
             
             if access_key != "":
                 command_args.extend(["--set", "kubescape-operator.accessKey={}".format(access_key)])
