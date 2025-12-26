@@ -223,24 +223,6 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
                                 if actual_repo not in repo_images:
                                     repo_images[actual_repo] = []
                                 
-                                # Use service key as initial hint for documentation, but actual repo comes from image
-                                # Try to find matching service_key for documentation purposes
-                                repo_name_hint = None
-                                for service_key, mapped_repo in service_keys.items():
-                                    if key == service_key or key.lower() == service_key.lower():
-                                        repo_name_hint = mapped_repo
-                                        break
-                                
-                                # Build note explaining the mapping
-                                note_parts = [f"Service key '{key}'"]
-                                if repo_name_hint and repo_name_hint == actual_repo:
-                                    note_parts.append(f"mapped to '{actual_repo}'")
-                                elif repo_name_hint:
-                                    note_parts.append(f"initially mapped to '{repo_name_hint}' but actual repo is '{actual_repo}'")
-                                else:
-                                    note_parts.append(f"discovered as '{actual_repo}' (no service_key mapping)")
-                                note_parts.append(f"confirmed from image '{repository}'")
-                                
                                 repo_images[actual_repo].append({
                                     "image": image_string,
                                     "tag": tag,
@@ -248,10 +230,7 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
                                     "repository": repository,
                                     "source": f"event_sourcing_values:{os.path.basename(values_file_path)}",
                                     "yaml_path": full_path,
-                                    "service_key": key,  # Service key from YAML (e.g., "dataPurger", "synchronizerIngester")
-                                    "service_key_mapped_to_repo": repo_name_hint,  # Initial mapping hint (if exists in service_keys)
-                                    "actual_repo": actual_repo,  # Actual repo determined from image.repository (source of truth)
-                                    "note": " | ".join(note_parts)
+                                    "service_key": key
                                 })
                 
                 # Recurse into nested dicts
@@ -579,19 +558,15 @@ def main():
     }
     
     for repo_name, images in repo_images.items():
-        # Deduplicate by full_image
-        unique_images = {}
-        for image_info in images:
-            image_key = image_info["full_image"]
-            if image_key not in unique_images:
-                unique_images[image_key] = image_info
+        # Keep ALL images (don't deduplicate) - each service is a separate deployment
+        # even if they share the same image:tag combination
         
         # Mark if this repo is the triggering repo
         is_triggering_repo = (triggering_repo_normalized and 
                              repo_name.lower() == triggering_repo_normalized.lower())
         
         result["repos"][repo_name] = {
-            "images": list(unique_images.values()),
+            "images": images,  # Keep all images, including duplicates with same image:tag
             "is_triggering_repo": is_triggering_repo,  # True if this repo triggered the test
             "note": "This is the triggering repo" if is_triggering_repo else 
                    f"Service from {repo_name} repo (not the triggering repo)"
