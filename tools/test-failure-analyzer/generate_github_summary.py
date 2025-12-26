@@ -11,6 +11,7 @@ import json
 import os
 import re
 import sys
+import traceback
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -1166,34 +1167,60 @@ def main():
     print(f"🔍 DEBUG: All args: {vars(args)}", file=sys.stderr)
     print(f"🔍 DEBUG: About to call generate_summary with services_only_path = {services_only_arg}", file=sys.stderr)
     
-    # Generate summary
-    summary = generate_summary(
-        args.llm_context,
-        args.api_mapping,
-        args.code_diffs,
-        args.found_indexes,
-        args.running_images,
-        args.gomod_deps,
-        args.context_summary,
-        args.environment,
-        args.run_ref,
-        args.workflow_commit,  # workflow_commit_path (position 10)
-        args.llm_analysis,      # llm_analysis_path (position 11)
-        args.test_deployed_services,  # test_deployed_services_path (position 12)
-        services_only_arg       # services_only_path (position 13)
-    )
-    
-    # Write to output
+    # Generate summary with error handling
     output_path = args.output or os.environ.get('GITHUB_STEP_SUMMARY')
     
-    if output_path:
-        with open(output_path, 'a') as f:
-            f.write(summary)
-        print(f"✅ Summary written to {output_path}")
-    else:
-        print(summary)
-    
-    return 0
+    try:
+        summary = generate_summary(
+            args.llm_context,
+            args.api_mapping,
+            args.code_diffs,
+            args.found_indexes,
+            args.running_images,
+            args.gomod_deps,
+            args.context_summary,
+            args.environment,
+            args.run_ref,
+            args.workflow_commit,  # workflow_commit_path (position 10)
+            args.llm_analysis,      # llm_analysis_path (position 11)
+            args.test_deployed_services,  # test_deployed_services_path (position 12)
+            services_only_arg       # services_only_path (position 13)
+        )
+        
+        # Write to output
+        if output_path:
+            with open(output_path, 'a') as f:
+                f.write(summary)
+            print(f"✅ Summary written to {output_path}")
+            SUMMARY_SIZE = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+            print(f"   Summary file size: {SUMMARY_SIZE} bytes")
+        else:
+            print(summary)
+        
+        return 0
+        
+    except Exception as e:
+        error_msg = f"❌ Error generating summary: {e}\n\nTraceback:\n{traceback.format_exc()}"
+        print(error_msg, file=sys.stderr)
+        
+        # Write error to output file so it's visible in GitHub Actions
+        if output_path:
+            try:
+                with open(output_path, 'a') as f:
+                    f.write(f"## ⚠️ Summary Generation Failed\n\n")
+                    f.write(f"**Error:** {str(e)}\n\n")
+                    f.write(f"```\n{traceback.format_exc()}\n```\n\n")
+                    f.write(f"**Debug Info:**\n")
+                    f.write(f"- LLM Context: {args.llm_context}\n")
+                    f.write(f"- Test Deployed Services: {args.test_deployed_services}\n")
+                    f.write(f"- Found Indexes: {args.found_indexes}\n")
+                    f.write(f"- Environment: {args.environment}\n")
+                print(f"⚠️  Error details written to {output_path}")
+            except Exception as write_error:
+                print(f"❌ Failed to write error to output file: {write_error}", file=sys.stderr)
+        
+        # Return non-zero to trigger workflow error logging
+        return 1
 
 
 if __name__ == '__main__':
