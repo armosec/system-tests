@@ -55,8 +55,8 @@ from pathlib import Path
 # Backend components only - focus on services that have code indexes
 BACKEND_REPOS = {
     "cadashboardbe": {
-        "aliases": ["dashboard-be", "dashboardbe", "ca-dashboard-be", "ca-dashboardbe"],
-        "image_patterns": ["cadashboardbe", "dashboard-be", "dashboardbe"]
+        "aliases": ["dashboard-be", "dashboardbe", "ca-dashboard-be", "ca-dashboardbe", "dashboard-backend"],
+        "image_patterns": ["cadashboardbe", "dashboard-be", "dashboardbe", "dashboard-backend"]
     },
     "config-service": {
         "aliases": ["configservice", "portal", "config"],
