@@ -1189,13 +1189,33 @@ def main():
         
         # Write to output
         if output_path:
-            with open(output_path, 'a') as f:
-                f.write(summary)
-            print(f"✅ Summary written to {output_path}")
-            SUMMARY_SIZE = os.path.getsize(output_path) if os.path.exists(output_path) else 0
-            print(f"   Summary file size: {SUMMARY_SIZE} bytes")
+            # Ensure summary is not empty
+            if not summary or len(summary.strip()) == 0:
+                summary = "## ⚠️ Summary Generation Warning\n\n**Status:** Summary was generated but is empty.\n\nThis may indicate an issue with the data or the generation process. Please check the logs for details."
+                print("⚠️  Warning: Generated summary is empty, writing placeholder", file=sys.stderr)
+            
+            # Use write mode ('w') to ensure file is created/overwritten properly
+            # GitHub Actions GITHUB_STEP_SUMMARY should be empty at start of step
+            try:
+                with open(output_path, 'w') as f:  # Changed from 'a' to 'w'
+                    f.write(summary)
+                print(f"✅ Summary written to {output_path}")
+                SUMMARY_SIZE = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+                print(f"   Summary file size: {SUMMARY_SIZE} bytes")
+                
+                # Verify content was actually written
+                if SUMMARY_SIZE == 0:
+                    print("❌ ERROR: Summary file is empty after writing!", file=sys.stderr)
+                    # Try writing a minimal summary
+                    with open(output_path, 'w') as f:
+                        f.write("## ⚠️ Summary Generation Issue\n\nSummary file was created but is empty. Please check logs for details.")
+            except Exception as write_error:
+                print(f"❌ Failed to write summary to {output_path}: {write_error}", file=sys.stderr)
+                raise  # Re-raise to trigger error handling
         else:
             print(summary)
+            if not summary or len(summary.strip()) == 0:
+                print("⚠️  Warning: Summary is empty", file=sys.stderr)
         
         return 0
         
@@ -1206,7 +1226,7 @@ def main():
         # Write error to output file so it's visible in GitHub Actions
         if output_path:
             try:
-                with open(output_path, 'a') as f:
+                with open(output_path, 'w') as f:  # Use write mode to ensure file is created
                     f.write(f"## ⚠️ Summary Generation Failed\n\n")
                     f.write(f"**Error:** {str(e)}\n\n")
                     f.write(f"```\n{traceback.format_exc()}\n```\n\n")
@@ -1215,6 +1235,7 @@ def main():
                     f.write(f"- Test Deployed Services: {args.test_deployed_services}\n")
                     f.write(f"- Found Indexes: {args.found_indexes}\n")
                     f.write(f"- Environment: {args.environment}\n")
+                    f.write(f"- Output Path: {output_path}\n")
                 print(f"⚠️  Error details written to {output_path}")
             except Exception as write_error:
                 print(f"❌ Failed to write error to output file: {write_error}", file=sys.stderr)
