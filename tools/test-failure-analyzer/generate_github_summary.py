@@ -541,15 +541,18 @@ def generate_summary(
         if found_indexes:
             repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
             rc_info = repo_info.get('rc', {})
-            rc_commit = rc_info.get('commit', commit_hash)
+            rc_commit = rc_info.get('commit') or commit_hash or 'unknown'
         
-        # Use workflow_commit_fallback if RC commit is unknown
-        if rc_commit == 'unknown' and workflow_commit_fallback:
+        # Use workflow_commit_fallback if RC commit is unknown or None
+        if (not rc_commit or rc_commit == 'unknown') and workflow_commit_fallback:
             rc_commit = workflow_commit_fallback
         
         # Repository already shown in header, so skip here
         lines.append(f"- **RC Version:** `{rc_version}`")
-        lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
+        if rc_commit and rc_commit != 'unknown' and isinstance(rc_commit, str):
+            lines.append(f"- **RC Commit:** `{rc_commit[:8]}`")
+        else:
+            lines.append(f"- **RC Commit:** `unknown`")
         
         # Get deployed version from found_indexes
         if found_indexes:
@@ -558,17 +561,29 @@ def generate_summary(
             deployed_version = deployed_info.get('version', 'unknown')
             deployed_commit = deployed_info.get('commit', 'unknown')
             
-            if deployed_version != 'unknown':
+            if deployed_version and deployed_version != 'unknown':
                 lines.append(f"- **Deployed Version:** `{deployed_version}`")
-            if deployed_commit != 'unknown':
+            if deployed_commit and deployed_commit != 'unknown' and isinstance(deployed_commit, str):
                 lines.append(f"- **Deployed Commit:** `{deployed_commit[:8]}`")
         
-        # Show PR info if available
-        if rc_version and rc_version.startswith('rc-') and '-' in rc_version:
-            pr_num = rc_version.split('-')[-1]
-            if pr_num.isdigit():
-                pr_url = f"https://github.com/{repo_name}/pull/{pr_num}"
-                lines.append(f"- **PR:** [#{pr_num}]({pr_url})")
+        # Show PR info if available from pr-metadata.json
+        # NOTE: DO NOT extract PR from RC version - the suffix is a run ID, not PR number!
+        # RC format: rc-v0.0.232-{run_id}, not rc-v0.0.232-{pr_number}
+        pr_metadata_path = Path("artifacts/pr-metadata.json")
+        if pr_metadata_path.exists():
+            try:
+                with open(pr_metadata_path, 'r') as f:
+                    pr_metadata = json.load(f)
+                    pr_number = pr_metadata.get('number')
+                    if pr_number:
+                        pr_url = f"https://github.com/{repo_name}/pull/{pr_number}"
+                        pr_title = pr_metadata.get('title', '')
+                        if pr_title:
+                            lines.append(f"- **PR:** [#{pr_number}: {pr_title}]({pr_url})")
+                        else:
+                            lines.append(f"- **PR:** [#{pr_number}]({pr_url})")
+            except Exception as e:
+                print(f"⚠️  Failed to read PR metadata: {e}", file=sys.stderr)
         
         lines.append("")
     
@@ -932,7 +947,10 @@ def generate_summary(
             commit = repo_info.get('commit', 'unknown')
             is_triggering = repo_info.get('is_triggering_repo', False)
             suffix = " (triggering)" if is_triggering else ""
-            lines.append(f"- **{repo_name}**: `{commit[:8] if commit != 'unknown' else 'unknown'}`{suffix}")
+            if commit and commit != 'unknown' and isinstance(commit, str):
+                lines.append(f"- **{repo_name}**: `{commit[:8]}`{suffix}")
+            else:
+                lines.append(f"- **{repo_name}**: `unknown`{suffix}")
         lines.append("")
     
     # ========================================
