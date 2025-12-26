@@ -693,15 +693,17 @@ def main():
         rc_commit = None
         if rc_path:
             rc_commit = extract_commit_from_index(rc_path, args.debug)
-            # Fallback to triggering_commit if not in index
-            if not rc_commit and args.triggering_commit:
-                rc_commit = args.triggering_commit
-                if args.debug:
-                    print(f"   📌 Using triggering commit as fallback: {rc_commit[:8]}")
+        
+        # Fallback to triggering_commit if not in index OR if index wasn't found
+        # This ensures we always have a commit when triggering_commit is available
+        if not rc_commit and args.triggering_commit and args.triggering_commit != 'unknown':
+            rc_commit = args.triggering_commit
+            if args.debug:
+                print(f"   📌 Using triggering commit as fallback: {rc_commit[:8]}")
         
         dashboard_indexes["rc"] = {
             "version": args.rc_version,
-            "commit": rc_commit,
+            "commit": rc_commit,  # Can be None if no index found and no triggering_commit
             "index_path": rc_path,
             "strategy": rc_strategy,
             "found": rc_path is not None,
@@ -715,16 +717,18 @@ def main():
         deployed_commit = None
         if deployed_path:
             deployed_commit = extract_commit_from_index(deployed_path, args.debug)
-            # Fallback: Get commit from Git tag if index has no metadata
-            if not deployed_commit and args.deployed_version:
-                repo_full_name = f"{triggering_org}/{args.triggering_repo}"
-                deployed_commit = get_commit_for_tag(repo_full_name, args.deployed_version, github_token, args.debug)
-                if deployed_commit and args.debug:
-                    print(f"   📌 Using Git tag commit as fallback: {deployed_commit[:8]}")
+        
+        # Fallback: Get commit from Git tag if index has no metadata OR if index wasn't found
+        # This ensures we try to get commit even when index download failed
+        if not deployed_commit and args.deployed_version and args.deployed_version != 'unknown':
+            repo_full_name = f"{triggering_org}/{args.triggering_repo}"
+            deployed_commit = get_commit_for_tag(repo_full_name, args.deployed_version, github_token, args.debug)
+            if deployed_commit and args.debug:
+                print(f"   📌 Using Git tag commit as fallback: {deployed_commit[:8]}")
         
         dashboard_indexes["deployed"] = {
             "version": args.deployed_version,
-            "commit": deployed_commit,
+            "commit": deployed_commit,  # Can be None if no index found and tag lookup fails
             "index_path": deployed_path,
             "strategy": deployed_strategy,
             "found": deployed_path is not None,
