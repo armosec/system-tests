@@ -316,24 +316,27 @@ def generate_summary(
     total_chunks = metadata.get('total_chunks', 0)
     total_lines = metadata.get('total_lines_of_code', 0)
     
-    # Get triggering repo name for header
-    # Extract from found_indexes or test_deployed_services
+    # Get triggering repo name for header (use normalized for matching chunks)
     triggering_repo = 'unknown'
+    triggering_repo_normalized = 'unknown'  # For matching chunks
     triggering_repo_data = None
     
     if test_deployed_services and isinstance(test_deployed_services, dict):
         triggering_repo_data = test_deployed_services.get('triggering_repo')
         if triggering_repo_data and isinstance(triggering_repo_data, dict):
             triggering_repo = triggering_repo_data.get('name', triggering_repo_data.get('repo', 'unknown'))
+            triggering_repo_normalized = triggering_repo_data.get('normalized', triggering_repo.split('/')[-1].lower())
         elif isinstance(triggering_repo_data, str):
             triggering_repo = triggering_repo_data
+            triggering_repo_normalized = triggering_repo.split('/')[-1].lower()
     elif found_indexes and isinstance(found_indexes, dict):
         triggering_repo = found_indexes.get('triggering_repo', 'unknown')
+        triggering_repo_normalized = triggering_repo.split('/')[-1].lower()
     
     # Format display name
     triggering_repo_display = 'unknown'
     if triggering_repo_data and isinstance(triggering_repo_data, dict):
-        triggering_repo_display = triggering_repo_data.get('name', f'armosec/{triggering_repo}')
+        triggering_repo_display = triggering_repo_data.get('name', f'armosec/{triggering_repo_normalized}')
     elif triggering_repo and triggering_repo != 'unknown':
         if '/' in triggering_repo:
             triggering_repo_display = triggering_repo
@@ -353,28 +356,31 @@ def generate_summary(
         run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
         lines.append(f"**Original Test Run:** [Run #{run_ref}]({run_url})")
     
-    # Code chunks and LOC - clarify these include ALL repos (triggering + dependencies)
-    chunks_by_repo = metadata.get('chunks_by_repo', {})
-    if chunks_by_repo:
-        # Show breakdown by repo
-        triggering_repo_chunks = chunks_by_repo.get(triggering_repo, {}).get('chunks', 0) if isinstance(chunks_by_repo.get(triggering_repo), dict) else 0
-        triggering_repo_loc = chunks_by_repo.get(triggering_repo, {}).get('loc', 0) if isinstance(chunks_by_repo.get(triggering_repo), dict) else 0
-        if triggering_repo_chunks == 0:
-            # Try alternative format
-            for repo, count in chunks_by_repo.items():
-                if repo.lower() == triggering_repo.lower():
-                    triggering_repo_chunks = count if isinstance(count, int) else count.get('chunks', 0)
-                    triggering_repo_loc = count.get('loc', 0) if isinstance(count, dict) else 0
-                    break
-        
-        dep_chunks = total_chunks - triggering_repo_chunks
-        dep_loc = total_lines - triggering_repo_loc
-        
-        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
-        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
-    else:
-        lines.append(f"**Total Code Chunks:** {total_chunks} (includes triggering repo + dependencies)")
-        lines.append(f"**Total Lines of Code:** {total_lines:,} (includes triggering repo + dependencies)")
+    # Code chunks and LOC - use extract_chunk_stats_per_repo for accurate counting
+    chunk_stats = extract_chunk_stats_per_repo(llm_context)
+    
+    # Get triggering repo stats (case-insensitive match)
+    triggering_repo_chunks = 0
+    triggering_repo_loc = 0
+    actual_triggering_repo_name = None
+    
+    for repo_name, stats in chunk_stats.items():
+        if repo_name.lower() == triggering_repo_normalized.lower():
+            triggering_repo_chunks = stats.get('chunks', 0)
+            triggering_repo_loc = stats.get('loc', 0)
+            actual_triggering_repo_name = repo_name  # Preserve actual case
+            break
+    
+    # Calculate dependency stats (all non-triggering repos)
+    dep_chunks = 0
+    dep_loc = 0
+    for repo_name, stats in chunk_stats.items():
+        if repo_name.lower() != triggering_repo_normalized.lower():
+            dep_chunks += stats.get('chunks', 0)
+            dep_loc += stats.get('loc', 0)
+    
+    lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
+    lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
     
     # Add Loki logs count - use consistent counting method
     loki_logs = llm_context.get('loki_logs', [])
@@ -821,6 +827,8 @@ def generate_summary(
             lines.append(f"**Summary**: {total_gomod_deps} go.mod dependencies, ")
             lines.append(f"{changed_gomod_deps} with version changes, ")
             lines.append(f"{missing_gomod_indexes} missing indexes")
+            lines.append("")
+            lines.append("> **Note:** The go.mod table shows all dependencies, but code chunks are only extracted for dependencies that are actually imported and used in the code. One dependency can contribute many chunks.")
             lines.append("")
     
     # ========================================
