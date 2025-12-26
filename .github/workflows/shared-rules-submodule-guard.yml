@@ -4,7 +4,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify-submodule:
@@ -17,7 +17,6 @@ jobs:
       - name: Checkout repository with submodules
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
           fetch-depth: 0
           submodules: 'true'
           token: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN || secrets.SHARED_RULES_PAT || secrets.GH_SUBMODULE_TOKEN || github.token }}
@@ -44,9 +43,6 @@ jobs:
 
       - name: Run shared rules verification
         shell: bash
-        env:
-          AUTO_UPDATE: "true"
-          MAX_COMMITS_BEHIND: "5"
         run: |
           set -euo pipefail
 
@@ -63,45 +59,4 @@ jobs:
             exit 1
           fi
 
-          # Run verification (may auto-update if within tolerance)
           bash "$submodule_path/scripts/verify-shared-rules-submodule.sh"
-
-          # Check if submodule was updated and commit if needed
-          if ! git diff --quiet -- "$submodule_path"; then
-            echo "::notice::Submodule was auto-updated. Committing changes..."
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add "$submodule_path"
-            
-            # Try to commit
-            if git commit -m "chore: auto-update shared-rules submodule to latest"; then
-              # Use GitHub event to get the PR head branch name (more reliable than git rev-parse)
-              pr_head_ref="${{ github.event.pull_request.head.ref }}"
-              
-              if [[ -n "$pr_head_ref" ]]; then
-                # Push using explicit HEAD:branch format (more reliable than relying on branch tracking)
-                if git push origin HEAD:"$pr_head_ref"; then
-                  echo "::notice::Submodule update committed and pushed to PR branch ($pr_head_ref)."
-                else
-                  echo "::warning::Failed to push submodule update to $pr_head_ref. Please pull and commit manually."
-                fi
-              else
-                # Fallback: try to get branch name from git
-                current_branch=$(git rev-parse --abbrev-ref HEAD)
-                if [[ -n "$current_branch" && "$current_branch" != "HEAD" ]]; then
-                  if git push origin HEAD:"$current_branch"; then
-                    echo "::notice::Submodule update committed and pushed to PR branch ($current_branch)."
-                  else
-                    echo "::warning::Failed to push submodule update to $current_branch. Please pull and commit manually."
-                  fi
-                else
-                  echo "::warning::Could not determine branch name. Please commit manually:"
-                  echo "  git add $submodule_path"
-                  echo "  git commit -m 'chore: auto-update shared-rules submodule to latest'"
-                fi
-              fi
-            else
-              echo "::warning::Failed to commit submodule update. This may be because the commit already exists or there are no changes."
-            fi
-          fi
-
