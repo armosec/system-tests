@@ -372,15 +372,48 @@ def generate_summary(
             break
     
     # Calculate dependency stats (all non-triggering repos)
+    # Break down into go.mod vs service dependencies
     dep_chunks = 0
     dep_loc = 0
-    for repo_name, stats in chunk_stats.items():
-        if repo_name.lower() != triggering_repo_normalized.lower():
-            dep_chunks += stats.get('chunks', 0)
-            dep_loc += stats.get('loc', 0)
+    gomod_dep_chunks = 0
+    gomod_dep_loc = 0
+    service_dep_chunks = 0
+    service_dep_loc = 0
     
-    lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
-    lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
+    # Categorize dependencies if found_indexes is available
+    if found_indexes and 'indexes' in found_indexes:
+        for repo_name, stats in chunk_stats.items():
+            if repo_name.lower() != triggering_repo_normalized.lower():
+                repo_chunks = stats.get('chunks', 0)
+                repo_loc = stats.get('loc', 0)
+                dep_chunks += repo_chunks
+                dep_loc += repo_loc
+                
+                # Check if this is a go.mod or service dependency
+                repo_info = found_indexes['indexes'].get(repo_name, {})
+                deployed = repo_info.get('deployed', {})
+                source = deployed.get('source', 'gomod')  # Default to gomod
+                
+                if source == 'service':
+                    service_dep_chunks += repo_chunks
+                    service_dep_loc += repo_loc
+                else:
+                    gomod_dep_chunks += repo_chunks
+                    gomod_dep_loc += repo_loc
+    else:
+        # Fallback: count all non-triggering repos as dependencies
+        for repo_name, stats in chunk_stats.items():
+            if repo_name.lower() != triggering_repo_normalized.lower():
+                dep_chunks += stats.get('chunks', 0)
+                dep_loc += stats.get('loc', 0)
+    
+    # Generate summary line with breakdown if available
+    if found_indexes and gomod_dep_chunks + service_dep_chunks > 0:
+        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies: {gomod_dep_chunks} from go.mod, {service_dep_chunks} from services)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies: {gomod_dep_loc:,} from go.mod, {service_dep_loc:,} from services)")
+    else:
+        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
     
     # Add Loki logs count - use consistent counting method
     loki_logs = llm_context.get('loki_logs', [])
