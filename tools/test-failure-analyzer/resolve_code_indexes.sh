@@ -174,10 +174,30 @@ if [[ -n "$WORKFLOW_COMMIT" ]] && ! [[ "$WORKFLOW_COMMIT" =~ ^[0-9a-f]{7,40}$ ]]
   WORKFLOW_COMMIT=""
 fi
 
-# Extract triggering repo commit from resolved commits or tag mapping (more accurate than workflow commit)
-# The workflow commit is from shared-workflows repo, but we need the commit of the triggering repo
+# Extract triggering repo commit - PRIORITY: Use commit from RC version
+# The RC version is created from the actual merge commit (before code index commit)
+# This ensures we get the right commit even if code index workflow created a new commit
 TRIGGERING_REPO_COMMIT=""
-if [[ -f artifacts/resolved-repo-commits.json ]]; then
+
+# Priority 1: Extract commit from RC version (if available)
+# RC version format: rc-v0.0.394-20549238574 or rc-v0.0.394-PR_NUMBER
+# The RC is created from the merge commit, so we need to get that commit from GitHub
+if [[ -n "$RC_VERSION" && "$RC_VERSION" =~ ^rc-v ]]; then
+  echo "🔍 Extracting triggering repo commit from RC version: $RC_VERSION"
+  
+  # Get the commit that the RC tag points to
+  RC_COMMIT=$(gh api repos/armosec/$TRIGGERING_REPO/git/refs/tags/$RC_VERSION --jq '.object.sha' 2>/dev/null || echo "")
+  
+  if [[ -n "$RC_COMMIT" && "$RC_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+    TRIGGERING_REPO_COMMIT="$RC_COMMIT"
+    echo "✅ Found triggering repo commit from RC tag: ${TRIGGERING_REPO_COMMIT:0:8}"
+  else
+    echo "⚠️  RC tag $RC_VERSION not found or invalid, trying alternative methods..."
+  fi
+fi
+
+# Priority 2: Try resolved commits (from tag mapping)
+if [[ -z "$TRIGGERING_REPO_COMMIT" && -f artifacts/resolved-repo-commits.json ]]; then
   # Try normalized repo name first (most common)
   TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" '.resolved_commits[$repo] // empty' artifacts/resolved-repo-commits.json 2>/dev/null || echo "")
   # If not found, try case-insensitive search
@@ -191,7 +211,7 @@ if [[ -f artifacts/resolved-repo-commits.json ]]; then
   fi
 fi
 
-# Fallback: Try to extract from repo-commits.json (tag mapping)
+# Priority 3: Try repo-commits.json (tag mapping)
 if [[ -z "$TRIGGERING_REPO_COMMIT" && -f artifacts/repo-commits.json ]]; then
   # Try normalized repo name first
   TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" '.[$repo].commit // empty' artifacts/repo-commits.json 2>/dev/null || echo "")
@@ -208,7 +228,7 @@ fi
 
 # Final fallback: Use workflow commit (but this is from shared-workflows, not the triggering repo)
 if [[ -z "$TRIGGERING_REPO_COMMIT" && -n "$WORKFLOW_COMMIT" ]]; then
-  echo "⚠️  No triggering repo commit found in resolved commits, using workflow commit as fallback"
+  echo "⚠️  No triggering repo commit found, using workflow commit as fallback"
   echo "   Note: Workflow commit is from shared-workflows repo, not $TRIGGERING_REPO"
   TRIGGERING_REPO_COMMIT="$WORKFLOW_COMMIT"
 fi
