@@ -15,6 +15,7 @@ echo ""
 DEPLOYED_VERSION=""
 RC_VERSION=""
 WORKFLOW_COMMIT=""
+GOMOD_DEPLOYED_VERSION=""  # Initialize to ensure it's always defined
 TRIGGERING_REPO="$TRIGGERING_REPO_FROM_STEP"
 
 # Prefer new format (test-deployed-services.json), fallback to legacy (running-images.json)
@@ -157,6 +158,44 @@ if [[ -n "$TAG_FILE" ]]; then
   # Use the same version for both code index and go.mod (no mismatch)
   GOMOD_DEPLOYED_VERSION="$DEPLOYED_VERSION"
   echo "   Final: DEPLOYED_VERSION=$DEPLOYED_VERSION (for code index and go.mod)"
+else
+  # TAG_FILE doesn't exist - this shouldn't happen but handle it gracefully
+  echo ""
+  echo "❌ ERROR: No running images file found!"
+  echo "=========================================="
+  echo ""
+  echo "Expected files:"
+  echo "  - artifacts/test-deployed-services.json (new format)"
+  echo "  - artifacts/running-images.json (legacy format)"
+  echo ""
+  echo "These files should have been downloaded from the test run artifacts."
+  echo ""
+  echo "Possible causes:"
+  echo "  1. Test run artifacts expired (GitHub keeps artifacts for 90 days)"
+  echo "  2. Test run failed before uploading artifacts"
+  echo "  3. Test run is from an old workflow that doesn't create these artifacts"
+  echo "  4. Artifact download failed in Step 11 (check logs above)"
+  echo ""
+  echo "Without these files, the analyzer cannot:"
+  echo "  - Determine deployed versions"
+  echo "  - Download version-specific code indexes"
+  echo "  - Extract go.mod dependencies"
+  echo "  - Generate code chunks"
+  echo ""
+  echo "The analyzer will proceed with minimal context (test logs only)."
+  echo "=========================================="
+  echo ""
+  
+  # Set defaults to allow analyzer to continue (though with limited functionality)
+  DEPLOYED_VERSION="unknown"
+  RC_VERSION="${INPUT_RC_VERSION:-unknown}"
+  GOMOD_DEPLOYED_VERSION="unknown"
+  
+  echo "Using fallback values:"
+  echo "  - DEPLOYED_VERSION: $DEPLOYED_VERSION"
+  echo "  - RC_VERSION: $RC_VERSION"
+  echo "  - GOMOD_DEPLOYED_VERSION: $GOMOD_DEPLOYED_VERSION"
+  echo ""
 fi
 
 # Get workflow commit - prefer file (updated by download-image-tags step) over step output
