@@ -93,22 +93,16 @@ if [[ -n "$TAG_FILE" ]]; then
   echo "   - inputs.rc_version: ${INPUT_RC_VERSION:-'(not set)'}"
   echo "   - TAG_FILE: $TAG_FILE"
 
-  # PRIORITY 1: Use actual cluster tag if it's a stable version (most reliable)
-  # PRIORITY 2: Derive from RC only if no stable cluster tag available
-  # PRIORITY 3: Use cluster RC tag and derive baseline if cluster has RC
+  # For triggering repo: ALWAYS derive deployed version from RC version
+  # Never use cluster tag - RC version is the source of truth
+  # PRIORITY 1: Derive from global RC version (if available)
+  # PRIORITY 2: Derive from cluster RC tag (if cluster has RC)
+  # PRIORITY 3: Fall back to cluster stable tag (only if no RC available)
   
-  if [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" != "null" && "$ACTUAL_DEPLOYED_VERSION" != "empty" && ! "$ACTUAL_DEPLOYED_VERSION" =~ ^rc- ]]; then
-    # Use actual cluster tag (stable version) - this is the most reliable
-    echo "✅ Found stable deployed version in cluster: $ACTUAL_DEPLOYED_VERSION"
-    DEPLOYED_VERSION="$ACTUAL_DEPLOYED_VERSION"
-    RC_VERSION="${GLOBAL_RC_VERSION:-unknown}"
-    echo "   Using cluster tag for both code index and go.mod: $DEPLOYED_VERSION"
-    echo "   RC version: $RC_VERSION"
-    
-  elif [[ -n "$GLOBAL_RC_VERSION" && "$GLOBAL_RC_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-    # No stable cluster tag, derive from RC
+  if [[ -n "$GLOBAL_RC_VERSION" && "$GLOBAL_RC_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+    # ALWAYS derive deployed version from RC for triggering repo
     echo "🔍 Deriving deployed version from RC: $GLOBAL_RC_VERSION"
-    echo "   ⚠️  No stable cluster tag available, deriving baseline from RC"
+    echo "   (For triggering repo, deployed version is always derived from RC, ignoring cluster tag)"
     MAJOR="${BASH_REMATCH[1]}"
     MINOR="${BASH_REMATCH[2]}"
     PATCH="${BASH_REMATCH[3]}"
@@ -122,11 +116,11 @@ if [[ -n "$TAG_FILE" ]]; then
     RC_VERSION="$GLOBAL_RC_VERSION"
     echo "   Derived deployed version: $DEPLOYED_VERSION"
     echo "   RC version: $RC_VERSION"
-    echo "   ⚠️  Using derived version (actual cluster tag not available or is RC)"
     
   elif [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" =~ ^rc- ]]; then
     # Cluster has RC version, derive stable baseline
     echo "🔍 Cluster tag is RC: $ACTUAL_DEPLOYED_VERSION"
+    echo "   Deriving deployed version from cluster RC tag"
     if [[ "$ACTUAL_DEPLOYED_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
       MAJOR="${BASH_REMATCH[1]}"
       MINOR="${BASH_REMATCH[2]}"
@@ -141,6 +135,15 @@ if [[ -n "$TAG_FILE" ]]; then
       echo "   Derived baseline: $DEPLOYED_VERSION"
       echo "   RC version: $RC_VERSION"
     fi
+    
+  elif [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" != "null" && "$ACTUAL_DEPLOYED_VERSION" != "empty" && ! "$ACTUAL_DEPLOYED_VERSION" =~ ^rc- ]]; then
+    # Fallback: Use cluster stable tag only if no RC version available
+    echo "⚠️  No RC version available, using cluster stable tag as fallback: $ACTUAL_DEPLOYED_VERSION"
+    echo "   (This should rarely happen - RC version should always be available for triggering repo)"
+    DEPLOYED_VERSION="$ACTUAL_DEPLOYED_VERSION"
+    RC_VERSION="${GLOBAL_RC_VERSION:-unknown}"
+    echo "   Using cluster tag: $DEPLOYED_VERSION"
+    echo "   RC version: $RC_VERSION"
     
   else
     echo "⚠️  No deployed version found in cluster and no RC version available"
