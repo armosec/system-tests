@@ -223,15 +223,58 @@ TRIGGERING_REPO_COMMIT=""
 # The RC is created from the merge commit, so we need to get that commit from GitHub
 if [[ -n "$RC_VERSION" && "$RC_VERSION" =~ ^rc-v ]]; then
   echo "🔍 Extracting triggering repo commit from RC version: $RC_VERSION"
+  echo "   Querying: gh api repos/armosec/$TRIGGERING_REPO/git/refs/tags/$RC_VERSION"
   
   # Get the commit that the RC tag points to
-  RC_COMMIT=$(gh api repos/armosec/$TRIGGERING_REPO/git/refs/tags/$RC_VERSION --jq '.object.sha' 2>/dev/null || echo "")
+  RC_COMMIT=$(gh api repos/armosec/$TRIGGERING_REPO/git/refs/tags/$RC_VERSION --jq '.object.sha' 2>&1)
+  RC_API_EXIT=$?
+  
+  if [[ $RC_API_EXIT -ne 0 ]]; then
+    echo "⚠️  GitHub API call failed (exit code: $RC_API_EXIT)"
+    echo "   Error: $RC_COMMIT"
+    echo "   This could be due to:"
+    echo "   - Network issues"
+    echo "   - GitHub token not set or expired"
+    echo "   - RC tag doesn't exist yet (tag creation may be delayed)"
+    RC_COMMIT=""
+  fi
   
   if [[ -n "$RC_COMMIT" && "$RC_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
     TRIGGERING_REPO_COMMIT="$RC_COMMIT"
     echo "✅ Found triggering repo commit from RC tag: ${TRIGGERING_REPO_COMMIT:0:8}"
+  elif [[ -n "$RC_COMMIT" ]]; then
+    echo "⚠️  RC tag API returned unexpected value: '$RC_COMMIT'"
+    echo "   Expected: 40-character hex SHA"
+    echo "   Trying alternative methods..."
   else
-    echo "⚠️  RC tag $RC_VERSION not found or invalid, trying alternative methods..."
+    echo "⚠️  RC tag $RC_VERSION not found or returned empty"
+    echo "   Possible reasons:"
+    echo "   - Tag hasn't been created yet (release workflow may still be running)"
+    echo "   - Tag was deleted"
+    echo "   - Network/API issues"
+    echo "   Trying alternative methods..."
+  fi
+fi
+
+# Priority 1.5: If RC tag failed, try to extract from the RC version number suffix
+# RC format: rc-v0.0.394-20549238574 where 20549238574 is the workflow run ID
+# We can get the commit from that workflow run
+if [[ -z "$TRIGGERING_REPO_COMMIT" && -n "$RC_VERSION" && "$RC_VERSION" =~ rc-v[0-9]+\.[0-9]+\.[0-9]+-([0-9]+)$ ]]; then
+  RUN_ID="${BASH_REMATCH[1]}"
+  # Only try this if it looks like a workflow run ID (8+ digits)
+  if [[ ${#RUN_ID} -ge 8 ]]; then
+    echo "🔍 Attempting to extract commit from RC workflow run ID: $RUN_ID"
+    
+    # Try to get the head SHA from the workflow run
+    # This requires checking the release workflow in the triggering repo
+    RC_RUN_COMMIT=$(gh api repos/armosec/$TRIGGERING_REPO/actions/runs/$RUN_ID --jq '.head_sha' 2>/dev/null || echo "")
+    
+    if [[ -n "$RC_RUN_COMMIT" && "$RC_RUN_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+      TRIGGERING_REPO_COMMIT="$RC_RUN_COMMIT"
+      echo "✅ Found triggering repo commit from RC workflow run: ${TRIGGERING_REPO_COMMIT:0:8}"
+    else
+      echo "⚠️  Could not get commit from workflow run $RUN_ID"
+    fi
   fi
 fi
 
