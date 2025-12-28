@@ -587,13 +587,22 @@ def build_llm_context(
                             repositories_included.add(repo)
         
         # Analyze each dependency
+        # Load found_indexes as fallback for version info
+        found_indexes = None
+        if found_indexes_path and os.path.exists(found_indexes_path):
+            try:
+                with open(found_indexes_path, 'r') as f:
+                    found_indexes = json.load(f)
+            except Exception:
+                pass
+        
         for dep_name in repositories_included:
             # Calculate impact
             impact, critical_functions = calculate_dependency_impact(
                 dep_name, code_diffs, api_mapping, formatted_chunks
             )
             
-            # Get version info
+            # Get version info - try code_diffs first, then found_indexes as fallback
             deployed_ver = "unknown"
             rc_ver = "unknown"
             version_changed = False
@@ -602,6 +611,15 @@ def build_llm_context(
                 deployed_ver = code_diffs[dep_name].get('old_version', 'unknown')
                 rc_ver = code_diffs[dep_name].get('new_version', 'unknown')
                 version_changed = code_diffs[dep_name].get('changed', False)
+            elif found_indexes:
+                # Fallback: get version from found_indexes (for dependencies without version changes)
+                dep_info = found_indexes.get('indexes', {}).get(dep_name, {})
+                if dep_info:
+                    deployed_info = dep_info.get('deployed', {})
+                    rc_info = dep_info.get('rc', {})
+                    deployed_ver = deployed_info.get('version', 'unknown')
+                    rc_ver = rc_info.get('version', 'unknown')
+                    version_changed = dep_info.get('version_changed', False)
             
             # Count chunks from this dependency
             chunks_included = sum(1 for c in formatted_chunks if c.get('_repo') == dep_name or c.get('repo') == dep_name)

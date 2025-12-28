@@ -11,17 +11,24 @@ import json
 import os
 import re
 import sys
+import traceback
 from pathlib import Path
 from typing import Dict, Any, Optional
 
 
 def load_json(path: str) -> Optional[Dict[str, Any]]:
     """Load JSON file, return None if not found."""
+    if not path:
+        return None
     if not os.path.exists(path):
+        print(f"🔍 DEBUG: File does not exist: {path}", file=sys.stderr)
         return None
     try:
         with open(path, 'r') as f:
-            return json.load(f)
+            data = json.load(f)
+            if isinstance(data, dict) and len(data) == 0:
+                print(f"🔍 DEBUG: File {path} is empty dict {{}}", file=sys.stderr)
+            return data
     except Exception as e:
         print(f"Warning: Failed to load {path}: {e}", file=sys.stderr)
         return None
@@ -123,8 +130,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
     if gomod_deps:
         table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Chunks | LOC |")
-        table_lines.append("|-----------|------------------|------------|---------|-----------------|--------|-----|")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|")
         
         for dep in gomod_deps:
             deployed = dep['deployed']
@@ -144,6 +151,32 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_status = "❌ Missing"
             
+            # Get code index type/strategy
+            deployed_strategy = deployed.get('strategy', 'unknown')
+            rc_strategy = rc.get('strategy', 'unknown')
+            
+            # Format strategy display
+            def format_strategy(strategy: str) -> str:
+                """Format strategy for display."""
+                if not strategy or strategy == 'unknown' or strategy == 'not_found':
+                    return "-"
+                strategy_map = {
+                    'version_tag': '🏷️ version-tag',
+                    'latest_fallback': '📌 latest',
+                    'pr_commit': '🔀 PR commit',
+                    'commit_direct': '🔀 commit',
+                    'always_include_fallback': '📌 latest (fallback)'
+                }
+                return strategy_map.get(strategy, strategy)
+            
+            # Show deployed strategy, or RC strategy if deployed not available
+            if dep['has_deployed_index']:
+                index_type = format_strategy(deployed_strategy)
+            elif dep['has_rc_index']:
+                index_type = format_strategy(rc_strategy)
+            else:
+                index_type = "-"
+            
             github_org = deployed.get('github_org') or 'armosec'
             repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
@@ -157,7 +190,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
             
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {chunks_display} | {loc_display} |"
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} |"
             )
         
         table_lines.append("")
@@ -227,7 +260,9 @@ def generate_summary(
     environment: str,
     run_ref: str,
     workflow_commit_path: str = None,
-    llm_analysis_path: str = None
+    llm_analysis_path: str = None,
+    test_deployed_services_path: str = None,
+    services_only_path: str = None
 ) -> str:
     """Generate markdown summary from artifacts."""
     
@@ -238,7 +273,21 @@ def generate_summary(
     api_mapping = load_json(api_mapping_path)
     code_diffs = load_json(code_diffs_path)
     found_indexes = load_json(found_indexes_path)
-    running_images = load_json(running_images_path)
+    # Prefer new format, fallback to legacy
+    test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
+    running_images = load_json(running_images_path) if not test_deployed_services else None
+    # Prefer services-only.json (already filtered) for services display
+    print(f"🔍 DEBUG: services_only_path = {services_only_path}", file=sys.stderr)
+    services_only = load_json(services_only_path) if services_only_path else None
+    print(f"🔍 DEBUG: After load_json, services_only = {services_only is not None}, type={type(services_only) if services_only else 'None'}", file=sys.stderr)
+    if services_only_path:
+        print(f"🔍 DEBUG: Loaded services_only from {services_only_path}: {services_only is not None}, type={type(services_only)}, len={len(services_only) if isinstance(services_only, dict) else 'N/A'}", file=sys.stderr)
+        if services_only and isinstance(services_only, dict):
+            print(f"🔍 DEBUG: services_only keys: {list(services_only.keys())}", file=sys.stderr)
+        elif services_only is None:
+            print(f"🔍 DEBUG: services_only is None (file might not exist or failed to load)", file=sys.stderr)
+        elif isinstance(services_only, dict) and len(services_only) == 0:
+            print(f"🔍 DEBUG: services_only is empty dict {{}}", file=sys.stderr)
     gomod_deps = load_json(gomod_deps_path)
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
@@ -267,9 +316,38 @@ def generate_summary(
     total_chunks = metadata.get('total_chunks', 0)
     total_lines = metadata.get('total_lines_of_code', 0)
     
+    # Get triggering repo name for header (use normalized for matching chunks)
+    triggering_repo = 'unknown'
+    triggering_repo_normalized = 'unknown'  # For matching chunks
+    triggering_repo_data = None
+    
+    if test_deployed_services and isinstance(test_deployed_services, dict):
+        triggering_repo_data = test_deployed_services.get('triggering_repo')
+        if triggering_repo_data and isinstance(triggering_repo_data, dict):
+            triggering_repo = triggering_repo_data.get('name', triggering_repo_data.get('repo', 'unknown'))
+            triggering_repo_normalized = triggering_repo_data.get('normalized', triggering_repo.split('/')[-1].lower())
+        elif isinstance(triggering_repo_data, str):
+            triggering_repo = triggering_repo_data
+            triggering_repo_normalized = triggering_repo.split('/')[-1].lower()
+    elif found_indexes and isinstance(found_indexes, dict):
+        triggering_repo = found_indexes.get('triggering_repo', 'unknown')
+        triggering_repo_normalized = triggering_repo.split('/')[-1].lower()
+    
+    # Format display name
+    triggering_repo_display = 'unknown'
+    if triggering_repo_data and isinstance(triggering_repo_data, dict):
+        triggering_repo_display = triggering_repo_data.get('name', f'armosec/{triggering_repo_normalized}')
+    elif triggering_repo and triggering_repo != 'unknown':
+        if '/' in triggering_repo:
+            triggering_repo_display = triggering_repo
+        else:
+            triggering_repo_display = f"armosec/{triggering_repo}"
+    
+    # Header section - Repository, Environment, Test
+    lines.append(f"**Repository:** `{triggering_repo_display}`")
+    lines.append(f"**Environment:** `{environment}`")
     lines.append(f"**Test:** `{test_name}`")
     lines.append(f"**Test Run ID:** `{test_run_id}`")
-    lines.append(f"**Environment:** `{environment}`")
     
     # Format original test run link
     if run_ref.startswith('http'):
@@ -278,13 +356,86 @@ def generate_summary(
         run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
         lines.append(f"**Original Test Run:** [Run #{run_ref}]({run_url})")
     
-    lines.append(f"**Total Code Chunks:** {total_chunks}")
-    lines.append(f"**Total Lines of Code:** {total_lines}")
+    # Code chunks and LOC - use extract_chunk_stats_per_repo for accurate counting
+    chunk_stats = extract_chunk_stats_per_repo(llm_context)
     
-    # Add Loki logs count
-    if context_summary:
+    # Get triggering repo stats (case-insensitive match)
+    triggering_repo_chunks = 0
+    triggering_repo_loc = 0
+    actual_triggering_repo_name = None
+    
+    for repo_name, stats in chunk_stats.items():
+        if repo_name.lower() == triggering_repo_normalized.lower():
+            triggering_repo_chunks = stats.get('chunks', 0)
+            triggering_repo_loc = stats.get('loc', 0)
+            actual_triggering_repo_name = repo_name  # Preserve actual case
+            break
+    
+    # Calculate dependency stats (all non-triggering repos)
+    # Break down into go.mod vs service dependencies
+    dep_chunks = 0
+    dep_loc = 0
+    gomod_dep_chunks = 0
+    gomod_dep_loc = 0
+    service_dep_chunks = 0
+    service_dep_loc = 0
+    
+    # Categorize dependencies if found_indexes is available
+    if found_indexes and 'indexes' in found_indexes:
+        for repo_name, stats in chunk_stats.items():
+            if repo_name.lower() != triggering_repo_normalized.lower():
+                repo_chunks = stats.get('chunks', 0)
+                repo_loc = stats.get('loc', 0)
+                dep_chunks += repo_chunks
+                dep_loc += repo_loc
+                
+                # Check if this is a go.mod or service dependency
+                repo_info = found_indexes['indexes'].get(repo_name, {})
+                deployed = repo_info.get('deployed', {})
+                source = deployed.get('source', 'gomod')  # Default to gomod
+                
+                if source == 'service':
+                    service_dep_chunks += repo_chunks
+                    service_dep_loc += repo_loc
+                else:
+                    gomod_dep_chunks += repo_chunks
+                    gomod_dep_loc += repo_loc
+    else:
+        # Fallback: count all non-triggering repos as dependencies
+        for repo_name, stats in chunk_stats.items():
+            if repo_name.lower() != triggering_repo_normalized.lower():
+                dep_chunks += stats.get('chunks', 0)
+                dep_loc += stats.get('loc', 0)
+    
+    # Generate summary line with breakdown if available
+    if found_indexes and gomod_dep_chunks + service_dep_chunks > 0:
+        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies: {gomod_dep_chunks} from go.mod, {service_dep_chunks} from services)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies: {gomod_dep_loc:,} from go.mod, {service_dep_loc:,} from services)")
+    else:
+        lines.append(f"**Total Code Chunks:** {total_chunks} ({triggering_repo_chunks} from triggering repo, {dep_chunks} from dependencies)")
+        lines.append(f"**Total Lines of Code:** {total_lines:,} ({triggering_repo_loc:,} from triggering repo, {dep_loc:,} from dependencies)")
+    
+    # Add Loki logs count - use consistent counting method
+    loki_logs = llm_context.get('loki_logs', [])
+    loki_logs_text = llm_context.get('error_logs', '')
+    
+    # Count Loki log lines consistently
+    loki_line_count = 0
+    if loki_logs:
+        # Count structured log entries
+        loki_line_count = len(loki_logs)
+    elif loki_logs_text and '=== Loki Excerpts ===' in loki_logs_text:
+        # Count lines in Loki excerpts section
+        loki_section = loki_logs_text.split('=== Loki Excerpts ===')[1] if '=== Loki Excerpts ===' in loki_logs_text else ''
+        loki_line_count = len([l for l in loki_section.split('\n') if l.strip()]) if loki_section else 0
+    
+    if loki_line_count > 0:
+        lines.append(f"**Total Loki Log Lines:** {loki_line_count}")
+    elif context_summary:
+        # Fallback to context_summary if available
         loki_count = context_summary.get('loki_logs_count', 0)
-        lines.append(f"**Total Loki Log Lines:** {loki_count}")
+        if loki_count > 0:
+            lines.append(f"**Total Loki Log Lines:** {loki_count}")
     
     # Add in-cluster logs summary
     incluster_log_summary = metadata.get('incluster_log_summary', {})
@@ -392,68 +543,207 @@ def generate_summary(
     lines.append("")
     
     # ========================================
-    # Version Information
+    # Triggering Repository Data
     # ========================================
     triggering_repo = found_indexes.get('triggering_repo', 'cadashboardbe') if found_indexes else 'cadashboardbe'
     
-    if found_indexes:
-        lines.append("### 🎯 Triggering Repository Version\n")
-        lines.append("")
-        
-        repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
-        rc_info = repo_info.get('rc', {})
-        rc_version = rc_info.get('version', 'unknown')
-        rc_commit = rc_info.get('commit', 'unknown')
-        
-        # Use workflow_commit_fallback if RC commit is unknown
-        if rc_commit == 'unknown' and workflow_commit_fallback:
-            rc_commit = workflow_commit_fallback
-        
-        lines.append(f"- **Repository:** `armosec/{triggering_repo}`")
-        lines.append(f"- **RC Version:** `{rc_version}`")
-        lines.append(f"- **RC Commit:** `{rc_commit[:8] if rc_commit != 'unknown' else 'unknown'}`")
-        lines.append("")
+    lines.append("## 🎯 Triggering Repository Data\n")
+    lines.append("")
     
-    # Deployed Version
-    if running_images:
-        lines.append("### 📦 Deployed Version (Currently Running)\n")
-        lines.append("")
-        
+    # Extract triggering repo info from new format or legacy format
+    triggering_repo_data = None
+    if test_deployed_services:
+        triggering_repo_data = test_deployed_services.get('triggering_repo', {})
+        triggering_repo = triggering_repo_data.get('normalized', triggering_repo)
+    elif running_images:
+        # Legacy format - extract triggering repo info
         repos = running_images.get('repos', {})
         repo_data = repos.get(triggering_repo, {})
         images = repo_data.get('images', [])
-        
         if images:
-            deployed_tag = images[0].get('tag', 'unknown')
+            triggering_repo_data = {
+                'name': running_images.get('triggering_repo', f'armosec/{triggering_repo}'),
+                'normalized': triggering_repo,
+                'rc_version': running_images.get('rc_version', 'unknown'),
+                'commit_hash': running_images.get('commit_hash', 'unknown'),
+                'images': images
+            }
+    
+    if triggering_repo_data:
+        repo_name = triggering_repo_data.get('name', f'armosec/{triggering_repo}')
+        rc_version = triggering_repo_data.get('rc_version', 'unknown')
+        commit_hash = triggering_repo_data.get('commit_hash', 'unknown')
+        images = triggering_repo_data.get('images', [])
+        
+        # Get RC commit from found_indexes if available
+        rc_commit = 'unknown'
+        if found_indexes:
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            rc_info = repo_info.get('rc', {})
+            rc_commit = rc_info.get('commit') or commit_hash or 'unknown'
+        
+        # Use workflow_commit_fallback if RC commit is unknown or None
+        if (not rc_commit or rc_commit == 'unknown') and workflow_commit_fallback:
+            rc_commit = workflow_commit_fallback
+        
+        # Repository already shown in header, so skip here
+        lines.append(f"- **RC Version:** `{rc_version}`")
+        if rc_commit and rc_commit != 'unknown' and isinstance(rc_commit, str):
+            lines.append(f"- **RC Commit:** `{rc_commit[:8]}`")
+        else:
+            lines.append(f"- **RC Commit:** `unknown`")
+        
+        # Get deployed version from found_indexes
+        if found_indexes:
+            repo_info = found_indexes.get('indexes', {}).get(triggering_repo, {})
+            deployed_info = repo_info.get('deployed', {})
+            deployed_version = deployed_info.get('version', 'unknown')
+            deployed_commit = deployed_info.get('commit', 'unknown')
             
-            # Get baseline version from found_indexes (if available)
-            baseline_version = 'unknown'
-            if found_indexes:
-                repo_idx = found_indexes.get('indexes', {}).get(triggering_repo, {})
-                baseline_version = repo_idx.get('deployed', {}).get('version', 'unknown')
-            
-            # Special handling for event-ingester-service: prefer baseline over cluster version
-            if triggering_repo == 'event-ingester-service' and baseline_version != 'unknown':
-                lines.append(f"- **Deployed Version:** `{baseline_version}` (derived from RC)")
-                if deployed_tag != baseline_version:
-                    lines.append(f"- **Cluster Version:** `{deployed_tag}` (for reference)")
-            # Check if deployed is also an RC - if so, show both actual and baseline
-            elif deployed_tag.startswith('rc-'):
-                lines.append(f"- **Actual Deployed:** `{deployed_tag}` (RC in production)")
-                
-                if baseline_version != 'unknown' and baseline_version != deployed_tag:
-                    lines.append(f"- **Baseline for Diff:** `{baseline_version}` (previous stable)")
-            else:
-                lines.append(f"- **Deployed Version:** `{deployed_tag}`")
-            
-            # Get previous stable commit from code-diffs
-            if code_diffs and triggering_repo in code_diffs:
-                git_diff = code_diffs[triggering_repo].get('git_diff', {})
-                prev_commit = git_diff.get('deployed_commit', 'unknown')
-                if prev_commit != 'unknown':
-                    lines.append(f"- **Previous Stable Commit:** `{prev_commit[:8]}`")
+            if deployed_version and deployed_version != 'unknown':
+                lines.append(f"- **Deployed Version:** `{deployed_version}`")
+            if deployed_commit and deployed_commit != 'unknown' and isinstance(deployed_commit, str):
+                lines.append(f"- **Deployed Commit:** `{deployed_commit[:8]}`")
+        
+        # Show PR info if available from pr-metadata.json
+        # NOTE: DO NOT extract PR from RC version - the suffix is a run ID, not PR number!
+        # RC format: rc-v0.0.232-{run_id}, not rc-v0.0.232-{pr_number}
+        pr_metadata_path = Path("artifacts/pr-metadata.json")
+        if pr_metadata_path.exists():
+            try:
+                with open(pr_metadata_path, 'r') as f:
+                    pr_metadata = json.load(f)
+                    pr_number = pr_metadata.get('number')
+                    if pr_number:
+                        pr_url = f"https://github.com/{repo_name}/pull/{pr_number}"
+                        pr_title = pr_metadata.get('title', '')
+                        if pr_title:
+                            lines.append(f"- **PR:** [#{pr_number}: {pr_title}]({pr_url})")
+                        else:
+                            lines.append(f"- **PR:** [#{pr_number}]({pr_url})")
+            except Exception as e:
+                print(f"⚠️  Failed to read PR metadata: {e}", file=sys.stderr)
         
         lines.append("")
+    
+    # ========================================
+    # Services Data
+    # ========================================
+    lines.append("## 📦 Services Data\n")
+    lines.append("")
+    lines.append("External services that were running when the test executed:\n")
+    lines.append("")
+    
+    services_data = None
+    # Prefer services-only.json (already filtered, excludes dataPurger and triggering repo)
+    # services-only.json is a flat dict: {"repo-name": {"images": [...]}, ...}
+    if services_only and isinstance(services_only, dict) and len(services_only) > 0:
+        services_data = services_only
+        print(f"🔍 DEBUG: Using services-only.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+    elif test_deployed_services and isinstance(test_deployed_services, dict):
+        # Use services from test-deployed-services.json, but note that dataPurger filtering happens below
+        services_data = test_deployed_services.get('services', {})
+        if services_data and len(services_data) > 0:
+            print(f"🔍 DEBUG: Using test-deployed-services.json with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+        else:
+            print(f"🔍 DEBUG: test-deployed-services.json has no services (empty dict)", file=sys.stderr)
+    elif running_images:
+        # Legacy format - extract services (exclude triggering repo)
+        repos = running_images.get('repos', {})
+        services_data = {}
+        triggering_repo_normalized = running_images.get('triggering_repo_normalized', triggering_repo)
+        for repo_name, repo_info in repos.items():
+            if not repo_info.get('is_triggering_repo', False) and repo_name.lower() != triggering_repo_normalized.lower():
+                services_data[repo_name] = repo_info
+        print(f"🔍 DEBUG: Using running-images.json (legacy) with {len(services_data)} services: {list(services_data.keys())}", file=sys.stderr)
+    else:
+        print(f"🔍 DEBUG: No services data source available (services_only={services_only is not None}, test_deployed_services={test_deployed_services is not None}, running_images={running_images is not None})", file=sys.stderr)
+    
+    if services_data and len(services_data) > 0:
+        # Create table for services
+        lines.append("| Service | Deployed Version | Index Available |")
+        lines.append("|---------|------------------|-----------------|")
+        
+        # Collect all service entries (one per service_key, not per repo)
+        service_entries = []
+        
+        for repo_name, repo_info in sorted(services_data.items()):
+            images = repo_info.get('images', [])
+            
+            # Filter out dataPurger (should already be filtered, but double-check)
+            filtered_images = [img for img in images if img.get('service_key') != 'dataPurger']
+            
+            if not filtered_images:
+                continue
+            
+            # Group by unique tags to show all services
+            # For repos with multiple services (like event-ingester-service), show each service
+            unique_tags = {}
+            for img in filtered_images:
+                tag = img.get('tag', 'unknown')
+                service_key = img.get('service_key', 'unknown')
+                
+                if tag not in unique_tags:
+                    unique_tags[tag] = []
+                if service_key not in unique_tags[tag]:
+                    unique_tags[tag].append(service_key)
+            
+            # Create entries: one per unique tag, showing all service_keys using that tag
+            for tag, service_keys in sorted(unique_tags.items()):
+                # Format service display: repo name + service keys if multiple
+                if len(service_keys) > 1:
+                    service_display = f"{repo_name} ({', '.join(service_keys)})"
+                elif len(service_keys) == 1 and service_keys[0] != 'unknown':
+                    service_display = f"{repo_name} ({service_keys[0]})"
+                else:
+                    service_display = repo_name
+                
+                # Check if index is available - try multiple key formats
+                index_available = "❌"
+                if found_indexes:
+                    indexes = found_indexes.get('indexes', {})
+                    
+                    # Try exact repo name match first
+                    repo_idx = indexes.get(repo_name, {})
+                    if repo_idx.get('deployed', {}).get('found', False):
+                        index_available = "✅"
+                    else:
+                        # Try tag-suffixed key (for repos with multiple tags)
+                        tag_key = f"{repo_name}-{tag}"
+                        repo_idx = indexes.get(tag_key, {})
+                        if repo_idx.get('deployed', {}).get('found', False):
+                            index_available = "✅"
+                        else:
+                            # Try any key starting with repo_name (for multiple versions)
+                            for key in indexes.keys():
+                                if key.startswith(f"{repo_name}-") and indexes[key].get('deployed', {}).get('found', False):
+                                    index_available = "✅"
+                                    break
+                
+                service_entries.append({
+                    'display': service_display,
+                    'tag': tag,
+                    'index_available': index_available
+                })
+        
+        # Sort and display entries
+        for entry in sorted(service_entries, key=lambda x: x['display']):
+            lines.append(f"| `{entry['display']}` | `{entry['tag']}` | {entry['index_available']} |")
+        
+        lines.append("")
+        lines.append(f"**Total Services:** {len(service_entries)}")
+        lines.append("")
+    else:
+        lines.append("No service data available.\n")
+        lines.append("")
+    
+    # ========================================
+    # Go Mod Dependencies Data
+    # ========================================
+    lines.append("## 📚 Go Mod Dependencies Data\n")
+    lines.append("")
+    lines.append("Internal Go libraries and shared modules extracted from `go.mod`:\n")
+    lines.append("")
     
     # Code Differences - Always show if we have commit info
     lines.append("### 🔄 Code Differences (RC vs Deployed)\n")
@@ -535,30 +825,44 @@ def generate_summary(
     
     lines.append("")
     
-    # ========================================
-    # Dependencies Table
-    # ========================================
-    if found_indexes and 'indexes' in found_indexes:
-        lines.append("## 📦 Dependencies\n")
-        lines.append("")
-        
+    # Show go.mod dependencies table (only go.mod deps, not services)
+    if gomod_deps:
         # Extract chunk/LOC stats from LLM context
         chunk_stats = extract_chunk_stats_per_repo(llm_context)
         
-        lines.append(format_dependencies_table(found_indexes, chunk_stats))
-        lines.append("")
+        # Filter to only go.mod dependencies (source='gomod' or not 'service')
+        gomod_only_indexes = {}
+        if found_indexes and 'indexes' in found_indexes:
+            for repo_name, repo_info in found_indexes.get('indexes', {}).items():
+                # Skip triggering repo and services
+                if repo_name == triggering_repo:
+                    continue
+                source = repo_info.get('deployed', {}).get('source', 'gomod')
+                if source != 'service':
+                    gomod_only_indexes[repo_name] = repo_info
         
-        # Summary stats
-        total_deps = len(found_indexes.get('indexes', {}))
-        changed_deps = sum(1 for dep in found_indexes.get('indexes', {}).values() 
-                          if dep.get('version_changed', False))
-        missing_indexes = sum(1 for dep in found_indexes.get('indexes', {}).values()
-                             if not dep.get('deployed', {}).get('found', False))
-        
-        lines.append(f"**Summary**: {total_deps} dependencies, ")
-        lines.append(f"{changed_deps} version changes, ")
-        lines.append(f"{missing_indexes} missing indexes\n")
-        lines.append("")
+        if gomod_only_indexes:
+            # Create filtered found_indexes for format_dependencies_table
+            filtered_found_indexes = {
+                'triggering_repo': triggering_repo,
+                'indexes': gomod_only_indexes
+            }
+            lines.append(format_dependencies_table(filtered_found_indexes, chunk_stats))
+            lines.append("")
+            
+            # Summary stats for go.mod deps only
+            total_gomod_deps = len(gomod_only_indexes)
+            changed_gomod_deps = sum(1 for dep in gomod_only_indexes.values() 
+                                    if dep.get('version_changed', False))
+            missing_gomod_indexes = sum(1 for dep in gomod_only_indexes.values()
+                                      if not dep.get('deployed', {}).get('found', False))
+            
+            lines.append(f"**Summary**: {total_gomod_deps} go.mod dependencies, ")
+            lines.append(f"{changed_gomod_deps} with version changes, ")
+            lines.append(f"{missing_gomod_indexes} missing indexes")
+            lines.append("")
+            lines.append("> **Note:** The go.mod table shows all dependencies, but code chunks are only extracted for dependencies that are actually imported and used in the code. One dependency can contribute many chunks.")
+            lines.append("")
     
     # ========================================
     # Dependency Analysis
@@ -684,7 +988,10 @@ def generate_summary(
             commit = repo_info.get('commit', 'unknown')
             is_triggering = repo_info.get('is_triggering_repo', False)
             suffix = " (triggering)" if is_triggering else ""
-            lines.append(f"- **{repo_name}**: `{commit[:8] if commit != 'unknown' else 'unknown'}`{suffix}")
+            if commit and commit != 'unknown' and isinstance(commit, str):
+                lines.append(f"- **{repo_name}**: `{commit[:8]}`{suffix}")
+            else:
+                lines.append(f"- **{repo_name}**: `unknown`{suffix}")
         lines.append("")
     
     # ========================================
@@ -900,7 +1207,9 @@ def main():
     parser.add_argument('--api-mapping', default='artifacts/api-code-map-with-chains.json')
     parser.add_argument('--code-diffs', default='artifacts/code-diffs.json')
     parser.add_argument('--found-indexes', default='artifacts/found-indexes.json')
-    parser.add_argument('--running-images', default='artifacts/running-images.json')
+    parser.add_argument('--running-images', default='artifacts/running-images.json', help='Legacy format (backward compatibility)')
+    parser.add_argument('--test-deployed-services', help='New format with separated triggering_repo and services sections')
+    parser.add_argument('--services-only', help='Filtered services-only.json (excludes dataPurger and triggering repo)')
     parser.add_argument('--gomod-deps', default='artifacts/gomod-dependencies.json')
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
@@ -911,32 +1220,87 @@ def main():
     
     args = parser.parse_args()
     
-    # Generate summary
-    summary = generate_summary(
-        args.llm_context,
-        args.api_mapping,
-        args.code_diffs,
-        args.found_indexes,
-        args.running_images,
-        args.gomod_deps,
-        args.context_summary,
-        args.environment,
-        args.run_ref,
-        args.workflow_commit,
-        args.llm_analysis
-    )
+    # Debug: Print all args to see what's being parsed
+    services_only_arg = getattr(args, 'services_only', None)
+    print(f"🔍 DEBUG: Parsed args.services_only = {services_only_arg}", file=sys.stderr)
+    print(f"🔍 DEBUG: All args: {vars(args)}", file=sys.stderr)
+    print(f"🔍 DEBUG: About to call generate_summary with services_only_path = {services_only_arg}", file=sys.stderr)
     
-    # Write to output
+    # Generate summary with error handling
     output_path = args.output or os.environ.get('GITHUB_STEP_SUMMARY')
     
-    if output_path:
-        with open(output_path, 'a') as f:
-            f.write(summary)
-        print(f"✅ Summary written to {output_path}")
-    else:
-        print(summary)
-    
-    return 0
+    try:
+        summary = generate_summary(
+            args.llm_context,
+            args.api_mapping,
+            args.code_diffs,
+            args.found_indexes,
+            args.running_images,
+            args.gomod_deps,
+            args.context_summary,
+            args.environment,
+            args.run_ref,
+            args.workflow_commit,  # workflow_commit_path (position 10)
+            args.llm_analysis,      # llm_analysis_path (position 11)
+            args.test_deployed_services,  # test_deployed_services_path (position 12)
+            services_only_arg       # services_only_path (position 13)
+        )
+        
+        # Write to output
+        if output_path:
+            # Ensure summary is not empty
+            if not summary or len(summary.strip()) == 0:
+                summary = "## ⚠️ Summary Generation Warning\n\n**Status:** Summary was generated but is empty.\n\nThis may indicate an issue with the data or the generation process. Please check the logs for details."
+                print("⚠️  Warning: Generated summary is empty, writing placeholder", file=sys.stderr)
+            
+            # Use write mode ('w') to ensure file is created/overwritten properly
+            # GitHub Actions GITHUB_STEP_SUMMARY should be empty at start of step
+            try:
+                with open(output_path, 'w') as f:  # Changed from 'a' to 'w'
+                    f.write(summary)
+                print(f"✅ Summary written to {output_path}")
+                SUMMARY_SIZE = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+                print(f"   Summary file size: {SUMMARY_SIZE} bytes")
+                
+                # Verify content was actually written
+                if SUMMARY_SIZE == 0:
+                    print("❌ ERROR: Summary file is empty after writing!", file=sys.stderr)
+                    # Try writing a minimal summary
+                    with open(output_path, 'w') as f:
+                        f.write("## ⚠️ Summary Generation Issue\n\nSummary file was created but is empty. Please check logs for details.")
+            except Exception as write_error:
+                print(f"❌ Failed to write summary to {output_path}: {write_error}", file=sys.stderr)
+                raise  # Re-raise to trigger error handling
+        else:
+            print(summary)
+            if not summary or len(summary.strip()) == 0:
+                print("⚠️  Warning: Summary is empty", file=sys.stderr)
+        
+        return 0
+        
+    except Exception as e:
+        error_msg = f"❌ Error generating summary: {e}\n\nTraceback:\n{traceback.format_exc()}"
+        print(error_msg, file=sys.stderr)
+        
+        # Write error to output file so it's visible in GitHub Actions
+        if output_path:
+            try:
+                with open(output_path, 'w') as f:  # Use write mode to ensure file is created
+                    f.write(f"## ⚠️ Summary Generation Failed\n\n")
+                    f.write(f"**Error:** {str(e)}\n\n")
+                    f.write(f"```\n{traceback.format_exc()}\n```\n\n")
+                    f.write(f"**Debug Info:**\n")
+                    f.write(f"- LLM Context: {args.llm_context}\n")
+                    f.write(f"- Test Deployed Services: {args.test_deployed_services}\n")
+                    f.write(f"- Found Indexes: {args.found_indexes}\n")
+                    f.write(f"- Environment: {args.environment}\n")
+                    f.write(f"- Output Path: {output_path}\n")
+                print(f"⚠️  Error details written to {output_path}")
+            except Exception as write_error:
+                print(f"❌ Failed to write error to output file: {write_error}", file=sys.stderr)
+        
+        # Return non-zero to trigger workflow error logging
+        return 1
 
 
 if __name__ == '__main__':
