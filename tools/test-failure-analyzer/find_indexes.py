@@ -82,13 +82,24 @@ def extract_pr_from_rc(rc_version: str) -> Optional[int]:
     """
     Extract PR number from RC version.
     
+    NOTE: RC versions can have either PR numbers or workflow run IDs as suffix.
+    - PR numbers are typically < 10,000,000
+    - Workflow run IDs are typically >= 10,000,000 (10+ digits)
+    
     Examples:
-        rc-v0.0.224-2435 -> 2435
-        rc-v1.2.3-999 -> 999
+        rc-v0.0.224-2435 -> 2435 (PR number)
+        rc-v1.2.3-999 -> 999 (PR number)
+        rc-v0.0.394-20549238574 -> None (workflow run ID, not a PR)
     """
     match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
     if match:
-        return int(match.group(1))
+        number = int(match.group(1))
+        # Workflow run IDs are typically 10+ digits (>= 10,000,000,000)
+        # PR numbers are typically smaller. Use 10,000,000 as threshold.
+        if number >= 10000000:
+            # Likely a workflow run ID, not a PR number
+            return None
+        return number
     return None
 
 
@@ -296,11 +307,24 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         if triggering_commit:
             print(f"   Triggering commit: {triggering_commit}")
     
-    # Strategy 1: PR-based resolution
+    # Strategy 1: Try triggering commit directly (if provided from workflow context)
+    # This is the most reliable since it's the actual commit that triggered the workflow
+    if triggering_commit and len(triggering_commit) >= 7:
+        if debug:
+            print(f"\n📋 Strategy 1: Commit-based resolution (commit {triggering_commit[:8]})")
+        
+        artifact_name = f"code-index-{triggering_commit}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
+        if index_path:
+            return index_path, "commit_direct"
+    
+    # Strategy 2: PR-based resolution (only if no triggering commit available)
+    # NOTE: RC versions may contain workflow run IDs instead of PR numbers
+    # The extract_pr_from_rc function filters out run IDs (>= 10,000,000)
     pr_number = extract_pr_from_rc(rc_version)
     if pr_number:
         if debug:
-            print(f"\n📋 Strategy 1: PR-based resolution (PR #{pr_number})")
+            print(f"\n📋 Strategy 2: PR-based resolution (PR #{pr_number})")
         
         commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
         if commit:
@@ -308,16 +332,13 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
             index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
             if index_path:
                 return index_path, "pr_commit"
-    
-    # Strategy 2: Try RC commit directly (if provided from workflow context)
-    if triggering_commit and len(triggering_commit) >= 7:
-        if debug:
-            print(f"\n📋 Strategy 2: Commit-based resolution (commit {triggering_commit[:8]})")
-        
-        artifact_name = f"code-index-{triggering_commit}"
-        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-        if index_path:
-            return index_path, "commit_direct"
+    elif debug:
+        # Log why PR-based resolution was skipped
+        match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
+        if match:
+            number = int(match.group(1))
+            if number >= 10000000:
+                print(f"\n📋 Strategy 2: Skipping PR-based resolution (suffix {number} is a workflow run ID, not a PR number)")
     
     # Strategy 3: Fallback to latest
     if debug:

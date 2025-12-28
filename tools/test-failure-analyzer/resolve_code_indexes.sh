@@ -164,9 +164,48 @@ if [[ -n "$WORKFLOW_COMMIT" ]] && ! [[ "$WORKFLOW_COMMIT" =~ ^[0-9a-f]{7,40}$ ]]
   WORKFLOW_COMMIT=""
 fi
 
-# If RC version not set, use workflow commit as fallback
-if [[ -z "$RC_VERSION" && -n "$WORKFLOW_COMMIT" ]]; then
-  RC_VERSION="commit-${WORKFLOW_COMMIT:0:8}"
+# Extract triggering repo commit from resolved commits or tag mapping (more accurate than workflow commit)
+# The workflow commit is from shared-workflows repo, but we need the commit of the triggering repo
+TRIGGERING_REPO_COMMIT=""
+if [[ -f artifacts/resolved-repo-commits.json ]]; then
+  # Try normalized repo name first (most common)
+  TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" '.resolved_commits[$repo] // empty' artifacts/resolved-repo-commits.json 2>/dev/null || echo "")
+  # If not found, try case-insensitive search
+  if [[ -z "$TRIGGERING_REPO_COMMIT" || "$TRIGGERING_REPO_COMMIT" == "null" ]]; then
+    TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" '.resolved_commits | to_entries | map(select(.key | ascii_downcase == ($repo | ascii_downcase))) | .[0].value // empty' artifacts/resolved-repo-commits.json 2>/dev/null || echo "")
+  fi
+  if [[ -n "$TRIGGERING_REPO_COMMIT" && "$TRIGGERING_REPO_COMMIT" != "null" && "$TRIGGERING_REPO_COMMIT" =~ ^[0-9a-f]{7,40}$ ]]; then
+    echo "✅ Found triggering repo commit from resolved-repo-commits.json: ${TRIGGERING_REPO_COMMIT:0:8}"
+  else
+    TRIGGERING_REPO_COMMIT=""
+  fi
+fi
+
+# Fallback: Try to extract from repo-commits.json (tag mapping)
+if [[ -z "$TRIGGERING_REPO_COMMIT" && -f artifacts/repo-commits.json ]]; then
+  # Try normalized repo name first
+  TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" '.[$repo].commit // empty' artifacts/repo-commits.json 2>/dev/null || echo "")
+  # If not found, try case-insensitive search
+  if [[ -z "$TRIGGERING_REPO_COMMIT" || "$TRIGGERING_REPO_COMMIT" == "null" ]]; then
+    TRIGGERING_REPO_COMMIT=$(jq -r --arg repo "$TRIGGERING_REPO" 'to_entries | map(select(.key | ascii_downcase == ($repo | ascii_downcase))) | .[0].value.commit // empty' artifacts/repo-commits.json 2>/dev/null || echo "")
+  fi
+  if [[ -n "$TRIGGERING_REPO_COMMIT" && "$TRIGGERING_REPO_COMMIT" != "null" && "$TRIGGERING_REPO_COMMIT" =~ ^[0-9a-f]{7,40}$ ]]; then
+    echo "✅ Found triggering repo commit from repo-commits.json: ${TRIGGERING_REPO_COMMIT:0:8}"
+  else
+    TRIGGERING_REPO_COMMIT=""
+  fi
+fi
+
+# Final fallback: Use workflow commit (but this is from shared-workflows, not the triggering repo)
+if [[ -z "$TRIGGERING_REPO_COMMIT" && -n "$WORKFLOW_COMMIT" ]]; then
+  echo "⚠️  No triggering repo commit found in resolved commits, using workflow commit as fallback"
+  echo "   Note: Workflow commit is from shared-workflows repo, not $TRIGGERING_REPO"
+  TRIGGERING_REPO_COMMIT="$WORKFLOW_COMMIT"
+fi
+
+# If RC version not set, use triggering repo commit as fallback
+if [[ -z "$RC_VERSION" && -n "$TRIGGERING_REPO_COMMIT" ]]; then
+  RC_VERSION="commit-${TRIGGERING_REPO_COMMIT:0:8}"
 fi
 
 echo ""
@@ -174,7 +213,8 @@ echo "📊 Version Info Summary:"
 echo "   Triggering Repo:  ${TRIGGERING_REPO:-unknown}"
 echo "   Deployed Version: ${DEPLOYED_VERSION:-unknown}"
 echo "   RC Version:       ${RC_VERSION:-unknown}"
-echo "   Workflow Commit:  ${WORKFLOW_COMMIT:-unknown}"
+echo "   Triggering Repo Commit: ${TRIGGERING_REPO_COMMIT:-unknown}"
+echo "   Workflow Commit (shared-workflows): ${WORKFLOW_COMMIT:-unknown}"
 echo ""
 
 # Validate triggering repo is set (but allow "cadashboardbe" as valid default)
@@ -199,7 +239,7 @@ python find_indexes.py \
   --triggering-repo "$TRIGGERING_REPO" \
   --deployed-version "${DEPLOYED_VERSION:-unknown}" \
   --rc-version "${RC_VERSION:-unknown}" \
-  --triggering-commit "${WORKFLOW_COMMIT:-unknown}" \
+  --triggering-commit "${TRIGGERING_REPO_COMMIT:-unknown}" \
   --images "artifacts/test-deployed-services.json" \
   --output-dir "artifacts/code-indexes" \
   --output "artifacts/found-indexes-pass1.json" \
@@ -213,7 +253,7 @@ python find_indexes.py \
   "indexes": {
     "$TRIGGERING_REPO": {
       "deployed": {"version": "${DEPLOYED_VERSION:-unknown}", "found": false},
-      "rc": {"version": "${RC_VERSION:-unknown}", "commit": "${WORKFLOW_COMMIT:-unknown}", "found": false}
+      "rc": {"version": "${RC_VERSION:-unknown}", "commit": "${TRIGGERING_REPO_COMMIT:-unknown}", "found": false}
     }
   }
 }
@@ -288,7 +328,7 @@ if [[ -f artifacts/gomod-dependencies.json ]] && [[ $(jq 'length' artifacts/gomo
     --triggering-repo "$TRIGGERING_REPO" \
     --deployed-version "${DEPLOYED_VERSION:-unknown}" \
     --rc-version "${RC_VERSION:-unknown}" \
-    --triggering-commit "${WORKFLOW_COMMIT:-unknown}" \
+    --triggering-commit "${TRIGGERING_REPO_COMMIT:-unknown}" \
     --images "artifacts/test-deployed-services.json" \
     --services-only "artifacts/services-only.json" \
     --output-dir "artifacts/code-indexes" \
