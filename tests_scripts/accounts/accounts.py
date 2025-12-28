@@ -158,6 +158,10 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
             except Exception as e:
                 Logger.logger.error(f"Failed to delete cloud organization with guid {guid}: {e}")
         
+        # Azure-specific cleanup (restore Reader role if it was removed)
+        # Method checks internally if credentials exist, so safe to call for all tests
+        self.cleanup_azure_reader_role()
+        
         return super().cleanup(**kwargs)
     
     def build_get_cloud_entity_by_guid_request(self, guid: str) -> Dict:
