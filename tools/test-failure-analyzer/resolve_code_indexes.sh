@@ -419,8 +419,8 @@ if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_
   }
 elif [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" ]]; then
   echo "⚠️  RC index not available, using deployed index only"
-  # Use same version for both code index and go.mod (no mismatch)
-  echo "📌 Using DEPLOYED_VERSION for go.mod: ${DEPLOYED_VERSION:-unknown} (same as code index)"
+  echo "📌 Data source: Deployed version ${DEPLOYED_VERSION:-unknown}"
+  echo "   go.mod will be extracted from deployed version (no comparison possible)"
   python extract_gomod_dependencies.py \
     --code-index "$DEPLOYED_INDEX" \
     --triggering-repo "$TRIGGERING_REPO" \
@@ -431,8 +431,24 @@ elif [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" ]]; then
     echo "⚠️  go.mod extraction failed"
     echo "{}" > artifacts/gomod-dependencies.json
   }
+elif [[ -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
+  echo "⚠️  Deployed index not available, using RC index as fallback"
+  echo "📌 Data source: RC version ${RC_VERSION:-unknown} (code being tested)"
+  echo "   go.mod will be extracted from RC version (cannot compare to deployed)"
+  echo "   This provides dependency context even without comparison"
+  python extract_gomod_dependencies.py \
+    --code-index "$RC_INDEX" \
+    --triggering-repo "$TRIGGERING_REPO" \
+    --deployed-version "$GOMOD_DEPLOYED_VERSION" \
+    --output artifacts/gomod-dependencies.json \
+    --github-token "$GITHUB_TOKEN" \
+    --debug || {
+    echo "⚠️  go.mod extraction failed"
+    echo "{}" > artifacts/gomod-dependencies.json
+  }
 else
   echo "⚠️  No code indexes available for go.mod extraction"
+  echo "   Cannot extract dependency information"
   echo "{}" > artifacts/gomod-dependencies.json
 fi
 
