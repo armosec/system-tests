@@ -53,6 +53,15 @@ if [[ -n "$TAG_FILE" ]]; then
     # Extract the tag currently running in the cluster for the triggering repo
     ACTUAL_DEPLOYED_VERSION=$(jq -r '.triggering_repo.images[0].tag // empty' "$TAG_FILE" 2>/dev/null || echo "")
     
+    # Extract the commit hash from test-deployed-services.json (MOST RELIABLE)
+    TRIGGERING_REPO_COMMIT_FROM_JSON=$(jq -r '.triggering_repo.commit_hash // empty' "$TAG_FILE" 2>/dev/null || echo "")
+    if [[ -n "$TRIGGERING_REPO_COMMIT_FROM_JSON" && "$TRIGGERING_REPO_COMMIT_FROM_JSON" != "null" && "$TRIGGERING_REPO_COMMIT_FROM_JSON" =~ ^[0-9a-f]{7,40}$ ]]; then
+      echo "✅ Found triggering repo commit from test-deployed-services.json: ${TRIGGERING_REPO_COMMIT_FROM_JSON:0:8}"
+    else
+      echo "⚠️  No valid commit_hash in test-deployed-services.json (value: '$TRIGGERING_REPO_COMMIT_FROM_JSON')"
+      TRIGGERING_REPO_COMMIT_FROM_JSON=""
+    fi
+    
     # Extract global RC version
     GLOBAL_RC_VERSION="$INPUT_RC_VERSION"
     echo "🔍 DEBUG: inputs.rc_version = '$INPUT_RC_VERSION'"
@@ -213,15 +222,27 @@ if [[ -n "$WORKFLOW_COMMIT" ]] && ! [[ "$WORKFLOW_COMMIT" =~ ^[0-9a-f]{7,40}$ ]]
   WORKFLOW_COMMIT=""
 fi
 
-# Extract triggering repo commit - PRIORITY: Use commit from RC version
-# The RC version is created from the actual merge commit (before code index commit)
-# This ensures we get the right commit even if code index workflow created a new commit
+# Extract triggering repo commit
+# Priority order:
+# 1. test-deployed-services.json commit_hash (most reliable - from test run)
+# 2. RC tag (from GitHub API)
+# 3. RC workflow run (extract from RC version suffix)
+# 4. Resolved commits (from tag mapping)
+# 5. Repo commits (from tag mapping)
+# 6. Workflow commit (from shared-workflows - last resort)
 TRIGGERING_REPO_COMMIT=""
 
-# Priority 1: Extract commit from RC version (if available)
+# Priority 0: Use commit from test-deployed-services.json if available (MOST RELIABLE)
+if [[ -n "$TRIGGERING_REPO_COMMIT_FROM_JSON" ]]; then
+  TRIGGERING_REPO_COMMIT="$TRIGGERING_REPO_COMMIT_FROM_JSON"
+  echo "✅ Using triggering repo commit from test-deployed-services.json: ${TRIGGERING_REPO_COMMIT:0:8}"
+  echo "   This is the most reliable source (extracted during test run)"
+fi
+
+# Priority 1: Extract commit from RC version (if not already found from JSON)
 # RC version format: rc-v0.0.394-20549238574 or rc-v0.0.394-PR_NUMBER
 # The RC is created from the merge commit, so we need to get that commit from GitHub
-if [[ -n "$RC_VERSION" && "$RC_VERSION" =~ ^rc-v ]]; then
+if [[ -z "$TRIGGERING_REPO_COMMIT" && -n "$RC_VERSION" && "$RC_VERSION" =~ ^rc-v ]]; then
   echo "🔍 Extracting triggering repo commit from RC version: $RC_VERSION"
   echo "   Querying: gh api repos/armosec/$TRIGGERING_REPO/git/refs/tags/$RC_VERSION"
   
