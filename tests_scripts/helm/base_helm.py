@@ -263,13 +263,13 @@ class BaseHelm(BaseK8S):
 
     def uninstall_kubescape_chart(self):
         # Determine release name based on environment
-        # For multi-prod environments, use 'armosec', otherwise use default 'kubescape'
+        # For multi-prod environments, use 'rapid7', otherwise use default 'kubescape'
         release_name = statics.CA_HELM_NAME  # default
         if self.backend and hasattr(self.backend, 'get_api_url'):
             try:
                 server = self.backend.get_api_url()
                 if server and "r7.armo-cadr.com" in server:
-                    release_name = "armosec"
+                    release_name = "rapid7"
             except:
                 pass  # If we can't get server URL, use default
         HelmWrapper.uninstall_kubescape_chart(release_name=release_name)

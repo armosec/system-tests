@@ -89,7 +89,7 @@ class HelmWrapper(object):
                 Logger.logger.warning("NA_IMAGE_PULL_SECRET_PASSWORD environment variable not set")
             
             # Build command for multi-prod using armosec/rapid7-operator from Helm repo
-            command_args = ["helm", "upgrade", "--debug", "--install", "armosec", "armosec/rapid7-operator", "-n", namespace,
+            command_args = ["helm", "upgrade", "--debug", "--install", "rapid7", "armosec/rapid7-operator", "-n", namespace,
                             "--set", "kubescape-operator.clusterName={}".format(current_context),
                             "--set", "kubescape-operator.account={}".format(customer),
                             "--set", "kubescape-operator.server={}".format(server),
