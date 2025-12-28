@@ -137,18 +137,20 @@ def parse_gomod_dependencies(gomod_content: str) -> Dict[str, str]:
     return dependencies
 
 
-def filter_relevant_dependencies(dependencies: Dict[str, str], triggering_repo: Optional[str] = None) -> Dict[str, str]:
+def filter_relevant_dependencies(dependencies: Dict[str, str], triggering_repo: Optional[str] = None, debug: bool = False) -> Dict[str, str]:
     """
     Filter to only armosec/* and kubescape/* dependencies, excluding triggering repo.
     
     Args:
         dependencies: Dict mapping package name to version
         triggering_repo: Name of triggering repo to exclude (e.g., "cadashboardbe")
+        debug: Enable debug logging
     
     Returns:
         Filtered dependencies dict
     """
     relevant = {}
+    excluded_count = 0
     
     for pkg, version in dependencies.items():
         if pkg.startswith('github.com/armosec/') or pkg.startswith('github.com/kubescape/'):
@@ -156,10 +158,17 @@ def filter_relevant_dependencies(dependencies: Dict[str, str], triggering_repo: 
             repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', pkg)
             if repo_match:
                 repo_name = repo_match.group(2)
-                # Skip if this is the triggering repo (it's a service, not a dependency)
-                if triggering_repo and repo_name == triggering_repo:
+                # Skip if this is the triggering repo (case-insensitive match)
+                if triggering_repo and repo_name.lower() == triggering_repo.lower():
+                    if debug:
+                        print(f"🚫 Excluding triggering repo '{repo_name}' (matches '{triggering_repo}') from dependencies")
+                    excluded_count += 1
                     continue
+            # Only add if we didn't skip it
             relevant[pkg] = version
+    
+    if debug and excluded_count > 0:
+        print(f"📊 Excluded {excluded_count} dependency(ies) matching triggering repo '{triggering_repo}'")
     
     return relevant
 
@@ -387,19 +396,8 @@ def main():
         rc_deps_all = parse_gomod_dependencies(rc_gomod)
         
         # Filter to relevant dependencies (excluding triggering repo)
-        deployed_deps = filter_relevant_dependencies(deployed_deps_all, args.triggering_repo)
-        rc_deps = filter_relevant_dependencies(rc_deps_all, args.triggering_repo)
-        
-        if args.debug and args.triggering_repo:
-            excluded_deployed = [pkg for pkg in deployed_deps_all.keys() if pkg.endswith(f'/{args.triggering_repo}')]
-            excluded_rc = [pkg for pkg in rc_deps_all.keys() if pkg.endswith(f'/{args.triggering_repo}')]
-            if excluded_deployed or excluded_rc:
-                print(f"🚫 Excluded triggering repo '{args.triggering_repo}' from dependencies")
-                if excluded_deployed:
-                    print(f"   Deployed: {excluded_deployed}")
-                if excluded_rc:
-                    print(f"   RC: {excluded_rc}")
-                print()
+        deployed_deps = filter_relevant_dependencies(deployed_deps_all, args.triggering_repo, args.debug)
+        rc_deps = filter_relevant_dependencies(rc_deps_all, args.triggering_repo, args.debug)
         
         if args.debug:
             print(f"📊 Found {len(deployed_deps)} relevant dependencies in deployed version")
@@ -490,13 +488,9 @@ def main():
         print(f"📦 Total dependencies: {len(all_deps)}")
     
     # Filter to relevant ones (excluding triggering repo)
-    relevant_deps = filter_relevant_dependencies(all_deps, args.triggering_repo)
+    relevant_deps = filter_relevant_dependencies(all_deps, args.triggering_repo, args.debug)
     if args.debug:
         print(f"📦 Relevant dependencies (armosec/kubescape): {len(relevant_deps)}")
-        if args.triggering_repo:
-            excluded = [pkg for pkg in all_deps.keys() if pkg.endswith(f'/{args.triggering_repo}')]
-            if excluded:
-                print(f"🚫 Excluded triggering repo '{args.triggering_repo}': {excluded}")
         print()
     
     # Check which ones have code indexes
