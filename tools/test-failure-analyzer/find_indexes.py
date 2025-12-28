@@ -34,7 +34,19 @@ ALWAYS_INCLUDE_REPOS = [
     ('armosec', 'postgres-connector'),  # Database layer
 ]
 
-GITHUB_ORGS_TO_CHECK = ['armosec', 'kubescape']  # Check both orgs
+GITHUB_ORGS_TO_CHECK = ['armosec', 'kubescape']  # Check both orgs (fallback only)
+
+# Default list of repos to fetch code indexes for (most commonly used)
+# This reduces time by not fetching indexes for rarely-used dependencies
+# Note: Repos in ALWAYS_INCLUDE_REPOS will be fetched regardless of this list
+DEFAULT_REPOS_TO_FETCH = [
+    'armosec-infra',           # Already in ALWAYS_INCLUDE, but explicit here for clarity
+    'postgres-connector',      # Already in ALWAYS_INCLUDE, but explicit here for clarity
+    'event-ingester-service',  # Frequently used in test failures
+    'config-service',          # Frequently used in test failures
+    'users-notification-service',  # Frequently used in test failures
+    'messaging',               # Infrastructure dependency (also in detect_dependencies.py ALWAYS_INCLUDE)
+]
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Find and download code indexes")
@@ -48,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     
     # Dependencies
     parser.add_argument("--gomod-dependencies", help="Path to gomod-dependencies.json")
+    parser.add_argument("--default-repos", help="Comma-separated list of repos to fetch (defaults to built-in list)")
     
     # Output
     parser.add_argument("--output", required=True, help="Output JSON file path")
@@ -69,13 +82,24 @@ def extract_pr_from_rc(rc_version: str) -> Optional[int]:
     """
     Extract PR number from RC version.
     
+    NOTE: RC versions can have either PR numbers or workflow run IDs as suffix.
+    - PR numbers are typically < 10,000,000
+    - Workflow run IDs are typically >= 10,000,000 (10+ digits)
+    
     Examples:
-        rc-v0.0.224-2435 -> 2435
-        rc-v1.2.3-999 -> 999
+        rc-v0.0.224-2435 -> 2435 (PR number)
+        rc-v1.2.3-999 -> 999 (PR number)
+        rc-v0.0.394-20549238574 -> None (workflow run ID, not a PR)
     """
     match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
     if match:
-        return int(match.group(1))
+        number = int(match.group(1))
+        # Workflow run IDs are typically 10+ digits (>= 10,000,000,000)
+        # PR numbers are typically smaller. Use 10,000,000 as threshold.
+        if number >= 10000000:
+            # Likely a workflow run ID, not a PR number
+            return None
+        return number
     return None
 
 
@@ -283,11 +307,24 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         if triggering_commit:
             print(f"   Triggering commit: {triggering_commit}")
     
-    # Strategy 1: PR-based resolution
+    # Strategy 1: Try triggering commit directly (if provided from workflow context)
+    # This is the most reliable since it's the actual commit that triggered the workflow
+    if triggering_commit and len(triggering_commit) >= 7:
+        if debug:
+            print(f"\n📋 Strategy 1: Commit-based resolution (commit {triggering_commit[:8]})")
+        
+        artifact_name = f"code-index-{triggering_commit}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
+        if index_path:
+            return index_path, "commit_direct"
+    
+    # Strategy 2: PR-based resolution (only if no triggering commit available)
+    # NOTE: RC versions may contain workflow run IDs instead of PR numbers
+    # The extract_pr_from_rc function filters out run IDs (>= 10,000,000)
     pr_number = extract_pr_from_rc(rc_version)
     if pr_number:
         if debug:
-            print(f"\n📋 Strategy 1: PR-based resolution (PR #{pr_number})")
+            print(f"\n📋 Strategy 2: PR-based resolution (PR #{pr_number})")
         
         commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
         if commit:
@@ -295,16 +332,13 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
             index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
             if index_path:
                 return index_path, "pr_commit"
-    
-    # Strategy 2: Try RC commit directly (if provided from workflow context)
-    if triggering_commit and len(triggering_commit) >= 7:
-        if debug:
-            print(f"\n📋 Strategy 2: Commit-based resolution (commit {triggering_commit[:8]})")
-        
-        artifact_name = f"code-index-{triggering_commit}"
-        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-        if index_path:
-            return index_path, "commit_direct"
+    elif debug:
+        # Log why PR-based resolution was skipped
+        match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
+        if match:
+            number = int(match.group(1))
+            if number >= 10000000:
+                print(f"\n📋 Strategy 2: Skipping PR-based resolution (suffix {number} is a workflow run ID, not a PR number)")
     
     # Strategy 3: Fallback to latest
     if debug:
@@ -340,16 +374,27 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     if index_path:
         return index_path, "version_tag"
     
-    # Strategy 2: Fallback to latest
+    # Strategy 2: Get commit from Git tag and try code-index-{commit}
     if debug:
-        print(f"\n📋 Strategy 2: Falling back to latest")
+        print(f"\n📋 Strategy 2: Getting commit from Git tag and trying code-index-{{commit}}")
     
-    artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
-    if index_path:
-        if debug:
-            print(f"  ⚠️  Using latest index (may not match deployed version)")
-        return index_path, "latest_fallback"
+    repo_full_name = f"{github_org}/{repo}"
+    tag_commit = get_commit_for_tag(repo_full_name, version, github_token, debug)
+    if tag_commit:
+        artifact_name = f"code-index-{tag_commit}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
+        if index_path:
+            if debug:
+                print(f"  ✅ Found code index for commit {tag_commit[:8]} (from tag {version})")
+            return index_path, "tag_commit"
+    
+    # DO NOT FALL BACK TO LATEST - deployed version must have exact code index
+    # Falling back to latest could use a PR commit, which would give wrong go.mod dependencies
+    if debug:
+        print(f"\n❌ No code index found for deployed version {version}")
+        print(f"   Tried: code-index-{version}, code-index-{tag_commit[:8] if tag_commit else 'N/A'}")
+        print(f"   Will NOT use code-index-latest (must match deployed version exactly)")
+        print(f"   This ensures go.mod dependencies match the actual deployed version")
     
     return None, "failed"
 
@@ -360,10 +405,14 @@ def find_dependency_index(
     github_orgs: List[str],  # Changed from single github_org
     github_token: str,
     output_dir: str, 
-    debug: bool = False
+    debug: bool = False,
+    github_org_hint: Optional[str] = None  # NEW: Use this org first, skip others if found
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
-    Find dependency index, checking multiple GitHub organizations.
+    Find dependency index, checking GitHub organizations.
+    
+    If github_org_hint is provided, ONLY check that org (don't check others).
+    This saves time by avoiding unnecessary API calls.
     
     Tries multiple strategies:
     1. Version tag: code-index-v0.0.1160
@@ -377,8 +426,11 @@ def find_dependency_index(
         "code-index-latest"       # Fallback to latest
     ]
     
+    # If we have an org hint, ONLY check that org (saves time)
+    orgs_to_check = [github_org_hint] if github_org_hint else github_orgs
+    
     for artifact_name in strategies:
-        for github_org in github_orgs:
+        for github_org in orgs_to_check:
             if debug:
                 print(f"  Checking {github_org}/{repo} with {artifact_name}")
             
@@ -400,37 +452,59 @@ def find_dependency_index(
     
     # Not found in any org
     if debug:
-        print(f"  ⚠️  Not found in any organization: {github_orgs}")
+        print(f"  ⚠️  Not found in any organization: {orgs_to_check}")
     return None, None, "not_found"
 
 
-def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_orgs: List[str], debug: bool = False) -> Dict[str, Any]:
+def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, github_token: str, github_orgs: List[str], debug: bool = False, default_repos: Optional[List[str]] = None) -> Dict[str, Any]:
     """
     Resolve code indexes for all dependencies from multiple GitHub organizations.
+    
+    NEW: Only fetches indexes for repos in default_repos list (plus always-include repos).
+    This significantly reduces resolution time by skipping rarely-used dependencies.
     
     New format handles version comparison and multi-org discovery:
     {
       "postgres-connector": {
         "deployed_version": "v0.0.1160",
         "rc_version": "v0.0.1165",
-        "version_changed": true
+        "version_changed": true,
+        "github_org": "armosec"  # Use this org ONLY, don't check both
       }
     }
+    
+    Args:
+        default_repos: List of repo names to fetch. If None, uses DEFAULT_REPOS_TO_FETCH.
+                      Dependencies not in this list are skipped (unless in ALWAYS_INCLUDE_REPOS).
     
     Returns:
         Dict mapping dependency name to index info
     """
+    if default_repos is None:
+        default_repos = DEFAULT_REPOS_TO_FETCH
+    
+    # Combine default repos with always-include repos (remove duplicates)
+    repos_to_fetch = set(default_repos)
+    for _, repo in ALWAYS_INCLUDE_REPOS:
+        repos_to_fetch.add(repo)
+    
     results = {}
     
-    # First, process gomod dependencies
+    # First, process gomod dependencies (but only if in repos_to_fetch)
     for dep_name, dep_info in dependencies.items():
+        # Skip if not in default list (unless it's an always-include repo)
+        if dep_name not in repos_to_fetch:
+            if debug:
+                print(f"\n⏭️  Skipping {dep_name} (not in default repos list)")
+            continue
+        
         if debug:
             print(f"\n📦 Processing dependency: {dep_name}")
         
         deployed_ver_raw = dep_info.get('deployed_version', 'unknown')
         rc_ver_raw = dep_info.get('rc_version', 'unknown')
         version_changed = dep_info.get('version_changed', False)
-        github_org_hint = dep_info.get('github_org')
+        github_org_hint = dep_info.get('github_org')  # This tells us which org to use
         
         # Extract base versions for index resolution (indexes are tagged with base versions)
         # But keep raw versions for display
@@ -445,11 +519,8 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         deployed_ver_base = extract_base_version(deployed_ver_raw) if deployed_ver_raw != 'unknown' else 'unknown'
         rc_ver_base = extract_base_version(rc_ver_raw) if rc_ver_raw != 'unknown' else 'unknown'
         
-        # If we have an org hint, prioritize it in the orgs list
-        check_orgs = github_orgs
-        if github_org_hint and github_org_hint in github_orgs:
-            # Move the hinted org to the front
-            check_orgs = [github_org_hint] + [o for o in github_orgs if o != github_org_hint]
+        # Use ONLY the org hint if available (don't check both orgs)
+        # This saves significant time by avoiding unnecessary API calls
         
         if deployed_ver_raw == 'unknown' and rc_ver_raw == 'unknown':
             if debug:
@@ -469,10 +540,14 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         if deployed_ver_base != 'unknown':
             if debug:
                 print(f"  🔍 Resolving deployed version: {deployed_ver_raw} (using base {deployed_ver_base} for index lookup)")
+                if github_org_hint:
+                    print(f"  📌 Using org hint: {github_org_hint} (skipping other orgs)")
             
+            # Pass org hint to avoid checking both orgs
             deployed_index, deployed_org, deployed_strategy = find_dependency_index(
-                dep_name, deployed_ver_base, check_orgs,  # Use base version for index lookup
-                github_token, f"{output_dir}/{dep_name}-deployed", debug
+                dep_name, deployed_ver_base, github_orgs,  # Still pass list for fallback
+                github_token, f"{output_dir}/{dep_name}-deployed", debug,
+                github_org_hint=github_org_hint  # NEW: Use this org ONLY
             )
             deployed_found = deployed_index is not None
             
@@ -491,10 +566,14 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         if version_changed and rc_ver_base != 'unknown':
             if debug:
                 print(f"  🔍 Resolving RC version: {rc_ver_raw} (using base {rc_ver_base} for index lookup)")
+                if github_org_hint:
+                    print(f"  📌 Using org hint: {github_org_hint} (skipping other orgs)")
             
+            # Pass org hint to avoid checking both orgs
             rc_index, rc_org, rc_strategy = find_dependency_index(
-                dep_name, rc_ver_base, check_orgs,  # Use base version for index lookup
-                github_token, f"{output_dir}/{dep_name}-rc", debug
+                dep_name, rc_ver_base, github_orgs,  # Still pass list for fallback
+                github_token, f"{output_dir}/{dep_name}-rc", debug,
+                github_org_hint=github_org_hint  # NEW: Use this org ONLY
             )
             rc_found = rc_index is not None
             
@@ -562,9 +641,11 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         if debug:
             print(f"  Adding fallback: {org}/{repo} (not in go.mod, using latest)")
         # Get latest release (only used if not in go.mod)
+        # Use specific org (don't check both)
         index_path, found_org, strategy = find_dependency_index(
-            repo, "latest", [org],  # Just check specific org
-            github_token, f"{output_dir}/{repo}-fallback", debug
+            repo, "latest", github_orgs,  # Pass list for fallback
+            github_token, f"{output_dir}/{repo}-fallback", debug,
+            github_org_hint=org  # NEW: Use specific org ONLY
         )
         if index_path:
             # Extract commit
@@ -748,12 +829,20 @@ def main():
         with open(args.gomod_dependencies, 'r') as f:
             dependencies = json.load(f)
         
+        # Parse default repos if provided
+        default_repos = None
+        if args.default_repos:
+            default_repos = [repo.strip() for repo in args.default_repos.split(',')]
+            if args.debug:
+                print(f"📋 Using custom default repos: {', '.join(default_repos)}")
+        
         dep_results = resolve_dependency_indexes(
             dependencies,
             args.output_dir,
             github_token,
             github_orgs,  # Pass list of orgs
-            args.debug
+            args.debug,
+            default_repos=default_repos or DEFAULT_REPOS_TO_FETCH  # Use custom or default
         )
         
         # Add dependencies to results and calculate summary
