@@ -60,4 +60,3 @@ jobs:
           fi
 
           bash "$submodule_path/scripts/verify-shared-rules-submodule.sh"
-

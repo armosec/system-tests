@@ -27,6 +27,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--code-index", help="Path to code index JSON (deprecated, use --deployed-code-index)")
     parser.add_argument("--output", required=True, help="Output JSON file path")
     parser.add_argument("--github-token", help="GitHub token (or use GITHUB_TOKEN env var)")
+    parser.add_argument("--triggering-repo", help="Name of triggering repo to exclude from dependencies (e.g., cadashboardbe)")
+    parser.add_argument("--deployed-version", help="Deployed version tag (e.g., v0.0.223) - used to fetch correct go.mod instead of PR commit")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     return parser.parse_args()
 
@@ -135,15 +137,62 @@ def parse_gomod_dependencies(gomod_content: str) -> Dict[str, str]:
     return dependencies
 
 
-def filter_relevant_dependencies(dependencies: Dict[str, str]) -> Dict[str, str]:
-    """Filter to only armosec/* and kubescape/* dependencies."""
+def filter_relevant_dependencies(dependencies: Dict[str, str], triggering_repo: Optional[str] = None, debug: bool = False) -> Dict[str, str]:
+    """
+    Filter to only armosec/* and kubescape/* dependencies, excluding triggering repo.
+    
+    Args:
+        dependencies: Dict mapping package name to version
+        triggering_repo: Name of triggering repo to exclude (e.g., "cadashboardbe")
+        debug: Enable debug logging
+    
+    Returns:
+        Filtered dependencies dict
+    """
     relevant = {}
+    excluded_count = 0
     
     for pkg, version in dependencies.items():
         if pkg.startswith('github.com/armosec/') or pkg.startswith('github.com/kubescape/'):
+            # Extract repo name to check if it's the triggering repo
+            repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', pkg)
+            if repo_match:
+                repo_name = repo_match.group(2)
+                # Skip if this is the triggering repo (case-insensitive match)
+                if triggering_repo and repo_name.lower() == triggering_repo.lower():
+                    if debug:
+                        print(f"🚫 Excluding triggering repo '{repo_name}' (matches '{triggering_repo}') from dependencies")
+                    excluded_count += 1
+                    continue
+            # Only add if we didn't skip it
             relevant[pkg] = version
     
+    if debug and excluded_count > 0:
+        print(f"📊 Excluded {excluded_count} dependency(ies) matching triggering repo '{triggering_repo}'")
+    
     return relevant
+
+
+def extract_base_version(version: str) -> str:
+    """
+    Extract base version from pseudo-version or regular version.
+    
+    Examples:
+        v0.0.1182-0.20251225061625-832fbea140cc -> v0.0.1182
+        v0.0.1182 -> v0.0.1182
+        v1.2.3-0.20240101120000-abc123 -> v1.2.3
+    """
+    if not version or version == "unknown":
+        return "unknown"
+    
+    # Pseudo-version format: v0.0.1182-0.20251225061625-832fbea140cc
+    # Extract base version before the first dash after version number
+    match = re.match(r'^(v\d+\.\d+\.\d+)(?:-|$)', version)
+    if match:
+        return match.group(1)
+    
+    # If no match, return as-is (might be a commit hash or other format)
+    return version
 
 
 def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str, str]) -> Dict[str, Dict]:
@@ -157,17 +206,33 @@ def compare_dependency_versions(deployed_deps: Dict[str, str], rc_deps: Dict[str
     all_deps = set(deployed_deps.keys()) | set(rc_deps.keys())
     
     for dep in all_deps:
-        deployed_ver = deployed_deps.get(dep, "unknown")
-        rc_ver = rc_deps.get(dep, "unknown")
+        deployed_ver_raw = deployed_deps.get(dep, "unknown")
+        rc_ver_raw = rc_deps.get(dep, "unknown")
         
-        # Extract just the repo name (not full package path)
+        # Use EXACT versions from go.mod (don't extract base versions)
+        # The versions shown should match exactly what's in go.mod
+        deployed_ver = deployed_ver_raw
+        rc_ver = rc_ver_raw
+        
+        # Extract base versions ONLY for comparison (to detect version changes)
+        # Pseudo-versions like v0.0.1182-0.20251225061625-832fbea140cc should be compared
+        # against base version v0.0.1182 to detect if they're the same base version
+        deployed_base = extract_base_version(deployed_ver_raw)
+        rc_base = extract_base_version(rc_ver_raw)
+        
+        # Extract org and repo name
         repo_match = re.match(r'github\.com/(armosec|kubescape)/([^/]+)', dep)
+        github_org = repo_match.group(1) if repo_match else "armosec"
         repo_name = repo_match.group(2) if repo_match else dep
         
+        # Version changed if base versions differ (pseudo-version vs tag of same base = not changed)
+        version_changed = deployed_base != rc_base and deployed_base != "unknown" and rc_base != "unknown"
+        
         result[repo_name] = {
-            "deployed_version": deployed_ver,
-            "rc_version": rc_ver,
-            "version_changed": deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown",
+            "deployed_version": deployed_ver,  # Exact version from go.mod
+            "rc_version": rc_ver,  # Exact version from go.mod (may include pseudo-version)
+            "version_changed": version_changed,
+            "github_org": github_org,
             "has_index": False  # Will be updated later if we check
         }
     
@@ -275,9 +340,51 @@ def main():
             print(f"❌ Error loading code indexes: {e}", file=sys.stderr)
             sys.exit(1)
         
-        # Extract go.mod from both
-        deployed_gomod = find_gomod_in_index(deployed_index)
-        rc_gomod = find_gomod_in_index(rc_index)
+        # Extract go.mod from both - prefer GitHub download (actual repo file) over code index content
+        # Code index go.mod might have pseudo-versions if index was generated from commit after tag
+        deployed_gomod = None
+        rc_gomod = None
+        
+        # Try to download from GitHub first (more accurate - actual repo file)
+        deployed_metadata = deployed_index.get('metadata', {})
+        rc_metadata = rc_index.get('metadata', {})
+        
+        deployed_repo = deployed_metadata.get('repo', 'armosec/cadashboardbe')
+        deployed_commit = deployed_metadata.get('commit') or deployed_metadata.get('version', 'main')
+        rc_repo = rc_metadata.get('repo', 'armosec/cadashboardbe')
+        rc_commit = rc_metadata.get('commit') or rc_metadata.get('version', 'main')
+        
+        if args.debug:
+            print(f"📥 Attempting to download go.mod from GitHub...")
+            print(f"   Deployed: {deployed_repo}@{deployed_commit}")
+            print(f"   RC: {rc_repo}@{rc_commit}")
+        
+        # Download deployed go.mod from GitHub
+        # IMPORTANT: Use deployed version tag if provided, not commit from code index
+        # This ensures we get the actual deployed go.mod, not from a PR commit
+        deployed_ref = args.deployed_version or deployed_commit
+        if args.deployed_version and args.debug:
+            print(f"📌 Using deployed version tag for go.mod: {args.deployed_version} (instead of commit {deployed_commit})")
+        
+        deployed_gomod = download_gomod_from_github(deployed_repo, deployed_ref, github_token)
+        if deployed_gomod and args.debug:
+            print(f"✅ Downloaded deployed go.mod from GitHub")
+        
+        # Download RC go.mod from GitHub
+        rc_gomod = download_gomod_from_github(rc_repo, rc_commit, github_token)
+        if rc_gomod and args.debug:
+            print(f"✅ Downloaded RC go.mod from GitHub")
+        
+        # Fallback to code index go.mod if GitHub download failed
+        if not deployed_gomod:
+            deployed_gomod = find_gomod_in_index(deployed_index)
+            if deployed_gomod and args.debug:
+                print(f"⚠️  Using deployed go.mod from code index (GitHub download failed)")
+        
+        if not rc_gomod:
+            rc_gomod = find_gomod_in_index(rc_index)
+            if rc_gomod and args.debug:
+                print(f"⚠️  Using RC go.mod from code index (GitHub download failed)")
         
         if not deployed_gomod or not rc_gomod:
             print(f"⚠️  Warning: go.mod not found in one or both indexes", file=sys.stderr)
@@ -288,9 +395,9 @@ def main():
         deployed_deps_all = parse_gomod_dependencies(deployed_gomod)
         rc_deps_all = parse_gomod_dependencies(rc_gomod)
         
-        # Filter to relevant dependencies
-        deployed_deps = filter_relevant_dependencies(deployed_deps_all)
-        rc_deps = filter_relevant_dependencies(rc_deps_all)
+        # Filter to relevant dependencies (excluding triggering repo)
+        deployed_deps = filter_relevant_dependencies(deployed_deps_all, args.triggering_repo, args.debug)
+        rc_deps = filter_relevant_dependencies(rc_deps_all, args.triggering_repo, args.debug)
         
         if args.debug:
             print(f"📊 Found {len(deployed_deps)} relevant dependencies in deployed version")
@@ -380,8 +487,8 @@ def main():
     if args.debug:
         print(f"📦 Total dependencies: {len(all_deps)}")
     
-    # Filter to relevant ones
-    relevant_deps = filter_relevant_dependencies(all_deps)
+    # Filter to relevant ones (excluding triggering repo)
+    relevant_deps = filter_relevant_dependencies(all_deps, args.triggering_repo, args.debug)
     if args.debug:
         print(f"📦 Relevant dependencies (armosec/kubescape): {len(relevant_deps)}")
         print()

@@ -217,6 +217,29 @@ def main():
     print(f"   Unmatched: {result.get('unmatched_count', 0)}")
     print(f"   Total related chunks: {result.get('total_related_chunks', 0)}")
     
+    # Count Pulsar matches across all APIs
+    total_pulsar_producers = 0
+    total_pulsar_matches = 0
+    total_cross_repo_calls = 0
+    repos_involved = set()
+    
+    for api_key, mapping in result.get('mappings', {}).items():
+        call_chain = mapping.get('call_chain', {})
+        if call_chain:
+            total_pulsar_producers += len(call_chain.get('pulsar_producers', []))
+            total_pulsar_matches += len(call_chain.get('pulsar_matches', []))
+            total_cross_repo_calls += len(call_chain.get('cross_repo_calls', []))
+            repos_involved.update(call_chain.get('repositories_in_chain', []))
+    
+    if total_pulsar_producers > 0:
+        print(f"\n   📨 Pulsar Producers: {total_pulsar_producers}")
+    if total_pulsar_matches > 0:
+        print(f"   🔗 Pulsar Matches: {total_pulsar_matches}")
+    if total_cross_repo_calls > 0:
+        print(f"   🌐 Cross-repo calls: {total_cross_repo_calls}")
+    if len(repos_involved) > 1:
+        print(f"   📦 Repositories: {', '.join(sorted(repos_involved))}")
+    
     # Save results
     os.makedirs(os.path.dirname(args.output) if os.path.dirname(args.output) else '.', exist_ok=True)
     with open(args.output, 'w') as f:

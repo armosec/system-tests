@@ -55,8 +55,8 @@ from pathlib import Path
 # Backend components only - focus on services that have code indexes
 BACKEND_REPOS = {
     "cadashboardbe": {
-        "aliases": ["dashboard-be", "dashboardbe", "ca-dashboard-be", "ca-dashboardbe"],
-        "image_patterns": ["cadashboardbe", "dashboard-be", "dashboardbe"]
+        "aliases": ["dashboard-be", "dashboardbe", "ca-dashboard-be", "ca-dashboardbe", "dashboard-backend"],
+        "image_patterns": ["cadashboardbe", "dashboard-be", "dashboardbe", "dashboard-backend"]
     },
     "config-service": {
         "aliases": ["configservice", "portal", "config"],
@@ -69,6 +69,10 @@ BACKEND_REPOS = {
     "event-ingester-service": {
         "aliases": ["event-ingester", "eventingester", "event-ingester-service"],
         "image_patterns": ["event-ingester", "event-ingester-service", "eventingester"]
+    },
+    "dashboard-event-receiver": {
+        "aliases": ["event-receiver", "eventreceiver", "eventReceiver", "eventReceiverKubescape"],
+        "image_patterns": ["dashboard-event-receiver", "event-receiver", "eventreceiver"]
     }
 }
 
@@ -139,7 +143,11 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
             return repo_images
         
         # Map of service keys in YAML to repo names
-        # These are top-level keys in the YAML file (case-insensitive matching)
+        # These are used ONLY as hints for documentation purposes.
+        # 
+        # IMPORTANT: The extraction logic now dynamically discovers ALL services with image.repository fields
+        # and uses map_image_to_repo() to determine the actual backend repo. This service_keys mapping
+        # is kept for backward compatibility and documentation, but is NOT required for extraction.
         # 
         # IMPORTANT DISTINCTION:
         # - Triggering repos: The repository that triggered the test (e.g., cadashboardbe, event-ingester-service)
@@ -149,8 +157,7 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
         # event-ingester-service repo. The actual source repo is ALWAYS determined by the image.repository 
         # field, NOT by service naming conventions or service keys.
         # 
-        # This mapping is only used as an initial hint - the final repo assignment comes from 
-        # map_image_to_repo() which analyzes the actual image repository name.
+        # NOTE: This mapping is optional - extraction works without it by discovering services dynamically.
         service_keys = {
             "dashboardBE": "cadashboardbe",
             "dashboard-be": "cadashboardbe",
@@ -164,63 +171,67 @@ def extract_from_event_sourcing_values(values_file_path: str) -> Dict[str, List[
             "eventIngester": "event-ingester-service",
             "event-ingester": "event-ingester-service",
             "event-ingester-service": "event-ingester-service",
-            "dataPurger": "event-ingester-service",  # Common case, but actual repo determined from image.repository
-            # Note: Services colloquially called "ingesters" may come from event-ingester-service repo,
-            # but could also come from other repos. Always check image.repository to determine actual source.
+            # Common event-ingester-service services (kept for documentation/hints)
+            # NOTE: These are NOT required - extraction discovers all services dynamically
+            "dataPurger": "event-ingester-service",
+            "synchronizerIngester": "event-ingester-service",
+            "analyticsIngester": "event-ingester-service",
+            "dbMigrator": "event-ingester-service",
+            "eventReceiver": "dashboard-event-receiver",
+            "eventReceiverKubescape": "dashboard-event-receiver",
+            "event-receiver": "dashboard-event-receiver",
+            # Note: Many more services exist (attackChainEngineIngester, securityRisksIngester, etc.)
+            # but they are automatically discovered by checking image.repository fields.
+            # No need to list them all here - the extraction logic handles it dynamically.
         }
         
         def extract_from_nested_dict(obj: dict, parent_key: str = "") -> None:
-            """Recursively extract image tags from nested YAML structure."""
+            """
+            Recursively extract image tags from nested YAML structure.
+            
+            This function dynamically extracts ALL services that have an image.repository field,
+            regardless of service key name. It uses map_image_to_repo() to determine if the
+            image belongs to a backend repo we care about.
+            
+            This approach is more robust than hardcoding service_keys because:
+            1. It automatically discovers new services without code changes
+            2. It doesn't require maintaining a list of all service keys
+            3. The image.repository field is the source of truth for determining the actual repo
+            """
             for key, value in obj.items():
                 current_key = key
                 full_path = f"{parent_key}.{key}" if parent_key else key
                 
-                # Check if this is a service we care about
-                repo_name = None
-                for service_key, repo in service_keys.items():
-                    if key == service_key or key.lower() == service_key.lower():
-                        repo_name = repo
-                        break
-                
-                # If this is a service key, look for image.repository and image.tag
-                if repo_name and isinstance(value, dict):
+                # Check if this dict has an image.repository field (any service with an image)
+                if isinstance(value, dict):
                     image_section = value.get("image", {})
                     if isinstance(image_section, dict):
                         repository = image_section.get("repository", "")
                         tag = image_section.get("tag", "")
+                        
                         if repository and tag:
-                            image_string = f"{repository}:{tag}"
-                            
-                            # CRITICAL: Determine actual repo from image repository name, NOT from service key or naming
+                            # CRITICAL: Determine actual repo from image repository name
+                            # This is the source of truth - we don't need service_keys mapping
                             # Services may be colloquially called "ingesters" but could come from any repo.
                             # The image.repository field is the source of truth for determining the actual source repo.
                             actual_repo = map_image_to_repo(repository)
-                            if not actual_repo:
-                                # Fallback to service key mapping only if image doesn't match any known patterns
-                                actual_repo = repo_name
                             
-                            if actual_repo not in repo_images:
-                                repo_images[actual_repo] = []
-                            
-                            # Build note explaining the mapping
-                            note_parts = [f"Service key '{key}' initially mapped to '{repo_name}'"]
-                            if actual_repo != repo_name:
-                                note_parts.append(f"but actual repo is '{actual_repo}' (determined from image '{repository}')")
-                            else:
-                                note_parts.append(f"confirmed as '{actual_repo}' from image '{repository}'")
-                            
-                            repo_images[actual_repo].append({
-                                "image": image_string,
-                                "tag": tag,
-                                "full_image": image_string,
-                                "repository": repository,
-                                "source": f"event_sourcing_values:{os.path.basename(values_file_path)}",
-                                "yaml_path": full_path,
-                                "service_key": key,  # Service key from YAML (e.g., "dataPurger", "dashboardBE")
-                                "service_key_mapped_to_repo": repo_name,  # Initial mapping from service key (hint only)
-                                "actual_repo": actual_repo,  # Actual repo determined from image.repository (source of truth)
-                                "note": " | ".join(note_parts)
-                            })
+                            # Only extract if it's a backend repo we care about
+                            if actual_repo and actual_repo in BACKEND_REPOS:
+                                image_string = f"{repository}:{tag}"
+                                
+                                if actual_repo not in repo_images:
+                                    repo_images[actual_repo] = []
+                                
+                                repo_images[actual_repo].append({
+                                    "image": image_string,
+                                    "tag": tag,
+                                    "full_image": image_string,
+                                    "repository": repository,
+                                    "source": f"event_sourcing_values:{os.path.basename(values_file_path)}",
+                                    "yaml_path": full_path,
+                                    "service_key": key
+                                })
                 
                 # Recurse into nested dicts
                 if isinstance(value, dict):
@@ -453,6 +464,10 @@ def main():
         help="Latest commit hash from main/master branch (from Step 5 - Get Latest Commit SHA)"
     )
     parser.add_argument(
+        "--kubernetes-deployment-commit",
+        help="Commit hash of kubernetes-deployment repo used for values file extraction. Ensures we know which version of values files was used."
+    )
+    parser.add_argument(
         "--output",
         default="artifacts/running-images.json",
         help="Output file path (default: artifacts/running-images.json)"
@@ -535,6 +550,7 @@ def main():
         "test_run_id": args.test_run_id,
         "rc_version": args.rc_version,  # Release candidate version tag (e.g., rc-v0.0.224-2437)
         "commit_hash": args.commit_hash,  # Latest commit hash from main/master branch (from Step 5)
+        "kubernetes_deployment_commit": args.kubernetes_deployment_commit if args.kubernetes_deployment_commit else "",  # Commit hash of kubernetes-deployment repo used for extraction
         "triggering_repo": args.triggering_repo,  # Full repo name (e.g., "armosec/cadashboardbe")
         "triggering_repo_normalized": triggering_repo_normalized,  # Normalized name (e.g., "cadashboardbe")
         "source": "event_sourcing_values" if args.event_sourcing_values else "deployment_manifest" if args.deployment_manifest else "workflow_artifacts" if args.workflow_artifacts else "image_tags_file",
@@ -542,19 +558,15 @@ def main():
     }
     
     for repo_name, images in repo_images.items():
-        # Deduplicate by full_image
-        unique_images = {}
-        for image_info in images:
-            image_key = image_info["full_image"]
-            if image_key not in unique_images:
-                unique_images[image_key] = image_info
+        # Keep ALL images (don't deduplicate) - each service is a separate deployment
+        # even if they share the same image:tag combination
         
         # Mark if this repo is the triggering repo
         is_triggering_repo = (triggering_repo_normalized and 
                              repo_name.lower() == triggering_repo_normalized.lower())
         
         result["repos"][repo_name] = {
-            "images": list(unique_images.values()),
+            "images": images,  # Keep all images, including duplicates with same image:tag
             "is_triggering_repo": is_triggering_repo,  # True if this repo triggered the test
             "note": "This is the triggering repo" if is_triggering_repo else 
                    f"Service from {repo_name} repo (not the triggering repo)"

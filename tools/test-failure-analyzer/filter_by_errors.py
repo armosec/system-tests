@@ -84,6 +84,102 @@ def extract_function_names_from_errors(error_logs: str) -> Set[str]:
     return function_names
 
 
+def extract_error_strings_from_logs(error_logs: str, min_length: int = 15) -> Set[str]:
+    """
+    Extract meaningful error message strings for search.
+    
+    Patterns:
+    - "error: <message>"
+    - "message: <text>"
+    - Exception messages
+    - Nested Go errors
+    """
+    error_strings = set()
+    
+    # Pattern 1: Extract from "message:" or "error:" lines
+    message_pattern = r'(?:message|error|Error|err):\s*([^,\n\)]{' + str(min_length) + r',100})'
+    matches = re.finditer(message_pattern, error_logs, re.IGNORECASE)
+    for match in matches:
+        error_text = match.group(1).strip()
+        error_text = re.sub(r'\s+', ' ', error_text)
+        error_text = error_text.rstrip(')')
+        if len(error_text) >= min_length:
+            error_strings.add(error_text)
+    
+    # Pattern 2: Exception messages
+    exception_pattern = r'Exception:\s*([^(]{' + str(min_length) + r',200})'
+    matches = re.finditer(exception_pattern, error_logs)
+    for match in matches:
+        error_text = match.group(1).strip()
+        error_text = re.sub(r'\s+', ' ', error_text)
+        if len(error_text) >= min_length:
+            error_strings.add(error_text)
+    
+    # Pattern 3: Nested Go errors
+    nested_pattern = r'failed to [^:]+:\s*([^:\n]{' + str(min_length) + r',}?)(?:\n|$)'
+    matches = re.finditer(nested_pattern, error_logs, re.IGNORECASE)
+    for match in matches:
+        error_text = match.group(1).strip()
+        error_text = re.sub(r'\s+', ' ', error_text)
+        if len(error_text) >= min_length:
+            error_strings.add(error_text)
+    
+    return error_strings
+
+
+def extract_key_phrase(error_string: str, max_words: int = 8) -> str:
+    """Extract key phrase from error for flexible search."""
+    # Remove GUIDs, numbers, specific IDs
+    cleaned = re.sub(r'\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b', '', error_string)
+    cleaned = re.sub(r'\b\d+\b', '', cleaned)
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    # Take significant words
+    words = [w for w in cleaned.split() if w.lower() not in {'with', 'the', 'a', 'an', 'is', 'was', 'for', 'to', 'in'}]
+    key_words = words[:max_words]
+    
+    # Create regex pattern
+    pattern = '.*'.join(re.escape(w) for w in key_words)
+    return pattern
+
+
+def search_error_strings_in_indexes(
+    error_strings: Set[str],
+    code_indexes: Dict[str, Dict[str, Any]],
+    debug: bool = False
+) -> Dict[str, List[Dict[str, Any]]]:
+    """Search for error strings in code indexes."""
+    results = {}
+    
+    for error_string in error_strings:
+        if debug:
+            print(f"🔍 Searching for: '{error_string[:60]}...'")
+        
+        matches = []
+        search_pattern = extract_key_phrase(error_string)
+        
+        for repo_name, code_index in code_indexes.items():
+            chunks = code_index.get("chunks", [])
+            
+            for chunk in chunks:
+                chunk_code = chunk.get("code", "")
+                # Search for error string in chunk code
+                if re.search(search_pattern, chunk_code, re.IGNORECASE):
+                    matches.append({
+                        "chunk": chunk,
+                        "repo": repo_name,
+                        "match_type": "error_string",
+                        "error_string": error_string
+                    })
+        
+        if matches:
+            results[error_string] = matches
+            if debug:
+                print(f"  ✅ Found {len(matches)} matches")
+    
+    return results
+
+
 def match_chunks_to_functions(
     function_names: Set[str],
     code_indexes: Dict[str, Dict[str, Any]]
@@ -181,10 +277,11 @@ def prioritize_chunks(
 
 def filter_by_errors(
     error_logs_path: str,
-    code_indexes: Dict[str, Dict[str, Any]]
+    code_indexes: Dict[str, Dict[str, Any]],
+    debug: bool = False
 ) -> Dict[str, Any]:
     """
-    Filter code chunks by error logs.
+    Enhanced filter code chunks by error logs (function names + error strings).
     """
     print(f"📖 Reading error logs from: {error_logs_path}")
     if not os.path.exists(error_logs_path):
@@ -198,19 +295,43 @@ def filter_by_errors(
     with open(error_logs_path, 'r') as f:
         error_logs = f.read()
     
-    # Extract function names
+    # Existing function name extraction
     print("🔍 Extracting function names from error logs...")
     function_names = extract_function_names_from_errors(error_logs)
     print(f"   Found {len(function_names)} unique function names")
     if len(function_names) <= 20:
         print(f"   Functions: {', '.join(sorted(function_names))}")
     
-    # Match to chunks
+    # NEW: Extract error strings
+    print("\n🔍 Extracting error message strings...")
+    error_strings = extract_error_strings_from_logs(error_logs)
+    print(f"   Found {len(error_strings)} unique error strings")
+    if debug and len(error_strings) <= 10:
+        for err_str in list(error_strings)[:10]:
+            print(f"      - {err_str[:80]}...")
+    
+    # Match functions to chunks (existing)
     print("\n🔍 Matching functions to code chunks...")
     matched_chunks = match_chunks_to_functions(function_names, code_indexes)
     
+    # NEW: Search error strings in indexes
+    print("\n🔍 Searching error strings in code indexes...")
+    error_string_matches = search_error_strings_in_indexes(error_strings, code_indexes, debug)
+    print(f"   Found matches for {len(error_string_matches)} error strings")
+    
+    # Merge results: add error string matches to matched_chunks
+    for error_str, matches in error_string_matches.items():
+        for match_info in matches:
+            repo = match_info["repo"]
+            if repo not in matched_chunks:
+                matched_chunks[repo] = []
+            # Avoid duplicates
+            chunk_id = match_info["chunk"].get("id")
+            if chunk_id and not any(c.get("chunk", {}).get("id") == chunk_id for c in matched_chunks[repo]):
+                matched_chunks[repo].append(match_info)
+    
     total_matched = sum(len(chunks) for chunks in matched_chunks.values())
-    print(f"   Matched {total_matched} chunks across {len(matched_chunks)} repos")
+    print(f"   Total matched: {total_matched} chunks across {len(matched_chunks)} repos")
     
     # Prioritize
     print("\n📊 Prioritizing matched chunks...")
@@ -219,12 +340,14 @@ def filter_by_errors(
     return {
         "total_functions": len(function_names),
         "function_names": list(function_names),
+        "error_strings": list(error_strings),
         "total_matched_chunks": total_matched,
         "filtered_chunks": {
             repo: [c["chunk"] for c in chunks]
             for repo, chunks in prioritized_chunks.items()
         },
-        "match_details": prioritized_chunks
+        "match_details": prioritized_chunks,
+        "error_string_matches": error_string_matches
     }
 
 
