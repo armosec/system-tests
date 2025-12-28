@@ -62,8 +62,6 @@ CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
 
-AZURE_READER_ROLE_DEFINITION_PATH = "/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
-
 class CloudEntityTypes(Enum):
     ACCOUNT = "account"
     ORGANIZATION = "organization"

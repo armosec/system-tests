@@ -5,6 +5,8 @@ from systest_utils import Logger
 from .cspm_test_models import PROVIDER_AZURE
 
 
+AZURE_READER_ROLE_DEFINITION_PATH = f"/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
+
 class AzureAccountsMixin:
     """Azure-specific methods for Accounts class."""
 
@@ -43,12 +45,11 @@ class AzureAccountsMixin:
                 Logger.logger.info("expected failure, returning None")
         return cloud_account_guid
 
-    def remove_azure_reader_role(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str) -> bool:
+    def remove_azure_reader_role(self, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, client_object_id: str) -> bool:
         try:
             from azure.identity import ClientSecretCredential
             from azure.mgmt.authorization import AuthorizationManagementClient
 
-            from .accounts import AZURE_READER_ROLE_DEFINITION_PATH
             Logger.logger.info(f"Trying to remove Reader role from client {client_id} in subscription {subscription_id}")
             credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
             auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
@@ -57,7 +58,7 @@ class AzureAccountsMixin:
 
             role_assignments = auth_client.role_assignments.list_for_scope(scope=scope)
             for assignment in role_assignments:
-                if assignment.role_definition_id == reader_role_definition_id:
+                if assignment.role_definition_id == reader_role_definition_id and assignment.principal_id == client_object_id:
                     Logger.logger.info("Removing Reader role...")
                     auth_client.role_assignments.delete_by_id(role_assignment_id=assignment.id)
                     Logger.logger.info(f"Successfully removed Reader role for client {client_id} in subscription {subscription_id}")
@@ -79,7 +80,6 @@ class AzureAccountsMixin:
             from azure.mgmt.authorization import AuthorizationManagementClient
             from azure.mgmt.authorization.models import RoleAssignmentCreateParameters
 
-            from .accounts import AZURE_READER_ROLE_DEFINITION_PATH
             Logger.logger.info(f"Trying to create Reader role for client {client_id} in subscription {subscription_id}")
             credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
             auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
@@ -106,7 +106,6 @@ class AzureAccountsMixin:
             from azure.identity import ClientSecretCredential
             from azure.mgmt.authorization import AuthorizationManagementClient
 
-            from .accounts import AZURE_READER_ROLE_DEFINITION_PATH
             credential = ClientSecretCredential(tenant_id=tenant_id, client_id=client_id, client_secret=client_secret)
             auth_client = AuthorizationManagementClient(credential=credential, subscription_id=subscription_id)
             scope = f"/subscriptions/{subscription_id}"
@@ -153,7 +152,7 @@ class AzureAccountsMixin:
     def break_and_reconnect_azure_account(self, cloud_account_guid: str, subscription_id: str, tenant_id: str, client_id: str, client_object_id: str, client_secret: str):
         from .accounts import FEATURE_STATUS_DISCONNECTED, COMPLIANCE_FEATURE_NAME
         Logger.logger.info("Breaking Azure connection by removing Reader role from Service Principal")
-        reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret)
+        reader_role_removed = self.remove_azure_reader_role(subscription_id, tenant_id, client_id, client_secret, client_object_id)
         assert reader_role_removed, "Failed to remove Reader role from Service Principal"
         Logger.logger.info("Reader role removed successfully, waiting for propagation")
         self.wait_for_report(
