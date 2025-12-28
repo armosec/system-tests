@@ -402,53 +402,64 @@ echo "🔍 PASS 2: Extracting go.mod dependencies..."
 DEPLOYED_INDEX=$(jq -r --arg repo "$TRIGGERING_REPO" '.indexes[$repo].deployed.index_path // empty' artifacts/found-indexes-pass1.json 2>/dev/null || echo "")
 RC_INDEX=$(jq -r --arg repo "$TRIGGERING_REPO" '.indexes[$repo].rc.index_path // empty' artifacts/found-indexes-pass1.json 2>/dev/null || echo "")
 
-if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
-  echo "📊 Comparing dependencies between deployed and RC versions"
-  # Use same version for both code index and go.mod (no mismatch)
-  echo "📌 Using DEPLOYED_VERSION for go.mod: ${DEPLOYED_VERSION:-unknown} (same as code index)"
-  python extract_gomod_dependencies.py \
-    --deployed-code-index "$DEPLOYED_INDEX" \
-    --rc-code-index "$RC_INDEX" \
-    --triggering-repo "$TRIGGERING_REPO" \
-    --deployed-version "$GOMOD_DEPLOYED_VERSION" \
-    --output artifacts/gomod-dependencies.json \
-    --github-token "$GITHUB_TOKEN" \
-    --debug || {
-    echo "⚠️  go.mod comparison failed"
-    echo "{}" > artifacts/gomod-dependencies.json
-  }
-elif [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" ]]; then
-  echo "⚠️  RC index not available, using deployed index only"
-  echo "📌 Data source: Deployed version ${DEPLOYED_VERSION:-unknown}"
-  echo "   go.mod will be extracted from deployed version (no comparison possible)"
-  python extract_gomod_dependencies.py \
-    --code-index "$DEPLOYED_INDEX" \
-    --triggering-repo "$TRIGGERING_REPO" \
-    --deployed-version "$GOMOD_DEPLOYED_VERSION" \
-    --output artifacts/gomod-dependencies.json \
-    --github-token "$GITHUB_TOKEN" \
-    --debug || {
-    echo "⚠️  go.mod extraction failed"
-    echo "{}" > artifacts/gomod-dependencies.json
-  }
+GOMOD_DEPLOYED_OUT="artifacts/gomod-dependencies-deployed.json"
+GOMOD_RC_OUT="artifacts/gomod-dependencies-rc.json"
+
+# Choose an index file to use for parsing (we may download go.mod by tag anyway)
+GOMOD_PARSE_INDEX=""
+if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" ]]; then
+  GOMOD_PARSE_INDEX="$DEPLOYED_INDEX"
 elif [[ -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
-  echo "⚠️  Deployed index not available, using RC index as fallback"
-  echo "📌 Data source: RC version ${RC_VERSION:-unknown} (code being tested)"
-  echo "   go.mod will be extracted from RC version (cannot compare to deployed)"
-  echo "   This provides dependency context even without comparison"
+  GOMOD_PARSE_INDEX="$RC_INDEX"
+fi
+
+# 1) RC go.mod snapshot (source of truth for "RC versions" column)
+if [[ -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
+  echo "📌 Extracting RC go.mod snapshot"
+  echo "   Data source: RC code index (${RC_VERSION:-unknown})"
   python extract_gomod_dependencies.py \
     --code-index "$RC_INDEX" \
     --triggering-repo "$TRIGGERING_REPO" \
-    --deployed-version "$GOMOD_DEPLOYED_VERSION" \
-    --output artifacts/gomod-dependencies.json \
+    --output "$GOMOD_RC_OUT" \
     --github-token "$GITHUB_TOKEN" \
     --debug || {
-    echo "⚠️  go.mod extraction failed"
-    echo "{}" > artifacts/gomod-dependencies.json
+    echo "⚠️  RC go.mod extraction failed"
+    echo "{}" > "$GOMOD_RC_OUT"
   }
 else
-  echo "⚠️  No code indexes available for go.mod extraction"
-  echo "   Cannot extract dependency information"
+  echo "⚠️  RC code index not available - cannot extract RC go.mod snapshot"
+  echo "{}" > "$GOMOD_RC_OUT"
+fi
+
+# 2) Deployed go.mod snapshot (baseline for comparison)
+# We fetch go.mod by deployed tag (DEPLOYED_VERSION) to avoid PR/merge commit ambiguity.
+if [[ -n "$GOMOD_PARSE_INDEX" && -f "$GOMOD_PARSE_INDEX" && -n "${DEPLOYED_VERSION:-}" && "${DEPLOYED_VERSION:-}" != "unknown" && "${DEPLOYED_VERSION:-}" != "latest" ]]; then
+  echo "📌 Extracting deployed go.mod snapshot"
+  echo "   Data source: GitHub go.mod @ tag ${DEPLOYED_VERSION} (baseline)"
+  python extract_gomod_dependencies.py \
+    --code-index "$GOMOD_PARSE_INDEX" \
+    --triggering-repo "$TRIGGERING_REPO" \
+    --deployed-version "$DEPLOYED_VERSION" \
+    --output "$GOMOD_DEPLOYED_OUT" \
+    --github-token "$GITHUB_TOKEN" \
+    --debug || {
+    echo "⚠️  Deployed go.mod extraction failed"
+    echo "{}" > "$GOMOD_DEPLOYED_OUT"
+  }
+else
+  echo "⚠️  Deployed tag not available or no index for parsing - cannot extract deployed go.mod snapshot"
+  echo "   DEPLOYED_VERSION='${DEPLOYED_VERSION:-<empty>}'"
+  echo "   GOMOD_PARSE_INDEX='${GOMOD_PARSE_INDEX:-<empty>}'"
+  echo "{}" > "$GOMOD_DEPLOYED_OUT"
+fi
+
+# Backward-compat: keep a single gomod-dependencies.json for downstream PASS 3.
+# Prefer deployed snapshot; fall back to RC snapshot.
+if [[ -f "$GOMOD_DEPLOYED_OUT" && "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+  cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
+elif [[ -f "$GOMOD_RC_OUT" && "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+  cp "$GOMOD_RC_OUT" artifacts/gomod-dependencies.json
+else
   echo "{}" > artifacts/gomod-dependencies.json
 fi
 
