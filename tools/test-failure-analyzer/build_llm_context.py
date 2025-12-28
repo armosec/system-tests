@@ -428,6 +428,7 @@ def build_llm_context(
     analysis_prompts: Optional[str] = None,
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     cross_test_interference: Optional[Dict[str, Any]] = None,
+    gomod_dependencies: Optional[Dict[str, Any]] = None,
     found_indexes_path: str = "artifacts/found-indexes.json"
 ) -> Dict[str, Any]:
     """
@@ -782,6 +783,25 @@ def build_llm_context(
             print(f"   ⚠️  Failed to load dependency info: {e}", file=sys.stderr)
             sys.stderr.flush()
     
+    # Merge go.mod dependency versions (from RC or deployed version)
+    if gomod_dependencies:
+        print(f"   📦 Merging go.mod versions into dependency info...", file=sys.stderr)
+        sys.stderr.flush()
+        
+        # Create gomod_versions section with version information
+        gomod_versions = {}
+        for pkg_name, pkg_info in gomod_dependencies.items():
+            gomod_versions[pkg_name] = {
+                "version": pkg_info.get('version', 'unknown'),
+                "source": pkg_info.get('source', 'go.mod'),
+                "full_package": pkg_info.get('full_package', ''),
+                "has_index": pkg_info.get('has_index', False)
+            }
+        
+        dependencies_info["gomod_versions"] = gomod_versions
+        print(f"   ✅ Added {len(gomod_versions)} go.mod package versions", file=sys.stderr)
+        sys.stderr.flush()
+    
     context = {
         "metadata": metadata,
         "dependencies": dependencies_info,  # NEW: Add dependencies section
@@ -876,6 +896,10 @@ def main():
         help="Path to found-indexes.json (for smart filtering)"
     )
     parser.add_argument(
+        "--gomod-dependencies",
+        help="Path to gomod-dependencies.json (go.mod versions from RC or deployed version)"
+    )
+    parser.add_argument(
         "--smart-filter",
         action="store_true",
         help="Enable smart dependency filtering based on imports"
@@ -947,6 +971,14 @@ def main():
                 print(f"📖 Loaded cross-test interference data", file=sys.stderr)
                 sys.stderr.flush()
         
+        # Load go.mod dependencies if available
+        gomod_dependencies = None
+        if args.gomod_dependencies:
+            gomod_dependencies = load_json_file(args.gomod_dependencies)
+            if gomod_dependencies:
+                print(f"📖 Loaded go.mod dependencies ({len(gomod_dependencies)} packages)", file=sys.stderr)
+                sys.stderr.flush()
+        
         # Smart filtering: Analyze imports and filter dependency indexes
         if args.smart_filter and connected_context and args.found_indexes:
             print(f"\n🔍 Smart dependency filtering enabled...", file=sys.stderr)
@@ -1009,7 +1041,8 @@ def main():
             extra_indexes=extra_indexes,
             analysis_prompts=analysis_prompts,
             incluster_logs=incluster_logs,
-            cross_test_interference=cross_test_interference
+            cross_test_interference=cross_test_interference,
+            gomod_dependencies=gomod_dependencies
         )
         
         # Save output
