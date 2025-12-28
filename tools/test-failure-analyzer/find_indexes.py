@@ -353,15 +353,29 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     if index_path:
         return index_path, "version_tag"
     
-    # Strategy 2: Fallback to latest
+    # Strategy 2: Get commit from Git tag and try code-index-{commit}
     if debug:
-        print(f"\n📋 Strategy 2: Falling back to latest")
+        print(f"\n📋 Strategy 2: Getting commit from Git tag and trying code-index-{{commit}}")
+    
+    repo_full_name = f"{github_org}/{repo}"
+    tag_commit = get_commit_for_tag(repo_full_name, version, github_token, debug)
+    if tag_commit:
+        artifact_name = f"code-index-{tag_commit}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
+        if index_path:
+            if debug:
+                print(f"  ✅ Found code index for commit {tag_commit[:8]} (from tag {version})")
+            return index_path, "tag_commit"
+    
+    # Strategy 3: Fallback to latest (only if version tag and commit-based lookup both failed)
+    if debug:
+        print(f"\n📋 Strategy 3: Falling back to latest (WARNING: may not match deployed version)")
     
     artifact_name = "code-index-latest"
     index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         if debug:
-            print(f"  ⚠️  Using latest index (may not match deployed version)")
+            print(f"  ⚠️  Using latest index (may not match deployed version {version})")
         return index_path, "latest_fallback"
     
     return None, "failed"
