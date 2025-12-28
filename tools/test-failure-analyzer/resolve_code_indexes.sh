@@ -93,11 +93,22 @@ if [[ -n "$TAG_FILE" ]]; then
   echo "   - inputs.rc_version: ${INPUT_RC_VERSION:-'(not set)'}"
   echo "   - TAG_FILE: $TAG_FILE"
 
-  # ALWAYS derive deployed version from RC for ANY triggering repo
-  # This ensures we compare against the correct baseline (previous stable version)
-  # Code index will use this derived version, go.mod will use actual cluster tag if available
-  if [[ -n "$GLOBAL_RC_VERSION" && "$GLOBAL_RC_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+  # PRIORITY 1: Use actual cluster tag if it's a stable version (most reliable)
+  # PRIORITY 2: Derive from RC only if no stable cluster tag available
+  # PRIORITY 3: Use cluster RC tag and derive baseline if cluster has RC
+  
+  if [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" != "null" && "$ACTUAL_DEPLOYED_VERSION" != "empty" && ! "$ACTUAL_DEPLOYED_VERSION" =~ ^rc- ]]; then
+    # Use actual cluster tag (stable version) - this is the most reliable
+    echo "✅ Found stable deployed version in cluster: $ACTUAL_DEPLOYED_VERSION"
+    DEPLOYED_VERSION="$ACTUAL_DEPLOYED_VERSION"
+    RC_VERSION="${GLOBAL_RC_VERSION:-unknown}"
+    echo "   Using cluster tag for both code index and go.mod: $DEPLOYED_VERSION"
+    echo "   RC version: $RC_VERSION"
+    
+  elif [[ -n "$GLOBAL_RC_VERSION" && "$GLOBAL_RC_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+    # No stable cluster tag, derive from RC
     echo "🔍 Deriving deployed version from RC: $GLOBAL_RC_VERSION"
+    echo "   ⚠️  No stable cluster tag available, deriving baseline from RC"
     MAJOR="${BASH_REMATCH[1]}"
     MINOR="${BASH_REMATCH[2]}"
     PATCH="${BASH_REMATCH[3]}"
@@ -109,20 +120,17 @@ if [[ -n "$TAG_FILE" ]]; then
       DEPLOYED_VERSION="v${MAJOR}.${MINOR}.0"
     fi
     RC_VERSION="$GLOBAL_RC_VERSION"
-    echo "   Derived deployed version from RC: $DEPLOYED_VERSION"
+    echo "   Derived deployed version: $DEPLOYED_VERSION"
     echo "   RC version: $RC_VERSION"
-    echo "   (Code index will use this derived version, go.mod will use actual cluster tag if available)"
-  elif [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" != "null" && "$ACTUAL_DEPLOYED_VERSION" != "empty" ]]; then
-    echo "✅ Found deployed version in cluster: $ACTUAL_DEPLOYED_VERSION"
-    echo "⚠️  No RC version available, using cluster tag as fallback"
+    echo "   ⚠️  Using derived version (actual cluster tag not available or is RC)"
     
-    # If the cluster version is an RC, derive previous stable for baseline
+  elif [[ -n "$ACTUAL_DEPLOYED_VERSION" && "$ACTUAL_DEPLOYED_VERSION" =~ ^rc- ]]; then
+    # Cluster has RC version, derive stable baseline
+    echo "🔍 Cluster tag is RC: $ACTUAL_DEPLOYED_VERSION"
     if [[ "$ACTUAL_DEPLOYED_VERSION" =~ ^rc-v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-      echo "🔍 Cluster tag is RC - calculating previous stable version for baseline"
       MAJOR="${BASH_REMATCH[1]}"
       MINOR="${BASH_REMATCH[2]}"
       PATCH="${BASH_REMATCH[3]}"
-      
       if [[ "$PATCH" -gt 0 ]]; then
         PREV_PATCH=$((PATCH - 1))
         DEPLOYED_VERSION="v${MAJOR}.${MINOR}.${PREV_PATCH}"
@@ -131,14 +139,9 @@ if [[ -n "$TAG_FILE" ]]; then
       fi
       RC_VERSION="$ACTUAL_DEPLOYED_VERSION"
       echo "   Derived baseline: $DEPLOYED_VERSION"
-      echo "   Set RC_VERSION (from cluster RC): $RC_VERSION"
-    else
-      # It's a stable version, use it as baseline
-      DEPLOYED_VERSION="$ACTUAL_DEPLOYED_VERSION"
-      # If we have a global RC, it's the target. Otherwise use cluster tag.
-      RC_VERSION="${GLOBAL_RC_VERSION:-$ACTUAL_DEPLOYED_VERSION}"
-      if [[ "$RC_VERSION" == "unknown" ]]; then RC_VERSION="$ACTUAL_DEPLOYED_VERSION"; fi
+      echo "   RC version: $RC_VERSION"
     fi
+    
   else
     echo "⚠️  No deployed version found in cluster and no RC version available"
     echo "⚠️  Using defaults (may not be accurate)"
@@ -147,6 +150,10 @@ if [[ -n "$TAG_FILE" ]]; then
     echo "   Set DEPLOYED_VERSION: $DEPLOYED_VERSION"
     echo "   Set RC_VERSION (fallback): $RC_VERSION"
   fi
+  
+  # Use the same version for both code index and go.mod (no mismatch)
+  GOMOD_DEPLOYED_VERSION="$DEPLOYED_VERSION"
+  echo "   Final: DEPLOYED_VERSION=$DEPLOYED_VERSION (for code index and go.mod)"
 fi
 
 # Get workflow commit - prefer file (updated by download-image-tags step) over step output
@@ -271,15 +278,8 @@ RC_INDEX=$(jq -r --arg repo "$TRIGGERING_REPO" '.indexes[$repo].rc.index_path //
 
 if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
   echo "📊 Comparing dependencies between deployed and RC versions"
-  # Use actual cluster tag for go.mod (more accurate), fallback to derived version
-  # Code index uses DEPLOYED_VERSION (derived from RC), but go.mod should use actual cluster tag
-  GOMOD_DEPLOYED_VERSION="${ACTUAL_DEPLOYED_VERSION:-${DEPLOYED_VERSION:-}}"
-  if [[ -n "$GOMOD_DEPLOYED_VERSION" && "$GOMOD_DEPLOYED_VERSION" != "null" && "$GOMOD_DEPLOYED_VERSION" != "empty" && ! "$GOMOD_DEPLOYED_VERSION" =~ ^rc- ]]; then
-    echo "📌 Using actual cluster tag for go.mod: $GOMOD_DEPLOYED_VERSION (code index uses: ${DEPLOYED_VERSION:-unknown})"
-  else
-    echo "📌 Using derived version for go.mod: ${DEPLOYED_VERSION:-unknown}"
-    GOMOD_DEPLOYED_VERSION="${DEPLOYED_VERSION:-}"
-  fi
+  # Use same version for both code index and go.mod (no mismatch)
+  echo "📌 Using DEPLOYED_VERSION for go.mod: ${DEPLOYED_VERSION:-unknown} (same as code index)"
   python extract_gomod_dependencies.py \
     --deployed-code-index "$DEPLOYED_INDEX" \
     --rc-code-index "$RC_INDEX" \
@@ -293,14 +293,8 @@ if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_
   }
 elif [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" ]]; then
   echo "⚠️  RC index not available, using deployed index only"
-  # Use actual cluster tag for go.mod (more accurate), fallback to derived version
-  GOMOD_DEPLOYED_VERSION="${ACTUAL_DEPLOYED_VERSION:-${DEPLOYED_VERSION:-}}"
-  if [[ -n "$GOMOD_DEPLOYED_VERSION" && "$GOMOD_DEPLOYED_VERSION" != "null" && "$GOMOD_DEPLOYED_VERSION" != "empty" && ! "$GOMOD_DEPLOYED_VERSION" =~ ^rc- ]]; then
-    echo "📌 Using actual cluster tag for go.mod: $GOMOD_DEPLOYED_VERSION (code index uses: ${DEPLOYED_VERSION:-unknown})"
-  else
-    echo "📌 Using derived version for go.mod: ${DEPLOYED_VERSION:-unknown}"
-    GOMOD_DEPLOYED_VERSION="${DEPLOYED_VERSION:-}"
-  fi
+  # Use same version for both code index and go.mod (no mismatch)
+  echo "📌 Using DEPLOYED_VERSION for go.mod: ${DEPLOYED_VERSION:-unknown} (same as code index)"
   python extract_gomod_dependencies.py \
     --code-index "$DEPLOYED_INDEX" \
     --triggering-repo "$TRIGGERING_REPO" \

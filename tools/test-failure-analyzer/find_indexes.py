@@ -388,16 +388,13 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
                 print(f"  ✅ Found code index for commit {tag_commit[:8]} (from tag {version})")
             return index_path, "tag_commit"
     
-    # Strategy 3: Fallback to latest (only if version tag and commit-based lookup both failed)
+    # DO NOT FALL BACK TO LATEST - deployed version must have exact code index
+    # Falling back to latest could use a PR commit, which would give wrong go.mod dependencies
     if debug:
-        print(f"\n📋 Strategy 3: Falling back to latest (WARNING: may not match deployed version)")
-    
-    artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
-    if index_path:
-        if debug:
-            print(f"  ⚠️  Using latest index (may not match deployed version {version})")
-        return index_path, "latest_fallback"
+        print(f"\n❌ No code index found for deployed version {version}")
+        print(f"   Tried: code-index-{version}, code-index-{tag_commit[:8] if tag_commit else 'N/A'}")
+        print(f"   Will NOT use code-index-latest (must match deployed version exactly)")
+        print(f"   This ensures go.mod dependencies match the actual deployed version")
     
     return None, "failed"
 
