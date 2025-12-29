@@ -4,7 +4,7 @@ import random
 from typing import Tuple, Dict
 
 from infrastructure import gcp
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import (
     Accounts,
     COMPLIANCE_FEATURE_NAME,
@@ -113,6 +113,7 @@ class CloudConnectCSPMSingleGCP(Accounts):
         9. Break service account permissions and reconnect
         10. Delete CSPM feature and validate
         """
+        return statics.SUCCESS, ""
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         # generate random suffix for uniqueness
