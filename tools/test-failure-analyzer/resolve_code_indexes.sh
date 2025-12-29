@@ -497,7 +497,10 @@ echo ""
 echo "📥 PASS 3: Downloading dependency indexes (defaults + version-changed go.mod deps)..."
 
 if [[ -f artifacts/gomod-dependencies.json ]] && [[ $(jq 'length' artifacts/gomod-dependencies.json) -gt 0 ]]; then
-  echo "✅ Found $(jq 'length' artifacts/gomod-dependencies.json) dependencies"
+  TOTAL_DEPS="$(jq 'length' artifacts/gomod-dependencies.json 2>/dev/null || echo 0)"
+  CHANGED_DEPS="$(jq '[.[] | select(.version_changed==true)] | length' artifacts/gomod-dependencies.json 2>/dev/null || echo 0)"
+  echo "✅ Parsed go.mod dependencies: total=$TOTAL_DEPS, version_changed=$CHANGED_DEPS"
+  echo "   (Resolution will still be limited by find_indexes.py default repos + version_changed=true)"
   python find_indexes.py \
     --triggering-repo "$TRIGGERING_REPO" \
     --deployed-version "${DEPLOYED_VERSION:-unknown}" \
