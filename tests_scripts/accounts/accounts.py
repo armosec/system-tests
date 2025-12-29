@@ -720,7 +720,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
         resources_resp = self.backend.get_cloud_compliance_resources(rule_hash=None,body=body)
         resources = [ComplianceResourceSummaries(**r) for r in resources_resp["response"]]
-        assert len(resources) == 1, f"Expected resources amount: {1}, got: {len(resources)} instead, response: {resources}"
+        assert len(resources) == 1, f"Expected resources amount: 1, got: {len(resources)} instead, response: {resources}"
         resource = resources[0]
 
         expected_response = get_expected_resource_summaries_response(provider, with_accepted_resources)
