@@ -490,20 +490,27 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
     
     results = {}
     
-    # First, process gomod dependencies (but only if in repos_to_fetch)
+    # First, process gomod dependencies
+    # Include repos that are:
+    # 1. In the default repos list (repos_to_fetch), OR
+    # 2. Have version_changed=True (even if not in default list)
     for dep_name, dep_info in dependencies.items():
-        # Skip if not in default list (unless it's an always-include repo)
-        if dep_name not in repos_to_fetch:
+        # Read version_changed FIRST before checking if we should skip
+        version_changed = dep_info.get('version_changed', False)
+        
+        # Skip if not in default list AND version didn't change
+        if dep_name not in repos_to_fetch and not version_changed:
             if debug:
-                print(f"\n⏭️  Skipping {dep_name} (not in default repos list)")
+                print(f"\n⏭️  Skipping {dep_name} (not in default repos list and version unchanged)")
             continue
         
         if debug:
             print(f"\n📦 Processing dependency: {dep_name}")
+            if version_changed and dep_name not in repos_to_fetch:
+                print(f"   ✅ Version changed - including even though not in default list")
         
         deployed_ver_raw = dep_info.get('deployed_version', 'unknown')
         rc_ver_raw = dep_info.get('rc_version', 'unknown')
-        version_changed = dep_info.get('version_changed', False)
         github_org_hint = dep_info.get('github_org')  # This tells us which org to use
         
         # Extract base versions for index resolution (indexes are tagged with base versions)
