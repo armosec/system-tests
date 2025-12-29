@@ -34,7 +34,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         8. Accept the risk
         9. Delete CSPM feature and validate
         """
-        return statics.SUCCESS, ""
+        
         if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
             return statics.SUCCESS, "Skipping for PROD US"
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
