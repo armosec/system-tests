@@ -256,6 +256,8 @@ def generate_summary(
     found_indexes_path: str,
     running_images_path: str,
     gomod_deps_path: str,
+    gomod_deps_deployed_path: str,
+    gomod_deps_rc_path: str,
     context_summary_path: str,
     environment: str,
     run_ref: str,
@@ -288,7 +290,16 @@ def generate_summary(
             print(f"🔍 DEBUG: services_only is None (file might not exist or failed to load)", file=sys.stderr)
         elif isinstance(services_only, dict) and len(services_only) == 0:
             print(f"🔍 DEBUG: services_only is empty dict {{}}", file=sys.stderr)
+    # go.mod dependencies snapshots:
+    # - deployed: baseline go.mod (prefer artifacts/gomod-dependencies-deployed.json)
+    # - rc: go.mod for RC code (prefer artifacts/gomod-dependencies-rc.json)
+    # Backward compat:
+    # - artifacts/gomod-dependencies.json is treated as deployed snapshot when the new files are missing.
     gomod_deps = load_json(gomod_deps_path)
+    gomod_deps_deployed = load_json(gomod_deps_deployed_path) if gomod_deps_deployed_path else None
+    gomod_deps_rc = load_json(gomod_deps_rc_path) if gomod_deps_rc_path else None
+    if not gomod_deps_deployed and gomod_deps:
+        gomod_deps_deployed = gomod_deps
     context_summary = load_json(context_summary_path)
     llm_analysis = load_json(llm_analysis_path) if llm_analysis_path else None
     
@@ -475,14 +486,12 @@ def generate_summary(
     lines.append("")
     
     # Phase 3.5 status
-    if gomod_deps:
-        dep_count = len(gomod_deps)
-        if dep_count > 0:
-            lines.append(f"- ✅ **Phase 3.5:** Extracted {dep_count} go.mod dependencies")
-        else:
-            lines.append("- ⚠️  **Phase 3.5:** No dependencies found (empty go.mod or extraction failed)")
+    dep_count_deployed = len(gomod_deps_deployed) if isinstance(gomod_deps_deployed, dict) else 0
+    dep_count_rc = len(gomod_deps_rc) if isinstance(gomod_deps_rc, dict) else 0
+    if dep_count_deployed > 0 or dep_count_rc > 0:
+        lines.append(f"- ✅ **Phase 3.5:** Extracted go.mod dependencies (deployed: {dep_count_deployed}, RC: {dep_count_rc})")
     else:
-        lines.append("- ❌ **Phase 3.5:** Dependency extraction skipped (no code index)")
+        lines.append("- ⚠️  **Phase 3.5:** No dependencies found (empty go.mod or extraction failed)")
     
     # Phase 4 status
     if api_mapping:
@@ -825,44 +834,72 @@ def generate_summary(
     
     lines.append("")
     
-    # Show go.mod dependencies table (only go.mod deps, not services)
-    if gomod_deps:
+    # Show go.mod dependencies table (versions from deployed + RC snapshots)
+    if gomod_deps_deployed or gomod_deps_rc:
         # Extract chunk/LOC stats from LLM context
         chunk_stats = extract_chunk_stats_per_repo(llm_context)
         
-        # Filter to only go.mod dependencies (source='gomod' or not 'service')
-        gomod_only_indexes = {}
-        if found_indexes and 'indexes' in found_indexes:
-            for repo_name, repo_info in found_indexes.get('indexes', {}).items():
-                # Skip triggering repo and services
-                if repo_name == triggering_repo:
-                    continue
-                source = repo_info.get('deployed', {}).get('source', 'gomod')
-                if source != 'service':
-                    gomod_only_indexes[repo_name] = repo_info
+        deployed_map = gomod_deps_deployed or {}
+        rc_map = gomod_deps_rc or {}
+        all_dep_names = sorted(set(deployed_map.keys()) | set(rc_map.keys()))
         
-        if gomod_only_indexes:
-            # Create filtered found_indexes for format_dependencies_table
-            filtered_found_indexes = {
-                'triggering_repo': triggering_repo,
-                'indexes': gomod_only_indexes
-            }
-            lines.append(format_dependencies_table(filtered_found_indexes, chunk_stats))
-            lines.append("")
+        def base_version(v: str) -> str:
+            """Extract base semantic version for comparison (handles pseudo-versions)."""
+            if not v:
+                return ""
+            v = str(v)
+            m = re.match(r'^(v\d+\.\d+\.\d+)', v)
+            return m.group(1) if m else v
+        
+        lines.append("### 📦 Go Module Dependencies (go.mod versions)\n")
+        lines.append("")
+        lines.append("| Repository | Deployed go.mod | RC go.mod | Changed | Has Index | Chunks | LOC |")
+        lines.append("|-----------|------------------|-----------|---------|----------|--------|-----|")
+        
+        changed_count = 0
+        for name in all_dep_names:
+            dep_deployed = deployed_map.get(name, {}) if isinstance(deployed_map, dict) else {}
+            dep_rc = rc_map.get(name, {}) if isinstance(rc_map, dict) else {}
             
-            # Summary stats for go.mod deps only
-            total_gomod_deps = len(gomod_only_indexes)
-            changed_gomod_deps = sum(1 for dep in gomod_only_indexes.values() 
-                                    if dep.get('version_changed', False))
-            missing_gomod_indexes = sum(1 for dep in gomod_only_indexes.values()
-                                      if not dep.get('deployed', {}).get('found', False))
+            deployed_ver = dep_deployed.get('version', 'N/A') if isinstance(dep_deployed, dict) else 'N/A'
+            rc_ver = dep_rc.get('version', 'N/A') if isinstance(dep_rc, dict) else 'N/A'
             
-            lines.append(f"**Summary**: {total_gomod_deps} go.mod dependencies, ")
-            lines.append(f"{changed_gomod_deps} with version changes, ")
-            lines.append(f"{missing_gomod_indexes} missing indexes")
-            lines.append("")
-            lines.append("> **Note:** The go.mod table shows all dependencies, but code chunks are only extracted for dependencies that are actually imported and used in the code. One dependency can contribute many chunks.")
-            lines.append("")
+            changed = False
+            if deployed_ver != 'N/A' and rc_ver != 'N/A':
+                changed = base_version(deployed_ver) != base_version(rc_ver)
+            if changed:
+                changed_count += 1
+            changed_icon = "⚠️ Yes" if changed else "✅ No"
+            
+            has_index = False
+            if isinstance(dep_deployed, dict) and dep_deployed.get('has_index') is True:
+                has_index = True
+            if isinstance(dep_rc, dict) and dep_rc.get('has_index') is True:
+                has_index = True
+            has_index_icon = "✅" if has_index else "❌"
+            
+            stats = chunk_stats.get(name, {"chunks": 0, "loc": 0})
+            chunks_count = stats.get("chunks", 0)
+            loc_count = stats.get("loc", 0)
+            chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
+            loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
+            
+            repo_display = name
+            repo_field = None
+            if isinstance(dep_deployed, dict):
+                repo_field = dep_deployed.get('repo')
+            if not repo_field and isinstance(dep_rc, dict):
+                repo_field = dep_rc.get('repo')
+            if isinstance(repo_field, str) and repo_field:
+                repo_display = repo_field
+            
+            lines.append(f"| `{repo_display}` | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {has_index_icon} | {chunks_display} | {loc_display} |")
+        
+        lines.append("")
+        lines.append(f"**Summary**: {len(all_dep_names)} go.mod dependencies, {changed_count} with version changes.")
+        lines.append("")
+        lines.append("> **Data sources:** deployed go.mod comes from the deployed tag baseline; RC go.mod comes from the RC code index (code being tested).")
+        lines.append("")
     
     # ========================================
     # Dependency Analysis
@@ -1211,6 +1248,8 @@ def main():
     parser.add_argument('--test-deployed-services', help='New format with separated triggering_repo and services sections')
     parser.add_argument('--services-only', help='Filtered services-only.json (excludes dataPurger and triggering repo)')
     parser.add_argument('--gomod-deps', default='artifacts/gomod-dependencies.json')
+    parser.add_argument('--gomod-deps-deployed', default='artifacts/gomod-dependencies-deployed.json')
+    parser.add_argument('--gomod-deps-rc', default='artifacts/gomod-dependencies-rc.json')
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
     parser.add_argument('--run-ref', default='')
@@ -1237,6 +1276,8 @@ def main():
             args.found_indexes,
             args.running_images,
             args.gomod_deps,
+            args.gomod_deps_deployed,
+            args.gomod_deps_rc,
             args.context_summary,
             args.environment,
             args.run_ref,
