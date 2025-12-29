@@ -453,14 +453,40 @@ else
   echo "{}" > "$GOMOD_DEPLOYED_OUT"
 fi
 
-# Backward-compat: keep a single gomod-dependencies.json for downstream PASS 3.
-# Prefer deployed snapshot; fall back to RC snapshot.
-if [[ -f "$GOMOD_DEPLOYED_OUT" && "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
-  cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
-elif [[ -f "$GOMOD_RC_OUT" && "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
-  cp "$GOMOD_RC_OUT" artifacts/gomod-dependencies.json
+# 3) Compare mode: Create gomod-dependencies.json with version_changed detection
+# This is the proper format that find_indexes.py expects (with deployed_version, rc_version, version_changed)
+if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
+  echo "📌 Comparing deployed vs RC go.mod to detect version changes"
+  echo "   Deployed: $DEPLOYED_INDEX"
+  echo "   RC: $RC_INDEX"
+  python extract_gomod_dependencies.py \
+    --deployed-code-index "$DEPLOYED_INDEX" \
+    --rc-code-index "$RC_INDEX" \
+    --triggering-repo "$TRIGGERING_REPO" \
+    --deployed-version "$DEPLOYED_VERSION" \
+    --output artifacts/gomod-dependencies.json \
+    --github-token "$GITHUB_TOKEN" \
+    --debug || {
+    echo "⚠️  Compare mode failed, falling back to single snapshot"
+    # Fallback: use deployed snapshot if compare fails
+    if [[ -f "$GOMOD_DEPLOYED_OUT" && "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+      cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
+    elif [[ -f "$GOMOD_RC_OUT" && "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+      cp "$GOMOD_RC_OUT" artifacts/gomod-dependencies.json
+    else
+      echo "{}" > artifacts/gomod-dependencies.json
+    fi
+  }
 else
-  echo "{}" > artifacts/gomod-dependencies.json
+  # Fallback: Backward-compat - use single snapshot if compare mode not possible
+  echo "⚠️  Compare mode not available (missing deployed or RC index), using single snapshot"
+  if [[ -f "$GOMOD_DEPLOYED_OUT" && "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+    cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
+  elif [[ -f "$GOMOD_RC_OUT" && "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+    cp "$GOMOD_RC_OUT" artifacts/gomod-dependencies.json
+  else
+    echo "{}" > artifacts/gomod-dependencies.json
+  fi
 fi
 
 # ====================================================================
