@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-token", help="GitHub token (or use GITHUB_TOKEN env var)")
     parser.add_argument("--triggering-repo", help="Name of triggering repo to exclude from dependencies (e.g., cadashboardbe)")
     parser.add_argument("--deployed-version", help="Deployed version tag (e.g., v0.0.223) - used to fetch correct go.mod instead of PR commit")
+    parser.add_argument("--rc-version", help="RC version tag (e.g., rc-v0.0.224-2435) - used to fetch correct RC go.mod instead of code index commit")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     return parser.parse_args()
 
@@ -371,7 +372,14 @@ def main():
             print(f"✅ Downloaded deployed go.mod from GitHub")
         
         # Download RC go.mod from GitHub
-        rc_gomod = download_gomod_from_github(rc_repo, rc_commit, github_token)
+        # IMPORTANT: Prefer RC tag if available; the RC index may fall back to code-index-latest,
+        # which can point to a non-RC commit and cause false "version_changed" for many deps.
+        rc_ref = rc_commit
+        if args.rc_version and args.rc_version not in ("unknown", "null", ""):
+            rc_ref = args.rc_version
+            if args.debug:
+                print(f"📌 Using RC version tag for go.mod: {args.rc_version} (instead of commit {rc_commit})")
+        rc_gomod = download_gomod_from_github(rc_repo, rc_ref, github_token)
         if rc_gomod and args.debug:
             print(f"✅ Downloaded RC go.mod from GitHub")
         
