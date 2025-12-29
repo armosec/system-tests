@@ -92,7 +92,7 @@ DEFAULT_TEST_CONFIG_GCP = {
     "check_type": "AUTOMATED",
     "severity": "high",
     "status": "FAIL",
-    "resource_hash": "ffb9edfe-49e8-3b12-9d93-8d16f6b491b6",
+    "resource_hash": "ffb9edaf-69e8-3b12-9d93-8d16f683f736",
     "resource_name": "umbrella",
     "resource_type": "bigquery",
     "resource_id": "elated-pottery-310110:umbrella",
