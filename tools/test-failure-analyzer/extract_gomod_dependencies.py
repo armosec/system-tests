@@ -501,7 +501,10 @@ def main():
         print(f"📦 Relevant dependencies (armosec/kubescape): {len(relevant_deps)}")
         print()
     
-    # Check which ones have code indexes
+    # NOTE:
+    # In single-index mode this script is used for snapshotting go.mod (baseline/RC) and for display.
+    # Code-index availability is resolved later by find_indexes.py (which checks actual artifacts).
+    # Probing GitHub workflow runs here is redundant and can be slow/noisy (404s are common).
     result = {}
     for pkg, version in relevant_deps.items():
         repo = extract_repo_from_package(pkg)
@@ -511,13 +514,11 @@ def main():
         repo_name = repo.split('/')[-1]  # e.g., postgres-connector
         
         if args.debug:
-            print(f"Checking {repo_name} ({version})...")
-        
-        has_index = check_code_index_exists(repo, version, github_token, args.debug)
-        
+            print(f"Found dependency {repo_name} ({version})")
+
         result[repo_name] = {
             "version": version,
-            "has_index": has_index,
+            "has_index": None,  # resolved later by find_indexes.py
             "source": "go.mod",
             "full_package": pkg,
             "repo": repo
@@ -534,15 +535,13 @@ def main():
         json.dump(result, f, indent=2)
     
     print(f"✅ Extracted {len(result)} dependencies")
-    print(f"   With code index: {sum(1 for d in result.values() if d['has_index'])}")
     print(f"   Output: {args.output}")
     
     if args.debug:
         print()
         print("📋 Summary:")
         for name, info in sorted(result.items()):
-            status = "✅" if info['has_index'] else "❌"
-            print(f"  {status} {name:30} {info['version']}")
+            print(f"  - {name:30} {info['version']}")
 
 
 if __name__ == '__main__':
