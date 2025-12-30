@@ -415,40 +415,79 @@ def find_dependency_index(
     This saves time by avoiding unnecessary API calls.
     
     Tries multiple strategies:
-    1. Version tag: code-index-v0.0.1160
-    2. Latest: code-index-latest
+    1. Get commit from Git tag and try code-index-{commit}
+    2. Latest: code-index-latest (only if commit resolution fails)
     
     Returns:
         (index_path, github_org_found, strategy_used)
     """
-    strategies = [
-        f"code-index-{version}",  # Try version tag first
-        "code-index-latest"       # Fallback to latest
-    ]
-    
     # If we have an org hint, ONLY check that org (saves time)
     orgs_to_check = [github_org_hint] if github_org_hint else github_orgs
     
-    for artifact_name in strategies:
+    # Strategy 1: Get commit from Git tag and try code-index-{commit}
+    # This is the correct approach since artifacts are named by commit hash, not version tag
+    if version and version != "unknown" and version != "latest":
+        if debug:
+            print(f"  🔍 Getting commit for tag: {version}")
+        
+        # Try each org to find the tag
+        tag_commit = None
+        tag_org = None
         for github_org in orgs_to_check:
+            repo_full_name = f"{github_org}/{repo}"
+            tag_commit = get_commit_for_tag(repo_full_name, version, github_token, debug)
+            if tag_commit:
+                tag_org = github_org
+                break
+        
+        if tag_commit:
             if debug:
-                print(f"  Checking {github_org}/{repo} with {artifact_name}")
+                print(f"  📌 Found commit for tag {version}: {tag_commit[:8]}")
             
-            # Try finding in this org
-            index_path = download_artifact(
-                repo, 
-                artifact_name,
-                output_dir,
-                github_token,
-                github_org,
-                debug
-            )
-            
-            if index_path:
+            artifact_name = f"code-index-{tag_commit}"
+            for github_org in orgs_to_check:
                 if debug:
-                    print(f"  ✅ Found in {github_org}/{repo}")
-                strategy = "version_tag" if artifact_name == f"code-index-{version}" else "latest_fallback"
-                return index_path, github_org, strategy
+                    print(f"  Checking {github_org}/{repo} with {artifact_name}")
+                
+                index_path = download_artifact(
+                    repo, 
+                    artifact_name,
+                    output_dir,
+                    github_token,
+                    github_org,
+                    debug
+                )
+                
+                if index_path:
+                    if debug:
+                        print(f"  ✅ Found in {github_org}/{repo}")
+                    return index_path, github_org, "tag_commit"
+        elif debug:
+            print(f"  ⚠️  Could not resolve commit for tag {version}")
+    
+    # Strategy 2: Fallback to latest (only if we couldn't get commit from tag)
+    if debug:
+        print(f"  🔄 Falling back to code-index-latest")
+    
+    artifact_name = "code-index-latest"
+    for github_org in orgs_to_check:
+        if debug:
+            print(f"  Checking {github_org}/{repo} with {artifact_name}")
+        
+        index_path = download_artifact(
+            repo, 
+            artifact_name,
+            output_dir,
+            github_token,
+            github_org,
+            debug
+        )
+        
+        if index_path:
+            if debug:
+                print(f"  ✅ Found in {github_org}/{repo}")
+                print(f"  ⚠️  Using latest index (may not match version {version} exactly)")
+            return index_path, github_org, "latest_fallback"
     
     # Not found in any org
     if debug:
