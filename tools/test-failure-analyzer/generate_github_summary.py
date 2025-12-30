@@ -130,8 +130,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
     if gomod_deps:
         table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC |")
-        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC | Diff |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|------|")
         
         for dep in gomod_deps:
             deployed = dep['deployed']
@@ -165,6 +165,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
                     'latest_fallback': '📌 latest',
                     'pr_commit': '🔀 PR commit',
                     'commit_direct': '🔀 commit',
+                    'tag_commit': '🏷️ tag→commit',
                     'always_include_fallback': '📌 latest (fallback)'
                 }
                 return strategy_map.get(strategy, strategy)
@@ -177,7 +178,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_type = "-"
             
-            github_org = deployed.get('github_org') or 'armosec'
+            github_org = deployed.get('github_org') or rc.get('github_org') or 'armosec'
             repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
             # Get chunk/LOC stats for this repo
@@ -189,8 +190,18 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
             loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
             
+            # Generate diff link if version changed and we have commit info
+            diff_display = "-"
+            if dep['version_changed']:
+                deployed_commit = deployed.get('commit')
+                rc_commit = rc.get('commit')
+                
+                if deployed_commit and rc_commit:
+                    compare_url = f"https://github.com/{github_org}/{dep['name']}/compare/{deployed_commit[:8]}...{rc_commit[:8]}"
+                    diff_display = f"[View Diff]({compare_url})"
+            
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} |"
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} | {diff_display} |"
             )
         
         table_lines.append("")
@@ -853,8 +864,8 @@ def generate_summary(
         
         lines.append("### 📦 Go Module Dependencies (go.mod versions)\n")
         lines.append("")
-        lines.append("| Repository | Deployed go.mod | RC go.mod | Changed | Has Index | Chunks | LOC |")
-        lines.append("|-----------|------------------|-----------|---------|----------|--------|-----|")
+        lines.append("| Repository | Deployed go.mod | RC go.mod | Changed | Has Index | Chunks | LOC | Diff |")
+        lines.append("|-----------|------------------|-----------|---------|----------|--------|-----|------|")
         
         changed_count = 0
         for name in all_dep_names:
@@ -893,7 +904,19 @@ def generate_summary(
             if isinstance(repo_field, str) and repo_field:
                 repo_display = repo_field
             
-            lines.append(f"| `{repo_display}` | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {has_index_icon} | {chunks_display} | {loc_display} |")
+            # Generate diff link if version changed and we have commit info
+            diff_display = "-"
+            if changed and found_indexes:
+                dep_info = found_indexes.get('indexes', {}).get(name, {})
+                deployed_commit = dep_info.get('deployed', {}).get('commit')
+                rc_commit = dep_info.get('rc', {}).get('commit')
+                github_org = dep_info.get('deployed', {}).get('github_org') or dep_info.get('rc', {}).get('github_org') or 'armosec'
+                
+                if deployed_commit and rc_commit:
+                    compare_url = f"https://github.com/{github_org}/{name}/compare/{deployed_commit[:8]}...{rc_commit[:8]}"
+                    diff_display = f"[View Diff]({compare_url})"
+            
+            lines.append(f"| `{repo_display}` | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {has_index_icon} | {chunks_display} | {loc_display} | {diff_display} |")
         
         lines.append("")
         lines.append(f"**Summary**: {len(all_dep_names)} go.mod dependencies, {changed_count} with version changes.")
