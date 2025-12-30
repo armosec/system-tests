@@ -489,12 +489,38 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
         repos_to_fetch.add(repo)
     
     results = {}
+
+    # Filter dependencies up-front (avoid iterating/logging "skipped" for every go.mod dep)
+    # We only attempt to resolve indexes for:
+    # 1) repos in default_repos (plus always-include), OR
+    # 2) repos that changed between deployed vs RC (version_changed=True)
+    selected_dependencies: Dict[str, Any] = {}
+    for dep_name, dep_info in dependencies.items():
+        try:
+            version_changed = bool(dep_info.get('version_changed', False)) if isinstance(dep_info, dict) else False
+        except Exception:
+            version_changed = False
+        if dep_name in repos_to_fetch or version_changed:
+            selected_dependencies[dep_name] = dep_info
+
+    if debug:
+        total_in = len(dependencies) if isinstance(dependencies, dict) else 0
+        total_selected = len(selected_dependencies)
+        changed_selected = sum(
+            1 for v in selected_dependencies.values()
+            if isinstance(v, dict) and v.get('version_changed', False)
+        )
+        print(f"\n🧮 go.mod dependency filtering:")
+        print(f"   - Total go.mod deps (input): {total_in}")
+        print(f"   - Selected for resolution:   {total_selected}")
+        print(f"     - In default repos list:  {sum(1 for k in selected_dependencies.keys() if k in repos_to_fetch)}")
+        print(f"     - Version-changed extras: {max(changed_selected - sum(1 for k,v in selected_dependencies.items() if k in repos_to_fetch and isinstance(v, dict) and v.get('version_changed', False)), 0)}")
     
     # First, process gomod dependencies
     # Include repos that are:
     # 1. In the default repos list (repos_to_fetch), OR
     # 2. Have version_changed=True (even if not in default list)
-    for dep_name, dep_info in dependencies.items():
+    for dep_name, dep_info in selected_dependencies.items():
         # Handle both formats:
         # - Compare mode: has deployed_version, rc_version, version_changed
         # - Single-index mode: has just version
@@ -520,12 +546,6 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 deployed_ver_raw = 'unknown'
             if rc_ver_raw is None:
                 rc_ver_raw = 'unknown'
-        
-        # Skip if not in default list AND version didn't change
-        if dep_name not in repos_to_fetch and not version_changed:
-            if debug:
-                print(f"\n⏭️  Skipping {dep_name} (not in default repos list and version unchanged)")
-            continue
         
         if debug:
             print(f"\n📦 Processing dependency: {dep_name}")
