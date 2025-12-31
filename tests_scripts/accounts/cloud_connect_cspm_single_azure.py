@@ -35,8 +35,6 @@ class CloudConnectCSPMSingleAzure(Accounts):
         9. Delete CSPM feature and validate
         """
 
-        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
-            return statics.SUCCESS, "Skipping for PROD US"
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         # generate random suffix for uniqueness
@@ -47,14 +45,21 @@ class CloudConnectCSPMSingleAzure(Accounts):
         self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
-        client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
-        client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS")
-        client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
+        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
+            client_id = os.environ.get("AZURE_CLIENT_ID_US_CLOUD_TESTS")
+            client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_US_CLOUD_TESTS")
+            client_secret = os.environ.get("AZURE_CLIENT_SECRET_US_CLOUD_TESTS")
+            assert client_id, "AZURE_CLIENT_ID_US_CLOUD_TESTS is not set"
+            assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_US_CLOUD_TESTS is not set"
+            assert client_secret, "AZURE_CLIENT_SECRET_US_CLOUD_TESTS is not set"
+        else:
+            client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
+            client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS")
+            client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
+            assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
+            assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS is not set"
+            assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
         tenant_id = AZURE_TENANT_ID_CLOUD_TESTS
-
-        assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
-        assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS is not set"
-        assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
 
         cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm"
         bad_cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-bad"
