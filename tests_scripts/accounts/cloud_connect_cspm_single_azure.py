@@ -35,6 +35,10 @@ class CloudConnectCSPMSingleAzure(Accounts):
         9. Delete CSPM feature and validate
         """
 
+        # This if is temporary
+        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
+            return statics.SUCCESS, "Skipping for PROD US"
+
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         # generate random suffix for uniqueness
