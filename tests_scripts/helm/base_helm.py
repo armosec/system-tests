@@ -239,21 +239,36 @@ class BaseHelm(BaseK8S):
 
     def verify_application_profiles(self, wlids: list, namespace):
         Logger.logger.info("Get application profiles")
-        k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
-                                                          "ApplicationProfile").get(namespace=namespace).items
-        assert k8s_data is not None, "Failed to get application profiles"
-        assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
-        Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
-        ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
-        for i in wlids:
-            assert i in ap_wlids, f"Failed to get application profile for {i}"
-        # kubescape.io/status: completed, kubescape.io/completion: complete
-        # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
-        not_complete_application_profiles = [i for i in k8s_data if
-                                             i.metadata.annotations['kubescape.io/status'] != 'completed']
+        if "r7.armo-cadr.com" in self.backend.server:
+            k8s_data = self.backend.get_application_profiles(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
+            assert k8s_data != [], "Failed to get application profiles"
+            assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
+            Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
+            ap_wlids = [i['metadata']['annotations']['kubescape.io/wlid'] for i in k8s_data]
+            for i in wlids:
+                assert i in ap_wlids, f"Failed to get application profile for {i}"
+            not_complete_application_profiles = [i for i in k8s_data if
+                                                i['metadata']['annotations']['kubescape.io/status'] != 'completed']
 
-        assert len(
-            not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
+            assert len(
+                not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i['metadata'] for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
+
+        else:
+            k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
+                                                            "ApplicationProfile").get(namespace=namespace).items
+            assert k8s_data != None, "Failed to get application profiles"
+            assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
+            Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
+            ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
+            for i in wlids:
+                assert i in ap_wlids, f"Failed to get application profile for {i}"
+            # kubescape.io/status: completed, kubescape.io/completion: complete
+            # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
+            not_complete_application_profiles = [i for i in k8s_data if
+                                                i.metadata.annotations['kubescape.io/status'] != 'completed']
+
+            assert len(
+                not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 
     # ---------------------- helm ------------------------
     @staticmethod
