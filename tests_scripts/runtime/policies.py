@@ -169,9 +169,9 @@ class RuntimePoliciesConfigurations(Incidents):
             "name": "Malware-new-systest",    
             "description": "Default Malware RuleSet System Test",
             "enabled": True,
-            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids,    
+            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],    
             "notifications":notifications_webhook,
             "actions": []
         }
@@ -203,15 +203,14 @@ class RuntimePoliciesConfigurations(Incidents):
         Logger.logger.info("✓ RuntimePolicyCreated event correctly filtered out (not in events list)")
     
         
- 
         # TODO: check the case of updating empty scope
         update_runtime_policy_body = {    
             "name": "Malware-new-systest - updated",    
             "description": "Default Malware RuleSet System Test  - updated",
             "enabled": True,
-            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla_update"}]},
+            "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids,
+            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
             "notifications": [],
             "actions": []
         }
@@ -339,7 +338,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "name": "Test-Policy-For-Events-" + rand,
             "description": "Test policy to verify events are received",
             "enabled": True,
-            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
+            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": cluster}]},
             "ruleSetType": "Custom",
             "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
             "notifications": [],
@@ -364,7 +363,7 @@ class RuntimePoliciesConfigurations(Incidents):
         Logger.logger.info("✓ RuntimePolicyDeleted event received as expected (now in events list)")
 
         Logger.logger.info("14. validate expected errors")
-        self. validate_expected_errors()
+        self. validate_expected_errors(cluster_name=cluster)
 
         Logger.logger.info("15. Delete webhook")
         self.delete_webhook(guid)
@@ -526,9 +525,9 @@ class RuntimePoliciesConfigurations(Incidents):
             "name": "Filtered-Test-Policy-" + rand,
             "description": "Test policy for events filtering",
             "enabled": True,
-            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
+            "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids,
+            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
             "notifications": [],
             "actions": []
         }
@@ -781,14 +780,14 @@ class RuntimePoliciesConfigurations(Incidents):
             
     
 
-    def validate_expected_errors(self):
+    def validate_expected_errors(self, cluster_name):
         test_cases = [
             {  # good case
                 "body": {
                     "name": "Malware-new-systest-good",
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
                     "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
@@ -801,7 +800,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "name": "Malware-new-systest-wrong-rule-set-type",    
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom123",
                     "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],   
                     "notifications": [],
@@ -813,7 +812,7 @@ class RuntimePoliciesConfigurations(Incidents):
                 "body": {
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
                     "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
@@ -1186,7 +1185,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         Logger.logger.info("✓ RuntimePolicyDeleted event received as expected (now in events list)")
 
         Logger.logger.info("14. validate expected errors")
-        self. validate_expected_errors()
+        self. validate_expected_errors(cluster_name=cluster)
 
         Logger.logger.info("15. Delete webhook")
         self.delete_webhook(guid)
@@ -1599,14 +1598,14 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             
     
 
-    def validate_expected_errors(self):
+    def validate_expected_errors(self, cluster_name):
         test_cases = [
             {  # good case
                 "body": {
                     "name": "Malware-new-systest-good",
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
                     "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
@@ -1619,7 +1618,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "name": "Malware-new-systest-wrong-rule-set-type",    
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom123",
                     "incidentTypeIDs":  incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
@@ -1631,7 +1630,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                 "body": {
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
+                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
                     "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
