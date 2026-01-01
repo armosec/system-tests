@@ -790,7 +790,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids,
+                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
                     "actions": []
                 },
@@ -802,10 +802,8 @@ class RuntimePoliciesConfigurations(Incidents):
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed123",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
+                    "ruleSetType": "Custom123",
+                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],   
                     "notifications": [],
                     "actions": []
                 },
@@ -817,7 +815,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids,    
+                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
                     "actions": []
                 },
@@ -1610,7 +1608,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids,
+                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
                     "actions": []
                 },
@@ -1623,7 +1621,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
                     "ruleSetType": "Custom123",
-                    "incidentTypeIDs": incident_type_ids,
+                    "incidentTypeIDs":  incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
                     "actions": []
                 },
@@ -1635,7 +1633,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids,
+                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
                     "notifications": [],
                     "actions": []
                 },
