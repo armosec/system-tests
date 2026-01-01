@@ -966,7 +966,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         incident_policies_default = json.loads(res.text)
         policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
 
-        assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
+        assert len(incident_policies_default["response"]) == 1, f"Runtime policies list is not 1, got {incident_policies_default['response']}"
 
 
         Logger.logger.info("9. Create webhook for policy notifications")
