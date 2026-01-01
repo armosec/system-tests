@@ -100,6 +100,14 @@ class HelmWrapper(object):
             
             if image_pull_secret_password:
                 command_args.extend(["--set", "kubescape-operator.imagePullSecret.password={}".format(image_pull_secret_password)])
+
+            command_args.extend(["--set", "capabilities.runtimeObservability=enable",
+            "--set", "capabilities.malwareDetection=enable",
+            "--set", "capabilities.runtimeDetection=enable",
+            "--set", "capabilities.nodeProfileService=enable",
+            "--set", "capabilities.admissionController=disable"
+            ])
+
         else:
             # Standard installation for non-multi-prod environments
             command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,
