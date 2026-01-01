@@ -19,7 +19,7 @@ POLICY_CREATED_RESPONSE = "Incident policy created"
 POLICY_UPDATED_RESPONSE = "Incident policy updated"
 POLICY_DELETED_RESPONSE = "Incident policy deleted"
 
-
+malware_found_incident_type_id = "I002"
 incident_type_ids = [
     "I006",
     "I007",
@@ -341,7 +341,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids,
+            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
             "notifications": [],
             "actions": []
         }
@@ -1165,7 +1165,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids,
+            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
             "notifications": [],
             "actions": []
         }
