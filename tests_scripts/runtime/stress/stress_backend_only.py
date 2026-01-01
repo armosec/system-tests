@@ -423,79 +423,95 @@ class BackendStressTest(BaseHelm):
         if not url.endswith("/v1/runtimealerts"):
             url = url.rstrip("/") + "/v1/runtimealerts"
         
+        
+        session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,      
+            pool_maxsize=10,          
+            max_retries=0             
+        )
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        
         error_count = 0
         last_error_log_time = 0
-        error_log_interval = 10  # Log errors at most once every 10 seconds
+        error_log_interval = 10  
         
-        while self.is_running:
-            try:
-                payload = self._create_alert_payload(profile, cluster)
-                
-                # Retry logic with exponential backoff for transient errors
-                max_retries = 3
-                retry_delay = 0.1
-                success = False
-                
-                for attempt in range(max_retries):
-                    try:
-                        response = requests.post(
-                            url,
-                            json=payload,
-                            timeout=30,  # Increased timeout for slow processing
-                            headers={"Content-Type": "application/json"}
-                        )
-                        response.raise_for_status()
-                        self.stats.alerts_sent += 1
-                        success = True
-                        error_count = 0  # Reset error count on success
-                        break
-                    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                        # Retry on timeout/connection errors
-                        if attempt < max_retries - 1:
-                            time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
-                            continue
-                        else:
-                            raise  # Re-raise on final attempt
-                
-                if not success:
-                    raise requests.exceptions.RequestException("Failed after retries")
+        try:  
+            while self.is_running:
+                try:
+                    payload = self._create_alert_payload(profile, cluster)
                     
-            except requests.exceptions.RequestException as e:
-                self.stats.alerts_failed += 1
-                error_count += 1
-                
-                # Only log errors periodically to reduce noise
-                current_time = time.time()
-                if current_time - last_error_log_time >= error_log_interval:
-                    error_details = str(e)
-                    if hasattr(e, 'response') and e.response is not None:
+                    # Retry logic with exponential backoff for transient errors
+                    max_retries = 3
+                    retry_delay = 0.1
+                    success = False
+                    
+                    for attempt in range(max_retries):
                         try:
-                            error_details = f"{e} - Response: {e.response.text[:200]}"
-                        except:
-                            pass
-                    Logger.logger.warning(
-                        f"Alert send failures [{profile.name}] worker {worker_idx}: "
-                        f"{error_count} recent errors (last: {error_details[:100]})"
-                    )
-                    last_error_log_time = current_time
-                    error_count = 0
+                            # Use session.post() instead of requests.post() to reuse connections
+                            response = session.post(
+                                url,
+                                json=payload,
+                                timeout=30,
+                                headers={"Content-Type": "application/json"}
+                            )
+                            response.raise_for_status()
+                            self.stats.alerts_sent += 1
+                            success = True
+                            error_count = 0  # Reset error count on success
+                            break
+                        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                            # Retry on timeout/connection errors
+                            if attempt < max_retries - 1:
+                                time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
+                                continue
+                            else:
+                                raise  # Re-raise on final attempt
+                    
+                    if not success:
+                        raise requests.exceptions.RequestException("Failed after retries")
+                        
+                except requests.exceptions.RequestException as e:
+                    self.stats.alerts_failed += 1
+                    error_count += 1
+                    
+                    # Only log errors periodically to reduce noise
+                    current_time = time.time()
+                    if current_time - last_error_log_time >= error_log_interval:
+                        error_details = str(e)
+                        if hasattr(e, 'response') and e.response is not None:
+                            try:
+                                error_details = f"{e} - Response: {e.response.text[:200]}"
+                            except:
+                                pass
+                        Logger.logger.warning(
+                            f"Alert send failures [{profile.name}] worker {worker_idx}: "
+                            f"{error_count} recent errors (last: {error_details[:100]})"
+                        )
+                        last_error_log_time = current_time
+                        error_count = 0
+                    
+                    if len(self.stats.errors) < 100:
+                        self.stats.errors.append(f"[{profile.name}] worker {worker_idx}: {str(e)[:200]}")
+                    
+                    # Add small delay after errors to avoid overwhelming the synchronizer
+                    time.sleep(0.1)
+                    
+                except Exception as e:
+                    self.stats.alerts_failed += 1
+                    error_msg = f"Unexpected error [{profile.name}] worker {worker_idx}: {e}"
+                    if len(self.stats.errors) < 100:
+                        self.stats.errors.append(error_msg)
+                    Logger.logger.error(error_msg, exc_info=True)
+                    time.sleep(0.1)
                 
-                if len(self.stats.errors) < 100:
-                    self.stats.errors.append(f"[{profile.name}] worker {worker_idx}: {str(e)[:200]}")
-                
-                # Add small delay after errors to avoid overwhelming the synchronizer
-                time.sleep(0.1)
-                
-            except Exception as e:
-                self.stats.alerts_failed += 1
-                error_msg = f"Unexpected error [{profile.name}] worker {worker_idx}: {e}"
-                if len(self.stats.errors) < 100:
-                    self.stats.errors.append(error_msg)
-                Logger.logger.error(error_msg, exc_info=True)
-                time.sleep(0.1)
-            
-            # Wait for next execution
-            time.sleep(interval)
+                # Wait for next execution
+                time.sleep(interval)
+        
+        finally:
+            # Close the session to clean up connection pool
+            session.close()
         
         Logger.logger.info(f"Alert sender [{profile.name}] worker {worker_idx} stopped")
     

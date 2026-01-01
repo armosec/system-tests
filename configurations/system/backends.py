@@ -96,7 +96,7 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # armo-prod-us-east-1 frontEgg
+    # armo-prod-us-east-1 frontEgg 
     backends.append(Backend(name='armo-prod-us-east-1',
                             dashboard='https://api.us-east-1.r7.armo-cadr.com',
                             api_url="api.us-east-1.r7.armo-cadr.com",
@@ -105,7 +105,7 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # armo-prod-eu-central-1 frontEgg
+    # armo-prod-eu-central-1 frontEgg 
     backends.append(Backend(name='armo-prod-eu-central-1',
                             dashboard='https://api.eu-central-1.r7.armo-cadr.com',
                             api_url="api.eu-central-1.r7.armo-cadr.com",
@@ -114,7 +114,7 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
-    # armo-prod-ap-southeast-2 frontEgg
+    # armo-prod-ap-southeast-2 frontEgg 
     backends.append(Backend(name='armo-prod-ap-southeast-2',
                             dashboard='https://api.ap-southeast-2.r7.armo-cadr.com',
                             api_url="api.ap-southeast-2.r7.armo-cadr.com",
@@ -122,15 +122,6 @@ def set_backends():
                             event_receiver_server="https://cloud-report.ap-southeast-2.r7.armo-cadr.com",
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
-
-    # # armo-prod-us-east-1 frontEgg (using production-us config as fallback - update with actual URLs when available)
-    # backends.append(Backend(name='armo-prod-us-east-1',
-    #                         api_url="api.us.armosec.io",
-    #                         dashboard='https://api.us.armosec.io',
-    #                         auth_url='https://auth.us.armosec.io',
-    #                         event_receiver_server="https://cloud-report.us.armosec.io",
-    #                         tls_verify=False,
-    #                         login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
 
     # # development

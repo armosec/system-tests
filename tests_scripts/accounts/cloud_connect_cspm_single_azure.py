@@ -34,8 +34,11 @@ class CloudConnectCSPMSingleAzure(Accounts):
         8. Accept the risk
         9. Delete CSPM feature and validate
         """
+
+        # This if is temporary
         if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
             return statics.SUCCESS, "Skipping for PROD US"
+
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         # generate random suffix for uniqueness
@@ -46,14 +49,21 @@ class CloudConnectCSPMSingleAzure(Accounts):
         self.cleanup_single_accounts_by_id(PROVIDER_AZURE, subscription_id, [COMPLIANCE_FEATURE_NAME])
 
         Logger.logger.info("Stage 1: Read Azure Service Principal credentials from env")
-        client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
-        client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS")
-        client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
+        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
+            client_id = os.environ.get("AZURE_CLIENT_ID_US_CLOUD_TESTS")
+            client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_US_CLOUD_TESTS")
+            client_secret = os.environ.get("AZURE_CLIENT_SECRET_US_CLOUD_TESTS")
+            assert client_id, "AZURE_CLIENT_ID_US_CLOUD_TESTS is not set"
+            assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_US_CLOUD_TESTS is not set"
+            assert client_secret, "AZURE_CLIENT_SECRET_US_CLOUD_TESTS is not set"
+        else:
+            client_id = os.environ.get("AZURE_CLIENT_ID_CLOUD_TESTS")
+            client_object_id = os.environ.get("AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS")
+            client_secret = os.environ.get("AZURE_CLIENT_SECRET_CLOUD_TESTS")
+            assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
+            assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS is not set"
+            assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
         tenant_id = AZURE_TENANT_ID_CLOUD_TESTS
-
-        assert client_id, "AZURE_CLIENT_ID_CLOUD_TESTS is not set"
-        assert client_object_id, "AZURE_CLIENT_SERVICE_PRINCIPAL_OBJECT_ID_CLOUD_TESTS is not set"
-        assert client_secret, "AZURE_CLIENT_SECRET_CLOUD_TESTS is not set"
 
         cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm"
         bad_cloud_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-bad"
@@ -87,7 +97,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         account = self.get_cloud_account_by_guid(cloud_account_guid)
         self.azure_cloud_account_name = account["name"]
 
-        Logger.logger.info("Stage 5: Try to connect the same account again (should fail)")
+        Logger.logger.info("Stage 4: Try to connect the same account again (should fail)")
         duplicate_account_name = f"systest-{self.test_identifier_rand}-azure-cspm-duplicate"
         # This should fail because the subscription is already connected
         duplicate_cloud_account_guid = self.connect_azure_cspm_new_account(
@@ -102,7 +112,7 @@ class CloudConnectCSPMSingleAzure(Accounts):
         assert account is not None, "Original account should still exist after duplicate connection attempt"
 
         if not self.skip_apis_validation:
-            Logger.logger.info("Stage 4: Wait for CSPM scan to complete successfully")
+            Logger.logger.info("Stage 5: Wait for CSPM scan to complete successfully")
             # wait for success
             self.wait_for_report(
                 self.validate_accounts_cloud_list_cspm_compliance,
@@ -119,24 +129,24 @@ class CloudConnectCSPMSingleAzure(Accounts):
             last_success_scan_id = account["features"][COMPLIANCE_FEATURE_NAME]["lastSuccessScanID"]
             Logger.logger.info(f"extracted last success scan id from created account: {last_success_scan_id}")
 
-            Logger.logger.info("Stage 5: Validate all scan results")
+            Logger.logger.info("Stage 6: Validate all scan results")
             self.validate_scan_data(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("all scan data is being validated successfully")
 
             if not self.skip_jira_validation:
-                Logger.logger.info("Stage 6: Create Jira issue for resource")
+                Logger.logger.info("Stage 7: Create Jira issue for resource")
                 self.create_jira_issue_for_cspm(PROVIDER_AZURE, last_success_scan_id)
                 Logger.logger.info("Jira issue for resource has been created successfully")
 
-            Logger.logger.info("Stage 7: Accept the risk")
+            Logger.logger.info("Stage 8: Accept the risk")
             self.accept_cspm_risk(PROVIDER_AZURE, cloud_account_guid, self.azure_cloud_account_name, last_success_scan_id)
             Logger.logger.info("risk has been accepted successfully")
 
-            Logger.logger.info("Stage 10: Break Azure connection and reconnect")
+            Logger.logger.info("Stage 9: Break Azure connection and reconnect")
             self.break_and_reconnect_azure_account(cloud_account_guid, subscription_id, tenant_id, client_id, client_object_id, client_secret)
             Logger.logger.info("Azure connection has been broken and reconnected successfully")
 
-        Logger.logger.info("Stage 11: Delete CSPM feature and validate")
+        Logger.logger.info("Stage 10: Delete CSPM feature and validate")
         self.delete_and_validate_account_feature(cloud_account_guid, COMPLIANCE_FEATURE_NAME)
 
         Logger.logger.info("Azure CSPM single subscription test completed successfully")

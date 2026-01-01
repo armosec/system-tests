@@ -500,8 +500,8 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         self.validate_compliance_frameworks(provider, cloud_account_guid, last_success_scan_id)
         control_hash = self.validate_compliance_controls(provider, last_success_scan_id, with_accepted_resources, with_jira)
         rule_hash = self.validate_compliance_rules(provider, last_success_scan_id, control_hash, with_accepted_resources, with_jira)
-        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, with_accepted_resources, with_jira)
-        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_name, with_accepted_resources, with_jira)
+        resource_hash ,_ = self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, with_accepted_resources, with_jira)
+        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_hash, with_accepted_resources, with_jira)
         self.validate_control_and_checks_under_resource(provider, last_success_scan_id, resource_hash, with_accepted_resources, with_jira)
 
         Logger.logger.info("Compliance account API data validation completed successfully")
@@ -702,14 +702,14 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
         return resource.cloudResourceHash, resource.cloudResourceName
 
-    def validate_resource_summaries_response(self, provider: str, last_success_scan_id : str, resource_name : str, with_accepted_resources : bool, with_jira : bool):
+    def validate_resource_summaries_response(self, provider: str, last_success_scan_id : str, resource_hash : str, with_accepted_resources : bool, with_jira : bool):
         body = {
             "pageSize": 100,
             "pageNum": 1,
             "innerFilters": [
                 {
                     "frameworkName": TEST_CONFIG_PROVIDER_MAP[provider]["framework"],
-                    "cloudResourceName": resource_name,
+                    "cloudResourceHash": resource_hash,
                     "reportGUID": last_success_scan_id
                 }
             ]
@@ -720,7 +720,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
         resources_resp = self.backend.get_cloud_compliance_resources(rule_hash=None,body=body)
         resources = [ComplianceResourceSummaries(**r) for r in resources_resp["response"]]
-        assert len(resources) == 1, f"Expected resources, got: {resources}"
+        assert len(resources) == 1, f"Expected resources amount: 1, got: {len(resources)} instead, response: {resources}"
         resource = resources[0]
 
         expected_response = get_expected_resource_summaries_response(provider, with_accepted_resources)
@@ -823,7 +823,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         self.validate_compliance_controls(provider, last_success_scan_id, False, True)
         self.validate_compliance_rules(provider, last_success_scan_id, control_hash, False, True)
         self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, False, True)
-        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_name, False, True)
+        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_hash, False, True)
         self.validate_control_and_checks_under_resource(provider, last_success_scan_id, resource_hash, False, True)
 
         Logger.logger.info(f"Unlink Jira issue")

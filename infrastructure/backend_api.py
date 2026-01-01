@@ -2744,21 +2744,6 @@ class ControlPanelAPI(object):
 
         return r
 
-    def get_runtime_incidents_rulesets(self, body = None):
-        params = {"customerGUID": self.selected_tenant_id}
-
-        if body is None:
-            body = {"pageSize": 50, "pageNum": 1}
-
-        Logger.logger.info("get_runtime_incidents_rulesets body: %s" % body)
-        r = self.post(API_RUNTIME_INCIDENTSRULESET, params=params, json=body)
-
-        if not 200 <= r.status_code < 300:
-            raise Exception(
-                'Error accessing dashboard. Request: get_runtime_incidents_rules "%s" (code: %d, message: %s)' % (
-                    self.customer, r.status_code, r.text))
-        return r
-
     def get_runtime_incident_types(self, body = None):
         params = {"customerGUID": self.selected_tenant_id}
 

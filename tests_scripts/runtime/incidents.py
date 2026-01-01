@@ -360,7 +360,7 @@ class Incidents(BaseHelm):
         unique_values_req = {
             "fields": {"clusterName": "", "containerName": "", "name": "",
                        "podName": "", "workloadKind": "", "workloadName": "",
-                       "incidentSeverity": "", "mitreTactic": "", "incidentCategory": "",
+                       "incidentSeverity": "", "mitreTactic": "", 
                        "nodeName": ""},
             "innerFilters": [{"guid": incident['guid']}],
             "pageSize": 100,
@@ -370,7 +370,7 @@ class Incidents(BaseHelm):
 
         assert unique_values is not None, f"Failed to get unique values of incident {json.dumps(incident)}"
         expected_values_for_sensitive_fa = {'fields': {'clusterName': [incident["clusterName"]], 'containerName': ['redis'],
-                                      'incidentCategory': ['Anomaly'], 'incidentSeverity': ['Medium'],
+                                      'incidentSeverity': ['Medium'],
                                       'mitreTactic': ['TA0006'],
                                       'name': ['Unexpected Sensitive File Access'], 'nodeName': [incident["nodeName"]],
                                       "podName": [incident["podName"]],
@@ -378,7 +378,6 @@ class Incidents(BaseHelm):
                                       'workloadName': ['redis-sleep']},
                            'fieldsCount': {'clusterName': [{'key': incident["clusterName"], 'count': 1}],
                                            'containerName': [{'key': 'redis', 'count': 1}],
-                                           'incidentCategory': [{'key': 'Anomaly', 'count': 1}],
                                            'incidentSeverity': [{'key': 'Medium', 'count': 1}],
                                            'mitreTactic': [{'key': 'TA0006', 'count': 1}],
                                            'name': [{'key': 'Unexpected Sensitive File Access', 'count': 1}],
@@ -387,7 +386,7 @@ class Incidents(BaseHelm):
                                            'workloadKind': [{'key': 'Deployment', 'count': 1}],
                                            'workloadName': [{'key': 'redis-sleep', 'count': 1}]}}
         expected_values_unexpected_process = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
-                                      "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"],
+                                      "incidentSeverity": ["Low"],
                                       "mitreTactic": ["TA0002"],
                                       "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
                                       "podName": [incident["podName"]],
@@ -395,8 +394,7 @@ class Incidents(BaseHelm):
                                       "workloadName": ["redis-sleep"]},
                            "fieldsCount": {"clusterName": [{"key": incident["clusterName"], "count": 1}],
                                            "containerName": [{"key": "redis", "count": 1}],
-                                           "incidentCategory": [{"key": "Anomaly", "count": 1}],
-                                           "incidentSeverity": [{"key": "Medium", "count": 1}],
+                                           "incidentSeverity": [{"key": "Low", "count": 1}],
                                            "mitreTactic": [{"key": "TA0002", "count": 1}],
                                            "name": [{"key": "Unexpected process launched", "count": 1}],
                                            "nodeName": [{"key": incident["nodeName"], "count": 1}],
@@ -406,8 +404,8 @@ class Incidents(BaseHelm):
         expected_values = expected_values_for_sensitive_fa
         if incident["name"] == "Unexpected process launched":
             expected_values = expected_values_unexpected_process
-        assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
-        Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
+        assert unique_values == expected_values, f"unique values of incident do not match. got: {json.dumps(unique_values)} expected: {json.dumps(expected_values)}"
+        Logger.logger.info(f"Got unique values of incident: {json.dumps(unique_values)}")
 
     def verify_incident_status_completed(self, incident_id: str):
         response = self.backend.get_incident(incident_id)
