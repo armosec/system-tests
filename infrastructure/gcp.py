@@ -2,6 +2,7 @@ import json
 import time
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
+from systest_utils import Logger
 
 class GcpManager:
     def __init__(self, service_account_key_json: str):
@@ -34,7 +35,7 @@ class GcpManager:
         
         if modified:
             self._set_iam_policy(policy)
-            print(f"Role {role} removed. Waiting for propagation...")
+            Logger.logger.info(f"Role {role} removed. Waiting for propagation...")
             # IAM changes can take a few seconds to propagate in GCP
             time.sleep(5) 
         return modified

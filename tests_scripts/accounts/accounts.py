@@ -6,6 +6,68 @@ from typing import List, Tuple, Any, Dict
 
 from infrastructure import aws
 from systest_utils import Logger
+
+
+def _sanitize_secrets_from_dict(data, max_depth=5):
+    """
+    Recursively sanitize secrets from a dictionary before logging.
+    Replaces sensitive values with '[REDACTED]' to prevent secret leakage in logs.
+    
+    Args:
+        data: Dictionary or value to sanitize
+        max_depth: Maximum recursion depth to prevent infinite loops
+        
+    Returns:
+        Sanitized dictionary with secrets redacted
+    """
+    if max_depth <= 0:
+        return "[MAX_DEPTH_REACHED]"
+    
+    if not isinstance(data, dict):
+        return data
+    
+    # List of keys that contain secrets (case-insensitive matching)
+    secret_keys = {
+        'clientsecret', 'client_secret', 'serviceaccountkey', 'service_account_key',
+        'externalid', 'external_id', 'adminroleexternalid', 'admin_role_external_id',
+        'memberroleexternalid', 'member_role_external_id', 'password', 'apikey', 'api_key',
+        'secret', 'token', 'accesskey', 'access_key', 'privatekey', 'private_key',
+        'crossaccountsrolearn', 'cross_accounts_role_arn', 'adminrolearn', 'admin_role_arn',
+        'memberrolearn', 'member_role_arn'
+    }
+    
+    sanitized = {}
+    for key, value in data.items():
+        key_lower = key.lower()
+        
+        # Check if this key contains secrets (exact match or substring match)
+        # Use exact match first for better performance, then substring match
+        is_secret_key = (
+            key_lower in secret_keys or 
+            any(secret_key in key_lower for secret_key in secret_keys) or
+            any(key_lower in secret_key for secret_key in secret_keys)
+        )
+        
+        if is_secret_key:
+            sanitized[key] = '[REDACTED]'
+        elif isinstance(value, dict):
+            sanitized[key] = _sanitize_secrets_from_dict(value, max_depth - 1)
+        elif isinstance(value, list):
+            sanitized[key] = [
+                _sanitize_secrets_from_dict(item, max_depth - 1) if isinstance(item, dict) else item
+                for item in value
+            ]
+        elif isinstance(value, str) and len(value) > 100:
+            # For long strings (like JSON service account keys), check if they contain private keys
+            value_lower = value.lower()
+            if 'private_key' in value_lower or '-----begin private key-----' in value_lower:
+                sanitized[key] = '[REDACTED - Contains private key]'
+            else:
+                sanitized[key] = value
+        else:
+            sanitized[key] = value
+    
+    return sanitized
 from .accounts_aws import AwsAccountsMixin
 from .accounts_azure import AzureAccountsMixin
 from .accounts_gcp import GcpAccountsMixin
@@ -273,13 +335,16 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
                     self.test_cloud_accounts_guids.append(account_guid)
         except Exception as e:
             if not expect_failure:
-                Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
+                # Sanitize body to prevent secret leakage - redact sensitive fields
+                sanitized_body = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+                Logger.logger.error(f"failed to create cloud account, body used: {sanitized_body}, error is {e}")
             failed = True
         
-        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
+        sanitized_body_for_assert = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {sanitized_body_for_assert}"
 
         if not expect_failure:
-            assert account_guid is not None, f"guid not found in response, body used: {body}"
+            assert account_guid is not None, f"guid not found in response, body used: {sanitized_body_for_assert}"
             return account_guid
         
         return account_guid  # Returns None if failed, or GUID if it was created despite failure

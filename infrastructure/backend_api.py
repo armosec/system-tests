@@ -3344,8 +3344,6 @@ class ControlPanelAPI(object):
     def get_cloud_accounts_uniquevalues(self, body):
         params = {"customerGUID": self.selected_tenant_id}
 
-        Logger.logger.info("get_cloud_accounts_uniquevalues body: %s" % body)
-
         r = self.post(API_UNIQUEVALUES_ACCOUNTS_CLOUD, params=params, json=body)
 
         if not 200 <= r.status_code < 300:

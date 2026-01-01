@@ -1,12 +1,17 @@
 import json
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 from infrastructure import gcp as gcp_module
 from systest_utils import Logger
 from .cspm_test_models import PROVIDER_GCP
 
+if TYPE_CHECKING:
+    from infrastructure import backend_api
+
 
 class GcpAccountsMixin:
     """GCP-specific methods for Accounts class."""
+    
+    backend: "backend_api.ControlPanelAPI"
 
     def create_and_validate_cloud_account_with_cspm_gcp(self, cloud_account_name: str, project_id: str, service_account_key: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
         compliance_gcp_config: Dict[str, Any] = {
