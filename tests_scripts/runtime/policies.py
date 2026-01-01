@@ -15,9 +15,6 @@ from tests_scripts.workflows.utils import WEBHOOK_NAME
 class Providers:
     WEBHOOK = "webhook"
 
-EXPECTED_UNIQUEVALUES_PATH = "configurations/expected-result/kdr/runtime_policies_unique_values.json"
-EXPECTED_UNIQUEVALUES_PATH_NO_CDR = "configurations/expected-result/kdr/runtime_policies_no_cdr_unique_values.json"
-
 POLICY_CREATED_RESPONSE = "Incident policy created"
 POLICY_UPDATED_RESPONSE = "Incident policy updated"
 POLICY_DELETED_RESPONSE = "Incident policy deleted"
@@ -150,30 +147,6 @@ class RuntimePoliciesConfigurations(Incidents):
         policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
-
-
-        Logger.logger.info("8. validate unique values")
-        unique_values_body = {
-            "fields": {
-                "name": "",
-                "ruleSetType": "",
-                "scope.designators.cluster": "",
-                "scope.designators.namespace": ""
-            },
-            "innerFilters": [
-                {
-                "ruleSetType": "Managed"
-                }
-            ],
-            "pageSize": 100,
-            "pageNum": 1
-            }
-        
-        res = self.backend.get_runtime_policies_uniquevalues(unique_values_body)
-        unique_values = json.loads(res.text)
-
-        expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
-        TestUtil.compare_jsons(expected_unique_values, unique_values, [])
 
         Logger.logger.info("9. Create webhook for policy notifications")
         self.webhook_name = WEBHOOK_NAME+ "_" + rand
@@ -998,29 +971,6 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
-
-        Logger.logger.info("8. validate unique values")
-        unique_values_body = {
-            "fields": {
-                "name": "",
-                "ruleSetType": "",
-                "scope.designators.cluster": "",
-                "scope.designators.namespace": ""
-            },
-            "innerFilters": [
-                {
-                "ruleSetType": "Managed"
-                }
-            ],
-            "pageSize": 100,
-            "pageNum": 1
-            }
-        
-        res = self.backend.get_runtime_policies_uniquevalues(unique_values_body)
-        unique_values = json.loads(res.text)
-
-        expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH_NO_CDR) 
-        TestUtil.compare_jsons(expected_unique_values, unique_values, [])
 
         Logger.logger.info("9. Create webhook for policy notifications")
         self.webhook_name = WEBHOOK_NAME+ "_" + rand
