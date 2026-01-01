@@ -1,7 +1,7 @@
 import os
 import random
 
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import (
     Accounts,
     COMPLIANCE_FEATURE_NAME,
@@ -9,6 +9,7 @@ from tests_scripts.accounts.accounts import (
     PROVIDER_AZURE,
 )
 
+PROD_US_CUSTOMER_GUID = "1cc202aa-e4a0-418d-a7f5-b3d1e85ce04d"
 AZURE_TENANT_ID_CLOUD_TESTS = "50a70646-52e3-4e46-911e-6ca1b46afba3"
 AZURE_SUBSCRIPTION_ID_CLOUD_TESTS = "57e3175c-71ce-45f8-8bfc-34d966223068"
 
@@ -33,6 +34,8 @@ class CloudConnectCSPMSingleAzure(Accounts):
         8. Accept the risk
         9. Delete CSPM feature and validate
         """
+        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
+            return statics.SUCCESS, "Skipping for PROD US"
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
 
         # generate random suffix for uniqueness
