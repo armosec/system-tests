@@ -15,10 +15,6 @@ from tests_scripts.workflows.utils import WEBHOOK_NAME
 class Providers:
     WEBHOOK = "webhook"
 
-UPDATE_EXPECTED_RUNTIME_POLICIES = False
-
-EXPECTED_RUNTIME_RULESETS_PATH = "configurations/expected-result/kdr/runtime_rulesets.json"
-EXPECTED_RUNTIME_POLICIES_PATH = "configurations/expected-result/kdr/runtime_policies_default.json"
 EXPECTED_UNIQUEVALUES_PATH = "configurations/expected-result/kdr/runtime_policies_unique_values.json"
 EXPECTED_UNIQUEVALUES_PATH_NO_CDR = "configurations/expected-result/kdr/runtime_policies_no_cdr_unique_values.json"
 
@@ -26,6 +22,39 @@ POLICY_CREATED_RESPONSE = "Incident policy created"
 POLICY_UPDATED_RESPONSE = "Incident policy updated"
 POLICY_DELETED_RESPONSE = "Incident policy deleted"
 
+
+incident_type_ids = [
+    "I006",
+    "I007",
+    "I008",
+    "I010",
+    "I011",
+    "I012",
+    "I013",
+    "I014",
+    "I015",
+    "I017",
+    "I018",
+    "I019",
+    "I020",
+    "I021",
+    "I022",
+    "I024",
+    "I026",
+    "I032",
+    "I033",
+    "I034",
+    "I035",
+    "I036",
+    "I131",
+    "I132",
+    "I133",
+    "I134",
+    "I136",
+    "I137",
+    "I138",
+    "I139"
+]
 
 class RuntimePoliciesConfigurations(Incidents):
     """
@@ -115,19 +144,10 @@ class RuntimePoliciesConfigurations(Incidents):
         self.siem_integration_guids[siem_integration_guid] = Providers.WEBHOOK
         Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid} and events filter: {integrations[0].get('events') if integrations else 'N/A'}")
 
-        Logger.logger.info("5. validate incident types")
-        self.validate_incident_types()
-
-        Logger.logger.info("6. validate default rulesets")
-        incident_rulesets = self.validate_default_rulesets()
-
         Logger.logger.info("7. get runtime policies list")
         res = self.backend.get_runtime_policies_list()
         incident_policies_default = json.loads(res.text)
         policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
@@ -151,9 +171,6 @@ class RuntimePoliciesConfigurations(Incidents):
         
         res = self.backend.get_runtime_policies_uniquevalues(unique_values_body)
         unique_values = json.loads(res.text)
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(unique_values, EXPECTED_UNIQUEVALUES_PATH)
 
         expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH) 
         TestUtil.compare_jsons(expected_unique_values, unique_values, [])
@@ -180,10 +197,8 @@ class RuntimePoliciesConfigurations(Incidents):
             "description": "Default Malware RuleSet System Test",
             "enabled": True,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [
-                incident_rulesets[0]["guid"]
-            ],    
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,    
             "notifications":notifications_webhook,
             "actions": []
         }
@@ -222,10 +237,8 @@ class RuntimePoliciesConfigurations(Incidents):
             "description": "Default Malware RuleSet System Test  - updated",
             "enabled": True,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla_update"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [
-                incident_rulesets[0]["guid"]
-            ],    
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -354,8 +367,8 @@ class RuntimePoliciesConfigurations(Incidents):
             "description": "Test policy to verify events are received",
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -541,8 +554,8 @@ class RuntimePoliciesConfigurations(Incidents):
             "description": "Test policy for events filtering",
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -671,26 +684,6 @@ class RuntimePoliciesConfigurations(Incidents):
         guid = self.get_webhook_name(self.webhook_name)
         self.tested_webhook_guid.append(guid)
         return guid
-
-    
-    def validate_incident_types(self):
-        res = self.backend.get_runtime_incident_types()
-        incident_type_default = json.loads(res.text)
-        assert len(incident_type_default["response"]) > 0, "no incident types found"
-        return incident_type_default["response"]
-
-
-    def validate_default_rulesets(self):
-        res = self.backend.get_runtime_incidents_rulesets()
-        incident_rulesets = json.loads(res.text)
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(incident_rulesets, EXPECTED_RUNTIME_RULESETS_PATH)
-        
-        assert len(incident_rulesets["response"]) > 0, "no incident rulesets found"  
-        
-        return incident_rulesets["response"]
-
 
     def validate_new_policy(self, body: Dict[str, Any]) -> str:
         """
@@ -823,10 +816,8 @@ class RuntimePoliciesConfigurations(Incidents):
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
+                    "ruleSetType": "Custom",
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -847,29 +838,13 @@ class RuntimePoliciesConfigurations(Incidents):
                 },
                 "expect_error": True
             },
-            { # bad case - rule set is Managed but no rule set id
-                "body": {
-                    "name": "Malware-new-systest-manage-no-rule-set",    
-                    "description": "Default Malware RuleSet System Test",
-                    "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                    ],    
-                    "notifications": [],
-                    "actions": []
-                },
-                "expect_error": True
-            },
             { # bad case - missing name
                 "body": {
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
+                    "ruleSetType": "Custom",
+                    "incidentTypeIDs": incident_type_ids,    
                     "notifications": [],
                     "actions": []
                 },
@@ -1016,19 +991,10 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         self.siem_integration_guids[siem_integration_guid] = Providers.WEBHOOK
         Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid} and events filter: {integrations[0].get('events') if integrations else 'N/A'}")
 
-        Logger.logger.info("5. validate incident types")
-        self.validate_incident_types()
-
-        Logger.logger.info("6. validate default rulesets")
-        incident_rulesets = self.validate_default_rulesets()
-
         Logger.logger.info("7. get runtime policies list")
         res = self.backend.get_runtime_policies_list()
         incident_policies_default = json.loads(res.text)
         policies_guids = [policy["guid"] for policy in incident_policies_default["response"]]
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(incident_policies_default, EXPECTED_RUNTIME_POLICIES_PATH)
 
         assert len(incident_policies_default["response"]) > 1, f"Runtime policies list is less than 1, got {incident_policies_default['response']}"
 
@@ -1052,9 +1018,6 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         
         res = self.backend.get_runtime_policies_uniquevalues(unique_values_body)
         unique_values = json.loads(res.text)
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(unique_values, EXPECTED_UNIQUEVALUES_PATH_NO_CDR)
 
         expected_unique_values = TestUtil.get_expected_json(EXPECTED_UNIQUEVALUES_PATH_NO_CDR) 
         TestUtil.compare_jsons(expected_unique_values, unique_values, [])
@@ -1081,10 +1044,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "description": "Default Malware RuleSet System Test",
             "enabled": True,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [
-                incident_rulesets[0]["guid"]
-            ],    
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,   
             "notifications":notifications_webhook,
             "actions": []
         }
@@ -1123,10 +1084,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "description": "Default Malware RuleSet System Test  - updated",
             "enabled": True,
             "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla_update"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [
-                incident_rulesets[0]["guid"]
-            ],    
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,    
             "notifications": [],
             "actions": []
         }
@@ -1255,8 +1214,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "description": "Test policy to verify events are received",
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -1442,8 +1401,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "description": "Test policy for events filtering",
             "enabled": True,
             "scope": {"riskFactors": ["Internet facing"], "designators": [{"cluster": "test"}]},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": [incident_rulesets[0]["guid"]],
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -1573,25 +1532,6 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         self.tested_webhook_guid.append(guid)
         return guid
 
-    
-    def validate_incident_types(self):
-        res = self.backend.get_runtime_incident_types()
-        incident_type_default = json.loads(res.text)
-        assert len(incident_type_default["response"]) > 0, "no incident types found"
-        return incident_type_default["response"]
-
-
-    def validate_default_rulesets(self):
-        res = self.backend.get_runtime_incidents_rulesets()
-        incident_rulesets = json.loads(res.text)
-
-        if UPDATE_EXPECTED_RUNTIME_POLICIES:
-            TestUtil.save_expected_json(incident_rulesets, EXPECTED_RUNTIME_RULESETS_PATH)
-        
-        assert len(incident_rulesets["response"]) > 0, "no incident rulesets found"  
-        
-        return incident_rulesets["response"]
-
 
     def validate_new_policy(self, body: Dict[str, Any]) -> str:
         res = self.backend.new_runtime_policy(body)
@@ -1719,10 +1659,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
+                    "ruleSetType": "Custom",
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -1734,24 +1672,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed123",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
-                    "notifications": [],
-                    "actions": []
-                },
-                "expect_error": True
-            },
-            { # bad case - rule set is Managed but no rule set id
-                "body": {
-                    "name": "Malware-new-systest-manage-no-rule-set",    
-                    "description": "Default Malware RuleSet System Test",
-                    "enabled": True,
-                    "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                    ],    
+                    "ruleSetType": "Custom123",
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -1762,10 +1684,8 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "description": "Default Malware RuleSet System Test",
                     "enabled": True,
                     "scope": {"riskFactors":["Internet facing"],"designators":[{"cluster":"bla"}]},
-                    "ruleSetType": "Managed",
-                    "managedRuleSetIDs": [
-                        "123"
-                    ],    
+                    "ruleSetType": "Custom",
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
