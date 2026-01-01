@@ -1,13 +1,18 @@
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 from systest_utils import Logger
 from .cspm_test_models import PROVIDER_AZURE
+
+if TYPE_CHECKING:
+    from infrastructure import backend_api
 
 
 AZURE_READER_ROLE_DEFINITION_PATH = f"/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
 
 class AzureAccountsMixin:
     """Azure-specific methods for Accounts class."""
+    
+    backend: "backend_api.ControlPanelAPI"
 
     def create_and_validate_cloud_account_with_cspm_azure(self, cloud_account_name: str, subscription_id: str, tenant_id: str, client_id: str, client_secret: str, skip_scan: bool = False, expect_failure: bool = False) -> str:
         compliance_azure_config: Dict[str, Any] = {

@@ -1,13 +1,18 @@
 import time
 import uuid
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, TYPE_CHECKING
 from infrastructure import aws
 from systest_utils import Logger
 from .cspm_test_models import PROVIDER_AWS, AwsStackResponse, AwsMembersStackResponse, AWSOrgCreateCloudOrganizationAdminRequest, CreateOrUpdateCloudOrganizationResponse, ConnectCloudOrganizationMembersRequest
 
+if TYPE_CHECKING:
+    from infrastructure import backend_api
+
 
 class AwsAccountsMixin:
     """AWS-specific methods for Accounts class."""
+    
+    backend: "backend_api.ControlPanelAPI"
 
     def build_get_cloud_aws_org_by_accountID_request(self, accountID: str) -> Dict:
         body = {
@@ -612,7 +617,8 @@ class AwsAccountsMixin:
             assert old_external_id != new_external_id, f"New external id is the same as the old one"
             update_result = self.update_role_external_id(aws_manager, role_arn, new_external_id)
             assert update_result, f"Failed to update role {role_arn} external id {new_external_id}"
-            time.sleep(10)
+            time.sleep(30)
+            Logger.logger.info("Triggering scan now (should fail due to invalid external ID)")
             self.backend.cspm_scan_now(cloud_account_guid=account_guid, with_error=True)
             self.wait_for_report(self.validate_account_feature_status, timeout=180, sleep_interval=10, cloud_account_guid=account_guid, feature_name=COMPLIANCE_FEATURE_NAME, expected_status=FEATURE_STATUS_DISCONNECTED)
             self.validate_org_status(org_guid, CSPM_STATUS_DEGRADED)
@@ -727,11 +733,16 @@ class AwsAccountsMixin:
                     self.test_cloud_orgs_guids.append(org_guid)
         except Exception as e:
             if not expect_failure:
-                Logger.logger.error(f"failed to create cloud org, body used: {body}, error is {e}")
+                # Sanitize body to prevent secret leakage - redact sensitive fields
+                from .accounts import _sanitize_secrets_from_dict
+                sanitized_body = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+                Logger.logger.error(f"failed to create cloud org, body used: {sanitized_body}, error is {e}")
             failed = True
-        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
+        from .accounts import _sanitize_secrets_from_dict
+        sanitized_body_for_assert = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {sanitized_body_for_assert}"
         if not expect_failure:
-            assert org_guid is not None, f"guid not found in response, body used: {body}"
+            assert org_guid is not None, f"guid not found in response, body used: {sanitized_body_for_assert}"
             return org_guid
         return org_guid
 
