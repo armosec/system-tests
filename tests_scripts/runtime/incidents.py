@@ -406,8 +406,8 @@ class Incidents(BaseHelm):
         expected_values = expected_values_for_sensitive_fa
         if incident["name"] == "Unexpected process launched":
             expected_values = expected_values_unexpected_process
-        assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
-        Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
+        assert unique_values == expected_values, f"unique values of incident do not match. got: {json.dumps(unique_values)} expected: {json.dumps(expected_values)}"
+        Logger.logger.info(f"Got unique values of incident: {json.dumps(unique_values)}")
 
     def verify_incident_status_completed(self, incident_id: str):
         response = self.backend.get_incident(incident_id)
