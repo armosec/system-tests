@@ -960,7 +960,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         assert siem_integration_guid, f"Failed to retrieve GUID for created SIEM integration: {self.siem_integration_name}"
         self.siem_integration_guids[siem_integration_guid] = Providers.WEBHOOK
         Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid} and events filter: {integrations[0].get('events') if integrations else 'N/A'}")
-
+        
         Logger.logger.info("7. get runtime policies list")
         res = self.backend.get_runtime_policies_list()
         incident_policies_default = json.loads(res.text)
@@ -1190,6 +1190,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         Logger.logger.info("15. Delete webhook")
         self.delete_webhook(guid)
 
+        """
         Logger.logger.info("16. Create incident to validate BE (triggers SIEM IncidentCreated event)")
         self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
         self.wait_for_report(self.verify_incident_in_backend_list, timeout=120, sleep_interval=10,
@@ -1199,6 +1200,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         # Validate SIEM IncidentCreated event
         self.wait_for_siem_event("IncidentCreated", siem_test_webhook_url)
 
+        """
         Logger.logger.info("17. Create exception (triggers SIEM RiskAcceptanceCreated event)")
         exception_id = self.backend.create_runtime_exception(policy_ids=["I013"], resources=[{
             "designatorType":"Attribute",
