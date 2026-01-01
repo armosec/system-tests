@@ -682,7 +682,7 @@ class RuntimePoliciesConfigurations(Incidents):
 
         res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
         incident_policies = json.loads(res.text)["response"]
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions", "notifications"]
+        props_to_check = ["name", "scope", "ruleSetType", "incidentTypeIDs", "actions", "notifications"]
         assert len(incident_policies)  > 0, f"failed to get new runtime policy, expected more than 1 but got {len(incident_policies)}, got result {incident_policies}"
 
         Logger.logger.info(f"New policy created: {json.dumps(incident_policies[0], indent=4)}")
@@ -751,7 +751,7 @@ class RuntimePoliciesConfigurations(Incidents):
         incident_policies = json.loads(res.text)["response"]
         assert len(incident_policies)  == 1, f"failed to get new runtime policy, expected 1 but got {len(incident_policies)}, got result {incident_policies}"
 
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions"]
+        props_to_check = ["name", "scope", "ruleSetType", "incidentTypeIDs", "actions"]
         for prop in props_to_check:
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
@@ -1502,7 +1502,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
 
         res = self.backend.get_runtime_policies_list(new_generated_runtime_policy_body)
         incident_policies = json.loads(res.text)["response"]
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions", "notifications"]
+        props_to_check = ["name", "scope", "ruleSetType", "incidentTypeIDs", "actions", "notifications"]
         assert len(incident_policies)  > 0, f"failed to get new runtime policy, expected more than 1 but got {len(incident_policies)}, got result {incident_policies}"
 
         Logger.logger.info(f"New policy created: {json.dumps(incident_policies[0], indent=4)}")
@@ -1571,7 +1571,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         incident_policies = json.loads(res.text)["response"]
         assert len(incident_policies)  == 1, f"failed to get new runtime policy, expected 1 but got {len(incident_policies)}, got result {incident_policies}"
 
-        props_to_check = ["name", "scope", "ruleSetType", "managedRuleSetIDs", "actions"]
+        props_to_check = ["name", "scope", "ruleSetType", "incidentTypeIDs", "actions"]
         for prop in props_to_check:
             assert incident_policies[0][prop] == body[prop], f"failed to get new runtime policy, expected '{prop}' {body[prop]} but got {incident_policies[0][prop]}, got result {incident_policies}"
 
