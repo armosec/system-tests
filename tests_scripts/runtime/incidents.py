@@ -298,7 +298,7 @@ class Incidents(BaseHelm):
         resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
         alerts = resp[__RESPONSE_FIELD__]
         assert alerts is not None, f"Failed to get alerts of incident {json.dumps(incident)}"
-        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got {resp}"
+        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got len(alerts): {len(alerts)}, resp: {resp}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
         self.check_alerts_unique_values(incident)
 
