@@ -78,7 +78,7 @@ class Incidents(BaseHelm):
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help", "more /etc/passwd"])
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
         time.sleep(1)
-        self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
+        #self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
         time.sleep(1)
         self.exec_pod(wlid=wlids[0], command="wget sodiumlaurethsulfatedesyroyer.com")
         time.sleep(160)
