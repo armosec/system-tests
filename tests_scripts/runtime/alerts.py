@@ -101,7 +101,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
 
         Logger.logger.info(
             f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
-        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
+        self.wait_for_report(self.verify_application_profiles, timeout=3 * 60, wlids=wlids, namespace=namespace)
         time.sleep(80) # the node agent cache waits 60+ secs before caching profile, needs to update helm chart with value to make it 5 secs
         self.exec_pod(wlid=wlids[0], command="cat /etc/shadow")
 
