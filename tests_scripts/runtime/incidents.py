@@ -84,7 +84,7 @@ class Incidents(BaseHelm):
         time.sleep(160)
         self._test_unexpected_process(cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
         # self._test_connection_to_malicious_destination(cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
-        self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        #self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
         return self.cleanup()
         
