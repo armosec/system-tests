@@ -10,6 +10,100 @@ from systest_utils import Logger
 from typing import List, Dict ,Optional
 
 
+def _sanitize_secrets_from_dict(data, max_depth=5):
+    """
+    Recursively sanitize secrets from a dictionary before logging.
+    Replaces sensitive values with '[REDACTED]' to prevent secret leakage in logs.
+    
+    Args:
+        data: Dictionary or value to sanitize
+        max_depth: Maximum recursion depth to prevent infinite loops
+        
+    Returns:
+        Sanitized dictionary with secrets redacted
+    """
+    if max_depth <= 0:
+        return "[MAX_DEPTH_REACHED]"
+    
+    if not isinstance(data, dict):
+        return data
+    
+    # List of keys that contain secrets (case-insensitive matching)
+    secret_keys = {
+        'externalid', 'external_id', 'password', 'secret', 'token', 
+        'accesskey', 'access_key', 'privatekey', 'private_key',
+        'apikey', 'api_key', 'clientsecret', 'client_secret',
+        'serviceaccountkey', 'service_account_key', 'sts:externalid'
+    }
+    
+    sanitized = {}
+    for key, value in data.items():
+        key_lower = key.lower()
+        
+        # Check if this key contains secrets
+        if any(secret_key in key_lower for secret_key in secret_keys):
+            sanitized[key] = '[REDACTED]'
+        elif isinstance(value, dict):
+            sanitized[key] = _sanitize_secrets_from_dict(value, max_depth - 1)
+        elif isinstance(value, list):
+            sanitized[key] = [
+                _sanitize_secrets_from_dict(item, max_depth - 1) if isinstance(item, dict) else item
+                for item in value
+            ]
+        else:
+            sanitized[key] = value
+    
+    return sanitized
+
+
+def _sanitize_parameters(parameters: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """
+    Sanitize CloudFormation parameters to redact sensitive values.
+    
+    Args:
+        parameters: List of parameter dictionaries
+        
+    Returns:
+        List of sanitized parameter dictionaries
+    """
+    if not parameters:
+        return parameters
+    
+    sanitized = []
+    secret_keys = {'externalid', 'external_id', 'password', 'secret', 'key', 'token'}
+    
+    for param in parameters:
+        sanitized_param = param.copy()
+        param_key = param.get('ParameterKey', '').lower()
+        
+        if any(secret_key in param_key for secret_key in secret_keys):
+            sanitized_param['ParameterValue'] = '[REDACTED]'
+        
+        sanitized.append(sanitized_param)
+    
+    return sanitized
+
+
+def _mask_parameter_value_for_logging(param_key: str, param_value: str) -> str:
+    """
+    Mask a parameter value if the key contains sensitive information.
+    
+    Args:
+        param_key: The parameter key name
+        param_value: The parameter value to potentially mask
+        
+    Returns:
+        The original value if not sensitive, or '[REDACTED]' if sensitive
+    """
+    param_key_lower = param_key.lower()
+    sensitive_keywords = ['password', 'secret', 'key', 'externalid', 'external_id', 'token']
+    
+    if any(keyword in param_key_lower for keyword in sensitive_keywords):
+        return '[REDACTED]'
+    
+    return param_value
+
+
 class AwsManager:
     def __init__(self, region: str, aws_access_key_id: str, aws_secret_access_key: str, aws_session_token: str = None):
         self.region = region
@@ -237,12 +331,14 @@ class AwsManager:
             update_args['Parameters'] = existing_parameters
 
         
-        print(f"Updating stack '{stack_name}' with args: {update_args} and parameters: {existing_parameters}")
+        sanitized_params = _sanitize_parameters(existing_parameters) if existing_parameters else []
+        sanitized_args = _sanitize_secrets_from_dict(update_args)
+        Logger.logger.info(f"Updating stack '{stack_name}' with args: {sanitized_args} and parameters: {sanitized_params}")
         self.cloudformation.update_stack(**update_args)
 
         if wait_for_completion:
             self.wait_for_stack_update(stack_name)
-            print(f"Stack '{stack_name}' update complete.")
+            Logger.logger.info(f"Stack '{stack_name}' update complete.")
 
     def wait_for_stack_update(self, stack_name: str, delay: int = 15, max_attempts: int = 80):
         """
@@ -252,7 +348,7 @@ class AwsManager:
         :param delay: The amount of time in seconds to wait between polls.
         :param max_attempts: The maximum number of attempts to poll.
         """
-        print(f"Waiting for stack '{stack_name}' update to complete...")
+        Logger.logger.info(f"Waiting for stack '{stack_name}' update to complete...")
         waiter = self.cloudformation.get_waiter('stack_update_complete')
         waiter.wait(
             StackName=stack_name,
@@ -425,7 +521,6 @@ class AwsManager:
         """
         Creates a CloudFormation StackSet container (Step 1) for SERVICE_MANAGED permission model.
         """
-        Logger.logger.info(self.get_caller_identity())
         try:
             # Required parameters for SERVICE_MANAGED stacksets with delegated admin
             create_stack_set_params = {
@@ -569,7 +664,8 @@ class AwsManager:
             # Add parameters if provided
             if parameters: 
                 update_params['Parameters'] = parameters
-                Logger.logger.info(f"Updating StackSet {stackset_name} with parameters: {parameters}")
+                sanitized_params = _sanitize_parameters(parameters)
+                Logger.logger.info(f"Updating StackSet {stackset_name} with parameters: {sanitized_params}")
             
             # Add operation preferences if provided
             if operation_preferences: 
@@ -601,13 +697,14 @@ class AwsManager:
                 # If template is updated but no regions/targets specified, update all instances
                 Logger.logger.info(f"Updating all stack instances for StackSet {stackset_name}")
 
-            Logger.logger.info(f"StackSet update parameters: {update_params}")
+            sanitized_update_params = _sanitize_secrets_from_dict(update_params)
+            Logger.logger.info(f"StackSet update parameters: {sanitized_update_params}")
             response = self.cloudformation.update_stack_set(**update_params)
             
             operation_id = response.get("OperationId")
             Logger.logger.info(f"StackSet update initiated for: {stackset_name}")
             Logger.logger.info(f"Operation ID: {operation_id}")
-            Logger.logger.info(f"Full response: {response}")
+            Logger.logger.info(f"StackSet update response received (operation ID: {operation_id})")
             
             if not operation_id:
                 Logger.logger.warning(f"No OperationId returned from update_stack_set for {stackset_name}")
@@ -1268,10 +1365,8 @@ class AwsManager:
             for param in parameters:
                 param_key = param.get('ParameterKey', 'Unknown')
                 param_value = param.get('ParameterValue', 'Unknown')
-                # Mask sensitive values
-                if 'password' in param_key.lower() or 'secret' in param_key.lower() or 'key' in param_key.lower():
-                    param_value = '***MASKED***'
-                Logger.logger.info(f"  - {param_key}: {param_value}")
+                masked_value = _mask_parameter_value_for_logging(param_key, param_value)
+                Logger.logger.info(f"  - {param_key}: {masked_value}")
             
             # Template description
             description = stackset.get('Description', 'No description')
@@ -1332,10 +1427,8 @@ class AwsManager:
             for param in parameters:
                 param_key = param.get('ParameterKey', 'Unknown')
                 param_value = param.get('ParameterValue', 'Unknown')
-                # Mask sensitive values
-                if 'password' in param_key.lower() or 'secret' in param_key.lower() or 'key' in param_key.lower():
-                    param_value = '***MASKED***'
-                Logger.logger.info(f"  - {param_key}: {param_value}")
+                masked_value = _mask_parameter_value_for_logging(param_key, param_value)
+                Logger.logger.info(f"  - {param_key}: {masked_value}")
             
             return parameters
             
@@ -1584,7 +1677,9 @@ class AwsManager:
             if not trust_policy:
                 return False
             
-            Logger.logger.info(f"Current trust policy: {json.dumps(trust_policy, indent=2)}")
+            # Sanitize trust policy before logging (redact external IDs)
+            sanitized_policy = _sanitize_secrets_from_dict(trust_policy)
+            Logger.logger.info(f"Current trust policy: {json.dumps(sanitized_policy, indent=2)}")
             
             # Update the external ID in the trust policy
             updated = False
@@ -1597,7 +1692,8 @@ class AwsManager:
                     old_external_id = string_equals['sts:ExternalId']
                     string_equals['sts:ExternalId'] = new_external_id
                     updated = True
-                    Logger.logger.info(f"Updated sts:ExternalId from {old_external_id} to {new_external_id}")
+                    # Don't log actual external IDs - they are secrets
+                    Logger.logger.info(f"Updated sts:ExternalId for role {role_arn} (value redacted)")
             
             if not updated:
                 Logger.logger.warning(f"No sts:ExternalId found in trust policy for role {role_arn}")
@@ -1639,7 +1735,7 @@ class AwsManager:
             
             external_id = self._find_external_id_in_policy(trust_policy)
             if external_id:
-                Logger.logger.info(f"Found external ID for role {role_arn}: {external_id}")
+                Logger.logger.info(f"Found external ID for role {role_arn} (value redacted)")
                 return external_id
             else:
                 Logger.logger.warning(f"No external ID found in trust policy for role {role_arn}")
