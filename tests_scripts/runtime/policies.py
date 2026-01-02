@@ -960,7 +960,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         assert siem_integration_guid, f"Failed to retrieve GUID for created SIEM integration: {self.siem_integration_name}"
         self.siem_integration_guids[siem_integration_guid] = Providers.WEBHOOK
         Logger.logger.info(f"Created SIEM integration '{self.siem_integration_name}' with GUID: {siem_integration_guid} and events filter: {integrations[0].get('events') if integrations else 'N/A'}")
-        
+
         Logger.logger.info("7. get runtime policies list")
         res = self.backend.get_runtime_policies_list()
         incident_policies_default = json.loads(res.text)
@@ -1337,7 +1337,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
         self.wait_for_siem_event("IncidentCreated", siem_test_webhook_url, timeout=60)
         """
         Logger.logger.info("✓ IncidentCreated event received as expected (in filter list)")
-
+        
         Logger.logger.info("29. Test Events filtering - Verify RuntimePolicyCreated event is NOT received (not in filter list)")
         # Get message count before creating policy
         messages_before = self.backend.get_test_webhook_messages(siem_test_webhook_url)
