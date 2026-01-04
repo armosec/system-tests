@@ -1,7 +1,9 @@
 import json
 import time
+import random
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
+from tests_scripts.runtime.policies import incident_type_ids
 
 
 class IncidentResponse(Incidents):
@@ -55,6 +57,20 @@ class IncidentResponse(Incidents):
 
         Logger.logger.info(f"3. Verify running pods in namespaces {namespaces}")
         namespace_to_wlid = self._verify_running_pods(namespaces, namespace_to_workload_objs, cluster)
+
+        rand = str(random.randint(10000000, 99999999))
+        test_policy_body = {
+            "name": "Test-Policy-" + cluster + rand,
+            "description": "Test policy",
+            "enabled": True,
+            "scope": {"designators": [{"cluster": cluster}]},
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
+            "notifications": [],
+            "actions": []
+        }
+        Logger.logger.info("Creating new runtime policy - " + test_policy_body["name"])
+        self.backend.new_runtime_policy(test_policy_body)
 
         Logger.logger.info(f'4. Simulate unexpected process in namespaces {namespaces}')
         namespace_to_incident = self._simulate_unexpected_process(

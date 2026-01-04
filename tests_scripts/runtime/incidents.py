@@ -1,7 +1,10 @@
 import json
+import random
 import time
 import os
 from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
+from tests_scripts.runtime.policies import incident_type_ids
+
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
 from tests_scripts.helm.base_helm import BaseHelm
@@ -72,8 +75,21 @@ class Incidents(BaseHelm):
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
-                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        rand = str(random.randint(10000000, 99999999))
+        test_policy_body = {
+            "name": "Test-Policy-" + cluster + rand,
+            "description": "Test policy",
+            "enabled": True,
+            "scope": {"designators": [{"cluster": cluster}]},
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
+            "notifications": [],
+            "actions": []
+        }
+        Logger.logger.info("Creating new runtime policy - " + test_policy_body["name"])
+        self.backend.new_runtime_policy(test_policy_body)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help", "more /etc/passwd"])
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
