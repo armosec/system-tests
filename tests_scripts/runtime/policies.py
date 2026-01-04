@@ -19,8 +19,8 @@ POLICY_CREATED_RESPONSE = "Incident policy created"
 POLICY_UPDATED_RESPONSE = "Incident policy updated"
 POLICY_DELETED_RESPONSE = "Incident policy deleted"
 
-malware_found_incident_type_id = "I002"
 incident_type_ids = [
+    "I002",
     "I006",
     "I007",
     "I008",
@@ -171,7 +171,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "enabled": True,
             "scope": {"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],    
+            "incidentTypeIDs": incident_type_ids,    
             "notifications":notifications_webhook,
             "actions": []
         }
@@ -210,7 +210,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "enabled": True,
             "scope": {"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -340,7 +340,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "enabled": True,
             "scope": {"designators": [{"cluster": cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -527,7 +527,7 @@ class RuntimePoliciesConfigurations(Incidents):
             "enabled": True,
             "scope": {"designators": [{"cluster": cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -789,7 +789,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -802,7 +802,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom123",
-                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],   
+                    "incidentTypeIDs": incident_type_ids,   
                     "notifications": [],
                     "actions": []
                 },
@@ -814,7 +814,7 @@ class RuntimePoliciesConfigurations(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -992,7 +992,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "enabled": True,
             "scope": {"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+            "incidentTypeIDs": incident_type_ids,
             "notifications":notifications_webhook,
             "actions": []
         }
@@ -1032,7 +1032,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "enabled": True,
             "scope": {"designators":[{"cluster":cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],    
+            "incidentTypeIDs": incident_type_ids,    
             "notifications": [],
             "actions": []
         }
@@ -1162,7 +1162,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
             "enabled": True,
             "scope": {"designators": [{"cluster": cluster}]},
             "ruleSetType": "Custom",
-            "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }
@@ -1609,7 +1609,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -1622,7 +1622,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom123",
-                    "incidentTypeIDs":  incident_type_ids + [malware_found_incident_type_id],
+                    "incidentTypeIDs":  incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
@@ -1634,7 +1634,7 @@ class RuntimePoliciesConfigurationsNoCDR(Incidents):
                     "enabled": True,
                     "scope": {"designators":[{"cluster":cluster_name}]},
                     "ruleSetType": "Custom",
-                    "incidentTypeIDs": incident_type_ids + [malware_found_incident_type_id],
+                    "incidentTypeIDs": incident_type_ids,
                     "notifications": [],
                     "actions": []
                 },
