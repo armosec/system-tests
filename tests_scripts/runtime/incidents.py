@@ -3,7 +3,6 @@ import random
 import time
 import os
 from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
-from tests_scripts.runtime.policies import incident_type_ids
 
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
@@ -11,6 +10,41 @@ from tests_scripts.helm.base_helm import BaseHelm
 
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
+
+
+incident_type_ids = [
+    "I002",
+    "I006",
+    "I007",
+    "I008",
+    "I010",
+    "I011",
+    "I012",
+    "I013",
+    "I014",
+    "I015",
+    "I017",
+    "I018",
+    "I019",
+    "I020",
+    "I021",
+    "I022",
+    "I024",
+    "I026",
+    "I032",
+    "I033",
+    "I034",
+    "I035",
+    "I036",
+    "I131",
+    "I132",
+    "I133",
+    "I134",
+    "I136",
+    "I137",
+    "I138",
+    "I139"
+]
 
 class IncidentStatuses:
     OPEN = "Open"
