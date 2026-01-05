@@ -247,7 +247,7 @@ class IncidentResponse(Incidents):
             wlid_to_namespace[wlids[0]] = namespace
 
         for wlid in wlid_to_namespace:
-            self.wait_for_report(self.verify_application_profiles, wlids=[wlid], namespace=wlid_to_namespace[wlid])
+            self.wait_for_report(self.verify_application_profiles, timeout=3 * 60, wlids=[wlid], namespace=wlid_to_namespace[wlid])
         
         time.sleep(60) # wait for application profiles to be created in cache
         

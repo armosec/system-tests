@@ -91,9 +91,9 @@ DEFAULT_DEPLOY_INTEGRATIONS_PATH = os.path.join(DEFAULT_K8S_PATHS, 'integrations
 DEFAULT_INTEGRATIONS_PATH = os.path.abspath(os.path.join('configurations', 'integrations'))
 
 # kubescape config
-ACCOUNT_ID_KEY="accountID"
-CLOUD_REPORT_URL_KEY="cloudReportURL"
-CLOUD_API_URL_KEY="cloudAPIURL"
+ACCOUNT_ID_KEY = "accountID"
+CLOUD_REPORT_URL_KEY = "cloudReportURL"
+CLOUD_API_URL_KEY = "cloudAPIURL"
 
 # vuln_scan paths
 DEFAULT_VULNERABILITY_SCANNING_PATHS = os.path.abspath(os.path.join('configurations', 'vuln_scan'))
@@ -150,7 +150,6 @@ K8S_API_SERVER_CONTAINER_NAME = "kube-apiserver"
 KS_PORT_FORWARD = 33334
 
 # kubernetes cluster - armo-system
-HELM_REPO_FROM_LOCAL = "charts/kubescape-operator"
 HELM_REPO = "kubescape/kubescape-operator"
 CA_NAMESPACE_NAME = "kubescape"
 CA_NAMESPACE_FROM_HELM_NAME = "kubescape"
