@@ -240,9 +240,7 @@ class BaseHelm(BaseK8S):
     def verify_application_profiles_from_backend(self, wlids: list, namespace):
         Logger.logger.info("Get application profiles from backend")
         k8s_data = self.backend.get_application_profiles(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
-        assert k8s_data != [], "Failed to get application profiles from backend"
-        Logger.logger.info(f"Application profiles from backend: {len(k8s_data)}")
-        
+        assert k8s_data != [], "Failed to get application profiles from backend"        
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
         Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
         ap_wlids = [i['metadata']['annotations']['kubescape.io/wlid'] for i in k8s_data]
@@ -259,8 +257,6 @@ class BaseHelm(BaseK8S):
         k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
                                                             "ApplicationProfile").get(namespace=namespace).items
         assert k8s_data != None, "Failed to get application profiles from cluster"
-        Logger.logger.info(f"Application profiles from cluster: {len(k8s_data)}")
-        
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
         Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
         ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
