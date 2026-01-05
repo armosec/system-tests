@@ -271,7 +271,7 @@ class BaseHelm(BaseK8S):
             not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
 
     def verify_application_profiles(self, wlids: list, namespace):
-        if self.test_driver.backend_obj.is_storage_backend():
+        if self.test_driver.backend_obj.use_storage_backend():
             self.verify_application_profiles_from_backend(wlids, namespace)
         else:
             self.verify_application_profiles_from_cluster(wlids, namespace)

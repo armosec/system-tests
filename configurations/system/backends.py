@@ -47,7 +47,7 @@ class Backend(object):
     def get_event_receiver_server(self):
         return self.event_receiver_server
 
-    def is_storage_backend(self):
+    def use_storage_backend(self):
         return self.is_storage_backend
 
 
