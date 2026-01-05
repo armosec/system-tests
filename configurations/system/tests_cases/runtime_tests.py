@@ -16,7 +16,6 @@ class RuntimeTests(object):
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=Incidents,
-            create_test_tenant=True,
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             # create_test_tenant=True,
         )
@@ -70,7 +69,6 @@ class RuntimeTests(object):
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=IncidentResponse,
-            create_test_tenant=True,
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "redis_sleep_long"),
             tests=["ApplyNetworkPolicy", "ApplySeccompProfile"],
             with_private_node_agent=False,
