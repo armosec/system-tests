@@ -96,6 +96,33 @@ def set_backends():
                             tls_verify=False,
                             login_method=LOGIN_METHOD_FRONTEGG_SECRET))
 
+    # armo-prod-us-east-1 frontEgg 
+    backends.append(Backend(name='armo-prod-us-east-1',
+                            dashboard='https://api.us-east-1.r7.armo-cadr.com',
+                            api_url="api.us-east-1.r7.armo-cadr.com",
+                            auth_url='https://auth.r7.armo-cadr.com',
+                            event_receiver_server="https://cloud-report.us-east-1.r7.armo-cadr.com",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
+    # armo-prod-eu-central-1 frontEgg 
+    backends.append(Backend(name='armo-prod-eu-central-1',
+                            dashboard='https://api.eu-central-1.r7.armo-cadr.com',
+                            api_url="api.eu-central-1.r7.armo-cadr.com",
+                            auth_url='https://auth.r7.armo-cadr.com',
+                            event_receiver_server="https://cloud-report.eu-central-1.r7.armo-cadr.com",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
+    # armo-prod-ap-southeast-2 frontEgg 
+    backends.append(Backend(name='armo-prod-ap-southeast-2',
+                            dashboard='https://api.ap-southeast-2.r7.armo-cadr.com',
+                            api_url="api.ap-southeast-2.r7.armo-cadr.com",
+                            auth_url='https://auth.r7.armo-cadr.com',
+                            event_receiver_server="https://cloud-report.ap-southeast-2.r7.armo-cadr.com",
+                            tls_verify=False,
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+
 
     # # development
     # backends.append(Backend(name='development',

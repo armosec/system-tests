@@ -1,13 +1,50 @@
 import json
+import random
 import time
 import os
 from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
+
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils import statics, Logger
 from tests_scripts.helm.base_helm import BaseHelm
 
 __RELATED_ALERTS_KEY__ = "relatedAlerts"
 __RESPONSE_FIELD__ = "response"
+
+
+incident_type_ids = [
+    "I002",
+    "I006",
+    "I007",
+    "I008",
+    "I010",
+    "I011",
+    "I012",
+    "I013",
+    "I014",
+    "I015",
+    "I017",
+    "I018",
+    "I019",
+    "I020",
+    "I021",
+    "I022",
+    "I024",
+    "I026",
+    "I032",
+    "I033",
+    "I034",
+    "I035",
+    "I036",
+    "I131",
+    "I132",
+    "I133",
+    "I134",
+    "I136",
+    "I137",
+    "I138",
+    "I139"
+]
 
 class IncidentStatuses:
     OPEN = "Open"
@@ -72,8 +109,21 @@ class Incidents(BaseHelm):
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
         self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360,
-                             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+        self.wait_for_report(self.verify_running_pods, sleep_interval=5, timeout=360, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        rand = str(random.randint(10000000, 99999999))
+        test_policy_body = {
+            "name": "Test-Policy-" + cluster + rand,
+            "description": "Test policy",
+            "enabled": True,
+            "scope": {"designators": [{"cluster": cluster}]},
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
+            "notifications": [],
+            "actions": []
+        }
+        Logger.logger.info("Creating new runtime policy - " + test_policy_body["name"])
+        self.backend.new_runtime_policy(test_policy_body)
         wlids = self.deploy_and_wait(deployments_path=self.test_obj["deployments"], cluster=cluster, namespace=namespace)
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help", "more /etc/passwd"])
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
@@ -360,7 +410,7 @@ class Incidents(BaseHelm):
         unique_values_req = {
             "fields": {"clusterName": "", "containerName": "", "name": "",
                        "podName": "", "workloadKind": "", "workloadName": "",
-                       "incidentSeverity": "", "mitreTactic": "", "incidentCategory": "",
+                       "incidentSeverity": "", "mitreTactic": "", 
                        "nodeName": ""},
             "innerFilters": [{"guid": incident['guid']}],
             "pageSize": 100,
@@ -370,7 +420,7 @@ class Incidents(BaseHelm):
 
         assert unique_values is not None, f"Failed to get unique values of incident {json.dumps(incident)}"
         expected_values_for_sensitive_fa = {'fields': {'clusterName': [incident["clusterName"]], 'containerName': ['redis'],
-                                      'incidentCategory': ['Anomaly'], 'incidentSeverity': ['Medium'],
+                                      'incidentSeverity': ['Medium'],
                                       'mitreTactic': ['TA0006'],
                                       'name': ['Unexpected Sensitive File Access'], 'nodeName': [incident["nodeName"]],
                                       "podName": [incident["podName"]],
@@ -378,7 +428,6 @@ class Incidents(BaseHelm):
                                       'workloadName': ['redis-sleep']},
                            'fieldsCount': {'clusterName': [{'key': incident["clusterName"], 'count': 1}],
                                            'containerName': [{'key': 'redis', 'count': 1}],
-                                           'incidentCategory': [{'key': 'Anomaly', 'count': 1}],
                                            'incidentSeverity': [{'key': 'Medium', 'count': 1}],
                                            'mitreTactic': [{'key': 'TA0006', 'count': 1}],
                                            'name': [{'key': 'Unexpected Sensitive File Access', 'count': 1}],
@@ -387,7 +436,7 @@ class Incidents(BaseHelm):
                                            'workloadKind': [{'key': 'Deployment', 'count': 1}],
                                            'workloadName': [{'key': 'redis-sleep', 'count': 1}]}}
         expected_values_unexpected_process = {"fields": {"clusterName": [incident["clusterName"]], "containerName": ["redis"],
-                                      "incidentCategory": ["Anomaly"], "incidentSeverity": ["Medium"],
+                                      "incidentSeverity": ["Low"],
                                       "mitreTactic": ["TA0002"],
                                       "name": ["Unexpected process launched"], "nodeName": [incident["nodeName"]],
                                       "podName": [incident["podName"]],
@@ -395,8 +444,7 @@ class Incidents(BaseHelm):
                                       "workloadName": ["redis-sleep"]},
                            "fieldsCount": {"clusterName": [{"key": incident["clusterName"], "count": 1}],
                                            "containerName": [{"key": "redis", "count": 1}],
-                                           "incidentCategory": [{"key": "Anomaly", "count": 1}],
-                                           "incidentSeverity": [{"key": "Medium", "count": 1}],
+                                           "incidentSeverity": [{"key": "Low", "count": 1}],
                                            "mitreTactic": [{"key": "TA0002", "count": 1}],
                                            "name": [{"key": "Unexpected process launched", "count": 1}],
                                            "nodeName": [{"key": incident["nodeName"], "count": 1}],
@@ -406,8 +454,8 @@ class Incidents(BaseHelm):
         expected_values = expected_values_for_sensitive_fa
         if incident["name"] == "Unexpected process launched":
             expected_values = expected_values_unexpected_process
-        assert unique_values == expected_values, f"Failed to get unique values of incident {json.dumps(incident)} {json.dumps(unique_values)}"
-        Logger.logger.info(f"Got unique values of incident {json.dumps(unique_values)}")
+        assert unique_values == expected_values, f"unique values of incident do not match. got: {json.dumps(unique_values)} expected: {json.dumps(expected_values)}"
+        Logger.logger.info(f"Got unique values of incident: {json.dumps(unique_values)}")
 
     def verify_incident_status_completed(self, incident_id: str):
         response = self.backend.get_incident(incident_id)

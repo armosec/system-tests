@@ -1,8 +1,42 @@
 import json
 import time
+import random
 from systest_utils import Logger, statics
 from tests_scripts.runtime.incidents import Incidents
 
+incident_type_ids = [
+    "I002",
+    "I006",
+    "I007",
+    "I008",
+    "I010",
+    "I011",
+    "I012",
+    "I013",
+    "I014",
+    "I015",
+    "I017",
+    "I018",
+    "I019",
+    "I020",
+    "I021",
+    "I022",
+    "I024",
+    "I026",
+    "I032",
+    "I033",
+    "I034",
+    "I035",
+    "I036",
+    "I131",
+    "I132",
+    "I133",
+    "I134",
+    "I136",
+    "I137",
+    "I138",
+    "I139"
+]
 
 class IncidentResponse(Incidents):
     """
@@ -55,6 +89,20 @@ class IncidentResponse(Incidents):
 
         Logger.logger.info(f"3. Verify running pods in namespaces {namespaces}")
         namespace_to_wlid = self._verify_running_pods(namespaces, namespace_to_workload_objs, cluster)
+
+        rand = str(random.randint(10000000, 99999999))
+        test_policy_body = {
+            "name": "Test-Policy-" + cluster + rand,
+            "description": "Test policy",
+            "enabled": True,
+            "scope": {"designators": [{"cluster": cluster}]},
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
+            "notifications": [],
+            "actions": []
+        }
+        Logger.logger.info("Creating new runtime policy - " + test_policy_body["name"])
+        self.backend.new_runtime_policy(test_policy_body)
 
         Logger.logger.info(f'4. Simulate unexpected process in namespaces {namespaces}')
         namespace_to_incident = self._simulate_unexpected_process(

@@ -5,7 +5,7 @@ import time
 from configurations.system.tests_cases.structures import TestConfiguration
 from systest_utils.tests_logger import Logger
 from tests_scripts.runtime.incidents import __RELATED_ALERTS_KEY__
-from tests_scripts.runtime.policies import RuntimePoliciesConfigurations, RuntimePoliciesConfigurationsNoCDR
+from tests_scripts.runtime.policies import RuntimePoliciesConfigurations, RuntimePoliciesConfigurationsNoCDR, incident_type_ids
 from tests_scripts.users_notifications.alert_notifications import AlertNotifications, get_env
 
 
@@ -48,8 +48,7 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
     def start(self):
         """
         agenda:
-        1. get runtime incidents rulesets
-        2. enrich the new runtime policy with alert notifications
+        1. nrich the new runtime policy with alert notifications
         3. create new runtime policy
         4. Install kubescape
         5. apply the deployment that will generate the incident
@@ -63,22 +62,14 @@ class IncidentsAlerts(AlertNotifications, RuntimePoliciesConfigurations, Runtime
 
         before_test_message_ts = time.time()
 
-
-        Logger.logger.info("1. get runtime incidents rulesets")
-        res = self.backend.get_runtime_incidents_rulesets()
-        incident_rulesets = json.loads(res.text)
-
-        incident_rulesets_guids = [rule["guid"] for rule in incident_rulesets["response"] if rule["name"] == "Anomaly"]
-
-
         # Update the name field
         new_runtime_policy_body = {
             "name": f"Malware-new-systest-" + self.cluster,
-            "description": "Default Malware RuleSet System Test",
+            "description": "Policy System Test",
             "enabled": True,
             "scope": {},
-            "ruleSetType": "Managed",
-            "managedRuleSetIDs": incident_rulesets_guids,
+            "ruleSetType": "Custom",
+            "incidentTypeIDs": incident_type_ids,
             "notifications": [],
             "actions": []
         }

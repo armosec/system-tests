@@ -6,6 +6,68 @@ from typing import List, Tuple, Any, Dict
 
 from infrastructure import aws
 from systest_utils import Logger
+
+
+def _sanitize_secrets_from_dict(data, max_depth=5):
+    """
+    Recursively sanitize secrets from a dictionary before logging.
+    Replaces sensitive values with '[REDACTED]' to prevent secret leakage in logs.
+    
+    Args:
+        data: Dictionary or value to sanitize
+        max_depth: Maximum recursion depth to prevent infinite loops
+        
+    Returns:
+        Sanitized dictionary with secrets redacted
+    """
+    if max_depth <= 0:
+        return "[MAX_DEPTH_REACHED]"
+    
+    if not isinstance(data, dict):
+        return data
+    
+    # List of keys that contain secrets (case-insensitive matching)
+    secret_keys = {
+        'clientsecret', 'client_secret', 'serviceaccountkey', 'service_account_key',
+        'externalid', 'external_id', 'adminroleexternalid', 'admin_role_external_id',
+        'memberroleexternalid', 'member_role_external_id', 'password', 'apikey', 'api_key',
+        'secret', 'token', 'accesskey', 'access_key', 'privatekey', 'private_key',
+        'crossaccountsrolearn', 'cross_accounts_role_arn', 'adminrolearn', 'admin_role_arn',
+        'memberrolearn', 'member_role_arn'
+    }
+    
+    sanitized = {}
+    for key, value in data.items():
+        key_lower = key.lower()
+        
+        # Check if this key contains secrets (exact match or substring match)
+        # Use exact match first for better performance, then substring match
+        is_secret_key = (
+            key_lower in secret_keys or 
+            any(secret_key in key_lower for secret_key in secret_keys) or
+            any(key_lower in secret_key for secret_key in secret_keys)
+        )
+        
+        if is_secret_key:
+            sanitized[key] = '[REDACTED]'
+        elif isinstance(value, dict):
+            sanitized[key] = _sanitize_secrets_from_dict(value, max_depth - 1)
+        elif isinstance(value, list):
+            sanitized[key] = [
+                _sanitize_secrets_from_dict(item, max_depth - 1) if isinstance(item, dict) else item
+                for item in value
+            ]
+        elif isinstance(value, str) and len(value) > 100:
+            # For long strings (like JSON service account keys), check if they contain private keys
+            value_lower = value.lower()
+            if 'private_key' in value_lower or '-----begin private key-----' in value_lower:
+                sanitized[key] = '[REDACTED - Contains private key]'
+            else:
+                sanitized[key] = value
+        else:
+            sanitized[key] = value
+    
+    return sanitized
 from .accounts_aws import AwsAccountsMixin
 from .accounts_azure import AzureAccountsMixin
 from .accounts_gcp import GcpAccountsMixin
@@ -61,8 +123,6 @@ CSPM_STATUS_DISCONNECTED = "disconnected"
 CSPM_SCAN_STATE_IN_PROGRESS = "In Progress"
 CSPM_SCAN_STATE_COMPLETED = "Completed"
 CSPM_SCAN_STATE_FAILED = "Failed"
-
-AZURE_READER_ROLE_DEFINITION_PATH = "/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"
 
 class CloudEntityTypes(Enum):
     ACCOUNT = "account"
@@ -159,6 +219,10 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
                 Logger.logger.info(f"Successfully deleted cloud organization with guid {guid}")
             except Exception as e:
                 Logger.logger.error(f"Failed to delete cloud organization with guid {guid}: {e}")
+        
+        # Azure-specific cleanup (restore Reader role if it was removed)
+        # Method checks internally if credentials exist, so safe to call for all tests
+        self.cleanup_azure_reader_role()
         
         return super().cleanup(**kwargs)
     
@@ -271,13 +335,16 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
                     self.test_cloud_accounts_guids.append(account_guid)
         except Exception as e:
             if not expect_failure:
-                Logger.logger.error(f"failed to create cloud account, body used: {body}, error is {e}")
+                # Sanitize body to prevent secret leakage - redact sensitive fields
+                sanitized_body = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+                Logger.logger.error(f"failed to create cloud account, body used: {sanitized_body}, error is {e}")
             failed = True
         
-        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {body}"
+        sanitized_body_for_assert = _sanitize_secrets_from_dict(body) if isinstance(body, dict) else body
+        assert failed == expect_failure, f"expected_failure is {expect_failure}, but failed is {failed}, body used: {sanitized_body_for_assert}"
 
         if not expect_failure:
-            assert account_guid is not None, f"guid not found in response, body used: {body}"
+            assert account_guid is not None, f"guid not found in response, body used: {sanitized_body_for_assert}"
             return account_guid
         
         return account_guid  # Returns None if failed, or GUID if it was created despite failure
@@ -498,8 +565,8 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         self.validate_compliance_frameworks(provider, cloud_account_guid, last_success_scan_id)
         control_hash = self.validate_compliance_controls(provider, last_success_scan_id, with_accepted_resources, with_jira)
         rule_hash = self.validate_compliance_rules(provider, last_success_scan_id, control_hash, with_accepted_resources, with_jira)
-        resource_hash ,resource_name = self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, with_accepted_resources, with_jira)
-        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_name, with_accepted_resources, with_jira)
+        resource_hash ,_ = self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, with_accepted_resources, with_jira)
+        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_hash, with_accepted_resources, with_jira)
         self.validate_control_and_checks_under_resource(provider, last_success_scan_id, resource_hash, with_accepted_resources, with_jira)
 
         Logger.logger.info("Compliance account API data validation completed successfully")
@@ -700,14 +767,14 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
         return resource.cloudResourceHash, resource.cloudResourceName
 
-    def validate_resource_summaries_response(self, provider: str, last_success_scan_id : str, resource_name : str, with_accepted_resources : bool, with_jira : bool):
+    def validate_resource_summaries_response(self, provider: str, last_success_scan_id : str, resource_hash : str, with_accepted_resources : bool, with_jira : bool):
         body = {
             "pageSize": 100,
             "pageNum": 1,
             "innerFilters": [
                 {
                     "frameworkName": TEST_CONFIG_PROVIDER_MAP[provider]["framework"],
-                    "cloudResourceName": resource_name,
+                    "cloudResourceHash": resource_hash,
                     "reportGUID": last_success_scan_id
                 }
             ]
@@ -718,7 +785,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
         resources_resp = self.backend.get_cloud_compliance_resources(rule_hash=None,body=body)
         resources = [ComplianceResourceSummaries(**r) for r in resources_resp["response"]]
-        assert len(resources) == 1, f"Expected resources, got: {resources}"
+        assert len(resources) == 1, f"Expected resources amount: 1, got: {len(resources)} instead, response: {resources}"
         resource = resources[0]
 
         expected_response = get_expected_resource_summaries_response(provider, with_accepted_resources)
@@ -821,7 +888,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         self.validate_compliance_controls(provider, last_success_scan_id, False, True)
         self.validate_compliance_rules(provider, last_success_scan_id, control_hash, False, True)
         self.validate_compliance_resources_under_rule(provider, last_success_scan_id, rule_hash, False, True)
-        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_name, False, True)
+        self.validate_resource_summaries_response(provider, last_success_scan_id, resource_hash, False, True)
         self.validate_control_and_checks_under_resource(provider, last_success_scan_id, resource_hash, False, True)
 
         Logger.logger.info(f"Unlink Jira issue")
@@ -1010,7 +1077,7 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         assert len(incidents["response"]) == 0, f"expected no incidents but got {len(incidents['response'])}"
         return None
 
-    def validate_entity_status(self, entity_guid: str, status_path: str, expected_status: str, entity_type: str = "account"):
+    def validate_entity_status(self, entity_guid: str, status_path: str, expected_status: str, entity_type: CloudEntityTypes):
         """
         Generic function to validate status of accounts or organizations.
         
@@ -1018,14 +1085,14 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
             entity_guid: GUID of the account or organization
             status_path: JSON path to the status field (e.g., "cspmSpecificData.cspmStatus")
             expected_status: Expected status value
-            entity_type: Type of entity ("account" or "org")
+            entity_type: Type of entity (CloudEntityTypes.ACCOUNT or CloudEntityTypes.ORGANIZATION)
         """
-        if entity_type == "account":
+        if entity_type == CloudEntityTypes.ACCOUNT:
             entity = self.get_cloud_account_by_guid(entity_guid)
-        else:
+        elif entity_type == CloudEntityTypes.ORGANIZATION:
             entity = self.get_cloud_org_by_guid(entity_guid)
         
-        # Navigate through the status path
+        # Navigate through the status path on the json
         current = entity
         for key in status_path.split('.'):
             current = current[key]
@@ -1034,23 +1101,23 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
 
     def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
         """Validate account feature status."""
-        self.validate_entity_status(cloud_account_guid, f"features.{feature_name}.featureStatus", expected_status, "account")
+        self.validate_entity_status(cloud_account_guid, f"features.{feature_name}.featureStatus", expected_status, CloudEntityTypes.ACCOUNT)
 
     def validate_account_status(self, cloud_account_guid: str, expected_status: str):
         """Validate account CSPM status."""
-        self.validate_entity_status(cloud_account_guid, "cspmSpecificData.cspmStatus", expected_status, "account")
+        self.validate_entity_status(cloud_account_guid, "cspmSpecificData.cspmStatus", expected_status, CloudEntityTypes.ACCOUNT)
    
     def validate_org_status(self, org_guid: str, expected_status: str):
         """Validate organization CSPM status."""
-        self.validate_entity_status(org_guid, "cspmSpecificData.cspmStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, "cspmSpecificData.cspmStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_org_feature_status(self, org_guid: str, feature_name: str, expected_status: str):
         """Validate organization feature status."""
-        self.validate_entity_status(org_guid, f"features.{feature_name}.featureStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, f"features.{feature_name}.featureStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_admin_status(self, org_guid: str, expected_status: str):
         """Validate organization admin status."""
-        self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, "org")
+        self.validate_entity_status(org_guid, "orgScanData.featureStatus", expected_status, CloudEntityTypes.ORGANIZATION)
 
     def validate_account_feature_is_excluded(self, cloud_account_guid: str, feature_name: str, is_excluded: bool):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
@@ -1091,14 +1158,6 @@ class Accounts(base_test.BaseTest, AwsAccountsMixin, AzureAccountsMixin, GcpAcco
         }
         self.backend.update_org_exclude_accounts(body)
     
-    def validate_account_feature_status(self, cloud_account_guid: str, feature_name: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["features"][feature_name]["featureStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['features'][feature_name]['featureStatus']}"
-
-    def validate_account__cspm_status(self, cloud_account_guid: str, expected_status: str):
-        account = self.get_cloud_account_by_guid(cloud_account_guid)
-        assert account["cspmSpecificData"]["cspmStatus"] == expected_status, f"Expected status: {expected_status}, got: {account['cspmSpecificData']['cspmStatus']}"
-
     def validate_no_account(self,cloud_account_guid: str):
         body = self.build_get_cloud_entity_by_guid_request(cloud_account_guid)
         res = self.backend.get_cloud_accounts(body=body)

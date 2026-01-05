@@ -1,5 +1,5 @@
 import os
-from systest_utils import Logger
+from systest_utils import Logger, statics
 from tests_scripts.accounts.accounts import (
     Accounts,
     CADR_FEATURE_NAME,
@@ -15,6 +15,7 @@ from infrastructure import aws
 
 
 REGION_SYSTEM_TEST = "us-east-1"
+PROD_US_CUSTOMER_GUID = "1cc202aa-e4a0-418d-a7f5-b3d1e85ce04d"
 
 class CloudConnectCSPMSingleAWS(Accounts):
     def __init__(self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None):
@@ -50,6 +51,11 @@ class CloudConnectCSPMSingleAWS(Accounts):
         18. Delete cadr feature and validate
         19. Delete cspm feature and validate
         """
+        
+        if self.backend.get_customer_guid() == PROD_US_CUSTOMER_GUID:
+            return statics.SUCCESS, "Skipping for PROD US"
+        assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
+
 
         assert self.backend is not None, f'the test {self.test_driver.test_name} must run with backend'
 

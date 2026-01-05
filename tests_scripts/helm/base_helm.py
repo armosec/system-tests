@@ -164,6 +164,15 @@ class BaseHelm(BaseK8S):
 
         helm_kwargs.update({"operator.podScanGuardTime": "5s"})
 
+        # Remove flags that shouldn't be set for multi-prod environments
+        server = self.test_driver.backend_obj.get_api_url()
+        if server and "r7.armo-cadr.com" in server:
+            # These flags are not needed/supported for multi-prod environments
+            helm_kwargs.pop("alertCRD.installDefault", None)
+            helm_kwargs.pop("alertCRD.scopeClustered", None)
+            helm_kwargs.pop("nodeAgent.image.repository", None)
+            helm_kwargs.pop("nodeAgent.image.tag", None)
+
         create_namespace = True
         if self.docker_default_secret:
             self.create_namespace(unique_name=False, name=namespace)
@@ -252,9 +261,18 @@ class BaseHelm(BaseK8S):
         HelmWrapper.add_armo_to_repo()
         HelmWrapper.upgrade_armo_in_repo()
 
-    @staticmethod
-    def uninstall_kubescape_chart():
-        HelmWrapper.uninstall_kubescape_chart()
+    def uninstall_kubescape_chart(self):
+        # Determine release name based on environment
+        # For multi-prod environments, use 'rapid7', otherwise use default 'kubescape'
+        release_name = statics.CA_HELM_NAME  # default
+        if self.backend and hasattr(self.backend, 'get_api_url'):
+            try:
+                server = self.backend.get_api_url()
+                if server and "r7.armo-cadr.com" in server:
+                    release_name = "rapid7"
+            except:
+                pass  # If we can't get server URL, use default
+        HelmWrapper.uninstall_kubescape_chart(release_name=release_name)
 
     @staticmethod
     def remove_armo_from_repo():

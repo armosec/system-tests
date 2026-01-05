@@ -186,8 +186,8 @@ class RuntimeTests(object):
                 "alert_profiles": [
                     {
                         "name": "unexpected_syscall_high_load",
-                        "rate_per_minute": 500,
-                        "worker_count": 2,
+                        "rate_per_minute": 1700,  # 1,700/min × 2 workers = 3,400/min
+                        "worker_count": 10,
                         "alert_name": "Unexpected system call",
                         "rule_id": "R0003",
                         "severity": 1,
@@ -196,8 +196,8 @@ class RuntimeTests(object):
                     },
                     {
                         "name": "file_operations_load",
-                        "rate_per_minute": 400,
-                        "worker_count": 2,
+                        "rate_per_minute": 1300,  # 1,300/min × 2 workers = 2,600/min
+                        "worker_count": 10,
                         "alert_name": "Malicious file detected",
                         "rule_id": "R1001",
                         "severity": 3,
@@ -206,8 +206,8 @@ class RuntimeTests(object):
                     },
                     {
                         "name": "network_activity_load",
-                        "rate_per_minute": 600,
-                        "worker_count": 2,
+                        "rate_per_minute": 2000,  # 2,000/min × 2 workers = 4,000/min
+                        "worker_count": 10,
                         "alert_name": "Suspicious network activity",
                         "rule_id": "R2001",
                         "severity": 2,

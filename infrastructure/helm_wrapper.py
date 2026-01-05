@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from systest_utils import TestUtil, statics, Logger
 import yaml
@@ -20,52 +21,133 @@ class HelmWrapper(object):
             command_args=["helm", "repo", "add", "kubescape", "https://kubescape.github.io/helm-charts/"])
 
     @staticmethod
+    def add_armosec_to_repo():
+        TestUtil.run_command(
+            command_args=["helm", "repo", "add", "armosec", "https://armosec.github.io/helm-charts/"])
+
+    @staticmethod
     def upgrade_armo_in_repo():
         TestUtil.run_command(command_args=["helm", "repo", "update", "kubescape"])
         # os.system("helm repo update armo")
 
     @staticmethod
+    def upgrade_armosec_in_repo():
+        TestUtil.run_command(command_args=["helm", "repo", "update", "armosec"])
+
+    @staticmethod
+    def is_multi_prod_environment(server: str) -> bool:
+        """
+        Check if the environment is a multi-prod environment based on server URL.
+        Multi-prod environments have URLs containing: r7.armo-cadr.com
+        """
+        if not server:
+            return False
+        return "r7.armo-cadr.com" in server
+
+    @staticmethod
+    def get_current_kubectl_context() -> str:
+        """
+        Get the current kubectl context name.
+        """
+        return_code, return_obj = TestUtil.run_command(
+            command_args=["kubectl", "config", "current-context"],
+            display_stdout=False
+        )
+        if return_code != 0:
+            Logger.logger.warning("Failed to get kubectl current context, using cluster_name as fallback")
+            return ""
+        context = return_obj.stdout.decode("utf-8").strip()
+        return context
+
+    @staticmethod
     def install_armo_helm_chart(customer: str, access_key: str, server: str, cluster_name: str,
                                 repo: str = statics.HELM_REPO, namespace: str = statics.CA_NAMESPACE_FROM_HELM_NAME,
                                 create_namespace: bool = True,
-                                helm_kwargs: dict = {}, use_offline_db: bool = True):
-        command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,
-                        "--set", "account={x}".format(x=customer),
-                        "--set", "server={x}".format(x=server),
-                        "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
+                                helm_kwargs: dict = {}, use_offline_db: bool = True, temp_dir: str = None, helm_branch: str = None):
+        # Check if this is a multi-prod environment
+        is_multi_prod = HelmWrapper.is_multi_prod_environment(server)
+        
+        if is_multi_prod:
+            # For multi-prod environments, use armosec Helm repo and rapid7-operator chart
+            Logger.logger.info("Detected multi-prod environment, using armosec/rapid7-operator chart")
+            
+            # Add and update armosec repo
+            HelmWrapper.add_armosec_to_repo()
+            HelmWrapper.upgrade_armosec_in_repo()
+            
+            # Get current kubectl context for cluster name
+            current_context = HelmWrapper.get_current_kubectl_context()
+            if not current_context:
+                current_context = cluster_name
+                Logger.logger.warning(f"Could not get kubectl current-context, using cluster_name: {cluster_name}")
+            else:
+                Logger.logger.info(f"Using kubectl current-context as cluster name: {current_context}")
+            
+            # Get imagePullSecret.password from environment variable
+            image_pull_secret_password = os.environ.get("NA_IMAGE_PULL_SECRET_PASSWORD", "")
+            if not image_pull_secret_password:
+                Logger.logger.warning("NA_IMAGE_PULL_SECRET_PASSWORD environment variable not set")
+            
+            # Build command for multi-prod using armosec/rapid7-operator from Helm repo
+            command_args = ["helm", "upgrade", "--debug", "--install", "rapid7", "armosec/rapid7-operator", "-n", namespace,
+                            "--set", "kubescape-operator.clusterName={}".format(current_context),
+                            "--set", "kubescape-operator.account={}".format(customer),
+                            "--set", "kubescape-operator.server={}".format(server),
+                            "--set", "kubescape-operator.logger.level=debug"]
+            
+            if access_key != "":
+                command_args.extend(["--set", "kubescape-operator.accessKey={}".format(access_key)])
+            
+            if image_pull_secret_password:
+                command_args.extend(["--set", "kubescape-operator.imagePullSecret.password={}".format(image_pull_secret_password)])
+        else:
+            # Standard installation for non-multi-prod environments
+            command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,
+                            "--set", "account={x}".format(x=customer),
+                            "--set", "server={x}".format(x=server),
+                            "--set", "clusterName={}".format(cluster_name), "--set", "logger.level=debug"]
         if create_namespace:
             command_args.append("--create-namespace")
 
-        if access_key != "":
-            command_args.extend(["--set", "accessKey={x}".format(x=access_key)])
+        if not is_multi_prod:
+            # Standard parameters for non-multi-prod environments
+            if access_key != "":
+                command_args.extend(["--set", "accessKey={x}".format(x=access_key)])
 
-        # by default use offline vuln DB
-        if use_offline_db:
-            command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
+            # by default use offline vuln DB
+            if use_offline_db:
+                command_args.extend(["--set", f"{statics.HELM_OFFLINE_VULN_DB}=True"])
 
-        # disable security framework scan
-        # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
-        if os.environ.get("DISABLE_RELEVANCY") == "true":
-            command_args.extend(["--set", "capabilities.relevancy=disable"])
-        if os.environ.get("DISABLE_NODE_AGENT") == "true": 
-            command_args.extend(["--set", "capabilities.runtimeObservability=disable", 
-                                 "--set", "capabilities.relevancy=disable", 
-                                 "--set", "capabilities.networkPolicyService=disable"])
+            # disable security framework scan
+            # command_args.extend(["--set", "operator.triggerSecurityFramework=false"])
+            if os.environ.get("DISABLE_RELEVANCY") == "true":
+                command_args.extend(["--set", "capabilities.relevancy=disable"])
+            if os.environ.get("DISABLE_NODE_AGENT") == "true": 
+                command_args.extend(["--set", "capabilities.runtimeObservability=disable", 
+                                     "--set", "capabilities.relevancy=disable", 
+                                     "--set", "capabilities.networkPolicyService=disable"])
 
-        # reduce resources requests
-        command_args.extend(["--set", "kubescape.resources.requests.cpu=100m"])
-        command_args.extend(["--set", "kubescape.resources.requests.memory=200Mi"])
-        command_args.extend(["--set", "nodeAgent.resources.requests.cpu=50m"])
-        command_args.extend(["--set", "nodeAgent.resources.requests.memory=100Mi"])
-        command_args.extend(["--set", "kubevuln.resources.requests.cpu=100m"])
-        command_args.extend(["--set", "kubevuln.resources.requests.memory=500Mi"])
-        command_args.extend(["--set", "storage.resources.requests.cpu=50m"])
-        command_args.extend(["--set", "storage.resources.requests.memory=200Mi"])
-        command_args.extend(["--set", "synchronizer.resources.requests.cpu=50m"])
-        command_args.extend(["--set", "synchronizer.resources.requests.memory=150Mi"])
+            # reduce resources requests
+            command_args.extend(["--set", "kubescape.resources.requests.cpu=100m"])
+            command_args.extend(["--set", "kubescape.resources.requests.memory=200Mi"])
+            command_args.extend(["--set", "nodeAgent.resources.requests.cpu=50m"])
+            command_args.extend(["--set", "nodeAgent.resources.requests.memory=100Mi"])
+            command_args.extend(["--set", "kubevuln.resources.requests.cpu=100m"])
+            command_args.extend(["--set", "kubevuln.resources.requests.memory=500Mi"])
+            command_args.extend(["--set", "storage.resources.requests.cpu=50m"])
+            command_args.extend(["--set", "storage.resources.requests.memory=200Mi"])
+            command_args.extend(["--set", "synchronizer.resources.requests.cpu=50m"])
+            command_args.extend(["--set", "synchronizer.resources.requests.memory=150Mi"])
 
+        # Add any additional helm_kwargs
+        # For multi-prod, prefix with kubescape-operator. if not already prefixed
         for k, v in helm_kwargs.items():
-            command_args.extend(["--set", f"{k}={v}"])
+            if is_multi_prod and not k.startswith("kubescape-operator."):
+                # Prefix with kubescape-operator. for multi-prod environments
+                prefixed_key = f"kubescape-operator.{k}"
+                command_args.extend(["--set", f"{prefixed_key}={v}"])
+            else:
+                command_args.extend(["--set", f"{k}={v}"])
 
         return_code, return_obj = TestUtil.run_command(command_args=command_args, timeout=360)
         assert return_code == 0, "return_code is {}\nreturn_obj\n stdout: {}\n stderror: {}".format(return_code,
@@ -73,9 +155,15 @@ class HelmWrapper(object):
                                                                                                     return_obj.stderr)
 
     @staticmethod
-    def uninstall_kubescape_chart():
+    def uninstall_kubescape_chart(release_name: str = None):
+        """
+        Uninstall the Helm chart.
+        For multi-prod environments, use release_name='rapid7', otherwise use default 'kubescape'.
+        """
+        if release_name is None:
+            release_name = statics.CA_HELM_NAME
         TestUtil.run_command(
-            command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", statics.CA_HELM_NAME])
+            command_args=["helm", "-n", statics.CA_NAMESPACE_FROM_HELM_NAME, "uninstall", release_name])
 
     @staticmethod
     def remove_armo_from_repo():
