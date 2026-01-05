@@ -849,8 +849,15 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
 
             Logger.logger.info("check if kubescape cronjob created in backend")
-            self.wait_for_report(timeout=30, report_type=self.backend.is_ks_cronjob_created_in_backend, cluster_name=cluster_name,
-                                 framework_name=framework_list[0])
+            # Backend cronjob list is eventually consistent (async propagation via backend services / cache),
+            # so allow multiple polls rather than a single ~30s attempt.
+            self.wait_for_report(
+                timeout=180,
+                sleep_interval=10,
+                report_type=self.backend.is_ks_cronjob_created_in_backend,
+                cluster_name=cluster_name,
+                framework_name=framework_list[0],
+            )
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")
             self.backend.is__backend_returning_only_ks_cronjob(
