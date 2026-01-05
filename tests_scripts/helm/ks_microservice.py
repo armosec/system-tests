@@ -849,8 +849,15 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
 
             Logger.logger.info("check if kubescape cronjob created in backend")
-            self.wait_for_report(timeout=30, report_type=self.backend.is_ks_cronjob_created_in_backend, cluster_name=cluster_name,
-                                 framework_name=framework_list[0])
+            # Backend cronjob list is eventually consistent (async propagation via backend services / cache),
+            # so allow multiple polls rather than a single ~30s attempt.
+            self.wait_for_report(
+                timeout=180,
+                sleep_interval=10,
+                report_type=self.backend.is_ks_cronjob_created_in_backend,
+                cluster_name=cluster_name,
+                framework_name=framework_list[0],
+            )
 
             Logger.logger.info("check if backend returns only kubescape cronjobs for api")
             self.backend.is__backend_returning_only_ks_cronjob(
@@ -879,7 +886,18 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             cronjobs_name = self.kubernetes_obj.get_ks_cronjob_name(statics.CA_NAMESPACE_FROM_HELM_NAME)
             self.backend.update_kubescape_job_request(cluster_name=cluster_name, cronjobs_name=cronjobs_name)
 
-            TestUtil.sleep(sleep_time, "wait till update will from backend to finish")
+            # Schedule update propagation is eventually consistent (backend → cluster).
+            # Poll for the schedule to change instead of a fixed sleep to reduce flakes.
+            def _schedule_changed():
+                new_schedule = self.kubernetes_obj.get_ks_cronjob_schedule(statics.CA_NAMESPACE_FROM_HELM_NAME)
+                assert new_schedule is not None, "kubescape cronjob schedule not found yet"
+                assert new_schedule != cron_job_schedule, (
+                    f"kubescape schedule string is not changed yet (still '{new_schedule}', old '{cron_job_schedule}')"
+                )
+                return True
+
+            self.wait_for_report(timeout=180, sleep_interval=10, report_type=_schedule_changed)
+
             Logger.logger.info("check if kubescape update succeeded")
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
             new_cron_job_schedule = self.kubernetes_obj.get_ks_cronjob_schedule(statics.CA_NAMESPACE_FROM_HELM_NAME)

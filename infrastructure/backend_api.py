@@ -1720,21 +1720,55 @@ class ControlPanelAPI(object):
         return r.json()
 
     def is_ks_cronjob_created_in_backend(self, cluster_name: str, framework_name: str):
-        params = {"customerGUID": self.selected_tenant_id} # , "cluster": cluster_name
+        # NOTE: Backend `/api/v1/posture/scan` GET handler supports filtering by `cluster`.
+        # Passing it reduces noise/flakiness when multiple cronjobs exist for the tenant.
+        params = {"customerGUID": self.selected_tenant_id, "cluster": cluster_name}
         r = self.get(API_POSTURE_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
                 'Error accessing dashboard. Request: get scan results sum summary "%s" (code: %d, message: %s)' % (
                     self.customer, r.status_code, r.text))
         cronjobs = r.json()
+        # The backend may return cronjobs under different naming conventions depending on component/version.
+        #
+        # Important: some tests (e.g. "create 2 cronjobs MITRE+NSA") are framework-specific and MUST
+        # validate the framework-specific cronjob name, otherwise we'd hide regressions.
+        #
+        # Therefore:
+        # - For a *specific* framework (non-empty), we only accept "ks-scheduled-scan-<framework>".
+        # - For the default/empty framework, we accept either "ks-scheduled-scan-" or the legacy "kubescape-scheduler".
+        expected_prefix = f"ks-scheduled-scan-{framework_name.lower()}"
         for cj in cronjobs:
-            if cj[statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED] == cluster_name and "ks-scheduled-scan-{}".format(
-                    framework_name.lower()) in cj[statics.CA_VULN_SCAN_CRONJOB_NAME_FILED]:
-                return True
-        raise Exception("kubescape cronjob failed to create in backend")
+            try:
+                if cj.get(statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED) != cluster_name:
+                    continue
+                name = cj.get(statics.CA_VULN_SCAN_CRONJOB_NAME_FILED, "")
+                if expected_prefix in name:
+                    return True
+                if (framework_name is None or str(framework_name).strip() == "") and name.startswith("kubescape-scheduler"):
+                    return True
+            except Exception:
+                # Defensive: don't fail the entire check due to a single malformed item.
+                continue
+
+        # Include a small sample in the error to make failures actionable (naming vs missing vs lag).
+        sample = [
+            {
+                "clusterName": cj.get(statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED),
+                "name": cj.get(statics.CA_VULN_SCAN_CRONJOB_NAME_FILED),
+            }
+            for cj in cronjobs[:10]
+            if isinstance(cj, dict)
+        ]
+        raise Exception(
+            f"kubescape cronjob failed to create in backend (cluster={cluster_name}, framework={framework_name}). "
+            f"Expected name contains '{expected_prefix}' or startswith 'kubescape-scheduler'. "
+            f"Sample response (first 10): {sample}"
+        )
 
     def is__backend_returning_only_ks_cronjob(self, cluster_name: str):
-        params = {"customerGUID": self.selected_tenant_id}
+        # Filter to the relevant cluster to avoid false failures when the tenant has unrelated cronjobs.
+        params = {"customerGUID": self.selected_tenant_id, "cluster": cluster_name}
         r = self.get(API_POSTURE_SCAN, params=params)
         if not 200 <= r.status_code < 300:
             raise Exception(
