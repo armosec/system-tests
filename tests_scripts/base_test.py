@@ -304,6 +304,19 @@ class BaseTest(object):
         :param **kwargs: Parameters needed for the input function.
         :return: Result of input function - Time passed since the first run.
         """
+        def _callable_name(fn) -> str:
+            """
+            report_type can be either:
+            - a plain function (has __name__)
+            - a bound method (has __func__.__name__)
+            This helper makes logging robust for both cases.
+            """
+            try:
+                return getattr(getattr(fn, "__func__", fn), "__name__", fn.__class__.__name__)
+            except Exception:
+                return str(fn)
+
+        report_name = _callable_name(report_type)
         start = time.time()
         err = ""
         while True:
@@ -314,13 +327,13 @@ class BaseTest(object):
                 if str(e).find("502 Bad Gateway") > 0:
                     raise e
                 err = e
-                Logger.logger.warning(f"{report_type.__func__.__name__}, error: '{e}', kwargs: '{kwargs}'")
+                Logger.logger.warning(f"{report_name}, error: '{e}', kwargs: '{kwargs}'")
             if time.time() - start < timeout:
                 time.sleep(sleep_interval)
             else:
                 break
         raise Exception(
-            f"{report_type.__func__.__name__}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
+            f"{report_name}, timeout: {timeout // 60} minutes, error: {err}. kwargs: '{kwargs}'")
 
     def _emergency_cleanup(self):
         """Emergency cleanup called from destructor as last resort"""
