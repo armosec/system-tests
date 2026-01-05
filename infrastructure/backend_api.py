@@ -1730,16 +1730,22 @@ class ControlPanelAPI(object):
                     self.customer, r.status_code, r.text))
         cronjobs = r.json()
         # The backend may return cronjobs under different naming conventions depending on component/version.
-        # We accept both:
-        # - "ks-scheduled-scan-<framework>"
-        # - "kubescape-scheduler"
+        #
+        # Important: some tests (e.g. "create 2 cronjobs MITRE+NSA") are framework-specific and MUST
+        # validate the framework-specific cronjob name, otherwise we'd hide regressions.
+        #
+        # Therefore:
+        # - For a *specific* framework (non-empty), we only accept "ks-scheduled-scan-<framework>".
+        # - For the default/empty framework, we accept either "ks-scheduled-scan-" or the legacy "kubescape-scheduler".
         expected_prefix = f"ks-scheduled-scan-{framework_name.lower()}"
         for cj in cronjobs:
             try:
                 if cj.get(statics.CA_VULN_SCAN_CRONJOB_CLUSTER_NAME_FILED) != cluster_name:
                     continue
                 name = cj.get(statics.CA_VULN_SCAN_CRONJOB_NAME_FILED, "")
-                if expected_prefix in name or name.startswith("kubescape-scheduler"):
+                if expected_prefix in name:
+                    return True
+                if (framework_name is None or str(framework_name).strip() == "") and name.startswith("kubescape-scheduler"):
                     return True
             except Exception:
                 # Defensive: don't fail the entire check due to a single malformed item.
