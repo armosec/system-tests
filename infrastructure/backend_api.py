@@ -757,10 +757,15 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
-    def get_alerts_of_incident(self, incident_id: str):
+    def get_alerts_of_incident(self, incident_id: str, request: Dict = None):
         url = API_RUNTIME_INCIDENTS + "/" + incident_id + "/alerts/list"
-        r = self.post(url, params={"customerGUID": self.selected_tenant_id},
-                      json={"pageNumber": 1, "pageSize": 100, "orderBy": "timestamp:asc"})
+        # NOTE: This endpoint expects an armotypes.V2ListRequest-like payload.
+        # We keep backwards-compatible defaults and allow callers to pass additional filters
+        # (e.g. ruleID/time window) for better isolation between tests sharing a tenant.
+        payload = {"pageNum": 1, "pageSize": 100, "orderBy": "timestamp:asc"}
+        if request:
+            payload.update(request)
+        r = self.post(url, params={"customerGUID": self.selected_tenant_id}, json=payload)
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         # TODO: get them all
         return r.json()

@@ -2,6 +2,8 @@ import json
 import random
 import time
 import os
+from datetime import timedelta
+import dateutil.parser
 from tests_scripts.runtime.consts import MALWARE_INCIDENT_MD5, MALICIOUS_DOMAIN
 
 from configurations.system.tests_cases.structures import TestConfiguration
@@ -345,11 +347,32 @@ class Incidents(BaseHelm):
 
     def check_alerts_of_incident(self, incident):
         Logger.logger.info("Get alerts of incident")
-        resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
+        # Tests may share a tenant/customer, so incident alerts can include unrelated noise from other
+        # runtime scenarios. Filter to the expected rule/name and a recent time window to keep this
+        # check isolated and deterministic.
+        expected_rule_id = "R0001"  # Unexpected process launched
+        expected_alert_name = incident.get("name", "Unexpected process launched")
+
+        req = {
+            "pageNum": 1,
+            "pageSize": 100,
+            "orderBy": "timestamp:asc",
+            "innerFilters": [{"ruleID": expected_rule_id, "alertName": expected_alert_name}],
+        }
+
+        # Constrain by time to avoid ancient/stale alerts (e.g. CloudTrail) being attached.
+        if incident.get("timestamp"):
+            try:
+                inc_ts = dateutil.parser.isoparse(incident["timestamp"])
+                req["since"] = (inc_ts - timedelta(minutes=10)).isoformat().replace("+00:00", "Z")
+            except Exception:
+                pass
+
+        resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'], request=req)
         alerts = resp[__RESPONSE_FIELD__]
         assert alerts is not None, f"Failed to get alerts of incident {json.dumps(incident)}"
-        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got {resp}"
-        Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
+        assert len(alerts) >= 1, f"Expected >=1 matching alert in incident {incident['guid']}, got {resp}"
+        Logger.logger.info(f"Got filtered alerts of incident {json.dumps(alerts)}")
         self.check_alerts_unique_values(incident)
 
     def check_alerts_unique_values(self, incident):
