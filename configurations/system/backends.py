@@ -11,7 +11,8 @@ class Backend(object):
                  auth_url: str = None,
                  event_receiver_server: str = None,
                  tls_verify: bool = True,
-                 login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None):
+                 login_method = LOGIN_METHOD_KEYCLOAK, customer_guid: str = None, 
+                 is_storage_backend: bool = False):
         self.name = name
         self.dashboard = dashboard
         self.auth_url = auth_url
@@ -20,6 +21,7 @@ class Backend(object):
         self.customer_guid = customer_guid
         self.api_url = api_url
         self.event_receiver_server = event_receiver_server
+        self.is_storage_backend = is_storage_backend
 
     def get_dashboard_url(self):
         return self.dashboard
@@ -44,6 +46,9 @@ class Backend(object):
     
     def get_event_receiver_server(self):
         return self.event_receiver_server
+
+    def is_storage_backend(self):
+        return self.is_storage_backend
 
 
 def set_backends():
@@ -94,7 +99,8 @@ def set_backends():
                             auth_url='https://auth.r7.armo-cadr.com',
                             event_receiver_server="https://cloud-report.stage-us-east-1.r7.armo-cadr.com",
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET,
+                            is_storage_backend=True))
 
     # armo-prod-us-east-1 frontEgg 
     backends.append(Backend(name='armo-prod-us-east-1',
@@ -103,7 +109,8 @@ def set_backends():
                             auth_url='https://auth.r7.armo-cadr.com',
                             event_receiver_server="https://cloud-report.us-east-1.r7.armo-cadr.com",
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET,
+                            is_storage_backend=True))
 
     # armo-prod-eu-central-1 frontEgg 
     backends.append(Backend(name='armo-prod-eu-central-1',
@@ -112,7 +119,8 @@ def set_backends():
                             auth_url='https://auth.r7.armo-cadr.com',
                             event_receiver_server="https://cloud-report.eu-central-1.r7.armo-cadr.com",
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET,
+                            is_storage_backend=True))
 
     # armo-prod-ap-southeast-2 frontEgg 
     backends.append(Backend(name='armo-prod-ap-southeast-2',
@@ -121,7 +129,8 @@ def set_backends():
                             auth_url='https://auth.r7.armo-cadr.com',
                             event_receiver_server="https://cloud-report.ap-southeast-2.r7.armo-cadr.com",
                             tls_verify=False,
-                            login_method=LOGIN_METHOD_FRONTEGG_SECRET))
+                            login_method=LOGIN_METHOD_FRONTEGG_SECRET,
+                            is_storage_backend=True))
 
 
     # # development
