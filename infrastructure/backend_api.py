@@ -3965,7 +3965,6 @@ class ControlPanelAPI(object):
                 {
                     "cluster": cluster,
                     "kind": "applicationprofile|&ignorecase",
-                    "relatedKind": "Deployment|&ignorecase",
                     "relatedNamespace": namespace,
                 }
             ]
