@@ -104,8 +104,6 @@ class Incidents(BaseHelm):
 
     def start(self):
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
-
-        self.is_rapid7_env = "r7.armo-cadr.com" in self.backend.server
         
         cluster, namespace = self.setup()
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
@@ -130,15 +128,13 @@ class Incidents(BaseHelm):
         self.create_application_profile(wlids=wlids, namespace=namespace, commands=["wget --help", "more /etc/passwd"])
         self.exec_pod(wlid=wlids[0], command="cat /etc/hosts")
         time.sleep(1)
-        if not self.is_rapid7_env:
-            self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
+        self.exec_pod(wlid=wlids[0], command="more /root/malware.o")
         time.sleep(1)
         self.exec_pod(wlid=wlids[0], command="wget sodiumlaurethsulfatedesyroyer.com")
         time.sleep(160)
         self._test_unexpected_process(cluster=cluster, namespace=namespace, expected_incident_name="Unexpected process launched")
         # self._test_connection_to_malicious_destination(cluster=cluster, namespace=namespace, expected_incident_name="Connection To Malicious Destination")
-        if not self.is_rapid7_env:
-            self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
+        self._test_malware_found(cluster=cluster, namespace=namespace, expected_incident_name="Malware found")
         self.wait_for_report(self.verify_kdr_monitored_counters, sleep_interval=25, timeout=600, cluster=cluster)
         return self.cleanup()
         
@@ -352,8 +348,7 @@ class Incidents(BaseHelm):
         resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
         alerts = resp[__RESPONSE_FIELD__]
         assert alerts is not None, f"Failed to get alerts of incident {json.dumps(incident)}"
-        if not self.is_rapid7_env:
-            assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got len(alerts): {len(alerts)}, resp: {resp}"
+        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got len(alerts): {len(alerts)}, resp: {resp}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
         self.check_alerts_unique_values(incident)
 
