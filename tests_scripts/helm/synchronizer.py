@@ -235,12 +235,16 @@ class Synchronizer(BaseSynchronizer):
         """
         Test plan:
         1. Install helm-chart
-        1. Apply workloads
-        4. Check all workloads are reported
+        2. Apply workloads for main test (deployment, replicaset, statefulset, daemonset)
+        3. Apply workloads for race condition test
+        4. Check all workloads are reported in backend
         5. Restart workloads
-        6. Check all workloads have new resourceVersion
-        7. Delete WLs
-        8. Check WLs are deleted
+        6. Check all workloads have new resourceVersion in backend
+        7. Check race condition test resources created in backend
+        8. Update env var 300 times to simulate multiple changes in deployment (race condition)
+        9. Check backend has last resource version after race condition
+        10. Delete workloads
+        11. Check workloads are deleted from backend
         """
         cluster, namespace = self.setup(apply_services=False)
 
