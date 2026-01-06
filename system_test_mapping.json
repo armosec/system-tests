@@ -833,64 +833,17 @@
   },
   "synchronizer_proxy": {
     "target": [
-      "In cluster",
-      "Backend"
+      "In cluster"
     ],
     "target_repositories": [
       "helm-chart",
       "node-agent",
       "storage",
-      "cadashboardbe",
-      "event-ingester-service",
       "synchronizer"
     ],
     "description": "Checks synchronizer proxy and disconnection",
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/helm/base_helm.py",
-      "tests_scripts/helm/synchronizer.py",
-      "tests_scripts/kubernetes/base_k8s.py"
-    ]
-  },
-  "synchronizer_race_condition": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "helm-chart",
-      "node-agent",
-      "storage",
-      "cadashboardbe",
-      "event-ingester-service",
-      "synchronizer"
-    ],
-    "description": "Checks synchronizer race condition (multiple updates)",
-    "skip_on_environment": "",
-    "owner": "amirm@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/helm/base_helm.py",
-      "tests_scripts/helm/synchronizer.py",
-      "tests_scripts/kubernetes/base_k8s.py"
-    ]
-  },
-  "synchronizer_kubescape_crds": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "helm-chart-dummy",
-      "node-agent-dummy",
-      "storage-dummy",
-      "cadashboardbe-dummy",
-      "event-ingester-service-dummy",
-      "synchronizer-dummy"
-    ],
-    "description": "Checks synchronizer - kubescape CRDs",
-    "skip_on_environment": "",
-    "owner": "matthiasb@armosec.io",
     "test_implementation_files": [
       "tests_scripts/helm/base_helm.py",
       "tests_scripts/helm/synchronizer.py",
