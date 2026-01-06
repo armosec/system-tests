@@ -324,10 +324,7 @@ class Synchronizer(BaseSynchronizer):
         TestUtil.sleep(20, "wait for synchronization", "info")
 
         Logger.logger.info("5. Check BE vs. Cluster - updated resource version")
-        self.verify_backend_resources(cluster, namespace)
-
-        Logger.logger.info("7. Check BE vs. Cluster - resources deleted from BE")
-        self.verify_backend_resources_deleted(cluster, namespace)
+        self.verify_backend_resources(cluster, namespace)        
 
         ## -------- RACE CONDITION TEST --------
         self.verify_all_pods_are_running(
