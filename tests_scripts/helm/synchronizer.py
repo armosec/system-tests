@@ -283,17 +283,41 @@ class Synchronizer(BaseSynchronizer):
             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
         )
 
-        Logger.logger.info(f'2. Apply workloads (namespace="{namespace}")')
-        workload_objs: list = self.apply_directory(
-            path=self.test_obj["workloads"], namespace=namespace
-        )
+        namespace_crds = self.create_namespace()
+        Logger.logger.info(f"2. Create CRDs (namespace="{namespace_crds}")")
+        crd_resources = self.apply_directory(path=self.test_obj["crds"], namespace=namespace_crds)
+        assert len(crd_resources) > 0, "no resources created"
+
+        # Load all workloads files
+        deployment_yaml_file = self.test_obj["deployment"]
+        replicaset_yaml_file = self.test_obj["replicaset"]
+        statefulset_yaml_file = self.test_obj["statefulset"]
+        daemonset_yaml_file = self.test_obj["daemonset"]
+
+        # Apply all workloads for main test
+        Logger.logger.info(f'2. Apply workloads for main test (namespace="{namespace}")')
+        deployment_obj = self.apply_yaml_file(yaml_file=deployment_yaml_file, namespace=namespace)
+        replicaset_obj = self.apply_yaml_file(yaml_file=replicaset_yaml_file, namespace=namespace)
+        statefulset_obj = self.apply_yaml_file(yaml_file=statefulset_yaml_file, namespace=namespace)
+        daemonset_obj = self.apply_yaml_file(yaml_file=daemonset_yaml_file, namespace=namespace)
+
+        # Create namespace and apply workload for race condition test
+        namespace_race = self.create_namespace()
+        Logger.logger.info(f'3. Apply workloads for race condition test (namespace="{namespace_race}")')
+        deployment_obj_race = self.apply_yaml_file(yaml_file=deployment_yaml_file, namespace=namespace_race)
+
         self.verify_all_pods_are_running(
-            namespace=namespace, workload=workload_objs, timeout=180
+            namespace=namespace, workload=[deployment_obj, replicaset_obj, statefulset_obj, daemonset_obj], timeout=180
         )
+
         TestUtil.sleep(20, "wait for synchronization", "info")
 
         Logger.logger.info("3. Check BE vs. Cluster - updated resource version")
         self.verify_backend_resources(cluster, namespace)
+
+        Logger.logger.info("4. Check BE vs. Cluster - CRDs created in BE")
+        self.verify_backend_resources(cluster, namespace_crds, list_func=self.get_all_namespaced_kubescape_crds)
+        self.verify_backend_resources(cluster, "", list_func=self.get_all_non_namespaced_kubescape_crds)
 
         Logger.logger.info("4. Restart workloads")
         self.restart_all_workloads(namespace)
@@ -302,116 +326,38 @@ class Synchronizer(BaseSynchronizer):
         Logger.logger.info("5. Check BE vs. Cluster - updated resource version")
         self.verify_backend_resources(cluster, namespace)
 
-        Logger.logger.info("6. Delete all workloads in namespace")
-        self.delete_all_workloads(namespace)
-        TestUtil.sleep(20, "wait for synchronization", "info")
-
         Logger.logger.info("7. Check BE vs. Cluster - resources deleted from BE")
         self.verify_backend_resources_deleted(cluster, namespace)
 
-        return self.cleanup()
-
-
-class SynchronizerReconciliation(BaseSynchronizer):
-    def __init__(
-        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
-    ):
-        super(SynchronizerReconciliation, self).__init__(
-            test_driver=test_driver,
-            test_obj=test_obj,
-            backend=backend,
-            kubernetes_obj=kubernetes_obj,
-        )
-
-    def start(self):
-        """
-        Test plan:
-        1. Apply workloads
-        2. Install Kubescape helm chart
-        3. Check all workloads are reported
-        4. Scale down synchronizer
-        5. Restart workload 1 (modify)
-        6. Delete workload 2 (delete)
-        7. Scale up synchronizer
-        8. Check workload 1 have new resource version
-        9. Check workload 2 is deleted
-
-        """
-        if self.backend.server == "https://api.armosec.io": # skip test for production
-            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
-            return statics.SUCCESS, ""
-
-        cluster, namespace_1 = self.setup(apply_services=False)
-
-        helm_kwargs = self.test_obj.get_arg("helm_kwargs")
-
-        # This test will fail if the synchronizer (BE) is configured with a greater interval than the test.
-        # Make sure that the BE is aligned with test config.
-        # See: https://github.com/kubescape/synchronizer/blob/main/config/config.go#L61
-        reconciliation_interval_minutes = self.test_obj.get_arg(
-            "reconciliation_interval_minutes"
-        )
-        Logger.logger.info(
-            f"Testing synchronizer reconciliation flow with interval of {reconciliation_interval_minutes} minutes"
-        )
-
-        Logger.logger.info(f"1. Apply workloads")
-        workload_1 = self.apply_yaml_file(
-            yaml_file=self.test_obj["workload_1"], namespace=namespace_1
-        )
+        ## -------- RACE CONDITION TEST --------
         self.verify_all_pods_are_running(
-            namespace=namespace_1, workload=workload_1, timeout=180
+            namespace=namespace_race, workload=[deployment_obj_race], timeout=180
         )
-
-        namespace_2 = self.create_namespace()
-        workload_2 = self.apply_yaml_file(
-            yaml_file=self.test_obj["workload_2"], namespace=namespace_2
-        )
-        self.verify_all_pods_are_running(
-            namespace=namespace_2, workload=workload_2, timeout=180
-        )
-
-        Logger.logger.info("2. Install Helm Chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(
-            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
-        )
-        TestUtil.sleep(20, "wait for synchronization", "info")
 
         Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
-        self.verify_backend_resources(cluster, namespace_1)
-        self.verify_backend_resources(cluster, namespace_2)
+        self.verify_backend_resources(cluster, namespace_race)
 
-        Logger.logger.info("4. Scale down synchronizer")
-        self.scale_down_synchronizer(statics.CA_NAMESPACE_FROM_HELM_NAME)
-        TestUtil.sleep(10)
+        ## Race condition
+        Logger.logger.info("8. Update env var 300 times to simulate multiple changes in deployment")
+        for i in range(300):
+            self.kubernetes_obj.update_env(namespace_race, deployment_obj_race['metadata']['name'], {"TEST_ENV": f"test_env_{i}"}, deployment_obj_race['kind'])
+        TestUtil.sleep(20, "wait for synchronization")
 
-        Logger.logger.info("5. Restart workload 1")
-        self.restart_all_workloads(namespace=namespace_1)
+        Logger.logger.info("5. Check BE vs. Cluster - last resource version")
+        self.verify_backend_resources(cluster, namespace_race)
 
-        Logger.logger.info("6. Delete workload 2")
-        self.delete_all_workloads(namespace=namespace_2)
-        TestUtil.sleep(10)
+        Logger.logger.info("4. Delete CRDs")
+        self.delete_all_crds(namespace_crds)
+        self.delete_all_workloads(namespace)
+        self.delete_all_workloads(namespace_race)
 
-        Logger.logger.info("7. Scale up synchronizer")
-        self.scale_up_synchronizer(statics.CA_NAMESPACE_FROM_HELM_NAME)
+        TestUtil.sleep(20, "wait for synchronization", "info")
 
-        Logger.logger.info("8. Check BE vs. Cluster - waiting for reconciliation")
-        self.verify_backend_resources(
-            cluster,
-            namespace_1,
-            iterations=reconciliation_interval_minutes,
-            sleep_time=60,
-        )  # every 60 seconds X times (=interval)
-
-        Logger.logger.info("7. Check BE vs. Cluster - resources deleted from BE")
-        self.verify_backend_resources_deleted(
-            cluster,
-            namespace_2,
-            iterations=reconciliation_interval_minutes,
-            sleep_time=60,
-        )
+        Logger.logger.info("5. Check BE vs. Cluster - resources deleted in BE")
+        self.verify_backend_resources_deleted(cluster, namespace_crds)  # namespaced crds
+        self.verify_backend_resources_deleted(cluster, namespace)       # workloads
+        self.verify_backend_resources_deleted(cluster, namespace_race)  # race condition
+        self.verify_backend_resources_deleted(cluster, "")              # non-namespaced crds
 
         return self.cleanup()
 
@@ -491,103 +437,5 @@ class SynchronizerProxy(BaseSynchronizer):
 
         Logger.logger.info("9. Check BE vs. Cluster - resources deleted from BE")
         self.verify_backend_resources_deleted(cluster, namespace_2, iterations=20, sleep_time=30)
-
-        return self.cleanup()
-
-
-class SynchronizerRaceCondition(BaseSynchronizer):
-    def __init__(
-        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
-    ):
-        super(SynchronizerRaceCondition, self).__init__(
-            test_driver=test_driver,
-            test_obj=test_obj,
-            backend=backend,
-            kubernetes_obj=kubernetes_obj,
-        )
-
-    def start(self):
-        """
-        Test plan:
-        1. Apply workload
-        2. Install Helm chart
-        3. Check workload is reported
-        4. Update env var in a loop
-        5. Check workload is reported
-        """
-        assert (
-            self.backend != None
-        ), f"the test {self.test_driver.test_name} must run with backend"
-
-        cluster, namespace = self.setup(apply_services=False)
-
-        Logger.logger.info(f"1. Apply workload")
-        workload = self.apply_yaml_file(yaml_file=self.test_obj["workload"], namespace=namespace)
-        self.verify_all_pods_are_running(namespace=namespace, workload=workload, timeout=180)
-
-        Logger.logger.info("2. Install Helm Chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-        TestUtil.sleep(20, "wait for synchronization")
-
-        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
-        self.verify_backend_resources(cluster, namespace)
-
-        Logger.logger.info("4. Update env var 300 times to simulate multiple changes")
-        for i in range(300):
-            self.kubernetes_obj.update_env(namespace, workload['metadata']['name'], {"TEST_ENV": f"test_env_{i}"}, workload['kind'])
-        TestUtil.sleep(20, "wait for synchronization")
-
-        Logger.logger.info("5. Check BE vs. Cluster - last resource version")
-        self.verify_backend_resources(cluster, namespace)
-
-        return self.cleanup()
-
-
-class SynchronizerKubescapeCRDs(BaseSynchronizer):
-    def __init__(
-        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
-    ):
-        super(SynchronizerKubescapeCRDs, self).__init__(
-            test_driver=test_driver,
-            test_obj=test_obj,
-            backend=backend,
-            kubernetes_obj=kubernetes_obj,
-        )
-
-    def start(self):
-        """
-        Test plan:
-        1. Install Helm chart
-        2. Create CRDs
-        3. Check CRDs are reported
-        4. Delete CRDs
-        5. Check CRDs are deleted
-        """
-
-        cluster, namespace = self.setup(apply_services=False)
-
-        Logger.logger.info("1. Install Helm Chart")
-        self.add_and_upgrade_armo_to_repo()
-        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
-        self.verify_running_pods(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360)
-
-        Logger.logger.info(f"2. Create CRDs")
-        resources = self.apply_directory(path=self.test_obj["crds"], namespace=namespace)
-        assert len(resources) > 0, "no resources created"
-
-        TestUtil.sleep(20, "wait for synchronization")
-
-        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
-        self.verify_backend_resources(cluster, namespace, list_func=self.get_all_namespaced_kubescape_crds)
-        self.verify_backend_resources(cluster, "", list_func=self.get_all_non_namespaced_kubescape_crds)
-
-        Logger.logger.info("4. Delete CRDs")
-        self.delete_all_crds(namespace)
-
-        Logger.logger.info("5. Check BE vs. Cluster - resources deleted in BE")
-        self.verify_backend_resources_deleted(cluster, namespace) # namespaced crds
-        self.verify_backend_resources_deleted(cluster, "")        # non-namespaced crds
 
         return self.cleanup()
