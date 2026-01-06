@@ -9,6 +9,7 @@ class SynchronizerTests(object):
     @staticmethod
     def synchronizer():
         from tests_scripts.helm.synchronizer import Synchronizer
+        from os.path import join
 
         return TestConfiguration(
             name=inspect.currentframe().f_code.co_name,
