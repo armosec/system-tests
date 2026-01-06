@@ -3990,6 +3990,32 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error deleting %s SIEM integration. Customer: "%s" (code: %d, message: %s)' % (
                     provider, self.customer, r.status_code, r.text))
+    
+    def get_application_profiles(self, cluster: str, namespace: str) -> List:
+        url = API_KUBERNETES_RESOURCES
+        params = {"customerGUID": self.selected_tenant_id, "enrichObjects": "true"}
+        payload = {
+            "innerFilters": [
+                {
+                    "cluster": cluster,
+                    "kind": "applicationprofile|&ignorecase",
+                    "relatedNamespace": namespace,
+                }
+            ]
+        }
+        r = self.post(url, params=params, json=payload)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing application profiles. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        response_data = r.json()
+        response_list = response_data.get('response', [])
+        kubernetes_objects = []
+        for item in response_list:
+            kubernetes_obj = item.get('kubernetesResourceObject')
+            if kubernetes_obj is not None:
+                kubernetes_objects.append(kubernetes_obj)
+        return kubernetes_objects
 
 
 class Solution(object):

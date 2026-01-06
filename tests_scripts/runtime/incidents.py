@@ -104,7 +104,7 @@ class Incidents(BaseHelm):
 
     def start(self):
         assert self.backend is not None, f"the test {self.test_driver.test_name} must run with backend"
-
+        
         cluster, namespace = self.setup()
         Logger.logger.info("1. Install armo helm-chart before application so we will have final AP")
         self.add_and_upgrade_armo_to_repo()
@@ -234,7 +234,7 @@ class Incidents(BaseHelm):
             self.exec_pod(wlid=wlids[0], command=command)
         
         Logger.logger.info(f'workloads are running, waiting for application profile finalizing before exec into pod {wlids}')
-        self.wait_for_report(self.verify_application_profiles, wlids=wlids, namespace=namespace)
+        self.wait_for_report(self.verify_application_profiles, timeout=3 * 60, wlids=wlids, namespace=namespace)
         time.sleep(60) # wait for application profiles to be created in cache
 
     def deploy_and_wait(self, deployments_path: str, cluster: str, namespace: str) -> list:
@@ -348,7 +348,7 @@ class Incidents(BaseHelm):
         resp = self.backend.get_alerts_of_incident(incident_id=incident['guid'])
         alerts = resp[__RESPONSE_FIELD__]
         assert alerts is not None, f"Failed to get alerts of incident {json.dumps(incident)}"
-        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got {resp}"
+        assert len(alerts) == 1, f"Expected 1 alert in incident {incident['guid']}, got len(alerts): {len(alerts)}, resp: {resp}"
         Logger.logger.info(f"Got alerts of incident {json.dumps(alerts)}")
         self.check_alerts_unique_values(incident)
 
