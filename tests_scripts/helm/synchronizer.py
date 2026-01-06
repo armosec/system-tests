@@ -284,7 +284,7 @@ class Synchronizer(BaseSynchronizer):
         )
 
         namespace_crds = self.create_namespace()
-        Logger.logger.info(f"2. Create CRDs (namespace="{namespace_crds}")")
+        Logger.logger.info(f"2. Create CRDs (namespace='{namespace_crds}')")
         crd_resources = self.apply_directory(path=self.test_obj["crds"], namespace=namespace_crds)
         assert len(crd_resources) > 0, "no resources created"
 
