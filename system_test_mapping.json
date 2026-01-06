@@ -833,15 +833,12 @@
   },
   "synchronizer_proxy": {
     "target": [
-      "In cluster",
-      "Backend"
+      "In cluster"
     ],
     "target_repositories": [
       "helm-chart",
       "node-agent",
       "storage",
-      "cadashboardbe",
-      "event-ingester-service",
       "synchronizer"
     ],
     "description": "Checks synchronizer proxy and disconnection",

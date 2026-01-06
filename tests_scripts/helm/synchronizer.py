@@ -275,14 +275,14 @@ class Synchronizer(BaseSynchronizer):
 
         TestUtil.sleep(20, "wait for synchronization", "info")
 
-        Logger.logger.info("3. Check BE vs. Cluster - updated resource version")
+        Logger.logger.info("4. Check BE vs. Cluster - updated resource version")
         self.verify_backend_resources(cluster, namespace)
 
-        Logger.logger.info("4. Restart workloads")
+        Logger.logger.info("5. Restart workloads")
         self.restart_all_workloads(namespace)
         TestUtil.sleep(20, "wait for synchronization", "info")
 
-        Logger.logger.info("5. Check BE vs. Cluster - updated resource version")
+        Logger.logger.info("6. Check BE vs. Cluster - updated resource version")
         self.verify_backend_resources(cluster, namespace)        
 
         ## -------- RACE CONDITION TEST --------
@@ -290,7 +290,7 @@ class Synchronizer(BaseSynchronizer):
             namespace=namespace_race, workload=[deployment_obj_race], timeout=180
         )
 
-        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
+        Logger.logger.info("7. Check BE vs. Cluster - race condition test resources created in BE")
         self.verify_backend_resources(cluster, namespace_race)
 
         ## Race condition
@@ -299,16 +299,16 @@ class Synchronizer(BaseSynchronizer):
             self.kubernetes_obj.update_env(namespace_race, deployment_obj_race['metadata']['name'], {"TEST_ENV": f"test_env_{i}"}, deployment_obj_race['kind'])
         TestUtil.sleep(20, "wait for synchronization")
 
-        Logger.logger.info("5. Check BE vs. Cluster - last resource version")
+        Logger.logger.info("9. Check BE vs. Cluster - last resource version")
         self.verify_backend_resources(cluster, namespace_race)
 
-        Logger.logger.info("4. Delete Workloads")
+        Logger.logger.info("10. Delete Workloads")
         self.delete_all_workloads(namespace)
         self.delete_all_workloads(namespace_race)
 
         TestUtil.sleep(20, "wait for synchronization", "info")
 
-        Logger.logger.info("5. Check BE vs. Cluster - resources deleted in BE")
+        Logger.logger.info("11. Check BE vs. Cluster - resources deleted in BE")
         self.verify_backend_resources_deleted(cluster, namespace)       # workloads
         self.verify_backend_resources_deleted(cluster, namespace_race)  # race condition
 
