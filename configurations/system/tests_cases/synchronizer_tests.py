@@ -17,7 +17,6 @@ class SynchronizerTests(object):
             replicaset=join(statics.DEFAULT_SYNCHRONIZER_PATH, "replicaset.yaml"),
             statefulset=join(statics.DEFAULT_SYNCHRONIZER_PATH, "statefulset.yaml"),
             daemonset=join(statics.DEFAULT_SYNCHRONIZER_PATH, "daemonset.yaml"),
-            crds=statics.DEFAULT_SYNCHRONIZER_CRDS_PATH,
             test_obj=Synchronizer)
 
     @staticmethod

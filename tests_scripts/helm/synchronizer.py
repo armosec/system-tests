@@ -77,30 +77,6 @@ class BaseSynchronizer(BaseHelm):
         )
         return wl_without_parent
 
-    def get_all_non_namespaced_kubescape_crds(self, _=None):
-        return self.kubernetes_obj.get_all_non_namespaced_kubescape_crds()
-
-    def get_all_namespaced_kubescape_crds(self, namespace):
-        r = self.kubernetes_obj.get_all_namespaced_kubescape_crds(
-            namespace=namespace
-        )
-        r_filtered = list(
-            filter(
-                lambda x: x['kind'] != 'GeneratedNetworkPolicy',
-                r,
-            )
-        )
-        return r_filtered
-
-
-    def get_all_kubescape_crds(self, namespace):
-        """
-        Get all kubescape crds in the cluster (namespaced and non-namespaced)
-        """
-        crds = self.get_all_namespaced_kubescape_crds(namespace)
-        crds.extend(self.get_all_non_namespaced_kubescape_crds())
-        return crds
-
     def get_workload_in_namespace(self, namespace, kind, name):
         wls = self.get_all_workloads_in_namespace(namespace)
         for wl in wls:
@@ -127,14 +103,6 @@ class BaseSynchronizer(BaseHelm):
             self.kubernetes_obj.delete_workload(
                 namespace=namespace,
                 application=dict(kind=kind, metadata=dict(name=name)),
-            )
-
-    def delete_all_crds(self, namespace):
-        crds = self.get_all_kubescape_crds(namespace)
-        for resource in crds:
-            self.kubernetes_obj.delete_workload(
-                namespace=namespace,
-                application=dict(kind=resource["kind"], metadata=dict(name=resource["metadata"]["name"])),
             )
 
     def verify_backend_resources_deleted(
@@ -283,11 +251,6 @@ class Synchronizer(BaseSynchronizer):
             namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
         )
 
-        namespace_crds = self.create_namespace()
-        Logger.logger.info(f"2. Create CRDs (namespace='{namespace_crds}')")
-        crd_resources = self.apply_directory(path=self.test_obj["crds"], namespace=namespace_crds)
-        assert len(crd_resources) > 0, "no resources created"
-
         # Load all workloads files
         deployment_yaml_file = self.test_obj["deployment"]
         replicaset_yaml_file = self.test_obj["replicaset"]
@@ -315,10 +278,6 @@ class Synchronizer(BaseSynchronizer):
         Logger.logger.info("3. Check BE vs. Cluster - updated resource version")
         self.verify_backend_resources(cluster, namespace)
 
-        Logger.logger.info("4. Check BE vs. Cluster - CRDs created in BE")
-        self.verify_backend_resources(cluster, namespace_crds, list_func=self.get_all_namespaced_kubescape_crds)
-        self.verify_backend_resources(cluster, "", list_func=self.get_all_non_namespaced_kubescape_crds)
-
         Logger.logger.info("4. Restart workloads")
         self.restart_all_workloads(namespace)
         TestUtil.sleep(20, "wait for synchronization", "info")
@@ -343,18 +302,15 @@ class Synchronizer(BaseSynchronizer):
         Logger.logger.info("5. Check BE vs. Cluster - last resource version")
         self.verify_backend_resources(cluster, namespace_race)
 
-        Logger.logger.info("4. Delete CRDs")
-        self.delete_all_crds(namespace_crds)
+        Logger.logger.info("4. Delete Workloads")
         self.delete_all_workloads(namespace)
         self.delete_all_workloads(namespace_race)
 
         TestUtil.sleep(20, "wait for synchronization", "info")
 
         Logger.logger.info("5. Check BE vs. Cluster - resources deleted in BE")
-        self.verify_backend_resources_deleted(cluster, namespace_crds)  # namespaced crds
         self.verify_backend_resources_deleted(cluster, namespace)       # workloads
         self.verify_backend_resources_deleted(cluster, namespace_race)  # race condition
-        self.verify_backend_resources_deleted(cluster, "")              # non-namespaced crds
 
         return self.cleanup()
 

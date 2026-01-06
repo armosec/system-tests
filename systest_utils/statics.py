@@ -66,7 +66,6 @@ DEFAULT_SECCOMP_PATH = os.path.join(DEFAULT_K8S_PATHS, 'seccomp')
 
 # synchronizer tests
 DEFAULT_SYNCHRONIZER_PATH = os.path.join(DEFAULT_K8S_PATHS, 'synchronizer')
-DEFAULT_SYNCHRONIZER_CRDS_PATH = os.path.abspath(os.path.join('configurations', 'kubescape-crds', 'supported'))
 
 # kubescape
 DEFAULT_EXCEPTIONS_PATH = os.path.join(RESOURCES_PATH, 'kubescape', 'exceptions')
