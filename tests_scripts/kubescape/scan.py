@@ -649,6 +649,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
         for kubescape_report, test_config in kubescape_reports_to_config:
+            git_repository = test_config.get("git_repository")
+
             Logger.logger.info("Testing kubescape results")
             self.test_counters(framework_report=kubescape_report)
 
