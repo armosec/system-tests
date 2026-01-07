@@ -600,19 +600,19 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 'clone_before': True
             },
             {
-                'policy_scope'='framework',
-                'policy_name'='AllControls',
-                'git_repository'=GitRepository(name='kubescape', owner="armosec", branch="master",
+                'policy_scope': 'framework',
+                'policy_name': 'AllControls',
+                'git_repository': GitRepository(name='kubescape', owner="armosec", branch="master",
                                             url="https://github.com/armosec/kubescape"),
-                'expected_helm_files'=[
+                'expected_helm_files': [
                     "examples/helm_chart/templates/serviceaccount.yaml",
                     "examples/helm_chart/templates/cronjob.yaml"
                 ],
-                'clone_before'=False,
+                'clone_before': False,
             },
         ]
 
-        kubescape_reports = []
+        kubescape_reports_to_config = {}
 
         for test_config in test_configs:
             policy_scope = test_config.get("policy_scope")
@@ -635,7 +635,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                     account=True,
                     path=temp_dir,
                 )
-                kubescape_reports.append(kubescape_report)
+                kubescape_reports_to_config[kubescape_report] = test_config
             else:
                 # Remote URL
                 kubescape_report = self.default_scan(
@@ -645,11 +645,11 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                     account=True,
                     url=git_repository.url,
                 )
-                kubescape_reports.append(kubescape_report)
+                kubescape_reports_to_config[kubescape_report] = test_config
 
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
-        for kubescape_report in kubescape_reports:
+        for kubescape_report, test_config in kubescape_reports_to_config.items():
             Logger.logger.info("Testing kubescape results")
             self.test_counters(framework_report=kubescape_report)
 
@@ -743,7 +743,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 for file in be_file_paths:
                     assert file in kubescape_scanned_files, f"Expected to find {file} in kubescape report, but it wasn't found"
             
-            expected_helm_files = self.test_obj.get_arg("expected_helm_files")
+            expected_helm_files = test_config.get("expected_helm_files", None)
             be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
             if expected_helm_files and len(expected_helm_files) > 0:
                 Logger.logger.info("Testing helm chart scanning")
