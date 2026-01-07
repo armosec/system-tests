@@ -17,8 +17,25 @@ import argparse
 import json
 import os
 import sys
+import re
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
+
+
+def normalize_test_name(test_name: str) -> str:
+    """
+    Normalize test name for mapping lookup.
+
+    The analyzer can receive names like "ST (siem_integrations)" from logs/job names.
+    Mapping keys are expected to be the raw key (e.g., "siem_integrations").
+    """
+    if not test_name:
+        return test_name
+    s = str(test_name).strip()
+    m = re.match(r"^ST\s*\(\s*([^)]+?)\s*\)\s*$", s)
+    if m:
+        return m.group(1).strip()
+    return s
 
 
 def load_test_mapping(mapping_path: str) -> Dict[str, Any]:
@@ -55,6 +72,50 @@ def normalize_path(path: str) -> str:
     if not path.startswith('/'):
         path = '/' + path
     return path
+
+
+_PARAM_SEGMENT_RE = re.compile(r"^(?:\{[^}]+\}|:[^/]+|<[^>]+>)$")
+
+
+def _split_segments(path: str) -> List[str]:
+    """Split a normalized path into segments, excluding empty."""
+    return [s for s in normalize_path(path).split("/") if s]
+
+
+def _is_param_segment(seg: str) -> bool:
+    """Return True if this segment is a path parameter placeholder."""
+    return bool(_PARAM_SEGMENT_RE.match(seg))
+
+
+def _segments_match(api_seg: str, endpoint_seg: str) -> bool:
+    """
+    Segment match with path-param awareness.
+
+    Treat {param}, :param, <param> as wildcards that match any concrete segment.
+    """
+    if api_seg == endpoint_seg:
+        return True
+    if _is_param_segment(api_seg) or _is_param_segment(endpoint_seg):
+        return True
+    return False
+
+
+def paths_equivalent(api_path: str, endpoint_path: str) -> bool:
+    """Return True if the two paths match, allowing param placeholders."""
+    a = _split_segments(api_path)
+    b = _split_segments(endpoint_path)
+    if len(a) != len(b):
+        return False
+    return all(_segments_match(x, y) for x, y in zip(a, b))
+
+
+def path_is_prefix(api_path: str, endpoint_path: str) -> bool:
+    """Return True if endpoint_path matches the prefix of api_path, allowing param placeholders."""
+    a = _split_segments(api_path)
+    b = _split_segments(endpoint_path)
+    if len(b) > len(a):
+        return False
+    return all(_segments_match(x, y) for x, y in zip(a[:len(b)], b))
 
 
 def is_generic_handler(endpoint: Dict[str, Any]) -> bool:
@@ -117,7 +178,7 @@ def match_endpoint(
             endpoint_method == "ANY"
         )
         
-        if method_matches and endpoint_full_path == normalized_api_path:
+        if method_matches and paths_equivalent(normalized_api_path, endpoint_full_path):
             return endpoint
     
     # Try matching without prefix (some endpoints might have prefix in FullPath)
@@ -136,7 +197,7 @@ def match_endpoint(
         
         # Check if api_path matches either path or fullPath
         if method_matches:
-            if endpoint_path == normalized_api_path or endpoint_full_path == normalized_api_path:
+            if paths_equivalent(normalized_api_path, endpoint_path) or paths_equivalent(normalized_api_path, endpoint_full_path):
                 return endpoint
     
     # Try partial match (for nested paths)
@@ -161,9 +222,9 @@ def match_endpoint(
         )
         
         if method_matches:
-            # Check if api_path starts with endpoint_full_path (nested route)
+            # Check if api_path starts with endpoint_full_path (nested route), allowing params
             # Only match if the endpoint is reasonably specific (not just /api/v1)
-            if normalized_api_path.startswith(endpoint_full_path):
+            if path_is_prefix(normalized_api_path, endpoint_full_path):
                 # Require at least 3 path segments to avoid matching too generic routes
                 path_segments = endpoint_full_path.strip('/').split('/')
                 if len(path_segments) >= 3:  # e.g., api/v1/runtime (not just api/v1)
@@ -173,7 +234,7 @@ def match_endpoint(
     for endpoint in non_generic_endpoints:
         endpoint_full_path = normalize_path(endpoint.get("fullPath", ""))
         
-        if endpoint_full_path == normalized_api_path:
+        if paths_equivalent(normalized_api_path, endpoint_full_path):
             return endpoint
     
     return None
@@ -206,7 +267,7 @@ def find_handler_by_api_path(
     # Example: /api/v1/runtime/policies -> look for runtime, policies
     search_terms = []
     for seg in segments:
-        if seg not in ['api', 'v1', 'v2', 'v3']:  # Skip API version segments
+        if seg not in ['api', 'v1', 'v2', 'v3'] and not _is_param_segment(seg):  # Skip API version + params
             search_terms.append(seg.lower())
     
     if not search_terms:
@@ -465,6 +526,11 @@ def map_apis_to_code(
     Returns:
         Dict mapping API (method + path) to handler chunk info
     """
+    original_test_name = test_name
+    test_name = normalize_test_name(test_name)
+    if test_name != original_test_name:
+        print(f"ℹ️  Normalized test name: '{original_test_name}' -> '{test_name}'", file=sys.stderr)
+
     if test_name not in test_mapping:
         print(f"Error: Test '{test_name}' not found in mapping", file=sys.stderr)
         return {}

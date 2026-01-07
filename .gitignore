@@ -28,3 +28,4 @@ creds_file.stage.json
 creds_file.prod.json
 # Cursor shared rules symlink (created by install script)
 .cursor/shared-rules
+.tmp

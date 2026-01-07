@@ -139,9 +139,15 @@ Difference: Config-service is returning exceptions when it shouldn't
 - What additional code chunks should be captured?
 
 ## 4. Suggested Fixes
-- Provide specific code changes needed
-- Include file paths and function names
-- Explain the impact of the fix
+- **Always provide a \"Best‑Effort Code Fix\" if the context contains enough evidence**
+  - Example of “enough evidence”: an explicit backend/remote error message like `400 Bad Request: Summary or Text is required`
+  - Even if the exact target file is NOT present in the provided code chunks, you MUST still propose a patch‑shaped code change (clearly labeled as best‑effort) that would address the observed failure.
+- If the exact file/function IS present in context:
+  - Provide the concrete change referencing the exact function/file and the relevant line range.
+- If the exact file/function is NOT present in context:
+  - Provide a minimal patch sketch (function signature + key lines).
+  - Add a short checklist titled **\"Missing code needed for exact diff\"** (e.g., dependency file path, function that builds request body, request/response structs).
+- Explain the impact of the fix.
 
 ## 5. Context Usage Guidelines
 When analyzing this failure, make use of the context information above:

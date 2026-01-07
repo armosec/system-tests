@@ -16,6 +16,7 @@ DEPLOYED_VERSION=""
 RC_VERSION=""
 WORKFLOW_COMMIT=""
 GOMOD_DEPLOYED_VERSION=""  # Initialize to ensure it's always defined
+TRIGGERING_REPO_COMMIT_FROM_JSON="" # Optional; only available when test-deployed-services.json exists
 TRIGGERING_REPO="$TRIGGERING_REPO_FROM_STEP"
 
 # Prefer new format (test-deployed-services.json), fallback to legacy (running-images.json)
@@ -233,7 +234,7 @@ fi
 TRIGGERING_REPO_COMMIT=""
 
 # Priority 0: Use commit from test-deployed-services.json if available (MOST RELIABLE)
-if [[ -n "$TRIGGERING_REPO_COMMIT_FROM_JSON" ]]; then
+if [[ -n "${TRIGGERING_REPO_COMMIT_FROM_JSON:-}" ]]; then
   TRIGGERING_REPO_COMMIT="$TRIGGERING_REPO_COMMIT_FROM_JSON"
   echo "✅ Using triggering repo commit from test-deployed-services.json: ${TRIGGERING_REPO_COMMIT:0:8}"
   echo "   This is the most reliable source (extracted during test run)"
