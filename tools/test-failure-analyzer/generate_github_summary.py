@@ -1050,6 +1050,23 @@ def generate_summary(
         for repo, count in chunks_by_repo.items():
             lines.append(f"- **{repo}**: {count}")
         lines.append("")
+
+    # Explicit system-tests (test-side) context info (helps validate "we have the right test chunks")
+    system_tests_meta = metadata.get('system_tests', {})
+    if isinstance(system_tests_meta, dict) and (system_tests_meta.get('implementation_files') or system_tests_meta.get('chunks_included') is not None):
+        lines.append("### 🧪 System-Tests Context (test-side)\n")
+        st_chunks = system_tests_meta.get('chunks_included', 0)
+        st_files = system_tests_meta.get('implementation_files', [])
+        lines.append(f"- **Included system-tests chunks** (`source=system_test_code`): **{st_chunks}**")
+        if isinstance(st_files, list) and st_files:
+            lines.append(f"- **Implementation files (from mapping)**: {len(st_files)}")
+            for fp in st_files[:15]:
+                lines.append(f"  - `{fp}`")
+            if len(st_files) > 15:
+                lines.append(f"  - ... and {len(st_files) - 15} more")
+        else:
+            lines.append("- **Implementation files (from mapping)**: (not available)")
+        lines.append("")
     
     repos = metadata.get('repos', {})
     if repos:
