@@ -14,6 +14,7 @@ Usage:
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Any, Optional
@@ -162,6 +163,55 @@ def compare_indexes(old_index: Dict, new_index: Dict, old_label: str, new_label:
     return result
 
 
+def get_git_compare(org: str, repo: str, base: str, head: str, max_changes: int = 100, debug: bool = False) -> Dict[str, Any]:
+    """
+    Fetch git compare info (including file patches) using GitHub's compare API via gh CLI.
+    Returns a stable structure compatible with generate_github_summary.py expectations.
+    """
+    git_diff: Dict[str, Any] = {
+        "deployed_commit": base or "",
+        "rc_commit": head or "",
+        "total_commits": 0,
+        "files": []
+    }
+
+    if not org or not repo or not base or not head or base == head:
+        return git_diff
+
+    endpoint = f"repos/{org}/{repo}/compare/{base}...{head}"
+    cmd = ["gh", "api", endpoint]
+
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if proc.returncode != 0:
+            if debug:
+                print(f"⚠️  gh api compare failed for {org}/{repo}: {proc.stderr.strip()}", file=sys.stderr)
+            return git_diff
+
+        data = json.loads(proc.stdout or "{}")
+        commits = data.get("commits") or []
+        files = data.get("files") or []
+
+        git_diff["total_commits"] = len(commits)
+        git_diff["files"] = [
+            {
+                "filename": f.get("filename", ""),
+                "status": f.get("status", ""),
+                "additions": f.get("additions", 0),
+                "deletions": f.get("deletions", 0),
+                "changes": f.get("changes", 0),
+                "patch": f.get("patch", ""),
+            }
+            for f in files[:max_changes]
+            if isinstance(f, dict)
+        ]
+        return git_diff
+    except Exception as e:
+        if debug:
+            print(f"⚠️  Failed to parse git compare for {org}/{repo}: {e}", file=sys.stderr)
+        return git_diff
+
+
 def main():
     args = parse_args()
     
@@ -208,13 +258,16 @@ def main():
             diff['rc_commit'] = rc_info.get('commit', '')
             diff['deployed_commit'] = deployed_info.get('commit', '')
             
-            # Also add git_diff section for compatibility with generate_github_summary.py
-            diff['git_diff'] = {
-                'deployed_commit': deployed_info.get('commit', ''),
-                'rc_commit': rc_info.get('commit', ''),
-                'total_commits': 0,  # Will be populated if git diff is run
-                'files': []  # Will be populated if git diff is run
-            }
+            # Add git_diff section (includes patches) for compatibility with generate_github_summary.py and LLM context
+            org = deployed_info.get("github_org") or rc_info.get("github_org") or "armosec"
+            diff['git_diff'] = get_git_compare(
+                org=org,
+                repo=triggering_repo,
+                base=deployed_info.get('commit', '') or "",
+                head=rc_info.get('commit', '') or "",
+                max_changes=args.max_changes,
+                debug=args.debug
+            )
             
             results[triggering_repo] = diff
             
@@ -226,25 +279,72 @@ def main():
                 print(f"⏭️  Skipping {triggering_repo} (missing RC or deployed index)")
                 print()
     
-    # Compare dependencies (deployed vs latest)
+    # Compare dependencies
+    #
+    # Current found-indexes schema (preferred):
+    #   indexes.<repo>.deployed.index_path + indexes.<repo>.rc.index_path
+    #
+    # Legacy schema (fallback):
+    #   deployed_index_path + latest_index_path
     for repo, repo_info in indexes_info.items():
         if repo == triggering_repo:
             continue
-        
-        # Check if this is a dependency (has deployed_version and latest_index_path)
-        deployed_version = repo_info.get('deployed_version')
-        deployed_path = repo_info.get('deployed_index_path')
-        latest_path = repo_info.get('latest_index_path')
-        
+
+        deployed_info = repo_info.get("deployed") if isinstance(repo_info, dict) else {}
+        rc_info = repo_info.get("rc") if isinstance(repo_info, dict) else {}
+
+        # Preferred path: deployed vs rc (matches go.mod analysis versions when available)
+        if isinstance(deployed_info, dict) and isinstance(rc_info, dict) and deployed_info.get("found") and rc_info.get("found"):
+            if args.debug:
+                print(f"📊 Comparing {repo}...")
+                print(f"   Deployed: {deployed_info.get('version')}")
+                print(f"   RC: {rc_info.get('version')}")
+
+            deployed_index = load_code_index(deployed_info.get("index_path"))
+            rc_index = load_code_index(rc_info.get("index_path"))
+
+            diff = compare_indexes(
+                deployed_index,
+                rc_index,
+                deployed_info.get("version", "deployed"),
+                rc_info.get("version", "rc"),
+                args.max_changes
+            )
+
+            diff["deployed_commit"] = deployed_info.get("commit", "") or ""
+            diff["rc_commit"] = rc_info.get("commit", "") or ""
+
+            org = deployed_info.get("github_org") or rc_info.get("github_org") or "armosec"
+            diff["git_diff"] = get_git_compare(
+                org=org,
+                repo=repo,
+                base=diff["deployed_commit"],
+                head=diff["rc_commit"],
+                max_changes=args.max_changes,
+                debug=args.debug
+            )
+
+            results[repo] = diff
+
+            if args.debug:
+                print(f"   ✅ Changes: {diff['summary']['total_functions_added']} added, {diff['summary']['total_functions_removed']} removed")
+                print()
+            continue
+
+        # Legacy fallback: deployed vs latest (old schema)
+        deployed_version = repo_info.get('deployed_version') if isinstance(repo_info, dict) else None
+        deployed_path = repo_info.get('deployed_index_path') if isinstance(repo_info, dict) else None
+        latest_path = repo_info.get('latest_index_path') if isinstance(repo_info, dict) else None
+
         if deployed_path and latest_path:
             if args.debug:
                 print(f"📊 Comparing {repo}...")
                 print(f"   Deployed: {deployed_version}")
                 print(f"   Latest: main")
-            
+
             deployed_index = load_code_index(deployed_path)
             latest_index = load_code_index(latest_path)
-            
+
             diff = compare_indexes(
                 deployed_index,
                 latest_index,
@@ -252,11 +352,8 @@ def main():
                 'latest',
                 args.max_changes
             )
-            
-            diff['deployed_version'] = deployed_version
-            diff['latest_version'] = 'latest'
             results[repo] = diff
-            
+
             if args.debug:
                 print(f"   ✅ Changes: {diff['summary']['total_functions_added']} added, {diff['summary']['total_functions_removed']} removed")
                 print()
