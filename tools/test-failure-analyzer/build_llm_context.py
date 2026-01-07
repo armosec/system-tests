@@ -519,6 +519,70 @@ def extract_chunks_from_connected_context(connected_context: Dict[str, Any]) -> 
     return chunks
 
 
+def extract_test_chunks_from_system_tests_index(
+    test_mapping: Optional[Dict[str, Any]],
+    test_name: str,
+    system_tests_index: Optional[Dict[str, Any]],
+    max_chunks: int = 80,
+) -> List[Dict[str, Any]]:
+    """
+    Extract *test-side* chunks from the system-tests code index for the failing test.
+
+    We use `test_implementation_files` from the mapping artifact (which already includes
+    base classes/helpers) and then pick matching chunks from the system-tests index.
+    """
+    if not test_mapping or not isinstance(test_mapping, dict):
+        return []
+    if not system_tests_index or not isinstance(system_tests_index, dict):
+        return []
+
+    cfg = test_mapping.get(test_name) or {}
+    impl_files = cfg.get("test_implementation_files") or []
+    if not isinstance(impl_files, list) or not impl_files:
+        return []
+
+    file_set = {f for f in impl_files if isinstance(f, str) and f}
+    if not file_set:
+        return []
+
+    chunks = system_tests_index.get("chunks", [])
+    if not isinstance(chunks, list) or not chunks:
+        return []
+
+    candidates: List[Dict[str, Any]] = []
+    for ch in chunks:
+        if not isinstance(ch, dict):
+            continue
+        fp = ch.get("file")
+        if fp in file_set:
+            candidates.append({
+                **ch,
+                "repo_name": "system-tests",
+                "source": "system_test_code",
+                "priority": 1,
+                "test_name": test_name,
+            })
+
+    def score(c: Dict[str, Any]) -> int:
+        s = 0
+        tags = c.get("tags") or []
+        if isinstance(tags, list) and any(str(t).lower() == "test" for t in tags):
+            s += 5
+        pattern = (c.get("pattern") or "").lower()
+        if pattern == "test":
+            s += 5
+        f = (c.get("file") or "").lower()
+        if test_name and test_name.lower() in f:
+            s += 3
+        t = (c.get("type") or "").lower()
+        if t in ("function", "method"):
+            s += 2
+        return s
+
+    candidates.sort(key=lambda c: (-score(c), c.get("file", ""), c.get("name", "")))
+    return candidates[:max_chunks]
+
+
 def format_chunk_for_llm(chunk: Dict[str, Any], repo_name: str = None) -> Dict[str, Any]:
     """Format a code chunk for LLM consumption."""
     formatted = {
@@ -979,6 +1043,9 @@ def build_llm_context(
     resolved_commits: Optional[Dict[str, Any]] = None,
     code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
+    test_mapping: Optional[Dict[str, Any]] = None,
+    system_tests_index: Optional[Dict[str, Any]] = None,
+    system_tests_max_chunks: int = 80,
     code_index: Optional[Dict[str, Any]] = None,
     extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
@@ -1038,6 +1105,24 @@ def build_llm_context(
         connected_chunks = extract_chunks_from_connected_context(connected_context)
         all_chunks.extend(connected_chunks)
         print(f"   Added {len(connected_chunks)} chunks from connected context")
+
+    # 2.2 Extract system-tests (test-side) chunks from the system-tests code index.
+    # This enables concrete suggestions/fixes in the system-tests repo.
+    if test_mapping and system_tests_index:
+        try:
+            st_chunks = extract_test_chunks_from_system_tests_index(
+                test_mapping=test_mapping,
+                test_name=test_name,
+                system_tests_index=system_tests_index,
+                max_chunks=system_tests_max_chunks,
+            )
+            if st_chunks:
+                all_chunks.extend(st_chunks)
+                print(f"   ➕ Added {len(st_chunks)} system-tests chunks (test-side code)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"⚠️  Failed extracting system-tests chunks: {e}", file=sys.stderr)
+            sys.stderr.flush()
 
     # 2.5 Extract extra dependency chunks hinted by diffs (covers cases where call-chain doesn't cross repos)
     if code_diffs and extra_indexes:
@@ -1165,6 +1250,21 @@ def build_llm_context(
         
         metadata["chunks_by_source"][source] = metadata["chunks_by_source"].get(source, 0) + 1
         metadata["chunks_by_repo"][repo] = metadata["chunks_by_repo"].get(repo, 0) + 1
+
+    # Track system-tests test-side inclusion (for confidence + debuggability)
+    system_tests_files: List[str] = []
+    if test_mapping and isinstance(test_mapping, dict):
+        cfg = test_mapping.get(test_name) or {}
+        impl_files = cfg.get("test_implementation_files") or []
+        if isinstance(impl_files, list):
+            system_tests_files = [f for f in impl_files if isinstance(f, str)]
+
+    if system_tests_files or metadata["chunks_by_source"].get("system_test_code"):
+        metadata["system_tests"] = {
+            "test_name": test_name,
+            "implementation_files": system_tests_files,
+            "chunks_included": metadata["chunks_by_source"].get("system_test_code", 0),
+        }
     
     # Build dependency analysis if code_diffs available
     if code_diffs and api_mapping:
@@ -1478,6 +1578,20 @@ def main():
         help="Path to test code file (optional)"
     )
     parser.add_argument(
+        "--test-mapping",
+        help="Path to system_test_mapping_artifact.json (optional; enables system-tests code chunk extraction)"
+    )
+    parser.add_argument(
+        "--system-tests-code-index",
+        help="Path to system-tests code index JSON (optional; enables system-tests code chunk extraction)"
+    )
+    parser.add_argument(
+        "--system-tests-max-chunks",
+        type=int,
+        default=80,
+        help="Max system-tests chunks to embed (default: 80)"
+    )
+    parser.add_argument(
         "--code-index",
         help="Path to code index JSON (optional, used to look up full chunk code for call chains)"
     )
@@ -1555,6 +1669,8 @@ def main():
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
+        test_mapping = load_json_file(args.test_mapping) if args.test_mapping else None
+        system_tests_index = load_json_file(args.system_tests_code_index) if args.system_tests_code_index else None
         code_index = load_json_file(args.code_index) if args.code_index else None
         
         # Load extra indexes for dependencies
@@ -1657,6 +1773,9 @@ def main():
             code_diffs=code_diffs,
             resolved_commits=resolved_commits,
             test_code=test_code,
+            test_mapping=test_mapping,
+            system_tests_index=system_tests_index,
+            system_tests_max_chunks=args.system_tests_max_chunks,
             code_index=code_index,
             extra_indexes=extra_indexes,
             analysis_prompts=analysis_prompts,
