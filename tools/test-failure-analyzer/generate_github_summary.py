@@ -287,6 +287,14 @@ def generate_summary(
     api_mapping = load_json(api_mapping_path)
     code_diffs = load_json(code_diffs_path)
     found_indexes = load_json(found_indexes_path)
+    # Index resolution mode (optional; written by workflow step in shared-workflows)
+    index_mode_path = None
+    try:
+        base_dir = os.path.dirname(llm_context_path) if llm_context_path else ""
+        index_mode_path = os.path.join(base_dir, "index-resolution-mode.json") if base_dir else "artifacts/index-resolution-mode.json"
+    except Exception:
+        index_mode_path = "artifacts/index-resolution-mode.json"
+    index_mode = load_json(index_mode_path)
     # Prefer new format, fallback to legacy
     test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
     running_images = load_json(running_images_path) if not test_deployed_services else None
@@ -387,6 +395,26 @@ def generate_summary(
     else:
         run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
         lines.append(f"**Original Test Run:** [Run #{run_ref}]({run_url})")
+
+    # Short indication of index-resolution mode (what it means + why)
+    if isinstance(index_mode, dict) and index_mode.get("mode"):
+        mode = str(index_mode.get("mode"))
+        meaning = str(index_mode.get("meaning") or "").strip()
+        why = str(index_mode.get("why") or "").strip()
+        allow_csv = str(index_mode.get("allowlist_csv") or "").strip()
+        allow = [x.strip() for x in allow_csv.split(",") if x.strip()] if allow_csv else []
+
+        lines.append("")
+        lines.append("### 🧭 Code Index Resolution Mode\n")
+        lines.append(f"- **Mode**: `{mode}`")
+        if meaning:
+            lines.append(f"- **Meaning**: {meaning}")
+        if why:
+            lines.append(f"- **Why**: {why}")
+        if allow:
+            preview = ", ".join(f"`{r}`" for r in allow[:8])
+            suffix = f" …(+{len(allow) - 8} more)" if len(allow) > 8 else ""
+            lines.append(f"- **Allowlist repos**: {len(allow)} ({preview}{suffix})")
     
     # Code chunks and LOC - use extract_chunk_stats_per_repo for accurate counting
     chunk_stats = extract_chunk_stats_per_repo(llm_context)
