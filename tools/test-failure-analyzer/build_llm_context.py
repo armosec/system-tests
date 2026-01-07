@@ -795,34 +795,52 @@ def _gh_api(path: str) -> Optional[Any]:
         return None
 
 
-def _extract_imported_repo_dirs_from_patches(code_diffs: Dict[str, Any]) -> Dict[Tuple[str, str], Set[str]]:
+def _extract_dependency_source_targets_from_code_diffs(code_diffs: Dict[str, Any]) -> Tuple[Dict[Tuple[str, str], Set[str]], Dict[Tuple[str, str], Set[str]]]:
     """
-    Parse git diff patches to find imports like:
-      github.com/<org>/<repo>/<dir>/<pkg>
-    Returns mapping: (org, repo) -> {dir paths (within repo)}.
-    """
-    results: Dict[Tuple[str, str], Set[str]] = {}
+    Extract dependency source targets from code_diffs in two ways:
+    1) **Directories** inferred from import paths inside patches (github.com/<org>/<repo>/<dir>/...)
+    2) **Exact file paths** inferred from dependency repos' own git_diff.files[].filename
 
-    cadb = code_diffs.get("cadashboardbe") or {}
-    git_diff = cadb.get("git_diff") or {}
-    files = git_diff.get("files") or []
-    for f in files:
-        patch = (f or {}).get("patch") or ""
-        if not patch:
+    Returns:
+      (repo_dirs, repo_files)
+        repo_dirs: (org, repo) -> set(dir paths)
+        repo_files: (org, repo) -> set(file paths)
+    """
+    repo_dirs: Dict[Tuple[str, str], Set[str]] = {}
+    repo_files: Dict[Tuple[str, str], Set[str]] = {}
+
+    for repo_name, diff in (code_diffs or {}).items():
+        if not isinstance(diff, dict):
+            continue
+        git_diff = diff.get("git_diff") or {}
+        files = git_diff.get("files") or []
+        if not isinstance(files, list):
             continue
 
-        for m in re.finditer(r"github\\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
-            org = m.group(1)
-            repo = m.group(2)
-            rest = (m.group(3) or "").lstrip("/")
-
-            # Avoid huge scans: require at least one directory component
-            if not rest or "/" not in rest:
+        # 2) If this is a dependency repo, collect its changed Go files directly.
+        # We don't know org here; infer from common cases. We'll also try to discover org via imports.
+        # Default to armosec when unknown.
+        default_org = "armosec"
+        for f in files:
+            if not isinstance(f, dict):
                 continue
+            filename = f.get("filename") or ""
+            if filename.endswith(".go") and "/" in filename:
+                repo_files.setdefault((default_org, repo_name), set()).add(filename)
 
-            results.setdefault((org, repo), set()).add(rest)
+            # 1) Scan patches for import paths into dependency repos
+            patch = f.get("patch") or ""
+            if not patch:
+                continue
+            for m in re.finditer(r"github\\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
+                org = m.group(1)
+                repo = m.group(2)
+                rest = (m.group(3) or "").lstrip("/")
+                if not rest or "/" not in rest:
+                    continue
+                repo_dirs.setdefault((org, repo), set()).add(rest)
 
-    return results
+    return repo_dirs, repo_files
 
 
 def _fetch_repo_dir_go_files(org: str, repo: str, dir_path: str, ref: str, max_files: int) -> List[str]:
@@ -876,13 +894,41 @@ def fetch_dependency_source_snippets(
     if not code_diffs or not found_indexes:
         return []
 
-    repo_dirs = _extract_imported_repo_dirs_from_patches(code_diffs)
-    if not repo_dirs:
+    repo_dirs, repo_files = _extract_dependency_source_targets_from_code_diffs(code_diffs)
+    if not repo_dirs and not repo_files:
         return []
 
     idx = found_indexes.get("indexes") or {}
     chunks: List[Dict[str, Any]] = []
 
+    # Prefer fetching exact changed files from dependency repos (more reliable than imports).
+    for (org, repo), files in repo_files.items():
+        repo_info = idx.get(repo) or {}
+        rc = repo_info.get("rc") or {}
+        deployed = repo_info.get("deployed") or {}
+        ref = (rc.get("commit") or "").strip() or (deployed.get("commit") or "").strip()
+        if not ref:
+            continue
+
+        for fp in sorted(files):
+            code = _fetch_repo_file_content(org, repo, fp, ref, max_lines=max_lines_per_file)
+            if not code:
+                continue
+            chunks.append({
+                "id": f"dependency_source/{repo}/{fp}@{ref}",
+                "name": os.path.basename(fp),
+                "type": "file",
+                "package": os.path.dirname(fp),
+                "file": fp,
+                "code": code,
+                "repo": repo,
+                "source": "dependency_source",
+                "priority": 1,
+            })
+            if len(chunks) >= max_files_total:
+                return chunks
+
+    # Fallback: fetch go files by directory derived from import paths
     for (org, repo), dirs in repo_dirs.items():
         repo_info = idx.get(repo) or {}
         rc = repo_info.get("rc") or {}
