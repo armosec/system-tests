@@ -45,6 +45,42 @@ class HelmWrapper(object):
         return "r7.armo-cadr.com" in server
 
     @staticmethod
+    def set_kubescape_advanced_flags():
+        """
+        Returns a list of advanced Helm flags for kubescape-operator configuration.
+        These flags configure capabilities, node agent settings, and other advanced options.
+        """
+        return [
+            "--set", "kubescape-operator.capabilities.manageWorkloads=enable",
+            "--set", "kubescape-operator.capabilities.configurationScan=disable",
+            "--set", "kubescape-operator.capabilities.continuousScan=disable",
+            "--set", "kubescape-operator.capabilities.nodeScan=disable",
+            "--set", "kubescape-operator.capabilities.vulnerabilityScan=disable",
+            "--set", "kubescape-operator.grypeOfflineDB.enabled=false",
+            "--set", "kubescape-operator.capabilities.relevancy=enable",
+            "--set", "kubescape-operator.capabilities.runtimeObservability=enable",
+            "--set", "kubescape-operator.capabilities.malwareDetection=enable",
+            "--set", "kubescape-operator.capabilities.runtimeDetection=enable",
+            "--set", "kubescape-operator.capabilities.nodeProfileService=enable",
+            "--set", "kubescape-operator.capabilities.admissionController=disable",
+            "--set", "kubescape-operator.alertCRD.installDefault=true",
+            "--set", "kubescape-operator.alertCRD.scopeClustered=true",
+            "--set", "kubescape-operator.nodeAgent.config.maxLearningPeriod=60s",
+            "--set", "kubescape-operator.nodeAgent.config.learningPeriod=50s",
+            "--set", "kubescape-operator.nodeAgent.config.updatePeriod=30s",
+            "--set", "kubescape-operator.nodeAgent.config.nodeProfileInterval=1m",
+            "--set", "kubescape-operator.nodeAgent.config.hostMalwareSensor=enable",
+            "--set", "kubescape-operator.nodeAgent.config.hostNetworkSensor=enable",
+            "--set", "kubescape-operator.nodeAgent.image.repository=quay.io/armosec/node-agent",
+            "--set", "kubescape-operator.logger.level=debug",
+            "--set", "kubescape-operator.capabilities.httpDetection=disable",
+            "--set", "kubescape-operator.capabilities.networkEventsStreaming=enable",
+            "--set", "kubescape-operator.capabilities.nodeSbomGeneration=disable",
+            "--set", "kubescape-operator.nodeAgent.config.networkStreamingInterval=5s",
+            "--set", "kubescape-operator.nodeAgent.config.profilesCacheRefreshRate=5s"
+        ]
+
+    @staticmethod
     def get_current_kubectl_context() -> str:
         """
         Get the current kubectl context name.
@@ -100,6 +136,9 @@ class HelmWrapper(object):
             
             if image_pull_secret_password:
                 command_args.extend(["--set", "kubescape-operator.imagePullSecret.password={}".format(image_pull_secret_password)])
+
+            command_args.extend(HelmWrapper.set_kubescape_advanced_flags())
+
         else:
             # Standard installation for non-multi-prod environments
             command_args = ["helm", "upgrade", "--debug", "--install", "kubescape", repo, "-n", namespace,

@@ -13,6 +13,7 @@ import json
 
 
 DEFAULT_BRANCH = "release"
+DEFAULT_CHARTS_NAME = "kubescape-operator"
 
 HTTPD_PROXY_CRT_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.crt")
 HTTPD_PROXY_KEY_PATH = os.path.join(statics.DEFAULT_HELM_PROXY_PATH, "httpd-proxy.key")
@@ -82,14 +83,14 @@ class BaseHelm(BaseK8S):
             #     continue
             try:
                 level(self.get_pod_logs(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
-                                        pod_name=pod.metadata.name,
+                        pod_name=pod.metadata.name,
                                         containers=list(map(lambda container: container.name, pod.spec.containers)),
                                         previous=False))
             except Exception as e:
                 Logger.logger.error("cant print webhook logs. reason: {}".format(e))
             try:
                 level(self.get_pod_logs(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME,
-                                        pod_name=pod.metadata.name,
+                        pod_name=pod.metadata.name,
                                         containers=list(map(lambda container: container.name, pod.spec.containers)),
                                         previous=True))
             except:
@@ -179,10 +180,10 @@ class BaseHelm(BaseK8S):
             create_namespace = False
 
         HelmWrapper.install_armo_helm_chart(customer=self.backend.get_customer_guid() if self.backend != None else "",
-                                            access_key=self.backend.get_access_key() if self.backend != None else "",
-                                            server=self.test_driver.backend_obj.get_api_url(),
-                                            cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                            namespace=namespace,
+            access_key=self.backend.get_access_key() if self.backend != None else "",
+            server=self.test_driver.backend_obj.get_api_url(),
+            cluster_name=self.kubernetes_obj.get_cluster_name(),
+            namespace=namespace,
                                             repo=self.helm_armo_repo, create_namespace=create_namespace,
                                             helm_kwargs=helm_kwargs, use_offline_db=use_offline_db)
 
@@ -213,12 +214,83 @@ class BaseHelm(BaseK8S):
         return {f'{component_name}.image.tag': tag.split(':')[-1]}
 
     def download_armo_helm_chart_from_branch(self, branch: str):
+        # Determine which repository to clone for charts. Prefer explicit --kwargs charts_repo,
+        # then the GITHUB_REPOSITORY environment variable (set in GH Actions), otherwise fallback.
+        charts_repo_input = self.test_driver.kwargs.get("charts_repo")
+        if charts_repo_input:
+            charts_repo = charts_repo_input
+        else:
+            charts_repo = os.environ.get("GITHUB_REPOSITORY", "kubescape/helm-charts")
+
+        if (
+            charts_repo.startswith("http://")
+            or charts_repo.startswith("https://")
+            or charts_repo.startswith("git@")
+        ):
+            clone_url = (
+                charts_repo
+                if charts_repo.endswith(".git") or charts_repo.startswith("git@")
+                else charts_repo + ".git"
+            )
+        else:
+            clone_url = f"https://github.com/{charts_repo}.git"
+
         # git clone branch dev
-        command_args = ["git", "clone", "-b", branch, "https://github.com/kubescape/helm-charts.git",
+        command_args = ["git", "clone", "-b", branch, clone_url,
                         self.test_driver.temp_dir]
 
-        TestUtil.run_command(command_args=command_args, timeout=360)
-        self.helm_armo_repo = os.path.join(self.test_driver.temp_dir, statics.HELM_REPO_FROM_LOCAL)
+        Logger.logger.info(
+            f"Cloning helm-charts repo '{clone_url}' branch '{branch}' into '{self.test_driver.temp_dir}'"
+        )
+        Logger.logger.debug(f"git clone command: {' '.join(command_args)}")
+
+        rc, out = TestUtil.run_command(command_args=command_args, timeout=360)
+        if rc != 0:
+            stderr = getattr(out, "stderr", b"")
+            stdout = getattr(out, "stdout", b"")
+            try:
+                stdout = stdout.decode()
+            except Exception:
+                stdout = str(stdout)
+            try:
+                stderr = stderr.decode()
+            except Exception:
+                stderr = str(stderr)
+            Logger.logger.error(
+                f"git clone failed for repo '{clone_url}' branch '{branch}': stdout: {stdout} stderr: {stderr}"
+            )
+            raise AssertionError(
+                f"Failed to clone helm-charts branch '{branch}' into {self.test_driver.temp_dir}. returncode={rc}\nstdout: {stdout}\nstderr: {stderr}"
+            )
+
+        Logger.logger.info(
+            f"Successfully cloned helm-charts repo '{clone_url}' branch '{branch}' into '{self.test_driver.temp_dir}'"
+        )
+
+        # Determine which chart to use; prefer explicit --kwargs charts_name, otherwise use DEFAULT_CHARTS_NAME
+        charts_name = self.test_driver.kwargs.get("charts_name", DEFAULT_CHARTS_NAME)
+        charts_base = os.path.join(self.test_driver.temp_dir, "charts")
+        target_chart_path = os.path.join(charts_base, charts_name)
+
+        if not os.path.isdir(target_chart_path):
+            available = []
+            if os.path.isdir(charts_base):
+                try:
+                    available = sorted(
+                        [
+                            d
+                            for d in os.listdir(charts_base)
+                            if os.path.isdir(os.path.join(charts_base, d))
+                        ]
+                    )
+                except Exception:
+                    available = []
+            raise AssertionError(
+                f"Chart path '{target_chart_path}' not found after cloning branch '{branch}'. Available charts: {available}"
+            )
+
+        self.helm_armo_repo = target_chart_path
+        Logger.logger.info(f"Using local helm chart: charts/{charts_name}")
 
     def test_helm_chart_results(self, report_guid: str):
         be_frameworks = self.get_posture_frameworks(report_guid=report_guid)
@@ -237,11 +309,26 @@ class BaseHelm(BaseK8S):
         return c_panel_info
 
 
-    def verify_application_profiles(self, wlids: list, namespace):
-        Logger.logger.info("Get application profiles")
+    def verify_application_profiles_from_backend(self, wlids: list, namespace):
+        Logger.logger.info("Get application profiles from backend")
+        k8s_data = self.backend.get_application_profiles(cluster=self.kubernetes_obj.get_cluster_name(), namespace=namespace)
+        assert k8s_data != [], "Failed to get application profiles from backend"
+        assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
+        Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
+        ap_wlids = [i['metadata']['annotations']['kubescape.io/wlid'] for i in k8s_data]
+        for i in wlids:
+            assert i in ap_wlids, f"Failed to get application profile for {i}"
+        not_complete_application_profiles = [i for i in k8s_data if
+                                            i['metadata']['annotations']['kubescape.io/status'] != 'completed']
+
+        assert len(
+            not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i['metadata'] for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
+
+    def verify_application_profiles_from_cluster(self, wlids: list, namespace):
+        Logger.logger.info("Get application profiles from cluster")
         k8s_data = self.kubernetes_obj.get_dynamic_client("spdx.softwarecomposition.kubescape.io/v1beta1",
-                                                          "ApplicationProfile").get(namespace=namespace).items
-        assert k8s_data is not None, "Failed to get application profiles"
+                                                            "ApplicationProfile").get(namespace=namespace).items
+        assert k8s_data is not None, "Failed to get application profiles from cluster"
         assert len(k8s_data) >= len(wlids), f"Failed to get all application profiles {len(k8s_data)}"
         Logger.logger.info(f"Application profiles are presented {len(k8s_data)}")
         ap_wlids = [i.metadata.annotations['kubescape.io/wlid'] for i in k8s_data]
@@ -250,10 +337,16 @@ class BaseHelm(BaseK8S):
         # kubescape.io/status: completed, kubescape.io/completion: complete
         # i.metadata.annotations['kubescape.io/completion'] != 'complete' or
         not_complete_application_profiles = [i for i in k8s_data if
-                                             i.metadata.annotations['kubescape.io/status'] != 'completed']
+                                            i.metadata.annotations['kubescape.io/status'] != 'completed']
 
         assert len(
             not_complete_application_profiles) == 0, f"Application profiles are not complete {json.dumps([i.metadata for i in not_complete_application_profiles], cls=ResourceFieldEncoder)}"
+
+    def verify_application_profiles(self, wlids: list, namespace):
+        if self.test_driver.backend_obj.get_is_storage_backend():
+            self.verify_application_profiles_from_backend(wlids, namespace)
+        else:
+            self.verify_application_profiles_from_cluster(wlids, namespace)
 
     # ---------------------- helm ------------------------
     @staticmethod

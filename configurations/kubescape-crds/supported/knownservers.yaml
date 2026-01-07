@@ -1,8 +1,0 @@
-apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
-kind: KnownServer
-metadata:
-  name: github
-spec:
-- ipBlock: 185.199.108.153/24
-  name: github-workflows
-  server: github.com

@@ -886,7 +886,18 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             cronjobs_name = self.kubernetes_obj.get_ks_cronjob_name(statics.CA_NAMESPACE_FROM_HELM_NAME)
             self.backend.update_kubescape_job_request(cluster_name=cluster_name, cronjobs_name=cronjobs_name)
 
-            TestUtil.sleep(sleep_time, "wait till update will from backend to finish")
+            # Schedule update propagation is eventually consistent (backend → cluster).
+            # Poll for the schedule to change instead of a fixed sleep to reduce flakes.
+            def _schedule_changed():
+                new_schedule = self.kubernetes_obj.get_ks_cronjob_schedule(statics.CA_NAMESPACE_FROM_HELM_NAME)
+                assert new_schedule is not None, "kubescape cronjob schedule not found yet"
+                assert new_schedule != cron_job_schedule, (
+                    f"kubescape schedule string is not changed yet (still '{new_schedule}', old '{cron_job_schedule}')"
+                )
+                return True
+
+            self.wait_for_report(timeout=180, sleep_interval=10, report_type=_schedule_changed)
+
             Logger.logger.info("check if kubescape update succeeded")
             assert self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to create"
             new_cron_job_schedule = self.kubernetes_obj.get_ks_cronjob_schedule(statics.CA_NAMESPACE_FROM_HELM_NAME)

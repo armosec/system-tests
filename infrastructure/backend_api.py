@@ -1733,6 +1733,13 @@ class ControlPanelAPI(object):
         # We accept both:
         # - "ks-scheduled-scan-<framework>"
         # - "kubescape-scheduler"
+        #
+        # Important: some tests (e.g. "create 2 cronjobs MITRE+NSA") are framework-specific and MUST
+        # validate the framework-specific cronjob name, otherwise we'd hide regressions.
+        #
+        # Therefore:
+        # - For a *specific* framework (non-empty), we only accept "ks-scheduled-scan-<framework>".
+        # - For the default/empty framework, we accept either "ks-scheduled-scan-" or the legacy "kubescape-scheduler".
         expected_prefix = f"ks-scheduled-scan-{framework_name.lower()}"
         for cj in cronjobs:
             try:
@@ -3984,6 +3991,32 @@ class ControlPanelAPI(object):
             raise Exception(
                 'Error deleting %s SIEM integration. Customer: "%s" (code: %d, message: %s)' % (
                     provider, self.customer, r.status_code, r.text))
+    
+    def get_application_profiles(self, cluster: str, namespace: str) -> List:
+        url = API_KUBERNETES_RESOURCES
+        params = {"customerGUID": self.selected_tenant_id, "enrichObjects": "true"}
+        payload = {
+            "innerFilters": [
+                {
+                    "cluster": cluster,
+                    "kind": "applicationprofile|&ignorecase",
+                    "relatedNamespace": namespace,
+                }
+            ]
+        }
+        r = self.post(url, params=params, json=payload)
+        if not 200 <= r.status_code < 300:
+            raise Exception(
+                'Error accessing application profiles. Customer: "%s" (code: %d, message: %s)' % (
+                    self.customer, r.status_code, r.text))
+        response_data = r.json()
+        response_list = response_data.get('response', [])
+        kubernetes_objects = []
+        for item in response_list:
+            kubernetes_obj = item.get('kubernetesResourceObject')
+            if kubernetes_obj is not None:
+                kubernetes_objects.append(kubernetes_obj)
+        return kubernetes_objects
 
 
 class Solution(object):
