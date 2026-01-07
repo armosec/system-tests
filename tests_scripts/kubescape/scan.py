@@ -576,7 +576,6 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
     ):
         super(ScanGitRepositoryAndSubmit, self).__init__(
             test_obj=test_obj,
-
             backend=backend,
             kubernetes_obj=kubernetes_obj,
             test_driver=test_driver,
@@ -584,7 +583,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
 
     def start(self):
         # Fixme
-        return statics.SUCCESS, ""
+        # return statics.SUCCESS, ""
 
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
