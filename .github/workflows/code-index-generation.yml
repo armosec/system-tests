@@ -101,11 +101,12 @@ jobs:
           # - Go repos: go.mod exists → use Go indexgen
           # - Python repos: requirements.txt/pyproject.toml/setup.py exists → use pyindexgen
           if [ -f "go.mod" ]; then
-            echo "Detected Go repository (go.mod present) → using Go indexgen"
-            go run ./shared-rules/scripts/code-indexing/indexgen \
-              docs/indexes/code-index.json \
-              . \
-              --versioned
+            echo "Detected Go repository (go.mod present) → using Go indexgen (via shared-rules module)"
+            # shared-rules is a nested module; run Go tools from within it.
+            (cd shared-rules && go run ./scripts/code-indexing/indexgen \
+              ../docs/indexes/code-index.json \
+              .. \
+              --versioned)
           elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ] || [ -f "setup.py" ]; then
             echo "Detected Python repository → using pyindexgen"
             python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py \
@@ -133,18 +134,11 @@ jobs:
         run: |
           echo "🔍 Generating .cursorignore from code index..."
 
-          # For Go repos we can run in repo module; for non-Go repos, run inside shared-rules module.
-          if [ -f "go.mod" ]; then
-            go run ./shared-rules/scripts/code-indexing/gen-cursorignore \
-              -index docs/indexes/code-index.json \
-              -output .cursorignore \
-              -root .
-          else
-            (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore \
-              -index ../docs/indexes/code-index.json \
-              -output ../.cursorignore \
-              -root ..)
-          fi
+          # shared-rules is a nested Go module; run Go tools from within it.
+          (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore \
+            -index ../docs/indexes/code-index.json \
+            -output ../.cursorignore \
+            -root ..)
           
           if [ ! -f ".cursorignore" ]; then
             echo "Error: .cursorignore was not generated"
@@ -259,11 +253,12 @@ jobs:
             echo "  - If you use Merge Queue: rebase/update your PR branch and rerun checks."
             echo ""
             echo "Local commands:"
-            echo "  # Go:"
-          echo "  go run ./shared-rules/scripts/code-indexing/indexgen docs/indexes/code-index.json ."
-          echo "  # Python:"
-          echo "  python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
-            echo "  go run ./shared-rules/scripts/code-indexing/gen-cursorignore -index docs/indexes/code-index.json -output .cursorignore -root ."
+            echo "  # Go (run from shared-rules module):"
+            echo "  (cd shared-rules && go run ./scripts/code-indexing/indexgen ../docs/indexes/code-index.json ..)"
+            echo "  # Python:"
+            echo "  python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
+            echo "  # .cursorignore (works for Go+Python repos):"
+            echo "  (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore -index ../docs/indexes/code-index.json -output ../.cursorignore -root ..)"
             exit 1
           fi
 
