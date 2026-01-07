@@ -75,38 +75,11 @@ class KubescapeTests(object):
         )
 
     @staticmethod
-    def scan_repository_from_url_and_submit_to_backend():
+    def scan_git_repository_and_submit_to_backend():
         from tests_scripts.kubescape.scan import ScanGitRepositoryAndSubmit
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
             test_obj=ScanGitRepositoryAndSubmit,
-            policy_scope='framework',
-            policy_name='AllControls',
-            submit=True,
-            account=True,
-            git_repository=GitRepository(name='kubescape', owner="armosec", branch="master",
-                                         url="https://github.com/armosec/kubescape"),
-            expected_helm_files=[
-                "examples/helm_chart/templates/serviceaccount.yaml",
-                "examples/helm_chart/templates/cronjob.yaml"
-            ],
-            clone_before=False,
-            create_test_tenant=True
-        )
-
-    @staticmethod
-    def scan_local_repository_and_submit_to_backend():
-        from tests_scripts.kubescape.scan import ScanGitRepositoryAndSubmit
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanGitRepositoryAndSubmit,
-            policy_scope='framework',
-            policy_name='MITRE',
-            submit=True,
-            account=True,
-            git_repository=GitRepository(name='examples', owner="kubernetes", branch="master",
-                                         url="https://github.com/kubernetes/examples"),
-            clone_before=True,
             create_test_tenant=True
         )
 
@@ -164,24 +137,6 @@ class KubescapeTests(object):
             create_test_tenant = True
         )
 
-
-    @staticmethod
-    def scan_mitre_and_submit_to_backend():
-        from tests_scripts.kubescape.scan import ScanAndSubmitToBackend
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanAndSubmitToBackend,
-            policy_scope='framework',
-            policy_name='MITRE',
-            submit=True,
-            account=True,
-            resources_for_test=[
-                {'kind': 'Deployment', 'name': 'apache', 'namespace': 'system-test', 'apiVersion': 'apps/v1'},
-                {'kind': 'Namespace', 'name': 'system-test', 'namespace': '', 'apiVersion': 'v1'}],
-            yaml="apache.yaml",
-            namespace="system-test",
-            create_test_tenant=True
-        )
 
     @staticmethod
     def scan_with_exception_to_backend():
