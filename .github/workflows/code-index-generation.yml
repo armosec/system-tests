@@ -1,0 +1,357 @@
+name: Generate Code Index
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [main, master]
+    paths-ignore:
+      - '**/README.md'
+      - '**.md'
+  merge_group:
+  push:
+    branches: [main, master]
+    tags:
+      - 'v*.*.*'  # Trigger on version tags
+    paths-ignore:
+      - '**/README.md'
+      - '**.md'
+  workflow_dispatch:  # Allow manual trigger for testing
+
+concurrency:
+  group: code-index-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  GH_ACCESS_TOKEN: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN }}
+  GO_VERSION: '1.24'
+
+jobs:
+  generate-index:
+    runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/armosec,github.com/kubescape
+    steps:
+      - name: Checkout repository (PR head)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GH_ACCESS_TOKEN }}
+          submodules: recursive
+          fetch-depth: 0
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Checkout repository (merge_group / tag / manual)
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GH_ACCESS_TOKEN }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure Git for private repos
+        run: |
+          git config --global url.https://${{ env.GH_ACCESS_TOKEN }}@github.com/armosec/.insteadOf https://github.com/armosec/
+          git config --global url.https://${{ env.GH_ACCESS_TOKEN }}@github.com/kubescape/.insteadOf https://github.com/kubescape/
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          check-latest: false
+          cache: false
+
+      - name: Install code indexing tools
+        run: |
+          if [ ! -f "./shared-rules/scripts/code-indexing/install-code-indexing.sh" ]; then
+            echo "Error: install-code-indexing.sh not found in shared-rules submodule"
+            echo "Make sure the submodule is initialized and points to the correct branch"
+            exit 1
+          fi
+          
+          bash ./shared-rules/scripts/code-indexing/install-code-indexing.sh --shared-rules-path shared-rules
+          
+          # In CI we typically skip symlinks and use direct paths to shared-rules.
+          # Accept either layout:
+          #  - direct:   ./shared-rules/scripts/code-indexing/indexgen/main.go
+          #  - symlink:  ./scripts/code-indexing/indexgen/main.go
+          if [ ! -f "./shared-rules/scripts/code-indexing/indexgen/main.go" ] && [ ! -f "./scripts/code-indexing/indexgen/main.go" ]; then
+            echo "Error: Code indexing tools not found after installation"
+            echo "Expected either ./shared-rules/scripts/code-indexing/indexgen/main.go (direct) or ./scripts/code-indexing/indexgen/main.go (symlinked)"
+            exit 1
+          fi
+          echo "✅ Code indexing tools installed successfully"
+
+      - name: Generate Code Index
+        env:
+          TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          CI_JOB_ID: ${{ github.job }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          echo "Generating code index..."
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: $GITHUB_SHA"
+          echo "Branch/Tag: $GITHUB_REF"
+          echo "Run ID: $TEST_RUN_ID"
+          
+          mkdir -p docs/indexes/versions
+          
+          # Language detection (minimal, fast):
+          # - Go repos: go.mod exists → use Go indexgen
+          # - Python repos: requirements.txt/pyproject.toml/setup.py exists → use pyindexgen
+          if [ -f "go.mod" ]; then
+            echo "Detected Go repository (go.mod present) → using Go indexgen"
+            go run ./shared-rules/scripts/code-indexing/indexgen \
+              docs/indexes/code-index.json \
+              . \
+              --versioned
+          elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ] || [ -f "setup.py" ]; then
+            echo "Detected Python repository → using pyindexgen"
+            python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py \
+              docs/indexes/code-index.json \
+              . \
+              --versioned
+          else
+            echo "Error: Could not detect repository language for code indexing."
+            echo "Expected either go.mod (Go) or one of: pyproject.toml / requirements.txt / setup.py (Python)."
+            exit 1
+          fi
+          
+          if [ ! -f "docs/indexes/code-index.json" ]; then
+            echo "Error: Index file was not generated"
+            exit 1
+          fi
+          
+          echo "✅ Index generated successfully"
+          echo "Index file size: $(du -h docs/indexes/code-index.json | cut -f1)"
+          if [ -f "docs/indexes/versions/code-index-*.json" ]; then
+            echo "Versioned index also created"
+          fi
+
+      - name: Generate .cursorignore from Code Index
+        run: |
+          echo "🔍 Generating .cursorignore from code index..."
+
+          # For Go repos we can run in repo module; for non-Go repos, run inside shared-rules module.
+          if [ -f "go.mod" ]; then
+            go run ./shared-rules/scripts/code-indexing/gen-cursorignore \
+              -index docs/indexes/code-index.json \
+              -output .cursorignore \
+              -root .
+          else
+            (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore \
+              -index ../docs/indexes/code-index.json \
+              -output ../.cursorignore \
+              -root ..)
+          fi
+          
+          if [ ! -f ".cursorignore" ]; then
+            echo "Error: .cursorignore was not generated"
+            exit 1
+          fi
+          
+          echo "✅ .cursorignore generated successfully"
+          echo "File size: $(du -h .cursorignore | cut -f1)"
+
+      - name: Validate Generated Files
+        run: |
+          echo "🔍 Validating generated files..."
+          
+          # Validate code index structure
+          bash ./shared-rules/scripts/code-indexing/validate-index.sh docs/indexes/code-index.json
+          
+          # Validate .cursorignore exists and has content
+          if [ ! -s ".cursorignore" ]; then
+            echo "Error: .cursorignore is empty"
+            exit 1
+          fi
+          
+          echo "✅ Validation passed"
+
+      - name: Commit code index and .cursorignore (if changed)
+        if: |
+          (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'auto-update-index'))
+        run: |
+          set -euo pipefail
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check what changed (handles both new untracked files and modified tracked files)
+          INDEX_CHANGED=false
+          CURSORIGNORE_CHANGED=false
+          
+          # Check if code-index.json is new (untracked) or changed (modified)
+          if [ -f "docs/indexes/code-index.json" ]; then
+            if git ls-files --error-unmatch docs/indexes/code-index.json >/dev/null 2>&1; then
+              # File is tracked, check if modified
+              if ! git diff --quiet docs/indexes/code-index.json; then
+                INDEX_CHANGED=true
+              fi
+            else
+              # File is untracked (new)
+              INDEX_CHANGED=true
+            fi
+            if [ "$INDEX_CHANGED" = true ]; then
+              git add docs/indexes/code-index.json
+            fi
+          fi
+          
+          # Check if .cursorignore is new (untracked) or changed (modified)
+          if [ -f ".cursorignore" ]; then
+            if git ls-files --error-unmatch .cursorignore >/dev/null 2>&1; then
+              # File is tracked, check if modified
+              if ! git diff --quiet .cursorignore; then
+                CURSORIGNORE_CHANGED=true
+              fi
+            else
+              # File is untracked (new)
+              CURSORIGNORE_CHANGED=true
+            fi
+            if [ "$CURSORIGNORE_CHANGED" = true ]; then
+              git add .cursorignore
+            fi
+          fi
+          
+          # Commit if anything changed
+          if [ "$INDEX_CHANGED" = true ] || [ "$CURSORIGNORE_CHANGED" = true ]; then
+            COMMIT_MSG="chore: auto-update code index [skip ci]"
+            if [ "$INDEX_CHANGED" = true ] && [ "$CURSORIGNORE_CHANGED" = true ]; then
+              COMMIT_MSG="chore: auto-update code index and .cursorignore [skip ci]"
+            elif [ "$INDEX_CHANGED" = true ]; then
+              COMMIT_MSG="chore: auto-update code index [skip ci]"
+            else
+              COMMIT_MSG="chore: auto-update .cursorignore [skip ci]"
+            fi
+
+            git commit -m "$COMMIT_MSG"
+
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              echo "Pushing index update back to PR branch: ${{ github.event.pull_request.head.ref }}"
+              git push origin HEAD:${{ github.event.pull_request.head.ref }}
+            else
+              echo "Pushing index update back to branch: ${{ github.ref_name }}"
+              git push origin HEAD:${{ github.ref }}
+            fi
+
+            echo "✅ Committed & pushed changes:"
+            if [ "$INDEX_CHANGED" = true ]; then
+              echo "   - docs/indexes/code-index.json"
+            fi
+            if [ "$CURSORIGNORE_CHANGED" = true ]; then
+              echo "   - .cursorignore"
+            fi
+          else
+            echo "✅ No changes to commit"
+          fi
+
+      - name: Fail if index is stale (tags / manual)
+        if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.event_name != 'push'
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
+            echo "::error::Generated code index differs from what is committed."
+            echo "This repo requires docs/indexes/code-index.json (and .cursorignore) to be up to date."
+            echo ""
+            echo "Fix options:"
+            echo "  - Update the PR branch that is being merged (regenerate index + commit)."
+            echo "  - If you use Merge Queue: rebase/update your PR branch and rerun checks."
+            echo ""
+            echo "Local commands:"
+            echo "  # Go:"
+          echo "  go run ./shared-rules/scripts/code-indexing/indexgen docs/indexes/code-index.json ."
+          echo "  # Python:"
+          echo "  python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
+            echo "  go run ./shared-rules/scripts/code-indexing/gen-cursorignore -index docs/indexes/code-index.json -output .cursorignore -root ."
+            exit 1
+          fi
+
+      - name: Fail if index is stale (fork PRs)
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
+            echo "::error::Generated code index differs from what is committed."
+            echo "This repo requires docs/indexes/code-index.json (and .cursorignore) to be up to date."
+            echo ""
+            echo "Fix options:"
+            echo "  - This PR is from a fork, so the workflow cannot push commits back to your branch."
+            echo "  - Please run the index generator locally and commit the results."
+            echo "    Run (Go):     go run ./shared-rules/scripts/code-indexing/indexgen docs/indexes/code-index.json ."
+          echo "    Run (Python): python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
+            echo "    Then: go run ./shared-rules/scripts/code-indexing/gen-cursorignore -index docs/indexes/code-index.json -output .cursorignore -root ."
+            exit 1
+          fi
+
+      - name: Get Latest Commit SHA (after code index commit)
+        id: get-commit
+        run: |
+          # After committing the code index (if changed), get the current HEAD SHA
+          # If code index didn't change, this will be github.sha (the merge commit)
+          # If code index changed, this will be the new commit that includes the index
+          LATEST_SHA=$(git rev-parse HEAD)
+          echo "latest-sha=$LATEST_SHA" >> $GITHUB_OUTPUT
+          echo "📌 Current HEAD SHA: ${LATEST_SHA:0:8}"
+          
+          if [ "$LATEST_SHA" != "${{ github.sha }}" ]; then
+            echo "   ✅ Code index was committed (new SHA created)"
+            echo "   This commit includes the code index"
+          else
+            echo "   ℹ️  Code index didn't change (no new commit)"
+          fi
+          
+          echo "   Artifact will be named: code-index-$LATEST_SHA"
+
+      - name: Upload Index by Commit Hash (commit with code index)
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-index-${{ steps.get-commit.outputs.latest-sha }}
+          path: |
+            docs/indexes/code-index.json
+            docs/indexes/versions/*.json
+          retention-days: 90
+          if-no-files-found: warn  # Versioned indexes are optional
+
+      - name: Upload Latest Index
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-index-latest
+          path: docs/indexes/code-index.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload Index by Version Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-index-${{ github.ref_name }}
+          path: docs/indexes/code-index.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Print artifact summary
+        run: |
+          echo ""
+          echo "📦 Code Index Artifacts Created:"
+          echo "================================="
+          echo "Repository: ${{ github.repository }}"
+          echo ""
+          echo "1. code-index-${{ github.sha }}"
+          echo "   Purpose: Find by commit hash"
+          echo "   Retention: 90 days"
+          echo ""
+          echo "2. code-index-latest"
+          echo "   Purpose: Quick access to most recent"
+          echo "   Retention: 90 days"
+          echo ""
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "3. code-index-${{ github.ref_name }}"
+            echo "   Purpose: Find by version tag (RELEASE)"
+            echo "   Retention: 90 days"
+            echo "   ⭐ This is a release build!"
+          fi
+          echo ""
+          echo "✅ .cursorignore auto-generated and committed"
+          echo "================================="
+
