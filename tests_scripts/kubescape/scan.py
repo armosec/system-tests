@@ -611,7 +611,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
             },
         ]
 
-        kubescape_reports_to_config = {}
+        kubescape_reports_to_config = []
 
         for test_config in test_configs:
             policy_scope = test_config.get("policy_scope")
@@ -634,7 +634,7 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                     account=True,
                     path=temp_dir,
                 )
-                kubescape_reports_to_config[kubescape_report] = test_config
+                kubescape_reports_to_config.append((kubescape_report, test_config))
             else:
                 # Remote URL
                 kubescape_report = self.default_scan(
@@ -644,11 +644,11 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                     account=True,
                     url=git_repository.url,
                 )
-                kubescape_reports_to_config[kubescape_report] = test_config
+                kubescape_reports_to_config.append((kubescape_report, test_config))
 
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
-        for kubescape_report, test_config in kubescape_reports_to_config.items():
+        for kubescape_report, test_config in kubescape_reports_to_config:
             Logger.logger.info("Testing kubescape results")
             self.test_counters(framework_report=kubescape_report)
 
