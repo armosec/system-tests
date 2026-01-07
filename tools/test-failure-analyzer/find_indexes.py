@@ -28,6 +28,10 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 import requests
 
+# Cache artifact listings per (org, repo) to reduce API calls and rate-limit pressure.
+# Key: (github_org, repo) -> dict(name -> artifact_json)
+_ARTIFACTS_CACHE: Dict[Tuple[str, str], Dict[str, Any]] = {}
+
 # Always include these repositories (fallback for critical dependencies)
 ALWAYS_INCLUDE_REPOS = [
     ('armosec', 'armosec-infra'),      # Always needed for notifications, utils
@@ -150,30 +154,33 @@ def download_artifact(repo: str, artifact_name: str, output_dir: str, github_tok
         "User-Agent": "test-failure-analyzer/1.0"
     }
     
-    # List artifacts
-    api_url = f"https://api.github.com/repos/{github_org}/{repo}/actions/artifacts"
-    
     if debug:
         print(f"  📡 Searching for artifact: {artifact_name}")
     
     try:
-        resp = requests.get(api_url, headers=headers, params={"per_page": 100}, timeout=30)
-        if resp.status_code != 200:
+        cache_key = (github_org, repo)
+        repo_cache = _ARTIFACTS_CACHE.get(cache_key)
+        if repo_cache is None:
+            # List artifacts once per repo/org and cache
+            api_url = f"https://api.github.com/repos/{github_org}/{repo}/actions/artifacts"
+            resp = requests.get(api_url, headers=headers, params={"per_page": 100}, timeout=30)
+            if resp.status_code != 200:
+                if debug:
+                    print(f"  ❌ Failed to list artifacts: {resp.status_code}")
+                return None
+            data = resp.json()
+            artifacts = data.get('artifacts', []) or []
+            repo_cache = {a.get('name'): a for a in artifacts if isinstance(a, dict) and a.get('name')}
+            _ARTIFACTS_CACHE[cache_key] = repo_cache
             if debug:
-                print(f"  ❌ Failed to list artifacts: {resp.status_code}")
-            return None
-        
-        data = resp.json()
-        artifacts = data.get('artifacts', [])
-        
-        # Find matching artifact
-        matching = [a for a in artifacts if a.get('name') == artifact_name]
-        if not matching:
+                print(f"  📦 Cached {len(repo_cache)} artifacts for {github_org}/{repo}")
+
+        artifact = repo_cache.get(artifact_name) if repo_cache else None
+        if not artifact:
             if debug:
                 print(f"  ❌ Artifact not found: {artifact_name}")
             return None
-        
-        artifact = matching[0]
+
         artifact_id = artifact.get('id')
         
         if debug:
