@@ -28,12 +28,13 @@ import json
 import os
 import sys
 import traceback
+import re
 
 # Import dependency detection functions
 from detect_dependencies import analyze_all_chunks, filter_available_indexes
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 
 
 def load_json_file(file_path: str, required: bool = False) -> Optional[Dict[str, Any]]:
@@ -65,6 +66,217 @@ def load_text_file(file_path: str) -> Optional[str]:
     except Exception as e:
         print(f"Warning: Could not read {file_path}: {e}", file=sys.stderr)
         return None
+
+
+_TRACEBACK_FILE_LINE_RE = re.compile(r'File "([^"]+)", line (\d+)', re.MULTILINE)
+
+
+def _candidate_paths_from_trace(trace_path: str) -> List[Path]:
+    """
+    Generate a list of relative path candidates from an absolute traceback path.
+
+    This tries to handle common CI shapes like:
+      /home/runner/_work/<repo>/<repo>/<subpath>
+    and returns multiple possible suffixes for best-effort resolution.
+    """
+    p = Path(trace_path)
+    parts = list(p.parts)
+    candidates: List[Path] = []
+
+    # 1) As-is (absolute)
+    candidates.append(p)
+
+    # 2) Try to strip common CI prefix: .../_work/<repo>/<repo>/...
+    # Find "_work" segment
+    if "_work" in parts:
+        idx = parts.index("_work")
+        suffix_parts = parts[idx + 1:]  # <repo>/<repo>/...
+        if suffix_parts:
+            # Drop leading <repo>
+            suffix_parts = suffix_parts[1:]
+        if suffix_parts and len(suffix_parts) >= 2 and suffix_parts[0] == suffix_parts[1]:
+            # Drop duplicate repo name if present
+            suffix_parts = suffix_parts[1:]
+        if suffix_parts:
+            candidates.append(Path(*suffix_parts))
+
+    # 3) Add a few trailing slices (last 2..10 parts) to resolve regardless of repo root
+    for k in range(2, min(10, len(parts)) + 1):
+        candidates.append(Path(*parts[-k:]))
+
+    # De-dup while preserving order
+    seen = set()
+    out: List[Path] = []
+    for c in candidates:
+        key = str(c)
+        if key not in seen:
+            seen.add(key)
+            out.append(c)
+    return out
+
+
+def _resolve_traceback_file(trace_path: str, search_roots: List[Path]) -> Optional[Path]:
+    """
+    Resolve a traceback file path against a set of repo roots.
+    Returns the first existing file path found.
+    """
+    candidates = _candidate_paths_from_trace(trace_path)
+    for cand in candidates:
+        # Absolute candidate
+        if cand.is_absolute() and cand.exists():
+            return cand
+        # Try relative to each root
+        for root in search_roots:
+            full = (root / cand)
+            if full.exists():
+                return full
+    return None
+
+
+def _extract_file_snippet(path: Path, line_no: int, context_lines: int = 60) -> str:
+    """Extract a +/- context_lines snippet around line_no (1-based)."""
+    try:
+        lines = path.read_text(errors="replace").splitlines()
+    except Exception:
+        return ""
+
+    if line_no < 1:
+        line_no = 1
+
+    start = max(1, line_no - context_lines)
+    end = min(len(lines), line_no + context_lines)
+
+    snippet_lines = []
+    for i in range(start, end + 1):
+        prefix = ">>" if i == line_no else "  "
+        snippet_lines.append(f"{prefix} {i:5d}: {lines[i - 1]}")
+    return "\n".join(snippet_lines)
+
+
+def build_test_code_from_traceback(
+    error_logs: str,
+    search_roots: Optional[List[Path]] = None,
+    max_locations: int = 3,
+    context_lines: int = 60
+) -> Optional[str]:
+    """
+    Best-effort: build test_code snippets by parsing Python traceback file:line locations.
+    This prevents `test_code` from being null when we have file:line evidence in logs.
+    """
+    if not error_logs:
+        return None
+
+    roots = search_roots or []
+
+    # Add a couple sane defaults: repo root + current working dir
+    try:
+        roots.append(Path.cwd())
+    except Exception:
+        pass
+    try:
+        roots.append(Path(__file__).parents[2])  # system-tests repo root
+    except Exception:
+        pass
+    roots = [r for r in roots if r and r.exists()]
+
+    matches = list(_TRACEBACK_FILE_LINE_RE.finditer(error_logs))
+    if not matches:
+        return None
+
+    snippets: List[str] = []
+    used = 0
+    for m in matches:
+        if used >= max_locations:
+            break
+        file_path = m.group(1)
+        line_no = int(m.group(2))
+
+        resolved = _resolve_traceback_file(file_path, roots)
+        if not resolved:
+            continue
+
+        snippet = _extract_file_snippet(resolved, line_no=line_no, context_lines=context_lines)
+        if not snippet:
+            continue
+
+        snippets.append(f"# {resolved} (traceback: {file_path}:{line_no})\n{snippet}\n")
+        used += 1
+
+    if not snippets:
+        return None
+
+    return "\n".join(snippets)
+
+
+def extract_dependency_chunks_from_diffs(
+    code_diffs: Optional[Dict[str, Any]],
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]],
+    max_total_chunks: int = 6
+) -> List[Dict[str, Any]]:
+    """
+    Best-effort: if diffs show new imports/usages of dependency packages, pull the likely
+    dependency implementation chunks even if call-chain extraction doesn't cross repos.
+    """
+    if not code_diffs or not extra_indexes:
+        return []
+
+    cadb = code_diffs.get("cadashboardbe") or {}
+    git_diff = cadb.get("git_diff") or {}
+    files = git_diff.get("files") or []
+    if not isinstance(files, list):
+        return []
+
+    # Find github.com/armosec/<repo>/<path> imports/usages in patches
+    import_re = re.compile(r'github\\.com/armosec/([^/\"\\s]+)/([^\"\\s]+)')
+
+    candidates: List[Tuple[int, str, Dict[str, Any]]] = []  # (score, repo, chunk)
+
+    for f in files:
+        patch = (f or {}).get("patch") or ""
+        if not patch:
+            continue
+        for repo, subpath in import_re.findall(patch):
+            if repo not in extra_indexes:
+                continue
+            idx = extra_indexes.get(repo) or {}
+            chunks = idx.get("chunks", [])
+            if not isinstance(chunks, list):
+                continue
+
+            # Prefer chunks that live under the imported subpath and look like handlers/send-test-message
+            for ch in chunks:
+                file_path = (ch.get("file") or "")
+                name = (ch.get("name") or "")
+                score = 0
+                if subpath and subpath in file_path:
+                    score += 5
+                lname = name.lower()
+                if "sendtestmessage" in lname:
+                    score += 10
+                if "webhook" in lname:
+                    score += 3
+                if score > 0:
+                    candidates.append((score, repo, ch))
+
+    # Sort and pick top unique chunks
+    candidates.sort(key=lambda t: t[0], reverse=True)
+    out: List[Dict[str, Any]] = []
+    seen_ids = set()
+    for score, repo, ch in candidates:
+        if len(out) >= max_total_chunks:
+            break
+        cid = ch.get("id") or f"{repo}:{ch.get('file')}:{ch.get('name')}"
+        if cid in seen_ids:
+            continue
+        seen_ids.add(cid)
+        out.append({
+            **ch,
+            "repo_name": repo,
+            "source": "diff_dependency",
+            "priority": 2,
+        })
+
+    return out
 
 
 def load_analysis_prompts(prompts_file: str = None) -> Optional[str]:
@@ -154,6 +366,7 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
         # Add handler chunk
         handler_chunk = mapping.get("handler_chunk")
         if handler_chunk:
+            # Default priority - may be bumped later if this is the failing API
             chunks.append({
                 **handler_chunk,
                 "source": "api_handler",
@@ -178,6 +391,88 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
                 })
     
     return chunks
+
+
+_LOKI_REQ_RE = re.compile(r'"method":"([A-Z]+)".*?"requestURI":"([^"]+)"')
+_PLAIN_REQ_RE = re.compile(r'\b(GET|POST|PUT|DELETE|PATCH)\s+(/api/[^\\s]+)')
+_API_KEY_RE = re.compile(r'^\s*([A-Z]+)\s+(.+?)\s*$')
+_PARAM_SEGMENT_RE = re.compile(r"^(?:\{[^}]+\}|:[^/]+|<[^>]+>)$")
+
+
+def _split_segments(path: str) -> List[str]:
+    path = (path or "").split("?")[0].rstrip("/")
+    if not path.startswith("/"):
+        path = "/" + path
+    return [s for s in path.split("/") if s]
+
+
+def _is_param(seg: str) -> bool:
+    return bool(_PARAM_SEGMENT_RE.match(seg))
+
+
+def _paths_equivalent(a: str, b: str) -> bool:
+    aa = _split_segments(a)
+    bb = _split_segments(b)
+    if len(aa) != len(bb):
+        return False
+    for x, y in zip(aa, bb):
+        if x == y:
+            continue
+        if _is_param(x) or _is_param(y):
+            continue
+        return False
+    return True
+
+
+def extract_failing_request_from_logs(error_logs: str) -> Optional[Dict[str, str]]:
+    """
+    Best-effort: extract a representative failing request from logs.
+    Prefer Loki JSON lines (method + requestURI), fallback to plain 'METHOD /api/...' patterns.
+    """
+    if not error_logs:
+        return None
+
+    m = _LOKI_REQ_RE.search(error_logs)
+    if m:
+        method = m.group(1)
+        uri = m.group(2)
+        path = uri.split("?")[0]
+        return {"method": method, "path": path, "request_uri": uri}
+
+    m = _PLAIN_REQ_RE.search(error_logs)
+    if m:
+        method = m.group(1)
+        uri = m.group(2)
+        path = uri.split("?")[0]
+        return {"method": method, "path": path, "request_uri": uri}
+
+    return None
+
+
+def bump_priority_for_failing_api(chunks: List[Dict[str, Any]], failing_req: Optional[Dict[str, str]]) -> None:
+    """Mutate chunk priorities: failing API handler/call-chain gets priority 0."""
+    if not failing_req:
+        return
+    req_method = (failing_req.get("method") or "").upper()
+    req_path = failing_req.get("path") or ""
+
+    for ch in chunks:
+        api_keys: List[str] = []
+        if ch.get("api_path"):
+            api_keys.append(ch.get("api_path"))
+        if isinstance(ch.get("api_paths"), list):
+            api_keys.extend([x for x in ch.get("api_paths") if isinstance(x, str)])
+
+        for api_key in api_keys:
+            km = _API_KEY_RE.match(api_key)
+            if not km:
+                continue
+            key_method = km.group(1).upper()
+            key_path = km.group(2)
+            if key_method == req_method and _paths_equivalent(req_path, key_path):
+                # Most important: failing endpoint + its chain
+                ch["priority"] = 0
+                break
 
 
 def extract_chunks_from_connected_context(connected_context: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -239,6 +534,8 @@ def format_chunk_for_llm(chunk: Dict[str, Any], repo_name: str = None) -> Dict[s
     # Add API path if this chunk is related to an API
     if chunk.get("api_path"):
         formatted["api_path"] = chunk.get("api_path")
+    if isinstance(chunk.get("api_paths"), list) and chunk.get("api_paths"):
+        formatted["api_paths"] = chunk.get("api_paths")
     
     # Add call chain info if available
     if chunk.get("depth") is not None:
@@ -370,23 +667,64 @@ def format_context_as_text(context: Dict[str, Any]) -> str:
 
 
 def deduplicate_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Remove duplicate chunks (by ID)."""
-    seen_ids = set()
-    unique_chunks = []
-    
+    """
+    Remove duplicate chunks (by ID) while preserving multi-API association.
+
+    If the same chunk_id appears for multiple APIs, we merge:
+    - **api_path** into **api_paths** list
+    - keep the lowest priority
+    - keep the first non-empty code
+    - prefer "api_handler" source if any merged instance is an api handler
+    """
+    by_key: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+
+    def chunk_key(c: Dict[str, Any]) -> str:
+        cid = c.get("id") or c.get("chunk_id")
+        if cid:
+            return f"id:{cid}"
+        return f"meta:{c.get('name')}:{c.get('package')}:{c.get('file')}"
+
     for chunk in chunks:
-        chunk_id = chunk.get("id") or chunk.get("chunk_id")
-        if chunk_id and chunk_id not in seen_ids:
-            seen_ids.add(chunk_id)
-            unique_chunks.append(chunk)
-        elif not chunk_id:
-            # If no ID, use name+package+file as key
-            key = f"{chunk.get('name')}:{chunk.get('package')}:{chunk.get('file')}"
-            if key not in seen_ids:
-                seen_ids.add(key)
-                unique_chunks.append(chunk)
-    
-    return unique_chunks
+        key = chunk_key(chunk)
+        if key not in by_key:
+            merged = dict(chunk)
+            api_path = chunk.get("api_path")
+            if api_path:
+                merged["api_paths"] = [api_path]
+            by_key[key] = merged
+            order.append(key)
+            continue
+
+        merged = by_key[key]
+
+        # Merge api_path into api_paths
+        api_path = chunk.get("api_path")
+        if api_path:
+            ap = merged.get("api_paths")
+            if not isinstance(ap, list):
+                ap = []
+            if api_path not in ap:
+                ap.append(api_path)
+            merged["api_paths"] = ap
+
+        # Keep lowest priority (higher importance)
+        merged_pri = merged.get("priority", 999)
+        new_pri = chunk.get("priority", 999)
+        if isinstance(new_pri, int) and new_pri < merged_pri:
+            merged["priority"] = new_pri
+
+        # Prefer api_handler as source if any merged is api_handler
+        if merged.get("source") != "api_handler" and chunk.get("source") == "api_handler":
+            merged["source"] = "api_handler"
+
+        # Fill code if missing
+        if not merged.get("code") and chunk.get("code"):
+            merged["code"] = chunk.get("code")
+
+        by_key[key] = merged
+
+    return [by_key[k] for k in order]
 
 
 def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None, extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None) -> Optional[str]:
@@ -451,6 +789,17 @@ def build_llm_context(
         Dictionary with LLM-ready context
     """
     all_chunks = []
+
+    # 0. Ensure test_code isn't null if error logs contain traceback locations
+    if not test_code and error_logs:
+        derived = build_test_code_from_traceback(error_logs)
+        if derived:
+            test_code = derived
+            print("🧩 Derived test_code from traceback locations in error logs", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 0.5 Extract a representative failing request from logs (used to prioritize the most relevant API)
+    failing_request = extract_failing_request_from_logs(error_logs) if error_logs else None
     
     # 1. Extract chunks from API mapping (highest priority - directly tested APIs)
     if api_mapping:
@@ -467,6 +816,17 @@ def build_llm_context(
         connected_chunks = extract_chunks_from_connected_context(connected_context)
         all_chunks.extend(connected_chunks)
         print(f"   Added {len(connected_chunks)} chunks from connected context")
+
+    # 2.5 Extract extra dependency chunks hinted by diffs (covers cases where call-chain doesn't cross repos)
+    if code_diffs and extra_indexes:
+        extra_diff_chunks = extract_dependency_chunks_from_diffs(code_diffs, extra_indexes)
+        if extra_diff_chunks:
+            all_chunks.extend(extra_diff_chunks)
+            print(f"   ➕ Added {len(extra_diff_chunks)} dependency chunks hinted by diffs", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 2.6 Prioritize failing API chunks (set priority=0 for matching api_path)
+    bump_priority_for_failing_api(all_chunks, failing_request)
     
     # 3. Deduplicate chunks
     print("🧹 Deduplicating chunks...", file=sys.stderr)
@@ -554,6 +914,8 @@ def build_llm_context(
         "chunks_by_repo": {},
         "repos": {}
     }
+    if failing_request:
+        metadata["failing_request"] = failing_request
     
     # Count chunks by source and repo
     for chunk in formatted_chunks:

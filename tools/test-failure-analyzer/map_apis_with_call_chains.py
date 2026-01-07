@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 from typing import Dict, List, Any
 
 # Import functions from other modules
@@ -124,8 +125,8 @@ def main():
     )
     parser.add_argument(
         "--mapping",
-        default="system_test_mapping.json",
-        help="Path to system_test_mapping.json (default: system_test_mapping.json)"
+        default=None,
+        help="Path to system test mapping JSON (default: prefer system_test_mapping_artifact.json, fallback to system_test_mapping.json)"
     )
     parser.add_argument(
         "--index",
@@ -151,9 +152,22 @@ def main():
     args = parser.parse_args()
     
     # Load test mapping and code index
-    print(f"Loading test mapping from: {args.mapping}")
     from map_apis_to_code import load_test_mapping, load_code_index
-    test_mapping = load_test_mapping(args.mapping)
+    mapping_path = args.mapping
+    if not mapping_path:
+        repo_root = Path(__file__).parents[2]
+        artifact = repo_root / "system_test_mapping_artifact.json"
+        mapping_path = str(artifact) if artifact.exists() else str(repo_root / "system_test_mapping.json")
+
+    if not os.path.exists(mapping_path) and mapping_path.endswith("system_test_mapping_artifact.json"):
+        # Fallback for older runs
+        repo_root = Path(__file__).parents[2]
+        fallback = repo_root / "system_test_mapping.json"
+        if fallback.exists():
+            mapping_path = str(fallback)
+
+    print(f"Loading test mapping from: {mapping_path}")
+    test_mapping = load_test_mapping(mapping_path)
     
     print(f"Loading code index from: {args.index}")
     code_index = load_code_index(args.index)
