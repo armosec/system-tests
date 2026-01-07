@@ -272,6 +272,7 @@ def generate_summary(
     context_summary_path: str,
     environment: str,
     run_ref: str,
+    actor: str = "",
     workflow_commit_path: str = None,
     llm_analysis_path: str = None,
     test_deployed_services_path: str = None,
@@ -326,14 +327,16 @@ def generate_summary(
     if not llm_context:
         return "⚠️  LLM context not available - cannot generate summary\n"
     
+    # Resolved title (uses resolved environment/repo/test after analyzer ran)
+    metadata = llm_context.get('metadata', {})
+    test_name = metadata.get('test_name', 'unknown')
+
     # ========================================
     # LLM Context Summary
     # ========================================
+    # NOTE: Triggering repo resolution happens below; we insert the title once triggering_repo_display is computed.
     lines.append("## 📊 LLM Context Summary\n")
     lines.append("")
-    
-    metadata = llm_context.get('metadata', {})
-    test_name = metadata.get('test_name', 'unknown')
     test_run_id = metadata.get('test_run_id', 'N/A')
     total_chunks = metadata.get('total_chunks', 0)
     total_lines = metadata.get('total_lines_of_code', 0)
@@ -366,6 +369,13 @@ def generate_summary(
             triggering_repo_display = f"armosec/{triggering_repo}"
     
     # Header section - Repository, Environment, Test
+    resolved_actor = actor or os.environ.get("GITHUB_ACTOR") or "unknown"
+    resolved_env = environment or "unknown"
+    title = f"# {resolved_actor} | {triggering_repo_display} | {resolved_env} | {test_name}\n"
+    # Put title above everything else (the "run title" can’t be changed after workflow start)
+    lines.insert(0, "")
+    lines.insert(0, title)
+
     lines.append(f"**Repository:** `{triggering_repo_display}`")
     lines.append(f"**Environment:** `{environment}`")
     lines.append(f"**Test:** `{test_name}`")
@@ -1276,6 +1286,7 @@ def main():
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
     parser.add_argument('--run-ref', default='')
+    parser.add_argument('--actor', default='', help='GitHub actor (user) that triggered the analyzer run')
     parser.add_argument('--workflow-commit', help='Path to workflow-commit.txt (fallback for RC commit)')
     parser.add_argument('--llm-analysis', help='Path to llm-analysis.json (optional, for AI analysis summary)')
     parser.add_argument('--output', help='Output file (defaults to $GITHUB_STEP_SUMMARY)')
@@ -1304,6 +1315,7 @@ def main():
             args.context_summary,
             args.environment,
             args.run_ref,
+            args.actor,
             args.workflow_commit,  # workflow_commit_path (position 10)
             args.llm_analysis,      # llm_analysis_path (position 11)
             args.test_deployed_services,  # test_deployed_services_path (position 12)
