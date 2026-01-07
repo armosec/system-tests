@@ -1,4 +1,4 @@
 [submodule "shared-rules"]
 	path = shared-rules
-	url = git@github.com:armosec/armosec-ai-shared-rules.git
-	branch = main
+	url = https://github.com/armosec/armosec-ai-shared-rules.git
+	branch = python_code_index
