@@ -675,6 +675,8 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                     time.sleep(5)
 
             assert repo_summary, f"ReportGUID was found ({new_report_guid}) but repository summary API returned an empty result"
+            
+            Logger.logger.info(f"BE - Repository summary: {repo_summary}")
 
             designators_attributes = repo_summary["designators"]["attributes"]
             assert designators_attributes[
@@ -698,9 +700,9 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
                 kubescape_status_to_control_id[control["status"]].append(c_id)
 
             # Check controlsStats counters in Repo Summary
-            assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"])
-            assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"])
-            assert repo_summary["controlsStats"]["skipped"] == len(kubescape_status_to_control_id["skipped"])
+            assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"]), f"Expected {len(kubescape_status_to_control_id['passed'])} passed controls, but got {repo_summary['controlsStats']['passed']}"
+            assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"]), f"Expected {len(kubescape_status_to_control_id['failed'])} failed controls, but got {repo_summary['controlsStats']['failed']}"
+            assert repo_summary["controlsStats"]["skipped"] == len(kubescape_status_to_control_id["skipped"]), f"Expected {len(kubescape_status_to_control_id['skipped'])} skipped controls, but got {repo_summary['controlsStats']['skipped']}"
 
             # Check controlsInfo in Repo Summary
             assert sorted([c["id"] for c in repo_summary["controlsInfo"]["failed"]]) == sorted(
