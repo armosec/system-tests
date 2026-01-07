@@ -15,6 +15,7 @@ import ast
 import os
 from pathlib import Path
 from collections import defaultdict
+from typing import Dict, Optional, Tuple
 
 # Get the repository root (parent of scripts/)
 REPO_ROOT = Path(__file__).parent.parent.resolve()
@@ -276,6 +277,153 @@ def get_api_method_mapping():
         'delete_siem_integration': {'method': 'DELETE', 'path': '/api/v1/siem/{provider}'},
     }
 
+def _evaluate_concat_expression(expr: str, definitions: Dict[str, str], max_depth: int = 8) -> Optional[str]:
+    """
+    Best-effort evaluation for expressions like:
+      API_FOO = API_BASE + \"bar\" + \"/baz\"
+    Returns a resolved string if possible.
+    """
+    expr = (expr or "").strip()
+    if not expr:
+        return None
+
+    # string literal
+    if (expr.startswith("'") and expr.endswith("'")) or (expr.startswith('"') and expr.endswith('"')):
+        return expr[1:-1]
+
+    if max_depth <= 0:
+        return None
+
+    # Support basic concatenation with '+'
+    parts = [p.strip().strip("() ") for p in expr.split("+")]
+    if len(parts) >= 2:
+        out = ""
+        for part in parts:
+            if not part:
+                continue
+            if (part.startswith("'") and part.endswith("'")) or (part.startswith('"') and part.endswith('"')):
+                out += part[1:-1]
+                continue
+            if part in definitions:
+                resolved = _evaluate_concat_expression(definitions[part], definitions, max_depth=max_depth - 1)
+                if resolved is None:
+                    return None
+                out += resolved
+                continue
+            return None
+        return out
+
+    # Reference to another const
+    if expr in definitions:
+        return _evaluate_concat_expression(definitions[expr], definitions, max_depth=max_depth - 1)
+
+    return None
+
+
+def _extract_backend_api_method_mapping(repo_root: Path) -> Dict[str, Dict[str, str]]:
+    """
+    Best-effort extraction of backend method -> {method, path} from infrastructure/backend_api.py.
+    This is used as a fallback when get_api_method_mapping() doesn't include a method.
+    """
+    backend_api = repo_root / "infrastructure" / "backend_api.py"
+    if not backend_api.exists():
+        return {}
+
+    try:
+        text = backend_api.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        text = backend_api.read_text(errors="ignore")
+
+    # Collect constant definitions (simple assignment lines). Many are concatenations.
+    assign_re = re.compile(r"^(?P<k>(API|BASE)_[A-Z0-9_]+)\s*=\s*(?P<rhs>.+?)\s*$", re.M)
+    raw_defs: Dict[str, str] = {m.group("k"): m.group("rhs") for m in assign_re.finditer(text)}
+
+    resolved_consts: Dict[str, str] = {}
+    for k, rhs in raw_defs.items():
+        val = _evaluate_concat_expression(rhs, raw_defs)
+        if isinstance(val, str) and "/api/" in val:
+            resolved_consts[k] = val
+
+    # Parse with AST to discover per-method verbs and url sources.
+    try:
+        tree = ast.parse(text)
+    except Exception:
+        return {}
+
+    results: Dict[str, Dict[str, str]] = {}
+
+    def resolve_path_from_value(node) -> Optional[str]:
+        # url = API_CONST
+        if isinstance(node, ast.Name) and node.id in resolved_consts:
+            return resolved_consts[node.id]
+        # url = BASE_API + "/suffix"
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+            # convert to string if possible by folding Name/Constant
+            parts = []
+            def walk(n):
+                if isinstance(n, ast.BinOp) and isinstance(n.op, ast.Add):
+                    walk(n.left); walk(n.right); return
+                if isinstance(n, ast.Name) and n.id in resolved_consts:
+                    parts.append(resolved_consts[n.id]); return
+                if isinstance(n, ast.Constant) and isinstance(n.value, str):
+                    parts.append(n.value); return
+            walk(node)
+            s = "".join(parts)
+            if "/api/" in s:
+                return s[s.find("/api/"):]
+        # f"{API_CONST}/{param}"  (JoinedStr)
+        if isinstance(node, ast.JoinedStr):
+            base = ""
+            for v in node.values:
+                if isinstance(v, ast.Constant) and isinstance(v.value, str):
+                    base += v.value
+                elif isinstance(v, ast.FormattedValue):
+                    # treat formatted values as placeholder
+                    base += "{param}"
+            if "/api/" in base:
+                return base[base.find("/api/"):]
+        return None
+
+    for fn in [n for n in tree.body if isinstance(n, ast.FunctionDef)]:
+        # backend_api.py is a class-heavy file; methods are inside class defs
+        pass
+    for cls in [n for n in tree.body if isinstance(n, ast.ClassDef)]:
+        for fn in [n for n in cls.body if isinstance(n, ast.FunctionDef)]:
+            verb = None
+            path = None
+            # Find r = self.<verb>(...) call and try to resolve its first argument or url var
+            for n in ast.walk(fn):
+                if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and n.targets[0].id == "url":
+                    path = path or resolve_path_from_value(n.value)
+                if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name) and n.func.value.id == "self":
+                    if n.func.attr in ("get", "post", "put", "delete"):
+                        verb = verb or n.func.attr.upper()
+                        if n.args:
+                            path = path or resolve_path_from_value(n.args[0])
+            if verb and path and "/api/" in path:
+                # normalize to path only (strip scheme/host if any)
+                if "://" in path:
+                    path = path[path.find("/api/"):]
+                results[fn.name] = {"method": verb, "path": path}
+
+    return results
+
+
+def build_api_method_mapping(repo_root: Path = REPO_ROOT) -> Dict[str, Dict[str, str]]:
+    """
+    Combined mapping:
+    - Static table from get_api_method_mapping() (kept for stability)
+    - Dynamic extraction from backend_api.py as a fallback (fills gaps)
+    """
+    mapping = dict(get_api_method_mapping())
+    dynamic = _extract_backend_api_method_mapping(repo_root)
+    # Do not override existing keys (static table is source of truth where present)
+    for k, v in dynamic.items():
+        if k not in mapping:
+            mapping[k] = v
+    return mapping
+
+
 def find_base_classes(file_path):
     """Find base classes that a test file might inherit from."""
     base_files = []
@@ -313,6 +461,11 @@ def find_base_classes(file_path):
     if 'workflows/' in str(file_path):
         if 'tests_scripts/workflows/workflows.py' not in base_files:
             base_files.append('tests_scripts/workflows/workflows.py')
+
+    # Accounts tests commonly inherit from Accounts base class, which contains most backend calls.
+    if 'tests_scripts/accounts/' in str(file_path):
+        if 'tests_scripts/accounts/accounts.py' not in base_files:
+            base_files.append('tests_scripts/accounts/accounts.py')
     
     return base_files
 
@@ -325,7 +478,7 @@ def update_system_mapping():
     print("📖 Loading system test mapping...")
     mapping_file = REPO_ROOT / 'system_test_mapping.json'
     system_mapping = load_json_file(str(mapping_file))
-    api_method_mapping = get_api_method_mapping()
+    api_method_mapping = build_api_method_mapping(REPO_ROOT)
     
     tests_dir = REPO_ROOT / 'tests_scripts'
     updated_count = 0
