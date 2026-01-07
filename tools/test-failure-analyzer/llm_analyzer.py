@@ -98,6 +98,24 @@ If you propose a test fix, make it concrete:
 System-test implementation files (from mapping):
 {chr(10).join([f"- {p}" for p in st_files[:25]]) if st_files else "- (not available)"}
 """)
+
+    prompt_parts.append("""
+## Analyzer Improvement Suggestions (future analysis quality)
+
+After you finish the root-cause analysis and recommended fixes, also provide **2-5 concrete improvements** to the *system test failure analyzer flow* itself.
+
+Focus on improvements that would make future analyses more accurate and less ambiguous, for example:
+- Better failing-request extraction (ensure the “failing endpoint” is the one that actually failed, not the first request in logs)
+- Capture/attach the exact system-tests ref/commit that ran and include it in metadata
+- Include additional test-side chunks (or narrower chunk selection) when a specific helper is in the traceback
+- Improve Loki queries (narrow by pod/app labels, add keywords like “failed to connect”, include relevant DB/proxy logs)
+- Emit explicit “data readiness” signals (e.g., whether aggregator/ingest completed) to distinguish infra vs eventual consistency vs app bugs
+
+Provide each suggestion as:
+- **Problem** (what is missing today)
+- **Change** (what to add/change in the analyzer)
+- **Benefit** (why it helps)
+""")
     
     # Add cross-test interference data from context (this is INPUT, not a conclusion)
     interference_data = llm_context.get('cross_test_interference')

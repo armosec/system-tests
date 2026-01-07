@@ -408,8 +408,21 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
 
 _LOKI_REQ_RE = re.compile(r'"method":"([A-Z]+)".*?"requestURI":"([^"]+)"')
 _PLAIN_REQ_RE = re.compile(r'\b(GET|POST|PUT|DELETE|PATCH)\s+(/api/[^\\s]+)')
+_BACKEND_API_REQ_RE = re.compile(r'\bRequest:\s*([a-zA-Z_][a-zA-Z0-9_]*)\b')
 _API_KEY_RE = re.compile(r'^\s*([A-Z]+)\s+(.+?)\s*$')
 _PARAM_SEGMENT_RE = re.compile(r"^(?:\{[^}]+\}|:[^/]+|<[^>]+>)$")
+
+# Best-effort mapping for common backend_api methods -> HTTP endpoint.
+# This is used only for prioritization of the failing API in LLM context.
+_BACKEND_METHOD_TO_ENDPOINT: Dict[str, Dict[str, str]] = {
+    # security risks
+    "get_security_risks_list": {"method": "POST", "path": "/api/v1/securityrisks/list"},
+    "get_security_risks_severities": {"method": "POST", "path": "/api/v1/securityrisks/severities"},
+    "get_security_risks_categories": {"method": "POST", "path": "/api/v1/securityrisks/categories"},
+    "get_security_risks_trends": {"method": "POST", "path": "/api/v1/securityrisks/trends"},
+    # unique-values endpoints (commonly used in scenarios)
+    "get_security_risks_list_uniquevalues": {"method": "POST", "path": "/api/v1/uniqueValues/securityrisks/list"},
+}
 
 
 def _split_segments(path: str) -> List[str]:
@@ -445,19 +458,34 @@ def extract_failing_request_from_logs(error_logs: str) -> Optional[Dict[str, str
     if not error_logs:
         return None
 
+    # Prefer explicit backend_api error messages:
+    #   "Error accessing dashboard. Request: get_security_risks_severities ..."
+    bm = _BACKEND_API_REQ_RE.search(error_logs)
+    if bm:
+        backend_method = bm.group(1)
+        mapped = _BACKEND_METHOD_TO_ENDPOINT.get(backend_method)
+        if mapped:
+            return {
+                "method": mapped["method"],
+                "path": mapped["path"],
+                "request_uri": f"{mapped['method']} {mapped['path']}",
+                "backend_method": backend_method,
+                "source": "backend_api_error",
+            }
+
     m = _LOKI_REQ_RE.search(error_logs)
     if m:
         method = m.group(1)
         uri = m.group(2)
         path = uri.split("?")[0]
-        return {"method": method, "path": path, "request_uri": uri}
+        return {"method": method, "path": path, "request_uri": uri, "source": "loki_http"}
 
     m = _PLAIN_REQ_RE.search(error_logs)
     if m:
         method = m.group(1)
         uri = m.group(2)
         path = uri.split("?")[0]
-        return {"method": method, "path": path, "request_uri": uri}
+        return {"method": method, "path": path, "request_uri": uri, "source": "plain_http"}
 
     return None
 
