@@ -396,3 +396,107 @@ class SynchronizerProxy(BaseSynchronizer):
         self.verify_backend_resources_deleted(cluster, namespace_2, iterations=20, sleep_time=30)
 
         return self.cleanup()
+
+
+class SynchronizerReconciliation(BaseSynchronizer):
+    def __init__(
+        self, test_obj=None, backend=None, kubernetes_obj=None, test_driver=None
+    ):
+        super(SynchronizerReconciliation, self).__init__(
+            test_driver=test_driver,
+            test_obj=test_obj,
+            backend=backend,
+            kubernetes_obj=kubernetes_obj,
+        )
+
+    def start(self):
+        """
+        Test plan:
+        1. Apply workloads
+        2. Install Kubescape helm chart
+        3. Check all workloads are reported
+        4. Scale down synchronizer
+        5. Restart workload 1 (modify)
+        6. Delete workload 2 (delete)
+        7. Scale up synchronizer
+        8. Check workload 1 have new resource version
+        9. Check workload 2 is deleted
+
+        """
+        if self.backend.server == "https://api.armosec.io": # skip test for production
+            Logger.logger.info(f"Skipping test '{self.test_driver.test_name}' for production backend")
+            return statics.SUCCESS, ""
+
+        cluster, namespace_1 = self.setup(apply_services=False)
+
+        helm_kwargs = self.test_obj.get_arg("helm_kwargs")
+
+        # This test will fail if the synchronizer (BE) is configured with a greater interval than the test.
+        # Make sure that the BE is aligned with test config.
+        # See: https://github.com/kubescape/synchronizer/blob/main/config/config.go#L61
+        reconciliation_interval_minutes = self.test_obj.get_arg(
+            "reconciliation_interval_minutes"
+        )
+        Logger.logger.info(
+            f"Testing synchronizer reconciliation flow with interval of {reconciliation_interval_minutes} minutes"
+        )
+
+        Logger.logger.info(f"1. Apply workloads")
+        workload_1 = self.apply_yaml_file(
+            yaml_file=self.test_obj["workload_1"], namespace=namespace_1
+        )
+        self.verify_all_pods_are_running(
+            namespace=namespace_1, workload=workload_1, timeout=180
+        )
+
+        namespace_2 = self.create_namespace()
+        workload_2 = self.apply_yaml_file(
+            yaml_file=self.test_obj["workload_2"], namespace=namespace_2
+        )
+        self.verify_all_pods_are_running(
+            namespace=namespace_2, workload=workload_2, timeout=180
+        )
+
+        Logger.logger.info("2. Install Helm Chart")
+        self.add_and_upgrade_armo_to_repo()
+        self.install_armo_helm_chart(helm_kwargs=self.helm_kwargs)
+        self.verify_running_pods(
+            namespace=statics.CA_NAMESPACE_FROM_HELM_NAME, timeout=360
+        )
+        TestUtil.sleep(20, "wait for synchronization", "info")
+
+        Logger.logger.info("3. Check BE vs. Cluster - resources created in BE")
+        self.verify_backend_resources(cluster, namespace_1)
+        self.verify_backend_resources(cluster, namespace_2)
+
+        Logger.logger.info("4. Scale down synchronizer")
+        self.scale_down_synchronizer(statics.CA_NAMESPACE_FROM_HELM_NAME)
+        TestUtil.sleep(10)
+
+        Logger.logger.info("5. Restart workload 1")
+        self.restart_all_workloads(namespace=namespace_1)
+
+        Logger.logger.info("6. Delete workload 2")
+        self.delete_all_workloads(namespace=namespace_2)
+        TestUtil.sleep(10)
+
+        Logger.logger.info("7. Scale up synchronizer")
+        self.scale_up_synchronizer(statics.CA_NAMESPACE_FROM_HELM_NAME)
+
+        Logger.logger.info("8. Check BE vs. Cluster - waiting for reconciliation")
+        self.verify_backend_resources(
+            cluster,
+            namespace_1,
+            iterations=reconciliation_interval_minutes,
+            sleep_time=60,
+        )  # every 60 seconds X times (=interval)
+
+        Logger.logger.info("7. Check BE vs. Cluster - resources deleted from BE")
+        self.verify_backend_resources_deleted(
+            cluster,
+            namespace_2,
+            iterations=reconciliation_interval_minutes,
+            sleep_time=60,
+        )
+
+        return self.cleanup()
