@@ -24,8 +24,10 @@ Usage:
 """
 
 import argparse
+import base64
 import json
 import os
+import shutil
 import sys
 import traceback
 import re
@@ -34,7 +36,7 @@ import re
 from detect_dependencies import analyze_all_chunks, filter_available_indexes
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, Set
 
 
 def normalize_test_name(test_name: Optional[str]) -> Optional[str]:
@@ -762,6 +764,156 @@ def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None
     return None
 
 
+def _gh_env() -> Dict[str, str]:
+    """
+    Ensure gh CLI has a token in env. GitHub Actions often provides GITHUB_TOKEN,
+    while gh prefers GH_TOKEN. Mirror if needed.
+    """
+    env = dict(os.environ)
+    if not env.get("GH_TOKEN") and env.get("GITHUB_TOKEN"):
+        env["GH_TOKEN"] = env["GITHUB_TOKEN"]
+    return env
+
+
+def _gh_api(path: str) -> Optional[Any]:
+    """Call `gh api <path>` and parse JSON output. Returns None on failure."""
+    if not shutil.which("gh"):
+        return None
+    try:
+        import subprocess
+        proc = subprocess.run(
+            ["gh", "api", path],
+            capture_output=True,
+            text=True,
+            env=_gh_env(),
+            check=False,
+        )
+        if proc.returncode != 0:
+            return None
+        return json.loads(proc.stdout or "null")
+    except Exception:
+        return None
+
+
+def _extract_imported_repo_dirs_from_patches(code_diffs: Dict[str, Any]) -> Dict[Tuple[str, str], Set[str]]:
+    """
+    Parse git diff patches to find imports like:
+      github.com/<org>/<repo>/<dir>/<pkg>
+    Returns mapping: (org, repo) -> {dir paths (within repo)}.
+    """
+    results: Dict[Tuple[str, str], Set[str]] = {}
+
+    cadb = code_diffs.get("cadashboardbe") or {}
+    git_diff = cadb.get("git_diff") or {}
+    files = git_diff.get("files") or []
+    for f in files:
+        patch = (f or {}).get("patch") or ""
+        if not patch:
+            continue
+
+        for m in re.finditer(r"github\\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
+            org = m.group(1)
+            repo = m.group(2)
+            rest = (m.group(3) or "").lstrip("/")
+
+            # Avoid huge scans: require at least one directory component
+            if not rest or "/" not in rest:
+                continue
+
+            results.setdefault((org, repo), set()).add(rest)
+
+    return results
+
+
+def _fetch_repo_dir_go_files(org: str, repo: str, dir_path: str, ref: str, max_files: int) -> List[str]:
+    data = _gh_api(f"repos/{org}/{repo}/contents/{dir_path}?ref={ref}")
+    if not isinstance(data, list):
+        return []
+    out: List[str] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") != "file":
+            continue
+        path = item.get("path") or ""
+        if not path.endswith(".go"):
+            continue
+        out.append(path)
+        if len(out) >= max_files:
+            break
+    return out
+
+
+def _fetch_repo_file_content(org: str, repo: str, file_path: str, ref: str, max_lines: int) -> Optional[str]:
+    data = _gh_api(f"repos/{org}/{repo}/contents/{file_path}?ref={ref}")
+    if not isinstance(data, dict):
+        return None
+    content_b64 = data.get("content")
+    encoding = data.get("encoding")
+    if not content_b64 or encoding != "base64":
+        return None
+    try:
+        raw = base64.b64decode(content_b64).decode("utf-8", errors="replace")
+        lines = raw.splitlines()
+        if len(lines) > max_lines:
+            raw = "\n".join(lines[:max_lines]) + "\n// ... truncated ..."
+        return raw
+    except Exception:
+        return None
+
+
+def fetch_dependency_source_snippets(
+    code_diffs: Optional[Dict[str, Any]],
+    found_indexes: Optional[Dict[str, Any]],
+    max_files_total: int = 6,
+    max_lines_per_file: int = 200,
+) -> List[Dict[str, Any]]:
+    """
+    Fetch small source snippets for dependency repos that appear in import diffs.
+    This enables the LLM to propose concrete patches even when dependency code
+    isn't present in local workspaces or extracted call chains.
+    """
+    if not code_diffs or not found_indexes:
+        return []
+
+    repo_dirs = _extract_imported_repo_dirs_from_patches(code_diffs)
+    if not repo_dirs:
+        return []
+
+    idx = found_indexes.get("indexes") or {}
+    chunks: List[Dict[str, Any]] = []
+
+    for (org, repo), dirs in repo_dirs.items():
+        repo_info = idx.get(repo) or {}
+        rc = repo_info.get("rc") or {}
+        deployed = repo_info.get("deployed") or {}
+        ref = (rc.get("commit") or "").strip() or (deployed.get("commit") or "").strip()
+        if not ref:
+            continue
+
+        for dir_path in sorted(dirs)[:2]:
+            go_files = _fetch_repo_dir_go_files(org, repo, dir_path, ref, max_files=max_files_total)
+            for fp in go_files:
+                code = _fetch_repo_file_content(org, repo, fp, ref, max_lines=max_lines_per_file)
+                if not code:
+                    continue
+                chunks.append({
+                    "id": f"dependency_source/{repo}/{fp}@{ref}",
+                    "name": os.path.basename(fp),
+                    "type": "file",
+                    "package": os.path.dirname(fp),
+                    "file": fp,
+                    "code": code,
+                    "repo": repo,
+                    "source": "dependency_source",
+                    "priority": 1,
+                })
+                if len(chunks) >= max_files_total:
+                    return chunks
+
+    return chunks
+
+
 def build_llm_context(
     test_name: str,
     test_run_id: Optional[str],
@@ -778,7 +930,10 @@ def build_llm_context(
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     cross_test_interference: Optional[Dict[str, Any]] = None,
     gomod_dependencies: Optional[Dict[str, Any]] = None,
-    found_indexes_path: str = "artifacts/found-indexes.json"
+    found_indexes_path: str = "artifacts/found-indexes.json",
+    fetch_dependency_sources: bool = False,
+    fetch_dependency_sources_max_files: int = 6,
+    fetch_dependency_sources_max_lines: int = 200,
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -835,6 +990,25 @@ def build_llm_context(
         if extra_diff_chunks:
             all_chunks.extend(extra_diff_chunks)
             print(f"   ➕ Added {len(extra_diff_chunks)} dependency chunks hinted by diffs", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 2.55 Fetch dependency source snippets (bounded) so we can propose concrete patches from LLM context
+    if fetch_dependency_sources and code_diffs and found_indexes_path and os.path.exists(found_indexes_path):
+        try:
+            with open(found_indexes_path, "r") as f:
+                found_indexes = json.load(f)
+            dep_src_chunks = fetch_dependency_source_snippets(
+                code_diffs=code_diffs,
+                found_indexes=found_indexes,
+                max_files_total=fetch_dependency_sources_max_files,
+                max_lines_per_file=fetch_dependency_sources_max_lines,
+            )
+            if dep_src_chunks:
+                all_chunks.extend(dep_src_chunks)
+                print(f"   ➕ Added {len(dep_src_chunks)} dependency source file snippets (for patchable context)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"⚠️  Failed to fetch dependency source snippets: {e}", file=sys.stderr)
             sys.stderr.flush()
 
     # 2.6 Prioritize failing API chunks (set priority=0 for matching api_path)
@@ -1274,6 +1448,23 @@ def main():
         help="Path to gomod-dependencies.json (go.mod versions from RC or deployed version)"
     )
     parser.add_argument(
+        "--fetch-dependency-sources",
+        action="store_true",
+        help="Fetch bounded dependency source snippets from GitHub (based on import diffs) and embed them as chunks (enables concrete code fixes)."
+    )
+    parser.add_argument(
+        "--fetch-dependency-sources-max-files",
+        type=int,
+        default=6,
+        help="Max dependency source files to embed (default: 6)"
+    )
+    parser.add_argument(
+        "--fetch-dependency-sources-max-lines",
+        type=int,
+        default=200,
+        help="Max lines per fetched dependency source file (default: 200)"
+    )
+    parser.add_argument(
         "--smart-filter",
         action="store_true",
         help="Enable smart dependency filtering based on imports"
@@ -1416,7 +1607,11 @@ def main():
             analysis_prompts=analysis_prompts,
             incluster_logs=incluster_logs,
             cross_test_interference=cross_test_interference,
-            gomod_dependencies=gomod_dependencies
+            gomod_dependencies=gomod_dependencies,
+            found_indexes_path=args.found_indexes or "artifacts/found-indexes.json",
+            fetch_dependency_sources=args.fetch_dependency_sources,
+            fetch_dependency_sources_max_files=args.fetch_dependency_sources_max_files,
+            fetch_dependency_sources_max_lines=args.fetch_dependency_sources_max_lines,
         )
         
         # Save output
