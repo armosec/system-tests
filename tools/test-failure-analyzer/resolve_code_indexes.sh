@@ -351,6 +351,20 @@ echo "   Triggering Repo Commit: ${TRIGGERING_REPO_COMMIT:-unknown}"
 echo "   Workflow Commit (shared-workflows): ${WORKFLOW_COMMIT:-unknown}"
 echo ""
 
+# ====================================================================
+# Index resolution mode (optional)
+# ====================================================================
+# Modes:
+# - full (default): current behavior
+# - targeted: limit service + go.mod dependency resolution to allowlist repos
+INDEX_RESOLUTION_MODE="${INDEX_RESOLUTION_MODE:-full}"
+INDEX_RESOLUTION_ALLOWLIST="${INDEX_RESOLUTION_ALLOWLIST:-}"
+echo "🧭 Index Resolution Mode: ${INDEX_RESOLUTION_MODE}"
+if [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]]; then
+  echo "   Allowlist: ${INDEX_RESOLUTION_ALLOWLIST}"
+fi
+echo ""
+
 # Validate triggering repo is set (but allow "cadashboardbe" as valid default)
 if [[ -z "$TRIGGERING_REPO" || "$TRIGGERING_REPO" == "unknown" ]]; then
   echo "❌ ERROR: Triggering repository is not properly set!"
@@ -491,29 +505,81 @@ else
   fi
 fi
 
+# Optional: Targeted mode filtering (limit go.mod deps to allowlist)
+GOMOD_DEPS_FILE="artifacts/gomod-dependencies.json"
+if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]] && [[ -f "${GOMOD_DEPS_FILE}" ]]; then
+  echo ""
+  echo "🎯 Targeted mode: filtering go.mod dependencies by allowlist"
+  echo "   Input:  ${GOMOD_DEPS_FILE}"
+  echo "   Output: artifacts/gomod-dependencies.filtered.json"
+  jq -c --arg csv "${INDEX_RESOLUTION_ALLOWLIST}" '
+    ($csv | split(",") | map(ascii_downcase)) as $allow
+    | with_entries(select((.key | ascii_downcase) as $k | ($allow | index($k))))
+  ' "${GOMOD_DEPS_FILE}" > artifacts/gomod-dependencies.filtered.json 2>/dev/null || true
+  if [[ -s artifacts/gomod-dependencies.filtered.json ]]; then
+    GOMOD_DEPS_FILE="artifacts/gomod-dependencies.filtered.json"
+    echo "✅ Filtered go.mod deps: $(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
+  else
+    echo "⚠️  Filter produced empty/invalid output, keeping full go.mod deps"
+    rm -f artifacts/gomod-dependencies.filtered.json 2>/dev/null || true
+    GOMOD_DEPS_FILE="artifacts/gomod-dependencies.json"
+  fi
+fi
+
 # ====================================================================
 # PASS 3: Download dependency indexes using gomod-dependencies.json
 # ====================================================================
 echo ""
 echo "📥 PASS 3: Downloading dependency indexes (defaults + version-changed go.mod deps)..."
 
-if [[ -f artifacts/gomod-dependencies.json ]] && [[ $(jq 'length' artifacts/gomod-dependencies.json) -gt 0 ]]; then
-  TOTAL_DEPS="$(jq 'length' artifacts/gomod-dependencies.json 2>/dev/null || echo 0)"
-  CHANGED_DEPS="$(jq '[.[] | select(.version_changed==true)] | length' artifacts/gomod-dependencies.json 2>/dev/null || echo 0)"
+SERVICES_ONLY_FILE="artifacts/services-only.json"
+if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]] && [[ -f "${SERVICES_ONLY_FILE}" ]]; then
+  echo ""
+  echo "🎯 Targeted mode: filtering service repos by allowlist"
+  echo "   Input:  ${SERVICES_ONLY_FILE}"
+  echo "   Output: artifacts/services-only.filtered.json"
+  jq -c --arg csv "${INDEX_RESOLUTION_ALLOWLIST}" '
+    ($csv | split(",") | map(ascii_downcase)) as $allow
+    | with_entries(select((.key | ascii_downcase) as $k | ($allow | index($k))))
+  ' "${SERVICES_ONLY_FILE}" > artifacts/services-only.filtered.json 2>/dev/null || true
+  if [[ -s artifacts/services-only.filtered.json ]]; then
+    SERVICES_ONLY_FILE="artifacts/services-only.filtered.json"
+    echo "✅ Filtered services: $(jq 'length' "${SERVICES_ONLY_FILE}" 2>/dev/null || echo 0)"
+  else
+    echo "⚠️  Filter produced empty/invalid output, keeping full services-only.json"
+    rm -f artifacts/services-only.filtered.json 2>/dev/null || true
+    SERVICES_ONLY_FILE="artifacts/services-only.json"
+  fi
+fi
+
+if [[ -f "${GOMOD_DEPS_FILE}" ]] && [[ $(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0) -gt 0 ]]; then
+  TOTAL_DEPS="$(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
+  CHANGED_DEPS="$(jq '[.[] | select(.version_changed==true)] | length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
   echo "✅ Parsed go.mod dependencies: total=$TOTAL_DEPS, version_changed=$CHANGED_DEPS"
-  echo "   (Resolution will still be limited by find_indexes.py default repos + version_changed=true)"
+  if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]]; then
+    echo "   (Targeted mode: deps are filtered to allowlist; services are filtered to allowlist)"
+  else
+    echo "   (Resolution will still be limited by find_indexes.py default repos + version_changed=true)"
+  fi
+
+  DEFAULT_REPOS_ARGS=()
+  if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]]; then
+    DEFAULT_REPOS_ARGS=( --default-repos "${INDEX_RESOLUTION_ALLOWLIST}" )
+  fi
+
   python find_indexes.py \
     --triggering-repo "$TRIGGERING_REPO" \
     --deployed-version "${DEPLOYED_VERSION:-unknown}" \
     --rc-version "${RC_VERSION:-unknown}" \
     --triggering-commit "${TRIGGERING_REPO_COMMIT:-unknown}" \
     --images "artifacts/test-deployed-services.json" \
-    --services-only "artifacts/services-only.json" \
+    --services-only "${SERVICES_ONLY_FILE}" \
     --output-dir "artifacts/code-indexes" \
     --output "artifacts/found-indexes.json" \
     --github-token "$GITHUB_TOKEN" \
     --github-orgs "armosec,kubescape" \
-    --gomod-dependencies artifacts/gomod-dependencies.json \
+    --gomod-dependencies "${GOMOD_DEPS_FILE}" \
+    "${DEFAULT_REPOS_ARGS[@]}" \
     --debug || {
     echo "⚠️  Pass 3 failed, using Pass 1 results"
     cp artifacts/found-indexes-pass1.json artifacts/found-indexes.json
