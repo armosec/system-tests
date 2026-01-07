@@ -240,7 +240,7 @@ def extract_dependency_chunks_from_diffs(
         return []
 
     # Find github.com/armosec/<repo>/<path> imports/usages in patches
-    import_re = re.compile(r'github\\.com/armosec/([^/\"\\s]+)/([^\"\\s]+)')
+    import_re = re.compile(r'github\.com/armosec/([^/\"\\s]+)/([^\"\\s]+)')
 
     candidates: List[Tuple[int, str, Dict[str, Any]]] = []  # (score, repo, chunk)
 
@@ -817,26 +817,35 @@ def _extract_dependency_source_targets_from_code_diffs(code_diffs: Dict[str, Any
         if not isinstance(files, list):
             continue
 
-        # 2) If this is a dependency repo, collect its changed Go files directly.
-        # We don't know org here; infer from common cases. We'll also try to discover org via imports.
-        # Default to armosec when unknown.
+        # We don't know org here; infer from common cases. Default to armosec when unknown.
         default_org = "armosec"
+
+        # 2) Collect changed Go files directly for dependency repos.
+        # IMPORTANT: skip the triggering repo (cadashboardbe) so we don't consume the snippet budget
+        # and starve real dependencies like armosec-infra/postgres-connector.
+        if repo_name != "cadashboardbe":
+            for f in files:
+                if not isinstance(f, dict):
+                    continue
+                filename = f.get("filename") or ""
+                if filename.endswith(".go") and "/" in filename:
+                    repo_files.setdefault((default_org, repo_name), set()).add(filename)
+
+        # 1) Scan patches for import paths into dependency repos (across all repos).
         for f in files:
             if not isinstance(f, dict):
                 continue
-            filename = f.get("filename") or ""
-            if filename.endswith(".go") and "/" in filename:
-                repo_files.setdefault((default_org, repo_name), set()).add(filename)
-
-            # 1) Scan patches for import paths into dependency repos
             patch = f.get("patch") or ""
             if not patch:
                 continue
-            for m in re.finditer(r"github\\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
+            for m in re.finditer(r"github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
                 org = m.group(1)
                 repo = m.group(2)
                 rest = (m.group(3) or "").lstrip("/")
                 if not rest or "/" not in rest:
+                    continue
+                # Skip triggering repo via import-derived dirs; focus on dependency code.
+                if repo == "cadashboardbe":
                     continue
                 repo_dirs.setdefault((org, repo), set()).add(rest)
 
