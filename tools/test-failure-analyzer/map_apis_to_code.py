@@ -22,6 +22,22 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
 
+def normalize_test_name(test_name: str) -> str:
+    """
+    Normalize test name for mapping lookup.
+
+    The analyzer can receive names like "ST (siem_integrations)" from logs/job names.
+    Mapping keys are expected to be the raw key (e.g., "siem_integrations").
+    """
+    if not test_name:
+        return test_name
+    s = str(test_name).strip()
+    m = re.match(r"^ST\s*\(\s*([^)]+?)\s*\)\s*$", s)
+    if m:
+        return m.group(1).strip()
+    return s
+
+
 def load_test_mapping(mapping_path: str) -> Dict[str, Any]:
     """Load system_test_mapping.json."""
     if not os.path.exists(mapping_path):
@@ -510,6 +526,11 @@ def map_apis_to_code(
     Returns:
         Dict mapping API (method + path) to handler chunk info
     """
+    original_test_name = test_name
+    test_name = normalize_test_name(test_name)
+    if test_name != original_test_name:
+        print(f"ℹ️  Normalized test name: '{original_test_name}' -> '{test_name}'", file=sys.stderr)
+
     if test_name not in test_mapping:
         print(f"Error: Test '{test_name}' not found in mapping", file=sys.stderr)
         return {}

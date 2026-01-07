@@ -37,6 +37,17 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
 
+def normalize_test_name(test_name: Optional[str]) -> Optional[str]:
+    """Normalize test name for output/consistency (strip wrappers like 'ST (name)')."""
+    if not test_name:
+        return test_name
+    s = str(test_name).strip()
+    m = re.match(r"^ST\\s*\\(\\s*([^)]+?)\\s*\\)\\s*$", s)
+    if m:
+        return m.group(1).strip()
+    return s
+
+
 def load_json_file(file_path: str, required: bool = False) -> Optional[Dict[str, Any]]:
     """Load JSON file."""
     if not os.path.exists(file_path):
@@ -788,6 +799,7 @@ def build_llm_context(
     Returns:
         Dictionary with LLM-ready context
     """
+    test_name = normalize_test_name(test_name) or test_name
     all_chunks = []
 
     # 0. Ensure test_code isn't null if error logs contain traceback locations
