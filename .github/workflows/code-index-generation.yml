@@ -131,10 +131,19 @@ jobs:
       - name: Generate .cursorignore from Code Index
         run: |
           echo "🔍 Generating .cursorignore from code index..."
-          go run ./shared-rules/scripts/code-indexing/gen-cursorignore \
-            -index docs/indexes/code-index.json \
-            -output .cursorignore \
-            -root .
+
+          # For Go repos we can run in repo module; for non-Go repos, run inside shared-rules module.
+          if [ -f "go.mod" ]; then
+            go run ./shared-rules/scripts/code-indexing/gen-cursorignore \
+              -index docs/indexes/code-index.json \
+              -output .cursorignore \
+              -root .
+          else
+            (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore \
+              -index ../docs/indexes/code-index.json \
+              -output ../.cursorignore \
+              -root ..)
+          fi
           
           if [ ! -f ".cursorignore" ]; then
             echo "Error: .cursorignore was not generated"
