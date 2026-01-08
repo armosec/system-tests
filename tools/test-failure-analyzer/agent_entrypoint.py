@@ -644,8 +644,25 @@ def main() -> int:
 
     rc = 0
     try:
-        proc = subprocess.run(cmd, check=False, cwd=str(analyzer_dir))
+        proc = subprocess.run(
+            cmd,
+            check=False,
+            cwd=str(analyzer_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
         rc = int(proc.returncode)
+        out = (proc.stdout or "")
+        # Persist analyzer output for debugging (uploaded to S3 with artifacts/)
+        try:
+            max_bytes = 250_000  # keep bounded
+            if len(out.encode("utf-8", errors="ignore")) > max_bytes:
+                # rough truncation by characters; good enough for logs
+                out = out[-max_bytes:]
+            (artifacts_dir / "analyzer.log").write_text(out, encoding="utf-8", errors="replace")
+        except Exception:
+            pass
         if rc != 0:
             status = "failed"
             errors.append(f"analyzer.py exited with code {rc}")
