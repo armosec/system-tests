@@ -240,10 +240,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
         Logger.logger.info("Installing kubescape")
         self.install()
 
-       # Logger.logger.info("Delete all exception from backend")
-      #  self.backend.delete_all_posture_exceptions(cluster_name=self.kubernetes_obj.get_cluster_name())
-
-
         Logger.logger.info('Stage 1: Apply namespace "system-test" and Deployment "apache" to cluster')
         Logger.logger.info('Stage 1.1: apply namespace "system-test" to cluster')
         namespace = self.create_namespace(name='system-test', auto_attach=False, auto_protect=False)
