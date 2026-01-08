@@ -1679,7 +1679,7 @@
       }
     ]
   },
-  "scan_nsa_and_submit_to_backend": {
+  "scan_and_submit_to_backend": {
     "target": [
       "CLI",
       "Backend"

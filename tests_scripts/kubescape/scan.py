@@ -184,27 +184,25 @@ class ScanAndSubmitToBackend(BaseKubescape):
 
     def start(self):    
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
-        Logger.logger.info("Installing kubescape")
+        Logger.logger.info("Stage 1: Installing kubescape")
 
         self.install(branch=self.ks_branch)
 
-        Logger.logger.info('Stage 1.1: apply namespace "system-test" to cluster')
+        Logger.logger.info("Stage 2: Testing NSA framework scan")
+
+        Logger.logger.info('Stage 2.1: apply namespace "system-test" to cluster')
         namespace = self.create_namespace(name=self.test_obj.get_arg("namespace"), auto_attach=False,
                                           auto_protect=False)
-        Logger.logger.info('Stage 1.2: apply deployment "apache" to cluster')
+        Logger.logger.info('Stage 2.2: apply deployment "apache" to cluster')
         self.apply_yaml_file(yaml_file=self.test_obj.get_arg("yaml"), namespace=namespace)
-        TestUtil.sleep(30, "wait for report guid", "info")
 
-        current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False,
-                                               framework_name=self.test_obj.get_arg("policy_name"))
-
-        Logger.logger.info("Scanning kubescape")
+        Logger.logger.info(f"Stage 2.3: Running Kubescape scan ({self.test_obj.policy_name} framework)")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
         TestUtil.sleep(30, "wait for kubescape scan to report", "info")
 
-        Logger.logger.info("Testing data in backend")
+        Logger.logger.info("Stage 2.4: Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
                              framework_name=(self.test_obj.get_arg("policy_name")),
                              old_report_guid=current_report_guid)
@@ -216,35 +214,34 @@ class ScanAndSubmitToBackend(BaseKubescape):
         # 1. Add custom framework to backend and check if success
         # 2. Scanning kubescape with custom framework and test result
         # 3. Delete custom-framework from backend and check if success
+        Logger.logger.info("Stage 3: Testing custom framework scan")
 
-        Logger.logger.info("Stage 1: Add custom framework to backend and check if success")
-        Logger.logger.info("Stage 1.1: Add custom framework to backend")
+        Logger.logger.info("Stage 3.1: Add custom framework to backend and check if success")
+        Logger.logger.info("Stage 3.2: Add custom framework to backend")
         fw_object, report_fw = self.post_custom_framework(framework_file=self.test_obj.get_arg("custom_framework_file"),
                                                                cluster_name=self.kubernetes_obj.get_cluster_name())
 
-        Logger.logger.info("Stage 1.3: Check if framework created")
+        Logger.logger.info("Stage 3.3: Check if framework created")
         self.test_framework_created(fw_object=fw_object, report_fw=report_fw)
 
-        Logger.logger.info("Stage 2: Scanning kubescape with custom framework and test result")
-        Logger.logger.info("Stage 2.1: Scanning kubescape with custom-fw")
+        Logger.logger.info("Stage 3.4: Scanning kubescape with custom framework")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=report_fw['name'],
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
         
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")
-        Logger.logger.info("Stage 2.2: Get report-guid")
+        Logger.logger.info("Stage 3.5: Check that scan result is reported")
         current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            framework_name=report_fw['name'], 
                                            old_report_guid=current_report_guid)
 
-        Logger.logger.info("Stage 2.3: Test cli result vs backend result")
+        Logger.logger.info("Stage 3.6: Test cli result vs backend result")
         self.test_scan_custom_fw_result(cli_result=cli_result, fw_object=fw_object, report_guid=current_report_guid)
 
-        Logger.logger.info("Stage 3: Delete custom-framework from backend and check if success")
-        Logger.logger.info("Stage 3.1: Delete custom-fw object from backend")
+        Logger.logger.info("Stage 3.7: Delete custom framework from backend")
         self.delete_custom_framework(ks_custom_fw=report_fw)
         fw_name = report_fw['name']
 
-        Logger.logger.info("Stage 3.2: Test custom framework deleted")
+        Logger.logger.info("Stage 3.8: Check that custom framework is deleted from backend")
         self.test_scan_custom_fw_deleted(fw_name)
 
         return self.cleanup()

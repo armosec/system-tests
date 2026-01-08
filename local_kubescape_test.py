@@ -11,7 +11,7 @@ tests = [
     "scan_local_file",
     "scan_local_glob_files",
     "scan_local_list_of_files",
-    "scan_nsa_and_submit_to_backend",
+    "scan_and_submit_to_backend",
     "scan_git_repository_and_submit_to_backend",
     "scan_with_exception_to_backend",
     "scan_with_kubescape_helm_chart",
