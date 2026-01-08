@@ -452,17 +452,29 @@ def main():
         print(f"❌ Error loading code index: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # Find go.mod - first try code index, then fallback to GitHub
-    gomod_content = find_gomod_in_index(index)
+    # Find go.mod.
+    #
+    # IMPORTANT:
+    # When snapshotting the *deployed* baseline, we want the go.mod that matches the deployed TAG,
+    # not whatever commit the code index was generated from (often RC commit).
+    # So if --deployed-version is provided, prefer downloading go.mod from GitHub by that ref
+    # even if go.mod is present inside the code index.
+    gomod_content = None
+    metadata = index.get('metadata', {})
+    repo = metadata.get('repo', 'armosec/cadashboardbe')
+    commit = metadata.get('commit') or metadata.get('version', 'main')
+    if args.deployed_version and github_token:
+        if args.debug:
+            print(f"📥 Attempting to download go.mod baseline from GitHub by deployed tag: {repo}@{args.deployed_version}")
+        gomod_content = download_gomod_from_github(repo, args.deployed_version, github_token)
+        if gomod_content and args.debug:
+            print("✅ Downloaded go.mod from GitHub (deployed baseline)")
+    if not gomod_content:
+        gomod_content = find_gomod_in_index(index)
     
     if not gomod_content:
         if args.debug:
             print(f"⚠️  go.mod not found in code index, trying GitHub fallback...")
-        
-        # Try to extract repo and commit from code index metadata
-        metadata = index.get('metadata', {})
-        repo = metadata.get('repo', 'armosec/cadashboardbe')
-        commit = metadata.get('commit') or metadata.get('version', 'main')
         
         if args.debug:
             print(f"   Repo: {repo}")
