@@ -538,10 +538,10 @@ if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_A
 fi
 
 # ====================================================================
-# PASS 3: Download dependency indexes using gomod-dependencies.json
+# PASS 3: Download dependency indexes (services + default repos + optional go.mod deps)
 # ====================================================================
 echo ""
-echo "📥 PASS 3: Downloading dependency indexes (defaults + version-changed go.mod deps)..."
+echo "📥 PASS 3: Downloading dependency/service indexes..."
 
 SERVICES_ONLY_FILE="artifacts/services-only.json"
 if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]] && [[ -f "${SERVICES_ONLY_FILE}" ]]; then
@@ -563,42 +563,38 @@ if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_A
   fi
 fi
 
+DEFAULT_REPOS_ARGS=()
+if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]]; then
+  DEFAULT_REPOS_ARGS=( --default-repos "${INDEX_RESOLUTION_ALLOWLIST}" )
+fi
+
+GOMOD_ARGS=()
 if [[ -f "${GOMOD_DEPS_FILE}" ]] && [[ $(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0) -gt 0 ]]; then
   TOTAL_DEPS="$(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
   CHANGED_DEPS="$(jq '[.[] | select(.version_changed==true)] | length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
   echo "✅ Parsed go.mod dependencies: total=$TOTAL_DEPS, version_changed=$CHANGED_DEPS"
-  if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]]; then
-    echo "   (Targeted mode: deps are filtered to allowlist; services are filtered to allowlist)"
-  else
-    echo "   (Resolution will still be limited by find_indexes.py default repos + version_changed=true)"
-  fi
-
-  DEFAULT_REPOS_ARGS=()
-  if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]]; then
-    DEFAULT_REPOS_ARGS=( --default-repos "${INDEX_RESOLUTION_ALLOWLIST}" )
-  fi
-
-  python find_indexes.py \
-    --triggering-repo "$TRIGGERING_REPO" \
-    --deployed-version "${DEPLOYED_VERSION:-unknown}" \
-    --rc-version "${RC_VERSION:-unknown}" \
-    --triggering-commit "${TRIGGERING_REPO_COMMIT:-unknown}" \
-    --images "artifacts/test-deployed-services.json" \
-    --services-only "${SERVICES_ONLY_FILE}" \
-    --output-dir "artifacts/code-indexes" \
-    --output "artifacts/found-indexes.json" \
-    --github-token "$GITHUB_TOKEN" \
-    --github-orgs "armosec,kubescape" \
-    --gomod-dependencies "${GOMOD_DEPS_FILE}" \
-    "${DEFAULT_REPOS_ARGS[@]}" \
-    --debug || {
-    echo "⚠️  Pass 3 failed, using Pass 1 results"
-    cp artifacts/found-indexes-pass1.json artifacts/found-indexes.json
-  }
+  GOMOD_ARGS=( --gomod-dependencies "${GOMOD_DEPS_FILE}" )
 else
-  echo "⚠️  No dependencies found, using Pass 1 results"
-  cp artifacts/found-indexes-pass1.json artifacts/found-indexes.json
+  echo "ℹ️  No go.mod dependencies available (or empty). Will still resolve service repos + default repos."
 fi
+
+python find_indexes.py \
+  --triggering-repo "$TRIGGERING_REPO" \
+  --deployed-version "${DEPLOYED_VERSION:-unknown}" \
+  --rc-version "${RC_VERSION:-unknown}" \
+  --triggering-commit "${TRIGGERING_REPO_COMMIT:-unknown}" \
+  --images "artifacts/test-deployed-services.json" \
+  --services-only "${SERVICES_ONLY_FILE}" \
+  --output-dir "artifacts/code-indexes" \
+  --output "artifacts/found-indexes.json" \
+  --github-token "$GITHUB_TOKEN" \
+  --github-orgs "armosec,kubescape" \
+  "${GOMOD_ARGS[@]}" \
+  "${DEFAULT_REPOS_ARGS[@]}" \
+  --debug || {
+  echo "⚠️  Pass 3 failed, using Pass 1 results"
+  cp artifacts/found-indexes-pass1.json artifacts/found-indexes.json
+}
 
 echo ""
 echo "✅ Code index resolution complete (3-pass approach)!"
