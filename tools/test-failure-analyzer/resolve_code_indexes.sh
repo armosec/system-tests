@@ -525,13 +525,22 @@ if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_A
   echo "   Output: artifacts/gomod-dependencies.filtered.json"
   jq -c --arg csv "${INDEX_RESOLUTION_ALLOWLIST}" '
     ($csv | split(",") | map(ascii_downcase)) as $allow
-    | with_entries(select((.key | ascii_downcase) as $k | ($allow | index($k))))
+    | with_entries(
+        select(
+          ((.key | ascii_downcase) as $k | ($allow | index($k)))
+          or
+          (.value.version_changed == true)
+        )
+      )
   ' "${GOMOD_DEPS_FILE}" > artifacts/gomod-dependencies.filtered.json 2>/dev/null || true
-  if [[ -s artifacts/gomod-dependencies.filtered.json ]]; then
+
+  # Only use the filtered file if it actually contains entries (jq length > 0).
+  FILTERED_LEN="$(jq 'length' artifacts/gomod-dependencies.filtered.json 2>/dev/null || echo 0)"
+  if [[ "${FILTERED_LEN}" -gt 0 ]]; then
     GOMOD_DEPS_FILE="artifacts/gomod-dependencies.filtered.json"
-    echo "✅ Filtered go.mod deps: $(jq 'length' "${GOMOD_DEPS_FILE}" 2>/dev/null || echo 0)"
+    echo "✅ Filtered go.mod deps: ${FILTERED_LEN} (kept allowlist + version_changed=true)"
   else
-    echo "⚠️  Filter produced empty/invalid output, keeping full go.mod deps"
+    echo "ℹ️  Filtered go.mod deps is empty; keeping full go.mod deps"
     rm -f artifacts/gomod-dependencies.filtered.json 2>/dev/null || true
     GOMOD_DEPS_FILE="artifacts/gomod-dependencies.json"
   fi
