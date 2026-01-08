@@ -708,6 +708,17 @@ def main() -> int:
             if resolve_script.exists():
                 env = dict(os.environ)
                 env.setdefault("ANALYZER_DEBUG", "false")
+                # Smart/targeted index resolution (optional; implemented in resolve_code_indexes.sh)
+                try:
+                    if isinstance(metadata, dict):
+                        mode = str(metadata.get("index_resolution_mode") or "").strip()
+                        allow = str(metadata.get("index_resolution_allowlist") or "").strip()
+                        if mode:
+                            env["INDEX_RESOLUTION_MODE"] = mode
+                        if allow:
+                            env["INDEX_RESOLUTION_ALLOWLIST"] = allow
+                except Exception:
+                    pass
                 # resolve_code_indexes.sh relies on TRIGGERING_REPO_FROM_STEP and INPUT_RC_VERSION.
                 # Prefer deriving these from artifacts/test-deployed-services.json (workflow parity).
                 try:
