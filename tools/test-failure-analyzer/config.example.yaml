@@ -19,7 +19,7 @@ loki:
   grafana:
     url: "${GRAFANA_URL}"
     api_token: "${GRAFANA_TOKEN}"
-    datasource_id: ${GRAFANA_DATASOURCE_ID}
+    datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Pagination and optimization settings
   # Number of logs to fetch per pagination query (default: 5000)
   limit_per_query: 5000

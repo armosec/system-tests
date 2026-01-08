@@ -413,7 +413,78 @@ def main() -> int:
 
     # --- Workflow parity: environment-specific Grafana/Loki config + token selection ---
     # Mirrors shared-workflows/.github/workflows/system-tests-analyzer.yml env-config + token selection.
+    def _detect_env_from_logs_or_job() -> str:
+        # Prefer job URL: fetch job logs and search patterns (similar to workflow detect-env step).
+        token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()
+        sref = (run_ref or "").strip()
+        run_id = None
+        job_id_local = None
+        if sref.startswith("http://") or sref.startswith("https://"):
+            m = re.search(r"/runs/(\d+)", sref)
+            if m:
+                run_id = m.group(1)
+            m2 = re.search(r"/job/(\d+)", sref)
+            if m2:
+                job_id_local = m2.group(1)
+        elif sref.isdigit():
+            run_id = sref
+        # Try local pre-logs first (we generate artifacts/pre-logs/workflow-logs.txt for job URLs)
+        pre_logs_txt = artifacts_dir / "pre-logs" / "workflow-logs.txt"
+        text = ""
+        if pre_logs_txt.exists():
+            try:
+                text = pre_logs_txt.read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                text = ""
+        # If no local logs and we have job id, try fetching job logs quickly
+        if (not text) and token and job_id_local:
+            try:
+                import requests  # type: ignore
+                url = f"https://api.github.com/repos/armosec/shared-workflows/actions/jobs/{job_id_local}/logs"
+                r = requests.get(
+                    url,
+                    headers={
+                        "Accept": "application/vnd.github+json",
+                        "User-Agent": "agents-infra-system-test-analyzer/1.0",
+                        "Authorization": f"Bearer {token}",
+                    },
+                    timeout=(10, 60),
+                    allow_redirects=True,
+                )
+                if r.status_code == 200:
+                    text = r.text or ""
+            except Exception:
+                pass
+
+        def _norm(x: str) -> str:
+            return (x or "").strip().lower()
+
+        detected = ""
+        if text:
+            # Pattern 1: "Environment: <env>"
+            m = re.search(r"(?im)^.*Environment:\s*([a-z-]+)\b", text)
+            if m:
+                detected = m.group(1)
+            # Pattern 2: ENVIRONMENT= or ENVIRONMENT:
+            if not detected:
+                m = re.search(r"(?im)ENVIRONMENT[:=]\s*([a-z-]+)\b", text)
+                if m:
+                    detected = m.group(1)
+            # Pattern 3: systest-cli.py ... -b <env>
+            if not detected:
+                m = re.search(r"(?im)systest-cli\.py.*\s-b\s+([a-z-]+)\b", text)
+                if m:
+                    detected = m.group(1)
+
+        detected = _norm(detected)
+        if detected in ("development", "staging", "production", "production-us", "custom", "onprem"):
+            return detected
+        return "staging"
+
     env_name = (environment or "auto").strip()
+    if env_name in ("", "auto", "unknown"):
+        env_name = _detect_env_from_logs_or_job()
+        environment = env_name  # ensure summary/analyzer get the resolved env
     # default staging/dev url
     grafana_url = "https://grafmon.eudev3.cyberarmorsoft.com"
     namespace = "event-sourcing-be-stage"

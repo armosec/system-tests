@@ -12,7 +12,7 @@ loki:
   grafana:
     url: "${GRAFANA_URL}"
     api_token: "${GRAFANA_TOKEN}"
-    datasource_id: ${GRAFANA_DATASOURCE_ID}
+    datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Default label keys used across services
   labels:
     namespace: "namespace"
