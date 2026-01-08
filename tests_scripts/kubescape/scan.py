@@ -312,8 +312,6 @@ class ScanWithExceptionToBackend(BaseKubescape):
             self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
                                             report_guid=current_report_guid, has_related=True, has_applied=True,
                                             framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
-            # Test for cli-result
-            # TODO self.test_exception_result(framework_report=cli_result)
             # Test for backend-result
             Logger.logger.info("Stage 4.3: Test data from controls-api, from backend")
             self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
