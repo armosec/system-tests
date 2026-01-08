@@ -619,6 +619,7 @@ def main() -> int:
 
     flag, value = _parse_run_ref(run_ref)
     pre_logs_zip: Optional[Path] = None
+    test_deployed_services_path: Optional[Path] = None
 
     # If run_ref is a specific job URL, scope analysis to that job's logs (no need for --only-test).
     job_parts = _parse_job_url(run_ref)
@@ -628,6 +629,13 @@ def main() -> int:
         if pre_logs_zip:
             # analyzer.py expects run identifier alongside --logs-zip (use run id, not job url)
             flag, value = "--run-id", run_id
+
+    # Download run-scoped artifacts early so later phases (resolve_code_indexes.sh) can use them.
+    # In the workflow this happens before Phase 4/4.5.
+    try:
+        test_deployed_services_path = _download_test_deployed_services_json(run_ref, artifacts_dir)
+    except Exception:
+        test_deployed_services_path = None
     cmd = [
         sys.executable,
         str(analyzer_dir / "analyzer.py"),
@@ -701,7 +709,21 @@ def main() -> int:
                 env = dict(os.environ)
                 env.setdefault("ANALYZER_DEBUG", "false")
                 # resolve_code_indexes.sh relies on TRIGGERING_REPO_FROM_STEP and INPUT_RC_VERSION.
-                # It can also infer from artifacts/test-deployed-services.json when present.
+                # Prefer deriving these from artifacts/test-deployed-services.json (workflow parity).
+                try:
+                    if test_deployed_services_path and test_deployed_services_path.exists():
+                        tds = json.loads(test_deployed_services_path.read_text())
+                        if isinstance(tds, dict):
+                            tr = tds.get("triggering_repo") or {}
+                            if isinstance(tr, dict):
+                                norm = tr.get("normalized")
+                                if norm:
+                                    env["TRIGGERING_REPO_FROM_STEP"] = str(norm)
+                                rc_ver = tr.get("rc_version")
+                                if rc_ver:
+                                    env["INPUT_RC_VERSION"] = str(rc_ver)
+                except Exception:
+                    pass
                 env.setdefault("TRIGGERING_REPO_FROM_STEP", "cadashboardbe")
                 env.setdefault("INPUT_RC_VERSION", "")
                 p = subprocess.run(
@@ -784,7 +806,8 @@ def main() -> int:
     # Generate a human-friendly summary (similar to GitHub step summary) as an artifact.
     # We run from WORKDIR so relative "artifacts/..." paths resolve.
     try:
-        test_deployed_services_path = _download_test_deployed_services_json(run_ref, artifacts_dir)
+        if not test_deployed_services_path:
+            test_deployed_services_path = _download_test_deployed_services_json(run_ref, artifacts_dir)
         summary_out = artifacts_dir / "summary.md"
         summary_cmd = [
             sys.executable,
