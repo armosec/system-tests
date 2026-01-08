@@ -333,7 +333,67 @@ def generate_summary(
             pass
     
     if not llm_context:
-        return "⚠️  LLM context not available - cannot generate summary\n"
+        # Fallback mode (used by agents-infra ECS runs): we may not have llm-context.json,
+        # but we still want a human-readable summary similar in spirit to the GitHub Step Summary.
+        report_path = os.path.join(os.path.dirname(llm_context_path) or "artifacts", "report.json")
+        report = load_json(report_path)
+        if not report:
+            return "⚠️  LLM context not available and report.json not found - cannot generate summary\n"
+
+        run = (report.get("run") or {}) if isinstance(report, dict) else {}
+        failures = (report.get("failures") or []) if isinstance(report, dict) else []
+        repo = run.get("repo") or "unknown"
+        run_id = run.get("id") or (run_ref if not str(run_ref).startswith("http") else "unknown")
+
+        # Best-effort: pick a representative test name
+        test_name = "unknown"
+        if isinstance(failures, list) and failures:
+            t0 = failures[0] or {}
+            t = (t0.get("test") or {}) if isinstance(t0, dict) else {}
+            test_name = t.get("name") or "unknown"
+
+        resolved_actor = actor or os.environ.get("GITHUB_ACTOR") or "unknown"
+        resolved_env = environment or "unknown"
+
+        out: list[str] = []
+        out.append(f"# {resolved_actor} | {repo} | {resolved_env} | {test_name}\n")
+        out.append(f"**Repository:** `{repo}`")
+        out.append(f"**Environment:** `{resolved_env}`")
+        out.append(f"**Run ID:** `{run_id}`")
+        if run_ref:
+            if str(run_ref).startswith("http"):
+                out.append(f"**Original Test Run:** [{run_ref}]({run_ref})")
+            else:
+                out.append(f"**Original Test Run:** `armosec/shared-workflows` run `{run_ref}`")
+        out.append("")
+        out.append("## ✅ Results\n")
+        out.append(f"- Failures parsed: **{len(failures) if isinstance(failures, list) else 0}**")
+        out.append("- LLM context: **not generated in this run** (no `artifacts/llm-context.json`)")
+        out.append("")
+
+        if isinstance(failures, list) and failures:
+            out.append("## 🔥 Failures (top)\n")
+            for i, f in enumerate(failures[:3], start=1):
+                if not isinstance(f, dict):
+                    continue
+                t = f.get("test") or {}
+                name = (t.get("name") if isinstance(t, dict) else None) or "unknown"
+                out.append(f"### {i}. `{name}`\n")
+                errs = f.get("errors") or []
+                if isinstance(errs, list) and errs:
+                    out.append("**Errors (first 3):**")
+                    for e in errs[:3]:
+                        s = str(e).replace("`", "'")
+                        out.append(f"- `{s[:300]}`")
+                out.append("")
+
+        out.append("## 📦 Artifacts\n")
+        out.append("- `artifacts/summary.md` (this file)")
+        out.append("- `artifacts/report.md`")
+        out.append("- `artifacts/report.json`")
+        out.append("- `artifacts/context/` (supporting context; may be partial)")
+        out.append("")
+        return "\n".join(out)
     
     # Resolved title (uses resolved environment/repo/test after analyzer ran)
     metadata = llm_context.get('metadata', {})

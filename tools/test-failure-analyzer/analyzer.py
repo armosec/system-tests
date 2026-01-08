@@ -584,12 +584,38 @@ def detect_repo_from_zip(run: RunInfo, cfg: Dict[str, Any]) -> Optional[str]:
 
 TIMESTAMP_REGEX = re.compile(r"\b(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)\b")
 
+ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-9;]*m")
+
+
+def _strip_ansi(s: str) -> str:
+    # Remove common ANSI color codes so regexes don't capture escape sequences into report.json
+    return ANSI_ESCAPE_RE.sub("", s or "")
+
+
+def _looks_like_noise_error_line(s: str) -> bool:
+    """
+    Heuristics to avoid treating random code fragments or package identifiers as "errors".
+    These show up in logs frequently (e.g. JS bundles with error(...) calls).
+    """
+    t = (s or "").strip()
+    if not t:
+        return True
+    # npm package identifiers, e.g. "error@2.1.0"
+    if re.match(r"^[A-Za-z0-9_.-]+@\d", t):
+        return True
+    # Common code fragments that match our prior broad error regexes
+    if re.search(r"\berror\(", t) or re.search(r"\bError\(", t):
+        return True
+    return False
+
 
 def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) -> Tuple[Optional[str], Optional[str], List[str], Optional[str], Optional[str]]:
     """
     From a section (Step 18) text, find first/last ISO timestamps and 'run_test: Test error' lines.
     Returns: (first_ts_iso, last_ts_iso, errors, from_time_iso_with_padding, to_time_iso_with_padding)
     """
+    section_text = _strip_ansi(section_text)
+
     timestamps: List[datetime] = []
     for m in TIMESTAMP_REGEX.finditer(section_text):
         try:
@@ -616,7 +642,7 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
             lj = lines[j]
             if ("Traceback (most recent call last)" in lj or
                 re.search(r"(?i)\bexception\b", lj) or
-                re.search(r"(?i)\berror[:\s]", lj) or
+                re.search(r"(?i)^\s*(?:error|failed|fatal)[:\s]", lj) or
                 re.search(r"^\s*Stack trace", lj)):
                 anchor = j
         if anchor is not None:
@@ -634,14 +660,18 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
         MAX_ERROR_BLOCK_LENGTH = 2000  # Error blocks can be multi-line, allow more length
         if len(block) > MAX_ERROR_BLOCK_LENGTH:
             block = block[:MAX_ERROR_BLOCK_LENGTH - 3] + "..."
+        # Avoid adding pure noise blocks that contain only code-fragment "error(" lines.
+        if _looks_like_noise_error_line(block):
+            continue
         if block and block not in errors:
             errors.append(block)
 
     # 2) Generic error patterns (in case there are other errors beyond the trigger)
     error_patterns = [
-        r"(?i)\bTest error\b.*",
-        r"(?i)^\s*Error:\s+.*",
-        r"(?i)\bERROR\b.*",
+        # Prefer line-anchored patterns to avoid grabbing "error(" code fragments.
+        r"(?im)^\s*Error:\s+.*$",
+        r"(?im)^\s*ERROR\b.*$",
+        r"(?im)^\s*FATAL\b.*$",
         r"Traceback \(most recent call last\):[\s\S]+?(?=^\S|\Z)",
     ]
     for pat in error_patterns:
@@ -651,6 +681,8 @@ def extract_time_window_and_errors(section_text: str, padding_minutes: int = 5) 
             MAX_ERROR_BLOCK_LENGTH = 2000  # Error blocks can be multi-line, allow more length
             if len(snippet) > MAX_ERROR_BLOCK_LENGTH:
                 snippet = snippet[:MAX_ERROR_BLOCK_LENGTH - 3] + "..."
+            if _looks_like_noise_error_line(snippet):
+                continue
             if snippet and snippet not in errors:
                 errors.append(snippet)
 
