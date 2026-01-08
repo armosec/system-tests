@@ -21,6 +21,7 @@ import sys
 import threading
 import time
 import zipfile
+import base64
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -224,7 +225,7 @@ def main() -> int:
     agent_name = str(req.get("agent_name") or "system-test-analyzer")
     correlation_id = str(req.get("correlation_id") or "")
     run_ref = str(req.get("run_ref") or "")
-    system_tests_ref = str(req.get("system_tests_ref") or "agent")
+    system_tests_ref = str(req.get("system_tests_ref") or "master")
     environment = str(req.get("environment") or "auto")
     only_test = req.get("only_test")
     use_llm_analysis = bool(req.get("use_llm_analysis") or False)
@@ -246,6 +247,64 @@ def main() -> int:
     started_at = _utcnow_iso()
     status = "succeeded"
     errors = []
+
+    def _best_effort_finalize(final_status: str, final_errors: list[str]) -> None:
+        """
+        Ensure we always:
+        - stop heartbeat
+        - write job_result.json
+        - upload artifacts (if configured)
+        - update DynamoDB to final state (best-effort)
+        """
+        finished_at = _utcnow_iso()
+        try:
+            hb_stop.set()
+        except Exception:
+            pass
+        try:
+            (workdir / "job_result.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": "v1",
+                        "job_id": job_id,
+                        "correlation_id": correlation_id,
+                        "agent_name": agent_name,
+                        "status": final_status,
+                        "started_at": started_at,
+                        "finished_at": finished_at,
+                        "artifact_prefix": os.environ.get("ARTIFACT_PREFIX", ""),
+                        "errors": final_errors,
+                    },
+                    indent=2,
+                )
+                + "\n"
+            )
+        except Exception:
+            pass
+
+        artifact_bucket = os.environ.get("ARTIFACT_BUCKET", "").strip()
+        artifact_prefix = os.environ.get("ARTIFACT_PREFIX", "").strip()
+        if artifact_bucket and artifact_prefix:
+            try:
+                s3 = _s3_client()
+                if s3:
+                    s3.upload_file(
+                        str(workdir / "job_result.json"),
+                        artifact_bucket,
+                        f"{artifact_prefix.rstrip('/')}/job_result.json",
+                    )
+            except Exception:
+                pass
+
+        _update_job_fields(
+            job_id,
+            {
+                "status": final_status,
+                "finished_at": finished_at,
+                "errors": final_errors,
+                "last_heartbeat_at": finished_at,
+            },
+        )
 
     # Mark running + start heartbeat (best-effort)
     _update_job_fields(
@@ -274,22 +333,31 @@ def main() -> int:
             env["GIT_TERMINAL_PROMPT"] = "0"
         return subprocess.run(cmd, cwd=str(repo_dir) if repo_dir.exists() else str(workdir), env=env, check=False).returncode
 
+    def _git_auth_args() -> list[str]:
+        """
+        GitHub git-over-https requires Basic auth. Bearer tokens work for API, not for git clone/fetch.
+        Use: Authorization: basic base64("x-access-token:<token>")
+        """
+        if not git_token:
+            return []
+        raw = f"x-access-token:{git_token}".encode("utf-8")
+        b64 = base64.b64encode(raw).decode("ascii")
+        return ["-c", f"http.extraheader=AUTHORIZATION: basic {b64}"]
+
     try:
         (workdir / "repos").mkdir(parents=True, exist_ok=True)
         if not repo_dir.exists():
             # clone with auth header (works for private repos)
             clone_url = f"https://github.com/{system_tests_repo}.git"
             clone_cmd = ["git"]
-            if git_token:
-                clone_cmd += ["-c", f"http.extraheader=AUTHORIZATION: bearer {git_token}"]
+            clone_cmd += _git_auth_args()
             clone_cmd += ["clone", "--no-tags", "--depth", "1", "--branch", system_tests_ref, clone_url, str(repo_dir)]
             if _run_git(clone_cmd) != 0:
                 raise RuntimeError("git clone failed")
         else:
             # Update existing clone and checkout requested ref
             fetch_cmd = ["git"]
-            if git_token:
-                fetch_cmd += ["-c", f"http.extraheader=AUTHORIZATION: bearer {git_token}"]
+            fetch_cmd += _git_auth_args()
             fetch_cmd += ["fetch", "--prune", "origin", system_tests_ref]
             _run_git(fetch_cmd)
             _run_git(["git", "checkout", "-f", "FETCH_HEAD"])
@@ -313,24 +381,7 @@ def main() -> int:
         # If we cannot guarantee code provenance, fail fast (better than silently using stale embedded code).
         status = "failed"
         errors.append(f"failed to clone system-tests at ref {system_tests_ref}: {e}")
-        hb_stop.set()
-        (workdir / "job_result.json").write_text(
-            json.dumps(
-                {
-                    "schema_version": "v1",
-                    "job_id": job_id,
-                    "correlation_id": correlation_id,
-                    "agent_name": agent_name,
-                    "status": status,
-                    "started_at": started_at,
-                    "finished_at": _utcnow_iso(),
-                    "artifact_prefix": os.environ.get("ARTIFACT_PREFIX", ""),
-                    "errors": errors,
-                },
-                indent=2,
-            )
-            + "\n"
-        )
+        _best_effort_finalize(status, errors)
         return 1
 
     flag, value = _parse_run_ref(run_ref)
