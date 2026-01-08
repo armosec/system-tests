@@ -218,31 +218,30 @@ class ScanAndSubmitToBackend(BaseKubescape):
         Logger.logger.info("Stage 3: Testing custom framework scan")
 
         Logger.logger.info("Stage 3.1: Add custom framework to backend and check if success")
-        Logger.logger.info("Stage 3.2: Add custom framework to backend")
         fw_object, report_fw = self.post_custom_framework(framework_file=self.test_obj.get_arg("custom_framework_file"),
                                                                cluster_name=self.kubernetes_obj.get_cluster_name())
 
-        Logger.logger.info("Stage 3.3: Check if framework created")
+        Logger.logger.info("Stage 3.2: Check if framework created")
         self.test_framework_created(fw_object=fw_object, report_fw=report_fw)
 
-        Logger.logger.info("Stage 3.4: Scanning kubescape with custom framework")
+        Logger.logger.info("Stage 3.3: Scanning kubescape with custom framework")
         cli_result = self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=report_fw['name'],
                                        submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
         
         TestUtil.sleep(25, "wait for kubescape scan to report", "info")
-        Logger.logger.info("Stage 3.5: Check that scan result is reported")
+        Logger.logger.info("Stage 3.4: Check that scan result is reported")
         current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                            framework_name=report_fw['name'], 
                                            old_report_guid=current_report_guid)
 
-        Logger.logger.info("Stage 3.6: Test cli result vs backend result")
+        Logger.logger.info("Stage 3.5: Test cli result vs backend result")
         self.test_scan_custom_fw_result(cli_result=cli_result, fw_object=fw_object, report_guid=current_report_guid)
 
-        Logger.logger.info("Stage 3.7: Delete custom framework from backend")
+        Logger.logger.info("Stage 3.6: Delete custom framework from backend")
         self.delete_custom_framework(ks_custom_fw=report_fw)
         fw_name = report_fw['name']
 
-        Logger.logger.info("Stage 3.8: Check that custom framework is deleted from backend")
+        Logger.logger.info("Stage 3.7: Check that custom framework is deleted from backend")
         self.test_scan_custom_fw_deleted(fw_name)
 
         return self.cleanup()
