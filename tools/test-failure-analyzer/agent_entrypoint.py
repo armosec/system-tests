@@ -327,6 +327,7 @@ def main() -> int:
     fetch_pr = bool(metadata.get("fetch_pr", True))
     bundle_tests = bool(metadata.get("bundle_tests", True))
     fetch_loki = bool(metadata.get("fetch_loki", True))
+    grafana_url_override = str(metadata.get("grafana_url") or "").strip()
 
     default_repo = os.environ.get("DEFAULT_RUN_REPO", "armosec/shared-workflows")
     job_id = str(req.get("job_id") or _derive_job_id(run_ref, default_repo=default_repo))
@@ -409,6 +410,63 @@ def main() -> int:
         },
     )
     hb_stop = _start_heartbeat(job_id)
+
+    # --- Workflow parity: environment-specific Grafana/Loki config + token selection ---
+    # Mirrors shared-workflows/.github/workflows/system-tests-analyzer.yml env-config + token selection.
+    env_name = (environment or "auto").strip()
+    # default staging/dev url
+    grafana_url = "https://grafmon.eudev3.cyberarmorsoft.com"
+    namespace = "event-sourcing-be-stage"
+    datasource_id = "7"
+    token_selector = "stage_and_dev"
+
+    if env_name == "production":
+        grafana_url = "https://grafmon.euprod1.cyberarmorsoft.com/"
+        namespace = "event-sourcing-be-prod"
+        datasource_id = "3"
+        token_selector = "prod"
+    elif env_name == "production-us":
+        grafana_url = "https://grafmon.us.euprod1.cyberarmorsoft.com/"
+        namespace = "armo-platform"
+        datasource_id = "3"
+        token_selector = "prod_us"
+    elif env_name == "staging":
+        grafana_url = grafana_url_override or "https://grafmon.eudev3.cyberarmorsoft.com"
+        namespace = "event-sourcing-be-stage"
+        datasource_id = "7"
+        token_selector = "stage_and_dev"
+    elif env_name in ("development", "custom"):
+        grafana_url = grafana_url_override or "https://grafmon.eudev3.cyberarmorsoft.com"
+        namespace = "event-sourcing-be-dev"
+        datasource_id = "7"
+        token_selector = "stage_and_dev"
+    elif env_name == "onprem":
+        grafana_url = grafana_url_override or "https://grafmon.eudev3.cyberarmorsoft.com"
+        namespace = "armo-platform"
+        datasource_id = "7"
+        token_selector = "stage_and_dev"
+    else:
+        # unknown/auto -> staging defaults
+        grafana_url = grafana_url_override or "https://grafmon.eudev3.cyberarmorsoft.com"
+        namespace = "event-sourcing-be-stage"
+        datasource_id = "7"
+        token_selector = "stage_and_dev"
+
+    os.environ["GRAFANA_URL"] = grafana_url.rstrip("/")
+    os.environ["NAMESPACE"] = namespace
+    os.environ["GRAFANA_DATASOURCE_ID"] = str(datasource_id)
+
+    # Token selection: prefer injected per-env secrets; fallback to existing GRAFANA_TOKEN/LOKI_TOKEN if set.
+    if token_selector == "prod":
+        selected = (os.environ.get("GRAFANA_TOKEN_PROD") or "").strip()
+    elif token_selector == "prod_us":
+        selected = (os.environ.get("GRAFANA_TOKEN_PROD_US") or "").strip()
+    else:
+        selected = (os.environ.get("GRAFANA_TOKEN_STAGE_AND_DEV") or "").strip()
+
+    if selected:
+        os.environ["GRAFANA_TOKEN"] = selected
+        os.environ["LOKI_TOKEN"] = selected
 
     # --- Source of truth for analyzer code: clone system-tests at system_tests_ref ---
     # This ensures results are reproducible and tied to an explicit ref (e.g. branch "agent").
