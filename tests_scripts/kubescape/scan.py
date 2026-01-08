@@ -255,10 +255,9 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
-
         current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                 framework_name=self.test_obj.get_arg("policy_name").upper())
+            framework_name=self.test_obj.get_arg("policy_name").upper(),
+            check_intervals=35)
 
         Logger.logger.info("Stage 2.2: Check if exception-applied empty and exception-related empty")
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
@@ -304,11 +303,10 @@ class ScanWithExceptionToBackend(BaseKubescape):
             self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                             submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
             
-            TestUtil.sleep(60, "wait for kubescape scan to report", "info")
-            
             current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                     framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                    old_report_guid=current_report_guid)
+                                                    old_report_guid=current_report_guid
+                                                    check_intervals=35)
 
             Logger.logger.info("Stage 4.2: Check if exception-applied not empty and exception-deployed not empty")
             self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
@@ -347,12 +345,11 @@ class ScanWithExceptionToBackend(BaseKubescape):
             Logger.logger.info("Stage 6.1: Scanning kubescape after deleting the exception")
             self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                             submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-
-            TestUtil.sleep(60, "wait for kubescape scan to report", "info")
             
             current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                     framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                    old_report_guid=current_report_guid)
+                                                    old_report_guid=current_report_guid,
+                                                    check_intervals=35)
 
             Logger.logger.info("Stage 6.2: Check if exception-applied empty and exception-deployed empty")
             self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,

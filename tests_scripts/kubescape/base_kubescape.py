@@ -1297,9 +1297,9 @@ class BaseKubescape(BaseK8S):
         git_repository: GitRepository,
         old_report_guid: str = "",
         wait_to_result: bool = False,
+        check_intervals: int = 30,
+        sleep_sec: int = 12,
     ) -> Tuple[Optional[str], Optional[str]]:
-        check_intervals = 30
-        sleep_sec = 12
 
         for _ in range(check_intervals):
             try:
