@@ -1,0 +1,8 @@
+# Generated code indexes
+# Exclude all JSON files except the main code-index.json (which is committed)
+*.json
+!code-index.json
+!code-index-latest.json.sample
+
+# Versioned indexes (large files, not committed)
+versions/

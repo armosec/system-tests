@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "rootDir": ".",
+    "totalFiles": 0,
+    "totalPackages": 0,
+    "totalChunks": 0,
+    "patternTypes": []
+  },
+  "packages": [],
+  "chunks": [],
+  "endpoints": [],
+  "patterns": [],
+  "generated": "Run: go run ./scripts/code-indexing/indexgen docs/indexes/code-index.json ."
+}

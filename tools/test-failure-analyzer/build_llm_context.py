@@ -24,16 +24,30 @@ Usage:
 """
 
 import argparse
+import base64
 import json
 import os
+import shutil
 import sys
 import traceback
+import re
 
 # Import dependency detection functions
 from detect_dependencies import analyze_all_chunks, filter_available_indexes
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple, Set
+
+
+def normalize_test_name(test_name: Optional[str]) -> Optional[str]:
+    """Normalize test name for output/consistency (strip wrappers like 'ST (name)')."""
+    if not test_name:
+        return test_name
+    s = str(test_name).strip()
+    m = re.match(r"^ST\\s*\\(\\s*([^)]+?)\\s*\\)\\s*$", s)
+    if m:
+        return m.group(1).strip()
+    return s
 
 
 def load_json_file(file_path: str, required: bool = False) -> Optional[Dict[str, Any]]:
@@ -65,6 +79,307 @@ def load_text_file(file_path: str) -> Optional[str]:
     except Exception as e:
         print(f"Warning: Could not read {file_path}: {e}", file=sys.stderr)
         return None
+
+
+_TRACEBACK_FILE_LINE_RE = re.compile(r'File "([^"]+)", line (\d+)', re.MULTILINE)
+
+
+def _candidate_paths_from_trace(trace_path: str) -> List[Path]:
+    """
+    Generate a list of relative path candidates from an absolute traceback path.
+
+    This tries to handle common CI shapes like:
+      /home/runner/_work/<repo>/<repo>/<subpath>
+    and returns multiple possible suffixes for best-effort resolution.
+    """
+    p = Path(trace_path)
+    parts = list(p.parts)
+    candidates: List[Path] = []
+
+    # 1) As-is (absolute)
+    candidates.append(p)
+
+    # 2) Try to strip common CI prefix: .../_work/<repo>/<repo>/...
+    # Find "_work" segment
+    if "_work" in parts:
+        idx = parts.index("_work")
+        suffix_parts = parts[idx + 1:]  # <repo>/<repo>/...
+        if suffix_parts:
+            # Drop leading <repo>
+            suffix_parts = suffix_parts[1:]
+        if suffix_parts and len(suffix_parts) >= 2 and suffix_parts[0] == suffix_parts[1]:
+            # Drop duplicate repo name if present
+            suffix_parts = suffix_parts[1:]
+        if suffix_parts:
+            candidates.append(Path(*suffix_parts))
+
+    # 3) Add a few trailing slices (last 2..10 parts) to resolve regardless of repo root
+    for k in range(2, min(10, len(parts)) + 1):
+        candidates.append(Path(*parts[-k:]))
+
+    # De-dup while preserving order
+    seen = set()
+    out: List[Path] = []
+    for c in candidates:
+        key = str(c)
+        if key not in seen:
+            seen.add(key)
+            out.append(c)
+    return out
+
+
+def _resolve_traceback_file(trace_path: str, search_roots: List[Path]) -> Optional[Path]:
+    """
+    Resolve a traceback file path against a set of repo roots.
+    Returns the first existing file path found.
+    """
+    candidates = _candidate_paths_from_trace(trace_path)
+    for cand in candidates:
+        # Absolute candidate
+        if cand.is_absolute() and cand.exists():
+            return cand
+        # Try relative to each root
+        for root in search_roots:
+            full = (root / cand)
+            if full.exists():
+                return full
+    return None
+
+
+def _extract_file_snippet(path: Path, line_no: int, context_lines: int = 60) -> str:
+    """Extract a +/- context_lines snippet around line_no (1-based)."""
+    try:
+        lines = path.read_text(errors="replace").splitlines()
+    except Exception:
+        return ""
+
+    if line_no < 1:
+        line_no = 1
+
+    start = max(1, line_no - context_lines)
+    end = min(len(lines), line_no + context_lines)
+
+    snippet_lines = []
+    for i in range(start, end + 1):
+        prefix = ">>" if i == line_no else "  "
+        snippet_lines.append(f"{prefix} {i:5d}: {lines[i - 1]}")
+    return "\n".join(snippet_lines)
+
+
+def build_test_code_from_traceback(
+    error_logs: str,
+    search_roots: Optional[List[Path]] = None,
+    max_locations: int = 3,
+    context_lines: int = 60
+) -> Optional[str]:
+    """
+    Best-effort: build test_code snippets by parsing Python traceback file:line locations.
+    This prevents `test_code` from being null when we have file:line evidence in logs.
+    """
+    if not error_logs:
+        return None
+
+    roots = search_roots or []
+
+    # Add a couple sane defaults: repo root + current working dir
+    try:
+        roots.append(Path.cwd())
+    except Exception:
+        pass
+    try:
+        roots.append(Path(__file__).parents[2])  # system-tests repo root
+    except Exception:
+        pass
+    roots = [r for r in roots if r and r.exists()]
+
+    matches = list(_TRACEBACK_FILE_LINE_RE.finditer(error_logs))
+    if not matches:
+        return None
+
+    snippets: List[str] = []
+    used = 0
+    for m in matches:
+        if used >= max_locations:
+            break
+        file_path = m.group(1)
+        line_no = int(m.group(2))
+
+        resolved = _resolve_traceback_file(file_path, roots)
+        if not resolved:
+            continue
+
+        snippet = _extract_file_snippet(resolved, line_no=line_no, context_lines=context_lines)
+        if not snippet:
+            continue
+
+        snippets.append(f"# {resolved} (traceback: {file_path}:{line_no})\n{snippet}\n")
+        used += 1
+
+    if not snippets:
+        return None
+
+    return "\n".join(snippets)
+
+
+def extract_dependency_chunks_from_diffs(
+    code_diffs: Optional[Dict[str, Any]],
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]],
+    max_total_chunks: int = 6
+) -> List[Dict[str, Any]]:
+    """
+    Best-effort: if diffs show new imports/usages of dependency packages, pull the likely
+    dependency implementation chunks even if call-chain extraction doesn't cross repos.
+    """
+    if not code_diffs or not extra_indexes:
+        return []
+
+    cadb = code_diffs.get("cadashboardbe") or {}
+    git_diff = cadb.get("git_diff") or {}
+    files = git_diff.get("files") or []
+    if not isinstance(files, list):
+        return []
+
+    # Find github.com/armosec/<repo>/<path> imports/usages in patches
+    import_re = re.compile(r'github\.com/armosec/([^/\"\\s]+)/([^\"\\s]+)')
+
+    candidates: List[Tuple[int, str, Dict[str, Any]]] = []  # (score, repo, chunk)
+
+    for f in files:
+        patch = (f or {}).get("patch") or ""
+        if not patch:
+            continue
+        for repo, subpath in import_re.findall(patch):
+            if repo not in extra_indexes:
+                continue
+            idx = extra_indexes.get(repo) or {}
+            chunks = idx.get("chunks", [])
+            if not isinstance(chunks, list):
+                continue
+
+            # Prefer chunks that live under the imported subpath and look like handlers/send-test-message
+            for ch in chunks:
+                file_path = (ch.get("file") or "")
+                name = (ch.get("name") or "")
+                score = 0
+                if subpath and subpath in file_path:
+                    score += 5
+                lname = name.lower()
+                if "sendtestmessage" in lname:
+                    score += 10
+                if "webhook" in lname:
+                    score += 3
+                if score > 0:
+                    candidates.append((score, repo, ch))
+
+    # Sort and pick top unique chunks
+    candidates.sort(key=lambda t: t[0], reverse=True)
+    out: List[Dict[str, Any]] = []
+    seen_ids = set()
+    for score, repo, ch in candidates:
+        if len(out) >= max_total_chunks:
+            break
+        cid = ch.get("id") or f"{repo}:{ch.get('file')}:{ch.get('name')}"
+        if cid in seen_ids:
+            continue
+        seen_ids.add(cid)
+        out.append({
+            **ch,
+            "repo_name": repo,
+            "source": "diff_dependency",
+            "priority": 2,
+        })
+
+    return out
+
+
+def extract_changed_function_chunks_from_code_diffs(
+    code_diffs: Optional[Dict[str, Any]],
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]],
+    max_total_chunks: int = 12,
+    max_per_repo: int = 3,
+) -> List[Dict[str, Any]]:
+    """
+    Best-effort: when dependency call-chains are not available (legacy mode), still pull a small
+    set of representative chunks from dependency repos that actually changed (per code_diffs).
+
+    Uses the `functions.added/removed` lists emitted by compare_code_indexes.py (file+name),
+    then resolves them back to concrete chunks in the dependency repo's code index.
+    """
+    if not code_diffs or not extra_indexes:
+        return []
+
+    out: List[Dict[str, Any]] = []
+    seen_ids: Set[str] = set()
+    per_repo_count: Dict[str, int] = {}
+
+    # Prefer repos that changed, exclude cadashboardbe (handled separately via API mapping).
+    dep_repos = [
+        r for r, d in (code_diffs or {}).items()
+        if r and r != "cadashboardbe" and isinstance(d, dict) and d.get("changed")
+    ]
+
+    for repo in dep_repos:
+        if repo not in extra_indexes:
+            continue
+        if len(out) >= max_total_chunks:
+            break
+
+        diff = code_diffs.get(repo) or {}
+        funcs = diff.get("functions") or {}
+        # functions.added/removed are lists of {"file","name",...}
+        candidates = []
+        for key in ("added", "removed"):
+            vals = funcs.get(key) or []
+            if isinstance(vals, list):
+                candidates.extend([v for v in vals if isinstance(v, dict)])
+
+        if not candidates:
+            continue
+
+        idx = extra_indexes.get(repo) or {}
+        chunks = idx.get("chunks", [])
+        if not isinstance(chunks, list) or not chunks:
+            continue
+
+        # Build quick lookup by (file,name)
+        by_key: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        for ch in chunks:
+            if not isinstance(ch, dict):
+                continue
+            f = ch.get("file") or ""
+            n = ch.get("name") or ""
+            if f and n and (f, n) not in by_key:
+                by_key[(f, n)] = ch
+
+        for d in candidates:
+            if len(out) >= max_total_chunks:
+                break
+            if per_repo_count.get(repo, 0) >= max_per_repo:
+                break
+
+            f = d.get("file") or ""
+            n = d.get("name") or ""
+            if not f or not n:
+                continue
+
+            ch = by_key.get((f, n))
+            if not ch:
+                continue
+
+            cid = ch.get("id") or f"{repo}:{f}:{n}"
+            if cid in seen_ids:
+                continue
+            seen_ids.add(cid)
+
+            out.append({
+                **ch,
+                "repo_name": repo,
+                "source": "diff_changed_function",
+                "priority": 3,
+            })
+            per_repo_count[repo] = per_repo_count.get(repo, 0) + 1
+
+    return out
 
 
 def load_analysis_prompts(prompts_file: str = None) -> Optional[str]:
@@ -154,6 +469,7 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
         # Add handler chunk
         handler_chunk = mapping.get("handler_chunk")
         if handler_chunk:
+            # Default priority - may be bumped later if this is the failing API
             chunks.append({
                 **handler_chunk,
                 "source": "api_handler",
@@ -178,6 +494,116 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
                 })
     
     return chunks
+
+
+_LOKI_REQ_RE = re.compile(r'"method":"([A-Z]+)".*?"requestURI":"([^"]+)"')
+_PLAIN_REQ_RE = re.compile(r'\b(GET|POST|PUT|DELETE|PATCH)\s+(/api/[^\\s]+)')
+_BACKEND_API_REQ_RE = re.compile(r'\bRequest:\s*([a-zA-Z_][a-zA-Z0-9_]*)\b')
+_API_KEY_RE = re.compile(r'^\s*([A-Z]+)\s+(.+?)\s*$')
+_PARAM_SEGMENT_RE = re.compile(r"^(?:\{[^}]+\}|:[^/]+|<[^>]+>)$")
+
+# Best-effort mapping for common backend_api methods -> HTTP endpoint.
+# This is used only for prioritization of the failing API in LLM context.
+_BACKEND_METHOD_TO_ENDPOINT: Dict[str, Dict[str, str]] = {
+    # security risks
+    "get_security_risks_list": {"method": "POST", "path": "/api/v1/securityrisks/list"},
+    "get_security_risks_severities": {"method": "POST", "path": "/api/v1/securityrisks/severities"},
+    "get_security_risks_categories": {"method": "POST", "path": "/api/v1/securityrisks/categories"},
+    "get_security_risks_trends": {"method": "POST", "path": "/api/v1/securityrisks/trends"},
+    # unique-values endpoints (commonly used in scenarios)
+    "get_security_risks_list_uniquevalues": {"method": "POST", "path": "/api/v1/uniqueValues/securityrisks/list"},
+}
+
+
+def _split_segments(path: str) -> List[str]:
+    path = (path or "").split("?")[0].rstrip("/")
+    if not path.startswith("/"):
+        path = "/" + path
+    return [s for s in path.split("/") if s]
+
+
+def _is_param(seg: str) -> bool:
+    return bool(_PARAM_SEGMENT_RE.match(seg))
+
+
+def _paths_equivalent(a: str, b: str) -> bool:
+    aa = _split_segments(a)
+    bb = _split_segments(b)
+    if len(aa) != len(bb):
+        return False
+    for x, y in zip(aa, bb):
+        if x == y:
+            continue
+        if _is_param(x) or _is_param(y):
+            continue
+        return False
+    return True
+
+
+def extract_failing_request_from_logs(error_logs: str) -> Optional[Dict[str, str]]:
+    """
+    Best-effort: extract a representative failing request from logs.
+    Prefer Loki JSON lines (method + requestURI), fallback to plain 'METHOD /api/...' patterns.
+    """
+    if not error_logs:
+        return None
+
+    # Prefer explicit backend_api error messages:
+    #   "Error accessing dashboard. Request: get_security_risks_severities ..."
+    bm = _BACKEND_API_REQ_RE.search(error_logs)
+    if bm:
+        backend_method = bm.group(1)
+        mapped = _BACKEND_METHOD_TO_ENDPOINT.get(backend_method)
+        if mapped:
+            return {
+                "method": mapped["method"],
+                "path": mapped["path"],
+                "request_uri": f"{mapped['method']} {mapped['path']}",
+                "backend_method": backend_method,
+                "source": "backend_api_error",
+            }
+
+    m = _LOKI_REQ_RE.search(error_logs)
+    if m:
+        method = m.group(1)
+        uri = m.group(2)
+        path = uri.split("?")[0]
+        return {"method": method, "path": path, "request_uri": uri, "source": "loki_http"}
+
+    m = _PLAIN_REQ_RE.search(error_logs)
+    if m:
+        method = m.group(1)
+        uri = m.group(2)
+        path = uri.split("?")[0]
+        return {"method": method, "path": path, "request_uri": uri, "source": "plain_http"}
+
+    return None
+
+
+def bump_priority_for_failing_api(chunks: List[Dict[str, Any]], failing_req: Optional[Dict[str, str]]) -> None:
+    """Mutate chunk priorities: failing API handler/call-chain gets priority 0."""
+    if not failing_req:
+        return
+    req_method = (failing_req.get("method") or "").upper()
+    req_path = failing_req.get("path") or ""
+
+    for ch in chunks:
+        api_keys: List[str] = []
+        if ch.get("api_path"):
+            api_keys.append(ch.get("api_path"))
+        if isinstance(ch.get("api_paths"), list):
+            api_keys.extend([x for x in ch.get("api_paths") if isinstance(x, str)])
+
+        for api_key in api_keys:
+            km = _API_KEY_RE.match(api_key)
+            if not km:
+                continue
+            key_method = km.group(1).upper()
+            key_path = km.group(2)
+            if key_method == req_method and _paths_equivalent(req_path, key_path):
+                # Most important: failing endpoint + its chain
+                ch["priority"] = 0
+                break
 
 
 def extract_chunks_from_connected_context(connected_context: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -211,6 +637,70 @@ def extract_chunks_from_connected_context(connected_context: Dict[str, Any]) -> 
     return chunks
 
 
+def extract_test_chunks_from_system_tests_index(
+    test_mapping: Optional[Dict[str, Any]],
+    test_name: str,
+    system_tests_index: Optional[Dict[str, Any]],
+    max_chunks: int = 80,
+) -> List[Dict[str, Any]]:
+    """
+    Extract *test-side* chunks from the system-tests code index for the failing test.
+
+    We use `test_implementation_files` from the mapping artifact (which already includes
+    base classes/helpers) and then pick matching chunks from the system-tests index.
+    """
+    if not test_mapping or not isinstance(test_mapping, dict):
+        return []
+    if not system_tests_index or not isinstance(system_tests_index, dict):
+        return []
+
+    cfg = test_mapping.get(test_name) or {}
+    impl_files = cfg.get("test_implementation_files") or []
+    if not isinstance(impl_files, list) or not impl_files:
+        return []
+
+    file_set = {f for f in impl_files if isinstance(f, str) and f}
+    if not file_set:
+        return []
+
+    chunks = system_tests_index.get("chunks", [])
+    if not isinstance(chunks, list) or not chunks:
+        return []
+
+    candidates: List[Dict[str, Any]] = []
+    for ch in chunks:
+        if not isinstance(ch, dict):
+            continue
+        fp = ch.get("file")
+        if fp in file_set:
+            candidates.append({
+                **ch,
+                "repo_name": "system-tests",
+                "source": "system_test_code",
+                "priority": 1,
+                "test_name": test_name,
+            })
+
+    def score(c: Dict[str, Any]) -> int:
+        s = 0
+        tags = c.get("tags") or []
+        if isinstance(tags, list) and any(str(t).lower() == "test" for t in tags):
+            s += 5
+        pattern = (c.get("pattern") or "").lower()
+        if pattern == "test":
+            s += 5
+        f = (c.get("file") or "").lower()
+        if test_name and test_name.lower() in f:
+            s += 3
+        t = (c.get("type") or "").lower()
+        if t in ("function", "method"):
+            s += 2
+        return s
+
+    candidates.sort(key=lambda c: (-score(c), c.get("file", ""), c.get("name", "")))
+    return candidates[:max_chunks]
+
+
 def format_chunk_for_llm(chunk: Dict[str, Any], repo_name: str = None) -> Dict[str, Any]:
     """Format a code chunk for LLM consumption."""
     formatted = {
@@ -239,6 +729,8 @@ def format_chunk_for_llm(chunk: Dict[str, Any], repo_name: str = None) -> Dict[s
     # Add API path if this chunk is related to an API
     if chunk.get("api_path"):
         formatted["api_path"] = chunk.get("api_path")
+    if isinstance(chunk.get("api_paths"), list) and chunk.get("api_paths"):
+        formatted["api_paths"] = chunk.get("api_paths")
     
     # Add call chain info if available
     if chunk.get("depth") is not None:
@@ -370,23 +862,64 @@ def format_context_as_text(context: Dict[str, Any]) -> str:
 
 
 def deduplicate_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Remove duplicate chunks (by ID)."""
-    seen_ids = set()
-    unique_chunks = []
-    
+    """
+    Remove duplicate chunks (by ID) while preserving multi-API association.
+
+    If the same chunk_id appears for multiple APIs, we merge:
+    - **api_path** into **api_paths** list
+    - keep the lowest priority
+    - keep the first non-empty code
+    - prefer "api_handler" source if any merged instance is an api handler
+    """
+    by_key: Dict[str, Dict[str, Any]] = {}
+    order: List[str] = []
+
+    def chunk_key(c: Dict[str, Any]) -> str:
+        cid = c.get("id") or c.get("chunk_id")
+        if cid:
+            return f"id:{cid}"
+        return f"meta:{c.get('name')}:{c.get('package')}:{c.get('file')}"
+
     for chunk in chunks:
-        chunk_id = chunk.get("id") or chunk.get("chunk_id")
-        if chunk_id and chunk_id not in seen_ids:
-            seen_ids.add(chunk_id)
-            unique_chunks.append(chunk)
-        elif not chunk_id:
-            # If no ID, use name+package+file as key
-            key = f"{chunk.get('name')}:{chunk.get('package')}:{chunk.get('file')}"
-            if key not in seen_ids:
-                seen_ids.add(key)
-                unique_chunks.append(chunk)
-    
-    return unique_chunks
+        key = chunk_key(chunk)
+        if key not in by_key:
+            merged = dict(chunk)
+            api_path = chunk.get("api_path")
+            if api_path:
+                merged["api_paths"] = [api_path]
+            by_key[key] = merged
+            order.append(key)
+            continue
+
+        merged = by_key[key]
+
+        # Merge api_path into api_paths
+        api_path = chunk.get("api_path")
+        if api_path:
+            ap = merged.get("api_paths")
+            if not isinstance(ap, list):
+                ap = []
+            if api_path not in ap:
+                ap.append(api_path)
+            merged["api_paths"] = ap
+
+        # Keep lowest priority (higher importance)
+        merged_pri = merged.get("priority", 999)
+        new_pri = chunk.get("priority", 999)
+        if isinstance(new_pri, int) and new_pri < merged_pri:
+            merged["priority"] = new_pri
+
+        # Prefer api_handler as source if any merged is api_handler
+        if merged.get("source") != "api_handler" and chunk.get("source") == "api_handler":
+            merged["source"] = "api_handler"
+
+        # Fill code if missing
+        if not merged.get("code") and chunk.get("code"):
+            merged["code"] = chunk.get("code")
+
+        by_key[key] = merged
+
+    return [by_key[k] for k in order]
 
 
 def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None, extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None) -> Optional[str]:
@@ -413,6 +946,211 @@ def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None
     return None
 
 
+def _gh_env() -> Dict[str, str]:
+    """
+    Ensure gh CLI has a token in env. GitHub Actions often provides GITHUB_TOKEN,
+    while gh prefers GH_TOKEN. Mirror if needed.
+    """
+    env = dict(os.environ)
+    if not env.get("GH_TOKEN") and env.get("GITHUB_TOKEN"):
+        env["GH_TOKEN"] = env["GITHUB_TOKEN"]
+    return env
+
+
+def _gh_api(path: str) -> Optional[Any]:
+    """Call `gh api <path>` and parse JSON output. Returns None on failure."""
+    if not shutil.which("gh"):
+        return None
+    try:
+        import subprocess
+        proc = subprocess.run(
+            ["gh", "api", path],
+            capture_output=True,
+            text=True,
+            env=_gh_env(),
+            check=False,
+        )
+        if proc.returncode != 0:
+            return None
+        return json.loads(proc.stdout or "null")
+    except Exception:
+        return None
+
+
+def _extract_dependency_source_targets_from_code_diffs(code_diffs: Dict[str, Any]) -> Tuple[Dict[Tuple[str, str], Set[str]], Dict[Tuple[str, str], Set[str]]]:
+    """
+    Extract dependency source targets from code_diffs in two ways:
+    1) **Directories** inferred from import paths inside patches (github.com/<org>/<repo>/<dir>/...)
+    2) **Exact file paths** inferred from dependency repos' own git_diff.files[].filename
+
+    Returns:
+      (repo_dirs, repo_files)
+        repo_dirs: (org, repo) -> set(dir paths)
+        repo_files: (org, repo) -> set(file paths)
+    """
+    repo_dirs: Dict[Tuple[str, str], Set[str]] = {}
+    repo_files: Dict[Tuple[str, str], Set[str]] = {}
+
+    for repo_name, diff in (code_diffs or {}).items():
+        if not isinstance(diff, dict):
+            continue
+        git_diff = diff.get("git_diff") or {}
+        files = git_diff.get("files") or []
+        if not isinstance(files, list):
+            continue
+
+        # We don't know org here; infer from common cases. Default to armosec when unknown.
+        default_org = "armosec"
+
+        # 2) Collect changed Go files directly for dependency repos.
+        # IMPORTANT: skip the triggering repo (cadashboardbe) so we don't consume the snippet budget
+        # and starve real dependencies like armosec-infra/postgres-connector.
+        if repo_name != "cadashboardbe":
+            for f in files:
+                if not isinstance(f, dict):
+                    continue
+                filename = f.get("filename") or ""
+                if filename.endswith(".go") and "/" in filename:
+                    repo_files.setdefault((default_org, repo_name), set()).add(filename)
+
+        # 1) Scan patches for import paths into dependency repos (across all repos).
+        for f in files:
+            if not isinstance(f, dict):
+                continue
+            patch = f.get("patch") or ""
+            if not patch:
+                continue
+            for m in re.finditer(r"github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(/[A-Za-z0-9_./-]+)?", patch):
+                org = m.group(1)
+                repo = m.group(2)
+                rest = (m.group(3) or "").lstrip("/")
+                if not rest or "/" not in rest:
+                    continue
+                # Skip triggering repo via import-derived dirs; focus on dependency code.
+                if repo == "cadashboardbe":
+                    continue
+                repo_dirs.setdefault((org, repo), set()).add(rest)
+
+    return repo_dirs, repo_files
+
+
+def _fetch_repo_dir_go_files(org: str, repo: str, dir_path: str, ref: str, max_files: int) -> List[str]:
+    data = _gh_api(f"repos/{org}/{repo}/contents/{dir_path}?ref={ref}")
+    if not isinstance(data, list):
+        return []
+    out: List[str] = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") != "file":
+            continue
+        path = item.get("path") or ""
+        if not path.endswith(".go"):
+            continue
+        out.append(path)
+        if len(out) >= max_files:
+            break
+    return out
+
+
+def _fetch_repo_file_content(org: str, repo: str, file_path: str, ref: str, max_lines: int) -> Optional[str]:
+    data = _gh_api(f"repos/{org}/{repo}/contents/{file_path}?ref={ref}")
+    if not isinstance(data, dict):
+        return None
+    content_b64 = data.get("content")
+    encoding = data.get("encoding")
+    if not content_b64 or encoding != "base64":
+        return None
+    try:
+        raw = base64.b64decode(content_b64).decode("utf-8", errors="replace")
+        lines = raw.splitlines()
+        if len(lines) > max_lines:
+            raw = "\n".join(lines[:max_lines]) + "\n// ... truncated ..."
+        return raw
+    except Exception:
+        return None
+
+
+def fetch_dependency_source_snippets(
+    code_diffs: Optional[Dict[str, Any]],
+    found_indexes: Optional[Dict[str, Any]],
+    max_files_total: int = 6,
+    max_lines_per_file: int = 200,
+) -> List[Dict[str, Any]]:
+    """
+    Fetch small source snippets for dependency repos that appear in import diffs.
+    This enables the LLM to propose concrete patches even when dependency code
+    isn't present in local workspaces or extracted call chains.
+    """
+    if not code_diffs or not found_indexes:
+        return []
+
+    repo_dirs, repo_files = _extract_dependency_source_targets_from_code_diffs(code_diffs)
+    if not repo_dirs and not repo_files:
+        return []
+
+    idx = found_indexes.get("indexes") or {}
+    chunks: List[Dict[str, Any]] = []
+
+    # Prefer fetching exact changed files from dependency repos (more reliable than imports).
+    for (org, repo), files in repo_files.items():
+        repo_info = idx.get(repo) or {}
+        rc = repo_info.get("rc") or {}
+        deployed = repo_info.get("deployed") or {}
+        ref = (rc.get("commit") or "").strip() or (deployed.get("commit") or "").strip()
+        if not ref:
+            continue
+
+        for fp in sorted(files):
+            code = _fetch_repo_file_content(org, repo, fp, ref, max_lines=max_lines_per_file)
+            if not code:
+                continue
+            chunks.append({
+                "id": f"dependency_source/{repo}/{fp}@{ref}",
+                "name": os.path.basename(fp),
+                "type": "file",
+                "package": os.path.dirname(fp),
+                "file": fp,
+                "code": code,
+                "repo": repo,
+                "source": "dependency_source",
+                "priority": 1,
+            })
+            if len(chunks) >= max_files_total:
+                return chunks
+
+    # Fallback: fetch go files by directory derived from import paths
+    for (org, repo), dirs in repo_dirs.items():
+        repo_info = idx.get(repo) or {}
+        rc = repo_info.get("rc") or {}
+        deployed = repo_info.get("deployed") or {}
+        ref = (rc.get("commit") or "").strip() or (deployed.get("commit") or "").strip()
+        if not ref:
+            continue
+
+        for dir_path in sorted(dirs)[:2]:
+            go_files = _fetch_repo_dir_go_files(org, repo, dir_path, ref, max_files=max_files_total)
+            for fp in go_files:
+                code = _fetch_repo_file_content(org, repo, fp, ref, max_lines=max_lines_per_file)
+                if not code:
+                    continue
+                chunks.append({
+                    "id": f"dependency_source/{repo}/{fp}@{ref}",
+                    "name": os.path.basename(fp),
+                    "type": "file",
+                    "package": os.path.dirname(fp),
+                    "file": fp,
+                    "code": code,
+                    "repo": repo,
+                    "source": "dependency_source",
+                    "priority": 1,
+                })
+                if len(chunks) >= max_files_total:
+                    return chunks
+
+    return chunks
+
+
 def build_llm_context(
     test_name: str,
     test_run_id: Optional[str],
@@ -423,13 +1161,19 @@ def build_llm_context(
     resolved_commits: Optional[Dict[str, Any]] = None,
     code_diffs: Optional[Dict[str, Any]] = None,
     test_code: Optional[str] = None,
+    test_mapping: Optional[Dict[str, Any]] = None,
+    system_tests_index: Optional[Dict[str, Any]] = None,
+    system_tests_max_chunks: int = 80,
     code_index: Optional[Dict[str, Any]] = None,
     extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
     analysis_prompts: Optional[str] = None,
     incluster_logs: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     cross_test_interference: Optional[Dict[str, Any]] = None,
     gomod_dependencies: Optional[Dict[str, Any]] = None,
-    found_indexes_path: str = "artifacts/found-indexes.json"
+    found_indexes_path: str = "artifacts/found-indexes.json",
+    fetch_dependency_sources: bool = False,
+    fetch_dependency_sources_max_files: int = 6,
+    fetch_dependency_sources_max_lines: int = 200,
 ) -> Dict[str, Any]:
     """
     Build LLM-ready context from all sources.
@@ -450,7 +1194,19 @@ def build_llm_context(
     Returns:
         Dictionary with LLM-ready context
     """
+    test_name = normalize_test_name(test_name) or test_name
     all_chunks = []
+
+    # 0. Ensure test_code isn't null if error logs contain traceback locations
+    if not test_code and error_logs:
+        derived = build_test_code_from_traceback(error_logs)
+        if derived:
+            test_code = derived
+            print("🧩 Derived test_code from traceback locations in error logs", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 0.5 Extract a representative failing request from logs (used to prioritize the most relevant API)
+    failing_request = extract_failing_request_from_logs(error_logs) if error_logs else None
     
     # 1. Extract chunks from API mapping (highest priority - directly tested APIs)
     if api_mapping:
@@ -467,6 +1223,63 @@ def build_llm_context(
         connected_chunks = extract_chunks_from_connected_context(connected_context)
         all_chunks.extend(connected_chunks)
         print(f"   Added {len(connected_chunks)} chunks from connected context")
+
+    # 2.2 Extract system-tests (test-side) chunks from the system-tests code index.
+    # This enables concrete suggestions/fixes in the system-tests repo.
+    if test_mapping and system_tests_index:
+        try:
+            st_chunks = extract_test_chunks_from_system_tests_index(
+                test_mapping=test_mapping,
+                test_name=test_name,
+                system_tests_index=system_tests_index,
+                max_chunks=system_tests_max_chunks,
+            )
+            if st_chunks:
+                all_chunks.extend(st_chunks)
+                print(f"   ➕ Added {len(st_chunks)} system-tests chunks (test-side code)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"⚠️  Failed extracting system-tests chunks: {e}", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 2.5 Extract extra dependency chunks hinted by diffs (covers cases where call-chain doesn't cross repos)
+    if code_diffs and extra_indexes:
+        extra_diff_chunks = extract_dependency_chunks_from_diffs(code_diffs, extra_indexes)
+        if extra_diff_chunks:
+            all_chunks.extend(extra_diff_chunks)
+            print(f"   ➕ Added {len(extra_diff_chunks)} dependency chunks hinted by diffs", file=sys.stderr)
+            sys.stderr.flush()
+
+        # 2.52 In legacy mapping mode, we may not have cross-repo call chains.
+        # Add a small set of changed dependency chunks based on code-diffs so dependency repos
+        # still contribute actionable context (bounded).
+        changed_dep_chunks = extract_changed_function_chunks_from_code_diffs(code_diffs, extra_indexes)
+        if changed_dep_chunks:
+            all_chunks.extend(changed_dep_chunks)
+            print(f"   ➕ Added {len(changed_dep_chunks)} changed dependency chunks from code diffs", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 2.55 Fetch dependency source snippets (bounded) so we can propose concrete patches from LLM context
+    if fetch_dependency_sources and code_diffs and found_indexes_path and os.path.exists(found_indexes_path):
+        try:
+            with open(found_indexes_path, "r") as f:
+                found_indexes = json.load(f)
+            dep_src_chunks = fetch_dependency_source_snippets(
+                code_diffs=code_diffs,
+                found_indexes=found_indexes,
+                max_files_total=fetch_dependency_sources_max_files,
+                max_lines_per_file=fetch_dependency_sources_max_lines,
+            )
+            if dep_src_chunks:
+                all_chunks.extend(dep_src_chunks)
+                print(f"   ➕ Added {len(dep_src_chunks)} dependency source file snippets (for patchable context)", file=sys.stderr)
+                sys.stderr.flush()
+        except Exception as e:
+            print(f"⚠️  Failed to fetch dependency source snippets: {e}", file=sys.stderr)
+            sys.stderr.flush()
+
+    # 2.6 Prioritize failing API chunks (set priority=0 for matching api_path)
+    bump_priority_for_failing_api(all_chunks, failing_request)
     
     # 3. Deduplicate chunks
     print("🧹 Deduplicating chunks...", file=sys.stderr)
@@ -554,6 +1367,8 @@ def build_llm_context(
         "chunks_by_repo": {},
         "repos": {}
     }
+    if failing_request:
+        metadata["failing_request"] = failing_request
     
     # Count chunks by source and repo
     for chunk in formatted_chunks:
@@ -562,6 +1377,21 @@ def build_llm_context(
         
         metadata["chunks_by_source"][source] = metadata["chunks_by_source"].get(source, 0) + 1
         metadata["chunks_by_repo"][repo] = metadata["chunks_by_repo"].get(repo, 0) + 1
+
+    # Track system-tests test-side inclusion (for confidence + debuggability)
+    system_tests_files: List[str] = []
+    if test_mapping and isinstance(test_mapping, dict):
+        cfg = test_mapping.get(test_name) or {}
+        impl_files = cfg.get("test_implementation_files") or []
+        if isinstance(impl_files, list):
+            system_tests_files = [f for f in impl_files if isinstance(f, str)]
+
+    if system_tests_files or metadata["chunks_by_source"].get("system_test_code"):
+        metadata["system_tests"] = {
+            "test_name": test_name,
+            "implementation_files": system_tests_files,
+            "chunks_included": metadata["chunks_by_source"].get("system_test_code", 0),
+        }
     
     # Build dependency analysis if code_diffs available
     if code_diffs and api_mapping:
@@ -875,6 +1705,20 @@ def main():
         help="Path to test code file (optional)"
     )
     parser.add_argument(
+        "--test-mapping",
+        help="Path to system_test_mapping_artifact.json (optional; enables system-tests code chunk extraction)"
+    )
+    parser.add_argument(
+        "--system-tests-code-index",
+        help="Path to system-tests code index JSON (optional; enables system-tests code chunk extraction)"
+    )
+    parser.add_argument(
+        "--system-tests-max-chunks",
+        type=int,
+        default=80,
+        help="Max system-tests chunks to embed (default: 80)"
+    )
+    parser.add_argument(
         "--code-index",
         help="Path to code index JSON (optional, used to look up full chunk code for call chains)"
     )
@@ -898,6 +1742,23 @@ def main():
     parser.add_argument(
         "--gomod-dependencies",
         help="Path to gomod-dependencies.json (go.mod versions from RC or deployed version)"
+    )
+    parser.add_argument(
+        "--fetch-dependency-sources",
+        action="store_true",
+        help="Fetch bounded dependency source snippets from GitHub (based on import diffs) and embed them as chunks (enables concrete code fixes)."
+    )
+    parser.add_argument(
+        "--fetch-dependency-sources-max-files",
+        type=int,
+        default=6,
+        help="Max dependency source files to embed (default: 6)"
+    )
+    parser.add_argument(
+        "--fetch-dependency-sources-max-lines",
+        type=int,
+        default=200,
+        help="Max lines per fetched dependency source file (default: 200)"
     )
     parser.add_argument(
         "--smart-filter",
@@ -935,6 +1796,8 @@ def main():
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
+        test_mapping = load_json_file(args.test_mapping) if args.test_mapping else None
+        system_tests_index = load_json_file(args.system_tests_code_index) if args.system_tests_code_index else None
         code_index = load_json_file(args.code_index) if args.code_index else None
         
         # Load extra indexes for dependencies
@@ -1037,12 +1900,19 @@ def main():
             code_diffs=code_diffs,
             resolved_commits=resolved_commits,
             test_code=test_code,
+            test_mapping=test_mapping,
+            system_tests_index=system_tests_index,
+            system_tests_max_chunks=args.system_tests_max_chunks,
             code_index=code_index,
             extra_indexes=extra_indexes,
             analysis_prompts=analysis_prompts,
             incluster_logs=incluster_logs,
             cross_test_interference=cross_test_interference,
-            gomod_dependencies=gomod_dependencies
+            gomod_dependencies=gomod_dependencies,
+            found_indexes_path=args.found_indexes or "artifacts/found-indexes.json",
+            fetch_dependency_sources=args.fetch_dependency_sources,
+            fetch_dependency_sources_max_files=args.fetch_dependency_sources_max_files,
+            fetch_dependency_sources_max_lines=args.fetch_dependency_sources_max_lines,
         )
         
         # Save output

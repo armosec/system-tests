@@ -1,0 +1,88 @@
+# .cursorignore - Auto-generated from code index
+# Generated automatically by code-index-generation workflow
+# This file excludes non-indexed files from Cursor's semantic search indexing
+# DO NOT EDIT MANUALLY - Regenerated on each commit
+
+# Build artifacts and binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+ca_dashboard_be
+cadashboardbe
+__debug_bin
+
+# Vendor and dependencies
+vendor/
+vendora/
+node_modules/
+
+# Python caches / virtualenvs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+systests_python_env/
+
+# Generated files (keep only essential config)
+*.json
+!go.mod
+!go.sum
+*config.json*
+*swagger*.yaml
+*swagger*.json
+
+# Test artifacts
+*_tests_go.txt
+*.xml
+
+# Logs and debug
+*.log
+log.log
+debug/
+
+# IDE files
+.history/
+.vscode/launch.json
+.vscode/tasks.json
+*.code-workspace
+
+# Code index meta files
+docs/indexes/
+scripts/code-indexing/
+
+# Git
+.git/
+.gitignore
+.gitmodules
+
+# Large documentation files (except README)
+*.md
+!README.md
+
+# Temporary files
+go.work
+go.work.*
+tests/newConfig.json
+dist/
+
+# Cursor cache
+.cursor/mcp-cache/
+
+# Files NOT in code index (auto-generated list)
+# These source files exist but aren't indexed as relevant code chunks
+
+.github/workflows/scripts/json_validator.py
+
+# Statistics:
+#   Indexed files: 168
+#   Excluded files: 1
+#   Total indexed-extension files: 169

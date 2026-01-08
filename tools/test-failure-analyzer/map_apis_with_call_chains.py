@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 from typing import Dict, List, Any
 
 # Import functions from other modules
@@ -57,9 +58,14 @@ def map_apis_with_call_chains(
     
     mappings = api_mapping_result["mappings"]
     
-    # Extract call chains for each matched handler
+    # Extract call chains for each matched handler.
+    #
+    # NOTE: In many tests, multiple APIs map to the same handler chunk (e.g., shared router/switch handlers).
+    # Call chain extraction can be expensive, especially in multi-repo mode. Cache by handler_chunk_id so we
+    # compute each call chain at most once per run and reuse it across APIs.
     all_chunk_ids = set()
     api_results = {}
+    call_chain_cache: Dict[str, Dict[str, Any]] = {}
     
     for api_key, mapping in mappings.items():
         if not mapping.get("matched"):
@@ -76,13 +82,17 @@ def map_apis_with_call_chains(
             api_results[api_key] = mapping
             continue
         
-        # Extract call chain (pass all_chunks if available for multi-repo support)
-        call_chain_result = extract_call_chain(
-            handler_chunk_id=handler_chunk_id,
-            code_index=code_index,
-            max_depth=max_depth,
-            all_chunks=all_chunks
-        )
+        # Extract call chain (pass all_chunks if available for multi-repo support), with caching.
+        if handler_chunk_id in call_chain_cache:
+            call_chain_result = call_chain_cache[handler_chunk_id]
+        else:
+            call_chain_result = extract_call_chain(
+                handler_chunk_id=handler_chunk_id,
+                code_index=code_index,
+                max_depth=max_depth,
+                all_chunks=all_chunks
+            )
+            call_chain_cache[handler_chunk_id] = call_chain_result
         
         # Collect chunk IDs from call chain
         chain_chunk_ids = set()
@@ -124,8 +134,8 @@ def main():
     )
     parser.add_argument(
         "--mapping",
-        default="system_test_mapping.json",
-        help="Path to system_test_mapping.json (default: system_test_mapping.json)"
+        default=None,
+        help="Path to system test mapping JSON (default: prefer system_test_mapping_artifact.json, fallback to system_test_mapping.json)"
     )
     parser.add_argument(
         "--index",
@@ -151,9 +161,22 @@ def main():
     args = parser.parse_args()
     
     # Load test mapping and code index
-    print(f"Loading test mapping from: {args.mapping}")
     from map_apis_to_code import load_test_mapping, load_code_index
-    test_mapping = load_test_mapping(args.mapping)
+    mapping_path = args.mapping
+    if not mapping_path:
+        repo_root = Path(__file__).parents[2]
+        artifact = repo_root / "system_test_mapping_artifact.json"
+        mapping_path = str(artifact) if artifact.exists() else str(repo_root / "system_test_mapping.json")
+
+    if not os.path.exists(mapping_path) and mapping_path.endswith("system_test_mapping_artifact.json"):
+        # Fallback for older runs
+        repo_root = Path(__file__).parents[2]
+        fallback = repo_root / "system_test_mapping.json"
+        if fallback.exists():
+            mapping_path = str(fallback)
+
+    print(f"Loading test mapping from: {mapping_path}")
+    test_mapping = load_test_mapping(mapping_path)
     
     print(f"Loading code index from: {args.index}")
     code_index = load_code_index(args.index)

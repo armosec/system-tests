@@ -614,7 +614,24 @@ class SecurityRisksScenarioManager(ScenarioManager):
         """
         # current_datetime = datetime.now(timezone.utc)
         Logger.logger.info("wait for response from BE")
-        r = self.backend.get_security_risks_severities(self.cluster, self.namespace, self.test_security_risk_ids)
+        # The backend may transiently return 5xx during staging infra hiccups (DB/proxy/connectivity) while data is still ingesting.
+        # Retry a few times to reduce flakes, then fail with full context.
+        last_exc = None
+        for attempt in range(1, 4):
+            try:
+                r = self.backend.get_security_risks_severities(self.cluster, self.namespace, self.test_security_risk_ids)
+                break
+            except Exception as e:
+                last_exc = e
+                msg = str(e)
+                is_transient = any(x in msg for x in ["(code: 500", "(code: 502", "(code: 503", "(code: 504"])
+                if not is_transient or attempt == 3:
+                    raise
+                Logger.logger.warning(self.construct_message(f"Transient backend error in get_security_risks_severities (attempt {attempt}/3): {e}"))
+                time.sleep(10 * attempt)
+        else:
+            # Should not happen, but keep a clear error if it does
+            raise last_exc  # type: ignore[misc]
 
         # Logger.logger.info('loading security risks scenario to validate it')
         # f = open(os.path.join(SCENARIOS_EXPECTED_VALUES, self.test_scenario+'_security-risks-severities.json'))

@@ -476,8 +476,14 @@ def parse_all_tests_with_timestamps(log_text: str) -> List[Dict[str, Any]]:
 def load_mapping(path: Optional[str], cfg_defaults_path: Optional[str]) -> Dict[str, Any]:
     mapping_path = path or cfg_defaults_path
     if not mapping_path:
-        # default relative to repo root
-        mapping_path = str(Path(__file__).parents[2] / "system_test_mapping.json")
+        # default relative to repo root:
+        # prefer the richer artifact mapping (methods + tested_dashboard_apis) when available
+        repo_root = Path(__file__).parents[2]
+        artifact_mapping = repo_root / "system_test_mapping_artifact.json"
+        if artifact_mapping.exists():
+            mapping_path = str(artifact_mapping)
+        else:
+            mapping_path = str(repo_root / "system_test_mapping.json")
     if not os.path.exists(mapping_path):
         console.print(f"[yellow]Mapping file not found at {mapping_path}. Continuing without mapping.[/yellow]")
         return {}

@@ -130,8 +130,8 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
     if gomod_deps:
         table_lines.append("### 📦 Go Module Dependencies (from go.mod)")
         table_lines.append("")
-        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC |")
-        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|")
+        table_lines.append("| Repository | Deployed Version | RC Version | Changed | Index Available | Code Index Type | Chunks | LOC | Diff |")
+        table_lines.append("|-----------|------------------|------------|---------|-----------------|-----------------|--------|-----|------|")
         
         for dep in gomod_deps:
             deployed = dep['deployed']
@@ -165,6 +165,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
                     'latest_fallback': '📌 latest',
                     'pr_commit': '🔀 PR commit',
                     'commit_direct': '🔀 commit',
+                    'tag_commit': '🏷️ tag→commit',
                     'always_include_fallback': '📌 latest (fallback)'
                 }
                 return strategy_map.get(strategy, strategy)
@@ -177,7 +178,7 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             else:
                 index_type = "-"
             
-            github_org = deployed.get('github_org') or 'armosec'
+            github_org = deployed.get('github_org') or rc.get('github_org') or 'armosec'
             repo_display = f"{github_org}/{dep['name']}" if github_org != 'unknown' else dep['name']
             
             # Get chunk/LOC stats for this repo
@@ -189,8 +190,18 @@ def format_dependencies_table(found_indexes: Dict[str, Any], chunk_stats: Option
             chunks_display = f"**{chunks_count}**" if chunks_count > 0 else "-"
             loc_display = f"{loc_count:,}" if loc_count > 0 else "-"
             
+            # Generate diff link if version changed and we have commit info
+            diff_display = "-"
+            if dep['version_changed']:
+                deployed_commit = deployed.get('commit')
+                rc_commit = rc.get('commit')
+                
+                if deployed_commit and rc_commit:
+                    compare_url = f"https://github.com/{github_org}/{dep['name']}/compare/{deployed_commit[:8]}...{rc_commit[:8]}"
+                    diff_display = f"[View Diff]({compare_url})"
+            
             table_lines.append(
-                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} |"
+                f"| {repo_display} | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {index_status} | {index_type} | {chunks_display} | {loc_display} | {diff_display} |"
             )
         
         table_lines.append("")
@@ -261,6 +272,7 @@ def generate_summary(
     context_summary_path: str,
     environment: str,
     run_ref: str,
+    actor: str = "",
     workflow_commit_path: str = None,
     llm_analysis_path: str = None,
     test_deployed_services_path: str = None,
@@ -275,6 +287,14 @@ def generate_summary(
     api_mapping = load_json(api_mapping_path)
     code_diffs = load_json(code_diffs_path)
     found_indexes = load_json(found_indexes_path)
+    # Index resolution mode (optional; written by workflow step in shared-workflows)
+    index_mode_path = None
+    try:
+        base_dir = os.path.dirname(llm_context_path) if llm_context_path else ""
+        index_mode_path = os.path.join(base_dir, "index-resolution-mode.json") if base_dir else "artifacts/index-resolution-mode.json"
+    except Exception:
+        index_mode_path = "artifacts/index-resolution-mode.json"
+    index_mode = load_json(index_mode_path)
     # Prefer new format, fallback to legacy
     test_deployed_services = load_json(test_deployed_services_path) if test_deployed_services_path else None
     running_images = load_json(running_images_path) if not test_deployed_services else None
@@ -315,14 +335,16 @@ def generate_summary(
     if not llm_context:
         return "⚠️  LLM context not available - cannot generate summary\n"
     
+    # Resolved title (uses resolved environment/repo/test after analyzer ran)
+    metadata = llm_context.get('metadata', {})
+    test_name = metadata.get('test_name', 'unknown')
+
     # ========================================
     # LLM Context Summary
     # ========================================
+    # NOTE: Triggering repo resolution happens below; we insert the title once triggering_repo_display is computed.
     lines.append("## 📊 LLM Context Summary\n")
     lines.append("")
-    
-    metadata = llm_context.get('metadata', {})
-    test_name = metadata.get('test_name', 'unknown')
     test_run_id = metadata.get('test_run_id', 'N/A')
     total_chunks = metadata.get('total_chunks', 0)
     total_lines = metadata.get('total_lines_of_code', 0)
@@ -355,6 +377,13 @@ def generate_summary(
             triggering_repo_display = f"armosec/{triggering_repo}"
     
     # Header section - Repository, Environment, Test
+    resolved_actor = actor or os.environ.get("GITHUB_ACTOR") or "unknown"
+    resolved_env = environment or "unknown"
+    title = f"# {resolved_actor} | {triggering_repo_display} | {resolved_env} | {test_name}\n"
+    # Put title above everything else (the "run title" can’t be changed after workflow start)
+    lines.insert(0, "")
+    lines.insert(0, title)
+
     lines.append(f"**Repository:** `{triggering_repo_display}`")
     lines.append(f"**Environment:** `{environment}`")
     lines.append(f"**Test:** `{test_name}`")
@@ -366,6 +395,26 @@ def generate_summary(
     else:
         run_url = f"https://github.com/armosec/shared-workflows/actions/runs/{run_ref}"
         lines.append(f"**Original Test Run:** [Run #{run_ref}]({run_url})")
+
+    # Short indication of index-resolution mode (what it means + why)
+    if isinstance(index_mode, dict) and index_mode.get("mode"):
+        mode = str(index_mode.get("mode"))
+        meaning = str(index_mode.get("meaning") or "").strip()
+        why = str(index_mode.get("why") or "").strip()
+        allow_csv = str(index_mode.get("allowlist_csv") or "").strip()
+        allow = [x.strip() for x in allow_csv.split(",") if x.strip()] if allow_csv else []
+
+        lines.append("")
+        lines.append("### 🧭 Code Index Resolution Mode\n")
+        lines.append(f"- **Mode**: `{mode}`")
+        if meaning:
+            lines.append(f"- **Meaning**: {meaning}")
+        if why:
+            lines.append(f"- **Why**: {why}")
+        if allow:
+            preview = ", ".join(f"`{r}`" for r in allow[:8])
+            suffix = f" …(+{len(allow) - 8} more)" if len(allow) > 8 else ""
+            lines.append(f"- **Allowlist repos**: {len(allow)} ({preview}{suffix})")
     
     # Code chunks and LOC - use extract_chunk_stats_per_repo for accurate counting
     chunk_stats = extract_chunk_stats_per_repo(llm_context)
@@ -853,8 +902,8 @@ def generate_summary(
         
         lines.append("### 📦 Go Module Dependencies (go.mod versions)\n")
         lines.append("")
-        lines.append("| Repository | Deployed go.mod | RC go.mod | Changed | Has Index | Chunks | LOC |")
-        lines.append("|-----------|------------------|-----------|---------|----------|--------|-----|")
+        lines.append("| Repository | Deployed go.mod | RC go.mod | Changed | Has Index | Chunks | LOC | Diff |")
+        lines.append("|-----------|------------------|-----------|---------|----------|--------|-----|------|")
         
         changed_count = 0
         for name in all_dep_names:
@@ -893,7 +942,19 @@ def generate_summary(
             if isinstance(repo_field, str) and repo_field:
                 repo_display = repo_field
             
-            lines.append(f"| `{repo_display}` | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {has_index_icon} | {chunks_display} | {loc_display} |")
+            # Generate diff link if version changed and we have commit info
+            diff_display = "-"
+            if changed and found_indexes:
+                dep_info = found_indexes.get('indexes', {}).get(name, {})
+                deployed_commit = dep_info.get('deployed', {}).get('commit')
+                rc_commit = dep_info.get('rc', {}).get('commit')
+                github_org = dep_info.get('deployed', {}).get('github_org') or dep_info.get('rc', {}).get('github_org') or 'armosec'
+                
+                if deployed_commit and rc_commit:
+                    compare_url = f"https://github.com/{github_org}/{name}/compare/{deployed_commit[:8]}...{rc_commit[:8]}"
+                    diff_display = f"[View Diff]({compare_url})"
+            
+            lines.append(f"| `{repo_display}` | `{deployed_ver}` | `{rc_ver}` | {changed_icon} | {has_index_icon} | {chunks_display} | {loc_display} | {diff_display} |")
         
         lines.append("")
         lines.append(f"**Summary**: {len(all_dep_names)} go.mod dependencies, {changed_count} with version changes.")
@@ -1016,6 +1077,23 @@ def generate_summary(
         lines.append("### 🗂️ Code Chunks by Repository\n")
         for repo, count in chunks_by_repo.items():
             lines.append(f"- **{repo}**: {count}")
+        lines.append("")
+
+    # Explicit system-tests (test-side) context info (helps validate "we have the right test chunks")
+    system_tests_meta = metadata.get('system_tests', {})
+    if isinstance(system_tests_meta, dict) and (system_tests_meta.get('implementation_files') or system_tests_meta.get('chunks_included') is not None):
+        lines.append("### 🧪 System-Tests Context (test-side)\n")
+        st_chunks = system_tests_meta.get('chunks_included', 0)
+        st_files = system_tests_meta.get('implementation_files', [])
+        lines.append(f"- **Included system-tests chunks** (`source=system_test_code`): **{st_chunks}**")
+        if isinstance(st_files, list) and st_files:
+            lines.append(f"- **Implementation files (from mapping)**: {len(st_files)}")
+            for fp in st_files[:15]:
+                lines.append(f"  - `{fp}`")
+            if len(st_files) > 15:
+                lines.append(f"  - ... and {len(st_files) - 15} more")
+        else:
+            lines.append("- **Implementation files (from mapping)**: (not available)")
         lines.append("")
     
     repos = metadata.get('repos', {})
@@ -1253,6 +1331,7 @@ def main():
     parser.add_argument('--context-summary', default='artifacts/context/summary.json')
     parser.add_argument('--environment', default='unknown')
     parser.add_argument('--run-ref', default='')
+    parser.add_argument('--actor', default='', help='GitHub actor (user) that triggered the analyzer run')
     parser.add_argument('--workflow-commit', help='Path to workflow-commit.txt (fallback for RC commit)')
     parser.add_argument('--llm-analysis', help='Path to llm-analysis.json (optional, for AI analysis summary)')
     parser.add_argument('--output', help='Output file (defaults to $GITHUB_STEP_SUMMARY)')
@@ -1281,6 +1360,7 @@ def main():
             args.context_summary,
             args.environment,
             args.run_ref,
+            args.actor,
             args.workflow_commit,  # workflow_commit_path (position 10)
             args.llm_analysis,      # llm_analysis_path (position 11)
             args.test_deployed_services,  # test_deployed_services_path (position 12)

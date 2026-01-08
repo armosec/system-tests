@@ -73,6 +73,49 @@ def build_prompt(llm_context: Dict, code_diffs: Optional[Dict] = None) -> str:
 - **Test Name**: {test_name}
 - **Test Type**: System integration test
 """)
+
+    # Explicitly instruct about test-side fixes (system-tests repo)
+    st_meta = metadata.get("system_tests") if isinstance(metadata, dict) else None
+    st_files = []
+    try:
+        if isinstance(st_meta, dict) and isinstance(st_meta.get("implementation_files"), list):
+            st_files = [x for x in st_meta.get("implementation_files") if isinstance(x, str)]
+    except Exception:
+        st_files = []
+
+    prompt_parts.append(f"""
+## Test-Side Analysis (system-tests repo)
+
+In addition to service-side/root-cause analysis, you MUST evaluate whether the failure is caused by the **system test flow** itself and propose **system-tests** fixes if needed.
+
+Use the LLM context:
+- Code chunks with `source=system_test_code` are test-side chunks extracted from the system-tests code index for this failing test.
+
+If you propose a test fix, make it concrete:
+- Mention the relevant file(s) and what should change (wait/poll logic, retries, assertions, parsing, IDs, cleanup, isolation).
+- Prefer minimal, targeted changes.
+
+System-test implementation files (from mapping):
+{chr(10).join([f"- {p}" for p in st_files[:25]]) if st_files else "- (not available)"}
+""")
+
+    prompt_parts.append("""
+## Analyzer Improvement Suggestions (future analysis quality)
+
+After you finish the root-cause analysis and recommended fixes, also provide **2-5 concrete improvements** to the *system test failure analyzer flow* itself.
+
+Focus on improvements that would make future analyses more accurate and less ambiguous, for example:
+- Better failing-request extraction (ensure the “failing endpoint” is the one that actually failed, not the first request in logs)
+- Capture/attach the exact system-tests ref/commit that ran and include it in metadata
+- Include additional test-side chunks (or narrower chunk selection) when a specific helper is in the traceback
+- Improve Loki queries (narrow by pod/app labels, add keywords like “failed to connect”, include relevant DB/proxy logs)
+- Emit explicit “data readiness” signals (e.g., whether aggregator/ingest completed) to distinguish infra vs eventual consistency vs app bugs
+
+Provide each suggestion as:
+- **Problem** (what is missing today)
+- **Change** (what to add/change in the analyzer)
+- **Benefit** (why it helps)
+""")
     
     # Add cross-test interference data from context (this is INPUT, not a conclusion)
     interference_data = llm_context.get('cross_test_interference')
