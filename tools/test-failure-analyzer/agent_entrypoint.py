@@ -597,6 +597,19 @@ def main() -> int:
             "system_tests_sha": sha,
         }
         (artifacts_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+
+        # Make workflow-style relative paths work:
+        # Many helper scripts assume they run from analyzer_dir and write to ./artifacts.
+        # We keep artifacts in WORKDIR (/work/artifacts) and link analyzer_dir/artifacts -> it.
+        try:
+            link_path = analyzer_dir / "artifacts"
+            if link_path.is_symlink() or link_path.exists():
+                # If someone created a real directory, don't delete it; just proceed.
+                pass
+            else:
+                link_path.symlink_to(artifacts_dir, target_is_directory=True)
+        except Exception:
+            pass
     except Exception as e:
         # If we cannot guarantee code provenance, fail fast (better than silently using stale embedded code).
         status = "failed"
@@ -673,6 +686,36 @@ def main() -> int:
         hb_stop.set()
 
     report_path = artifacts_dir / "report.json"
+
+    # --- Phase 4/4.5 parity (best-effort): resolve code indexes, dependencies, api mapping, diffs ---
+    # This produces artifacts like:
+    # - artifacts/gomod-dependencies*.json
+    # - artifacts/found-indexes.json
+    # - artifacts/api-code-map-with-chains.json
+    # - artifacts/code-diffs.json
+    # (same filenames the GitHub workflow expects)
+    try:
+        if report_path.exists():
+            resolve_script = analyzer_dir / "resolve_code_indexes.sh"
+            if resolve_script.exists():
+                env = dict(os.environ)
+                env.setdefault("ANALYZER_DEBUG", "false")
+                # resolve_code_indexes.sh relies on TRIGGERING_REPO_FROM_STEP and INPUT_RC_VERSION.
+                # It can also infer from artifacts/test-deployed-services.json when present.
+                env.setdefault("TRIGGERING_REPO_FROM_STEP", "cadashboardbe")
+                env.setdefault("INPUT_RC_VERSION", "")
+                p = subprocess.run(
+                    ["bash", str(resolve_script)],
+                    cwd=str(analyzer_dir),
+                    env=env,
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+                (artifacts_dir / "resolve_code_indexes.log").write_text((p.stdout or "").strip() + "\n")
+    except Exception:
+        pass
 
     # --- Phase 7 parity (best-effort): create artifacts/llm-context.json for richer summary ---
     llm_context_path = artifacts_dir / "llm-context.json"
