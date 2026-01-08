@@ -183,6 +183,12 @@ class ScanAndSubmitToBackend(BaseKubescape):
                                                      kubernetes_obj=kubernetes_obj, test_driver=test_driver)
 
     def start(self):    
+        # Test Agenda:
+        # 1. Install kubescape
+        # 2. Test NSA framework scan (Kubescape CLI scan)
+        # 3. Test custom framework scan (Kubescape CLI scan)
+        # 4. Delete custom framework from backend
+
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Stage 1: Installing kubescape")
 
@@ -204,16 +210,11 @@ class ScanAndSubmitToBackend(BaseKubescape):
 
         Logger.logger.info("Stage 2.4: Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
-                             framework_name=(self.test_obj.get_arg("policy_name")),
-                             old_report_guid=current_report_guid)
+                             framework_name=(self.test_obj.get_arg("policy_name")))
 
+        current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
+                                               framework_name=self.test_obj.get_arg("policy_name"))
 
-        # Test for custom framework
-
-   # test Agenda:
-        # 1. Add custom framework to backend and check if success
-        # 2. Scanning kubescape with custom framework and test result
-        # 3. Delete custom-framework from backend and check if success
         Logger.logger.info("Stage 3: Testing custom framework scan")
 
         Logger.logger.info("Stage 3.1: Add custom framework to backend and check if success")
