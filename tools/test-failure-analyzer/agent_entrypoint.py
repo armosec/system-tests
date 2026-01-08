@@ -223,31 +223,35 @@ def _download_test_deployed_services_json(run_ref: str, artifacts_dir: Path) -> 
     except Exception:
         return None
 
-    # List artifacts for the run and find the newest test-deployed-services-* artifact
-    list_url = f"https://api.github.com/repos/armosec/shared-workflows/actions/runs/{run_id}/artifacts"
+    # List artifacts for the run (paginated) and find the newest test-deployed-services-* artifact
+    base_url = f"https://api.github.com/repos/armosec/shared-workflows/actions/runs/{run_id}/artifacts"
     try:
-        r = requests.get(
-            list_url,
-            headers={
-                "Accept": "application/vnd.github+json",
-                "User-Agent": "agents-infra-system-test-analyzer/1.0",
-                "Authorization": f"Bearer {token}",
-            },
-            timeout=(10, 60),
-        )
-        if r.status_code != 200:
-            return None
-        data = r.json()
-        artifacts = data.get("artifacts") if isinstance(data, dict) else None
-        if not isinstance(artifacts, list):
-            return None
         match = None
-        for a in artifacts:
-            if not isinstance(a, dict):
-                continue
-            name = str(a.get("name") or "")
-            if name.startswith("test-deployed-services-"):
-                match = a
+        for page in range(1, 11):
+            list_url = f"{base_url}?per_page=100&page={page}"
+            r = requests.get(
+                list_url,
+                headers={
+                    "Accept": "application/vnd.github+json",
+                    "User-Agent": "agents-infra-system-test-analyzer/1.0",
+                    "Authorization": f"Bearer {token}",
+                },
+                timeout=(10, 60),
+            )
+            if r.status_code != 200:
+                return None
+            data = r.json()
+            artifacts = data.get("artifacts") if isinstance(data, dict) else None
+            if not isinstance(artifacts, list) or not artifacts:
+                break
+            for a in artifacts:
+                if not isinstance(a, dict):
+                    continue
+                name = str(a.get("name") or "")
+                if name.startswith("test-deployed-services-"):
+                    match = a
+                    break
+            if match:
                 break
         if not match:
             return None
@@ -320,40 +324,44 @@ def _download_run_artifact_file(
     except Exception:
         return None
 
-    list_url = f"https://api.github.com/repos/armosec/shared-workflows/actions/runs/{run_id}/artifacts"
+    base_url = f"https://api.github.com/repos/armosec/shared-workflows/actions/runs/{run_id}/artifacts"
     try:
-        r = requests.get(
-            list_url,
-            headers={
-                "Accept": "application/vnd.github+json",
-                "User-Agent": "agents-infra-system-test-analyzer/1.0",
-                "Authorization": f"Bearer {token}",
-            },
-            timeout=(10, 60),
-        )
-        if r.status_code != 200:
-            return None
-        data = r.json()
-        artifacts = data.get("artifacts") if isinstance(data, dict) else None
-        if not isinstance(artifacts, list):
-            return None
+        artifacts: List[Dict[str, Any]] = []
+        for page in range(1, 11):
+            list_url = f"{base_url}?per_page=100&page={page}"
+            r = requests.get(
+                list_url,
+                headers={
+                    "Accept": "application/vnd.github+json",
+                    "User-Agent": "agents-infra-system-test-analyzer/1.0",
+                    "Authorization": f"Bearer {token}",
+                },
+                timeout=(10, 60),
+            )
+            if r.status_code != 200:
+                return None
+            data = r.json()
+            page_items = data.get("artifacts") if isinstance(data, dict) else None
+            if not isinstance(page_items, list) or not page_items:
+                break
+            artifacts.extend([a for a in page_items if isinstance(a, dict)])
 
         # Try preferred artifact names first (if provided), then scan all artifacts.
         ordered: List[Dict[str, Any]] = []
         pref = [p for p in (prefer_artifact_prefixes or []) if p]
         if pref:
             for a in artifacts:
-                if not isinstance(a, dict):
-                    continue
                 name = str(a.get("name") or "")
                 if any(name.startswith(p) for p in pref):
                     ordered.append(a)
         for a in artifacts:
-            if isinstance(a, dict) and a not in ordered:
+            if a not in ordered:
                 ordered.append(a)
 
+        tried_names: List[str] = []
         for a in ordered:
             name = str(a.get("name") or "")
+            tried_names.append(name)
             download_url = str(a.get("archive_download_url") or "")
             if not download_url:
                 continue
@@ -378,6 +386,15 @@ def _download_run_artifact_file(
                     if n.split("/")[-1] == filename:
                         out_path.write_bytes(zf.read(n))
                         return out_path
+        # Persist a small debug log for visibility when missing (helps diagnose pagination/retention issues).
+        try:
+            (artifacts_dir / f"download_{filename}.log").write_text(
+                "not_found\n" + "\n".join(tried_names[:200]) + "\n",
+                encoding="utf-8",
+                errors="replace",
+            )
+        except Exception:
+            pass
         return None
     except Exception:
         return None
@@ -891,7 +908,6 @@ def main() -> int:
                 # Ensure run-scoped mapping file exists (workflow parity).
                 # map_apis_with_call_chains.py prefers <system-tests-root>/system_test_mapping_artifact.json,
                 # but in ECS we must download it from the original run artifacts.
-                mapping_file = None
                 try:
                     mapping_file = _download_run_artifact_file(
                         run_ref,
@@ -899,12 +915,6 @@ def main() -> int:
                         filename="system_test_mapping_artifact.json",
                         prefer_artifact_prefixes=["extracted-identifiers", "test-mapping-latest"],
                     )
-                    if mapping_file:
-                        # Place it where scripts expect it (system-tests repo root).
-                        repo_root = analyzer_dir.parents[2]
-                        dst = repo_root / "system_test_mapping_artifact.json"
-                        if not dst.exists():
-                            dst.write_bytes(Path(mapping_file).read_bytes())
                 except Exception:
                     mapping_file = None
 
@@ -938,8 +948,6 @@ def main() -> int:
                         str(analyzer_dir / "map_apis_with_call_chains.py"),
                         "--test-name",
                         str(test_name),
-                        "--mapping",
-                        str((analyzer_dir.parents[2] / "system_test_mapping_artifact.json")),
                         "--index",
                         str(index_path),
                         "--max-depth",
@@ -947,6 +955,8 @@ def main() -> int:
                         "--output",
                         str(api_out),
                     ]
+                    if mapping_file and Path(mapping_file).exists():
+                        cmd += ["--mapping", str(mapping_file)]
                     if dep_map:
                         cmd += ["--dependency-indexes", json.dumps(dep_map)]
                     p = subprocess.run(cmd, cwd=str(analyzer_dir), check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)

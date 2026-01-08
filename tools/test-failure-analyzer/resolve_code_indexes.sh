@@ -613,23 +613,29 @@ echo "📋 Indexes available for API mapping:"
 jq '.indexes | keys' artifacts/found-indexes.json || true
 echo ""
 
-# Step 3: Extract deployed index path from found-indexes.json
-# NOTE: APIs are always in cadashboardbe, so always use cadashboardbe index for API mapping
-# The triggering repo indexes are downloaded for code diffs (Phase 4.5), not for API mapping
-DEPLOYED_INDEX_PATH=""
+# Step 3: Extract an index path from found-indexes.json for API mapping.
+# NOTE: APIs are always in cadashboardbe. Prefer deployed index; fall back to RC index when deployed index is missing.
+INDEX_PATH=""
 if [[ -f artifacts/found-indexes.json ]]; then
   # Always use cadashboardbe index for API mapping (APIs are always in dashboard)
-  DEPLOYED_INDEX_PATH=$(jq -r ".indexes[\"cadashboardbe\"].deployed.index_path // empty" artifacts/found-indexes.json 2>/dev/null || echo "")
+  INDEX_PATH=$(jq -r ".indexes[\"cadashboardbe\"].deployed.index_path // empty" artifacts/found-indexes.json 2>/dev/null || echo "")
+  if [[ -z "$INDEX_PATH" ]]; then
+    # Fallback to RC (common when deployed version index artifact was not generated/retained)
+    INDEX_PATH=$(jq -r ".indexes[\"cadashboardbe\"].rc.index_path // empty" artifacts/found-indexes.json 2>/dev/null || echo "")
+    if [[ -n "$INDEX_PATH" ]]; then
+      echo "⚠️  Deployed cadashboardbe index missing; falling back to RC index for API mapping"
+    fi
+  fi
   
   # Check if local file exists (for development/testing)
-  if [[ -z "$DEPLOYED_INDEX_PATH" ]] && [[ -f "../../../cadashboardbe/docs/indexes/code-index.json" ]]; then
-    DEPLOYED_INDEX_PATH="../../../cadashboardbe/docs/indexes/code-index.json"
+  if [[ -z "$INDEX_PATH" ]] && [[ -f "../../../cadashboardbe/docs/indexes/code-index.json" ]]; then
+    INDEX_PATH="../../../cadashboardbe/docs/indexes/code-index.json"
     echo "✅ Using local code index (for development)"
   fi
 fi
 
 # Check if we found an index
-if [[ -z "$DEPLOYED_INDEX_PATH" ]]; then
+if [[ -z "$INDEX_PATH" ]]; then
   echo ""
   echo "❌ ERROR: Could not find any code index"
   echo "   Check found-indexes.json for details"
@@ -642,12 +648,12 @@ fi
 
 echo ""
 echo "✅ Code Index Resolution Complete"
-echo "   Using: $DEPLOYED_INDEX_PATH"
-echo "   Index size: $(du -h "$DEPLOYED_INDEX_PATH" | cut -f1)"
+echo "   Using: $INDEX_PATH"
+echo "   Index size: $(du -h "$INDEX_PATH" | cut -f1)"
 echo "================================================================"
 echo ""
 
-INDEX_PATH="$DEPLOYED_INDEX_PATH"
+INDEX_PATH="$INDEX_PATH"
 
 # Note: Index download is complete. Even if we skip API mapping (no test name),
 # the indexes are available for Phase 4.5 (code diffs) and Phase 7 (LLM context).
