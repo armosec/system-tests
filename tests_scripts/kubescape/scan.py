@@ -576,7 +576,6 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
     ):
         super(ScanGitRepositoryAndSubmit, self).__init__(
             test_obj=test_obj,
-
             backend=backend,
             kubernetes_obj=kubernetes_obj,
             test_driver=test_driver,
@@ -584,209 +583,234 @@ class ScanGitRepositoryAndSubmit(BaseKubescape):
 
     def start(self):
         # Fixme
-        return statics.SUCCESS, ""
+        # return statics.SUCCESS, ""
 
         assert self.backend != None; f'the test {self.test_driver.test_name} must run with backend'
         Logger.logger.info("Installing kubescape")
 
         self.install(branch=self.ks_branch)
 
-        should_clone_before = self.test_obj.get_arg("clone_before")
-        git_repository = self.test_obj.get_arg("git_repository")
-        if not isinstance(git_repository, GitRepository):
-            raise Exception("test expected git_repository arg to be a GitRepository instance")
+        test_configs = [
+            {
+                'policy_scope': 'framework',
+                'policy_name': 'MITRE',
+                'git_repository': GitRepository(name='examples', owner="kubernetes", branch="master",
+                                        url="https://github.com/kubernetes/examples"),
+                'clone_before': True
+            },
+            {
+                'policy_scope': 'framework',
+                'policy_name': 'AllControls',
+                'git_repository': GitRepository(name='kubescape', owner="armosec", branch="master",
+                                            url="https://github.com/armosec/kubescape"),
+                'expected_helm_files': [
+                    "examples/helm_chart/templates/serviceaccount.yaml",
+                    "examples/helm_chart/templates/cronjob.yaml"
+                ],
+                'clone_before': False,
+            },
+        ]
 
-        # Check for existing previous report
-        old_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
-                                                                                               wait_to_result=False)
-        if repo_hash is not None:
-            Logger.logger.info(f"Running test cleanup - deleting repository ({repo_hash})")
-            self.backend.delete_repository(repository_hash=repo_hash)
+        kubescape_reports_to_config = []
 
-        Logger.logger.info("Scanning with kubescape")
-
-        if should_clone_before:
-            # Local Git Folder
-            temp_dir = os.path.abspath(
-                os.path.join(self.test_driver.temp_dir, "repo_clone")
-            )
-            os.system(f'git clone -b {git_repository.branch} {git_repository.url} "{temp_dir}"')
-            kubescape_report = self.default_scan(
-                policy_scope=self.test_obj.policy_scope,
-                policy_name=self.test_obj.policy_name,
-                submit=self.test_obj.get_arg("submit"),
-                account=self.test_obj.get_arg("account"),
-                path=temp_dir,
-            )
-        else:
-            # Remote URL
-            kubescape_report = self.default_scan(
-                policy_scope=self.test_obj.policy_scope,
-                policy_name=self.test_obj.policy_name,
-                submit=self.test_obj.get_arg("submit"),
-                account=self.test_obj.get_arg("account"),
-                url=git_repository.url,
-            )
-            
-        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
-        Logger.logger.info("Testing kubescape results")
-        self.test_counters(framework_report=kubescape_report)
-
-        # Check that all relevant resources have a source
-        relevant_resources = [resource for resource in kubescape_report[_CLI_RESOURCES_FIELD]
-                              if
-                              not 'rbac.authorization' in resource['resourceID'] and 'apiVersion' in resource['object']]
-        relevant_resources_without_source = [resource['resourceID'] for resource in relevant_resources if
-                                             'source' not in resource]
-        assert len(
-            relevant_resources_without_source) == 0, f"The following resources are missing source: {','.join(relevant_resources_without_source)}"
-
-        Logger.logger.info("Fetching repo posture report from backend")
-        new_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
-                                                                                               wait_to_result=True)
-        Logger.logger.info("Testing repository summary")
-        repo_summary = None
-        for _ in range(5):
-            repo_summaries = self.backend.get_repository_posture_repositories_by_report_guid(new_report_guid)
-            if len(repo_summaries) != 0:
-                repo_summary = repo_summaries[0]
-                break
-            else:
-                time.sleep(5)
-
-        assert repo_summary, f"ReportGUID was found ({new_report_guid}) but repository summary API returned an empty result"
-
-        designators_attributes = repo_summary["designators"]["attributes"]
-        assert designators_attributes[
-                   "repoName"] == git_repository.name, f"Expected repo name '{git_repository.name}', but got {designators_attributes['repoName']}"
-        assert designators_attributes[
-                   "branch"] == git_repository.branch, f"Expected branch name '{git_repository.branch}', but got {designators_attributes['branch']}"
-        assert designators_attributes[
-                   "repoOwner"] == git_repository.owner, f"Expected repo owner '{git_repository.owner}', but got {designators_attributes['repoOwner']}"
-        assert designators_attributes[
-                   "remoteURL"] == git_repository.url, f"Expected remote URL '{git_repository.url}', but got {designators_attributes['remoteURL']}"
-        assert designators_attributes[
-                   "repoHash"] != "", f"Expected to find a non-empty value for repoHash, but got {designators_attributes['repoHash']}"
-        assert repo_summary["statusText"] == kubescape_report[_CLI_SUMMARY_DETAILS_FIELD][
-            "status"], "Repository summary status is different between BE and KS"
-
-        kubescape_status_to_control_id = dict(passed=[], failed=[], skipped=[])
-        for c_id, control in kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(statics.CONTROLS_FIELD,
-                                                                                      {}).items():
-            if control["status"] not in kubescape_status_to_control_id:
-                kubescape_status_to_control_id[control["status"]] = []
-            kubescape_status_to_control_id[control["status"]].append(c_id)
-
-        # Check controlsStats counters in Repo Summary
-        assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"])
-        assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"])
-        assert repo_summary["controlsStats"]["skipped"] == len(kubescape_status_to_control_id["skipped"])
-
-        # Check controlsInfo in Repo Summary
-        assert sorted([c["id"] for c in repo_summary["controlsInfo"]["failed"]]) == sorted(
-            kubescape_status_to_control_id["failed"])
-        assert sorted([c["id"] for c in repo_summary["controlsInfo"]["passed"]]) == sorted(
-            kubescape_status_to_control_id["passed"])
-        if "skipped" in repo_summary["controlsInfo"].keys():
-            assert sorted([c["id"] for c in repo_summary["controlsInfo"]["skipped"]]) == sorted(
-                kubescape_status_to_control_id["skipped"])
-        else:
-            assert len(kubescape_status_to_control_id["skipped"]) == 0
-
-        Logger.logger.info("Testing file summary")
-        file_summary = None
-        for _ in range(12):
-            file_summary = self.backend.get_repository_posture_files(new_report_guid)
-            if len(file_summary) == repo_summary["childCount"]:
-                break
-            else:
-                time.sleep(5)
-
-        # Compare Files
-        assert repo_summary["childCount"] == len(file_summary), \
-            f"expected {len(file_summary)} files to be the value of childCount, but got {repo_summary['childCount']}"
-
-        kubescape_scanned_files = set(
-            [
-                resource["source"]["relativePath"]
-                for resource in kubescape_report[_CLI_RESOURCES_FIELD]
-                if resource.get("source")
-            ]
-        )
-        be_file_paths = set(
-            [file["designators"]["attributes"]["filePath"] for file in file_summary]
-        )
-        if len(kubescape_scanned_files) != len(be_file_paths):
-            for file in kubescape_scanned_files:
-                assert file in be_file_paths, f"Expected to find {file} in file summary, but it wasn't found"
-            for file in be_file_paths:
-                assert file in kubescape_scanned_files, f"Expected to find {file} in kubescape report, but it wasn't found"
+        for test_config in test_configs:
+            policy_scope = test_config.get("policy_scope")
+            policy_name = test_config.get("policy_name")
+            git_repository = test_config.get("git_repository")
+            should_clone_before = test_config.get("clone_before")
         
-        expected_helm_files = self.test_obj.get_arg("expected_helm_files")
-        be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
-        if expected_helm_files and len(expected_helm_files) > 0:
-            Logger.logger.info("Testing helm chart scanning")
-            be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
-            assert len(expected_helm_files) <= len(
-                be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
-                                     f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
-            for helm_chart in expected_helm_files:
-                assert helm_chart in be_helm_file_paths, f"Expected to find {helm_chart} in file summary, but it wasn't found"
-            assert "0" not in [str(f["childCount"]) for f in
-                               be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
-        else:
-            assert len(be_helm_files) == 0
+            Logger.logger.info("Scanning with kubescape")
 
-        max_retries = 10
-        retry = 1
-        while True:
-            Logger.logger.info(f"Testing resources summary (retry #{retry})")
-            be_resources = self.backend.get_repository_posture_resources(new_report_guid)
-            cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
-            if len(be_resources) == len(cli_resources):
-                break
+            if should_clone_before:
+                # Local Git Folder
+                temp_dir = os.path.abspath(
+                    os.path.join(self.test_driver.temp_dir, "repo_clone")
+                )
+                os.system(f'git clone -b {git_repository.branch} {git_repository.url} "{temp_dir}"')
+                kubescape_report = self.default_scan(
+                    policy_scope=policy_scope,
+                    policy_name=policy_name,
+                    submit=True,
+                    account=True,
+                    path=temp_dir,
+                )
+                kubescape_reports_to_config.append((kubescape_report, test_config))
+            else:
+                # Remote URL
+                kubescape_report = self.default_scan(
+                    policy_scope=policy_scope,
+                    policy_name=policy_name,
+                    submit=True,
+                    account=True,
+                    url=git_repository.url,
+                )
+                kubescape_reports_to_config.append((kubescape_report, test_config))
 
-            Logger.logger.info("Number of resources in BE and CLI are not equal, retrying in 30 seconds")
-            if retry < max_retries:
-                retry += 1
-                time.sleep(30)
-                continue
+        TestUtil.sleep(25, "wait for kubescape scan to report", "info")
 
-            l = [i["resourceID"] for i in be_resources if any(i["resourceID"] != j["resourceID"] for j in cli_resources)]
-            li = [i["resourceID"] for i in cli_resources if any(i["resourceID"] != j["resourceID"] for j in be_resources)]
-            raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}."\
-                f"Diff: Resources in be_resources and not in cli_resources:{l}, Resources in cli_resources and not in be_resources:{li}")
+        for kubescape_report, test_config in kubescape_reports_to_config:
+            git_repository = test_config.get("git_repository")
 
-        # Check amount of resources per status
-        ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
-            _CLI_RESOURCE_COUNTERS_FIELD, {}
-        )
+            Logger.logger.info("Testing kubescape results")
+            self.test_counters(framework_report=kubescape_report)
 
-        failed = len([r["statusText"] for r in be_resources if r["statusText"] == "failed"])
-        skipped = len([r["statusText"] for r in be_resources if r["statusText"] == "skipped"])
-        excluded = len([r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")])
-        passed = len([r["statusText"] for r in be_resources if r["statusText"] == "passed"])
+            # Check that all relevant resources have a source
+            relevant_resources = [resource for resource in kubescape_report[_CLI_RESOURCES_FIELD]
+                                if
+                                not 'rbac.authorization' in resource['resourceID'] and 'apiVersion' in resource['object']]
+            relevant_resources_without_source = [resource['resourceID'] for resource in relevant_resources if
+                                                'source' not in resource]
+            assert len(
+                relevant_resources_without_source) == 0, f"The following resources are missing source: {','.join(relevant_resources_without_source)}"
 
-        assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == failed, f'CLI - number of failed resources: {ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0)}. BE - number of failed resources: {failed}'
-        assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == skipped, f'CLI - number of skipped resources: {ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0)}. BE - number of skipped resources: {skipped}'
-        assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == excluded, f'CLI - number of excluded resources: {ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0)}. BE - number of excluded resources: {excluded}'
-        assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == passed, f'CLI - number of passed resources: {ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0)}. BE - number of passed resources: {passed}'
+            Logger.logger.info("Fetching repo posture report from backend")
+            new_report_guid, repo_hash = self.get_report_guid_and_repo_hash_for_git_repository(git_repository,
+                                                                                                wait_to_result=True)
+            Logger.logger.info("Testing repository summary")
+            repo_summary = None
+            for _ in range(5):
+                repo_summaries = self.backend.get_repository_posture_repositories_by_report_guid(new_report_guid)
+                if len(repo_summaries) != 0:
+                    repo_summary = repo_summaries[0]
+                    break
+                else:
+                    time.sleep(5)
 
-        Logger.logger.info("Testing repository registration in portal")
-        repoHash = designators_attributes['repoHash']
-        customer_repos = self.backend.get_repositories()
-        repository_info = next((r for r in customer_repos if r['name'] == repoHash), None)
+            assert repo_summary, f"ReportGUID was found ({new_report_guid}) but repository summary API returned an empty result"
+            
+            Logger.logger.info(f"BE - Repository summary: {repo_summary}")
 
-        assert repository_info, f"Expected to find repository in portal with repoHash {repoHash}"
-        expected = new_report_guid
-        actual = repository_info['attributes']['lastPostureReportGUID']
-        assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
-        assert repository_info['provider'] == designators_attributes['provider'], f"Expected provider to be {designators_attributes['provider']} but got {repository_info['provider']}"
-        assert repository_info['owner'] == designators_attributes['repoOwner'], f"Expected owner to be {designators_attributes['repoOwner']} but got {repository_info['owner']}"
-        assert repository_info['repoName'] == designators_attributes['repoName'], f"Expected repoName to be {designators_attributes['repoName']} but got {repository_info['repoName']}"
-        assert repository_info['branchName'] == designators_attributes['branch'], f"Expected branchName to be {designators_attributes['branch']} but got {repository_info['branchName']}"
-        Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
-        self.backend.delete_repository(repository_hash=repoHash)
+            designators_attributes = repo_summary["designators"]["attributes"]
+            assert designators_attributes[
+                    "repoName"] == git_repository.name, f"Expected repo name '{git_repository.name}', but got {designators_attributes['repoName']}"
+            assert designators_attributes[
+                    "branch"] == git_repository.branch, f"Expected branch name '{git_repository.branch}', but got {designators_attributes['branch']}"
+            assert designators_attributes[
+                    "repoOwner"] == git_repository.owner, f"Expected repo owner '{git_repository.owner}', but got {designators_attributes['repoOwner']}"
+            assert designators_attributes[
+                    "remoteURL"] == git_repository.url, f"Expected remote URL '{git_repository.url}', but got {designators_attributes['remoteURL']}"
+            assert designators_attributes[
+                    "repoHash"] != "", f"Expected to find a non-empty value for repoHash, but got {designators_attributes['repoHash']}"
+            assert repo_summary["statusText"] == kubescape_report[_CLI_SUMMARY_DETAILS_FIELD][
+                "status"], "Repository summary status is different between BE and KS"
+
+            kubescape_status_to_control_id = dict(passed=[], failed=[], skipped=[])
+            for c_id, control in kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(statics.CONTROLS_FIELD,
+                                                                                        {}).items():
+                if control["status"] not in kubescape_status_to_control_id:
+                    kubescape_status_to_control_id[control["status"]] = []
+                kubescape_status_to_control_id[control["status"]].append(c_id)
+
+            # Check controlsStats counters in Repo Summary
+            assert repo_summary["controlsStats"]["passed"] == len(kubescape_status_to_control_id["passed"]), f"Expected {len(kubescape_status_to_control_id['passed'])} passed controls, but got {repo_summary['controlsStats']['passed']}"
+            assert repo_summary["controlsStats"]["failed"] == len(kubescape_status_to_control_id["failed"]), f"Expected {len(kubescape_status_to_control_id['failed'])} failed controls, but got {repo_summary['controlsStats']['failed']}"
+            assert repo_summary["controlsStats"]["skipped"] == len(kubescape_status_to_control_id["skipped"]), f"Expected {len(kubescape_status_to_control_id['skipped'])} skipped controls, but got {repo_summary['controlsStats']['skipped']}"
+
+            # Check controlsInfo in Repo Summary
+            assert sorted([c["id"] for c in repo_summary["controlsInfo"]["failed"]]) == sorted(
+                kubescape_status_to_control_id["failed"])
+            assert sorted([c["id"] for c in repo_summary["controlsInfo"]["passed"]]) == sorted(
+                kubescape_status_to_control_id["passed"])
+            if "skipped" in repo_summary["controlsInfo"].keys():
+                assert sorted([c["id"] for c in repo_summary["controlsInfo"]["skipped"]]) == sorted(
+                    kubescape_status_to_control_id["skipped"])
+            else:
+                assert len(kubescape_status_to_control_id["skipped"]) == 0
+
+            Logger.logger.info("Testing file summary")
+            file_summary = None
+            for _ in range(12):
+                file_summary = self.backend.get_repository_posture_files(new_report_guid)
+                if len(file_summary) == repo_summary["childCount"]:
+                    break
+                else:
+                    time.sleep(5)
+
+            # Compare Files
+            assert repo_summary["childCount"] == len(file_summary), \
+                f"expected {len(file_summary)} files to be the value of childCount, but got {repo_summary['childCount']}"
+
+            kubescape_scanned_files = set(
+                [
+                    resource["source"]["relativePath"]
+                    for resource in kubescape_report[_CLI_RESOURCES_FIELD]
+                    if resource.get("source")
+                ]
+            )
+            be_file_paths = set(
+                [file["designators"]["attributes"]["filePath"] for file in file_summary]
+            )
+            if len(kubescape_scanned_files) != len(be_file_paths):
+                for file in kubescape_scanned_files:
+                    assert file in be_file_paths, f"Expected to find {file} in file summary, but it wasn't found"
+                for file in be_file_paths:
+                    assert file in kubescape_scanned_files, f"Expected to find {file} in kubescape report, but it wasn't found"
+            
+            expected_helm_files = test_config.get("expected_helm_files", None)
+            be_helm_files = [file for file in file_summary if file["designators"]["attributes"]["fileType"] == "Helm Chart"]
+            if expected_helm_files and len(expected_helm_files) > 0:
+                Logger.logger.info("Testing helm chart scanning")
+                be_helm_file_paths = [f["designators"]["attributes"]["filePath"] for f in be_helm_files]
+                assert len(expected_helm_files) <= len(
+                    be_helm_file_paths), f"Expected {len(expected_helm_files)} files to be with type 'Helm Chart' in file summary: {expected_helm_files}, " \
+                                        f"but there are {len(be_helm_file_paths)}: {be_helm_file_paths}"
+                for helm_chart in expected_helm_files:
+                    assert helm_chart in be_helm_file_paths, f"Expected to find {helm_chart} in file summary, but it wasn't found"
+                assert "0" not in [str(f["childCount"]) for f in
+                                be_helm_files], f"Helm charts expected to have at least 1 resource, but some have 0"
+            else:
+                assert len(be_helm_files) == 0
+
+            max_retries = 10
+            retry = 1
+            while True:
+                Logger.logger.info(f"Testing resources summary (retry #{retry})")
+                be_resources = self.backend.get_repository_posture_resources(new_report_guid)
+                cli_resources = kubescape_report[_CLI_RESOURCES_FIELD]
+                if len(be_resources) == len(cli_resources):
+                    break
+
+                Logger.logger.info("Number of resources in BE and CLI are not equal, retrying in 30 seconds")
+                if retry < max_retries:
+                    retry += 1
+                    time.sleep(30)
+                    continue
+
+                l = [i["resourceID"] for i in be_resources if any(i["resourceID"] != j["resourceID"] for j in cli_resources)]
+                li = [i["resourceID"] for i in cli_resources if any(i["resourceID"] != j["resourceID"] for j in be_resources)]
+                raise Exception(f"Number of failed resources reported to BE: {len(be_resources)}, Number of failed resources counted by the CLI: {len(cli_resources)}."\
+                    f"Diff: Resources in be_resources and not in cli_resources:{l}, Resources in cli_resources and not in be_resources:{li}")
+
+            # Check amount of resources per status
+            ks_resource_counters = kubescape_report.get(_CLI_SUMMARY_DETAILS_FIELD, {}).get(
+                _CLI_RESOURCE_COUNTERS_FIELD, {}
+            )
+
+            failed = len([r["statusText"] for r in be_resources if r["statusText"] == "failed"])
+            skipped = len([r["statusText"] for r in be_resources if r["statusText"] == "skipped"])
+            excluded = len([r["statusText"] for r in be_resources if (r["statusText"] == "excluded" or r["statusText"] == "warning")])
+            passed = len([r["statusText"] for r in be_resources if r["statusText"] == "passed"])
+
+            assert ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0) == failed, f'CLI - number of failed resources: {ks_resource_counters.get(_CLI_FAILED_RESOURCES_FIELD, 0)}. BE - number of failed resources: {failed}'
+            assert ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0) == skipped, f'CLI - number of skipped resources: {ks_resource_counters.get(_CLI_SKIPPED_RESOURCES_FIELD, 0)}. BE - number of skipped resources: {skipped}'
+            assert ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0) == excluded, f'CLI - number of excluded resources: {ks_resource_counters.get(_CLI_EXCLUDED_RESOURCES_FIELD, 0)}. BE - number of excluded resources: {excluded}'
+            assert ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0) == passed, f'CLI - number of passed resources: {ks_resource_counters.get(_CLI_PASSED_RESOURCES_FIELD, 0)}. BE - number of passed resources: {passed}'
+
+            Logger.logger.info("Testing repository registration in portal")
+            repoHash = designators_attributes['repoHash']
+            customer_repos = self.backend.get_repositories()
+            repository_info = next((r for r in customer_repos if r['name'] == repoHash), None)
+
+            assert repository_info, f"Expected to find repository in portal with repoHash {repoHash}"
+            expected = new_report_guid
+            actual = repository_info['attributes']['lastPostureReportGUID']
+            assert actual == expected, f"last report GUID of repository was not updated in portal expected: {expected} actual: {actual}"
+            assert repository_info['provider'] == designators_attributes['provider'], f"Expected provider to be {designators_attributes['provider']} but got {repository_info['provider']}"
+            assert repository_info['owner'] == designators_attributes['repoOwner'], f"Expected owner to be {designators_attributes['repoOwner']} but got {repository_info['owner']}"
+            assert repository_info['repoName'] == designators_attributes['repoName'], f"Expected repoName to be {designators_attributes['repoName']} but got {repository_info['repoName']}"
+            assert repository_info['branchName'] == designators_attributes['branch'], f"Expected branchName to be {designators_attributes['branch']} but got {repository_info['branchName']}"
+            Logger.logger.info(f"Running test cleanup - deleting repository ({repoHash})")
+            self.backend.delete_repository(repository_hash=repoHash)
         return statics.SUCCESS, ""
 
 class TestScanningScope(BaseKubescape):

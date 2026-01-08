@@ -40,9 +40,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `scan_local_glob_files`                                        | kubescape  | scan local glob files                                                  | kubescape                     |
 | `scan_local_list_of_files`                                     | kubescape  | scan local list of files                                               | kubescape      
 | `scan_nsa_and_submit_to_backend`                               | kubescape  | scan framework NSA and test results against the backend                | kubescape, backend            | 
-| `scan_mitre_and_submit_to_backend`                             | kubescape  | scan framework MITRE and test results against the backend              | kubescape, backend            | 
-| `scan_local_repository_and_submit_to_backend`                  | kubescape  | scan local repository and test results against the backend             | kubescape, backend            | 
-| `scan_repository_from_url_and_submit_to_backend`               | kubescape  | scan repository from URL and test results against the backend          | kubescape, backend            |
+| `scan_git_repository_and_submit_to_backend`               | kubescape  | scan git repository and test results against the backend          | kubescape, backend            |
 | `scan_with_exception_to_backend`                               | kubescape  | scan framework NSA with exception and test results against the backend | kubescape, backend            | 
 | `scan_with_custom_framework`                                   | kubescape  | scan custom framework and test results against the backend             | kubescape, backend            |
 | `scan_compliance_score`                                        | kubescape  | scan and test compliance score from kubescape report and from backend  | kubescape, backend            |

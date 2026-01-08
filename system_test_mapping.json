@@ -373,41 +373,7 @@
       "tests_scripts/kubescape/scan.py"
     ]
   },
-  "scan_mitre_and_submit_to_backend": {
-    "target": [
-      "CLI",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "idoh@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/kubescape/base_kubescape.py",
-      "tests_scripts/kubescape/scan.py"
-    ]
-  },
-  "scan_local_repository_and_submit_to_backend": {
-    "target": [
-      "CLI",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "config-service"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "jonathang@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/kubescape/base_kubescape.py",
-      "tests_scripts/kubescape/scan.py"
-    ]
-  },
-  "scan_repository_from_url_and_submit_to_backend": {
+  "scan_git_repository_and_submit_to_backend": {
     "target": [
       "CLI",
       "Backend"
