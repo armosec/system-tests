@@ -257,7 +257,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
 
         current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
             framework_name=self.test_obj.get_arg("policy_name").upper(),
-            check_intervals=35)
+            check_intervals=112)
 
         Logger.logger.info("Stage 2.2: Check if exception-applied empty and exception-related empty")
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
@@ -306,7 +306,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
             current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                     framework_name=self.test_obj.get_arg("policy_name").upper(),
                                                     old_report_guid=current_report_guid,
-                                                    check_intervals=35)
+                                                    check_intervals=112)
 
             Logger.logger.info("Stage 4.2: Check if exception-applied not empty and exception-deployed not empty")
             self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
@@ -349,7 +349,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
             current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                     framework_name=self.test_obj.get_arg("policy_name").upper(),
                                                     old_report_guid=current_report_guid,
-                                                    check_intervals=35)
+                                                    check_intervals=112)
 
             Logger.logger.info("Stage 6.2: Check if exception-applied empty and exception-deployed empty")
             self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,

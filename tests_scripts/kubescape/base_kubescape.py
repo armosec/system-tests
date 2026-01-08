@@ -1731,6 +1731,8 @@ class BaseKubescape(BaseK8S):
         framework_name: str = "",
         old_report_guid: str = "",
         wait_to_result: bool = False,
+        check_intervals: int = 100,
+        sleep_sec: int = 5,
     ):
         found = False
         Logger.logger.info(
@@ -1738,7 +1740,7 @@ class BaseKubescape(BaseK8S):
                 cluster_name, framework_name, old_report_guid, wait_to_result
             )
         )
-        for i in range(100):
+        for i in range(check_intervals):
             be_cluster_overtime = self.get_posture_clusters_overtime(
                 cluster_name=cluster_name, framework_name=framework_name
             )
@@ -1773,7 +1775,7 @@ class BaseKubescape(BaseK8S):
                 # results where found, this means the backend started the aggregation, we will wait a little for the backend to complete the aggregation
                 time.sleep(20)
 
-            time.sleep(5)
+            time.sleep(sleep_sec)
         raise Exception("Failed to get the report-guid for the last scan.")
 
     def test_controls_compliance_score(self, report: dict):
