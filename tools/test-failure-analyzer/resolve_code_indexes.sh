@@ -562,7 +562,7 @@ if [[ ! -f "${SERVICES_ONLY_FILE}" ]] && [[ -f "artifacts/test-deployed-services
   jq -c '
     (.services // {}) 
     | with_entries(
-        .value.images |= ( [ .value.images[]? | select(.service_key != "dataPurger") ] )
+        .value.images |= [ .[]? | select(.service_key != "dataPurger") ]
       )
     | with_entries(select((.value.images | length) > 0))
   ' artifacts/test-deployed-services.json > "${SERVICES_ONLY_FILE}" 2>/dev/null || true

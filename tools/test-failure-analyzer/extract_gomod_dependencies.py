@@ -368,8 +368,12 @@ def main():
             print(f"📌 Using deployed version tag for go.mod: {args.deployed_version} (instead of commit {deployed_commit})")
         
         deployed_gomod = download_gomod_from_github(deployed_repo, deployed_ref, github_token)
-        if deployed_gomod and args.debug:
-            print(f"✅ Downloaded deployed go.mod from GitHub")
+        if deployed_gomod:
+            if args.debug:
+                print(f"✅ Downloaded deployed go.mod from GitHub")
+        else:
+            print(f"⚠️  Failed to download deployed go.mod from GitHub (tag '{deployed_ref}' may not exist)")
+            print(f"   Will fall back to code index go.mod (may not reflect deployed baseline)")
         
         # Download RC go.mod from GitHub
         # IMPORTANT: Prefer RC tag if available; the RC index may fall back to code-index-latest,
