@@ -24,7 +24,7 @@ import zipfile
 import base64
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 def _utcnow_iso() -> str:
@@ -437,24 +437,90 @@ def main() -> int:
 
     report_path = artifacts_dir / "report.json"
 
+    # --- Phase 7 parity (best-effort): create artifacts/llm-context.json for richer summary ---
+    llm_context_path = artifacts_dir / "llm-context.json"
+    try:
+        if report_path.exists():
+            report_obj = json.loads(report_path.read_text())
+            failures = report_obj.get("failures") or []
+
+            test_name = "unknown"
+            incluster_logs_obj: Dict[str, Any] = {}
+            if isinstance(failures, list) and failures:
+                f0 = failures[0] or {}
+                if isinstance(f0, dict):
+                    t = f0.get("test") or {}
+                    if isinstance(t, dict):
+                        test_name = str(t.get("name") or "unknown")
+                    incluster_logs_obj = f0.get("incluster_logs") or {}
+
+            error_logs_path = artifacts_dir / "error-logs.txt"
+            lines: List[str] = []
+            if isinstance(failures, list) and failures:
+                f = failures[0] or {}
+                if isinstance(f, dict):
+                    for e in (f.get("errors") or []):
+                        lines.append(str(e))
+                    loki = f.get("loki") or {}
+                    if isinstance(loki, dict):
+                        for ex in (loki.get("excerpts") or []):
+                            lines.append(str(ex))
+            error_logs_path.write_text("\n".join([ln for ln in lines if ln.strip()]) + "\n")
+
+            incluster_logs_path = artifacts_dir / "incluster-logs.json"
+            if isinstance(incluster_logs_obj, dict):
+                incluster_logs_path.write_text(json.dumps(incluster_logs_obj, indent=2) + "\n")
+
+            build_cmd = [
+                sys.executable,
+                str(analyzer_dir / "build_llm_context.py"),
+                "--test-name",
+                test_name,
+                "--output",
+                str(llm_context_path),
+                "--error-logs",
+                str(error_logs_path),
+            ]
+
+            tr = artifacts_dir / "test-run-id.txt"
+            if tr.exists():
+                build_cmd += ["--test-run-id", tr.read_text().strip()]
+            wc = artifacts_dir / "workflow-commit.txt"
+            if wc.exists():
+                build_cmd += ["--workflow-commit", wc.read_text().strip()]
+            cti = artifacts_dir / "context" / "cross_test_interference.json"
+            if cti.exists():
+                build_cmd += ["--cross-test-interference", str(cti)]
+            if incluster_logs_path.exists():
+                build_cmd += ["--incluster-logs", str(incluster_logs_path)]
+
+            p = subprocess.run(build_cmd, check=False, cwd=str(analyzer_dir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            if p.returncode != 0:
+                # Persist build_llm_context diagnostics for debugging and to explain summary fallback
+                (artifacts_dir / "llm-context-build.log").write_text((p.stdout or "").strip() + "\n")
+    except Exception:
+        pass
+
     # Generate a human-friendly summary (similar to GitHub step summary) as an artifact.
     # We run from WORKDIR so relative "artifacts/..." paths resolve.
     try:
         summary_out = artifacts_dir / "summary.md"
-        subprocess.run(
-            [
-                sys.executable,
-                str(analyzer_dir / "generate_github_summary.py"),
-                "--environment",
-                environment,
-                "--run-ref",
-                run_ref,
-                "--output",
-                str(summary_out),
-            ],
-            cwd=str(workdir),
-            check=False,
-        )
+        summary_cmd = [
+            sys.executable,
+            str(analyzer_dir / "generate_github_summary.py"),
+            "--environment",
+            environment,
+            "--run-ref",
+            run_ref,
+            "--output",
+            str(summary_out),
+        ]
+        if llm_context_path.exists():
+            summary_cmd += ["--llm-context", str(llm_context_path)]
+        ctx_summary = artifacts_dir / "context" / "summary.json"
+        if ctx_summary.exists():
+            summary_cmd += ["--context-summary", str(ctx_summary)]
+        subprocess.run(summary_cmd, cwd=str(workdir), check=False)
         # Add a tiny README that points to the main artifacts for quick viewing.
         readme = artifacts_dir / "README.md"
         readme.write_text(
