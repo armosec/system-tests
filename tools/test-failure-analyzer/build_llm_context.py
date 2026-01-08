@@ -292,6 +292,96 @@ def extract_dependency_chunks_from_diffs(
     return out
 
 
+def extract_changed_function_chunks_from_code_diffs(
+    code_diffs: Optional[Dict[str, Any]],
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]],
+    max_total_chunks: int = 12,
+    max_per_repo: int = 3,
+) -> List[Dict[str, Any]]:
+    """
+    Best-effort: when dependency call-chains are not available (legacy mode), still pull a small
+    set of representative chunks from dependency repos that actually changed (per code_diffs).
+
+    Uses the `functions.added/removed` lists emitted by compare_code_indexes.py (file+name),
+    then resolves them back to concrete chunks in the dependency repo's code index.
+    """
+    if not code_diffs or not extra_indexes:
+        return []
+
+    out: List[Dict[str, Any]] = []
+    seen_ids: Set[str] = set()
+    per_repo_count: Dict[str, int] = {}
+
+    # Prefer repos that changed, exclude cadashboardbe (handled separately via API mapping).
+    dep_repos = [
+        r for r, d in (code_diffs or {}).items()
+        if r and r != "cadashboardbe" and isinstance(d, dict) and d.get("changed")
+    ]
+
+    for repo in dep_repos:
+        if repo not in extra_indexes:
+            continue
+        if len(out) >= max_total_chunks:
+            break
+
+        diff = code_diffs.get(repo) or {}
+        funcs = diff.get("functions") or {}
+        # functions.added/removed are lists of {"file","name",...}
+        candidates = []
+        for key in ("added", "removed"):
+            vals = funcs.get(key) or []
+            if isinstance(vals, list):
+                candidates.extend([v for v in vals if isinstance(v, dict)])
+
+        if not candidates:
+            continue
+
+        idx = extra_indexes.get(repo) or {}
+        chunks = idx.get("chunks", [])
+        if not isinstance(chunks, list) or not chunks:
+            continue
+
+        # Build quick lookup by (file,name)
+        by_key: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        for ch in chunks:
+            if not isinstance(ch, dict):
+                continue
+            f = ch.get("file") or ""
+            n = ch.get("name") or ""
+            if f and n and (f, n) not in by_key:
+                by_key[(f, n)] = ch
+
+        for d in candidates:
+            if len(out) >= max_total_chunks:
+                break
+            if per_repo_count.get(repo, 0) >= max_per_repo:
+                break
+
+            f = d.get("file") or ""
+            n = d.get("name") or ""
+            if not f or not n:
+                continue
+
+            ch = by_key.get((f, n))
+            if not ch:
+                continue
+
+            cid = ch.get("id") or f"{repo}:{f}:{n}"
+            if cid in seen_ids:
+                continue
+            seen_ids.add(cid)
+
+            out.append({
+                **ch,
+                "repo_name": repo,
+                "source": "diff_changed_function",
+                "priority": 3,
+            })
+            per_repo_count[repo] = per_repo_count.get(repo, 0) + 1
+
+    return out
+
+
 def load_analysis_prompts(prompts_file: str = None) -> Optional[str]:
     """Load analysis prompts from file."""
     if prompts_file and os.path.exists(prompts_file):
@@ -1158,6 +1248,15 @@ def build_llm_context(
         if extra_diff_chunks:
             all_chunks.extend(extra_diff_chunks)
             print(f"   ➕ Added {len(extra_diff_chunks)} dependency chunks hinted by diffs", file=sys.stderr)
+            sys.stderr.flush()
+
+        # 2.52 In legacy mapping mode, we may not have cross-repo call chains.
+        # Add a small set of changed dependency chunks based on code-diffs so dependency repos
+        # still contribute actionable context (bounded).
+        changed_dep_chunks = extract_changed_function_chunks_from_code_diffs(code_diffs, extra_indexes)
+        if changed_dep_chunks:
+            all_chunks.extend(changed_dep_chunks)
+            print(f"   ➕ Added {len(changed_dep_chunks)} changed dependency chunks from code diffs", file=sys.stderr)
             sys.stderr.flush()
 
     # 2.55 Fetch dependency source snippets (bounded) so we can propose concrete patches from LLM context
