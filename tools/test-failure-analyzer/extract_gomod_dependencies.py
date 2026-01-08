@@ -20,6 +20,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 import requests
 
+# Map internal repo names to GitHub repo names (for GitHub API calls)
+REPO_NAME_TO_GITHUB = {
+    "cadashboardbe": "dashboard-backend",
+    # Add more mappings here if needed
+}
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract go.mod dependencies")
     parser.add_argument("--deployed-code-index", help="Path to deployed version code index JSON")
@@ -350,9 +356,19 @@ def main():
         deployed_metadata = deployed_index.get('metadata', {})
         rc_metadata = rc_index.get('metadata', {})
         
-        deployed_repo = deployed_metadata.get('repo', 'armosec/cadashboardbe')
+        # Get repo names from metadata, apply GitHub name mapping if needed
+        deployed_repo_name = deployed_metadata.get('repo', 'cadashboardbe')
+        rc_repo_name = rc_metadata.get('repo', 'cadashboardbe')
+        
+        # Map internal repo names to GitHub repo names
+        deployed_github_name = REPO_NAME_TO_GITHUB.get(deployed_repo_name, deployed_repo_name)
+        rc_github_name = REPO_NAME_TO_GITHUB.get(rc_repo_name, rc_repo_name)
+        
+        # Construct full GitHub repo paths
+        deployed_repo = f"armosec/{deployed_github_name}" if '/' not in deployed_github_name else deployed_github_name
+        rc_repo = f"armosec/{rc_github_name}" if '/' not in rc_github_name else rc_github_name
+        
         deployed_commit = deployed_metadata.get('commit') or deployed_metadata.get('version', 'main')
-        rc_repo = rc_metadata.get('repo', 'armosec/cadashboardbe')
         rc_commit = rc_metadata.get('commit') or rc_metadata.get('version', 'main')
         
         if args.debug:
