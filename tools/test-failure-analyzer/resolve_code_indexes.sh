@@ -1,5 +1,12 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
+
+# This script can be very verbose/heavy; GitHub Actions log I/O can significantly slow runtime.
+# Enable xtrace/debug only when explicitly requested.
+ANALYZER_DEBUG="${ANALYZER_DEBUG:-false}"
+if [[ "${ANALYZER_DEBUG}" == "true" ]]; then
+  set -x
+fi
 
 echo "🔍 Phase 4: Code Index Resolution (3-Pass) & API Mapping"
 echo "================================================================"
@@ -23,15 +30,17 @@ TRIGGERING_REPO="$TRIGGERING_REPO_FROM_STEP"
 TAG_FILE=""
 if [[ -f artifacts/test-deployed-services.json ]]; then
   TAG_FILE="artifacts/test-deployed-services.json"
-  echo "🔍 DEBUG (Phase 4): Using new format (test-deployed-services.json)"
+  [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG (Phase 4): Using new format (test-deployed-services.json)"
 elif [[ -f artifacts/running-images.json ]]; then
   TAG_FILE="artifacts/running-images.json"
-  echo "🔍 DEBUG (Phase 4): Using legacy format (running-images.json)"
+  [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG (Phase 4): Using legacy format (running-images.json)"
 fi
 
 if [[ -n "$TAG_FILE" ]]; then
-  echo "🔍 DEBUG (Phase 4): Keys in $TAG_FILE:"
-  jq 'keys' "$TAG_FILE" || echo "Failed to parse JSON"
+  if [[ "${ANALYZER_DEBUG}" == "true" ]]; then
+    echo "🔍 DEBUG (Phase 4): Keys in $TAG_FILE:"
+    jq 'keys' "$TAG_FILE" || echo "Failed to parse JSON"
+  fi
   
   # Extract triggering repo (handles both formats)
   if [[ "$TAG_FILE" == *"test-deployed-services.json" ]]; then
@@ -65,16 +74,18 @@ if [[ -n "$TAG_FILE" ]]; then
     
     # Extract global RC version
     GLOBAL_RC_VERSION="$INPUT_RC_VERSION"
-    echo "🔍 DEBUG: inputs.rc_version = '$INPUT_RC_VERSION'"
-    echo "🔍 DEBUG: GLOBAL_RC_VERSION (from input) = '$GLOBAL_RC_VERSION'"
+    [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: inputs.rc_version = '$INPUT_RC_VERSION'"
+    [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: GLOBAL_RC_VERSION (from input) = '$GLOBAL_RC_VERSION'"
     if [[ -z "$GLOBAL_RC_VERSION" || "$GLOBAL_RC_VERSION" == "null" || "$GLOBAL_RC_VERSION" == "unknown" ]]; then
       GLOBAL_RC_VERSION=$(jq -r '.triggering_repo.rc_version // empty' "$TAG_FILE" 2>/dev/null || echo "")
-      echo "🔍 DEBUG: GLOBAL_RC_VERSION (from JSON) = '$GLOBAL_RC_VERSION'"
+      [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: GLOBAL_RC_VERSION (from JSON) = '$GLOBAL_RC_VERSION'"
     fi
   else
     # Legacy format
-    echo "🔍 DEBUG (Phase 4): Repos in running-images.json:"
-    jq '.repos | keys' "$TAG_FILE" || echo "Failed to parse JSON"
+    if [[ "${ANALYZER_DEBUG}" == "true" ]]; then
+      echo "🔍 DEBUG (Phase 4): Repos in running-images.json:"
+      jq '.repos | keys' "$TAG_FILE" || echo "Failed to parse JSON"
+    fi
     
     DETECTED_REPO=$(jq -r '.triggering_repo_normalized // empty' "$TAG_FILE" 2>/dev/null || echo "")
     if [[ -n "$DETECTED_REPO" && "$DETECTED_REPO" != "null" ]]; then
@@ -87,16 +98,16 @@ if [[ -n "$TAG_FILE" ]]; then
     
     # Extract global RC version
     GLOBAL_RC_VERSION="$INPUT_RC_VERSION"
-    echo "🔍 DEBUG: inputs.rc_version = '$INPUT_RC_VERSION'"
-    echo "🔍 DEBUG: GLOBAL_RC_VERSION (from input) = '$GLOBAL_RC_VERSION'"
+    [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: inputs.rc_version = '$INPUT_RC_VERSION'"
+    [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: GLOBAL_RC_VERSION (from input) = '$GLOBAL_RC_VERSION'"
     if [[ -z "$GLOBAL_RC_VERSION" || "$GLOBAL_RC_VERSION" == "null" || "$GLOBAL_RC_VERSION" == "unknown" ]]; then
       GLOBAL_RC_VERSION=$(jq -r '.rc_version // empty' "$TAG_FILE" 2>/dev/null || echo "")
-      echo "🔍 DEBUG: GLOBAL_RC_VERSION (from JSON legacy) = '$GLOBAL_RC_VERSION'"
+      [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG: GLOBAL_RC_VERSION (from JSON legacy) = '$GLOBAL_RC_VERSION'"
     fi
   fi
     
-  echo "🔍 DEBUG (Phase 4): ACTUAL_DEPLOYED_VERSION='${ACTUAL_DEPLOYED_VERSION}'"
-  echo "🔍 DEBUG (Phase 4): TRIGGERING_REPO='${TRIGGERING_REPO}'"
+  [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG (Phase 4): ACTUAL_DEPLOYED_VERSION='${ACTUAL_DEPLOYED_VERSION}'"
+  [[ "${ANALYZER_DEBUG}" == "true" ]] && echo "🔍 DEBUG (Phase 4): TRIGGERING_REPO='${TRIGGERING_REPO}'"
 
   echo "📦 Version discovery for $TRIGGERING_REPO:"
   echo "   - Cluster Tag: ${ACTUAL_DEPLOYED_VERSION:-none}"
