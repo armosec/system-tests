@@ -1098,6 +1098,23 @@ def main() -> int:
             idx_path = _choose_cadb_index_path()
             if idx_path:
                 build_cmd += ["--code-index", str(idx_path)]
+            
+            # Pass dependency indexes (required for looking up call chain chunk code)
+            try:
+                found_obj = json.loads((artifacts_dir / "found-indexes.json").read_text())
+                idx = found_obj.get("indexes") if isinstance(found_obj, dict) else {}
+                dep_map_llm: Dict[str, str] = {}
+                if isinstance(idx, dict):
+                    for repo_name, repo_info in idx.items():
+                        if repo_name == "cadashboardbe" or not isinstance(repo_info, dict):
+                            continue
+                        deployed = repo_info.get("deployed") or {}
+                        if isinstance(deployed, dict) and deployed.get("found") and deployed.get("index_path"):
+                            dep_map_llm[str(repo_name)] = str(deployed.get("index_path"))
+                if dep_map_llm:
+                    build_cmd += ["--dependency-indexes", json.dumps(dep_map_llm)]
+            except Exception:
+                pass
 
             tr = artifacts_dir / "test-run-id.txt"
             if tr.exists():
