@@ -1,5 +1,5 @@
 github:
-  token: "${GITHUB_TOKEN}"
+  token: '${GITHUB_TOKEN}'
   api_base_url: "https://api.github.com"
   # Organization/repo resolution will be derived from run URL/ID
 
@@ -8,10 +8,10 @@ loki:
   base_url: "${GRAFANA_URL}"
   mode: "grafana_proxy"
   # Either basic auth or bearer token, prefer tokens via env
-  bearer_token: "${LOKI_TOKEN}"
+  bearer_token: '${LOKI_TOKEN}'
   grafana:
     url: "${GRAFANA_URL}"
-    api_token: "${GRAFANA_TOKEN}"
+    api_token: '${GRAFANA_TOKEN}'
     datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Default label keys used across services
   labels:

@@ -1,5 +1,5 @@
 github:
-  token: "${GITHUB_TOKEN}"
+  token: '${GITHUB_TOKEN}'
   api_base_url: "https://api.github.com"
   # Organization/repo resolution will be derived from run URL/ID
 
@@ -15,10 +15,10 @@ loki:
   # - grafana_proxy: calls <grafana.url>/api/datasources/proxy/<datasource_id>/loki/api/v1/query_range
   mode: "auto"
   # Either basic auth or bearer token, prefer tokens via env
-  bearer_token: "${LOKI_TOKEN}"
+  bearer_token: '${LOKI_TOKEN}'
   grafana:
     url: "${GRAFANA_URL}"
-    api_token: "${GRAFANA_TOKEN}"
+    api_token: '${GRAFANA_TOKEN}'
     datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Pagination and optimization settings
   # Number of logs to fetch per pagination query (default: 5000)
