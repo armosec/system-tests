@@ -14,7 +14,6 @@ tests = [
     "scan_nsa_and_submit_to_backend",
     "scan_git_repository_and_submit_to_backend",
     "scan_with_exception_to_backend",
-    "scan_with_custom_framework",
     "scan_with_kubescape_helm_chart",
     "scan_image_controls",
     "scan_compliance_score"
