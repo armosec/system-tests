@@ -191,6 +191,97 @@ def _predownload_job_logs_zip(owner: str, repo: str, run_id: str, job_id: str, a
         return None
 
 
+def _download_test_deployed_services_json(run_ref: str, artifacts_dir: Path) -> Optional[Path]:
+    """
+    Best-effort parity with shared-workflows/system-tests-analyzer.yml:
+    download the `test-deployed-services-...` artifact from the original run and extract
+    `test-deployed-services.json` into artifacts_dir.
+    """
+    token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()
+    if not token:
+        return None
+
+    # derive run id from run_ref (supports run id, run url, job url)
+    s = (run_ref or "").strip()
+    run_id = None
+    if s.isdigit():
+        run_id = s
+    else:
+        m = re.search(r"/runs/(\d+)", s)
+        if m:
+            run_id = m.group(1)
+    if not run_id:
+        return None
+
+    out_path = artifacts_dir / "test-deployed-services.json"
+    if out_path.exists():
+        return out_path
+
+    try:
+        import io
+        import requests  # type: ignore
+    except Exception:
+        return None
+
+    # List artifacts for the run and find the newest test-deployed-services-* artifact
+    list_url = f"https://api.github.com/repos/armosec/shared-workflows/actions/runs/{run_id}/artifacts"
+    try:
+        r = requests.get(
+            list_url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "agents-infra-system-test-analyzer/1.0",
+                "Authorization": f"Bearer {token}",
+            },
+            timeout=(10, 60),
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        artifacts = data.get("artifacts") if isinstance(data, dict) else None
+        if not isinstance(artifacts, list):
+            return None
+        match = None
+        for a in artifacts:
+            if not isinstance(a, dict):
+                continue
+            name = str(a.get("name") or "")
+            if name.startswith("test-deployed-services-"):
+                match = a
+                break
+        if not match:
+            return None
+
+        download_url = str(match.get("archive_download_url") or "")
+        if not download_url:
+            return None
+
+        zr = requests.get(
+            download_url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "agents-infra-system-test-analyzer/1.0",
+                "Authorization": f"Bearer {token}",
+            },
+            timeout=(10, 120),
+            allow_redirects=True,
+        )
+        if zr.status_code != 200:
+            return None
+
+        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(io.BytesIO(zr.content)) as zf:
+            for n in zf.namelist():
+                if n.endswith("/"):
+                    continue
+                if n.split("/")[-1] == "test-deployed-services.json":
+                    out_path.write_bytes(zf.read(n))
+                    return out_path
+        return None
+    except Exception:
+        return None
+
+
 def _parse_run_ref(run_ref: str) -> Tuple[str, str]:
     """
     Returns (flag, value) suitable for analyzer.py:
@@ -504,6 +595,7 @@ def main() -> int:
     # Generate a human-friendly summary (similar to GitHub step summary) as an artifact.
     # We run from WORKDIR so relative "artifacts/..." paths resolve.
     try:
+        test_deployed_services_path = _download_test_deployed_services_json(run_ref, artifacts_dir)
         summary_out = artifacts_dir / "summary.md"
         summary_cmd = [
             sys.executable,
@@ -520,6 +612,8 @@ def main() -> int:
         ctx_summary = artifacts_dir / "context" / "summary.json"
         if ctx_summary.exists():
             summary_cmd += ["--context-summary", str(ctx_summary)]
+        if test_deployed_services_path and test_deployed_services_path.exists():
+            summary_cmd += ["--test-deployed-services", str(test_deployed_services_path)]
         subprocess.run(summary_cmd, cwd=str(workdir), check=False)
         # Add a tiny README that points to the main artifacts for quick viewing.
         readme = artifacts_dir / "README.md"
