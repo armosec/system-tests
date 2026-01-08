@@ -746,6 +746,107 @@ def main() -> int:
     except Exception:
         pass
 
+    # --- Phase 4: API mapping + Phase 4.5: diffs (workflow parity) ---
+    # resolve_code_indexes.sh only prepares found-indexes + gomod deps + downloaded indexes.
+    # In the GitHub workflow, API mapping and diffs are separate steps; we run them here to
+    # produce the artifacts that generate_github_summary.py expects.
+    def _choose_cadb_index_path() -> Optional[str]:
+        try:
+            found = artifacts_dir / "found-indexes.json"
+            if not found.exists():
+                return None
+            obj = json.loads(found.read_text())
+            idx = obj.get("indexes") if isinstance(obj, dict) else None
+            cadb = idx.get("cadashboardbe") if isinstance(idx, dict) else None
+            if not isinstance(cadb, dict):
+                return None
+            rc = cadb.get("rc") or {}
+            dep = cadb.get("deployed") or {}
+            if isinstance(rc, dict) and rc.get("index_path"):
+                return str(rc.get("index_path"))
+            if isinstance(dep, dict) and dep.get("index_path"):
+                return str(dep.get("index_path"))
+            return None
+        except Exception:
+            return None
+
+    # API mapping (needs test_name + code index)
+    try:
+        api_out = artifacts_dir / "api-code-map-with-chains.json"
+        if report_path.exists() and not api_out.exists():
+            index_path = _choose_cadb_index_path()
+            if index_path:
+                report_obj = json.loads(report_path.read_text())
+                failures = report_obj.get("failures") or []
+                test_name = None
+                if isinstance(failures, list) and failures:
+                    f0 = failures[0] or {}
+                    if isinstance(f0, dict):
+                        t = f0.get("test") or {}
+                        if isinstance(t, dict):
+                            test_name = t.get("name")
+                if test_name:
+                    # dependency indexes: include deployed indexes that exist on disk
+                    dep_map: Dict[str, str] = {}
+                    try:
+                        found_obj = json.loads((artifacts_dir / "found-indexes.json").read_text())
+                        idx = found_obj.get("indexes") if isinstance(found_obj, dict) else {}
+                        if isinstance(idx, dict):
+                            for repo_name, repo_info in idx.items():
+                                if repo_name == "cadashboardbe" or not isinstance(repo_info, dict):
+                                    continue
+                                deployed = repo_info.get("deployed") or {}
+                                if isinstance(deployed, dict) and deployed.get("found") and deployed.get("index_path"):
+                                    dep_map[str(repo_name)] = str(deployed.get("index_path"))
+                    except Exception:
+                        dep_map = {}
+
+                    cmd = [
+                        sys.executable,
+                        str(analyzer_dir / "map_apis_with_call_chains.py"),
+                        "--test-name",
+                        str(test_name),
+                        "--index",
+                        str(index_path),
+                        "--max-depth",
+                        str(int(metadata.get("call_chain_max_depth", 5)) if isinstance(metadata, dict) else 5),
+                        "--output",
+                        str(api_out),
+                    ]
+                    if dep_map:
+                        cmd += ["--dependency-indexes", json.dumps(dep_map)]
+                    p = subprocess.run(cmd, cwd=str(analyzer_dir), check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    (artifacts_dir / "api_mapping.log").write_text((p.stdout or "").strip() + "\n")
+    except Exception:
+        pass
+
+    # Code diffs (best-effort; if cannot compute, write {} like workflow fallback)
+    try:
+        diffs = artifacts_dir / "code-diffs.json"
+        if report_path.exists() and not diffs.exists():
+            found = artifacts_dir / "found-indexes.json"
+            if found.exists():
+                p = subprocess.run(
+                    [
+                        sys.executable,
+                        str(analyzer_dir / "compare_code_indexes.py"),
+                        "--found-indexes",
+                        str(found),
+                        "--output",
+                        str(diffs),
+                    ],
+                    cwd=str(analyzer_dir),
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+                (artifacts_dir / "code_diffs.log").write_text((p.stdout or "").strip() + "\n")
+            if not diffs.exists():
+                diffs.write_text("{}\n")
+    except Exception:
+        pass
+
     # --- Phase 7 parity (best-effort): create artifacts/llm-context.json for richer summary ---
     llm_context_path = artifacts_dir / "llm-context.json"
     try:
@@ -790,6 +891,23 @@ def main() -> int:
                 "--error-logs",
                 str(error_logs_path),
             ]
+
+            # Enrich llm-context with Phase 4/4.5 artifacts when available (parity direction).
+            api_map = artifacts_dir / "api-code-map-with-chains.json"
+            if api_map.exists():
+                build_cmd += ["--api-mapping", str(api_map)]
+            found = artifacts_dir / "found-indexes.json"
+            if found.exists():
+                build_cmd += ["--found-indexes", str(found)]
+            diffs = artifacts_dir / "code-diffs.json"
+            if diffs.exists():
+                build_cmd += ["--code-diffs", str(diffs)]
+            gomod = artifacts_dir / "gomod-dependencies.json"
+            if gomod.exists():
+                build_cmd += ["--gomod-dependencies", str(gomod)]
+            idx_path = _choose_cadb_index_path()
+            if idx_path:
+                build_cmd += ["--code-index", str(idx_path)]
 
             tr = artifacts_dir / "test-run-id.txt"
             if tr.exists():
