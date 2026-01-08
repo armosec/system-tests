@@ -58,9 +58,14 @@ def map_apis_with_call_chains(
     
     mappings = api_mapping_result["mappings"]
     
-    # Extract call chains for each matched handler
+    # Extract call chains for each matched handler.
+    #
+    # NOTE: In many tests, multiple APIs map to the same handler chunk (e.g., shared router/switch handlers).
+    # Call chain extraction can be expensive, especially in multi-repo mode. Cache by handler_chunk_id so we
+    # compute each call chain at most once per run and reuse it across APIs.
     all_chunk_ids = set()
     api_results = {}
+    call_chain_cache: Dict[str, Dict[str, Any]] = {}
     
     for api_key, mapping in mappings.items():
         if not mapping.get("matched"):
@@ -77,13 +82,17 @@ def map_apis_with_call_chains(
             api_results[api_key] = mapping
             continue
         
-        # Extract call chain (pass all_chunks if available for multi-repo support)
-        call_chain_result = extract_call_chain(
-            handler_chunk_id=handler_chunk_id,
-            code_index=code_index,
-            max_depth=max_depth,
-            all_chunks=all_chunks
-        )
+        # Extract call chain (pass all_chunks if available for multi-repo support), with caching.
+        if handler_chunk_id in call_chain_cache:
+            call_chain_result = call_chain_cache[handler_chunk_id]
+        else:
+            call_chain_result = extract_call_chain(
+                handler_chunk_id=handler_chunk_id,
+                code_index=code_index,
+                max_depth=max_depth,
+                all_chunks=all_chunks
+            )
+            call_chain_cache[handler_chunk_id] = call_chain_result
         
         # Collect chunk IDs from call chain
         chain_chunk_ids = set()
