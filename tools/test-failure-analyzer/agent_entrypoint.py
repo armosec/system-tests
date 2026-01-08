@@ -724,6 +724,13 @@ def main() -> int:
                                     env["INPUT_RC_VERSION"] = str(rc_ver)
                 except Exception:
                     pass
+                # Also pass workflow commit if we have it (matches workflow step output name).
+                wc = artifacts_dir / "workflow-commit.txt"
+                if wc.exists():
+                    try:
+                        env["WORKFLOW_COMMIT_FROM_STEP"] = wc.read_text().strip()
+                    except Exception:
+                        pass
                 env.setdefault("TRIGGERING_REPO_FROM_STEP", "cadashboardbe")
                 env.setdefault("INPUT_RC_VERSION", "")
                 p = subprocess.run(

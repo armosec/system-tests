@@ -22,6 +22,8 @@ echo ""
 DEPLOYED_VERSION=""
 RC_VERSION=""
 WORKFLOW_COMMIT=""
+# In GitHub workflow this is passed as a step output. In ECS agent runs it may be unset.
+WORKFLOW_COMMIT_FROM_STEP="${WORKFLOW_COMMIT_FROM_STEP:-}"
 GOMOD_DEPLOYED_VERSION=""  # Initialize to ensure it's always defined
 TRIGGERING_REPO_COMMIT_FROM_JSON="" # Optional; only available when test-deployed-services.json exists
 TRIGGERING_REPO="$TRIGGERING_REPO_FROM_STEP"
