@@ -305,7 +305,7 @@ class ScanWithExceptionToBackend(BaseKubescape):
             
             current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
                                                     framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                    old_report_guid=current_report_guid
+                                                    old_report_guid=current_report_guid,
                                                     check_intervals=35)
 
             Logger.logger.info("Stage 4.2: Check if exception-applied not empty and exception-deployed not empty")
