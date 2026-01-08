@@ -210,7 +210,7 @@ class ScanAndSubmitToBackend(BaseKubescape):
 
         Logger.logger.info("Stage 2.4: Testing data in backend")
         self.test_data_in_be(cli_result=cli_result, cluster_name=self.kubernetes_obj.get_cluster_name(),
-                             framework_name=(self.test_obj.get_arg("policy_name")))
+                             framework_name=(self.test_obj.get_arg("policy_name")), old_report_guid="")
 
         current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=True,
                                                framework_name=self.test_obj.get_arg("policy_name"))
