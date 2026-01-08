@@ -980,11 +980,20 @@ def generate_summary(
                 changed_count += 1
             changed_icon = "⚠️ Yes" if changed else "✅ No"
             
+            # NOTE: extract_gomod_dependencies.py snapshots don't reliably include a 'has_index' field.
+            # Prefer the authoritative result of resolve_code_indexes.sh -> found-indexes.json.
             has_index = False
-            if isinstance(dep_deployed, dict) and dep_deployed.get('has_index') is True:
-                has_index = True
-            if isinstance(dep_rc, dict) and dep_rc.get('has_index') is True:
-                has_index = True
+            if found_indexes:
+                dep_info = found_indexes.get('indexes', {}).get(name, {})
+                if isinstance(dep_info, dict):
+                    if dep_info.get('deployed', {}).get('found', False) or dep_info.get('rc', {}).get('found', False):
+                        has_index = True
+            if not has_index:
+                # Fallback for legacy/older snapshots
+                if isinstance(dep_deployed, dict) and dep_deployed.get('has_index') is True:
+                    has_index = True
+                if isinstance(dep_rc, dict) and dep_rc.get('has_index') is True:
+                    has_index = True
             has_index_icon = "✅" if has_index else "❌"
             
             stats = chunk_stats.get(name, {"chunks": 0, "loc": 0})

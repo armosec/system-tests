@@ -555,6 +555,24 @@ echo ""
 echo "📥 PASS 3: Downloading dependency/service indexes..."
 
 SERVICES_ONLY_FILE="artifacts/services-only.json"
+# In GitHub workflow, services-only.json is produced earlier. In ECS runs we may not have it,
+# so generate it from test-deployed-services.json (filter out dataPurger, keep only repos with images).
+if [[ ! -f "${SERVICES_ONLY_FILE}" ]] && [[ -f "artifacts/test-deployed-services.json" ]]; then
+  echo "ℹ️  services-only.json not found; generating from test-deployed-services.json"
+  jq -c '
+    (.services // {}) 
+    | with_entries(
+        .value.images |= ( [ .value.images[]? | select(.service_key != "dataPurger") ] )
+      )
+    | with_entries(select((.value.images | length) > 0))
+  ' artifacts/test-deployed-services.json > "${SERVICES_ONLY_FILE}" 2>/dev/null || true
+  if [[ -s "${SERVICES_ONLY_FILE}" ]]; then
+    echo "✅ Generated services-only.json ($(jq 'length' "${SERVICES_ONLY_FILE}" 2>/dev/null || echo 0) repos)"
+  else
+    echo "⚠️  Failed to generate services-only.json (will continue; service index resolution may be incomplete)"
+    rm -f "${SERVICES_ONLY_FILE}" 2>/dev/null || true
+  fi
+fi
 if [[ "${INDEX_RESOLUTION_MODE}" == "targeted" ]] && [[ -n "${INDEX_RESOLUTION_ALLOWLIST}" ]] && [[ -f "${SERVICES_ONLY_FILE}" ]]; then
   echo ""
   echo "🎯 Targeted mode: filtering service repos by allowlist"
