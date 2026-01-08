@@ -134,7 +134,7 @@ class KubescapeTests(object):
                 {'kind': 'Namespace', 'name': 'system-test', 'namespace': '', 'apiVersion': 'v1'}],
             yaml="apache.yaml",
             namespace="system-test",
-            custom_framework_file="system-test-framework.json"
+            custom_framework_file="system-test-framework.json",
             create_test_tenant = True
         )
 
