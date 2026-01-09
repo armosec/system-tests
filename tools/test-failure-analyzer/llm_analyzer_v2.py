@@ -34,9 +34,15 @@ import re
 import sys
 from pathlib import Path
 
-# Add agents-infra/src to path so we can import agent_runtime
-# This assumes both repos are in the same parent directory
+# Add agents-infra/src to path so we can import agent_runtime.
+# Supported layouts:
+# - local dev: repos/{system-tests,agents-infra}/...
+# - ECS task: agents-infra cloned under WORKDIR (/work/agents-infra)
 agents_infra_src = Path(__file__).parents[3] / "agents-infra" / "src"
+workdir = os.environ.get("WORKDIR") or "/work"
+agents_infra_src_workdir = Path(workdir) / "agents-infra" / "src"
+if agents_infra_src_workdir.exists():
+    agents_infra_src = agents_infra_src_workdir
 if agents_infra_src.exists():
     sys.path.insert(0, str(agents_infra_src))
 

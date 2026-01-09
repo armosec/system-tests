@@ -22,6 +22,7 @@ import threading
 import time
 import zipfile
 import base64
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -162,6 +163,32 @@ def _predownload_job_logs_zip(owner: str, repo: str, run_id: str, job_id: str, a
         import requests  # type: ignore
     except Exception:
         return None
+
+
+def _git_clone_or_update(repo_url: str, dest_dir: Path, ref: str, token: str = "") -> None:
+    """
+    Clone repo_url into dest_dir (or fetch if exists) and checkout ref.
+    Uses token for HTTPS auth when provided.
+    """
+    dest_dir = Path(dest_dir)
+    ref = (ref or "").strip() or "main"
+
+    url = repo_url
+    if token and repo_url.startswith("https://"):
+        # https://<token>@github.com/org/repo.git
+        url = repo_url.replace("https://", f"https://{token}@")
+
+    if dest_dir.exists() and (dest_dir / ".git").exists():
+        # fetch + checkout
+        subprocess.run(["git", "-C", str(dest_dir), "fetch", "--all", "--tags"], check=True)
+    else:
+        dest_dir.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "clone", "--depth", "1", url, str(dest_dir)], check=True)
+
+    # Try checkout by branch/tag, then by origin/<ref> if needed.
+    rc = subprocess.run(["git", "-C", str(dest_dir), "checkout", ref], check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    if rc.returncode != 0:
+        subprocess.run(["git", "-C", str(dest_dir), "checkout", f"origin/{ref}"], check=True)
 
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/jobs/{job_id}/logs"
     headers = {
@@ -435,6 +462,7 @@ def main() -> int:
     correlation_id = str(req.get("correlation_id") or "")
     run_ref = str(req.get("run_ref") or "")
     system_tests_ref = str(req.get("system_tests_ref") or "master")
+    agents_infra_ref = str(req.get("agents_infra_ref") or "main")
     environment = str(req.get("environment") or "auto")
     only_test = req.get("only_test")
     use_llm_analysis = bool(req.get("use_llm_analysis") or False)
@@ -778,8 +806,7 @@ def main() -> int:
     if fetch_loki:
         cmd += ["--fetch-loki"]
     # NOTE: analyzer.py uses config.yaml + env vars for tokens; keep this thin.
-    # use_llm_analysis is handled by later phases in shared-workflows today; keep field for future.
-    _ = (system_tests_ref, environment, use_llm_analysis)  # reserved
+    _ = (system_tests_ref, environment)  # reserved
 
     rc = 0
     try:
@@ -1135,6 +1162,54 @@ def main() -> int:
     except Exception:
         pass
 
+    # --- Phase 8: Optional LLM analysis (writes artifacts/llm-analysis.json) ---
+    llm_analysis_path = artifacts_dir / "llm-analysis.json"
+    if use_llm_analysis and llm_context_path.exists():
+        try:
+            # Ensure agent_runtime is available by cloning agents-infra into WORKDIR.
+            # (The analyzer image only contains system-tests code.)
+            token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip()
+            agents_infra_dir = workdir / "agents-infra"
+            # Prefer HTTPS for container environments. Same token should have access.
+            _git_clone_or_update("https://github.com/armosec/agents-infra.git", agents_infra_dir, agents_infra_ref, token=token)
+
+            provider = str(metadata.get("llm_provider") or "bedrock")
+            model = str(metadata.get("llm_model") or "anthropic.claude-3-7-sonnet-20250219-v1:0")
+            region = str(metadata.get("llm_region") or os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "eu-north-1")
+            inference_profile = str(metadata.get("llm_inference_profile") or "").strip()
+            owner_team = str(metadata.get("llm_owner_team") or "unknown")
+
+            llm_cmd = [
+                sys.executable,
+                str(analyzer_dir / "llm_analyzer_v2.py"),
+                "--provider",
+                provider,
+                "--model",
+                model,
+                "--llm-context",
+                str(llm_context_path),
+                "--output",
+                str(llm_analysis_path),
+                "--owner-team",
+                owner_team,
+                "--region",
+                region,
+            ]
+            code_diffs = artifacts_dir / "code-diffs.json"
+            if code_diffs.exists():
+                llm_cmd += ["--code-diffs", str(code_diffs)]
+            if inference_profile:
+                llm_cmd += ["--inference-profile", inference_profile]
+
+            p = subprocess.run(llm_cmd, check=False, cwd=str(analyzer_dir), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            (artifacts_dir / "llm-analysis.log").write_text((p.stdout or "").strip() + "\n", encoding="utf-8", errors="replace")
+            if p.returncode != 0:
+                status = "failed"
+                errors.append(f"llm_analyzer_v2.py exited with code {p.returncode}")
+        except Exception as e:
+            status = "failed"
+            errors.append(f"llm analysis failed: {e}")
+
     # Generate a human-friendly summary (similar to GitHub step summary) as an artifact.
     # We run from WORKDIR so relative "artifacts/..." paths resolve.
     try:
@@ -1153,6 +1228,8 @@ def main() -> int:
         ]
         if llm_context_path.exists():
             summary_cmd += ["--llm-context", str(llm_context_path)]
+        if llm_analysis_path.exists():
+            summary_cmd += ["--llm-analysis", str(llm_analysis_path)]
         ctx_summary = artifacts_dir / "context" / "summary.json"
         if ctx_summary.exists():
             summary_cmd += ["--context-summary", str(ctx_summary)]
