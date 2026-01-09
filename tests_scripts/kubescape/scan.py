@@ -236,18 +236,9 @@ class ScanWithExceptionToBackend(BaseKubescape):
         control_id_1 = "C-0034"
         control_name_1 = "Allow privilege escalation"
         
-        exceptionFiles = self.test_obj.get_arg("exceptions").split(',')
 
         Logger.logger.info("Installing kubescape")
-        # Logger.logger.info(self.install())
         self.install()
-
-        Logger.logger.info("Delete all exception from backend")
-        self.backend.delete_all_posture_exceptions(cluster_name=self.kubernetes_obj.get_cluster_name())
-
-        old_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(), wait_to_result=False,
-                                               framework_name=self.test_obj.get_arg("policy_name").upper())
-        TestUtil.sleep(30, "wait for report guid", "info")
 
         Logger.logger.info('Stage 1: Apply namespace "system-test" and Deployment "apache" to cluster')
         Logger.logger.info('Stage 1.1: apply namespace "system-test" to cluster')
@@ -260,107 +251,109 @@ class ScanWithExceptionToBackend(BaseKubescape):
         self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
                           submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
 
-        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
-
-        first_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                 framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                 old_report_guid=old_report_guid)
+        current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
+            framework_name=self.test_obj.get_arg("policy_name").upper(),
+            check_intervals=112)
 
         Logger.logger.info("Stage 2.2: Check if exception-applied empty and exception-related empty")
         self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
-                                        report_guid=first_report_guid, has_related=False, has_applied=False,
+                                        report_guid=current_report_guid, has_related=False, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper())
         Logger.logger.info("Stage 2.2.1: Check 2nd control if exception-applied empty and exception-related empty")
         self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
-                                        report_guid=first_report_guid, has_related=False, has_applied=False,
+                                        report_guid=current_report_guid, has_related=False, has_applied=False,
                                         framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
         Logger.logger.info("Stage 2.3: Verify download of controls and resources")
         self.get_posture_controls_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                      report_guid=first_report_guid)
+                                      report_guid=current_report_guid)
         self.get_posture_resources_CSV(framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                       report_guid=first_report_guid)
+                                       report_guid=current_report_guid)
+        i = 1
+        test_cases = self.test_obj.get_arg("exception_test_cases")
+        for exception_test_case in test_cases:
+            Logger.logger.info(f"Staring exceptions test case - {i}/{len(test_cases)}")
+            Logger.logger.info("Deleting all exception from backend")
+            self.backend.delete_all_posture_exceptions(cluster_name=self.kubernetes_obj.get_cluster_name())
 
-        Logger.logger.info("Stage 3: Add exception to backend and test with backend")
-        Logger.logger.info("Stage 3.1: Add exception to backend")
-        policy_guid = self.post_posture_exception(exceptions_file=exceptionFiles[0],
-                                                  cluster_name=self.kubernetes_obj.get_cluster_name())
-        Logger.logger.info("Stage 3.1.1: Add 2nd exception to backend")
-        policy_guid_1 = self.post_posture_exception(exceptions_file=exceptionFiles[1],
-                                                  cluster_name=self.kubernetes_obj.get_cluster_name())
+            exceptionFiles = exception_test_case.split(',')            
+            Logger.logger.info("Stage 3: Add exception to backend and test with backend")
+            Logger.logger.info("Stage 3.1: Add exception to backend")
+            policy_guid = self.post_posture_exception(exceptions_file=exceptionFiles[0],
+                                                    cluster_name=self.kubernetes_obj.get_cluster_name())
+            Logger.logger.info("Stage 3.1.1: Add 2nd exception to backend")
+            policy_guid_1 = self.post_posture_exception(exceptions_file=exceptionFiles[1],
+                                                    cluster_name=self.kubernetes_obj.get_cluster_name())
 
-        Logger.logger.info("Stage 3.2: Check if exception-applied empty and exception-deployed not empty")
-        self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
-                                        report_guid=first_report_guid, has_related=True, has_applied=False,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper())
-        Logger.logger.info("Stage 3.2.1: Check 2nd control if exception-applied empty and exception-deployed not empty")
-        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
-                                        report_guid=first_report_guid, has_related=True, has_applied=False,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+            Logger.logger.info("Stage 3.2: Check if exception-applied empty and exception-deployed not empty")
+            self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
+                                            report_guid=current_report_guid, has_related=True, has_applied=False,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper())
+            Logger.logger.info("Stage 3.2.1: Check 2nd control if exception-applied empty and exception-deployed not empty")
+            self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                            report_guid=current_report_guid, has_related=True, has_applied=False,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
-        Logger.logger.info("Stage 4: Scanning kubescape with exception and test result with backend")
-        Logger.logger.info("Stage 4.1: Scanning kubescape with exception")
-        self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
-                          submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
-        
-        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
-        
-        second_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                  framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                  old_report_guid=first_report_guid)
+            Logger.logger.info("Stage 4: Scanning kubescape with exception and test result with backend")
+            Logger.logger.info("Stage 4.1: Scanning kubescape with exception")
+            self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
+                            submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
+            
+            current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                    framework_name=self.test_obj.get_arg("policy_name").upper(),
+                                                    old_report_guid=current_report_guid,
+                                                    check_intervals=112)
 
-        Logger.logger.info("Stage 4.2: Check if exception-applied not empty and exception-deployed not empty")
-        self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
-                                        report_guid=second_report_guid, has_related=True, has_applied=True,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper())
-        Logger.logger.info("Stage 4.2.1: Check for 2nd control if exception-applied not empty and exception-deployed not empty")
-        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
-                                        report_guid=second_report_guid, has_related=True, has_applied=True,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
-        # Test for cli-result
-        # TODO self.test_exception_result(framework_report=cli_result)
-        # Test for backend-result
-        Logger.logger.info("Stage 4.3: Test data from controls-api, from backend")
-        self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
-                                        report_guid=second_report_guid, control_id=control_id)
-        Logger.logger.info("Stage 4.3.1: Test data of 2nd from controls-api, from backend")
-        self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
-                                        report_guid=second_report_guid, control_id=control_id_1)
+            Logger.logger.info("Stage 4.2: Check if exception-applied not empty and exception-deployed not empty")
+            self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
+                                            report_guid=current_report_guid, has_related=True, has_applied=True,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper())
+            Logger.logger.info("Stage 4.2.1: Check for 2nd control if exception-applied not empty and exception-deployed not empty")
+            self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                            report_guid=current_report_guid, has_related=True, has_applied=True,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+            # Test for backend-result
+            Logger.logger.info("Stage 4.3: Test data from controls-api, from backend")
+            self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
+                                            report_guid=current_report_guid, control_id=control_id)
+            Logger.logger.info("Stage 4.3.1: Test data of 2nd from controls-api, from backend")
+            self.test_exception_in_controls(framework_name=(self.test_obj.get_arg("policy_name")).upper(),
+                                            report_guid=current_report_guid, control_id=control_id_1)
 
-        Logger.logger.info("Stage 5: Delete exception object from backend and test with backend")
-        Logger.logger.info("Stage 5.1: Delete exception object from backend")
-        self.delete_posture_exception(policy_guid=policy_guid)
-        Logger.logger.info("Stage 5.1: Delete 2nd exception object from backend")
-        self.delete_posture_exception(policy_guid=policy_guid_1)
+            Logger.logger.info("Stage 5: Delete exception object from backend and test with backend")
+            Logger.logger.info("Stage 5.1: Delete exception object from backend")
+            self.delete_posture_exception(policy_guid=policy_guid)
+            Logger.logger.info("Stage 5.1: Delete 2nd exception object from backend")
+            self.delete_posture_exception(policy_guid=policy_guid_1)
 
-        Logger.logger.info("Stage 5.2: Check if exception-applied not empty and exception-deployed empty")
-        self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
-                                        report_guid=second_report_guid, has_related=False, has_applied=True,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper())
-        Logger.logger.info("Stage 5.2.1: Check if 2nd exception-applied not empty and exception-deployed empty")
-        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
-                                        report_guid=second_report_guid, has_related=False, has_applied=True,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+            Logger.logger.info("Stage 5.2: Check if exception-applied not empty and exception-deployed empty")
+            self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
+                                            report_guid=current_report_guid, has_related=False, has_applied=True,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper())
+            Logger.logger.info("Stage 5.2.1: Check if 2nd exception-applied not empty and exception-deployed empty")
+            self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                            report_guid=current_report_guid, has_related=False, has_applied=True,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
 
-        Logger.logger.info("Stage 6: Scanning kubescape after deleting the exception and test result with backend")
-        Logger.logger.info("Stage 6.1: Scanning kubescape after deleting the exception")
-        self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
-                          submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
+            Logger.logger.info("Stage 6: Scanning kubescape after deleting the exception and test result with backend")
+            Logger.logger.info("Stage 6.1: Scanning kubescape after deleting the exception")
+            self.default_scan(policy_scope=self.test_obj.policy_scope, policy_name=self.test_obj.policy_name,
+                            submit=self.test_obj.get_arg("submit"), account=self.test_obj.get_arg("account"))
+            
+            current_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
+                                                    framework_name=self.test_obj.get_arg("policy_name").upper(),
+                                                    old_report_guid=current_report_guid,
+                                                    check_intervals=112)
 
-        TestUtil.sleep(60, "wait for kubescape scan to report", "info")
-        
-        third_report_guid = self.get_report_guid(cluster_name=self.kubernetes_obj.get_cluster_name(),
-                                                 framework_name=self.test_obj.get_arg("policy_name").upper(),
-                                                 old_report_guid=second_report_guid)
-
-        Logger.logger.info("Stage 6.2: Check if exception-applied empty and exception-deployed empty")
-        self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
-                                        report_guid=third_report_guid, has_related=False, has_applied=False,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper())
-        Logger.logger.info("Stage 6.2.1: Check if 2nd exception-applied empty and exception-deployed empty")
-        self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
-                                        report_guid=third_report_guid, has_related=False, has_applied=False,
-                                        framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+            Logger.logger.info("Stage 6.2: Check if exception-applied empty and exception-deployed empty")
+            self.test_related_applied_in_be(control_name=control_name, control_id=control_id, resource_name=resource,
+                                            report_guid=current_report_guid, has_related=False, has_applied=False,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper())
+            Logger.logger.info("Stage 6.2.1: Check if 2nd exception-applied empty and exception-deployed empty")
+            self.test_related_applied_in_be(control_name=control_name_1, control_id=control_id_1, resource_name=resource_1,
+                                            report_guid=current_report_guid, has_related=False, has_applied=False,
+                                            framework_name=self.test_obj.get_arg("policy_name").upper(),namespace="system-test")
+            i += 1
 
         return self.cleanup()
 
