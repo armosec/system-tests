@@ -27,6 +27,10 @@ cloud_account_guid_bad = self.create_and_validate_cloud_account_with_cspm_aws(
         self.assertTrue(any("cspm\\-bad" in p for p in patterns))
         # placeholder account-ID ARN prefix pattern
         self.assertTrue(any("arn:aws:iam::12345678" in p for p in patterns))
+        # common expected-negative error patterns are added when expect_failure=True exists
+        self.assertTrue(any("We cannot assume your role" in p for p in patterns))
+        self.assertTrue(any("credentials connectivity error" in p for p in patterns))
+        self.assertTrue(any("AssumeRole" in p for p in patterns))
 
     def test_finds_expected_negative_lines_in_logs(self):
         markers = _extract_expected_negative_markers(

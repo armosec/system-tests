@@ -190,6 +190,19 @@ def _extract_expected_negative_markers(test_code: Optional[str]) -> List[Dict[st
             "pattern": r"expect_failure=True",
             "reason": "Test contains explicit expected-failure steps (true negatives).",
         })
+        # Common, expected error signatures in negative AWS auth steps.
+        markers.append({
+            "pattern": r"We cannot assume your role",
+            "reason": "Common expected error in negative AWS auth steps (trust/AssumeRole).",
+        })
+        markers.append({
+            "pattern": r"credentials connectivity error",
+            "reason": "Common expected error signature in negative AWS auth steps.",
+        })
+        markers.append({
+            "pattern": r"\\bAssumeRole\\b",
+            "reason": "Common expected error signature in negative AWS auth steps.",
+        })
 
     # Extract string literals that contain 'bad' (e.g., '-cspm-bad') to match request bodies/names.
     for line in test_code.splitlines():
