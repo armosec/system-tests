@@ -164,32 +164,6 @@ def _predownload_job_logs_zip(owner: str, repo: str, run_id: str, job_id: str, a
     except Exception:
         return None
 
-
-def _git_clone_or_update(repo_url: str, dest_dir: Path, ref: str, token: str = "") -> None:
-    """
-    Clone repo_url into dest_dir (or fetch if exists) and checkout ref.
-    Uses token for HTTPS auth when provided.
-    """
-    dest_dir = Path(dest_dir)
-    ref = (ref or "").strip() or "main"
-
-    url = repo_url
-    if token and repo_url.startswith("https://"):
-        # https://<token>@github.com/org/repo.git
-        url = repo_url.replace("https://", f"https://{token}@")
-
-    if dest_dir.exists() and (dest_dir / ".git").exists():
-        # fetch + checkout
-        subprocess.run(["git", "-C", str(dest_dir), "fetch", "--all", "--tags"], check=True)
-    else:
-        dest_dir.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["git", "clone", "--depth", "1", url, str(dest_dir)], check=True)
-
-    # Try checkout by branch/tag, then by origin/<ref> if needed.
-    rc = subprocess.run(["git", "-C", str(dest_dir), "checkout", ref], check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    if rc.returncode != 0:
-        subprocess.run(["git", "-C", str(dest_dir), "checkout", f"origin/{ref}"], check=True)
-
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/jobs/{job_id}/logs"
     headers = {
         "Accept": "application/vnd.github+json",
@@ -216,6 +190,32 @@ def _git_clone_or_update(repo_url: str, dest_dir: Path, ref: str, token: str = "
         return zip_path
     except Exception:
         return None
+
+
+def _git_clone_or_update(repo_url: str, dest_dir: Path, ref: str, token: str = "") -> None:
+    """
+    Clone repo_url into dest_dir (or fetch if exists) and checkout ref.
+    Uses token for HTTPS auth when provided.
+    """
+    dest_dir = Path(dest_dir)
+    ref = (ref or "").strip() or "main"
+
+    url = repo_url
+    if token and repo_url.startswith("https://"):
+        # https://<token>@github.com/org/repo.git
+        url = repo_url.replace("https://", f"https://{token}@")
+
+    if dest_dir.exists() and (dest_dir / ".git").exists():
+        # fetch + checkout
+        subprocess.run(["git", "-C", str(dest_dir), "fetch", "--all", "--tags"], check=True)
+    else:
+        dest_dir.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["git", "clone", "--depth", "1", url, str(dest_dir)], check=True)
+
+    # Try checkout by branch/tag, then by origin/<ref> if needed.
+    rc = subprocess.run(["git", "-C", str(dest_dir), "checkout", ref], check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    if rc.returncode != 0:
+        subprocess.run(["git", "-C", str(dest_dir), "checkout", f"origin/{ref}"], check=True)
 
 
 def _download_test_deployed_services_json(run_ref: str, artifacts_dir: Path) -> Optional[Path]:
