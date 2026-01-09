@@ -1229,6 +1229,25 @@ def main() -> int:
             inference_profile = str(metadata.get("llm_inference_profile") or "").strip()
             owner_team = str(metadata.get("llm_owner_team") or "unknown")
 
+            # Persist resolved LLM config for debugging (uploaded with artifacts).
+            try:
+                (artifacts_dir / "llm-config.json").write_text(
+                    json.dumps(
+                        {
+                            "provider": provider,
+                            "model": model,
+                            "region": region,
+                            "task_region": task_region,
+                            "inference_profile": inference_profile or None,
+                            "owner_team": owner_team,
+                        },
+                        indent=2,
+                    )
+                    + "\n"
+                )
+            except Exception:
+                pass
+
             llm_cmd = [
                 sys.executable,
                 str(analyzer_dir / "llm_analyzer_v2.py"),
@@ -1244,6 +1263,7 @@ def main() -> int:
                 owner_team,
                 "--region",
                 region,
+                "--debug",
             ]
             code_diffs = artifacts_dir / "code-diffs.json"
             if code_diffs.exists():
