@@ -83,6 +83,6 @@ dist/
 .github/workflows/scripts/json_validator.py
 
 # Statistics:
-#   Indexed files: 168
+#   Indexed files: 169
 #   Excluded files: 1
-#   Total indexed-extension files: 169
+#   Total indexed-extension files: 170
