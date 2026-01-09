@@ -484,7 +484,7 @@ fi
 # 3) Compare mode: Create gomod-dependencies.json with version_changed detection
 # This is the proper format that find_indexes.py expects (with deployed_version, rc_version, version_changed)
 if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_INDEX" ]]; then
-  echo "📌 Comparing deployed vs RC go.mod to detect version changes"
+  echo "📌 Comparing deployed vs RC go.mod to detect version changes (using code indexes)"
   echo "   Deployed: $DEPLOYED_INDEX"
   echo "   RC: $RC_INDEX"
   python extract_gomod_dependencies.py \
@@ -506,9 +506,61 @@ if [[ -n "$DEPLOYED_INDEX" && -f "$DEPLOYED_INDEX" && -n "$RC_INDEX" && -f "$RC_
       echo "{}" > artifacts/gomod-dependencies.json
     fi
   }
+elif [[ -f "$GOMOD_DEPLOYED_OUT" && -f "$GOMOD_RC_OUT" ]] && \
+     [[ "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]] && \
+     [[ "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
+  # NEW: Even without code indexes, we can create comparison from gomod snapshot files
+  echo "📌 Comparing deployed vs RC go.mod to detect version changes (using extracted go.mod snapshots)"
+  echo "   Deployed: $GOMOD_DEPLOYED_OUT"
+  echo "   RC: $GOMOD_RC_OUT"
+  python -c '
+import json
+import sys
+
+# Load both files
+with open("'$GOMOD_DEPLOYED_OUT'", "r") as f:
+    deployed = json.load(f)
+with open("'$GOMOD_RC_OUT'", "r") as f:
+    rc = json.load(f)
+
+# Create comparison format
+result = {}
+all_deps = set(deployed.keys()) | set(rc.keys())
+
+for dep in all_deps:
+    deployed_info = deployed.get(dep, {})
+    rc_info = rc.get(dep, {})
+    
+    deployed_ver = deployed_info.get("version", "unknown")
+    rc_ver = rc_info.get("version", "unknown")
+    
+    # Simple version comparison (exact match)
+    version_changed = deployed_ver != rc_ver and deployed_ver != "unknown" and rc_ver != "unknown"
+    
+    result[dep] = {
+        "deployed_version": deployed_ver,
+        "rc_version": rc_ver,
+        "version_changed": version_changed,
+        "github_org": deployed_info.get("repo", "armosec/unknown").split("/")[0] if "/" in deployed_info.get("repo", "") else "armosec",
+        "has_index": None,
+        "full_package": deployed_info.get("full_package") or rc_info.get("full_package"),
+        "repo": deployed_info.get("repo") or rc_info.get("repo")
+    }
+
+# Write output
+with open("artifacts/gomod-dependencies.json", "w") as f:
+    json.dump(result, f, indent=2)
+
+# Report
+changed_count = sum(1 for v in result.values() if v["version_changed"])
+print(f"✅ Created comparison file with {len(result)} dependencies ({changed_count} changed)")
+' || {
+    echo "⚠️  Python comparison failed, falling back to single snapshot"
+    cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
+  }
 else
   # Fallback: Backward-compat - use single snapshot if compare mode not possible
-  echo "⚠️  Compare mode not available (missing deployed or RC index), using single snapshot"
+  echo "⚠️  Compare mode not available (missing deployed or RC snapshots), using single snapshot"
   if [[ -f "$GOMOD_DEPLOYED_OUT" && "$(jq 'length' "$GOMOD_DEPLOYED_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
     cp "$GOMOD_DEPLOYED_OUT" artifacts/gomod-dependencies.json
   elif [[ -f "$GOMOD_RC_OUT" && "$(jq 'length' "$GOMOD_RC_OUT" 2>/dev/null || echo 0)" -gt 0 ]]; then
