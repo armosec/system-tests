@@ -262,6 +262,44 @@ def _find_expected_negative_log_lines(error_logs: str, markers: List[Dict[str, s
     return out
 
 
+def _filter_out_expected_negative_evidence(
+    evidence_quotes: List[str],
+    markers: List[Dict[str, str]],
+    expected_negative_evidence_quotes: List[str],
+) -> List[str]:
+    """
+    Remove expected-negative evidence lines from the 'top evidence' list so the LLM doesn't
+    accidentally anchor on intentional failures.
+    """
+    if not evidence_quotes:
+        return []
+    if not markers and not expected_negative_evidence_quotes:
+        return list(evidence_quotes)
+
+    # Compile matchers from marker patterns (excluding the meta marker expect_failure=True).
+    compiled: List[re.Pattern] = []
+    for m in markers or []:
+        p = (m.get("pattern") or "").strip()
+        if not p or p == r"expect_failure=True":
+            continue
+        try:
+            compiled.append(re.compile(p, re.IGNORECASE))
+        except re.error:
+            continue
+
+    neg_exact = set((expected_negative_evidence_quotes or []))
+
+    out: List[str] = []
+    for ln in evidence_quotes:
+        if ln in neg_exact:
+            continue
+        if any(rx.search(ln) for rx in compiled):
+            continue
+        out.append(ln)
+
+    return out
+
+
 def _render_analysis_instructions(template: str, vars_map: Dict[str, Any]) -> str:
     """
     Render {placeholders} in the analysis instruction template.
@@ -1560,6 +1598,13 @@ def build_llm_context(
         max_lines=12,
     ) if error_logs else []
 
+    # Ensure "top evidence" is about the unexpected failure, not the intentional negative checks.
+    evidence_quotes = _filter_out_expected_negative_evidence(
+        evidence_quotes,
+        expected_negative_markers,
+        expected_negative_evidence_quotes,
+    )
+
     primary_error_signature = _primary_error_signature(error_logs or "", evidence_quotes) if error_logs else ""
 
     analysis_prompts_effective = analysis_prompts
@@ -1572,6 +1617,8 @@ def build_llm_context(
             "Some error logs are *expected* and should **NOT** be treated as the root cause unless the test failed because they did not fail as expected.",
             "",
             "When you see errors tied to expected-negative markers, treat them as **expected behavior** and focus on the first *unexpected* failure that causes the test to fail.",
+            "",
+            f"Primary unexpected failure signature (start here): {primary_error_signature}",
             "",
         ]
         if expected_negative_evidence_quotes:
