@@ -207,15 +207,60 @@ def _git_clone_or_update(repo_url: str, dest_dir: Path, ref: str, token: str = "
 
     if dest_dir.exists() and (dest_dir / ".git").exists():
         # fetch + checkout
-        subprocess.run(["git", "-C", str(dest_dir), "fetch", "--all", "--tags"], check=True)
+        subprocess.run(["git", "-C", str(dest_dir), "fetch", "origin", "--prune", "--tags"], check=True)
+        # Ensure remote-tracking branches exist even if the repo was cloned shallow/single-branch.
+        subprocess.run(
+            ["git", "-C", str(dest_dir), "fetch", "origin", "--depth", "1", "+refs/heads/*:refs/remotes/origin/*"],
+            check=True,
+        )
     else:
         dest_dir.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["git", "clone", "--depth", "1", url, str(dest_dir)], check=True)
+        # Shallow clone is fine, but must fetch all branches (we often checkout non-default refs like agent/llm-integration).
+        subprocess.run(["git", "clone", "--depth", "1", "--no-single-branch", url, str(dest_dir)], check=True)
+        subprocess.run(
+            ["git", "-C", str(dest_dir), "fetch", "origin", "--depth", "1", "+refs/heads/*:refs/remotes/origin/*"],
+            check=True,
+        )
 
-    # Try checkout by branch/tag, then by origin/<ref> if needed.
-    rc = subprocess.run(["git", "-C", str(dest_dir), "checkout", ref], check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    if rc.returncode != 0:
-        subprocess.run(["git", "-C", str(dest_dir), "checkout", f"origin/{ref}"], check=True)
+    # Try checkout by branch/tag/sha; then by origin/<ref>; then create local branch from origin/<ref>.
+    rc = subprocess.run(
+        ["git", "-C", str(dest_dir), "checkout", ref],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if rc.returncode == 0:
+        return
+
+    rc2 = subprocess.run(
+        ["git", "-C", str(dest_dir), "checkout", f"origin/{ref}"],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if rc2.returncode == 0:
+        return
+
+    # Last attempt: create local branch pointing at origin/<ref>
+    rc3 = subprocess.run(
+        ["git", "-C", str(dest_dir), "checkout", "-B", ref, f"origin/{ref}"],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if rc3.returncode != 0:
+        out = "\n".join(
+            [
+                f"checkout {ref} failed:",
+                (rc.stdout or "").strip(),
+                (rc2.stdout or "").strip(),
+                (rc3.stdout or "").strip(),
+            ]
+        ).strip()
+        raise RuntimeError(out or f"failed to checkout ref {ref!r} in {dest_dir}")
 
 
 def _download_test_deployed_services_json(run_ref: str, artifacts_dir: Path) -> Optional[Path]:
