@@ -84,6 +84,102 @@ def load_text_file(file_path: str) -> Optional[str]:
 _TRACEBACK_FILE_LINE_RE = re.compile(r'File "([^"]+)", line (\d+)', re.MULTILINE)
 
 
+def _extract_env_from_logs(error_logs: str) -> Optional[str]:
+    """
+    Best-effort: extract ENVIRONMENT value from workflow logs.
+    Example line: 'ENVIRONMENT: staging'
+    """
+    if not error_logs:
+        return None
+    m = re.search(r"\bENVIRONMENT:\s*([a-zA-Z0-9_-]+)\b", error_logs)
+    if m:
+        return m.group(1).strip()
+    return None
+
+
+def _extract_triggering_repo_from_logs(error_logs: str) -> Optional[str]:
+    """
+    Best-effort: extract GITHUB_REPOSITORY from workflow logs.
+    Example: 'GITHUB_REPOSITORY: armosec/cadashboardbe'
+    """
+    if not error_logs:
+        return None
+    m = re.search(r"\bGITHUB_REPOSITORY:\s*([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\b", error_logs)
+    if m:
+        return m.group(1).strip()
+    return None
+
+
+def _pick_evidence_quotes(error_logs: str, max_lines: int = 12) -> List[str]:
+    """
+    Extract the highest-signal lines from error logs to anchor the LLM.
+    Prioritize:
+    - AssertionError / traceback lines
+    - explicit backend errors (assume role / auth / 4xx/5xx)
+    - request URI/method lines
+    """
+    if not error_logs:
+        return []
+    patterns = [
+        r"AssertionError:",
+        r"\bTraceback \(most recent call last\):",
+        r"We cannot assume your role",
+        r"\bAssumeRole\b",
+        r"credentials connectivity error",
+        r"\brequestURI\b",
+        r"\bmethod\b.*\brequestURI\b",
+        r"\bstatus[_ ]code\b",
+        r"\bERROR\b",
+        r"\bfailed\b",
+    ]
+    compiled = [re.compile(p, re.IGNORECASE) for p in patterns]
+    out: List[str] = []
+    seen: Set[str] = set()
+    for raw in (error_logs or "").splitlines():
+        line = (raw or "").strip()
+        if not line or len(line) < 6:
+            continue
+        if any(c.search(line) for c in compiled):
+            if line not in seen:
+                out.append(line)
+                seen.add(line)
+        if len(out) >= max_lines:
+            break
+    return out
+
+
+def _primary_error_signature(error_logs: str, evidence_quotes: List[str]) -> str:
+    """
+    Pick a short primary error signature string.
+    """
+    for ln in evidence_quotes:
+        if "AssertionError" in ln:
+            return ln
+        if "We cannot assume your role" in ln:
+            return ln
+    # fallback: first non-empty line
+    for ln in (error_logs or "").splitlines():
+        ln = (ln or "").strip()
+        if ln:
+            return ln[:200]
+    return ""
+
+
+def _render_analysis_instructions(template: str, vars_map: Dict[str, Any]) -> str:
+    """
+    Render {placeholders} in the analysis instruction template.
+    Keep it safe: only substitute known keys, leave unknown placeholders intact.
+    """
+    if not isinstance(template, str) or not template:
+        return ""
+    rendered = template
+    for k, v in (vars_map or {}).items():
+        if not k:
+            continue
+        rendered = rendered.replace("{" + str(k) + "}", str(v if v is not None else ""))
+    return rendered
+
+
 def _candidate_paths_from_trace(trace_path: str) -> List[Path]:
     """
     Generate a list of relative path candidates from an absolute traceback path.
@@ -1356,12 +1452,23 @@ def build_llm_context(
         formatted_chunks.append(formatted_chunk)
     
     # 8. Build metadata
+    env_name = _extract_env_from_logs(error_logs or "") if error_logs else None
+    triggering_repo = _extract_triggering_repo_from_logs(error_logs or "") if error_logs else None
+
+    evidence_quotes = _pick_evidence_quotes(error_logs or "", max_lines=12) if error_logs else []
+    primary_error_signature = _primary_error_signature(error_logs or "", evidence_quotes) if error_logs else ""
+
     metadata = {
         "test_name": test_name,
         "test_run_id": test_run_id,
         "workflow_commit": workflow_commit,
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "analysis_instructions": analysis_prompts,
+        "environment": env_name,
+        "triggering_repo": triggering_repo,
+        "workflow_run_url": str(run_ref or ""),
+        "primary_error_signature": primary_error_signature,
+        "evidence_quotes": evidence_quotes,
         "total_chunks": len(formatted_chunks),
         "chunks_by_source": {},
         "chunks_by_repo": {},
@@ -1369,6 +1476,22 @@ def build_llm_context(
     }
     if failing_request:
         metadata["failing_request"] = failing_request
+
+    # Render instructions template now that we have basic vars.
+    try:
+        vars_map = {
+            "test_name": test_name,
+            "test_run_id": test_run_id,
+            "environment": env_name or "",
+            "workflow_run_url": str(run_ref or ""),
+            "triggering_repo": triggering_repo or "",
+        }
+        metadata["analysis_instructions_rendered"] = _render_analysis_instructions(
+            str(metadata.get("analysis_instructions") or ""),
+            vars_map,
+        )
+    except Exception:
+        metadata["analysis_instructions_rendered"] = str(metadata.get("analysis_instructions") or "")
     
     # Count chunks by source and repo
     for chunk in formatted_chunks:
@@ -1632,12 +1755,56 @@ def build_llm_context(
         print(f"   ✅ Added {len(gomod_versions)} go.mod package versions", file=sys.stderr)
         sys.stderr.flush()
     
+    # Cap total chunks to reduce prompt noise (can be overridden via env var).
+    try:
+        cap = int(os.environ.get("LLM_CONTEXT_MAX_CHUNKS", "250"))
+    except Exception:
+        cap = 250
+    if cap < 50:
+        cap = 50
+
+    # Prefer: priority 0/1 + system test code + api handlers; then fill by priority.
+    def _pri(c: Dict[str, Any]) -> int:
+        try:
+            return int(c.get("priority", 999))
+        except Exception:
+            return 999
+
+    must = [c for c in formatted_chunks if _pri(c) <= 1 or c.get("source") in ("api_handler", "system_test_code")]
+    # preserve order (already sorted)
+    seen_ids: Set[str] = set()
+    selected: List[Dict[str, Any]] = []
+    for c in must:
+        cid = str(c.get("id") or c.get("chunk_id") or "")
+        key = cid or (c.get("file", "") + ":" + c.get("name", ""))
+        if key in seen_ids:
+            continue
+        selected.append(c)
+        seen_ids.add(key)
+        if len(selected) >= cap:
+            break
+    if len(selected) < cap:
+        for c in formatted_chunks:
+            cid = str(c.get("id") or c.get("chunk_id") or "")
+            key = cid or (c.get("file", "") + ":" + c.get("name", ""))
+            if key in seen_ids:
+                continue
+            selected.append(c)
+            seen_ids.add(key)
+            if len(selected) >= cap:
+                break
+
+    # Update metadata counts after capping
+    if len(selected) != len(formatted_chunks):
+        metadata["total_chunks_before_cap"] = len(formatted_chunks)
+        metadata["total_chunks"] = len(selected)
+
     context = {
         "metadata": metadata,
         "dependencies": dependencies_info,  # NEW: Add dependencies section
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
-        "code_chunks": formatted_chunks,
+        "code_chunks": selected,
         "incluster_logs": incluster_logs or {}
     }
     
