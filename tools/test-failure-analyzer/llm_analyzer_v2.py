@@ -72,6 +72,8 @@ def parse_args():
     parser.add_argument("--max-tokens", type=int, default=6000, help="Max output tokens")
     parser.add_argument("--temperature", type=float, default=0.3, help="Temperature")
     parser.add_argument("--region", default="us-east-1", help="AWS region (for Bedrock)")
+    parser.add_argument("--inference-profile", help="Bedrock inference profile for cost attribution (e.g., 'team-platform', 'agents-infra')")
+    parser.add_argument("--owner-team", default="unknown", help="Owner team for cost attribution (e.g., 'platform', 'security')")
     parser.add_argument("--debug", action="store_true", help="Debug logging")
     return parser.parse_args()
 
@@ -123,7 +125,10 @@ def create_provider(provider_name, args):
     elif provider_name == "openai":
         return OpenAIProvider()
     elif provider_name == "bedrock":
-        return BedrockProvider(region=args.region)
+        return BedrockProvider(
+            region=args.region,
+            inference_profile=args.inference_profile
+        )
     else:
         raise ValueError(f"Unknown provider: {provider_name}")
 
@@ -182,7 +187,9 @@ def main():
         temperature=args.temperature,
         attribution={
             "analyzer_version": "v2",
-            "provider": args.provider
+            "provider": args.provider,
+            "owner_team": args.owner_team,
+            "inference_profile": args.inference_profile
         }
     )
     
