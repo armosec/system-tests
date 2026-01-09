@@ -123,9 +123,14 @@ def _pick_evidence_quotes(error_logs: str, max_lines: int = 12) -> List[str]:
     patterns = [
         r"AssertionError:",
         r"\bTraceback \(most recent call last\):",
+        r"\bcontrol response is empty\b",
         r"We cannot assume your role",
         r"\bAssumeRole\b",
         r"credentials connectivity error",
+        r"\bRequest failed\b",
+        r"\bRequest body\b",
+        r"\bResponse body\b",
+        r"Feature with accountID already exists",
         r"\brequestURI\b",
         r"\bmethod\b.*\brequestURI\b",
         r"\bstatus[_ ]code\b",
@@ -155,6 +160,8 @@ def _primary_error_signature(error_logs: str, evidence_quotes: List[str]) -> str
     for ln in evidence_quotes:
         if "AssertionError" in ln:
             return ln
+        if "control response is empty" in ln.lower():
+            return ln
         if "We cannot assume your role" in ln:
             return ln
     # fallback: first non-empty line
@@ -163,6 +170,96 @@ def _primary_error_signature(error_logs: str, evidence_quotes: List[str]) -> str
         if ln:
             return ln[:200]
     return ""
+
+
+def _extract_expected_negative_markers(test_code: Optional[str]) -> List[Dict[str, str]]:
+    """
+    Detect "expected failure"/true-negative markers from system-test source code.
+
+    This is best-effort and intentionally conservative: we only generate markers that
+    are likely to also appear in logs (so we can tag evidence as expected-negative).
+    """
+    if not test_code:
+        return []
+
+    markers: List[Dict[str, str]] = []
+
+    # If the test explicitly uses expect_failure=True anywhere, annotate.
+    if "expect_failure=True" in test_code:
+        markers.append({
+            "pattern": r"expect_failure=True",
+            "reason": "Test contains explicit expected-failure steps (true negatives).",
+        })
+
+    # Extract string literals that contain 'bad' (e.g., '-cspm-bad') to match request bodies/names.
+    for line in test_code.splitlines():
+        l = line.strip()
+        if not l:
+            continue
+        if "bad" not in l.lower() and "expect_failure=True" not in l:
+            continue
+        for m in re.finditer(r"(['\"])(.*?)(\1)", l):
+            lit = m.group(2) or ""
+            if "bad" in lit.lower() and len(lit) >= 4:
+                markers.append({
+                    "pattern": re.escape(lit),
+                    "reason": "Expected-negative step identifier from test code (contains 'bad').",
+                })
+
+    # Capture placeholder account-ID ARNs commonly used in negative checks.
+    # Keep this regex conservative and safe (avoid tricky character class ranges).
+    for m in re.finditer(r"arn:aws:iam::(\d{8,12}):role/[A-Za-z0-9+=,.@_/-]+", test_code):
+        arn = m.group(0)
+        if "::12345678:" in arn or "::00000000:" in arn:
+            markers.append({
+                "pattern": re.escape(arn.split(":role/")[0]) + r":role/",
+                "reason": "Expected-negative placeholder IAM role ARN used in the test.",
+            })
+
+    # De-duplicate by pattern.
+    seen = set()
+    out: List[Dict[str, str]] = []
+    for m in markers:
+        p = (m.get("pattern") or "").strip()
+        if not p or p in seen:
+            continue
+        seen.add(p)
+        out.append(m)
+    return out
+
+
+def _find_expected_negative_log_lines(error_logs: str, markers: List[Dict[str, str]], max_lines: int = 12) -> List[str]:
+    """Find concrete log lines that match expected-negative markers."""
+    if not error_logs or not markers:
+        return []
+
+    compiled: List[Tuple[re.Pattern, str]] = []
+    for m in markers:
+        p = (m.get("pattern") or "").strip()
+        if not p:
+            continue
+        # Skip patterns that won't appear in logs (e.g., expect_failure=True).
+        if p == r"expect_failure=True":
+            continue
+        try:
+            compiled.append((re.compile(p, re.IGNORECASE), p))
+        except re.error:
+            # Ignore invalid patterns.
+            continue
+
+    out: List[str] = []
+    seen: Set[str] = set()
+    for raw in error_logs.splitlines():
+        line = (raw or "").strip()
+        if not line:
+            continue
+        if any(rx.search(line) for rx, _ in compiled):
+            if line not in seen:
+                out.append(line)
+                seen.add(line)
+        if len(out) >= max_lines:
+            break
+    return out
 
 
 def _render_analysis_instructions(template: str, vars_map: Dict[str, Any]) -> str:
@@ -1456,20 +1553,48 @@ def build_llm_context(
     triggering_repo = _extract_triggering_repo_from_logs(error_logs or "") if error_logs else None
 
     evidence_quotes = _pick_evidence_quotes(error_logs or "", max_lines=12) if error_logs else []
+    expected_negative_markers = _extract_expected_negative_markers(test_code)
+    expected_negative_evidence_quotes = _find_expected_negative_log_lines(
+        error_logs or "",
+        expected_negative_markers,
+        max_lines=12,
+    ) if error_logs else []
+
     primary_error_signature = _primary_error_signature(error_logs or "", evidence_quotes) if error_logs else ""
+
+    analysis_prompts_effective = analysis_prompts
+    if expected_negative_markers:
+        # Prepend a short instruction block to avoid misdiagnosing true-negative steps.
+        hdr = [
+            "# Expected Negative Checks (True Negatives)",
+            "",
+            "This test contains **intentional failure checks** (e.g., `expect_failure=True`).",
+            "Some error logs are *expected* and should **NOT** be treated as the root cause unless the test failed because they did not fail as expected.",
+            "",
+            "When you see errors tied to expected-negative markers, treat them as **expected behavior** and focus on the first *unexpected* failure that causes the test to fail.",
+            "",
+        ]
+        if expected_negative_evidence_quotes:
+            hdr.append("## Expected-negative evidence found in logs (do not over-index on these)")
+            for q in expected_negative_evidence_quotes[:8]:
+                hdr.append(f"- {q}")
+            hdr.append("")
+        analysis_prompts_effective = "\n".join(hdr) + (analysis_prompts or "")
 
     metadata = {
         "test_name": test_name,
         "test_run_id": test_run_id,
         "workflow_commit": workflow_commit,
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "analysis_instructions": analysis_prompts,
+        "analysis_instructions": analysis_prompts_effective,
         "environment": env_name,
         "triggering_repo": triggering_repo,
         # build_llm_context.py does not currently receive a run ref; keep empty.
         "workflow_run_url": "",
         "primary_error_signature": primary_error_signature,
         "evidence_quotes": evidence_quotes,
+        "expected_negative_markers": expected_negative_markers,
+        "expected_negative_evidence_quotes": expected_negative_evidence_quotes,
         "total_chunks": len(formatted_chunks),
         "chunks_by_source": {},
         "chunks_by_repo": {},
