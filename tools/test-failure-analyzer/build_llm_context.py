@@ -2099,6 +2099,23 @@ def main():
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
+
+        # Best-effort fallback: in ECS runs we often bundle system-tests sources under:
+        #   artifacts/context/tests/src/**.py
+        # If caller forgot to pass --test-code, try to auto-detect it based on the error-logs path.
+        if not test_code and args.error_logs:
+            try:
+                base = Path(args.error_logs).resolve().parent
+                src_root = base / "context" / "tests" / "src"
+                if src_root.exists():
+                    py_files = sorted(src_root.glob("**/*.py"))
+                    if py_files:
+                        test_code = load_text_file(str(py_files[0]))
+                        if test_code:
+                            print(f"🧩 Loaded test_code from bundled sources: {py_files[0]}", file=sys.stderr)
+                            sys.stderr.flush()
+            except Exception:
+                pass
         test_mapping = load_json_file(args.test_mapping) if args.test_mapping else None
         system_tests_index = load_json_file(args.system_tests_code_index) if args.system_tests_code_index else None
         code_index = load_json_file(args.code_index) if args.code_index else None
