@@ -1647,9 +1647,19 @@ def build_llm_context(
         print(f"   ✅ Added cross-test interference data to context", file=sys.stderr)
         sys.stderr.flush()
     
-    # Calculate total size
-    total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
+    # Calculate total size and per-repo LOC (count non-empty lines only)
+    total_lines = 0
+    loc_by_repo = {}
+    for chunk in formatted_chunks:
+        code = chunk.get("code", "")
+        repo = chunk.get("repo", "unknown")
+        # Count non-empty lines (consistent with generate_github_summary.py)
+        loc = len([line for line in code.split('\n') if line.strip()])
+        total_lines += loc
+        loc_by_repo[repo] = loc_by_repo.get(repo, 0) + loc
+    
     context["metadata"]["total_lines_of_code"] = total_lines
+    context["metadata"]["loc_by_repo"] = loc_by_repo
     
     # Add dependency statistics to metadata
     context["metadata"]["dependencies_count"] = dependencies_info.get('total_dependencies', 0)

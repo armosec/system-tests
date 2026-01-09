@@ -1,21 +1,25 @@
 github:
-  token: "${GITHUB_TOKEN}"
+  token: '${GITHUB_TOKEN}'
   api_base_url: "https://api.github.com"
   # Organization/repo resolution will be derived from run URL/ID
 
 loki:
-  base_url: "https://<your-loki-endpoint>"
+  # In agents-infra, these are typically set by env:
+  # - GRAFANA_URL
+  # - NAMESPACE
+  # - GRAFANA_DATASOURCE_ID
+  base_url: "${GRAFANA_URL}"
   # mode can be: auto | direct | grafana_proxy
   # - auto: try direct (/loki/api/v1, then /api/v1). If 404 and grafana.* available, try Grafana datasource proxy.
   # - direct: calls <base_url>/loki/api/v1/query_range (with fallback to /api/v1/query_range)
   # - grafana_proxy: calls <grafana.url>/api/datasources/proxy/<datasource_id>/loki/api/v1/query_range
   mode: "auto"
   # Either basic auth or bearer token, prefer tokens via env
-  bearer_token: "${LOKI_TOKEN}"
+  bearer_token: '${LOKI_TOKEN}'
   grafana:
-    url: "https://<your-grafana-host>"
-    api_token: "${GRAFANA_TOKEN}"
-    datasource_id: 2
+    url: "${GRAFANA_URL}"
+    api_token: '${GRAFANA_TOKEN}'
+    datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Pagination and optimization settings
   # Number of logs to fetch per pagination query (default: 5000)
   limit_per_query: 5000
@@ -43,10 +47,10 @@ loki:
   # Query templates per service (string templates; {customer_guid}, {cluster}, {namespace}, {app}, {level_selector}, {id_filters})
   # Example uses the staging namespace; change as needed per environment.
   templates:
-    event-ingester-service: '{{{namespace}="event-sourcing-be-stage", {level_selector}}} {id_filters}'
-    cadashboardbe: '{{{namespace}="event-sourcing-be-stage", {app}="ca-dashboard-be-egg", {level_selector}}} {id_filters}'
-    config-service: '{{{namespace}="event-sourcing-be-stage", {app}="config-service", {level_selector}}} {id_filters}'
-    users-notification-service: '{{{namespace}="event-sourcing-be-stage", {app}="ca-users-notification-service", {level_selector}}} {id_filters}'
+    event-ingester-service: '{{{namespace}="${NAMESPACE}", {level_selector}}} {id_filters}'
+    cadashboardbe: '{{{namespace}="${NAMESPACE}", {app}="ca-dashboard-be-egg", {level_selector}}} {id_filters}'
+    config-service: '{{{namespace}="${NAMESPACE}", {app}="config-service", {level_selector}}} {id_filters}'
+    users-notification-service: '{{{namespace}="${NAMESPACE}", {app}="ca-users-notification-service", {level_selector}}} {id_filters}'
 
 parser:
   # Regex patterns to extract identifiers from logs
