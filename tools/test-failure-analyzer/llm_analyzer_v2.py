@@ -71,7 +71,13 @@ def parse_args():
     parser.add_argument("--model", help="Model name (uses provider default if not specified)")
     parser.add_argument("--max-tokens", type=int, default=6000, help="Max output tokens")
     parser.add_argument("--temperature", type=float, default=0.3, help="Temperature")
-    parser.add_argument("--region", default="us-east-1", help="AWS region (for Bedrock)")
+    # Default Bedrock region should follow infra region; allow overrides via flag.
+    default_region = (
+        os.environ.get("AWS_REGION")
+        or os.environ.get("AWS_DEFAULT_REGION")
+        or "eu-north-1"
+    )
+    parser.add_argument("--region", default=default_region, help="AWS region (for Bedrock)")
     parser.add_argument("--inference-profile", help="Bedrock inference profile for cost attribution (e.g., 'team-platform', 'agents-infra')")
     parser.add_argument("--owner-team", default="unknown", help="Owner team for cost attribution (e.g., 'platform', 'security')")
     parser.add_argument("--debug", action="store_true", help="Debug logging")
