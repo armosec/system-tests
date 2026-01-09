@@ -30,6 +30,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -91,6 +92,95 @@ def load_json_file(path):
         return {}
     with open(path, 'r') as f:
         return json.load(f)
+
+
+def _extract_json_from_text(text: str):
+    """
+    Best-effort extraction of a JSON object from LLM output.
+    Handles common cases:
+    - Raw JSON
+    - Markdown fenced JSON: ```json ... ```
+    - Extra prose before/after JSON
+    """
+    if not isinstance(text, str):
+        return None
+
+    s = text.strip()
+    if not s:
+        return None
+
+    # Try direct parse first
+    try:
+        v = json.loads(s)
+        if isinstance(v, dict):
+            return v
+    except Exception:
+        pass
+
+    # Try fenced ```json ... ```
+    m = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", s, flags=re.IGNORECASE)
+    if m:
+        inner = m.group(1).strip()
+        try:
+            v = json.loads(inner)
+            if isinstance(v, dict):
+                return v
+        except Exception:
+            pass
+
+    # Try to locate first {...} block
+    m = re.search(r"(\{[\s\S]*\})", s)
+    if m:
+        candidate = m.group(1).strip()
+        try:
+            v = json.loads(candidate)
+            if isinstance(v, dict):
+                return v
+        except Exception:
+            pass
+
+    return None
+
+
+def _normalize_legacy_analysis(analysis: dict, response) -> dict:
+    """
+    Ensure output shape is stable even when the model returns odd types.
+    Prefer JSON object embedded in the model content (very common with Claude).
+    """
+    parsed = _extract_json_from_text(getattr(response, "content", ""))
+    if isinstance(parsed, dict) and parsed:
+        analysis = {**analysis, **parsed}
+
+    def to_str(v):
+        if v is None:
+            return ""
+        if isinstance(v, str):
+            return v
+        return json.dumps(v, ensure_ascii=False)
+
+    def to_list(v):
+        if v is None:
+            return []
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            return [v]
+        return [v]
+
+    analysis["root_cause"] = to_str(analysis.get("root_cause"))
+    analysis["executive_verdict"] = to_str(analysis.get("executive_verdict"))
+    analysis["evidence"] = to_list(analysis.get("evidence"))
+    analysis["recommended_fix"] = to_list(analysis.get("recommended_fix"))
+
+    impact = analysis.get("impact")
+    if not isinstance(impact, dict):
+        analysis["impact"] = {"severity": "unknown", "blast_radius": "unknown", "raw": impact}
+    else:
+        impact.setdefault("severity", "unknown")
+        impact.setdefault("blast_radius", "unknown")
+        analysis["impact"] = impact
+
+    return analysis
 
 
 def build_analysis_context(llm_context, code_diffs=None):
@@ -219,8 +309,8 @@ def main():
         print(f"❌ Analysis failed: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # Convert to legacy format for backward compatibility
-    analysis = response.to_legacy_format()
+    # Convert to legacy format for backward compatibility, then normalize.
+    analysis = _normalize_legacy_analysis(response.to_legacy_format(), response)
     
     # Save results
     output_path = Path(args.output)
