@@ -667,11 +667,18 @@ def calculate_dependency_impact(dep_name: str, code_diffs: Dict,
     # Get changed functions
     changed_funcs = set()
     if 'functions' in dep_diff:
-        changed_funcs.update(dep_diff['functions'].get('added', []))
-        changed_funcs.update(dep_diff['functions'].get('removed', []))
+        # Functions can be strings or dicts with 'name' field
+        for func in dep_diff['functions'].get('added', []):
+            func_name = func['name'] if isinstance(func, dict) else func
+            changed_funcs.add(func_name)
+        for func in dep_diff['functions'].get('removed', []):
+            func_name = func['name'] if isinstance(func, dict) else func
+            changed_funcs.add(func_name)
         # If there's a 'modified' field, include it
         if 'modified' in dep_diff['functions']:
-            changed_funcs.update(dep_diff['functions'].get('modified', []))
+            for func in dep_diff['functions'].get('modified', []):
+                func_name = func['name'] if isinstance(func, dict) else func
+                changed_funcs.add(func_name)
     
     # Get called functions from call chains
     called_funcs = set()
