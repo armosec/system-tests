@@ -23,8 +23,31 @@ import requests
 # Map internal repo names to GitHub repo names (for GitHub API calls)
 REPO_NAME_TO_GITHUB = {
     "cadashboardbe": "dashboard-backend",
+    "dashboard-backend": "dashboard-backend",  # Idempotent mapping
     # Add more mappings here if needed
 }
+
+def extract_repo_name_from_path(repo_path: str) -> str:
+    """
+    Extract just the repo name from various formats.
+    
+    Examples:
+        github.com/armosec/cadashboardbe -> cadashboardbe
+        armosec/cadashboardbe -> cadashboardbe
+        cadashboardbe -> cadashboardbe
+    """
+    if not repo_path:
+        return "cadashboardbe"
+    
+    # Remove github.com prefix if present
+    if repo_path.startswith("github.com/"):
+        repo_path = repo_path[len("github.com/"):]
+    
+    # Remove org prefix if present (armosec/ or kubescape/)
+    if "/" in repo_path:
+        repo_path = repo_path.split("/")[-1]
+    
+    return repo_path
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract go.mod dependencies")
@@ -357,8 +380,12 @@ def main():
         rc_metadata = rc_index.get('metadata', {})
         
         # Get repo names from metadata, apply GitHub name mapping if needed
-        deployed_repo_name = deployed_metadata.get('repo', 'cadashboardbe')
-        rc_repo_name = rc_metadata.get('repo', 'cadashboardbe')
+        # Extract just the repo name (strip github.com prefix and org prefix)
+        deployed_repo_raw = deployed_metadata.get('repo', 'cadashboardbe')
+        rc_repo_raw = rc_metadata.get('repo', 'cadashboardbe')
+        
+        deployed_repo_name = extract_repo_name_from_path(deployed_repo_raw)
+        rc_repo_name = extract_repo_name_from_path(rc_repo_raw)
         
         # Map internal repo names to GitHub repo names
         deployed_github_name = REPO_NAME_TO_GITHUB.get(deployed_repo_name, deployed_repo_name)
@@ -481,7 +508,13 @@ def main():
     # even if go.mod is present inside the code index.
     gomod_content = None
     metadata = index.get('metadata', {})
-    repo = metadata.get('repo', 'armosec/cadashboardbe')
+    repo_raw = metadata.get('repo', 'armosec/cadashboardbe')
+    
+    # Extract repo name and apply GitHub mapping
+    repo_name = extract_repo_name_from_path(repo_raw)
+    github_name = REPO_NAME_TO_GITHUB.get(repo_name, repo_name)
+    repo = f"armosec/{github_name}" if '/' not in github_name else github_name
+    
     commit = metadata.get('commit') or metadata.get('version', 'main')
     if args.deployed_version and github_token:
         if args.debug:
