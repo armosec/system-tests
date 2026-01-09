@@ -1220,7 +1220,12 @@ def main() -> int:
 
             provider = str(metadata.get("llm_provider") or "bedrock")
             model = str(metadata.get("llm_model") or "anthropic.claude-3-7-sonnet-20250219-v1:0")
-            region = str(metadata.get("llm_region") or os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "eu-north-1")
+            task_region = str(os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "eu-north-1")
+            region = str(metadata.get("llm_region") or task_region)
+            if region != "eu-north-1" or task_region != "eu-north-1":
+                raise RuntimeError(
+                    f"Refusing to run LLM in ECS: region must be eu-north-1 (task_region={task_region!r}, llm_region={region!r})"
+                )
             inference_profile = str(metadata.get("llm_inference_profile") or "").strip()
             owner_team = str(metadata.get("llm_owner_team") or "unknown")
 
