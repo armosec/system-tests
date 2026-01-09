@@ -137,10 +137,13 @@ def compare_indexes(old_index: Dict, new_index: Dict, old_label: str, new_label:
     removed_endpoints_list = [{"method": m, "path": p} for m, p in sorted(removed_endpoints)]
     
     # Build result
+    # Note: "changed" means either code changes OR version changes (dependencies can have new versions without code changes)
+    has_code_changes = len(added_functions) > 0 or len(removed_functions) > 0 or len(added_endpoints) > 0 or len(removed_endpoints) > 0
+    has_version_change = old_label != new_label and old_label != "unknown" and new_label != "unknown"
     result = {
         "old_version": old_label,
         "new_version": new_label,
-        "changed": len(added_functions) > 0 or len(removed_functions) > 0 or len(added_endpoints) > 0 or len(removed_endpoints) > 0,
+        "changed": has_code_changes or has_version_change,
         "summary": {
             "total_functions_added": len(added_functions),
             "total_functions_removed": len(removed_functions),
