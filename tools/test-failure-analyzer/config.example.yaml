@@ -37,6 +37,28 @@ loki:
     max_chars: 7000
     # Similarity threshold for deduplication (0.0-1.0, default: 0.9)
     similarity_threshold: 0.9
+    # Preserve these patterns even if they look like duplicates / would be dropped by limits.
+    # Each entry is treated as a case-insensitive regex (fallback to substring if regex invalid).
+    preserve_patterns:
+      - "\\bRequest failed\\b"
+      - "\\bRequest body\\b"
+      - "\\bResponse body\\b"
+      - "\\bHTTP status\\b"
+      - "\\bAssumeRole\\b"
+      - "\\bexternalID\\b"
+      - "\\bcrossAccountsRoleARN\\b"
+      - "\\bAccessDenied\\b"
+
+  # Optional "context window" fetch: for a few top error events, fetch ±N seconds around
+  # their timestamp using a query stripped of the keyword-regex filter, while still keeping
+  # the testRunId filter. This captures nearby debug/info lines with request/response payloads.
+  context:
+    enable: true
+    window_seconds: 30
+    max_anchors: 5
+    min_anchor_separation_seconds: 5
+    limit_per_anchor: 800
+    max_total_fetch: 4000
   # Default label keys used across services
   labels:
     namespace: "namespace"

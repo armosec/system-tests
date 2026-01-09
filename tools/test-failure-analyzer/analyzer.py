@@ -1138,6 +1138,53 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
     max_snippets_final = optimization_cfg.get("max_snippets", 500)
     max_chars_final = optimization_cfg.get("max_chars", 7000)
     similarity_threshold = optimization_cfg.get("similarity_threshold", 0.9)
+    preserve_patterns = optimization_cfg.get("preserve_patterns") or [
+        # Keep request/response payload carriers and auth details (high-signal).
+        r"\bRequest failed\b",
+        r"\bRequest body\b",
+        r"\bResponse body\b",
+        r"\bHTTP status\b",
+        r"\bAssumeRole\b",
+        r"\bexternalID\b",
+        r"\bcrossAccountsRoleARN\b",
+        r"\bAccessDenied\b",
+    ]
+
+    # Optional: fetch a small "context window" (±N seconds) around top anchor logs,
+    # still filtered by testRunId, but without the extra keyword regex. This keeps
+    # run-id filtering while capturing nearby lines (debug/info) that often contain
+    # request bodies, parameters, and HTTP response payloads.
+    ctx_cfg = loki_cfg.get("context", {}) or {}
+    ctx_enabled = ctx_cfg.get("enable", True)
+    ctx_window_seconds = int(ctx_cfg.get("window_seconds", 30))
+    ctx_max_anchors = int(ctx_cfg.get("max_anchors", 5))
+    ctx_min_anchor_separation_seconds = int(ctx_cfg.get("min_anchor_separation_seconds", 5))
+    ctx_limit_per_anchor = int(ctx_cfg.get("limit_per_anchor", 800))
+    ctx_max_total = int(ctx_cfg.get("max_total_fetch", 4000))
+
+    def _strip_regex_filters(query: str) -> str:
+        # Typical query shape:
+        #   {labels} |= "id" |~ "(?i)error|warn|..."
+        # For context windows we want:
+        #   {labels} |= "id"
+        if "|~" in query:
+            return query.split("|~", 1)[0].rstrip()
+        return query.rstrip()
+
+    def _rank_anchor_line(line: str) -> int:
+        # Lower is better.
+        l = line.lower()
+        if "request body" in l or "response body" in l:
+            return 0
+        if "request failed" in l or "http status" in l:
+            return 1
+        if "assumerole" in l or "externalid" in l or "crossaccountsrolearn" in l:
+            return 2
+        if "accessdenied" in l:
+            return 3
+        if "error" in l or "exception" in l:
+            return 4
+        return 10
 
     headers = {"Accept": "application/json"}
     query_range_url = None
@@ -1260,6 +1307,85 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
         # Apply optimization if we have logs
         if all_fetched_logs:
             try:
+                # Fetch context windows around top anchors (optional).
+                if ctx_enabled and fentry.loki.queries:
+                    try:
+                        ctx_query = _strip_regex_filters(fentry.loki.queries[0])
+                        # Choose anchors from the already-fetched logs.
+                        ranked = sorted(
+                            all_fetched_logs,
+                            key=lambda t: (_rank_anchor_line(t[1]), t[0]),
+                        )
+
+                        anchors: List[int] = []
+                        for ts_s, line in ranked:
+                            if len(anchors) >= ctx_max_anchors:
+                                break
+                            if _rank_anchor_line(line) >= 10:
+                                # Not interesting enough to anchor a context fetch.
+                                continue
+                            try:
+                                ts_ns = int(ts_s)
+                            except Exception:
+                                continue
+
+                            # Enforce minimal separation between anchors.
+                            too_close = any(
+                                abs(ts_ns - a) <= (ctx_min_anchor_separation_seconds * 1_000_000_000)
+                                for a in anchors
+                            )
+                            if too_close:
+                                continue
+
+                            anchors.append(ts_ns)
+
+                        if debug and anchors:
+                            print(f"[loki] Context anchors: {len(anchors)} (±{ctx_window_seconds}s), query={ctx_query[:140]}{'...' if len(ctx_query) > 140 else ''}")
+
+                        # Collect context logs, capped.
+                        context_logs: List[Tuple[str, str]] = []
+                        for a in anchors:
+                            if len(context_logs) >= ctx_max_total:
+                                break
+                            ctx_start = max(start_ns, a - (ctx_window_seconds * 1_000_000_000))
+                            ctx_end = min(end_ns, a + (ctx_window_seconds * 1_000_000_000))
+                            resp = execute_query(ctx_query, ctx_start, ctx_end, ctx_limit_per_anchor)
+                            if not resp or resp.status_code != 200:
+                                continue
+                            try:
+                                data = resp.json()
+                                result = data.get("data", {}).get("result", [])
+                                for stream in result:
+                                    values = stream.get("values") or []
+                                    for ts, ln in values[:ctx_limit_per_anchor]:
+                                        context_logs.append((ts, str(ln)))
+                                        if len(context_logs) >= ctx_max_total:
+                                            break
+                                    if len(context_logs) >= ctx_max_total:
+                                        break
+                            except Exception:
+                                continue
+
+                        if context_logs:
+                            if debug:
+                                print(f"[loki] Context fetch added {len(context_logs)} logs (pre-merge)")
+                            all_fetched_logs.extend(context_logs)
+                    except Exception as e:
+                        if debug:
+                            print(f"[loki] Context fetch failed: {e}")
+
+                # De-duplicate exact (timestamp,line) pairs after merging.
+                seen_pairs = set()
+                merged_logs: List[Tuple[str, str]] = []
+                for ts_s, line in all_fetched_logs:
+                    k = (ts_s, line)
+                    if k in seen_pairs:
+                        continue
+                    seen_pairs.add(k)
+                    merged_logs.append((ts_s, line))
+                merged_logs.sort(key=lambda t: t[0])
+                all_fetched_logs = merged_logs
+
                 # Convert to list of strings
                 log_strings = [line for _, line in all_fetched_logs]
                 
@@ -1277,7 +1403,9 @@ def fetch_loki_excerpts_for_failures(failures: List[FailureEntry], cfg: Dict[str
                 optimized_logs = optimize_logs_for_llm(
                     log_strings,
                     max_snippets=max_snippets_final,
-                    max_chars=max_chars_final
+                    max_chars=max_chars_final,
+                    similarity_threshold=similarity_threshold,
+                    preserve_patterns=preserve_patterns,
                 )
                 opt_time = time.time() - opt_start_time
                 
