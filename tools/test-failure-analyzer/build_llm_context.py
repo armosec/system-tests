@@ -1466,7 +1466,8 @@ def build_llm_context(
         "analysis_instructions": analysis_prompts,
         "environment": env_name,
         "triggering_repo": triggering_repo,
-        "workflow_run_url": str(run_ref or ""),
+        # build_llm_context.py does not currently receive a run ref; keep empty.
+        "workflow_run_url": "",
         "primary_error_signature": primary_error_signature,
         "evidence_quotes": evidence_quotes,
         "total_chunks": len(formatted_chunks),
@@ -1483,7 +1484,7 @@ def build_llm_context(
             "test_name": test_name,
             "test_run_id": test_run_id,
             "environment": env_name or "",
-            "workflow_run_url": str(run_ref or ""),
+            "workflow_run_url": "",
             "triggering_repo": triggering_repo or "",
         }
         metadata["analysis_instructions_rendered"] = _render_analysis_instructions(
