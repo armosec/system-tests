@@ -735,11 +735,21 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
         chain_list = call_chain.get("chain", [])
         for chain_item in chain_list:
             if isinstance(chain_item, dict) and chain_item.get("chunk_id"):
+                # Determine source - helper chunks get special labeling for visibility
+                source = "call_chain"
+                priority = 2  # Medium priority - related to tested API
+                
+                # Check if this is a helper chunk (discovered via helper file discovery)
+                discovery_reason = chain_item.get("discovery_reason", "")
+                if discovery_reason.startswith("helper_file"):
+                    source = "helper_in_call_chain"
+                    priority = 1  # Higher priority - helpers often contain critical logic
+                
                 chunks.append({
                     **chain_item,
-                    "source": "call_chain",
+                    "source": source,
                     "api_path": api_key,
-                    "priority": 2,  # Medium priority - related to tested API
+                    "priority": priority,
                     # Note: code may be missing - will be looked up from code_index if provided
                     "code": chain_item.get("code", "")
                 })

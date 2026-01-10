@@ -659,6 +659,110 @@ def classify_chunk_pattern(chunk: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def is_helper_file(file_path: str) -> bool:
+    """
+    Check if a file is a helper/utility file based on naming conventions.
+    
+    Helper files often contain critical business logic that is called by handlers
+    but may not be discovered through direct function call tracing.
+    
+    Patterns:
+    - *_helpers.go
+    - *_helper.go
+    - *_utils.go
+    - *_util.go
+    - helpers.go
+    - utils.go
+    
+    Args:
+        file_path: Path to the file
+    
+    Returns:
+        True if the file matches helper naming patterns
+    """
+    if not file_path:
+        return False
+    
+    base_name = os.path.basename(file_path).lower()
+    
+    helper_patterns = [
+        '_helpers.go',
+        '_helper.go',
+        '_utils.go',
+        '_util.go',
+    ]
+    
+    # Check suffix patterns
+    for pattern in helper_patterns:
+        if base_name.endswith(pattern):
+            return True
+    
+    # Check exact matches
+    if base_name in ['helpers.go', 'utils.go', 'helper.go', 'util.go']:
+        return True
+    
+    return False
+
+
+def discover_helper_chunks_for_package(
+    package_name: str,
+    directory: str,
+    all_chunks: List[Dict[str, Any]],
+    repo: Optional[str] = None,
+    debug: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Discover helper file chunks in the same package/directory as a handler.
+    
+    This addresses the gap where helper functions (like ticket_create_helpers.go)
+    are not discovered through call chain tracing but contain critical logic.
+    
+    Args:
+        package_name: Package name (e.g., "httphandlerv2")
+        directory: Directory path containing the handler (e.g., "httphandlerv2/")
+        all_chunks: All available chunks
+        repo: Optional repository filter
+        debug: Enable debug logging
+    
+    Returns:
+        List of helper chunks from the same package/directory
+    """
+    helper_chunks = []
+    seen_ids = set()
+    
+    # Normalize directory for matching
+    dir_normalized = directory.rstrip('/') + '/' if directory else ''
+    
+    for chunk in all_chunks:
+        chunk_file = chunk.get("file", "")
+        chunk_package = chunk.get("package", "")
+        chunk_repo = chunk.get("_repo", "")
+        chunk_id = chunk.get("id")
+        
+        # Filter by repo if specified
+        if repo and chunk_repo and chunk_repo != repo:
+            continue
+        
+        # Check if this chunk is from a helper file in the same package/directory
+        is_same_package = (
+            (package_name and chunk_package == package_name) or
+            (dir_normalized and chunk_file.startswith(dir_normalized))
+        )
+        
+        if is_same_package and is_helper_file(chunk_file):
+            if chunk_id and chunk_id not in seen_ids:
+                seen_ids.add(chunk_id)
+                helper_chunks.append(chunk)
+                
+                if debug:
+                    print(f"   📎 DEBUG: Found helper chunk: {chunk_file}:{chunk.get('name')} (package: {chunk_package})", file=sys.stderr)
+    
+    if debug and helper_chunks:
+        print(f"   📎 DEBUG: Discovered {len(helper_chunks)} helper chunks for package {package_name or directory}", file=sys.stderr)
+    
+    return helper_chunks
+
+
 def extract_call_chain(
     handler_chunk_id: str,
     code_index: Dict[str, Any],
@@ -745,6 +849,46 @@ def extract_call_chain(
         "repo": handler_chunk.get("_repo", "cadashboardbe")  # Include repo tag
     }]
     
+    # NEW: Discover helper files in the same package as the handler
+    # This addresses the gap where helpers like ticket_create_helpers.go contain
+    # critical business logic that isn't discovered through call chain tracing
+    handler_dir = os.path.dirname(handler_chunk.get("file", ""))
+    handler_repo = handler_chunk.get("_repo", "cadashboardbe")
+    
+    helper_chunks = discover_helper_chunks_for_package(
+        package_name=handler_package,
+        directory=handler_dir,
+        all_chunks=chunks,
+        repo=handler_repo,
+        debug=True
+    )
+    
+    # Add helper chunks to the chain with high priority
+    for helper_chunk in helper_chunks:
+        helper_chunk_id = helper_chunk.get("id")
+        if helper_chunk_id and helper_chunk_id not in visited:
+            visited.add(helper_chunk_id)
+            helper_item = {
+                "chunk_id": helper_chunk_id,
+                "name": helper_chunk.get("name"),
+                "type": helper_chunk.get("type"),
+                "pattern": "helper",
+                "package": helper_chunk.get("package"),
+                "file": helper_chunk.get("file"),
+                "repo": helper_chunk.get("_repo", handler_repo),
+                "called_from": handler_chunk_id,
+                "function_name": f"helper:{helper_chunk.get('name')}",
+                "discovery_reason": "helper_file_in_same_package"
+            }
+            chain.append(helper_item)
+            repositories_in_chain.add(helper_chunk.get("_repo", handler_repo))
+    
+    if helper_chunks:
+        print(f"   📎 Added {len(helper_chunks)} helper chunks from handler package", file=sys.stderr)
+    
+    # Track packages we've already discovered helpers for (to avoid duplicates)
+    packages_with_helpers_discovered = {handler_package}
+    
     level = 0
     while level < max_depth and current_level:
         next_level = []
@@ -754,6 +898,45 @@ def extract_call_chain(
             chunk = find_chunk_by_id(item["chunk_id"], chunks)
             if not chunk:
                 continue
+            
+            # NEW: Discover helpers for this chunk's package if not already done
+            chunk_package = chunk.get("package", "")
+            chunk_dir = os.path.dirname(chunk.get("file", ""))
+            chunk_repo = chunk.get("_repo", "cadashboardbe")
+            
+            if chunk_package and chunk_package not in packages_with_helpers_discovered:
+                packages_with_helpers_discovered.add(chunk_package)
+                
+                pkg_helper_chunks = discover_helper_chunks_for_package(
+                    package_name=chunk_package,
+                    directory=chunk_dir,
+                    all_chunks=chunks,
+                    repo=chunk_repo,
+                    debug=False  # Less verbose at deeper levels
+                )
+                
+                for helper_chunk in pkg_helper_chunks:
+                    helper_chunk_id = helper_chunk.get("id")
+                    if helper_chunk_id and helper_chunk_id not in visited:
+                        visited.add(helper_chunk_id)
+                        helper_item = {
+                            "chunk_id": helper_chunk_id,
+                            "name": helper_chunk.get("name"),
+                            "type": helper_chunk.get("type"),
+                            "pattern": "helper",
+                            "package": helper_chunk.get("package"),
+                            "file": helper_chunk.get("file"),
+                            "repo": helper_chunk.get("_repo", chunk_repo),
+                            "called_from": item["chunk_id"],
+                            "function_name": f"helper:{helper_chunk.get('name')}",
+                            "discovery_reason": f"helper_file_in_package_{chunk_package}"
+                        }
+                        chain.append(helper_item)
+                        next_level.append(helper_item)  # Continue traversal from helpers
+                        repositories_in_chain.add(helper_chunk.get("_repo", chunk_repo))
+                
+                if pkg_helper_chunks:
+                    print(f"   📎 Level {level}: Discovered {len(pkg_helper_chunks)} helper chunks for package {chunk_package}", file=sys.stderr)
             
             chunk_code = chunk.get("code", "")
             chunk_package = chunk.get("package", "")
