@@ -25,7 +25,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -91,7 +99,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -159,7 +175,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -227,7 +251,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -295,7 +327,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -363,7 +403,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -431,7 +479,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -499,7 +555,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -567,7 +631,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -635,7 +707,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -741,6 +821,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -781,6 +865,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -790,6 +882,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -841,7 +937,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -908,7 +1012,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -1034,6 +1146,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -1110,6 +1226,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1192,6 +1312,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -1268,6 +1392,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1350,6 +1478,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -1426,6 +1558,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1508,6 +1644,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -1584,6 +1724,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1666,6 +1810,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -1745,6 +1893,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1832,87 +1984,7 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
-        "method": "POST",
-        "path": "/api/v1/repositoryPosture/files"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/repositoryPosture/repositories"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/repositoryPosture/resources"
-      }
-    ]
-  },
-  "scan_repository_from_url_and_submit_to_backend": {
-    "target": [
-      "CLI",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "careportsreceiver",
-      "config-service"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "jonathang@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/kubescape/base_kubescape.py",
-      "tests_scripts/kubescape/scan.py"
-    ],
-    "tested_dashboard_apis": [
-      {
         "method": "GET",
-        "path": "/api/v1/cluster"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/customerConfiguration"
-      },
-      {
-        "method": "PUT",
-        "path": "/api/v1/customerConfiguration"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/framework"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/framework"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/framework"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/posture/controls"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/posture/frameworks"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/posture/resources"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/posture/topFailedControls"
-      },
-      {
-        "method": "DELETE",
-        "path": "/api/v1/postureExceptionPolicy"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/postureExceptionPolicy"
-      },
-      {
-        "method": "DELETE",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -1999,6 +2071,97 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/files"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/repositories"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/repositoryPosture/resources"
+      }
+    ]
+  },
+  "scan_with_global_exception_to_backend": {
+    "target": [
+      "CLI",
+      "Backend"
+    ],
+    "target_repositories": [
+      "config-service",
+      "cadashboardbe"
+    ],
+    "description": "",
+    "skip_on_environment": "",
+    "owner": "idoh@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/kubescape/base_kubescape.py",
+      "tests_scripts/kubescape/scan.py"
+    ],
+    "tested_dashboard_apis": [
+      {
+        "method": "GET",
+        "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/customerConfiguration"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/customerConfiguration"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/framework"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/framework"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/framework"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/topFailedControls"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/postureExceptionPolicy"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -2079,6 +2242,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -2167,6 +2334,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -2247,6 +2418,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/repositoryPosture"
       },
       {
@@ -2332,6 +2507,10 @@
         "path": "/api/v1/repositoryPosture"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/repositoryPosture"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/repositoryPosture/files"
       },
@@ -2371,7 +2550,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -2460,7 +2647,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -2548,7 +2743,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -2636,7 +2839,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -2721,6 +2932,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -2730,6 +2949,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -2781,6 +3004,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -2790,6 +3021,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -2841,6 +3076,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -2850,6 +3093,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -2901,6 +3148,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -2910,6 +3165,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -2963,6 +3222,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -2972,6 +3239,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -3025,6 +3296,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -3034,6 +3313,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -3087,6 +3370,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -3096,6 +3387,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -3148,6 +3443,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -3157,6 +3460,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -3212,12 +3519,24 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
       {
         "method": "POST",
         "path": "/api/v1/posture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/posture/resources/highlights"
       },
       {
         "method": "POST",
@@ -3254,6 +3573,10 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
       },
       {
         "method": "POST",
@@ -3300,6 +3623,10 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/kubernetesresources"
       },
@@ -3339,6 +3666,10 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
       },
       {
         "method": "POST",
@@ -3383,6 +3714,14 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -3438,6 +3777,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/networkpolicies"
       },
@@ -3491,6 +3838,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/networkpolicies"
       },
@@ -3536,6 +3891,14 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -3591,6 +3954,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/networkpolicies"
       },
@@ -3644,6 +4015,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/networkpolicies"
       },
@@ -3693,6 +4072,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -3702,6 +4089,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -3756,7 +4147,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -4126,7 +4525,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -4196,7 +4603,15 @@
       },
       {
         "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/customerState/reports/imageScan"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -4265,6 +4680,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4274,6 +4697,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4327,6 +4754,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4336,6 +4771,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4389,6 +4828,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4398,6 +4845,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4451,6 +4902,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4460,6 +4919,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4513,6 +4976,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4522,6 +4993,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4575,6 +5050,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4584,6 +5067,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4663,6 +5150,10 @@
       },
       {
         "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
         "path": "/api/v1/uniqueValues/incidents"
       }
     ]
@@ -4697,12 +5188,63 @@
         "path": "/api/v1/notifications/webhooks"
       },
       {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidentTypes"
+        "method": "DELETE",
+        "path": "/api/v1/runtime/policies"
       },
       {
         "method": "POST",
-        "path": "/api/v1/runtime/incidentsRuleSet"
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/siem/{provider}"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/siem/{provider}"
+      }
+    ]
+  },
+  "kdr_runtime_policies_configurations_no_cdr": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service",
+      "config-service"
+    ],
+    "description": "Test kdr runtime policy configurations - list, create, update, delete, unique values - no CDR",
+    "skip_on_environment": "staging,production,production-us",
+    "owner": "jonathang@armosec.io",
+    "test_implementation_files": [
+      "tests_scripts/runtime/base_runtime.py",
+      "tests_scripts/runtime/policies.py"
+    ],
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/notifications/webhooks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/notifications/webhooks"
       },
       {
         "method": "DELETE",
@@ -4731,10 +5273,6 @@
       {
         "method": "PUT",
         "path": "/api/v1/siem/{provider}"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/uniqueValues/runtimeIncidentPolicy"
       }
     ]
   },
@@ -4763,10 +5301,6 @@
       {
         "method": "GET",
         "path": "/api/v1/runtime/incidents/{incident_id}"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidentsRuleSet"
       },
       {
         "method": "DELETE",
@@ -4799,10 +5333,6 @@
       {
         "method": "GET",
         "path": "/api/v1/runtime/incidents/{incident_id}"
-      },
-      {
-        "method": "POST",
-        "path": "/api/v1/runtime/incidentsRuleSet"
       },
       {
         "method": "DELETE",
@@ -4852,6 +5382,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -4861,6 +5399,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -4911,6 +5453,10 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/integrations"
       },
@@ -4925,6 +5471,10 @@
       {
         "method": "PUT",
         "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -5003,6 +5553,10 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
         "method": "DELETE",
         "path": "/api/v1/integrations"
       },
@@ -5017,6 +5571,10 @@
       {
         "method": "PUT",
         "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -5099,6 +5657,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -5145,6 +5711,14 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -5195,6 +5769,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -5241,6 +5823,14 @@
       {
         "method": "GET",
         "path": "/api/v1/cluster"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
       },
       {
         "method": "POST",
@@ -5536,33 +6126,113 @@
     "skip_on_environment": "",
     "owner": "eranm@armosec.io",
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/clusters.py"
-    ],
-    "tested_dashboard_apis": []
-  },
-  "cloud_connect_cspm_single_aws": {
-    "target": [
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "event-ingester-service"
-    ],
-    "description": "Checks AWS cloud accounts connect with CSPM single account",
-    "skip_on_environment": "",
-    "owner": "eranm@armosec.io",
-    "skip_cluster": true,
-    "test_implementation_files": [
-      "tests_scripts/accounts/cloud_connect_cspm_single_aws.py"
     ],
     "tested_dashboard_apis": [
       {
-        "method": "GET",
-        "path": "/api/v1/accounts/aws/regions"
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/kubernetes/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
       },
       {
         "method": "GET",
-        "path": "/api/v1/accounts/aws/regionsdetails"
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/kubernetes"
       }
     ]
   },
@@ -5579,9 +6249,107 @@
     "owner": "benm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_connect_cspm_single_azure.py"
     ],
-    "tested_dashboard_apis": []
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      }
+    ]
   },
   "cloud_connect_cspm_single_gcp": {
     "target": [
@@ -5596,9 +6364,230 @@
     "owner": "benm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_connect_cspm_single_gcp.py"
     ],
-    "tested_dashboard_apis": []
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      }
+    ]
+  },
+  "cloud_connect_cspm_single_aws": {
+    "target": [
+      "Backend"
+    ],
+    "target_repositories": [
+      "cadashboardbe",
+      "event-ingester-service"
+    ],
+    "description": "Checks AWS cloud accounts connect with CSPM single account",
+    "skip_on_environment": "",
+    "owner": "eranm@armosec.io",
+    "skip_cluster": true,
+    "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
+      "tests_scripts/accounts/cloud_connect_cspm_single_aws.py"
+    ],
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regions"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/accounts/aws/regionsdetails"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      }
+    ]
   },
   "cloud_connect_cadr_single_aws": {
     "target": [
@@ -5614,12 +6603,109 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_connect_cadr_single_aws.py"
     ],
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "DELETE",
         "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
       }
     ]
   },
@@ -5637,9 +6723,107 @@
     "skip_cluster": true,
     "customer_name": "SECOND_CUSTOMER",
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_connect_cspm_org_aws.py"
     ],
-    "tested_dashboard_apis": []
+    "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      }
+    ]
   },
   "cloud_connect_cadr_org_aws": {
     "target": [
@@ -5654,12 +6838,109 @@
     "owner": "shanyl@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_connect_cadr_org_aws.py"
     ],
     "tested_dashboard_apis": [
       {
         "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "DELETE",
         "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
       }
     ]
   },
@@ -5678,9 +6959,106 @@
     "owner": "eranm@armosec.io",
     "skip_cluster": true,
     "test_implementation_files": [
+      "tests_scripts/accounts/accounts.py",
       "tests_scripts/accounts/cloud_vulnscan_aws.py"
     ],
     "tested_dashboard_apis": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/list"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/cloud/organizations/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/cloud/organizations/list"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/excludeaccounts"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/accounts/cloud/organizations/update/metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/accounts/feature"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/accounts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/controls"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworks"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/frameworksOvertime"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/resources"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/cloudposture/rules"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/cloudposture/severityCounts"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/incidents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/runtime/incidents/{incident_id}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies/list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/uniqueValues/accounts/cloud"
+      },
       {
         "method": "POST",
         "path": "/api/v1/uniqueValues/vulnerability_v2/component"
@@ -5736,6 +7114,10 @@
       {
         "method": "POST",
         "path": "/api/v1/runtime/incidents/{incident_id}/response"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
       }
     ]
   },
@@ -5766,6 +7148,14 @@
         "path": "/api/v1/cluster"
       },
       {
+        "method": "GET",
+        "path": "/api/v1/commands/helm"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kubernetesresources"
+      },
+      {
         "method": "POST",
         "path": "/api/v1/posture/clustersOvertime"
       },
@@ -5775,6 +7165,10 @@
       },
       {
         "method": "DELETE",
+        "path": "/api/v1/posture/scan"
+      },
+      {
+        "method": "GET",
         "path": "/api/v1/posture/scan"
       },
       {
@@ -5849,6 +7243,10 @@
       {
         "method": "POST",
         "path": "/api/v1/runtime/incidentsPerSeverity"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/runtime/policies"
       },
       {
         "method": "POST",

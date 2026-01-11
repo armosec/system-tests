@@ -1,21 +1,25 @@
 github:
-  token: "${GITHUB_TOKEN}"
+  token: '${GITHUB_TOKEN}'
   api_base_url: "https://api.github.com"
   # Organization/repo resolution will be derived from run URL/ID
 
 loki:
-  base_url: "https://<your-loki-endpoint>"
+  # In agents-infra, these are typically set by env:
+  # - GRAFANA_URL
+  # - NAMESPACE
+  # - GRAFANA_DATASOURCE_ID
+  base_url: "${GRAFANA_URL}"
   # mode can be: auto | direct | grafana_proxy
   # - auto: try direct (/loki/api/v1, then /api/v1). If 404 and grafana.* available, try Grafana datasource proxy.
   # - direct: calls <base_url>/loki/api/v1/query_range (with fallback to /api/v1/query_range)
   # - grafana_proxy: calls <grafana.url>/api/datasources/proxy/<datasource_id>/loki/api/v1/query_range
   mode: "auto"
   # Either basic auth or bearer token, prefer tokens via env
-  bearer_token: "${LOKI_TOKEN}"
+  bearer_token: '${LOKI_TOKEN}'
   grafana:
-    url: "https://<your-grafana-host>"
-    api_token: "${GRAFANA_TOKEN}"
-    datasource_id: 2
+    url: "${GRAFANA_URL}"
+    api_token: '${GRAFANA_TOKEN}'
+    datasource_id: "${GRAFANA_DATASOURCE_ID}"
   # Pagination and optimization settings
   # Number of logs to fetch per pagination query (default: 5000)
   limit_per_query: 5000
@@ -33,6 +37,28 @@ loki:
     max_chars: 7000
     # Similarity threshold for deduplication (0.0-1.0, default: 0.9)
     similarity_threshold: 0.9
+    # Preserve these patterns even if they look like duplicates / would be dropped by limits.
+    # Each entry is treated as a case-insensitive regex (fallback to substring if regex invalid).
+    preserve_patterns:
+      - "\\bRequest failed\\b"
+      - "\\bRequest body\\b"
+      - "\\bResponse body\\b"
+      - "\\bHTTP status\\b"
+      - "\\bAssumeRole\\b"
+      - "\\bexternalID\\b"
+      - "\\bcrossAccountsRoleARN\\b"
+      - "\\bAccessDenied\\b"
+
+  # Optional "context window" fetch: for a few top error events, fetch ±N seconds around
+  # their timestamp using a query stripped of the keyword-regex filter, while still keeping
+  # the testRunId filter. This captures nearby debug/info lines with request/response payloads.
+  context:
+    enable: true
+    window_seconds: 30
+    max_anchors: 5
+    min_anchor_separation_seconds: 5
+    limit_per_anchor: 800
+    max_total_fetch: 4000
   # Default label keys used across services
   labels:
     namespace: "namespace"
@@ -43,10 +69,10 @@ loki:
   # Query templates per service (string templates; {customer_guid}, {cluster}, {namespace}, {app}, {level_selector}, {id_filters})
   # Example uses the staging namespace; change as needed per environment.
   templates:
-    event-ingester-service: '{{{namespace}="event-sourcing-be-stage", {level_selector}}} {id_filters}'
-    cadashboardbe: '{{{namespace}="event-sourcing-be-stage", {app}="ca-dashboard-be-egg", {level_selector}}} {id_filters}'
-    config-service: '{{{namespace}="event-sourcing-be-stage", {app}="config-service", {level_selector}}} {id_filters}'
-    users-notification-service: '{{{namespace}="event-sourcing-be-stage", {app}="ca-users-notification-service", {level_selector}}} {id_filters}'
+    event-ingester-service: '{{{namespace}="${NAMESPACE}", {level_selector}}} {id_filters}'
+    cadashboardbe: '{{{namespace}="${NAMESPACE}", {app}="ca-dashboard-be-egg", {level_selector}}} {id_filters}'
+    config-service: '{{{namespace}="${NAMESPACE}", {app}="config-service", {level_selector}}} {id_filters}'
+    users-notification-service: '{{{namespace}="${NAMESPACE}", {app}="ca-users-notification-service", {level_selector}}} {id_filters}'
 
 parser:
   # Regex patterns to extract identifiers from logs
@@ -84,4 +110,39 @@ cross_test_interference:
       - "*_ids"
       - "guid"
       - "id"
+
+# Expected failure (true negative) detection
+# These patterns help the LLM distinguish between intentional test failures
+# (e.g., negative test cases) and actual bugs. The analyzer extracts these
+# patterns from test source code and includes them in the LLM context.
+expected_failure_detection:
+  enabled: true
+  # Patterns to detect in test code that indicate expected failure
+  test_code_patterns:
+    # Explicit expect_failure flag
+    - "expect_failure\\s*=\\s*True"
+    - "expect_failure\\s*:\\s*True"
+    - "expected_to_fail\\s*=\\s*True"
+    # Negative test naming conventions
+    - "[-_]bad\\b"      # e.g., "systest-cspm-bad"
+    - "[-_]invalid\\b"
+    - "[-_]error\\b"
+    - "[-_]fail\\b"
+    - "[-_]negative\\b"
+    # Placeholder/dummy values that should fail
+    - "arn:aws:iam::12345678:"      # Dummy AWS account ID
+    - "arn:aws:iam::123456789:"     # Another common dummy
+    - "dummy[-_]"
+    - "placeholder[-_]"
+  # Evidence patterns that indicate expected failures
+  # These are matched against error logs and removed from "unexpected failure" evidence
+  evidence_patterns:
+    # Common AWS AssumeRole errors (often expected in negative tests)
+    - "We cannot assume your role"
+    - "credentials connectivity error"
+    - "AssumeRole.*AccessDenied"
+    - "trust relationship.*externalID"
+    # Account/feature already exists (cleanup issue, not a bug)
+    - "Feature with accountID already exists"
+    - "account already connected"
 

@@ -20,6 +20,35 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 import requests
 
+# Map internal repo names to GitHub repo names (for GitHub API calls)
+# Note: cadashboardbe is the correct GitHub repo name (image name is dashboard-backend in Quay)
+REPO_NAME_TO_GITHUB = {
+    # Add mappings here only if GitHub repo name differs from internal name
+    # Example: "internal-name": "github-repo-name",
+}
+
+def extract_repo_name_from_path(repo_path: str) -> str:
+    """
+    Extract just the repo name from various formats.
+    
+    Examples:
+        github.com/armosec/cadashboardbe -> cadashboardbe
+        armosec/cadashboardbe -> cadashboardbe
+        cadashboardbe -> cadashboardbe
+    """
+    if not repo_path:
+        return "cadashboardbe"
+    
+    # Remove github.com prefix if present
+    if repo_path.startswith("github.com/"):
+        repo_path = repo_path[len("github.com/"):]
+    
+    # Remove org prefix if present (armosec/ or kubescape/)
+    if "/" in repo_path:
+        repo_path = repo_path.split("/")[-1]
+    
+    return repo_path
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract go.mod dependencies")
     parser.add_argument("--deployed-code-index", help="Path to deployed version code index JSON")
@@ -337,6 +366,17 @@ def main():
             rc_index = load_code_index(args.rc_code_index)
             if args.debug:
                 print(f"✅ Loaded both code indexes")
+            
+            # Check if both indexes are the same file (common when deployed code index is missing)
+            deployed_path_resolved = Path(args.deployed_code_index).resolve()
+            rc_path_resolved = Path(args.rc_code_index).resolve()
+            if deployed_path_resolved == rc_path_resolved:
+                print(f"", file=sys.stderr)
+                print(f"⚠️  WARNING: Deployed and RC code indexes are the same file!", file=sys.stderr)
+                print(f"   {args.deployed_code_index}", file=sys.stderr)
+                print(f"   This means the deployed code index was not found and fallback to RC was used.", file=sys.stderr)
+                print(f"   go.mod comparison will show NO CHANGES (both reading from RC).", file=sys.stderr)
+                print(f"", file=sys.stderr)
         except Exception as e:
             print(f"❌ Error loading code indexes: {e}", file=sys.stderr)
             sys.exit(1)
@@ -350,9 +390,23 @@ def main():
         deployed_metadata = deployed_index.get('metadata', {})
         rc_metadata = rc_index.get('metadata', {})
         
-        deployed_repo = deployed_metadata.get('repo', 'armosec/cadashboardbe')
+        # Get repo names from metadata, apply GitHub name mapping if needed
+        # Extract just the repo name (strip github.com prefix and org prefix)
+        deployed_repo_raw = deployed_metadata.get('repo', 'cadashboardbe')
+        rc_repo_raw = rc_metadata.get('repo', 'cadashboardbe')
+        
+        deployed_repo_name = extract_repo_name_from_path(deployed_repo_raw)
+        rc_repo_name = extract_repo_name_from_path(rc_repo_raw)
+        
+        # Map internal repo names to GitHub repo names
+        deployed_github_name = REPO_NAME_TO_GITHUB.get(deployed_repo_name, deployed_repo_name)
+        rc_github_name = REPO_NAME_TO_GITHUB.get(rc_repo_name, rc_repo_name)
+        
+        # Construct full GitHub repo paths
+        deployed_repo = f"armosec/{deployed_github_name}" if '/' not in deployed_github_name else deployed_github_name
+        rc_repo = f"armosec/{rc_github_name}" if '/' not in rc_github_name else rc_github_name
+        
         deployed_commit = deployed_metadata.get('commit') or deployed_metadata.get('version', 'main')
-        rc_repo = rc_metadata.get('repo', 'armosec/cadashboardbe')
         rc_commit = rc_metadata.get('commit') or rc_metadata.get('version', 'main')
         
         if args.debug:
@@ -368,8 +422,14 @@ def main():
             print(f"📌 Using deployed version tag for go.mod: {args.deployed_version} (instead of commit {deployed_commit})")
         
         deployed_gomod = download_gomod_from_github(deployed_repo, deployed_ref, github_token)
-        if deployed_gomod and args.debug:
-            print(f"✅ Downloaded deployed go.mod from GitHub")
+        deployed_gomod_source = "github" if deployed_gomod else None
+        
+        if deployed_gomod:
+            if args.debug:
+                print(f"✅ Downloaded deployed go.mod from GitHub")
+        else:
+            print(f"⚠️  Failed to download deployed go.mod from GitHub (tag '{deployed_ref}' may not exist for {deployed_repo})", file=sys.stderr)
+            print(f"   Will fall back to code index go.mod (may not reflect deployed baseline)", file=sys.stderr)
         
         # Download RC go.mod from GitHub
         # IMPORTANT: Prefer RC tag if available; the RC index may fall back to code-index-latest,
@@ -380,17 +440,21 @@ def main():
             if args.debug:
                 print(f"📌 Using RC version tag for go.mod: {args.rc_version} (instead of commit {rc_commit})")
         rc_gomod = download_gomod_from_github(rc_repo, rc_ref, github_token)
+        rc_gomod_source = "github" if rc_gomod else None
+        
         if rc_gomod and args.debug:
             print(f"✅ Downloaded RC go.mod from GitHub")
         
         # Fallback to code index go.mod if GitHub download failed
         if not deployed_gomod:
             deployed_gomod = find_gomod_in_index(deployed_index)
+            deployed_gomod_source = "code_index_fallback"
             if deployed_gomod and args.debug:
                 print(f"⚠️  Using deployed go.mod from code index (GitHub download failed)")
         
         if not rc_gomod:
             rc_gomod = find_gomod_in_index(rc_index)
+            rc_gomod_source = "code_index_fallback"
             if rc_gomod and args.debug:
                 print(f"⚠️  Using RC go.mod from code index (GitHub download failed)")
         
@@ -415,6 +479,12 @@ def main():
         # Compare versions
         result = compare_dependency_versions(deployed_deps, rc_deps)
         
+        # Add data quality warnings if we used fallback for deployed go.mod
+        if deployed_gomod_source == "code_index_fallback":
+            for repo_name, info in result.items():
+                info["data_quality"] = "UNRELIABLE - deployed go.mod from code index fallback (not GitHub)"
+                info["warning"] = f"Could not fetch deployed go.mod from GitHub for {deployed_repo}@{deployed_ref}"
+        
         # Optionally check if code indexes exist
         if github_token and args.debug:
             print(f"🔍 Checking code index availability...")
@@ -427,6 +497,14 @@ def main():
             print(f"📊 {changed_count} dependencies changed versions")
             print()
         
+        # Final warning if data quality is unreliable
+        if deployed_gomod_source == "code_index_fallback":
+            print(f"", file=sys.stderr)
+            print(f"⚠️  WARNING: go.mod comparison may be UNRELIABLE", file=sys.stderr)
+            print(f"   Deployed go.mod was NOT fetched from GitHub (used code index fallback)", file=sys.stderr)
+            print(f"   If deployed and RC code indexes are the same, comparison will show NO CHANGES", file=sys.stderr)
+            print(f"", file=sys.stderr)
+        
         # Write output
         output_dir = os.path.dirname(args.output)
         if output_dir:
@@ -437,6 +515,8 @@ def main():
         
         if args.debug:
             print(f"✅ Wrote comparison results to {args.output}")
+            if deployed_gomod_source == "code_index_fallback":
+                print(f"⚠️  Note: Results marked with data_quality warnings")
         
         return
     
@@ -452,17 +532,35 @@ def main():
         print(f"❌ Error loading code index: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # Find go.mod - first try code index, then fallback to GitHub
-    gomod_content = find_gomod_in_index(index)
+    # Find go.mod.
+    #
+    # IMPORTANT:
+    # When snapshotting the *deployed* baseline, we want the go.mod that matches the deployed TAG,
+    # not whatever commit the code index was generated from (often RC commit).
+    # So if --deployed-version is provided, prefer downloading go.mod from GitHub by that ref
+    # even if go.mod is present inside the code index.
+    gomod_content = None
+    metadata = index.get('metadata', {})
+    repo_raw = metadata.get('repo', 'armosec/cadashboardbe')
+    
+    # Extract repo name and apply GitHub mapping
+    repo_name = extract_repo_name_from_path(repo_raw)
+    github_name = REPO_NAME_TO_GITHUB.get(repo_name, repo_name)
+    repo = f"armosec/{github_name}" if '/' not in github_name else github_name
+    
+    commit = metadata.get('commit') or metadata.get('version', 'main')
+    if args.deployed_version and github_token:
+        if args.debug:
+            print(f"📥 Attempting to download go.mod baseline from GitHub by deployed tag: {repo}@{args.deployed_version}")
+        gomod_content = download_gomod_from_github(repo, args.deployed_version, github_token)
+        if gomod_content and args.debug:
+            print("✅ Downloaded go.mod from GitHub (deployed baseline)")
+    if not gomod_content:
+        gomod_content = find_gomod_in_index(index)
     
     if not gomod_content:
         if args.debug:
             print(f"⚠️  go.mod not found in code index, trying GitHub fallback...")
-        
-        # Try to extract repo and commit from code index metadata
-        metadata = index.get('metadata', {})
-        repo = metadata.get('repo', 'armosec/cadashboardbe')
-        commit = metadata.get('commit') or metadata.get('version', 'main')
         
         if args.debug:
             print(f"   Repo: {repo}")

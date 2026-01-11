@@ -34,6 +34,7 @@ import re
 
 # Import dependency detection functions
 from detect_dependencies import analyze_all_chunks, filter_available_indexes
+from extract_call_chain import is_helper_file
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Set
@@ -82,6 +83,250 @@ def load_text_file(file_path: str) -> Optional[str]:
 
 
 _TRACEBACK_FILE_LINE_RE = re.compile(r'File "([^"]+)", line (\d+)', re.MULTILINE)
+
+
+def _extract_env_from_logs(error_logs: str) -> Optional[str]:
+    """
+    Best-effort: extract ENVIRONMENT value from workflow logs.
+    Example line: 'ENVIRONMENT: staging'
+    """
+    if not error_logs:
+        return None
+    m = re.search(r"\bENVIRONMENT:\s*([a-zA-Z0-9_-]+)\b", error_logs)
+    if m:
+        return m.group(1).strip()
+    return None
+
+
+def _extract_triggering_repo_from_logs(error_logs: str) -> Optional[str]:
+    """
+    Best-effort: extract GITHUB_REPOSITORY from workflow logs.
+    Example: 'GITHUB_REPOSITORY: armosec/cadashboardbe'
+    """
+    if not error_logs:
+        return None
+    m = re.search(r"\bGITHUB_REPOSITORY:\s*([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\b", error_logs)
+    if m:
+        return m.group(1).strip()
+    return None
+
+
+def _pick_evidence_quotes(error_logs: str, max_lines: int = 12) -> List[str]:
+    """
+    Extract the highest-signal lines from error logs to anchor the LLM.
+    Prioritize:
+    - AssertionError / traceback lines
+    - explicit backend errors (assume role / auth / 4xx/5xx)
+    - request URI/method lines
+    """
+    if not error_logs:
+        return []
+    patterns = [
+        r"AssertionError:",
+        r"\bTraceback \(most recent call last\):",
+        r"\bcontrol response is empty\b",
+        r"We cannot assume your role",
+        r"\bAssumeRole\b",
+        r"credentials connectivity error",
+        r"\bRequest failed\b",
+        r"\bRequest body\b",
+        r"\bResponse body\b",
+        r"Feature with accountID already exists",
+        r"\brequestURI\b",
+        r"\bmethod\b.*\brequestURI\b",
+        r"\bstatus[_ ]code\b",
+        r"\bERROR\b",
+        r"\bfailed\b",
+    ]
+    compiled = [re.compile(p, re.IGNORECASE) for p in patterns]
+    out: List[str] = []
+    seen: Set[str] = set()
+    for raw in (error_logs or "").splitlines():
+        line = (raw or "").strip()
+        if not line or len(line) < 6:
+            continue
+        if any(c.search(line) for c in compiled):
+            if line not in seen:
+                out.append(line)
+                seen.add(line)
+        if len(out) >= max_lines:
+            break
+    return out
+
+
+def _primary_error_signature(error_logs: str, evidence_quotes: List[str]) -> str:
+    """
+    Pick a short primary error signature string.
+    """
+    for ln in evidence_quotes:
+        if "AssertionError" in ln:
+            return ln
+        if "control response is empty" in ln.lower():
+            return ln
+        if "We cannot assume your role" in ln:
+            return ln
+    # fallback: first non-empty line
+    for ln in (error_logs or "").splitlines():
+        ln = (ln or "").strip()
+        if ln:
+            return ln[:200]
+    return ""
+
+
+def _extract_expected_negative_markers(test_code: Optional[str]) -> List[Dict[str, str]]:
+    """
+    Detect "expected failure"/true-negative markers from system-test source code.
+
+    This is best-effort and intentionally conservative: we only generate markers that
+    are likely to also appear in logs (so we can tag evidence as expected-negative).
+    """
+    if not test_code:
+        return []
+
+    markers: List[Dict[str, str]] = []
+
+    # If the test explicitly uses expect_failure=True anywhere, annotate.
+    if "expect_failure=True" in test_code:
+        markers.append({
+            "pattern": r"expect_failure=True",
+            "reason": "Test contains explicit expected-failure steps (true negatives).",
+        })
+        # Common, expected error signatures in negative AWS auth steps.
+        markers.append({
+            "pattern": r"We cannot assume your role",
+            "reason": "Common expected error in negative AWS auth steps (trust/AssumeRole).",
+        })
+        markers.append({
+            "pattern": r"credentials connectivity error",
+            "reason": "Common expected error signature in negative AWS auth steps.",
+        })
+        markers.append({
+            "pattern": r"\\bAssumeRole\\b",
+            "reason": "Common expected error signature in negative AWS auth steps.",
+        })
+
+    # Extract string literals that contain 'bad' (e.g., '-cspm-bad') to match request bodies/names.
+    for line in test_code.splitlines():
+        l = line.strip()
+        if not l:
+            continue
+        if "bad" not in l.lower() and "expect_failure=True" not in l:
+            continue
+        for m in re.finditer(r"(['\"])(.*?)(\1)", l):
+            lit = m.group(2) or ""
+            if "bad" in lit.lower() and len(lit) >= 4:
+                markers.append({
+                    "pattern": re.escape(lit),
+                    "reason": "Expected-negative step identifier from test code (contains 'bad').",
+                })
+
+    # Capture placeholder account-ID ARNs commonly used in negative checks.
+    # Keep this regex conservative and safe (avoid tricky character class ranges).
+    for m in re.finditer(r"arn:aws:iam::(\d{8,12}):role/[A-Za-z0-9+=,.@_/-]+", test_code):
+        arn = m.group(0)
+        if "::12345678:" in arn or "::00000000:" in arn:
+            markers.append({
+                "pattern": re.escape(arn.split(":role/")[0]) + r":role/",
+                "reason": "Expected-negative placeholder IAM role ARN used in the test.",
+            })
+
+    # De-duplicate by pattern.
+    seen = set()
+    out: List[Dict[str, str]] = []
+    for m in markers:
+        p = (m.get("pattern") or "").strip()
+        if not p or p in seen:
+            continue
+        seen.add(p)
+        out.append(m)
+    return out
+
+
+def _find_expected_negative_log_lines(error_logs: str, markers: List[Dict[str, str]], max_lines: int = 12) -> List[str]:
+    """Find concrete log lines that match expected-negative markers."""
+    if not error_logs or not markers:
+        return []
+
+    compiled: List[Tuple[re.Pattern, str]] = []
+    for m in markers:
+        p = (m.get("pattern") or "").strip()
+        if not p:
+            continue
+        # Skip patterns that won't appear in logs (e.g., expect_failure=True).
+        if p == r"expect_failure=True":
+            continue
+        try:
+            compiled.append((re.compile(p, re.IGNORECASE), p))
+        except re.error:
+            # Ignore invalid patterns.
+            continue
+
+    out: List[str] = []
+    seen: Set[str] = set()
+    for raw in error_logs.splitlines():
+        line = (raw or "").strip()
+        if not line:
+            continue
+        if any(rx.search(line) for rx, _ in compiled):
+            if line not in seen:
+                out.append(line)
+                seen.add(line)
+        if len(out) >= max_lines:
+            break
+    return out
+
+
+def _filter_out_expected_negative_evidence(
+    evidence_quotes: List[str],
+    markers: List[Dict[str, str]],
+    expected_negative_evidence_quotes: List[str],
+) -> List[str]:
+    """
+    Remove expected-negative evidence lines from the 'top evidence' list so the LLM doesn't
+    accidentally anchor on intentional failures.
+    """
+    if not evidence_quotes:
+        return []
+    if not markers and not expected_negative_evidence_quotes:
+        return list(evidence_quotes)
+
+    # Compile matchers from marker patterns (excluding the meta marker expect_failure=True).
+    compiled: List[re.Pattern] = []
+    for m in markers or []:
+        p = (m.get("pattern") or "").strip()
+        if not p or p == r"expect_failure=True":
+            continue
+        try:
+            compiled.append(re.compile(p, re.IGNORECASE))
+        except re.error:
+            continue
+
+    neg_exact = set((expected_negative_evidence_quotes or []))
+
+    out: List[str] = []
+    for ln in evidence_quotes:
+        if ln in neg_exact:
+            continue
+        if any(rx.search(ln) for rx in compiled):
+            continue
+        out.append(ln)
+
+    return out
+
+
+def _render_analysis_instructions(template: str, vars_map: Dict[str, Any]) -> str:
+    """
+    Render {placeholders} in the analysis instruction template.
+    Keep it safe: only substitute known keys, leave unknown placeholders intact.
+    """
+    if not isinstance(template, str) or not template:
+        return ""
+    rendered = template
+    for k, v in (vars_map or {}).items():
+        if not k:
+            continue
+        rendered = rendered.replace("{" + str(k) + "}", str(v if v is not None else ""))
+    return rendered
 
 
 def _candidate_paths_from_trace(trace_path: str) -> List[Path]:
@@ -423,11 +668,18 @@ def calculate_dependency_impact(dep_name: str, code_diffs: Dict,
     # Get changed functions
     changed_funcs = set()
     if 'functions' in dep_diff:
-        changed_funcs.update(dep_diff['functions'].get('added', []))
-        changed_funcs.update(dep_diff['functions'].get('removed', []))
+        # Functions can be strings or dicts with 'name' field
+        for func in dep_diff['functions'].get('added', []):
+            func_name = func['name'] if isinstance(func, dict) else func
+            changed_funcs.add(func_name)
+        for func in dep_diff['functions'].get('removed', []):
+            func_name = func['name'] if isinstance(func, dict) else func
+            changed_funcs.add(func_name)
         # If there's a 'modified' field, include it
         if 'modified' in dep_diff['functions']:
-            changed_funcs.update(dep_diff['functions'].get('modified', []))
+            for func in dep_diff['functions'].get('modified', []):
+                func_name = func['name'] if isinstance(func, dict) else func
+                changed_funcs.add(func_name)
     
     # Get called functions from call chains
     called_funcs = set()
@@ -484,11 +736,21 @@ def extract_chunks_from_api_mapping(api_mapping: Dict[str, Any]) -> List[Dict[st
         chain_list = call_chain.get("chain", [])
         for chain_item in chain_list:
             if isinstance(chain_item, dict) and chain_item.get("chunk_id"):
+                # Determine source - helper chunks get special labeling for visibility
+                source = "call_chain"
+                priority = 2  # Medium priority - related to tested API
+                
+                # Check if this is a helper chunk (discovered via helper file discovery)
+                discovery_reason = chain_item.get("discovery_reason", "")
+                if discovery_reason.startswith("helper_file"):
+                    source = "helper_in_call_chain"
+                    priority = 1  # Higher priority - helpers often contain critical logic
+                
                 chunks.append({
                     **chain_item,
-                    "source": "call_chain",
+                    "source": source,
                     "api_path": api_key,
-                    "priority": 2,  # Medium priority - related to tested API
+                    "priority": priority,
                     # Note: code may be missing - will be looked up from code_index if provided
                     "code": chain_item.get("code", "")
                 })
@@ -946,6 +1208,79 @@ def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None
     return None
 
 
+def get_sibling_chunks_from_file(
+    file_path: str,
+    exclude_chunk_ids: Set[str],
+    code_index: Optional[Dict[str, Any]] = None,
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
+    max_per_file: int = 20,
+) -> List[Dict[str, Any]]:
+    """
+    Get all chunks from the same file, excluding already-selected chunks.
+    
+    This implements "file cohesion" - when a helper file is partially selected,
+    we include all functions from that file to ensure complete context.
+    
+    Args:
+        file_path: Path to the file (e.g., "httphandlerv2/ticket_create_helpers.go")
+        exclude_chunk_ids: Set of chunk IDs already selected (to avoid duplicates)
+        code_index: Main code index
+        extra_indexes: Additional code indexes for dependencies
+        max_per_file: Maximum chunks to return per file (safety cap)
+    
+    Returns:
+        List of chunk dictionaries from the same file
+    """
+    if not file_path:
+        return []
+    
+    siblings: List[Dict[str, Any]] = []
+    
+    # Normalize file path for comparison (strip leading ./ or /)
+    normalized_file = file_path.lstrip("./").lstrip("/")
+    
+    def matches_file(chunk_file: str) -> bool:
+        """Check if chunk file matches the target file."""
+        if not chunk_file:
+            return False
+        norm_chunk = chunk_file.lstrip("./").lstrip("/")
+        return norm_chunk == normalized_file or norm_chunk.endswith("/" + normalized_file)
+    
+    # Search in main code index
+    if code_index:
+        for chunk in code_index.get("chunks", []):
+            chunk_id = chunk.get("id") or ""
+            chunk_file = chunk.get("file") or ""
+            if matches_file(chunk_file) and chunk_id not in exclude_chunk_ids:
+                siblings.append({
+                    **chunk,
+                    "source": "file_cohesion",
+                    "priority": 1,  # High priority - same file as selected helper
+                })
+                if len(siblings) >= max_per_file:
+                    return siblings
+    
+    # Search in extra indexes
+    if extra_indexes:
+        for repo_name, idx in extra_indexes.items():
+            if not idx:
+                continue
+            for chunk in idx.get("chunks", []):
+                chunk_id = chunk.get("id") or ""
+                chunk_file = chunk.get("file") or ""
+                if matches_file(chunk_file) and chunk_id not in exclude_chunk_ids:
+                    siblings.append({
+                        **chunk,
+                        "repo_name": repo_name,
+                        "source": "file_cohesion",
+                        "priority": 1,
+                    })
+                    if len(siblings) >= max_per_file:
+                        return siblings
+    
+    return siblings
+
+
 def _gh_env() -> Dict[str, str]:
     """
     Ensure gh CLI has a token in env. GitHub Actions often provides GITHUB_TOKEN,
@@ -958,22 +1293,43 @@ def _gh_env() -> Dict[str, str]:
 
 
 def _gh_api(path: str) -> Optional[Any]:
-    """Call `gh api <path>` and parse JSON output. Returns None on failure."""
-    if not shutil.which("gh"):
-        return None
+    """
+    Call GitHub API. Tries `gh api` first, falls back to direct HTTP if gh not installed.
+    Returns None on failure.
+    """
+    # Try gh CLI first (faster and handles auth automatically)
+    if shutil.which("gh"):
+        try:
+            import subprocess
+            proc = subprocess.run(
+                ["gh", "api", path],
+                capture_output=True,
+                text=True,
+                env=_gh_env(),
+                check=False,
+            )
+            if proc.returncode == 0:
+                return json.loads(proc.stdout or "null")
+        except Exception:
+            pass
+    
+    # Fallback: direct HTTP request
     try:
-        import subprocess
-        proc = subprocess.run(
-            ["gh", "api", path],
-            capture_output=True,
-            text=True,
-            env=_gh_env(),
-            check=False,
-        )
-        if proc.returncode != 0:
-            return None
-        return json.loads(proc.stdout or "null")
-    except Exception:
+        import urllib.request
+        import urllib.error
+        
+        url = f"https://api.github.com/{path}"
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        
+        # Try to get token from environment
+        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        if token:
+            headers["Authorization"] = f"token {token}"
+        
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError, Exception):
         return None
 
 
@@ -1069,6 +1425,105 @@ def _fetch_repo_file_content(org: str, repo: str, file_path: str, ref: str, max_
         return raw
     except Exception:
         return None
+
+
+def fetch_triggering_repo_diff(
+    found_indexes: Optional[Dict[str, Any]],
+    max_files: int = 30,
+    max_patch_lines_per_file: int = 100,
+) -> Optional[Dict[str, Any]]:
+    """
+    Fetch the git diff for the triggering repo (RC vs deployed).
+    
+    This provides crucial context for the LLM to identify what code changed
+    and potentially caused the test failure.
+    
+    Args:
+        found_indexes: The found-indexes.json data containing commit info
+        max_files: Maximum number of changed files to include
+        max_patch_lines_per_file: Maximum patch lines per file (truncate longer patches)
+    
+    Returns:
+        Dictionary with diff summary and file patches, or None if unavailable
+    """
+    if not found_indexes:
+        return None
+    
+    triggering_repo = found_indexes.get("triggering_repo")
+    if not triggering_repo:
+        return None
+    
+    indexes = found_indexes.get("indexes", {})
+    repo_info = indexes.get(triggering_repo, {})
+    
+    rc_info = repo_info.get("rc", {})
+    deployed_info = repo_info.get("deployed", {})
+    
+    rc_commit = rc_info.get("commit", "")
+    deployed_commit = deployed_info.get("commit", "")
+    org = rc_info.get("github_org") or deployed_info.get("github_org") or "armosec"
+    
+    if not rc_commit or not deployed_commit:
+        return None
+    
+    if rc_commit == deployed_commit:
+        return {"summary": "No changes - RC and deployed commits are identical", "files": []}
+    
+    # Fetch compare data from GitHub
+    endpoint = f"repos/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}"
+    data = _gh_api(endpoint)
+    
+    if not data or not isinstance(data, dict):
+        return {
+            "summary": f"Could not fetch diff from GitHub (commits: {deployed_commit[:8]}...{rc_commit[:8]})",
+            "compare_url": f"https://github.com/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}",
+            "files": []
+        }
+    
+    commits = data.get("commits", [])
+    files = data.get("files", [])
+    
+    # Build summary
+    diff_result = {
+        "triggering_repo": triggering_repo,
+        "deployed_commit": deployed_commit,
+        "rc_commit": rc_commit,
+        "compare_url": f"https://github.com/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}",
+        "total_commits": len(commits),
+        "total_files_changed": len(files),
+        "summary": f"{len(commits)} commits, {len(files)} files changed",
+        "files": []
+    }
+    
+    # Extract file patches (limited)
+    for f in files[:max_files]:
+        if not isinstance(f, dict):
+            continue
+        
+        filename = f.get("filename", "")
+        status = f.get("status", "")
+        additions = f.get("additions", 0)
+        deletions = f.get("deletions", 0)
+        patch = f.get("patch", "")
+        
+        # Truncate long patches
+        patch_lines = patch.splitlines() if patch else []
+        if len(patch_lines) > max_patch_lines_per_file:
+            patch = "\n".join(patch_lines[:max_patch_lines_per_file])
+            patch += f"\n... (truncated, {len(patch_lines) - max_patch_lines_per_file} more lines)"
+        
+        diff_result["files"].append({
+            "filename": filename,
+            "status": status,
+            "additions": additions,
+            "deletions": deletions,
+            "patch": patch
+        })
+    
+    if len(files) > max_files:
+        diff_result["note"] = f"Showing {max_files} of {len(files)} changed files"
+    
+    return diff_result
 
 
 def fetch_dependency_source_snippets(
@@ -1356,12 +1811,61 @@ def build_llm_context(
         formatted_chunks.append(formatted_chunk)
     
     # 8. Build metadata
+    env_name = _extract_env_from_logs(error_logs or "") if error_logs else None
+    triggering_repo = _extract_triggering_repo_from_logs(error_logs or "") if error_logs else None
+
+    evidence_quotes = _pick_evidence_quotes(error_logs or "", max_lines=12) if error_logs else []
+    expected_negative_markers = _extract_expected_negative_markers(test_code)
+    expected_negative_evidence_quotes = _find_expected_negative_log_lines(
+        error_logs or "",
+        expected_negative_markers,
+        max_lines=12,
+    ) if error_logs else []
+
+    # Ensure "top evidence" is about the unexpected failure, not the intentional negative checks.
+    evidence_quotes = _filter_out_expected_negative_evidence(
+        evidence_quotes,
+        expected_negative_markers,
+        expected_negative_evidence_quotes,
+    )
+
+    primary_error_signature = _primary_error_signature(error_logs or "", evidence_quotes) if error_logs else ""
+
+    analysis_prompts_effective = analysis_prompts
+    if expected_negative_markers:
+        # Prepend a short instruction block to avoid misdiagnosing true-negative steps.
+        hdr = [
+            "# Expected Negative Checks (True Negatives)",
+            "",
+            "This test contains **intentional failure checks** (e.g., `expect_failure=True`).",
+            "Some error logs are *expected* and should **NOT** be treated as the root cause unless the test failed because they did not fail as expected.",
+            "",
+            "When you see errors tied to expected-negative markers, treat them as **expected behavior** and focus on the first *unexpected* failure that causes the test to fail.",
+            "",
+            f"Primary unexpected failure signature (start here): {primary_error_signature}",
+            "",
+        ]
+        if expected_negative_evidence_quotes:
+            hdr.append("## Expected-negative evidence found in logs (do not over-index on these)")
+            for q in expected_negative_evidence_quotes[:8]:
+                hdr.append(f"- {q}")
+            hdr.append("")
+        analysis_prompts_effective = "\n".join(hdr) + (analysis_prompts or "")
+
     metadata = {
         "test_name": test_name,
         "test_run_id": test_run_id,
         "workflow_commit": workflow_commit,
         "generated_at": datetime.utcnow().isoformat() + "Z",
-        "analysis_instructions": analysis_prompts,
+        "analysis_instructions": analysis_prompts_effective,
+        "environment": env_name,
+        "triggering_repo": triggering_repo,
+        # build_llm_context.py does not currently receive a run ref; keep empty.
+        "workflow_run_url": "",
+        "primary_error_signature": primary_error_signature,
+        "evidence_quotes": evidence_quotes,
+        "expected_negative_markers": expected_negative_markers,
+        "expected_negative_evidence_quotes": expected_negative_evidence_quotes,
         "total_chunks": len(formatted_chunks),
         "chunks_by_source": {},
         "chunks_by_repo": {},
@@ -1369,6 +1873,22 @@ def build_llm_context(
     }
     if failing_request:
         metadata["failing_request"] = failing_request
+
+    # Render instructions template now that we have basic vars.
+    try:
+        vars_map = {
+            "test_name": test_name,
+            "test_run_id": test_run_id,
+            "environment": env_name or "",
+            "workflow_run_url": "",
+            "triggering_repo": triggering_repo or "",
+        }
+        metadata["analysis_instructions_rendered"] = _render_analysis_instructions(
+            str(metadata.get("analysis_instructions") or ""),
+            vars_map,
+        )
+    except Exception:
+        metadata["analysis_instructions_rendered"] = str(metadata.get("analysis_instructions") or "")
     
     # Count chunks by source and repo
     for chunk in formatted_chunks:
@@ -1568,10 +2088,12 @@ def build_llm_context(
     
     # Load dependency information from found-indexes.json
     dependencies_info = {}
+    found_indexes_data = None  # Will be used for triggering repo diff
     if os.path.exists(found_indexes_path):
         try:
             with open(found_indexes_path, 'r') as f:
-                found_indexes = json.load(f)
+                found_indexes_data = json.load(f)
+                found_indexes = found_indexes_data  # Keep backwards compat for local var
                 dependencies_info = {
                     "total_dependencies": len(found_indexes.get('indexes', {})),
                     "version_changes": [
@@ -1632,14 +2154,131 @@ def build_llm_context(
         print(f"   ✅ Added {len(gomod_versions)} go.mod package versions", file=sys.stderr)
         sys.stderr.flush()
     
+    # Cap total chunks to reduce prompt noise (can be overridden via env var).
+    # Increased from 250 to 400 to accommodate file cohesion expansion.
+    try:
+        cap = int(os.environ.get("LLM_CONTEXT_MAX_CHUNKS", "400"))
+    except Exception:
+        cap = 400
+    if cap < 50:
+        cap = 50
+
+    # Prefer: priority 0/1 + system test code + api handlers; then fill by priority.
+    def _pri(c: Dict[str, Any]) -> int:
+        try:
+            return int(c.get("priority", 999))
+        except Exception:
+            return 999
+
+    must = [c for c in formatted_chunks if _pri(c) <= 1 or c.get("source") in ("api_handler", "system_test_code")]
+    # preserve order (already sorted)
+    seen_ids: Set[str] = set()
+    selected: List[Dict[str, Any]] = []
+    for c in must:
+        cid = str(c.get("id") or c.get("chunk_id") or "")
+        key = cid or (c.get("file", "") + ":" + c.get("name", ""))
+        if key in seen_ids:
+            continue
+        selected.append(c)
+        seen_ids.add(key)
+        if len(selected) >= cap:
+            break
+    if len(selected) < cap:
+        for c in formatted_chunks:
+            cid = str(c.get("id") or c.get("chunk_id") or "")
+            key = cid or (c.get("file", "") + ":" + c.get("name", ""))
+            if key in seen_ids:
+                continue
+            selected.append(c)
+            seen_ids.add(key)
+            if len(selected) >= cap:
+                break
+
+    # FILE COHESION: Expand helper files to include all functions from the same file.
+    # This ensures that if any function from a helper file is selected, all related
+    # functions are included (critical for catching bugs like resolveIssueOwner).
+    helper_files_expanded: List[str] = []
+    helper_chunks_added = 0
+    
+    # Identify helper files that were selected
+    selected_helper_files: Set[str] = set()
+    for c in selected:
+        file_path = c.get("file") or ""
+        if is_helper_file(file_path):
+            selected_helper_files.add(file_path)
+    
+    # Expand each helper file (add sibling chunks)
+    if selected_helper_files and len(selected) < cap:
+        print(f"   🔗 File cohesion: expanding {len(selected_helper_files)} helper files...", file=sys.stderr)
+        sys.stderr.flush()
+        
+        for helper_file in sorted(selected_helper_files):
+            if len(selected) >= cap:
+                break
+            
+            # Get sibling chunks from the same file
+            siblings = get_sibling_chunks_from_file(
+                file_path=helper_file,
+                exclude_chunk_ids=seen_ids,
+                code_index=code_index,
+                extra_indexes=extra_indexes,
+                max_per_file=20,
+            )
+            
+            if siblings:
+                helper_files_expanded.append(helper_file)
+                for sibling in siblings:
+                    if len(selected) >= cap:
+                        break
+                    
+                    # Format the sibling chunk for LLM
+                    repo_name = sibling.get("repo_name") or sibling.get("repo") or repo_mapping.get("default", "cadashboardbe")
+                    formatted_sibling = format_chunk_for_llm(sibling, repo_name)
+                    
+                    cid = str(formatted_sibling.get("id") or "")
+                    key = cid or (formatted_sibling.get("file", "") + ":" + formatted_sibling.get("name", ""))
+                    if key not in seen_ids:
+                        selected.append(formatted_sibling)
+                        seen_ids.add(key)
+                        helper_chunks_added += 1
+        
+        if helper_chunks_added > 0:
+            print(f"      Added {helper_chunks_added} sibling chunks from {len(helper_files_expanded)} helper files", file=sys.stderr)
+            sys.stderr.flush()
+
+    # Update metadata counts after capping and file cohesion
+    if len(selected) != len(formatted_chunks):
+        metadata["total_chunks_before_cap"] = len(formatted_chunks)
+        metadata["total_chunks"] = len(selected)
+    
+    # Track file cohesion in metadata for visibility
+    if helper_files_expanded:
+        metadata["file_cohesion"] = {
+            "helper_files_expanded": helper_files_expanded,
+            "chunks_added": helper_chunks_added,
+        }
+
     context = {
         "metadata": metadata,
         "dependencies": dependencies_info,  # NEW: Add dependencies section
         "error_logs": truncated_error_logs,
         "test_code": test_code[:10000] if test_code else None,  # Limit test code to 10000 chars
-        "code_chunks": formatted_chunks,
+        "code_chunks": selected,
         "incluster_logs": incluster_logs or {}
     }
+    
+    # Add triggering repo code diff (CRITICAL for root cause analysis)
+    # This shows exactly what changed between deployed and RC versions
+    if found_indexes_data:
+        triggering_diff = fetch_triggering_repo_diff(
+            found_indexes=found_indexes_data,
+            max_files=30,
+            max_patch_lines_per_file=100,
+        )
+        if triggering_diff and triggering_diff.get("files"):
+            context["triggering_repo_diff"] = triggering_diff
+            print(f"   ✅ Added triggering repo diff: {triggering_diff.get('summary', 'N/A')}", file=sys.stderr)
+            sys.stderr.flush()
     
     # Add cross-test interference data if available (this is INPUT context, not a conclusion)
     if cross_test_interference:
@@ -1647,9 +2286,19 @@ def build_llm_context(
         print(f"   ✅ Added cross-test interference data to context", file=sys.stderr)
         sys.stderr.flush()
     
-    # Calculate total size
-    total_lines = sum(len(chunk.get("code", "").splitlines()) for chunk in formatted_chunks)
+    # Calculate total size and per-repo LOC (count non-empty lines only)
+    total_lines = 0
+    loc_by_repo = {}
+    for chunk in formatted_chunks:
+        code = chunk.get("code", "")
+        repo = chunk.get("repo", "unknown")
+        # Count non-empty lines (consistent with generate_github_summary.py)
+        loc = len([line for line in code.split('\n') if line.strip()])
+        total_lines += loc
+        loc_by_repo[repo] = loc_by_repo.get(repo, 0) + loc
+    
     context["metadata"]["total_lines_of_code"] = total_lines
+    context["metadata"]["loc_by_repo"] = loc_by_repo
     
     # Add dependency statistics to metadata
     context["metadata"]["dependencies_count"] = dependencies_info.get('total_dependencies', 0)
@@ -1796,6 +2445,23 @@ def main():
         error_logs = load_text_file(args.error_logs) if args.error_logs else None
         incluster_logs = load_json_file(args.incluster_logs) if args.incluster_logs else None
         test_code = load_text_file(args.test_code) if args.test_code else None
+
+        # Best-effort fallback: in ECS runs we often bundle system-tests sources under:
+        #   artifacts/context/tests/src/**.py
+        # If caller forgot to pass --test-code, try to auto-detect it based on the error-logs path.
+        if not test_code and args.error_logs:
+            try:
+                base = Path(args.error_logs).resolve().parent
+                src_root = base / "context" / "tests" / "src"
+                if src_root.exists():
+                    py_files = sorted(src_root.glob("**/*.py"))
+                    if py_files:
+                        test_code = load_text_file(str(py_files[0]))
+                        if test_code:
+                            print(f"🧩 Loaded test_code from bundled sources: {py_files[0]}", file=sys.stderr)
+                            sys.stderr.flush()
+            except Exception:
+                pass
         test_mapping = load_json_file(args.test_mapping) if args.test_mapping else None
         system_tests_index = load_json_file(args.system_tests_code_index) if args.system_tests_code_index else None
         code_index = load_json_file(args.code_index) if args.code_index else None

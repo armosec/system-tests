@@ -652,12 +652,13 @@ def resolve_dependency_indexes(dependencies: Dict[str, Any], output_dir: str, gi
                 if debug:
                     print(f"  ⚠️  Deployed index not found")
         
-        # Resolve RC version if changed (use base version for index lookup)
+        # Resolve RC version (use base version for index lookup)
+        # NOTE: We resolve RC even if version didn't change, so we can compute commit-level diffs
         rc_index = None
         rc_org = None
         rc_strategy = None
         rc_found = False
-        if version_changed and rc_ver_base != 'unknown':
+        if rc_ver_base != 'unknown':
             if debug:
                 print(f"  🔍 Resolving RC version: {rc_ver_raw} (using base {rc_ver_base} for index lookup)")
                 if github_org_hint:
