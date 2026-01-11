@@ -117,22 +117,7 @@ class KSMicroserviceTests(object):
         )
 
     @staticmethod
-    def ks_microservice_triggering_with_cron_job():
-        from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanWithKubescapeAsServiceTest,
-            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
-            secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
-            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True}]
-        )
-
-    @staticmethod
-    def ks_microservice_update_cronjob_schedule():
+    def ks_microservice_cronjob():
         from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
         from os.path import join
@@ -144,39 +129,10 @@ class KSMicroserviceTests(object):
             config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
             deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
             test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True},
-                      {"trigger_by": "cronjob", "operation": "update", "framework": [""], "hostsensor": True}]
-        )
-
-    @staticmethod
-    def ks_microservice_delete_cronjob():
-        from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanWithKubescapeAsServiceTest,
-            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
-            secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
-            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": [""], "hostsensor": True},
+                      {"trigger_by": "cronjob", "operation": "create", "framework": ["NSA"], "hostsensor": False},
+                      {"trigger_by": "cronjob", "operation": "update", "framework": ["NSA"], "hostsensor": False},
+                      {"trigger_by": "cronjob", "operation": "delete", "framework": ["NSA"], "hostsensor": False},
                       {"trigger_by": "cronjob", "operation": "delete", "framework": [""], "hostsensor": True}]
-        )
-
-    @staticmethod
-    def ks_microservice_create_2_cronjob_mitre_and_nsa():
-        from tests_scripts.helm.ks_microservice import ScanWithKubescapeAsServiceTest
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanWithKubescapeAsServiceTest,
-            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
-            secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
-            test_job=[{"trigger_by": "cronjob", "operation": "create", "framework": ["MITRE"], "hostsensor": False},
-                      {"trigger_by": "cronjob", "operation": "create", "framework": ["NSA"], "hostsensor": False}]
         )
 
 

@@ -54,12 +54,9 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_mitre_framework_on_demand`                    | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_nsa_and_mitre_framework_demand`               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_triggering_with_cron_job`                     | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_update_cronjob_schedule`                      | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_delete_cronjob`                               | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_create_2_cronjob_mitre_and_nsa`               | helm-chart |                                                                        | in-cluster kubescape, backend |
+| `ks_microservice_cronjob`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `attackchains_all`                | helm-chart |                                    | in-cluster kubescape, backend |
-| `ks_microservice_create_2_cronjob_mitre_and_nsa_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
+| `ks_microservice_cronjob_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `vuln_scan_triggering_with_cron_job`              | helm-chart |                                                                        | kubevuln, backend             |   |
 | `stripe_checkout`                                              | payment |                                                                           | stripe, backend             |
 | `stripe_billing_portal`                                        | payment |                                                                           | stripe, backend             |
