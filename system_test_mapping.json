@@ -548,22 +548,6 @@
       "tests_scripts/kubernetes/base_k8s.py"
     ]
   },
-  "ks_microservice_ns_creation": {
-    "target": [
-      "In cluster"
-    ],
-    "target_repositories": [
-      "cadashboardbe"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "amirm@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/helm/base_helm.py",
-      "tests_scripts/helm/ks_microservice.py",
-      "tests_scripts/kubernetes/base_k8s.py"
-    ]
-  },
   "ks_microservice_on_demand": {
     "target": [
       "In cluster",
@@ -571,43 +555,8 @@
     ],
     "target_repositories": [
       "cadashboardbe",
-      "gateway"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "amirm@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/helm/base_helm.py",
-      "tests_scripts/helm/ks_microservice.py",
-      "tests_scripts/kubernetes/base_k8s.py"
-    ]
-  },
-  "ks_microservice_mitre_framework_on_demand": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "gateway"
-    ],
-    "description": "",
-    "skip_on_environment": "",
-    "owner": "amirm@armosec.io",
-    "test_implementation_files": [
-      "tests_scripts/helm/base_helm.py",
-      "tests_scripts/helm/ks_microservice.py",
-      "tests_scripts/kubernetes/base_k8s.py"
-    ]
-  },
-  "ks_microservice_nsa_and_mitre_framework_demand": {
-    "target": [
-      "In cluster",
-      "Backend"
-    ],
-    "target_repositories": [
-      "cadashboardbe",
-      "gateway"
+      "careportsreceiver",
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -860,8 +809,7 @@
     ],
     "target_repositories": [
       "cadashboardbe",
-      "careportsreceiver",
-      "gateway"
+      "careportsreceiver"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -879,8 +827,7 @@
     ],
     "target_repositories": [
       "cadashboardbe",
-      "careportsreceiver",
-      "gateway"
+      "careportsreceiver"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1062,8 +1009,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1082,8 +1028,7 @@
     "target_repositories": [
       "cadashboardbe-dummy",
       "careportsreceiver-dummy",
-      "event-ingester-service-dummy",
-      "gateway-dummy"
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1102,8 +1047,7 @@
     "target_repositories": [
       "cadashboardbe-dummy",
       "careportsreceiver-dummy",
-      "event-ingester-service-dummy",
-      "gateway-dummy"
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1122,8 +1066,7 @@
     "target_repositories": [
       "cadashboardbe-dummy",
       "careportsreceiver-dummy",
-      "event-ingester-service-dummy",
-      "gateway-dummy"
+      "event-ingester-service-dummy"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1142,8 +1085,7 @@
     "target_repositories": [
       "cadashboardbe-dummy",
       "careportsreceiver-dummy",
-      "event-ingester-service-dummy",
-      "gateway-dummy"
+      "event-ingester-service-dummy"
     ],
     "description": "test security risk vulnerability type, R-0037",
     "skip_on_environment": "",
@@ -1162,8 +1104,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "",
@@ -1285,8 +1226,7 @@
     "target_repositories": [
       "cadashboardbe",
       "careportsreceiver",
-      "event-ingester-service",
-      "gateway"
+      "event-ingester-service"
     ],
     "description": "",
     "skip_on_environment": "production,production-us,custom",

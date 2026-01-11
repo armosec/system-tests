@@ -50,10 +50,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `vuln_scan_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_v2_views`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_v2_views`                                       | helm-chart |                                                                        | kubevuln, backend             |
-| `ks_microservice_ns_creation`                                  | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_mitre_framework_on_demand`                    | helm-chart |                                                                        | in-cluster kubescape, backend |
-| `ks_microservice_nsa_and_mitre_framework_demand`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `ks_microservice_cronjob`               | helm-chart |                                                                        | in-cluster kubescape, backend |
 | `attackchains_all`                | helm-chart |                                    | in-cluster kubescape, backend |
 | `ks_microservice_cronjob_proxy`               | helm-chart |                                                                        | in-cluster kubescape, backend |
