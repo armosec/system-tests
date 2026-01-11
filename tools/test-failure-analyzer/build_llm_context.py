@@ -1293,22 +1293,43 @@ def _gh_env() -> Dict[str, str]:
 
 
 def _gh_api(path: str) -> Optional[Any]:
-    """Call `gh api <path>` and parse JSON output. Returns None on failure."""
-    if not shutil.which("gh"):
-        return None
+    """
+    Call GitHub API. Tries `gh api` first, falls back to direct HTTP if gh not installed.
+    Returns None on failure.
+    """
+    # Try gh CLI first (faster and handles auth automatically)
+    if shutil.which("gh"):
+        try:
+            import subprocess
+            proc = subprocess.run(
+                ["gh", "api", path],
+                capture_output=True,
+                text=True,
+                env=_gh_env(),
+                check=False,
+            )
+            if proc.returncode == 0:
+                return json.loads(proc.stdout or "null")
+        except Exception:
+            pass
+    
+    # Fallback: direct HTTP request
     try:
-        import subprocess
-        proc = subprocess.run(
-            ["gh", "api", path],
-            capture_output=True,
-            text=True,
-            env=_gh_env(),
-            check=False,
-        )
-        if proc.returncode != 0:
-            return None
-        return json.loads(proc.stdout or "null")
-    except Exception:
+        import urllib.request
+        import urllib.error
+        
+        url = f"https://api.github.com/{path}"
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        
+        # Try to get token from environment
+        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        if token:
+            headers["Authorization"] = f"token {token}"
+        
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError, Exception):
         return None
 
 
