@@ -1406,6 +1406,105 @@ def _fetch_repo_file_content(org: str, repo: str, file_path: str, ref: str, max_
         return None
 
 
+def fetch_triggering_repo_diff(
+    found_indexes: Optional[Dict[str, Any]],
+    max_files: int = 30,
+    max_patch_lines_per_file: int = 100,
+) -> Optional[Dict[str, Any]]:
+    """
+    Fetch the git diff for the triggering repo (RC vs deployed).
+    
+    This provides crucial context for the LLM to identify what code changed
+    and potentially caused the test failure.
+    
+    Args:
+        found_indexes: The found-indexes.json data containing commit info
+        max_files: Maximum number of changed files to include
+        max_patch_lines_per_file: Maximum patch lines per file (truncate longer patches)
+    
+    Returns:
+        Dictionary with diff summary and file patches, or None if unavailable
+    """
+    if not found_indexes:
+        return None
+    
+    triggering_repo = found_indexes.get("triggering_repo")
+    if not triggering_repo:
+        return None
+    
+    indexes = found_indexes.get("indexes", {})
+    repo_info = indexes.get(triggering_repo, {})
+    
+    rc_info = repo_info.get("rc", {})
+    deployed_info = repo_info.get("deployed", {})
+    
+    rc_commit = rc_info.get("commit", "")
+    deployed_commit = deployed_info.get("commit", "")
+    org = rc_info.get("github_org") or deployed_info.get("github_org") or "armosec"
+    
+    if not rc_commit or not deployed_commit:
+        return None
+    
+    if rc_commit == deployed_commit:
+        return {"summary": "No changes - RC and deployed commits are identical", "files": []}
+    
+    # Fetch compare data from GitHub
+    endpoint = f"repos/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}"
+    data = _gh_api(endpoint)
+    
+    if not data or not isinstance(data, dict):
+        return {
+            "summary": f"Could not fetch diff from GitHub (commits: {deployed_commit[:8]}...{rc_commit[:8]})",
+            "compare_url": f"https://github.com/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}",
+            "files": []
+        }
+    
+    commits = data.get("commits", [])
+    files = data.get("files", [])
+    
+    # Build summary
+    diff_result = {
+        "triggering_repo": triggering_repo,
+        "deployed_commit": deployed_commit,
+        "rc_commit": rc_commit,
+        "compare_url": f"https://github.com/{org}/{triggering_repo}/compare/{deployed_commit}...{rc_commit}",
+        "total_commits": len(commits),
+        "total_files_changed": len(files),
+        "summary": f"{len(commits)} commits, {len(files)} files changed",
+        "files": []
+    }
+    
+    # Extract file patches (limited)
+    for f in files[:max_files]:
+        if not isinstance(f, dict):
+            continue
+        
+        filename = f.get("filename", "")
+        status = f.get("status", "")
+        additions = f.get("additions", 0)
+        deletions = f.get("deletions", 0)
+        patch = f.get("patch", "")
+        
+        # Truncate long patches
+        patch_lines = patch.splitlines() if patch else []
+        if len(patch_lines) > max_patch_lines_per_file:
+            patch = "\n".join(patch_lines[:max_patch_lines_per_file])
+            patch += f"\n... (truncated, {len(patch_lines) - max_patch_lines_per_file} more lines)"
+        
+        diff_result["files"].append({
+            "filename": filename,
+            "status": status,
+            "additions": additions,
+            "deletions": deletions,
+            "patch": patch
+        })
+    
+    if len(files) > max_files:
+        diff_result["note"] = f"Showing {max_files} of {len(files)} changed files"
+    
+    return diff_result
+
+
 def fetch_dependency_source_snippets(
     code_diffs: Optional[Dict[str, Any]],
     found_indexes: Optional[Dict[str, Any]],
@@ -1968,10 +2067,12 @@ def build_llm_context(
     
     # Load dependency information from found-indexes.json
     dependencies_info = {}
+    found_indexes_data = None  # Will be used for triggering repo diff
     if os.path.exists(found_indexes_path):
         try:
             with open(found_indexes_path, 'r') as f:
-                found_indexes = json.load(f)
+                found_indexes_data = json.load(f)
+                found_indexes = found_indexes_data  # Keep backwards compat for local var
                 dependencies_info = {
                     "total_dependencies": len(found_indexes.get('indexes', {})),
                     "version_changes": [
@@ -2144,6 +2245,19 @@ def build_llm_context(
         "code_chunks": selected,
         "incluster_logs": incluster_logs or {}
     }
+    
+    # Add triggering repo code diff (CRITICAL for root cause analysis)
+    # This shows exactly what changed between deployed and RC versions
+    if found_indexes_data:
+        triggering_diff = fetch_triggering_repo_diff(
+            found_indexes=found_indexes_data,
+            max_files=30,
+            max_patch_lines_per_file=100,
+        )
+        if triggering_diff and triggering_diff.get("files"):
+            context["triggering_repo_diff"] = triggering_diff
+            print(f"   ✅ Added triggering repo diff: {triggering_diff.get('summary', 'N/A')}", file=sys.stderr)
+            sys.stderr.flush()
     
     # Add cross-test interference data if available (this is INPUT context, not a conclusion)
     if cross_test_interference:
