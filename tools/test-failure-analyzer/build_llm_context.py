@@ -34,6 +34,7 @@ import re
 
 # Import dependency detection functions
 from detect_dependencies import analyze_all_chunks, filter_available_indexes
+from extract_call_chain import is_helper_file
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Set
@@ -1207,6 +1208,79 @@ def lookup_chunk_code(chunk_id: str, code_index: Optional[Dict[str, Any]] = None
     return None
 
 
+def get_sibling_chunks_from_file(
+    file_path: str,
+    exclude_chunk_ids: Set[str],
+    code_index: Optional[Dict[str, Any]] = None,
+    extra_indexes: Optional[Dict[str, Dict[str, Any]]] = None,
+    max_per_file: int = 20,
+) -> List[Dict[str, Any]]:
+    """
+    Get all chunks from the same file, excluding already-selected chunks.
+    
+    This implements "file cohesion" - when a helper file is partially selected,
+    we include all functions from that file to ensure complete context.
+    
+    Args:
+        file_path: Path to the file (e.g., "httphandlerv2/ticket_create_helpers.go")
+        exclude_chunk_ids: Set of chunk IDs already selected (to avoid duplicates)
+        code_index: Main code index
+        extra_indexes: Additional code indexes for dependencies
+        max_per_file: Maximum chunks to return per file (safety cap)
+    
+    Returns:
+        List of chunk dictionaries from the same file
+    """
+    if not file_path:
+        return []
+    
+    siblings: List[Dict[str, Any]] = []
+    
+    # Normalize file path for comparison (strip leading ./ or /)
+    normalized_file = file_path.lstrip("./").lstrip("/")
+    
+    def matches_file(chunk_file: str) -> bool:
+        """Check if chunk file matches the target file."""
+        if not chunk_file:
+            return False
+        norm_chunk = chunk_file.lstrip("./").lstrip("/")
+        return norm_chunk == normalized_file or norm_chunk.endswith("/" + normalized_file)
+    
+    # Search in main code index
+    if code_index:
+        for chunk in code_index.get("chunks", []):
+            chunk_id = chunk.get("id") or ""
+            chunk_file = chunk.get("file") or ""
+            if matches_file(chunk_file) and chunk_id not in exclude_chunk_ids:
+                siblings.append({
+                    **chunk,
+                    "source": "file_cohesion",
+                    "priority": 1,  # High priority - same file as selected helper
+                })
+                if len(siblings) >= max_per_file:
+                    return siblings
+    
+    # Search in extra indexes
+    if extra_indexes:
+        for repo_name, idx in extra_indexes.items():
+            if not idx:
+                continue
+            for chunk in idx.get("chunks", []):
+                chunk_id = chunk.get("id") or ""
+                chunk_file = chunk.get("file") or ""
+                if matches_file(chunk_file) and chunk_id not in exclude_chunk_ids:
+                    siblings.append({
+                        **chunk,
+                        "repo_name": repo_name,
+                        "source": "file_cohesion",
+                        "priority": 1,
+                    })
+                    if len(siblings) >= max_per_file:
+                        return siblings
+    
+    return siblings
+
+
 def _gh_env() -> Dict[str, str]:
     """
     Ensure gh CLI has a token in env. GitHub Actions often provides GITHUB_TOKEN,
@@ -1959,10 +2033,11 @@ def build_llm_context(
         sys.stderr.flush()
     
     # Cap total chunks to reduce prompt noise (can be overridden via env var).
+    # Increased from 250 to 400 to accommodate file cohesion expansion.
     try:
-        cap = int(os.environ.get("LLM_CONTEXT_MAX_CHUNKS", "250"))
+        cap = int(os.environ.get("LLM_CONTEXT_MAX_CHUNKS", "400"))
     except Exception:
-        cap = 250
+        cap = 400
     if cap < 50:
         cap = 50
 
@@ -1997,10 +2072,69 @@ def build_llm_context(
             if len(selected) >= cap:
                 break
 
-    # Update metadata counts after capping
+    # FILE COHESION: Expand helper files to include all functions from the same file.
+    # This ensures that if any function from a helper file is selected, all related
+    # functions are included (critical for catching bugs like resolveIssueOwner).
+    helper_files_expanded: List[str] = []
+    helper_chunks_added = 0
+    
+    # Identify helper files that were selected
+    selected_helper_files: Set[str] = set()
+    for c in selected:
+        file_path = c.get("file") or ""
+        if is_helper_file(file_path):
+            selected_helper_files.add(file_path)
+    
+    # Expand each helper file (add sibling chunks)
+    if selected_helper_files and len(selected) < cap:
+        print(f"   🔗 File cohesion: expanding {len(selected_helper_files)} helper files...", file=sys.stderr)
+        sys.stderr.flush()
+        
+        for helper_file in sorted(selected_helper_files):
+            if len(selected) >= cap:
+                break
+            
+            # Get sibling chunks from the same file
+            siblings = get_sibling_chunks_from_file(
+                file_path=helper_file,
+                exclude_chunk_ids=seen_ids,
+                code_index=code_index,
+                extra_indexes=extra_indexes,
+                max_per_file=20,
+            )
+            
+            if siblings:
+                helper_files_expanded.append(helper_file)
+                for sibling in siblings:
+                    if len(selected) >= cap:
+                        break
+                    
+                    # Format the sibling chunk for LLM
+                    repo_name = sibling.get("repo_name") or sibling.get("repo") or repo_mapping.get("default", "cadashboardbe")
+                    formatted_sibling = format_chunk_for_llm(sibling, repo_name)
+                    
+                    cid = str(formatted_sibling.get("id") or "")
+                    key = cid or (formatted_sibling.get("file", "") + ":" + formatted_sibling.get("name", ""))
+                    if key not in seen_ids:
+                        selected.append(formatted_sibling)
+                        seen_ids.add(key)
+                        helper_chunks_added += 1
+        
+        if helper_chunks_added > 0:
+            print(f"      Added {helper_chunks_added} sibling chunks from {len(helper_files_expanded)} helper files", file=sys.stderr)
+            sys.stderr.flush()
+
+    # Update metadata counts after capping and file cohesion
     if len(selected) != len(formatted_chunks):
         metadata["total_chunks_before_cap"] = len(formatted_chunks)
         metadata["total_chunks"] = len(selected)
+    
+    # Track file cohesion in metadata for visibility
+    if helper_files_expanded:
+        metadata["file_cohesion"] = {
+            "helper_files_expanded": helper_files_expanded,
+            "chunks_added": helper_chunks_added,
+        }
 
     context = {
         "metadata": metadata,
