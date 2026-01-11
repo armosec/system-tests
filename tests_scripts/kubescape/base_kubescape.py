@@ -1895,6 +1895,15 @@ class BaseKubescape(BaseK8S):
             time.sleep(10)
         return False
 
+    def is_ks_cronjob_deleted(self, framework_name, timeout=120):
+        start = time.time()
+        err = ""
+        while time.time() - start < timeout:
+            if not self.kubernetes_obj.is_ks_cronjob_created(framework_name=framework_name):
+                return True
+            time.sleep(10)
+        return False
+
     def is_hostsensor_triggered(self, timeout=180):
         start = time.time()
         err = ""

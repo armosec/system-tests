@@ -772,10 +772,12 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         cluster_name = self.kubernetes_obj.get_cluster_name()
         Logger.logger.info("Get old report-guid")
         old_report_guid = self.get_report_guid(cluster_name=cluster_name, wait_to_result=True)
-        # TestUtil.sleep(120, "wait for namespace creation to finished")
+        Logger.logger.info("Port forwarding to kubescape pod")
         pod_name = self.kubernetes_obj.get_kubescape_pod(namespace=statics.CA_NAMESPACE_FROM_HELM_NAME)
         self.port_forward_proc = self.kubernetes_obj.portforward(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                                  pod_name, 8080)
+
+        Logger.logger.info("Starting tests scenarios")
 
         for job in self.test_obj["test_job"]:
             job_type = job["trigger_by"]
@@ -830,8 +832,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         self.test_backend_vs_kubescape_result(report_guid=report_guid, kubescape_result=kubescape_result)
 
     def check_result_with_backend_cronjob(self, job, cluster_name, old_report_guid, port):
-        sleep_time = 120
-
         trigger_by = job["trigger_by"]
         framework_list = None
         if "framework" in job.keys():
@@ -916,9 +916,8 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             self.backend.delete_kubescape_job_request(cluster_name=cluster_name, schedule=cron_job_schedule,
                                                       cronjobs_name=cronjobs_name)
 
-            TestUtil.sleep(sleep_time, "wait till delete cronjob will from backend to finish")
             Logger.logger.info("check if kubescape cronjob deleted")
-            assert not self.is_ks_cronjob_created(framework_list[0]), "kubescape cronjob failed to deleted"
+            assert self.is_ks_cronjob_deleted(framework_list[0]), "kubescape cronjob failed to deleted"
 
 
 class ControlClusterFromCLI(BaseHelm, BaseKubescape):
