@@ -120,7 +120,7 @@ class KubescapeTests(object):
         )
 
     @staticmethod
-    def scan_nsa_and_submit_to_backend():
+    def scan_and_submit_to_backend():
         from tests_scripts.kubescape.scan import ScanAndSubmitToBackend
         return KubescapeConfiguration(
             name=inspect.currentframe().f_code.co_name,
@@ -134,6 +134,7 @@ class KubescapeTests(object):
                 {'kind': 'Namespace', 'name': 'system-test', 'namespace': '', 'apiVersion': 'v1'}],
             yaml="apache.yaml",
             namespace="system-test",
+            custom_framework_file="system-test-framework.json",
             create_test_tenant = True
         )
 
@@ -154,18 +155,6 @@ class KubescapeTests(object):
             ],
             yaml="apache.yaml",
             create_test_tenant=True
-        )
-
-    @staticmethod
-    def scan_with_custom_framework():
-        from tests_scripts.kubescape.scan import ScanWithCustomFramework
-        return KubescapeConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=ScanWithCustomFramework,
-            policy_scope='framework',
-            submit=True,
-            account=True,
-            framework_file="system-test-framework.json"
         )
 
     @staticmethod
