@@ -500,24 +500,61 @@ class KubectlWrapper(object):
         c = subprocess.Popen(cmd, shell=True)
         return c
 
-    def get_ks_cronjob_schedule(self, namespace):
+    def get_ks_cronjob_schedule(self, namespace, framework_name=None):
+        """Get the schedule of a kubescape cronjob.
+        
+        Args:
+            namespace: The namespace to search in
+            framework_name: Optional framework name to filter by. If None, returns first match.
+                          If empty string "", matches cronjobs without a framework suffix.
+        """
         cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan" in cj.metadata.name:
-                return cj.spec._schedule
+                if framework_name is not None:
+                    if self._matches_framework(cj.metadata.name, framework_name):
+                        return cj.spec._schedule
+                else:
+                    return cj.spec._schedule
+        return None
 
-    def get_ks_cronjob_name(self, namespace):
-        cronjobs_name=[]
+    def get_ks_cronjob_name(self, namespace, framework_name=None):
+        """Get the name(s) of kubescape cronjob(s).
+        
+        Args:
+            namespace: The namespace to search in
+            framework_name: Optional framework name to filter by. If None, returns all matches.
+                          If empty string "", matches cronjobs without a framework suffix.
+        """
+        cronjobs_name = []
         cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
             if "ks-scheduled-scan" in cj.metadata.name:
-                cronjobs_name.append(cj.metadata.name)
+                if framework_name is not None:
+                    if self._matches_framework(cj.metadata.name, framework_name):
+                        cronjobs_name.append(cj.metadata.name)
+                else:
+                    cronjobs_name.append(cj.metadata.name)
         return cronjobs_name
 
+    def _matches_framework(self, cronjob_name, framework_name):
+        """Check if a cronjob name matches the given framework.
+        
+        Args:
+            cronjob_name: The name of the cronjob
+            framework_name: The framework name to match. Empty string matches cronjobs 
+                          with "all" as the framework (operator converts "" to "all").
+        """
+        # Operator converts empty framework to "all"
+        target_name = "all" if framework_name == "" else framework_name.lower()
+        return f"ks-scheduled-scan-{target_name}" in cronjob_name
+
     def is_ks_cronjob_created(self, framework_name, namespace=statics.CA_NAMESPACE_FROM_HELM_NAME):
+        # Operator converts empty framework to "all"
+        target_name = "all" if framework_name == "" else framework_name.lower()
         cronjobs = self.run(method=self.client_BatchV1Api.list_namespaced_cron_job, namespace=namespace)
         for cj in cronjobs.items:
-            if "ks-scheduled-scan-{}".format(framework_name.lower()) in cj.metadata.name:
+            if f"ks-scheduled-scan-{target_name}" in cj.metadata.name:
                 return True
         return False
 
