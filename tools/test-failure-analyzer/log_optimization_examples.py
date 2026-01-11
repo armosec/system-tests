@@ -15,7 +15,23 @@ MAX_CHARS = 7000
 SIMILARITY_THRESHOLD = 0.9
 
 
-def deduplicate_logs(snippets: List[str], similarity_threshold: float = 0.9) -> List[str]:
+def _matches_any(text: str, patterns: List[str]) -> bool:
+    """Return True if any regex (or fallback substring) pattern matches the text."""
+    for p in patterns or []:
+        try:
+            if re.search(p, text, flags=re.IGNORECASE):
+                return True
+        except re.error:
+            if p.lower() in text.lower():
+                return True
+    return False
+
+
+def deduplicate_logs(
+    snippets: List[str],
+    similarity_threshold: float = 0.9,
+    preserve_patterns: List[str] = None,
+) -> List[str]:
     """
     Strategy 1: Remove duplicate log lines.
     
@@ -29,6 +45,8 @@ def deduplicate_logs(snippets: List[str], similarity_threshold: float = 0.9) -> 
     seen_logs: List[str] = []
     deduplicated: List[str] = []
     
+    preserve_patterns = preserve_patterns or []
+
     for line in snippets:
         # Normalize for comparison
         normalized = normalize_log_line(line)
@@ -40,6 +58,11 @@ def deduplicate_logs(snippets: List[str], similarity_threshold: float = 0.9) -> 
                 is_duplicate = True
                 break
         
+        # Preserve high-signal lines even if they look like duplicates.
+        if _matches_any(line, preserve_patterns):
+            deduplicated.append(line)
+            continue
+
         if not is_duplicate:
             seen_logs.append(normalized)
             deduplicated.append(line)
@@ -307,7 +330,14 @@ def summarize_logs_heuristic(logs: List[str], max_output_chars: int = 7000) -> s
 
 
 # Example integration function
-def optimize_logs_for_llm(snippets: List[str], max_snippets: int = 500, max_chars: int = 7000) -> List[str]:
+def optimize_logs_for_llm(
+    snippets: List[str],
+    max_snippets: int = 500,
+    max_chars: int = 7000,
+    similarity_threshold: float = 0.9,
+    preserve_patterns: List[str] = None,
+    pinned_max: int = 50,
+) -> List[str]:
     """
     Combined optimization: Apply multiple strategies.
     
@@ -317,9 +347,24 @@ def optimize_logs_for_llm(snippets: List[str], max_snippets: int = 500, max_char
     if not snippets:
         return []
     
-    # Step 1: Deduplicate
-    deduplicated = deduplicate_logs(snippets)
-    print(f"  Deduplication: {len(snippets)} → {len(deduplicated)} logs")
+    preserve_patterns = preserve_patterns or []
+
+    # Step 0: Pin high-signal lines so they don't get dropped by dedup/limits.
+    pinned: List[str] = []
+    remaining: List[str] = []
+    for line in snippets:
+        if _matches_any(line, preserve_patterns) and len(pinned) < pinned_max:
+            pinned.append(line)
+        else:
+            remaining.append(line)
+
+    # Step 1: Deduplicate (keep pinned lines even if duplicates)
+    deduplicated = deduplicate_logs(
+        remaining,
+        similarity_threshold=similarity_threshold,
+        preserve_patterns=preserve_patterns,
+    )
+    print(f"  Deduplication: {len(snippets)} → {len(deduplicated) + len(pinned)} logs")
     
     # Step 2: If still too many, prioritize
     if len(deduplicated) > max_snippets:
@@ -329,15 +374,31 @@ def optimize_logs_for_llm(snippets: List[str], max_snippets: int = 500, max_char
         print(f"  Prioritization: {len(deduplicated)} → {len(prioritized)} logs")
     else:
         prioritized = deduplicated
+
+    # Merge pinned + prioritized, ensuring pinned always stays.
+    if pinned:
+        budget_for_prioritized = max(0, max_snippets - len(pinned))
+        prioritized = prioritized[:budget_for_prioritized]
+        merged = pinned + prioritized
+    else:
+        merged = prioritized
     
     # Step 3: If still too large, summarize
-    total_chars = sum(len(log) for log in prioritized)
+    total_chars = sum(len(log) for log in merged)
     if total_chars > max_chars:
-        summarized_text = summarize_logs_heuristic(prioritized, max_chars)
-        print(f"  Summarization: {len(prioritized)} logs ({total_chars} chars) → 1 summary ({len(summarized_text)} chars)")
+        if pinned:
+            pinned_chars = sum(len(x) for x in pinned)
+            remaining_budget = max(0, max_chars - pinned_chars)
+            # Always return pinned; summarize the rest to fit.
+            summarized_text = summarize_logs_heuristic(prioritized, max(300, remaining_budget))
+            print(f"  Summarization: {len(merged)} logs ({total_chars} chars) → {len(pinned)} pinned + 1 summary")
+            return pinned + [summarized_text]
+
+        summarized_text = summarize_logs_heuristic(merged, max_chars)
+        print(f"  Summarization: {len(merged)} logs ({total_chars} chars) → 1 summary ({len(summarized_text)} chars)")
         return [summarized_text]
-    
-    return prioritized
+
+    return merged
 
 
 if __name__ == "__main__":

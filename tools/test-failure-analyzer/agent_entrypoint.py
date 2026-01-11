@@ -1154,6 +1154,22 @@ def main() -> int:
                 str(error_logs_path),
             ]
 
+            # Provide test source code when available so build_llm_context can detect
+            # expected-failure / true-negative steps (e.g., expect_failure=True).
+            try:
+                src_root = artifacts_dir / "context" / "tests" / "src"
+                test_code_file = None
+                if src_root.exists():
+                    py_files = sorted(src_root.glob("**/*.py"))
+                    if py_files:
+                        test_code_file = py_files[0]
+                if test_code_file and test_code_file.exists():
+                    build_cmd += ["--test-code", str(test_code_file)]
+                    if args.debug:
+                        print(f"[llm] Using test code for LLM context: {test_code_file}")
+            except Exception:
+                pass
+
             # Enrich llm-context with Phase 4/4.5 artifacts when available (parity direction).
             api_map = artifacts_dir / "api-code-map-with-chains.json"
             if api_map.exists():

@@ -177,6 +177,16 @@ def _normalize_legacy_analysis(analysis: dict, response) -> dict:
     analysis["executive_verdict"] = to_str(analysis.get("executive_verdict"))
     analysis["evidence"] = to_list(analysis.get("evidence"))
     analysis["recommended_fix"] = to_list(analysis.get("recommended_fix"))
+    analysis["evidence_quotes"] = to_list(analysis.get("evidence_quotes"))
+
+    # Normalize confidence/category (optional but recommended)
+    conf = str(analysis.get("confidence") or "").strip().lower()
+    if conf not in ("low", "medium", "high"):
+        analysis["confidence"] = "low" if analysis.get("evidence_quotes") else "unknown"
+    cat = str(analysis.get("most_likely_category") or "").strip().lower()
+    allowed = {"aws_auth", "eventual_consistency", "backend_bug", "test_bug", "infra", "unknown"}
+    if cat not in allowed:
+        analysis["most_likely_category"] = "unknown"
 
     impact = analysis.get("impact")
     if not isinstance(impact, dict):
@@ -198,23 +208,89 @@ def build_analysis_context(llm_context, code_diffs=None):
     """
     metadata = llm_context.get('metadata', {})
     test_name = metadata.get('test_name', 'unknown')
-    error_log = llm_context.get('error_log', '')
+    env_name = metadata.get("environment") or "unknown"
+    failing_req = metadata.get("failing_request") or {}
+    primary_sig = (metadata.get("primary_error_signature") or "").strip()
+    evidence_quotes = metadata.get("evidence_quotes") or []
+    instructions = (metadata.get("analysis_instructions_rendered") or metadata.get("analysis_instructions") or "").strip()
+
+    # Correct key is "error_logs" (produced by build_llm_context.py)
+    error_logs = llm_context.get('error_logs', '') or ''
+    test_code = llm_context.get("test_code") or ""
     
     parts = []
-    parts.append(f"Test Name: {test_name}")
-    
-    if error_log:
-        parts.append(f"\nError Log:\n{error_log[:2000]}")
-    
-    code_chunks = llm_context.get('code_chunks', [])
+    parts.append("You are an expert SRE + backend engineer doing postmortem-quality test failure triage.")
+    parts.append("You MUST ground your conclusions in the provided evidence. If evidence is insufficient, say so.")
+    parts.append("")
+    parts.append(f"## Test\n- name: {test_name}\n- environment: {env_name}")
+    if isinstance(failing_req, dict) and failing_req.get("method") and failing_req.get("request_uri"):
+        parts.append(
+            "## Failing request (from logs)\n"
+            f"- {failing_req.get('method')} {failing_req.get('request_uri')} (source={failing_req.get('source')})"
+        )
+    if primary_sig:
+        parts.append(f"## Primary error signature\n{primary_sig}")
+
+    if evidence_quotes and isinstance(evidence_quotes, list):
+        parts.append("## Top Failure Evidence (verbatim)\n```")
+        for ln in evidence_quotes[:12]:
+            parts.append(str(ln))
+        parts.append("```")
+
+    if test_code:
+        parts.append("## Test code (snippet)\n```")
+        parts.append(test_code[:3000] + ("..." if len(test_code) > 3000 else ""))
+        parts.append("```")
+
+    if error_logs:
+        parts.append("## Error logs (excerpt)\n```")
+        parts.append(error_logs[:4000] + ("..." if len(error_logs) > 4000 else ""))
+        parts.append("```")
+
+    if instructions:
+        parts.append("## Analysis instructions (rendered)\n")
+        parts.append(instructions)
+
+    # Code chunks: include fewer but higher signal
+    code_chunks = llm_context.get('code_chunks', []) or []
     if code_chunks:
-        parts.append(f"\nRelevant Code ({len(code_chunks)} chunks):")
-        for chunk in code_chunks[:5]:
-            chunk_id = chunk.get('id', 'unknown')
-            code = chunk.get('code', '')[:300]
-            parts.append(f"\n{chunk_id}:\n{code}")
-    
-    parts.append("\n\nProvide analysis in JSON format with: root_cause, evidence, impact, recommended_fix, executive_verdict")
+        def _score(ch):
+            try:
+                return int(ch.get("priority", 999))
+            except Exception:
+                return 999
+
+        # group: api handlers + system test code first, then rest by priority
+        handlers = [c for c in code_chunks if c.get("source") == "api_handler"]
+        tests = [c for c in code_chunks if c.get("source") == "system_test_code"]
+        rest = [c for c in code_chunks if c.get("source") not in ("api_handler", "system_test_code")]
+        rest.sort(key=_score)
+        selected = handlers[:20] + tests[:20] + rest[:40]
+        parts.append(f"\n## Relevant code chunks (showing {len(selected)} of {len(code_chunks)})")
+        for chunk in selected:
+            chunk_id = chunk.get('id', chunk.get("chunk_id", 'unknown'))
+            repo = chunk.get("repo", "unknown")
+            file_ = chunk.get("file", "")
+            name = chunk.get("name", "")
+            code = (chunk.get('code', '') or '')[:800]
+            parts.append(f"\n### {chunk_id} ({repo}) {file_} {name}\n```")
+            parts.append(code)
+            parts.append("```")
+
+    parts.append(
+        "\n## Output format (STRICT)\n"
+        "Return ONLY a single JSON object (no markdown fences) with keys:\n"
+        "- root_cause: string\n"
+        "- evidence_quotes: array of verbatim lines copied from the 'Top Failure Evidence' / logs\n"
+        "- most_likely_category: one of ['aws_auth','eventual_consistency','backend_bug','test_bug','infra','unknown']\n"
+        "- confidence: one of ['low','medium','high']\n"
+        "- impact: {severity, blast_radius, raw}\n"
+        "- recommended_fix: array of concrete actions (code and/or ops)\n"
+        "- executive_verdict: string\n"
+        "\nRules:\n"
+        "- If you cannot cite at least 2 evidence_quotes for your root_cause, set confidence='low' and category='unknown'.\n"
+        "- Prefer explanations supported by the error logs over unrelated code details.\n"
+    )
     
     return "\n".join(parts)
 
