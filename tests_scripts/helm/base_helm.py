@@ -217,10 +217,13 @@ class BaseHelm(BaseK8S):
         # Determine which repository to clone for charts. Prefer explicit --kwargs charts_repo,
         # then the GITHUB_REPOSITORY environment variable (set in GH Actions), otherwise fallback.
         charts_repo_input = self.test_driver.kwargs.get("charts_repo")
+        current_repo = os.environ.get("GITHUB_REPOSITORY", "")
         if charts_repo_input:
             charts_repo = charts_repo_input
+        elif "helm-charts" in current_repo:
+            charts_repo = current_repo
         else:
-            charts_repo = os.environ.get("GITHUB_REPOSITORY", "kubescape/helm-charts")
+            charts_repo = "kubescape/helm-charts"
 
         if (
             charts_repo.startswith("http://")
