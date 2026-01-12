@@ -80,9 +80,9 @@ dist/
 # Files NOT in code index (auto-generated list)
 # These source files exist but aren't indexed as relevant code chunks
 
-.github/workflows/scripts/json_validator.py
+shared-rules/templates/.cursorrules.go
 
 # Statistics:
-#   Indexed files: 176
+#   Indexed files: 6
 #   Excluded files: 1
-#   Total indexed-extension files: 177
+#   Total indexed-extension files: 7
