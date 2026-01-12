@@ -165,7 +165,6 @@ jobs:
 
       - name: Commit code index and .cursorignore (if changed)
         if: |
-          (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) ||
           (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'auto-update-index'))
         run: |
           set -euo pipefail
@@ -240,8 +239,8 @@ jobs:
             echo "✅ No changes to commit"
           fi
 
-      - name: Fail if index is stale (tags / manual)
-        if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.event_name != 'push'
+      - name: Fail if index is stale (default branch / merge queue / tags / manual)
+        if: github.event_name != 'pull_request'
         run: |
           set -euo pipefail
           if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
@@ -262,8 +261,8 @@ jobs:
             exit 1
           fi
 
-      - name: Fail if index is stale (fork PRs)
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+      - name: Fail if index is stale (PRs without auto-update-index label or fork PRs)
+        if: github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || !contains(github.event.pull_request.labels.*.name, 'auto-update-index'))
         run: |
           set -euo pipefail
           if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
@@ -271,11 +270,14 @@ jobs:
             echo "This repo requires docs/indexes/code-index.json (and .cursorignore) to be up to date."
             echo ""
             echo "Fix options:"
-            echo "  - This PR is from a fork, so the workflow cannot push commits back to your branch."
-            echo "  - Please run the index generator locally and commit the results."
-            echo "    Run (Go):     go run ./shared-rules/scripts/code-indexing/indexgen docs/indexes/code-index.json ."
-          echo "    Run (Python): python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
-            echo "    Then: go run ./shared-rules/scripts/code-indexing/gen-cursorignore -index docs/indexes/code-index.json -output .cursorignore -root ."
+            echo "  - If you want CI to auto-update your PR branch: add the label 'auto-update-index'."
+            echo "    (Only works for non-fork PRs.)"
+            echo "  - Otherwise: run the index generator locally and commit the results."
+            echo ""
+            echo "Local commands:"
+            echo "  Run (Go):     (cd shared-rules && go run ./scripts/code-indexing/indexgen ../docs/indexes/code-index.json ..)"
+            echo "  Run (Python): python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
+            echo "  Then:         (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore -index ../docs/indexes/code-index.json -output ../.cursorignore -root ..)"
             exit 1
           fi
 
