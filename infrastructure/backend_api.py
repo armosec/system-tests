@@ -1584,14 +1584,17 @@ class ControlPanelAPI(object):
         return self.ws_extract_receive(ws)
 
     @staticmethod
-    def get_cron_job_schedule():
+    def get_cron_job_schedule(existing_schedule=None):
         now = datetime.utcnow()
         hour_of_schedual = now.hour
         minute_of_schedual = now.minute
         if now.minute >= 58:
             hour_of_schedual = (hour_of_schedual + 1) % 24
         minute_of_schedual = (now.minute + 2) % 60
-        return "{} {} * * *".format(minute_of_schedual, hour_of_schedual)
+        generated_schedule = "{} {} * * *".format(minute_of_schedual, hour_of_schedual)
+        if existing_schedule and existing_schedule == generated_schedule:
+            generated_schedule = "{} {} * * *".format(minute_of_schedual + 1, hour_of_schedual)
+        return generated_schedule
 
     def create_kubescape_job_request(self, cluster_name, trigger_by="job", framework_list=[""],
                                      with_host_sensor="true"):
@@ -1781,13 +1784,13 @@ class ControlPanelAPI(object):
                     statics.CA_VULN_SCAN_CRONJOB_NAME_FILED].startswith(
                     "kubescape-scheduler"), f"ks-scheduled-scan- or kubescape-scheduler not in name: {cronjobs}"
 
-    def update_kubescape_job_request(self, cluster_name, cronjobs_name):
+    def update_kubescape_job_request(self, cluster_name, cronjobs_name, existing_schedule):
         params = {"customerGUID": self.selected_tenant_id}
         body = []
         for cj in cronjobs_name:
             id = "wlid://cluster-{}/namespace-{}/cronjob-{}".format(cluster_name, statics.CA_NAMESPACE_FROM_HELM_NAME,
                                                                     cj)
-            schedule_string = self.get_cron_job_schedule()
+            schedule_string = self.get_cron_job_schedule(existing_schedule)
             body.append({"clusterName": cluster_name, "cronTabSchedule": schedule_string, "id": id, "name": cj})
         r = self.put(API_POSTURE_SCAN, params=params, json=body)
         if not 200 <= r.status_code < 300:

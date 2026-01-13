@@ -738,10 +738,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         }
 
     def start(self):
-        # Temporary disable test 
-        if self.test_obj.get_arg("test_job")[0]["trigger_by"] == "cronjob":
-            return statics.SUCCESS, ""
-
         assert self.backend != None
         f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
@@ -892,7 +888,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
             cronjobs_name = self.kubernetes_obj.get_ks_cronjob_name(
                 statics.CA_NAMESPACE_FROM_HELM_NAME, framework_name=framework_list[0]
             )
-            self.backend.update_kubescape_job_request(cluster_name=cluster_name, cronjobs_name=cronjobs_name)
+            self.backend.update_kubescape_job_request(cluster_name=cluster_name, cronjobs_name=cronjobs_name, existing_schedule=cron_job_schedule)
 
             # Schedule update propagation is eventually consistent (backend → cluster).
             # Poll for the schedule to change instead of a fixed sleep to reduce flakes.
@@ -902,7 +898,7 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
                 )
                 assert new_schedule is not None, "kubescape cronjob schedule not found yet"
                 assert new_schedule != cron_job_schedule, (
-                    f"kubescape schedule string is not changed yet (still '{new_schedule}', old '{cron_job_schedule}')"
+                    f"kubescape schedule string is not changed yet (still '{cron_job_schedule}')"
                 )
                 return True
 
