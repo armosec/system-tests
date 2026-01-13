@@ -8,24 +8,6 @@ from systest_utils import statics
 class VulnerabilityScanningTests(object):
 
     @staticmethod
-    def vuln_scan_proxy():
-        from tests_scripts.helm.vuln_scan import VulnerabilityScanningProxy
-        from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
-        from os.path import join
-        return TestConfiguration(
-            name=inspect.currentframe().f_code.co_name,
-            test_obj=VulnerabilityScanningProxy,
-            services=join(DEFAULT_SERVICE_PATH, "wikijs"),
-            secret="wikijs.yaml",
-            config_maps=join(DEFAULT_CONFIGMAP_PATH, "wikijs"),
-            deployments=join(DEFAULT_DEPLOYMENT_PATH, "wikijs"),
-            database=supported_systemsAPI.WikiJS,
-            expected_results="wikijs.json",
-            helm_kwargs={statics.HELM_NODE_SBOM_GENERATION: statics.HELM_NODE_SBOM_GENERATION_DISABLED},
-            proxy_config={"helm_proxy_url": statics.HELM_PROXY_URL}
-        )
-
-    @staticmethod
     def vuln_v2_views():
         from tests_scripts.helm.vuln_scan import VulnerabilityV2Views
         from systest_utils.statics import DEFAULT_DEPLOYMENT_PATH, DEFAULT_SERVICE_PATH, DEFAULT_CONFIGMAP_PATH
