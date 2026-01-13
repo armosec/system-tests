@@ -231,6 +231,93 @@ def download_artifact(repo: str, artifact_name: str, output_dir: str, github_tok
         return None
 
 
+def download_release_asset(repo: str, release_tag: str, asset_name: str, output_dir: str, github_token: str, github_org: str, debug: bool = False) -> Optional[str]:
+    """
+    Download an asset from a GitHub Release.
+    
+    Args:
+        repo: Repository name (e.g., 'cadashboardbe')
+        release_tag: Release tag (e.g., 'v1.2.3')
+        asset_name: Name of the asset file (e.g., 'code-index.json')
+        output_dir: Directory to save the downloaded file
+        github_token: GitHub API token
+        github_org: GitHub organization
+        debug: Enable debug output
+    
+    Returns:
+        Path to downloaded file, or None if not found
+    """
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {github_token}",
+        "User-Agent": "test-failure-analyzer/1.0"
+    }
+    
+    if debug:
+        print(f"  📡 Searching for release asset: {asset_name} in release {release_tag}")
+    
+    try:
+        # Get release by tag
+        api_url = f"https://api.github.com/repos/{github_org}/{repo}/releases/tags/{release_tag}"
+        resp = requests.get(api_url, headers=headers, timeout=30)
+        
+        if resp.status_code != 200:
+            if debug:
+                print(f"  ❌ Release {release_tag} not found: {resp.status_code}")
+            return None
+        
+        release_data = resp.json()
+        assets = release_data.get('assets', [])
+        
+        # Find the asset by name
+        target_asset = None
+        for asset in assets:
+            if asset.get('name') == asset_name:
+                target_asset = asset
+                break
+        
+        if not target_asset:
+            if debug:
+                print(f"  ❌ Asset {asset_name} not found in release {release_tag}")
+                if assets:
+                    print(f"     Available assets: {[a.get('name') for a in assets]}")
+            return None
+        
+        asset_id = target_asset.get('id')
+        if debug:
+            print(f"  ✅ Found asset (ID: {asset_id})")
+            print(f"  📥 Downloading...")
+        
+        # Download asset (need to use application/octet-stream for binary download)
+        download_headers = headers.copy()
+        download_headers["Accept"] = "application/octet-stream"
+        download_url = f"https://api.github.com/repos/{github_org}/{repo}/releases/assets/{asset_id}"
+        download_resp = requests.get(download_url, headers=download_headers, timeout=120, allow_redirects=True)
+        
+        if download_resp.status_code != 200:
+            if debug:
+                print(f"  ❌ Download failed: {download_resp.status_code}")
+            return None
+        
+        # Save file
+        os.makedirs(output_dir, exist_ok=True)
+        file_path = Path(output_dir) / asset_name
+        
+        with open(file_path, 'wb') as f:
+            f.write(download_resp.content)
+        
+        if debug:
+            size = file_path.stat().st_size / 1024 / 1024
+            print(f"  ✅ Downloaded: {file_path} ({size:.1f} MB)")
+        
+        return str(file_path)
+    
+    except Exception as e:
+        if debug:
+            print(f"  ❌ Error downloading release asset: {e}")
+        return None
+
+
 def get_commit_for_tag(repo_full_name: str, tag: str, github_token: str, debug: bool = False) -> Optional[str]:
     """Get commit SHA for a Git tag using GitHub API."""
     try:
@@ -314,50 +401,29 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         if triggering_commit:
             print(f"   Triggering commit: {triggering_commit}")
     
-    # Strategy 1: Try triggering commit directly (if provided from workflow context)
-    # This is the most reliable since it's the actual commit that triggered the workflow
+    # Strategy 1: RC tag artifact (preferred when available)
+    # After moving to merge-only + workflow_call generation, we expect code-index-{rc_version} to exist.
+    if rc_version:
+        if debug:
+            print(f"\n📋 Strategy 1: RC tag artifact (code-index-{rc_version})")
+        artifact_name = f"code-index-{rc_version}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
+        if index_path:
+            return index_path, "rc_tag"
+
+    # Strategy 2: Try triggering commit directly (if provided from workflow context)
+    # This is the most reliable fallback since it's the actual commit that triggered the workflow
     if triggering_commit and len(triggering_commit) >= 7:
         if debug:
-            print(f"\n📋 Strategy 1: Commit-based resolution (commit {triggering_commit[:8]})")
+            print(f"\n📋 Strategy 2: Commit-based resolution (commit {triggering_commit[:8]})")
         
         artifact_name = f"code-index-{triggering_commit}"
         index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
         if index_path:
             return index_path, "commit_direct"
     
-    # Strategy 2: PR-based resolution (only if no triggering commit available)
-    # NOTE: RC versions may contain workflow run IDs instead of PR numbers
-    # The extract_pr_from_rc function filters out run IDs (>= 10,000,000)
-    pr_number = extract_pr_from_rc(rc_version)
-    if pr_number:
-        if debug:
-            print(f"\n📋 Strategy 2: PR-based resolution (PR #{pr_number})")
-        
-        commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
-        if commit:
-            artifact_name = f"code-index-{commit}"
-            index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-            if index_path:
-                return index_path, "pr_commit"
-    elif debug:
-        # Log why PR-based resolution was skipped
-        match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
-        if match:
-            number = int(match.group(1))
-            if number >= 10000000:
-                print(f"\n📋 Strategy 2: Skipping PR-based resolution (suffix {number} is a workflow run ID, not a PR number)")
-    
-    # Strategy 3: Fallback to latest
-    if debug:
-        print(f"\n📋 Strategy 3: Falling back to latest")
-    
-    artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-    if index_path:
-        if debug:
-            print(f"  ⚠️  Using latest index (may not match RC exactly)")
-        return index_path, "latest_fallback"
-    
+    # NOTE: Removed PR-based and latest fallbacks for determinism.
+    # If we couldn't resolve by tag or commit, fail explicitly.
     return None, "failed"
 
 
@@ -372,18 +438,26 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
         print(f"\n🔍 Resolving deployed index for {repo}...")
         print(f"   Version: {version}")
     
-    # Strategy 1: Version tag
+    # Strategy 1: Version tag artifact (workflow artifact)
     if debug:
-        print(f"\n📋 Strategy 1: Version tag")
+        print(f"\n📋 Strategy 1: Version tag artifact")
     
     artifact_name = f"code-index-{version}"
     index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
     if index_path:
         return index_path, "version_tag"
     
-    # Strategy 2: Get commit from Git tag and try code-index-{commit}
+    # Strategy 2: Release asset (code-index.json attached to GitHub Release)
     if debug:
-        print(f"\n📋 Strategy 2: Getting commit from Git tag and trying code-index-{{commit}}")
+        print(f"\n📋 Strategy 2: GitHub Release asset")
+    
+    index_path = download_release_asset(repo, version, "code-index.json", f"{output_dir}/{repo}-deployed", github_token, github_org, debug)
+    if index_path:
+        return index_path, "release_asset"
+    
+    # Strategy 3: Get commit from Git tag and try code-index-{commit}
+    if debug:
+        print(f"\n📋 Strategy 3: Getting commit from Git tag and trying code-index-{{commit}}")
     
     repo_full_name = f"{github_org}/{repo}"
     tag_commit = get_commit_for_tag(repo_full_name, version, github_token, debug)
@@ -399,7 +473,7 @@ def resolve_deployed_index(repo: str, version: str, output_dir: str, github_toke
     # Falling back to latest could use a PR commit, which would give wrong go.mod dependencies
     if debug:
         print(f"\n❌ No code index found for deployed version {version}")
-        print(f"   Tried: code-index-{version}, code-index-{tag_commit[:8] if tag_commit else 'N/A'}")
+        print(f"   Tried: code-index-{version} artifact, release asset, code-index-{tag_commit[:8] if tag_commit else 'N/A'}")
         print(f"   Will NOT use code-index-latest (must match deployed version exactly)")
         print(f"   This ensures go.mod dependencies match the actual deployed version")
     
