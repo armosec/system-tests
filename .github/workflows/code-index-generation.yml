@@ -2,16 +2,14 @@ name: Generate Code Index
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main   # Trigger on merge to main (for release workflow)
+      - master # Trigger on merge to master (for release workflow)
     tags:
-      - 'v*.*.*'  # Trigger on version tags
-    paths-ignore:
-      - '**/README.md'
-      - '**.md'
+      - 'v*.*.*'  # Trigger on version tags only (direct releases)
   workflow_dispatch:  # Allow manual trigger for testing
 
-  # Allow callers (triggering repo workflows) to generate an index for a specific commit/tag name.
-  # This is used to create artifacts like: code-index-rc-vX.Y.Z-NNN (and/or code-index-vX.Y.Z).
+  # Called from merge workflow to generate index with RC tag name (when RC_TAG is needed).
   workflow_call:
     inputs:
       TAG_NAME:
@@ -38,15 +36,15 @@ jobs:
       GOPRIVATE: github.com/armosec,github.com/kubescape
     steps:
       - name: Checkout repository (push / tag / manual)
-        if: github.event_name != 'workflow_call'
+        if: inputs.COMMIT_SHA == ''
         uses: actions/checkout@v4
         with:
           token: ${{ env.GH_ACCESS_TOKEN }}
           submodules: recursive
           fetch-depth: 0
 
-      - name: Checkout repository (workflow_call)
-        if: github.event_name == 'workflow_call'
+      - name: Checkout repository (workflow_call with COMMIT_SHA)
+        if: inputs.COMMIT_SHA != ''
         uses: actions/checkout@v4
         with:
           token: ${{ env.GH_ACCESS_TOKEN }}
@@ -212,7 +210,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Index by Tag Name (workflow_call)
-        if: github.event_name == 'workflow_call'
+        if: inputs.TAG_NAME != ''
         uses: actions/upload-artifact@v4
         with:
           name: code-index-${{ inputs.TAG_NAME }}
@@ -241,9 +239,9 @@ jobs:
             echo "   Retention: 90 days"
             echo "   ⭐ This is a release build!"
           fi
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          if [[ -n "${{ inputs.TAG_NAME }}" ]]; then
             echo "3. code-index-${{ inputs.TAG_NAME }}"
-            echo "   Purpose: Find by provided tag name (workflow_call)"
+            echo "   Purpose: Find by provided tag name (RC tag)"
             echo "   Retention: 90 days"
           fi
           echo ""

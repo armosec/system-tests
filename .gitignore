@@ -29,3 +29,5 @@ creds_file.prod.json
 # Cursor shared rules symlink (created by install script)
 .cursor/shared-rules
 .tmp
+# Claude shared commands symlink (created by install script)
+.claude/commands/shared
