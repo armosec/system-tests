@@ -1,13 +1,6 @@
 name: Generate Code Index
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
-    branches: [main, master]
-    paths-ignore:
-      - '**/README.md'
-      - '**.md'
-  merge_group:
   push:
     branches: [main, master]
     tags:
@@ -17,8 +10,21 @@ on:
       - '**.md'
   workflow_dispatch:  # Allow manual trigger for testing
 
+  # Allow callers (triggering repo workflows) to generate an index for a specific commit/tag name.
+  # This is used to create artifacts like: code-index-rc-vX.Y.Z-NNN (and/or code-index-vX.Y.Z).
+  workflow_call:
+    inputs:
+      TAG_NAME:
+        description: 'Artifact tag name to use (e.g., rc-v1.2.3-456 or v1.2.3)'
+        type: string
+        required: true
+      COMMIT_SHA:
+        description: 'Commit SHA to checkout and index'
+        type: string
+        required: true
+
 concurrency:
-  group: code-index-${{ github.event.pull_request.head.ref || github.ref }}
+  group: code-index-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -31,23 +37,22 @@ jobs:
     env:
       GOPRIVATE: github.com/armosec,github.com/kubescape
     steps:
-      - name: Checkout repository (PR head)
-        if: github.event_name == 'pull_request'
+      - name: Checkout repository (push / tag / manual)
+        if: github.event_name != 'workflow_call'
         uses: actions/checkout@v4
         with:
           token: ${{ env.GH_ACCESS_TOKEN }}
           submodules: recursive
           fetch-depth: 0
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Checkout repository (merge_group / tag / manual)
-        if: github.event_name != 'pull_request'
+      - name: Checkout repository (workflow_call)
+        if: github.event_name == 'workflow_call'
         uses: actions/checkout@v4
         with:
           token: ${{ env.GH_ACCESS_TOKEN }}
           submodules: recursive
           fetch-depth: 0
+          ref: ${{ inputs.COMMIT_SHA }}
 
       - name: Configure Git for private repos
         run: |
@@ -163,145 +168,26 @@ jobs:
           
           echo "✅ Validation passed"
 
-      - name: Commit code index and .cursorignore (if changed)
-        if: |
-          (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) ||
-          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'auto-update-index'))
+      - name: Commit code index and .cursorignore
+        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
         run: |
-          set -euo pipefail
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Check what changed (handles both new untracked files and modified tracked files)
-          INDEX_CHANGED=false
-          CURSORIGNORE_CHANGED=false
-          
-          # Check if code-index.json is new (untracked) or changed (modified)
-          if [ -f "docs/indexes/code-index.json" ]; then
-            if git ls-files --error-unmatch docs/indexes/code-index.json >/dev/null 2>&1; then
-              # File is tracked, check if modified
-              if ! git diff --quiet docs/indexes/code-index.json; then
-                INDEX_CHANGED=true
-              fi
-            else
-              # File is untracked (new)
-              INDEX_CHANGED=true
-            fi
-            if [ "$INDEX_CHANGED" = true ]; then
-              git add docs/indexes/code-index.json
-            fi
+          # Check if there are changes to commit
+          if git diff --quiet docs/indexes/code-index.json .cursorignore 2>/dev/null; then
+            echo "No changes to commit"
+            exit 0
           fi
           
-          # Check if .cursorignore is new (untracked) or changed (modified)
-          if [ -f ".cursorignore" ]; then
-            if git ls-files --error-unmatch .cursorignore >/dev/null 2>&1; then
-              # File is tracked, check if modified
-              if ! git diff --quiet .cursorignore; then
-                CURSORIGNORE_CHANGED=true
-              fi
-            else
-              # File is untracked (new)
-              CURSORIGNORE_CHANGED=true
-            fi
-            if [ "$CURSORIGNORE_CHANGED" = true ]; then
-              git add .cursorignore
-            fi
-          fi
-          
-          # Commit if anything changed
-          if [ "$INDEX_CHANGED" = true ] || [ "$CURSORIGNORE_CHANGED" = true ]; then
-            COMMIT_MSG="chore: auto-update code index [skip ci]"
-            if [ "$INDEX_CHANGED" = true ] && [ "$CURSORIGNORE_CHANGED" = true ]; then
-              COMMIT_MSG="chore: auto-update code index and .cursorignore [skip ci]"
-            elif [ "$INDEX_CHANGED" = true ]; then
-              COMMIT_MSG="chore: auto-update code index [skip ci]"
-            else
-              COMMIT_MSG="chore: auto-update .cursorignore [skip ci]"
-            fi
+          git add docs/indexes/code-index.json .cursorignore
+          git commit -m "chore: update code index [skip ci]" || echo "Nothing to commit"
+          git push || echo "::warning::Failed to push code index commit"
 
-            git commit -m "$COMMIT_MSG"
-
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
-              echo "Pushing index update back to PR branch: ${{ github.event.pull_request.head.ref }}"
-              git push origin HEAD:${{ github.event.pull_request.head.ref }}
-            else
-              echo "Pushing index update back to branch: ${{ github.ref_name }}"
-              git push origin HEAD:${{ github.ref }}
-            fi
-
-            echo "✅ Committed & pushed changes:"
-            if [ "$INDEX_CHANGED" = true ]; then
-              echo "   - docs/indexes/code-index.json"
-            fi
-            if [ "$CURSORIGNORE_CHANGED" = true ]; then
-              echo "   - .cursorignore"
-            fi
-          else
-            echo "✅ No changes to commit"
-          fi
-
-      - name: Fail if index is stale (tags / manual)
-        if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.event_name != 'push'
-        run: |
-          set -euo pipefail
-          if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
-            echo "::error::Generated code index differs from what is committed."
-            echo "This repo requires docs/indexes/code-index.json (and .cursorignore) to be up to date."
-            echo ""
-            echo "Fix options:"
-            echo "  - Update the PR branch that is being merged (regenerate index + commit)."
-            echo "  - If you use Merge Queue: rebase/update your PR branch and rerun checks."
-            echo ""
-            echo "Local commands:"
-            echo "  # Go (run from shared-rules module):"
-            echo "  (cd shared-rules && go run ./scripts/code-indexing/indexgen ../docs/indexes/code-index.json ..)"
-            echo "  # Python:"
-            echo "  python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
-            echo "  # .cursorignore (works for Go+Python repos):"
-            echo "  (cd shared-rules && go run ./scripts/code-indexing/gen-cursorignore -index ../docs/indexes/code-index.json -output ../.cursorignore -root ..)"
-            exit 1
-          fi
-
-      - name: Fail if index is stale (fork PRs)
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
-        run: |
-          set -euo pipefail
-          if ! git diff --quiet -- docs/indexes/code-index.json .cursorignore; then
-            echo "::error::Generated code index differs from what is committed."
-            echo "This repo requires docs/indexes/code-index.json (and .cursorignore) to be up to date."
-            echo ""
-            echo "Fix options:"
-            echo "  - This PR is from a fork, so the workflow cannot push commits back to your branch."
-            echo "  - Please run the index generator locally and commit the results."
-            echo "    Run (Go):     go run ./shared-rules/scripts/code-indexing/indexgen docs/indexes/code-index.json ."
-          echo "    Run (Python): python3 ./shared-rules/scripts/code-indexing/pyindexgen/pyindexgen.py docs/indexes/code-index.json ."
-            echo "    Then: go run ./shared-rules/scripts/code-indexing/gen-cursorignore -index docs/indexes/code-index.json -output .cursorignore -root ."
-            exit 1
-          fi
-
-      - name: Get Latest Commit SHA (after code index commit)
-        id: get-commit
-        run: |
-          # After committing the code index (if changed), get the current HEAD SHA
-          # If code index didn't change, this will be github.sha (the merge commit)
-          # If code index changed, this will be the new commit that includes the index
-          LATEST_SHA=$(git rev-parse HEAD)
-          echo "latest-sha=$LATEST_SHA" >> $GITHUB_OUTPUT
-          echo "📌 Current HEAD SHA: ${LATEST_SHA:0:8}"
-          
-          if [ "$LATEST_SHA" != "${{ github.sha }}" ]; then
-            echo "   ✅ Code index was committed (new SHA created)"
-            echo "   This commit includes the code index"
-          else
-            echo "   ℹ️  Code index didn't change (no new commit)"
-          fi
-          
-          echo "   Artifact will be named: code-index-$LATEST_SHA"
-
-      - name: Upload Index by Commit Hash (commit with code index)
+      - name: Upload Index by Commit Hash
         uses: actions/upload-artifact@v4
         with:
-          name: code-index-${{ steps.get-commit.outputs.latest-sha }}
+          name: code-index-${{ github.sha }}
           path: |
             docs/indexes/code-index.json
             docs/indexes/versions/*.json
@@ -321,6 +207,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: code-index-${{ github.ref_name }}
+          path: docs/indexes/code-index.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload Index by Tag Name (workflow_call)
+        if: github.event_name == 'workflow_call'
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-index-${{ inputs.TAG_NAME }}
           path: docs/indexes/code-index.json
           retention-days: 90
           if-no-files-found: error
@@ -346,7 +241,12 @@ jobs:
             echo "   Retention: 90 days"
             echo "   ⭐ This is a release build!"
           fi
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            echo "3. code-index-${{ inputs.TAG_NAME }}"
+            echo "   Purpose: Find by provided tag name (workflow_call)"
+            echo "   Retention: 90 days"
+          fi
           echo ""
-          echo "✅ .cursorignore auto-generated and committed"
+          echo "✅ .cursorignore generated"
           echo "================================="
 
