@@ -47,7 +47,6 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `host_scanner`                                                 | kubescape  | scan with host scanner                                                 | kubescape                     |
 | `host_scanner_with_hostsensorrule`                             | kubescape  | scan with host scanner using rules with `hostSensorRule: true`         | kubescape                     |
 | `vuln_scan`                                       | helm-chart |                                                                        | kubevuln, backend             |
-| `vuln_scan_proxy`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_v2_views`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `vuln_v2_views`                                       | helm-chart |                                                                        | kubevuln, backend             |
 | `ks_microservice_on_demand`                                    | helm-chart |                                                                        | in-cluster kubescape, backend |
@@ -63,7 +62,7 @@ Please ensure all these details are accurately filled to maintain the effectiven
 | `user_alert_channels`                                          | users-notification |                                                                | notifications, backend             |
 | `synchronizer`                      | helm-chart |  synchronizer happy flow    | in-cluster synchronizer, backend |
 | `synchronizer_reconciliation`       | helm-chart |  synchronizer reconciliation flow | in-cluster synchronizer, backend |
-| `synchronizer_proxy`                | helm-chart |  synchronizer network disconnection and proxy | in-cluster synchronizer, backend |
+| `proxy_integration_test`            | helm-chart |  proxy integration test (synchronizer, kubescape through proxy) | in-cluster synchronizer, kubescape, backend |
 | `sr_r_0035_attack_chain`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `sr_r_0005_control`             | helm-chart |                                    | in-cluster kubescape, backend |
 | `sr_r_0007_control_networkpolicy`             | helm-chart |                                    | in-cluster kubescape, backend |

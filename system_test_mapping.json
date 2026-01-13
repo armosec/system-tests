@@ -1643,7 +1643,7 @@
       "storage",
       "synchronizer"
     ],
-    "description": "Combined proxy test that verifies synchronizer, vulnerability scanning, and kubescape control scanning all work through proxy. Merges vuln_scan_proxy, synchronizer_proxy, and ks_microservice_create_2_cronjob_mitre_and_nsa_proxy into one test.",
+    "description": "Combined proxy test that verifies synchronizer, vulnerability scanning, and kubescape control scanning all work through proxy. Simplified proxy test that verifies basic proxy functionality.",
     "skip_on_environment": "",
     "owner": "amirm@armosec.io",
     "test_implementation_files": [
