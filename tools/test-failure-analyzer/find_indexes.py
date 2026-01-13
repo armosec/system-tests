@@ -314,50 +314,29 @@ def resolve_rc_index(repo: str, rc_version: str, output_dir: str, github_token: 
         if triggering_commit:
             print(f"   Triggering commit: {triggering_commit}")
     
-    # Strategy 1: Try triggering commit directly (if provided from workflow context)
-    # This is the most reliable since it's the actual commit that triggered the workflow
+    # Strategy 1: RC tag artifact (preferred when available)
+    # After moving to merge-only + workflow_call generation, we expect code-index-{rc_version} to exist.
+    if rc_version:
+        if debug:
+            print(f"\n📋 Strategy 1: RC tag artifact (code-index-{rc_version})")
+        artifact_name = f"code-index-{rc_version}"
+        index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
+        if index_path:
+            return index_path, "rc_tag"
+
+    # Strategy 2: Try triggering commit directly (if provided from workflow context)
+    # This is the most reliable fallback since it's the actual commit that triggered the workflow
     if triggering_commit and len(triggering_commit) >= 7:
         if debug:
-            print(f"\n📋 Strategy 1: Commit-based resolution (commit {triggering_commit[:8]})")
+            print(f"\n📋 Strategy 2: Commit-based resolution (commit {triggering_commit[:8]})")
         
         artifact_name = f"code-index-{triggering_commit}"
         index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
         if index_path:
             return index_path, "commit_direct"
     
-    # Strategy 2: PR-based resolution (only if no triggering commit available)
-    # NOTE: RC versions may contain workflow run IDs instead of PR numbers
-    # The extract_pr_from_rc function filters out run IDs (>= 10,000,000)
-    pr_number = extract_pr_from_rc(rc_version)
-    if pr_number:
-        if debug:
-            print(f"\n📋 Strategy 2: PR-based resolution (PR #{pr_number})")
-        
-        commit = get_pr_head_commit(repo, pr_number, github_token, github_org, debug)
-        if commit:
-            artifact_name = f"code-index-{commit}"
-            index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-            if index_path:
-                return index_path, "pr_commit"
-    elif debug:
-        # Log why PR-based resolution was skipped
-        match = re.match(r'rc-v\d+\.\d+\.\d+-(\d+)', rc_version)
-        if match:
-            number = int(match.group(1))
-            if number >= 10000000:
-                print(f"\n📋 Strategy 2: Skipping PR-based resolution (suffix {number} is a workflow run ID, not a PR number)")
-    
-    # Strategy 3: Fallback to latest
-    if debug:
-        print(f"\n📋 Strategy 3: Falling back to latest")
-    
-    artifact_name = "code-index-latest"
-    index_path = download_artifact(repo, artifact_name, f"{output_dir}/{repo}-rc", github_token, github_org, debug)
-    if index_path:
-        if debug:
-            print(f"  ⚠️  Using latest index (may not match RC exactly)")
-        return index_path, "latest_fallback"
-    
+    # NOTE: Removed PR-based and latest fallbacks for determinism.
+    # If we couldn't resolve by tag or commit, fail explicitly.
     return None, "failed"
 
 
