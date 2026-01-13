@@ -738,10 +738,6 @@ class ScanWithKubescapeAsServiceTest(BaseHelm, BaseKubescape):
         }
 
     def start(self):
-        # Temporary disable test 
-        if self.test_obj.get_arg("test_job")[0]["trigger_by"] == "cronjob":
-            return statics.SUCCESS, ""
-
         assert self.backend != None
         f'the test {self.test_driver.test_name} must run with backend'
         # test Agenda:
