@@ -1,5 +1,5 @@
 kind: SeccompProfile
-apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+apiVersion: kubescape.io/v1
 metadata:
   name: replicaset-nginx-77b4fdf86c
 spec:
