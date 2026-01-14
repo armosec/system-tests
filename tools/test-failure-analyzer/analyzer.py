@@ -1455,6 +1455,8 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
     # per-failure bundles
     for idx, fentry in enumerate(failures, start=1):
         name_safe = re.sub(r"[^A-Za-z0-9._-]+", "_", fentry.test.get("name") or f"failure_{idx}")
+        # Truncate to 100 chars to avoid "File name too long" errors (filesystem limit is typically 255 bytes)
+        name_safe = name_safe[:100]
         meta = {
             "test_name": fentry.test.get("name"),
             "identifiers": fentry.identifiers.model_dump(),
@@ -1502,6 +1504,8 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
             # Create a subdirectory for this test to avoid filename conflicts
             # Sanitize the key to create a safe directory name
             key_safe = re.sub(r"[^A-Za-z0-9._-]+", "_", key)
+            # Truncate to 100 chars to avoid "File name too long" errors (filesystem limit is typically 255 bytes)
+            key_safe = key_safe[:100]
             test_dir = src_out / f"{idx:02d}_{key_safe}"
             test_dir.mkdir(parents=True, exist_ok=True)
             
