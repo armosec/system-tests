@@ -1455,6 +1455,8 @@ def bundle_context(run: RunInfo, failures: List[FailureEntry], raw_log: str, out
     # per-failure bundles
     for idx, fentry in enumerate(failures, start=1):
         name_safe = re.sub(r"[^A-Za-z0-9._-]+", "_", fentry.test.get("name") or f"failure_{idx}")
+        # Truncate to 100 chars to avoid "File name too long" errors (filesystem limit is typically 255 bytes)
+        name_safe = name_safe[:100]
         meta = {
             "test_name": fentry.test.get("name"),
             "identifiers": fentry.identifiers.model_dump(),
