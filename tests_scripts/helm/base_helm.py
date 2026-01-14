@@ -165,6 +165,9 @@ class BaseHelm(BaseK8S):
 
         helm_kwargs.update({"operator.podScanGuardTime": "5s"})
 
+        # FIXME: temporary fix for seccomp profiles backend change
+        helm_kwargs.update({"capabilities.seccompProfileBackend": "storage"})
+
         # Remove flags that shouldn't be set for multi-prod environments
         server = self.test_driver.backend_obj.get_api_url()
         if server and "r7.armo-cadr.com" in server:
