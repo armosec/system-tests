@@ -643,21 +643,6 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{API_CLUSTER}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json(), len(r.content)
 
-    def get_info_from_wlid(self, wlid):
-        # TODO update to v2
-        url = "/v1/microservicesOverview"
-        r = self.get(
-            url, params={"customerGUID": self.selected_tenant_id, "wlid": wlid})
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
-
-    def get_full_customer_overview(self):
-        # TODO update to v2
-        url = "/v1/microservicesOverview"
-        r = self.get(
-            url, params={"customerGUID": self.selected_tenant_id, "active": ('true', 'false')})
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json(), len(r.content)
 
     def get_secret(self, sid):
         url = "/k8srestapi/v1/secret"
@@ -682,13 +667,6 @@ class ControlPanelAPI(object):
         assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
         return r.json()
 
-    def get_all_namespace_wlids(self, cluster: str, namespace: str):
-        # TODO update to v2
-        url = "/v1/microservicesOverview"
-        r = self.get(url, params={
-            "customerGUID": self.selected_tenant_id, "cluster": cluster, "namespace": namespace})
-        assert 200 <= r.status_code < 300, f"{inspect.currentframe().f_code.co_name}, url: '{url}', customer: '{self.customer}' code: {r.status_code}, message: '{r.text}'"
-        return r.json()
 
     def get_neighbours(self):
         # TODO update to v2
@@ -883,47 +861,10 @@ class ControlPanelAPI(object):
             f"expected: {protection_status}, {sid}, last update: {c_panel_info['caLastUpdate']}"
         return c_panel_info
 
-    def is_detached(self, wlid: str):
-        c_panel_info = self.get_info_from_wlid(wlid=wlid)
-        Logger.logger.info(c_panel_info)
-        assert c_panel_info['isActive'], f"reported inactive, {wlid}"
-        assert not c_panel_info['isCAAttached'], f"reported attached, {wlid}"
-        assert c_panel_info[
-                   "armoIntegrityStatus"] == "Unattached", f"wrong armoIntegrityStatus for unattached workload {c_panel_info['armoIntegrityStatus']}"
-        if Wlid.is_k8s(kind=Wlid.get_kind(wlid=wlid)):
-            assert 'Running' in c_panel_info['instancesStatus'] and c_panel_info['instancesStatus']['Running'] > 0, \
-                f"instancesStatus not reported as running, instancesStatus: {c_panel_info['instancesStatus']}, {wlid}"
-        assert c_panel_info['numOfProcesses'] > 0, \
-            f"reported numOfProcesses == {c_panel_info['numOfProcesses']}, {wlid}"
-        return c_panel_info
+    
 
-    def is_attached(self, wlid: str):
-        c_panel_info = self.get_info_from_wlid(wlid=wlid)
-        Logger.logger.info(c_panel_info)
-        last_update_time = c_panel_info['caLastUpdate']
-        assert c_panel_info['isActive'], f"reported inactive, {wlid}; {last_update_time}"
-        assert c_panel_info['isCAAttached'], f"reported not attached, {wlid}; {last_update_time}"
-        assert 'Running' in c_panel_info['instancesStatus'] and c_panel_info['instancesStatus']['Running'] > 0, \
-            f"instancesStatus not reported as running, instancesStatus: {c_panel_info['instancesStatus']}, {wlid}; {last_update_time}"
-        assert c_panel_info['numOfProcesses'] > 0, \
-            f"reported numOfProcesses == {c_panel_info['numOfProcesses']}, {wlid}; {last_update_time}"
-        return c_panel_info
 
-    def is_signed(self, wlid=str()):
-        c_panel_info = self.is_attached(wlid=wlid)
-        assert c_panel_info['caIntegrityStatus'] > 0, \
-            f"reported caIntegrityStatus == {c_panel_info['caIntegrityStatus']}, last update: {c_panel_info['caLastUpdate']}, wlid: {wlid}"
-        return c_panel_info
 
-    def is_encrypting(self, wlid=str(), expected_number: int = -1):
-        c_panel_info = self.is_attached(wlid=wlid)
-        if expected_number == -1:
-            assert c_panel_info['numOfEncryptedFiles'] > 0, \
-                f"reported {c_panel_info['numOfEncryptedFiles']} == 0, {wlid}; {c_panel_info['caLastUpdate']}"
-        else:
-            assert c_panel_info['numOfEncryptedFiles'] == expected_number, \
-                f"{c_panel_info['numOfEncryptedFiles']} != {expected_number}, {wlid}; {c_panel_info['caLastUpdate']}"
-        return c_panel_info
 
     def get_execution_info_from_wlid(self, wlid: str):
         url = "/v1/microserviceCodeExecution"
