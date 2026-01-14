@@ -160,14 +160,6 @@ class BaseK8S(BaseDockerizeTest):
             pass
 
         try:
-            for ns in self.namespaces:
-                wlids = list(self.backend.get_all_namespace_wlids(cluster=self.cluster, namespace=ns).keys())
-                wlids.extend(self.wlids)
-                self.wlids = list(set(wlids))
-        except:
-            pass
-
-        try:
             self.remove_all_namespaces(remove_kubescape_namespace=self.remove_kubescape_namespace)
         except:
             pass

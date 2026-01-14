@@ -233,38 +233,7 @@ class BaseTest(object):
             kubescape_expected_results = json.loads(f.read())
         return kubescape_expected_results
 
-    def is_unattached_n_running(self, wlid: list, replicas=None):
-        total_running_instances = 0
-        c_panel_infos = {}
-        for i in wlid:
-            c_panel_info = self.backend.get_info_from_wlid(wlid)
-            assert c_panel_info[
-                       "armoIntegrityStatus"] == "Unattached", f"wrong armoIntegrityStatus for unattached workload: {c_panel_info['armoIntegrityStatus']}; {c_panel_info['caLastUpdate']}"
-            assert "Running" in c_panel_info[
-                "instancesStatus"], f"wrong instancesStatus for unattached workload:{c_panel_info['instancesStatus']} ; {c_panel_info['caLastUpdate']}"
-            assert c_panel_info["instancesStatus"][
-                       "Running"] > 0, f"no running instances for unattached workload:{c_panel_info['instancesStatus']} ; {c_panel_info['caLastUpdate']}"
-            total_running_instances += c_panel_info["instancesStatus"]["Running"]
-            c_panel_infos[i] = copy.deepcopy(c_panel_info)
-        if replicas:
-            assert total_running_instances == replicas, f"wrong running instances num for unattached workloads: expected {replicas} running instances; found {c_panel_infos}"
-        return c_panel_infos[wlid[0]] if len(wlid) == 1 and wlid[0] in c_panel_infos else c_panel_infos
-
-    def is_running(self, wlid: list, replicas=None):
-        total_running_instances = 0
-        c_panel_infos = {}
-        for i in wlid:
-            c_panel_info = self.backend.get_info_from_wlid(wlid)
-            assert "Running" in c_panel_info[
-                "instancesStatus"], f"wrong instancesStatus for running workload:{c_panel_info['instancesStatus']} ; {c_panel_info['caLastUpdate']}"
-            assert c_panel_info["instancesStatus"][
-                       "Running"] > 0, f"no running instances for running workload:{c_panel_info['instancesStatus']} ; {c_panel_info['caLastUpdate']}"
-            total_running_instances += c_panel_info["instancesStatus"]["Running"]
-            c_panel_infos[i] = copy.deepcopy(c_panel_info)
-        if replicas:
-            assert total_running_instances == replicas, f"wrong number of running instances: expected {replicas}, found {c_panel_infos}"
-        return c_panel_infos[wlid[0]] if len(wlid) == 1 and wlid[0] in c_panel_infos else c_panel_infos
-
+   
     def is_unattached_reported(self, wlid, timeout=120, replicas=None):
         if self.ignore_agent:
             return
@@ -359,28 +328,6 @@ class BaseTest(object):
             Logger.logger.error(f"Cleanup failed: {e}")
             return statics.FAILURE, f"Cleanup failed: {e}"
 
-    def validate_microservice_is_inactive(self, wlid, tries_num=5):
-        for i in range(tries_num):
-            waiting_time = 30 * (i + 1)
-            time.sleep(waiting_time)
-            try:
-                ms_info = self.backend.get_info_from_wlid(wlid=wlid)
-                assert ms_info['isActive'], "still active"
-                assert ms_info['numOfProcesses'] == 0, "processes reported"
-                break
-            except Exception as ex:
-                Logger.logger.warning(
-                    "Microservice is still active!!! ({}/{}) {}".format(i + 1, tries_num, ex))
-            if i == (tries_num - 1):
-                Logger.logger.warning("make sure the agent had send bye packet (report type 0x1)")
-
-    def validate_microservice_is_deleted(self, wlid):
-        try:
-            Logger.logger.info("Validating microservices is deleted")
-            self.backend.get_info_from_wlid(wlid=wlid)
-        except:
-            return
-        raise Exception("microservice not deleted. wlid: {}".format(wlid))
 
     @staticmethod
     def get_workload_templates_paths(wt):
