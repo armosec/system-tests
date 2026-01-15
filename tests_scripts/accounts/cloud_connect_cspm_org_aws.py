@@ -58,10 +58,13 @@ class CloudOrganizationCSPM(Accounts):
         delegated_admin_account_id = "515497298766"
         single_account_id = "617632154863"
         member_account_id = "897545368193"
+        expected_account_ids = [single_account_id, delegated_admin_account_id, member_account_id]
+
         
         # Cleanup org and single accounts features
         self.cleanup_aws_orgs_by_id(ORG_ID, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
-        self.cleanup_single_accounts_by_id(PROVIDER_AWS, single_account_id, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
+        for account_id in expected_account_ids:
+            self.cleanup_single_accounts_by_id(PROVIDER_AWS, account_id, [COMPLIANCE_FEATURE_NAME, VULN_SCAN_FEATURE_NAME])
 
         #compliance tests
         # Initialize AWS manager for compliance tests
@@ -72,7 +75,6 @@ class CloudOrganizationCSPM(Accounts):
                                                 aws_secret_access_key=aws_secret_access_key)
         Logger.logger.info(f"AwsManager initiated in region {compliance_test_region}")
         Logger.logger.info('Stage 2: Setup AWS managers and validate permissions')
-        expected_account_ids = [single_account_id, delegated_admin_account_id, member_account_id]
         initial_OU = "ou-fo1t-hbdw5p8g"
         
         single_account_aws_manager = self.aws_manager.assume_role_in_account(single_account_id)
