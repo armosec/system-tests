@@ -1790,8 +1790,16 @@ def main() -> None:
         inferred_service = infer_service_from_run_meta(run, cfg)
 
     # Extract test_run_id from workflow logs ONCE at the top level
-    # This ensures we use the workflow-level test run ID, not per-test cluster names
-    workflow_test_run_id = extract_test_run_id(raw_log)
+    # Use basic pattern only (not cluster name pattern) to get workflow-level UUID
+    # The cluster name pattern is for per-test extraction, not workflow-level
+    workflow_test_run_id = None
+    workflow_pattern = re.compile(r'Test\s+Run\s+ID\s*:\s*(\S+)', re.IGNORECASE | re.MULTILINE)
+    match = workflow_pattern.search(raw_log)
+    if match:
+        workflow_test_run_id = match.group(1).strip()
+        # Clean up ANSI codes and trailing punctuation
+        workflow_test_run_id = re.sub(r'\x1b[^m]*m', '', workflow_test_run_id)
+        workflow_test_run_id = re.sub(r'\s*\(.*$', '', workflow_test_run_id)
     if args.debug and workflow_test_run_id:
         console.print(f"[magenta]Workflow test_run_id:[/magenta] {workflow_test_run_id}")
 
