@@ -30,6 +30,14 @@ except ImportError:
     # Fallback if module not available
     def detect_cross_test_interference(*args, **kwargs):
         return []
+try:
+    from extract_test_run_id import extract_test_run_id
+except ImportError:
+    # Fallback if module not available
+    def extract_test_run_id(text: str) -> Optional[str]:
+        # Basic fallback: take FIRST match of "Test Run ID:" pattern
+        match = re.search(r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)', text)
+        return match.group(1).strip() if match else None
 
 console = Console()
 
@@ -804,14 +812,13 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
     
     # Extract Test Run ID from logs if not provided as override
     if not test_run_id:
-        # Pattern: "Test Run ID: <value>" (printed by all tests)
-        # K8s tests print with cluster name (e.g., "kind-abc123")
-        # Older logs may have printed twice (UUID then cluster name) - take last match for backward compatibility
-        test_run_id_pattern = r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)'
-        matches = re.findall(test_run_id_pattern, text)
-        if matches:
-            # Take the LAST match (handles both single-print and old double-print logs)
-            test_run_id = matches[-1].strip()
+        # Use dedicated extraction logic that prioritizes:
+        # 1. "Test Run ID updated to cluster name: <name>" (primary pattern from actual test execution)
+        # 2. First occurrence of "Test Run ID: <id>" (fallback)
+        # This ensures we get the ID from actual test execution, not workflow setup.
+        extracted = extract_test_run_id(text)
+        if extracted:
+            test_run_id = extracted.strip()
             # Remove trailing punctuation like "(from" if present
             test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
             # Clean up ANSI codes just in case
@@ -1782,6 +1789,39 @@ def main() -> None:
         # Fallback 2: read run metadata (name/display_title)
         inferred_service = infer_service_from_run_meta(run, cfg)
 
+    # Extract test_run_id from job logs if available, otherwise from run logs
+    # Job logs contain the workflow-level UUID, run logs ZIP may have cluster names first
+    workflow_test_run_id = None
+    
+    # Check if job logs file is provided (via environment variable from testpack.py)
+    job_logs_file = os.environ.get("JOB_LOGS_FILE", "").strip()
+    job_logs_text = ""
+    if job_logs_file and os.path.exists(job_logs_file):
+        try:
+            job_logs_text = Path(job_logs_file).read_text(encoding="utf-8", errors="replace")
+            if args.debug:
+                console.print(f"[cyan]Using job logs from: {job_logs_file}[/cyan]")
+        except Exception as e:
+            if args.debug:
+                console.print(f"[yellow]Failed to read job logs file: {e}[/yellow]")
+    
+    # Extract from job logs if available, otherwise from run logs
+    source_text = job_logs_text if job_logs_text else raw_log
+    workflow_pattern = re.compile(r'Test\s+Run\s+ID\s*:\s*(\S+)', re.IGNORECASE | re.MULTILINE)
+    match = workflow_pattern.search(source_text)
+    if match:
+        workflow_test_run_id = match.group(1).strip()
+        # Clean up ANSI codes and trailing punctuation
+        workflow_test_run_id = re.sub(r'\x1b[^m]*m', '', workflow_test_run_id)
+        workflow_test_run_id = re.sub(r'\s*\(.*$', '', workflow_test_run_id)
+    
+    if args.debug:
+        source = "job logs" if job_logs_text else "run logs"
+        if workflow_test_run_id:
+            console.print(f"[magenta]Workflow test_run_id (from {source}):[/magenta] {workflow_test_run_id}")
+        else:
+            console.print(f"[yellow]No workflow test_run_id found in {source}[/yellow]")
+
     # Debug logging
     if args.debug:
         console.print(f"[magenta]Inferred service:[/magenta] {inferred_service or '<none>'}")
@@ -1822,7 +1862,11 @@ def main() -> None:
         section_text = t.get("section") or t.get("raw", "")  # prefer full section text if available
         identifiers = extract_identifiers(
             text=section_text + "\n" + raw_log,
-            overrides={"customer_guid": args.customer_guid, "cluster": args.cluster, "test_run_id": None},
+            overrides={
+                "customer_guid": args.customer_guid,
+                "cluster": args.cluster,
+                "test_run_id": workflow_test_run_id,  # Use workflow-level test run ID
+            },
             patterns=cfg.get("parser", {}),
         )
         # If mapping indicates skip_cluster, drop cluster from identifiers
