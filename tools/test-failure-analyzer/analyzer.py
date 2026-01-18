@@ -1789,19 +1789,38 @@ def main() -> None:
         # Fallback 2: read run metadata (name/display_title)
         inferred_service = infer_service_from_run_meta(run, cfg)
 
-    # Extract test_run_id from workflow logs ONCE at the top level
-    # Use basic pattern only (not cluster name pattern) to get workflow-level UUID
-    # The cluster name pattern is for per-test extraction, not workflow-level
+    # Extract test_run_id from job logs if available, otherwise from run logs
+    # Job logs contain the workflow-level UUID, run logs ZIP may have cluster names first
     workflow_test_run_id = None
+    
+    # Check if job logs file is provided (via environment variable from testpack.py)
+    job_logs_file = os.environ.get("JOB_LOGS_FILE", "").strip()
+    job_logs_text = ""
+    if job_logs_file and os.path.exists(job_logs_file):
+        try:
+            job_logs_text = Path(job_logs_file).read_text(encoding="utf-8", errors="replace")
+            if args.debug:
+                console.print(f"[cyan]Using job logs from: {job_logs_file}[/cyan]")
+        except Exception as e:
+            if args.debug:
+                console.print(f"[yellow]Failed to read job logs file: {e}[/yellow]")
+    
+    # Extract from job logs if available, otherwise from run logs
+    source_text = job_logs_text if job_logs_text else raw_log
     workflow_pattern = re.compile(r'Test\s+Run\s+ID\s*:\s*(\S+)', re.IGNORECASE | re.MULTILINE)
-    match = workflow_pattern.search(raw_log)
+    match = workflow_pattern.search(source_text)
     if match:
         workflow_test_run_id = match.group(1).strip()
         # Clean up ANSI codes and trailing punctuation
         workflow_test_run_id = re.sub(r'\x1b[^m]*m', '', workflow_test_run_id)
         workflow_test_run_id = re.sub(r'\s*\(.*$', '', workflow_test_run_id)
-    if args.debug and workflow_test_run_id:
-        console.print(f"[magenta]Workflow test_run_id:[/magenta] {workflow_test_run_id}")
+    
+    if args.debug:
+        source = "job logs" if job_logs_text else "run logs"
+        if workflow_test_run_id:
+            console.print(f"[magenta]Workflow test_run_id (from {source}):[/magenta] {workflow_test_run_id}")
+        else:
+            console.print(f"[yellow]No workflow test_run_id found in {source}[/yellow]")
 
     # Debug logging
     if args.debug:
