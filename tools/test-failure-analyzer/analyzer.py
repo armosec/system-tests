@@ -30,6 +30,14 @@ except ImportError:
     # Fallback if module not available
     def detect_cross_test_interference(*args, **kwargs):
         return []
+try:
+    from extract_test_run_id import extract_test_run_id
+except ImportError:
+    # Fallback if module not available
+    def extract_test_run_id(text: str) -> Optional[str]:
+        # Basic fallback: take FIRST match of "Test Run ID:" pattern
+        match = re.search(r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)', text)
+        return match.group(1).strip() if match else None
 
 console = Console()
 
@@ -804,14 +812,13 @@ def extract_identifiers(text: str, overrides: Dict[str, Optional[str]], patterns
     
     # Extract Test Run ID from logs if not provided as override
     if not test_run_id:
-        # Pattern: "Test Run ID: <value>" (printed by all tests)
-        # K8s tests print with cluster name (e.g., "kind-abc123")
-        # Older logs may have printed twice (UUID then cluster name) - take last match for backward compatibility
-        test_run_id_pattern = r'(?i)Test\s+Run\s+ID\s*:\s*(\S+)'
-        matches = re.findall(test_run_id_pattern, text)
-        if matches:
-            # Take the LAST match (handles both single-print and old double-print logs)
-            test_run_id = matches[-1].strip()
+        # Use dedicated extraction logic that prioritizes:
+        # 1. "Test Run ID updated to cluster name: <name>" (primary pattern from actual test execution)
+        # 2. First occurrence of "Test Run ID: <id>" (fallback)
+        # This ensures we get the ID from actual test execution, not workflow setup.
+        extracted = extract_test_run_id(text)
+        if extracted:
+            test_run_id = extracted.strip()
             # Remove trailing punctuation like "(from" if present
             test_run_id = re.sub(r'\s*\(.*$', '', test_run_id)
             # Clean up ANSI codes just in case
