@@ -1791,9 +1791,7 @@ def main() -> None:
 
     # Extract test_run_id from workflow logs ONCE at the top level
     # This ensures we use the workflow-level test run ID, not per-test cluster names
-    workflow_test_run_id = args.test_run_id  # Honor CLI override if provided
-    if not workflow_test_run_id:
-        workflow_test_run_id = extract_test_run_id(raw_log)
+    workflow_test_run_id = extract_test_run_id(raw_log)
     if args.debug and workflow_test_run_id:
         console.print(f"[magenta]Workflow test_run_id:[/magenta] {workflow_test_run_id}")
 
