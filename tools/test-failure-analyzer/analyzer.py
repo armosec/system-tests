@@ -1789,6 +1789,14 @@ def main() -> None:
         # Fallback 2: read run metadata (name/display_title)
         inferred_service = infer_service_from_run_meta(run, cfg)
 
+    # Extract test_run_id from workflow logs ONCE at the top level
+    # This ensures we use the workflow-level test run ID, not per-test cluster names
+    workflow_test_run_id = args.test_run_id  # Honor CLI override if provided
+    if not workflow_test_run_id:
+        workflow_test_run_id = extract_test_run_id(raw_log)
+    if args.debug and workflow_test_run_id:
+        console.print(f"[magenta]Workflow test_run_id:[/magenta] {workflow_test_run_id}")
+
     # Debug logging
     if args.debug:
         console.print(f"[magenta]Inferred service:[/magenta] {inferred_service or '<none>'}")
@@ -1829,7 +1837,11 @@ def main() -> None:
         section_text = t.get("section") or t.get("raw", "")  # prefer full section text if available
         identifiers = extract_identifiers(
             text=section_text + "\n" + raw_log,
-            overrides={"customer_guid": args.customer_guid, "cluster": args.cluster, "test_run_id": None},
+            overrides={
+                "customer_guid": args.customer_guid,
+                "cluster": args.cluster,
+                "test_run_id": workflow_test_run_id,  # Use workflow-level test run ID
+            },
             patterns=cfg.get("parser", {}),
         )
         # If mapping indicates skip_cluster, drop cluster from identifiers
